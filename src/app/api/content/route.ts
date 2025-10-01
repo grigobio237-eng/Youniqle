@@ -34,14 +34,20 @@ export async function GET(request: NextRequest) {
       .sort({ publishedAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean() as any[];
+
+    // _id를 id로 변환
+    const transformedContents = contents.map(content => ({
+      ...content,
+      id: content._id.toString(),
+    }));
 
     // 전체 개수 조회
     const total = await Content.countDocuments(filter);
 
     return NextResponse.json({
       success: true,
-      data: contents,
+      contents: transformedContents,
       pagination: {
         page,
         limit,

@@ -26,7 +26,13 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ product });
+    // Transform _id to id for frontend compatibility
+    const transformedProduct = {
+      ...product,
+      id: (product as any)._id,
+    };
+
+    return NextResponse.json({ product: transformedProduct });
   } catch (error) {
     console.error('Get product error:', error);
     

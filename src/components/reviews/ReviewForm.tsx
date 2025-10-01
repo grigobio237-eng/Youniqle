@@ -43,13 +43,22 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
     setUploading(true);
     try {
       const uploadPromises = Array.from(files).map(async (file) => {
-        // 실제 구현에서는 이미지 업로드 API를 호출
-        // 여기서는 임시로 URL을 생성
-        const reader = new FileReader();
-        return new Promise<string>((resolve) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', 'reviews');
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
         });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || '업로드 실패');
+        }
+
+        const result = await response.json();
+        return result.url;
       });
 
       const uploadedImages = await Promise.all(uploadPromises);
@@ -62,7 +71,25 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
     }
   };
 
-  const handleRemoveImage = (index: number) => {
+  const handleRemoveImage = async (index: number) => {
+    const imageToRemove = images[index];
+    
+    // Vercel Blob URL인 경우 서버에서도 삭제
+    if (imageToRemove.includes('blob.vercel-storage.com')) {
+      try {
+        await fetch('/api/upload/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: imageToRemove }),
+        });
+      } catch (error) {
+        console.error('이미지 삭제 오류:', error);
+        // 서버 삭제 실패해도 UI에서는 제거
+      }
+    }
+    
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 

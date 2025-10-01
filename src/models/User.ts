@@ -29,6 +29,38 @@ export interface IUser extends Document {
     productId: mongoose.Types.ObjectId;
     addedAt: Date;
   }>;
+  // 파트너 관련 필드
+  partnerStatus: 'none' | 'pending' | 'approved' | 'rejected' | 'suspended';
+  partnerApplication?: {
+    businessName: string;
+    businessNumber: string;
+    businessAddress: string;
+    businessPhone: string;
+    businessDescription: string;
+    bankAccount: string;
+    bankName: string;
+    accountHolder: string;
+    businessRegistrationImage?: string; // 사업자등록증 이미지
+    bankStatementImage?: string; // 통장사본 이미지
+    appliedAt: Date;
+    approvedAt?: Date;
+    rejectedAt?: Date;
+    rejectedReason?: string;
+    approvedBy?: mongoose.Types.ObjectId;
+  };
+  partnerSettings?: {
+    commissionRate: number; // 수수료율 (기본 10%)
+    autoApproval: boolean; // 주문 자동 승인 여부
+    notificationEmail: string; // 알림 받을 이메일
+    notificationPhone: string; // 알림 받을 전화번호
+  };
+  partnerStats?: {
+    totalProducts: number;
+    totalOrders: number;
+    totalRevenue: number;
+    totalCommission: number;
+    lastSettlementAt?: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -115,6 +147,42 @@ const UserSchema = new Schema<IUser>({
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     addedAt: { type: Date, default: Date.now },
   }],
+  // 파트너 관련 필드
+  partnerStatus: {
+    type: String,
+    enum: ['none', 'pending', 'approved', 'rejected', 'suspended'],
+    default: 'none'
+  },
+  partnerApplication: {
+    businessName: { type: String, trim: true },
+    businessNumber: { type: String, trim: true },
+    businessAddress: { type: String, trim: true },
+    businessPhone: { type: String, trim: true },
+    businessDescription: { type: String, trim: true },
+    bankAccount: { type: String, trim: true },
+    bankName: { type: String, trim: true },
+    accountHolder: { type: String, trim: true },
+    businessRegistrationImage: { type: String, trim: true },
+    bankStatementImage: { type: String, trim: true },
+    appliedAt: { type: Date },
+    approvedAt: { type: Date },
+    rejectedAt: { type: Date },
+    rejectedReason: { type: String, trim: true },
+    approvedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+  },
+  partnerSettings: {
+    commissionRate: { type: Number, default: 10, min: 0, max: 50 },
+    autoApproval: { type: Boolean, default: false },
+    notificationEmail: { type: String, trim: true },
+    notificationPhone: { type: String, trim: true }
+  },
+  partnerStats: {
+    totalProducts: { type: Number, default: 0 },
+    totalOrders: { type: Number, default: 0 },
+    totalRevenue: { type: Number, default: 0 },
+    totalCommission: { type: Number, default: 0 },
+    lastSettlementAt: { type: Date }
+  }
 }, {
   timestamps: true,
 });

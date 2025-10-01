@@ -16,7 +16,7 @@ export default function ContentPage() {
               Youniqle 콘텐츠
             </h1>
             <p className="text-xl text-text-secondary mb-8">
-              유튜브, 틱톡, 블로그 등 다양한 미디어 콘텐츠를 만나보세요
+              동영상, 블로그 등 다양한 미디어 콘텐츠를 만나보세요
             </p>
             
             {/* Character Images */}
@@ -66,25 +66,27 @@ export default function ContentPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* YouTube */}
+            {/* 동영상 */}
             <Card className="text-center p-8 hover:shadow-lg transition-shadow relative">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Play className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">유튜브</h3>
+                <h3 className="text-xl font-semibold mb-4">동영상</h3>
                 <p className="text-text-secondary mb-6">
                   제품 리뷰, 사용법 가이드, 브랜드 스토리
                 </p>
-                <Button variant="outline" className="w-full">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  유튜브 채널 보기
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/content/video">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    동영상 콘텐츠 보기
+                  </Link>
                 </Button>
                 {/* Character 5 */}
                 <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
                   <CharacterImage
                     src="/character/youniqle-5.png"
-                    alt="유튜브 캐릭터"
+                    alt="동영상 캐릭터"
                     fill
                     className="object-contain"
                   />
@@ -92,33 +94,8 @@ export default function ContentPage() {
               </CardContent>
             </Card>
 
-            {/* TikTok */}
-            <Card className="text-center p-8 hover:shadow-lg transition-shadow relative">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Play className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">틱톡</h3>
-                <p className="text-text-secondary mb-6">
-                  짧고 재미있는 제품 소개, 트렌드 콘텐츠
-                </p>
-                <Button variant="outline" className="w-full">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  틱톡 계정 보기
-                </Button>
-                {/* Character 6 */}
-                <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
-                  <CharacterImage
-                    src="/character/youniqle-6.png"
-                    alt="틱톡 캐릭터"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Blog */}
+            {/* 블로그 */}
             <Card className="text-center p-8 hover:shadow-lg transition-shadow relative">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -128,9 +105,11 @@ export default function ContentPage() {
                 <p className="text-text-secondary mb-6">
                   상세한 제품 정보, 사용 후기, 브랜드 뉴스
                 </p>
-                <Button variant="outline" className="w-full">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  블로그 보기
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/content/blog">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    블로그 콘텐츠 보기
+                  </Link>
                 </Button>
                 {/* Character 1 */}
                 <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
@@ -139,6 +118,7 @@ export default function ContentPage() {
                     alt="블로그 캐릭터"
                     fill
                     className="object-contain"
+                    sizes="48px"
                   />
                 </div>
               </CardContent>
@@ -164,19 +144,11 @@ export default function ContentPage() {
             {[
               {
                 title: "Youniqle 신상품 소개",
-                platform: "유튜브",
+                platform: "동영상",
                 views: "12.5K",
                 likes: "1.2K",
                 date: "2024-01-15",
                 thumbnail: "/character/youniqle-1.png"
-              },
-              {
-                title: "프리미엄 한우 요리법",
-                platform: "틱톡",
-                views: "8.7K",
-                likes: "856",
-                date: "2024-01-14",
-                thumbnail: "/character/youniqle-2.png"
               },
               {
                 title: "유기농 토마토 재배기",
@@ -188,19 +160,11 @@ export default function ContentPage() {
               },
               {
                 title: "스포츠웨어 착용법",
-                platform: "유튜브",
+                platform: "동영상",
                 views: "15.2K",
                 likes: "2.1K",
                 date: "2024-01-12",
                 thumbnail: "/character/youniqle-4.png"
-              },
-              {
-                title: "신선식품 보관법",
-                platform: "틱톡",
-                views: "9.8K",
-                likes: "1.5K",
-                date: "2024-01-11",
-                thumbnail: "/character/youniqle-5.png"
               },
               {
                 title: "브랜드 스토리",
@@ -243,9 +207,11 @@ export default function ContentPage() {
                       {content.date}
                     </span>
                   </div>
-                  <Button variant="outline" className="w-full">
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    보러가기
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={content.platform === '동영상' ? '/content/video' : '/content/blog'}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      보러가기
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -264,9 +230,11 @@ export default function ContentPage() {
             다양한 플랫폼에서 Youniqle의 콘텐츠를 확인하세요
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg">
-              <ExternalLink className="mr-2 h-5 w-5" />
-              모든 콘텐츠 보기
+            <Button variant="secondary" size="lg" asChild>
+              <Link href="/content/video">
+                <ExternalLink className="mr-2 h-5 w-5" />
+                모든 콘텐츠 보기
+              </Link>
             </Button>
             <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white hover:text-primary">
               구독하기

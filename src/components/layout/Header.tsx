@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Header() {
+  const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [session, setSession] = useState(null);
@@ -16,7 +19,7 @@ export default function Header() {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    // 세션 상태 확인
+    // 세션 상태 확인 (최초 1회만)
     const checkSession = async () => {
       try {
         const response = await fetch('/api/auth/session');
@@ -24,7 +27,7 @@ export default function Header() {
           const data = await response.json();
           setSession(data.user ? data : null);
           
-          // 로그인된 경우 장바구니 개수 가져오기
+          // 로그인된 경우 장바구니 개수 가져오기 (최초 1회만)
           if (data.user) {
             fetchCartCount();
           }
@@ -37,7 +40,18 @@ export default function Header() {
     };
 
     checkSession();
-  }, []);
+
+    // 장바구니 업데이트 이벤트 리스너 (사용자 액션 시에만 동작)
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []); // session 의존성 제거 - 최초 1회만 실행
 
   const fetchCartCount = async () => {
     try {
@@ -90,13 +104,13 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/products" className="text-text-primary hover:text-primary transition-colors">
-              상품
+              {t('nav.products')}
             </Link>
             <Link href="/content" className="text-text-primary hover:text-primary transition-colors">
-              콘텐츠
+              {t('nav.content')}
             </Link>
             <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
-              소개
+              {t('nav.about')}
             </Link>
           </nav>
 
@@ -106,7 +120,7 @@ export default function Header() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="text"
-                placeholder="상품 검색..."
+                placeholder={t('products.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4"
@@ -115,7 +129,10 @@ export default function Header() {
           </form>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
             {/* Cart */}
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href="/cart">
@@ -128,7 +145,7 @@ export default function Header() {
                     {cartCount > 99 ? '99+' : cartCount}
                   </Badge>
                 )}
-                <span className="sr-only">장바구니</span>
+                <span className="sr-only">{t('nav.cart')}</span>
               </Link>
             </Button>
 
@@ -140,7 +157,7 @@ export default function Header() {
                 <Button variant="ghost" size="icon" asChild>
                   <Link href="/me">
                     <User className="h-5 w-5" />
-                    <span className="sr-only">마이페이지</span>
+                    <span className="sr-only">{t('nav.myPage')}</span>
                   </Link>
                 </Button>
                 <Button 
@@ -150,19 +167,19 @@ export default function Header() {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
-                  로그아웃
+                  {t('nav.logout')}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/auth/signin">
-                    로그인
+                    {t('nav.login')}
                   </Link>
                 </Button>
                 <Button size="sm" asChild>
                   <Link href="/auth/signup">
-                    회원가입
+                    {t('nav.signup')}
                   </Link>
                 </Button>
               </div>
@@ -185,13 +202,13 @@ export default function Header() {
           <div className="md:hidden border-t py-4">
             <nav className="flex flex-col space-y-4">
               <Link href="/products" className="text-text-primary hover:text-primary transition-colors">
-                상품
+                {t('nav.products')}
               </Link>
               <Link href="/content" className="text-text-primary hover:text-primary transition-colors">
-                콘텐츠
+                {t('nav.content')}
               </Link>
               <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
-                소개
+                {t('nav.about')}
               </Link>
               
               {/* Mobile Search */}
@@ -200,7 +217,7 @@ export default function Header() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     type="text"
-                    placeholder="상품 검색..."
+                    placeholder={t('products.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 pr-4"

@@ -33,3 +33,12 @@ class ModalState {
 
 export const modalState = ModalState.getInstance();
 export const MEMBERSHIP_MODAL_ID = 'membership-info-modal';
+
+
+
+
+
+
+
+
+

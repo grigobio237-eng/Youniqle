@@ -44,3 +44,12 @@ export function useCart(): UseCartReturn {
 
   return { addToCart, loading };
 }
+
+
+
+
+
+
+
+
+

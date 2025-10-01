@@ -15,6 +15,7 @@ export default function Footer() {
                   alt="Youniqle 로고"
                   fill
                   className="object-contain"
+                  sizes="40px"
                 />
               </div>
               <span className="text-xl font-bold">Youniqle</span>

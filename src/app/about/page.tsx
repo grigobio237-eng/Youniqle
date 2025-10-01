@@ -333,6 +333,7 @@ export default function AboutPage() {
                   alt="Youniqle 대표 캐릭터"
                   fill
                   className="object-contain"
+                  sizes="64px"
                 />
               </div>
             </div>

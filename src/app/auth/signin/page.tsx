@@ -85,6 +85,7 @@ export default function SigninPage() {
                   alt="Youniqle 로고"
                   fill
                   className="object-contain"
+                  sizes="64px"
                 />
               </div>
             </div>

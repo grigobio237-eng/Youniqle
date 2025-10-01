@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +38,12 @@ interface Product {
   category: string;
   summary: string;
   description: string;
-  images: string[];
+  images: Array<{
+    url: string;
+    w?: number;
+    h?: number;
+    type?: string;
+  }>;
   status: 'active' | 'inactive';
   featured: boolean;
   createdAt: string;
@@ -72,7 +78,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         name: product.name,
         price: product.price,
         originalPrice: product.originalPrice,
-        images: product.images.map((url: string) => ({ url })),
+        images: product.images,
         category: product.category,
         summary: product.summary,
         stock: product.stock,
@@ -136,6 +142,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
       if (response.ok) {
         alert(`${product?.name} ${quantity}개가 장바구니에 추가되었습니다!`);
+        // 헤더 장바구니 개수 업데이트
+        window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const errorData = await response.json();
         alert(`장바구니 추가 실패: ${errorData.error}`);
@@ -262,12 +270,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           <div className="space-y-4">
             {/* 메인 이미지 */}
             <div className="relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden">
-              {product.images && product.images.length > 0 ? (
+              {product.images && product.images.length > 0 && product.images[0]?.url ? (
                 <>
-                  <img
-                    src={product.images[selectedImageIndex]}
+                  <Image
+                    src={product.images[selectedImageIndex].url}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={selectedImageIndex === 0}
                   />
                   {product.images.length > 1 && (
                     <>
@@ -298,13 +309,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     width={200}
                     height={200}
                     className="object-contain opacity-50"
+                    sizes="200px"
                   />
                 </div>
               )}
             </div>
 
             {/* 썸네일 이미지들 */}
-            {product.images && product.images.length > 1 && (
+            {product.images && product.images.length > 1 && product.images.every(img => img?.url) && (
               <div className="flex space-x-2 overflow-x-auto">
                 {product.images.map((image, index) => (
                   <button
@@ -316,10 +328,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <img
-                      src={image}
+                    <Image
+                      src={image.url}
                       alt={`${product.name} ${index + 1}`}
+                      width={80}
+                      height={80}
                       className="w-full h-full object-cover"
+                      sizes="80px"
                     />
                   </button>
                 ))}

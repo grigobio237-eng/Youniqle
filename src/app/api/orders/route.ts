@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import Order from '@/models/Order';
+import { InventoryManager } from '@/lib/inventoryManagement';
+import { AutomationRuleManager } from '@/lib/automationRules';
 
 export async function GET(request: NextRequest) {
   try {
@@ -53,6 +55,31 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    // 사용자 ObjectId 찾기
+    const User = (await import('@/models/User')).default;
+    const user = await User.findOne({ email: session.user.email });
+    
+    if (!user) {
+      return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    // 재고 예약 확인 및 처리
+    const reservationResults = [];
+    for (const item of items) {
+      const result = await InventoryManager.reserveStock(item.productId, item.quantity);
+      reservationResults.push({ productId: item.productId, result });
+      
+      if (!result.success) {
+        // 예약 실패 시 이전 예약들 모두 취소
+        for (const prevItem of items.slice(0, items.indexOf(item))) {
+          await InventoryManager.cancelReservation(prevItem.productId, prevItem.quantity);
+        }
+        return NextResponse.json({ 
+          error: `재고 부족: ${result.message}` 
+        }, { status: 400 });
+      }
+    }
+
     // 주문번호 생성 (YYYYMMDD + 랜덤 6자리)
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
@@ -61,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // 주문 생성
     const order = new Order({
-      userId: session.user.email,
+      userId: user._id,
       orderNumber,
       items,
       totalAmount,
@@ -72,6 +99,14 @@ export async function POST(request: NextRequest) {
     });
 
     await order.save();
+
+    // 자동화 규칙 실행
+    try {
+      await AutomationRuleManager.executeOrderRules(order);
+    } catch (error) {
+      console.error('자동화 규칙 실행 오류:', error);
+      // 자동화 규칙 실패는 주문 생성을 막지 않음
+    }
 
     // 생성된 주문을 상품 정보와 함께 조회
     const savedOrder = await Order.findById(order._id)

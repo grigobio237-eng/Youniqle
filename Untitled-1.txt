@@ -1,4 +1,0 @@
-mongodb+srv://grigobio237_db_user:Irw9EODSMEY7R2Xt@cluster0.e78xeiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-mongodb grigobio237_db_user@admin password : Youniqle2024!
-
-구글 id : 102136527081-vljs45ri64p6vaigc756p0fe6nu9gkkg.apps.googleusercontent.com

@@ -71,3 +71,12 @@ CartSchema.index({ userId: 1 });
 CartSchema.index({ 'items.productId': 1 });
 
 export default mongoose.models.Cart || mongoose.model<ICart>('Cart', CartSchema);
+
+
+
+
+
+
+
+
+

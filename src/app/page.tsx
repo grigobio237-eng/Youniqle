@@ -1,12 +1,65 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
-import { ArrowRight, Star, Truck, Shield, Heart } from 'lucide-react';
+import { ArrowRight, Star, Truck, Shield, Heart, ShoppingCart } from 'lucide-react';
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  images: Array<{
+    url: string;
+    _id: string;
+  }>;
+  category: string;
+  featured?: boolean;
+  stock: number;
+}
 
 export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/products?limit=8&sort=newest');
+      
+      if (!response.ok) {
+        throw new Error('상품을 불러오는데 실패했습니다.');
+      }
+      
+      const data = await response.json();
+      
+      if (data.products) {
+        setProducts(data.products || []);
+      } else {
+        throw new Error(data.error || '상품을 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      setError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCart = (productId: string) => {
+    // 장바구니 추가 로직 (추후 구현)
+    console.log('Add to cart:', productId);
+  };
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -17,7 +70,7 @@ export default function HomePage() {
               {/* Left Content */}
               <div className="text-center lg:text-left">
                 <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 animate-fade-in">
-                  프리미엄 쇼핑의 새로운 경험
+                  프리미엄 쇼핑의<br />새로운 경험
                 </h1>
                 <p className="text-xl text-text-secondary mb-8 animate-slide-up">
                   Youniqle에서 특별한 상품들을 만나보세요. 
@@ -83,49 +136,116 @@ export default function HomePage() {
       {/* Featured Products Preview */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
-              인기 상품
-            </h2>
-            <p className="text-lg text-text-secondary">
-              지금 가장 인기 있는 상품들을 확인해보세요.
-            </p>
-          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Placeholder Product Cards */}
-            {[1, 2, 3, 4].map((item) => (
-              <Card key={item} className="overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                    <Heart className="h-12 w-12" />
-                  </div>
-                  <Badge className="absolute top-3 left-3" variant="secondary">
-                    인기
-                  </Badge>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">샘플 상품 {item}</h3>
-                  <p className="text-text-secondary text-sm mb-4">
-                    고품질 샘플 상품 설명입니다.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-primary">₩29,000</span>
-                    <Button size="sm">장바구니</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              {[1, 2, 3, 4].map((item) => (
+                <Card key={item} className="overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-gray-200"></div>
+                  <CardContent className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                      <div className="h-8 bg-gray-200 rounded w-16"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-text-secondary mb-4">
+                <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                <p className="text-lg">상품을 불러올 수 없습니다</p>
+                <p className="text-sm text-gray-500 mt-2">{error}</p>
+              </div>
+              <Button onClick={fetchProducts} variant="outline">
+                다시 시도
+              </Button>
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              {products.slice(0, 8).map((product) => (
+                <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Link href={`/products/${product.id}`}>
+                    <div className="aspect-square bg-gray-100 relative">
+                      {product.images && product.images.length > 0 && product.images[0].url ? (
+                        <Image
+                          src={product.images[0].url}
+                          alt={product.name}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                          <Heart className="h-12 w-12" />
+                        </div>
+                      )}
+                      {product.featured && (
+                        <Badge className="absolute top-3 left-3" variant="secondary">
+                          인기
+                        </Badge>
+                      )}
+                      {product.stock <= 5 && product.stock > 0 && (
+                        <Badge className="absolute top-3 right-3" variant="destructive">
+                          품절임박
+                        </Badge>
+                      )}
+                      {product.stock === 0 && (
+                        <Badge className="absolute top-3 right-3" variant="outline">
+                          품절
+                        </Badge>
+                      )}
+                    </div>
+                  </Link>
+                  <CardContent className="p-6">
+                    <Link href={`/products/${product.id}`}>
+                      <h3 className="font-semibold mb-2 hover:text-primary transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+                    </Link>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-primary">
+                        ₩{product.price.toLocaleString()}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleAddToCart(product.id)}
+                        disabled={product.stock === 0}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-1" />
+                        {product.stock === 0 ? '품절' : '장바구니'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-text-secondary mb-4">
+                <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                <p className="text-lg">등록된 상품이 없습니다</p>
+                <p className="text-sm text-gray-500 mt-2">새로운 상품이 곧 등록될 예정입니다.</p>
+              </div>
+            </div>
+          )}
           
-          <div className="text-center">
-            <Button size="lg" asChild>
-              <Link href="/products">
-                모든 상품 보기
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+          {products.length > 0 && (
+            <div className="text-center">
+              <Button size="lg" asChild>
+                <Link href="/products">
+                  모든 상품 보기
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -158,6 +278,7 @@ export default function HomePage() {
                     alt="품질 캐릭터"
                     fill
                     className="object-contain"
+                    sizes="48px"
                   />
                 </div>
               </CardContent>
@@ -179,6 +300,7 @@ export default function HomePage() {
                     alt="배송 캐릭터"
                     fill
                     className="object-contain"
+                    sizes="48px"
                   />
                 </div>
               </CardContent>
@@ -200,6 +322,7 @@ export default function HomePage() {
                     alt="보안 캐릭터"
                     fill
                     className="object-contain"
+                    sizes="48px"
                   />
                 </div>
               </CardContent>
@@ -236,6 +359,7 @@ export default function HomePage() {
             alt="뉴스레터 캐릭터"
             fill
             className="object-contain"
+            sizes="64px"
           />
         </div>
         <div className="absolute bottom-4 right-4 w-20 h-20 opacity-20">
@@ -244,6 +368,7 @@ export default function HomePage() {
             alt="뉴스레터 캐릭터"
             fill
             className="object-contain"
+            sizes="80px"
           />
         </div>
       </section>

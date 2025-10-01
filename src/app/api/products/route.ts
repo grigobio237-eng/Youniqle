@@ -58,8 +58,14 @@ export async function GET(request: NextRequest) {
       Product.countDocuments(filter),
     ]);
 
+    // Transform _id to id for frontend compatibility
+    const transformedProducts = products.map((product: any) => ({
+      ...product,
+      id: product._id,
+    }));
+
     return NextResponse.json({
-      products,
+      products: transformedProducts,
       pagination: {
         page,
         limit,
