@@ -72,6 +72,18 @@
           "hostname": "blob.vercel-storage.com",
           "port": "",
           "pathname": "/**"
+        },
+        {
+          "protocol": "https",
+          "hostname": "qhlswiwiisfserta.public.blob.vercel-storage.com",
+          "port": "",
+          "pathname": "/**"
+        },
+        {
+          "protocol": "https",
+          "hostname": "img.youtube.com",
+          "port": "",
+          "pathname": "/**"
         }
       ],
       "unoptimized": false
