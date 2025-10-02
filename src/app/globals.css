@@ -6,12 +6,28 @@
 @layer base {
   html {
     font-family: 'Pretendard', 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
   }
   
   body {
     @apply bg-background text-text-primary;
     letter-spacing: -0.01em;
     line-height: 1.5;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+    width: 100%; /* 전체 너비 사용 */
+  }
+  
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px; /* 모바일에서 폰트 크기 조정 */
+    }
+    
+    /* 모든 요소가 화면 너비를 초과하지 않도록 */
+    * {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
   }
 }
 

@@ -63,16 +63,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 sm:py-20 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Left Content */}
               <div className="text-center lg:text-left">
-                <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 animate-fade-in">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary mb-6 animate-fade-in">
                   프리미엄 쇼핑의<br />새로운 경험
                 </h1>
-                <p className="text-xl text-text-secondary mb-8 animate-slide-up">
+                <p className="text-lg sm:text-xl text-text-secondary mb-8 animate-slide-up">
                   Youniqle에서 특별한 상품들을 만나보세요. 
                   <br />
                   고품질과 합리적인 가격을 동시에 경험하세요.
@@ -94,7 +94,7 @@ export default function HomePage() {
               
               {/* Right Content - Character Images */}
               <div className="flex justify-center lg:justify-end">
-                <div className="relative w-80 h-80 lg:w-96 lg:h-96">
+                <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
                   {/* Main Character */}
                   <div className="absolute inset-0">
                     <CharacterImage
