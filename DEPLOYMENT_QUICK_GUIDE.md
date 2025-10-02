@@ -189,3 +189,4 @@ node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString(
 **최종 수정**: 2025년 10월 1일  
 **상태**: Vercel 프로덕션 배포 완료 ✅
 
+

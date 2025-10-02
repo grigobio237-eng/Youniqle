@@ -19,12 +19,12 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // 파트너 권한 및 승인 상태 확인 (role이 'partner'이거나 'user'이고 partnerStatus가 'approved'인 경우)
+    // 파트너 권한 및 승인 상태 확인 (role이 'partner'이거나 'member'이고 partnerStatus가 'approved'인 경우)
     const partner = await User.findOne({ 
       email: email.toLowerCase(),
       $or: [
         { role: 'partner', partnerStatus: 'approved' },
-        { role: 'user', partnerStatus: 'approved' }
+        { role: 'member', partnerStatus: 'approved' }
       ]
     });
 
