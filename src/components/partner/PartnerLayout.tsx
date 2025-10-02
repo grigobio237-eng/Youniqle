@@ -18,10 +18,23 @@ import {
   Store,
   Bell,
   Search,
-  Warehouse
+  Warehouse,
+  Clock,
+  AlertCircle,
+  DollarSign,
+  Megaphone,
+  Globe
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface PartnerLayoutProps {
   children: ReactNode;
@@ -42,6 +55,16 @@ interface Partner {
     totalCommission: number;
   };
   avatar?: string;
+}
+
+interface Notification {
+  id: string;
+  type: 'order' | 'stock' | 'payment' | 'system';
+  title: string;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+  link?: string;
 }
 
 const navigationItems = [
@@ -94,11 +117,19 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [language, setLanguage] = useState('ko');
+  const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    // 파트너 대시보드 접근 시 기존 토큰 삭제 후 새로 인증
+    document.cookie = 'partner-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    console.log('파트너 대시보드 접근, 기존 토큰 삭제 완료');
     checkPartnerAuth();
+    fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkPartnerAuth = async () => {
@@ -107,8 +138,59 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('파트너 정보:', data.partner); // 디버깅용
         setPartner(data.partner);
+      } else if (response.status === 401) {
+        console.log('파트너 토큰 없음, 소셜 로그인 사용자 확인 중...');
+        
+        // 소셜 로그인 사용자인지 확인
+        const sessionResponse = await fetch('/api/auth/session');
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json();
+          if (sessionData.user) {
+            console.log('소셜 로그인 사용자 발견:', sessionData.user);
+            
+            // 파트너 권한 확인
+            const checkResponse = await fetch('/api/partner/auth/check-partner-status');
+            const checkData = await checkResponse.json();
+            
+            if (checkResponse.ok && checkData.isPartner) {
+              console.log('파트너 권한 확인됨, 토큰 발급 시작');
+              
+              // 파트너 토큰 발급
+              const tokenResponse = await fetch('/api/partner/auth/social-login', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ provider: sessionData.user.provider || 'google' }),
+              });
+              
+              if (tokenResponse.ok) {
+                console.log('파트너 토큰 발급 성공, 재인증 시도');
+                // 토큰 발급 후 다시 인증 확인
+                setTimeout(() => {
+                  checkPartnerAuth();
+                }, 1000);
+                return;
+              } else {
+                console.log('파트너 토큰 발급 실패:', tokenResponse.status);
+              }
+            } else {
+              console.log('파트너 권한 없음:', checkData);
+            }
+          } else {
+            console.log('소셜 로그인 사용자 없음');
+          }
+        } else {
+          console.log('세션 확인 실패:', sessionResponse.status);
+        }
+        
+        console.log('파트너 권한 확인 실패:', response.status);
+        // 파트너 권한이 없으면 로그인 페이지로 리다이렉트
+        router.push('/partner/login');
       } else {
+        console.log('파트너 권한 확인 실패:', response.status);
         // 파트너 권한이 없으면 로그인 페이지로 리다이렉트
         router.push('/partner/login');
       }
@@ -117,6 +199,19 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
       router.push('/partner/login');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch('/api/partner/notifications');
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.unreadCount || 0);
+      }
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
     }
   };
 
@@ -136,6 +231,54 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
       // 검색 기능 구현 (추후 확장)
       console.log('Search:', searchQuery);
     }
+  };
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    // 언어 변경 로직을 여기에 추가할 수 있습니다
+    console.log('Language changed to:', newLanguage);
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'order':
+        return <ShoppingCart className="h-4 w-4" />;
+      case 'stock':
+        return <AlertCircle className="h-4 w-4" />;
+      case 'payment':
+        return <DollarSign className="h-4 w-4" />;
+      case 'system':
+        return <Megaphone className="h-4 w-4" />;
+      default:
+        return <Bell className="h-4 w-4" />;
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case 'order':
+        return 'text-green-600';
+      case 'stock':
+        return 'text-orange-600';
+      case 'payment':
+        return 'text-blue-600';
+      case 'system':
+        return 'text-purple-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
+  const formatTimeAgo = (date: string) => {
+    const now = new Date();
+    const notificationDate = new Date(date);
+    const diffInSeconds = Math.floor((now.getTime() - notificationDate.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return '방금 전';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}일 전`;
+    return notificationDate.toLocaleDateString('ko-KR');
   };
 
   if (loading) {
@@ -213,10 +356,10 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text-primary truncate">
-                  {partner.name}
+                  {partner.name || '파트너'}
                 </p>
                 <p className="text-xs text-text-secondary truncate">
-                  {partner.businessName || partner.email}
+                  {partner.businessName || partner.email || '파트너샵'}
                 </p>
               </div>
             </div>
@@ -261,8 +404,22 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
             })}
           </nav>
 
-          {/* Logout */}
+          {/* Language Selection */}
           <div className="p-4 border-t">
+            <div className="flex items-center space-x-3 mb-3">
+              <Globe className="h-4 w-4 text-text-secondary" />
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                className="flex-1 text-sm bg-transparent border-none outline-none text-text-secondary focus:text-text-primary"
+              >
+                <option value="ko">한국어</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+              </select>
+            </div>
+            
+            {/* Logout */}
             <Button
               variant="ghost"
               onClick={handleLogout}
@@ -277,70 +434,16 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
 
       {/* Main content */}
       <div className="lg:ml-64">
-        {/* Top bar */}
-        <header className="bg-white border-b px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              
-              {/* Search */}
-              <form onSubmit={handleSearch} className="hidden sm:block">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="파트너 검색..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 w-64"
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-                >
-                  5
-                </Badge>
-              </Button>
-
-              {/* Partner Stats */}
-              <div className="hidden sm:flex items-center space-x-4 text-sm">
-                <div className="text-center">
-                  <div className="font-semibold text-text-primary">
-                    {partner.partnerStats?.totalProducts || 0}
-                  </div>
-                  <div className="text-xs text-text-secondary">상품</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-text-primary">
-                    {partner.partnerStats?.totalOrders || 0}
-                  </div>
-                  <div className="text-xs text-text-secondary">주문</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-primary">
-                    ₩{(partner.partnerStats?.totalRevenue || 0).toLocaleString()}
-                  </div>
-                  <div className="text-xs text-text-secondary">매출</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Mobile menu button */}
+        <div className="lg:hidden p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
 
         {/* Page content */}
         <main className="p-6">

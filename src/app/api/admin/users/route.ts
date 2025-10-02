@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
           email: user.email,
           phone: user.phone,
           role: user.role,
-          grade: user.grade,
+          grade: user.grade || 'cedar', // 기본값으로 cedar 설정
           points: user.points,
           provider: user.provider,
           emailVerified: user.emailVerified,
@@ -95,6 +95,7 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
 
 
 

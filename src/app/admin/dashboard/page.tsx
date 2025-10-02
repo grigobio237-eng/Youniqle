@@ -128,13 +128,13 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-text-primary">관리자 대시보드</h1>
           <p className="text-text-secondary mt-1">
-            grigobil.co.kr 관리 시스템
+            grigobio.co.kr 관리 시스템
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -379,6 +379,7 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
 
 
 

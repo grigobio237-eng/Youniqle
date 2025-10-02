@@ -53,6 +53,12 @@ export interface IUser extends Document {
     autoApproval: boolean; // 주문 자동 승인 여부
     notificationEmail: string; // 알림 받을 이메일
     notificationPhone: string; // 알림 받을 전화번호
+    emailNotifications?: {
+      newOrder: boolean;
+      lowStock: boolean;
+      paymentReceived: boolean;
+      systemUpdates: boolean;
+    };
   };
   partnerStats?: {
     totalProducts: number;
@@ -174,7 +180,13 @@ const UserSchema = new Schema<IUser>({
     commissionRate: { type: Number, default: 10, min: 0, max: 50 },
     autoApproval: { type: Boolean, default: false },
     notificationEmail: { type: String, trim: true },
-    notificationPhone: { type: String, trim: true }
+    notificationPhone: { type: String, trim: true },
+    emailNotifications: {
+      newOrder: { type: Boolean, default: true },
+      lowStock: { type: Boolean, default: true },
+      paymentReceived: { type: Boolean, default: true },
+      systemUpdates: { type: Boolean, default: true }
+    }
   },
   partnerStats: {
     totalProducts: { type: Number, default: 0 },

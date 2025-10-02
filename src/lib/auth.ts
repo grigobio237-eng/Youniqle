@@ -13,6 +13,11 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'openid email profile',
+        },
+      },
     }),
     KakaoProvider({
       clientId: process.env.KAKAO_CLIENT_ID!,

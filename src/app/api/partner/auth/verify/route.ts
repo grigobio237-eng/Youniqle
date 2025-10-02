@@ -30,6 +30,14 @@ export async function GET(request: NextRequest) {
     const partner = await User.findById(decoded.id)
       .select('-passwordHash');
     
+    console.log('파트너 인증 확인:', {
+      tokenId: decoded.id,
+      partnerFound: !!partner,
+      partnerName: partner?.name,
+      partnerEmail: partner?.email,
+      partnerStatus: partner?.partnerStatus
+    });
+    
     if (!partner || partner.partnerStatus !== 'approved') {
       return NextResponse.json(
         { error: '승인된 파트너가 아닙니다.' },

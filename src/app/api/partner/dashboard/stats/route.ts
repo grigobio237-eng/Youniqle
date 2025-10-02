@@ -3,6 +3,8 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Product from '@/models/Product';
 import Order from '@/models/Order';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +17,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
     if (decoded.type !== 'partner') {
@@ -37,6 +38,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // ObjectId로 변환
+    const partnerObjectId = new mongoose.Types.ObjectId(partnerId);
+
     // 기본 통계 조회
     const [
       totalProducts,
@@ -46,13 +50,13 @@ export async function GET(request: NextRequest) {
     ] = await Promise.all([
       Product.countDocuments({ partnerId }),
       Product.countDocuments({ partnerId, status: 'active' }),
-      Order.find({ 'partnerOrders.partnerId': partnerId })
+      Order.find({ 'partnerOrders.partnerId': partnerObjectId })
         .sort({ createdAt: -1 })
         .limit(10)
         .populate('userId', 'name email'),
       Order.aggregate([
         { $unwind: '$partnerOrders' },
-        { $match: { 'partnerOrders.partnerId': { $toObjectId: partnerId } } },
+        { $match: { 'partnerOrders.partnerId': partnerObjectId } },
         { $group: { _id: null, total: { $sum: 1 } } }
       ])
     ]);
@@ -62,14 +66,14 @@ export async function GET(request: NextRequest) {
     
     // 대기 중인 주문 수
     const pendingOrders = await Order.countDocuments({
-      'partnerOrders.partnerId': partnerId,
+      'partnerOrders.partnerId': partnerObjectId,
       'partnerOrders.status': 'pending'
     });
 
     // 매출 통계 계산
     const revenueStats = await Order.aggregate([
       { $unwind: '$partnerOrders' },
-      { $match: { 'partnerOrders.partnerId': { $toObjectId: partnerId } } },
+      { $match: { 'partnerOrders.partnerId': partnerObjectId } },
       {
         $group: {
           _id: null,
@@ -97,7 +101,7 @@ export async function GET(request: NextRequest) {
       { $unwind: '$partnerOrders' },
       { 
         $match: { 
-          'partnerOrders.partnerId': { $toObjectId: partnerId },
+          'partnerOrders.partnerId': partnerObjectId,
           'partnerOrders.status': { $in: ['pending', 'confirmed', 'shipped', 'delivered'] }
         }
       },
@@ -113,7 +117,7 @@ export async function GET(request: NextRequest) {
     const topProducts = await Order.aggregate([
       { $unwind: '$partnerOrders' },
       { $unwind: '$partnerOrders.items' },
-      { $match: { 'partnerOrders.partnerId': { $toObjectId: partnerId } } },
+      { $match: { 'partnerOrders.partnerId': partnerObjectId } },
       {
         $group: {
           _id: '$partnerOrders.items.productId',

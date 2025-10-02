@@ -74,7 +74,7 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/signout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST' });
       setSession(null);
       window.location.href = '/';
     } catch (error) {

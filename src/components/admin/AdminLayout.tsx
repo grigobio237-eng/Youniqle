@@ -19,7 +19,8 @@ import {
   Bell,
   Search,
   Store,
-  ShoppingCart
+  ShoppingCart,
+  Globe
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -99,6 +100,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState<NotificationData>({ pendingPartners: 0, total: 0 });
+  const [language, setLanguage] = useState('ko');
   const router = useRouter();
   const pathname = usePathname();
 
@@ -164,6 +166,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
   };
 
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    // 언어 변경 로직을 여기에 추가할 수 있습니다
+    console.log('Language changed to:', newLanguage);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -210,7 +218,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               </div>
               <div>
                 <span className="text-lg font-bold text-text-primary">Admin</span>
-                <div className="text-xs text-text-secondary">grigobil.co.kr</div>
+                <div className="text-xs text-text-secondary">grigobio.co.kr</div>
               </div>
             </Link>
             <Button
@@ -303,8 +311,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             })}
           </nav>
 
-          {/* Logout */}
+          {/* Language Selection */}
           <div className="p-4 border-t">
+            <div className="flex items-center space-x-3 mb-3">
+              <Globe className="h-4 w-4 text-text-secondary" />
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                className="flex-1 text-sm bg-transparent border-none outline-none text-text-secondary focus:text-text-primary"
+              >
+                <option value="ko">한국어</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+              </select>
+            </div>
+            
+            {/* Logout */}
             <Button
               variant="ghost"
               onClick={handleLogout}
@@ -319,59 +341,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main content */}
       <div className="lg:ml-64">
-        {/* Top bar */}
-        <header className="bg-white border-b px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              
-              {/* Search */}
-              <form onSubmit={handleSearch} className="hidden sm:block">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="관리자 검색..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 w-64"
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                {notifications.total > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-                  >
-                    {notifications.total}
-                  </Badge>
-                )}
-              </Button>
-
-              {/* Admin Badge */}
-              <Badge variant="secondary" className="hidden sm:flex">
-                <Shield className="h-3 w-3 mr-1" />
-                {admin.grade.toUpperCase()} ADMIN
-              </Badge>
-            </div>
-          </div>
-        </header>
+        {/* Mobile menu button */}
+        <div className="lg:hidden p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-4 lg:p-6">
           {children}
         </main>
       </div>

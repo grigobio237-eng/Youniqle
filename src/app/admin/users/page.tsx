@@ -40,8 +40,8 @@ interface User {
   name: string;
   email: string;
   phone?: string;
-  role: 'member' | 'partner' | 'admin';
-  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
+  role: 'member' | 'partner' | 'admin' | 'user';
+  grade?: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
   points: number;
   provider: 'local' | 'google' | 'kakao' | 'naver';
   emailVerified: boolean;
@@ -130,19 +130,19 @@ export default function AdminUsersPage() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesGrade = gradeFilter === 'all' || user.grade === gradeFilter;
+    const matchesGrade = gradeFilter === 'all' || (user.grade || 'cedar') === gradeFilter;
     
     return matchesSearch && matchesRole && matchesGrade;
   });
 
   const getGradeDisplay = (grade: string) => {
-    const GradeIcon = gradeIcons[grade as keyof typeof gradeIcons];
-    const colorClass = gradeColors[grade as keyof typeof gradeColors];
+    const GradeIcon = gradeIcons[grade as keyof typeof gradeIcons] || Shield; // 기본값으로 Shield 사용
+    const colorClass = gradeColors[grade as keyof typeof gradeColors] || 'bg-gray-100 text-gray-800'; // 기본값으로 gray 사용
     
     return (
       <Badge className={`${colorClass} flex items-center space-x-1`}>
         <GradeIcon className="h-3 w-3" />
-        <span>{grade.toUpperCase()}</span>
+        <span>{(grade || 'UNKNOWN').toUpperCase()}</span>
       </Badge>
     );
   };
@@ -176,7 +176,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -338,7 +338,7 @@ export default function AdminUsersPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
                       <h3 className="font-medium text-text-primary">{user.name}</h3>
-                      {getGradeDisplay(user.grade)}
+                      {getGradeDisplay(user.grade || 'cedar')}
                       <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                         {user.role === 'admin' ? '관리자' : 
                          user.role === 'partner' ? '파트너' : '회원'}
@@ -419,6 +419,7 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
 
 
 

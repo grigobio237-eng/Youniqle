@@ -142,7 +142,7 @@ JWT 기반 인증 시스템을 사용합니다:
   name: string;
   phone?: string;
   role: 'member' | 'partner' | 'admin';
-  grade: 'bronze' | 'silver' | 'gold';
+  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
   points: number;
   addresses: Address[];
 }
@@ -178,16 +178,42 @@ JWT 기반 인증 시스템을 사용합니다:
 
 ## 🚀 배포
 
-### Vercel 배포
+### ✅ 배포 완료 (2025.10.01)
 
-1. Vercel 계정에 연결
-2. GitHub 저장소 연결
-3. 환경 변수 설정
-4. 자동 배포
+- **프로덕션 URL**: https://www.grigobio.co.kr
+- **Vercel 기본 URL**: https://youniqle.vercel.app
+- **배포 상태**: 운영 중
+- **도메인 연동**: 완료
+
+### Vercel 배포 절차
+
+1. ✅ Vercel 계정에 GitHub 저장소 연결
+2. ✅ 도메인 구입 및 DNS 설정
+3. ✅ 환경 변수 설정 (19개 변수)
+4. ✅ 자동 배포 및 프로덕션 배포 완료
 
 ### 환경 변수 설정 (Vercel)
 
-프로덕션 환경에서 필요한 환경 변수들을 Vercel 대시보드에서 설정하세요.
+**Vercel Dashboard → Settings → Environment Variables**에서 다음 변수들을 설정합니다:
+
+#### 핵심 환경변수
+- `MONGODB_URI` - MongoDB Atlas 연결 문자열
+- `NEXT_PUBLIC_SITE_URL` - https://www.grigobio.co.kr
+- `NEXTAUTH_URL` - https://www.grigobio.co.kr
+- `JWT_SECRET` - 강력한 랜덤 문자열 (64바이트)
+- `NEXTAUTH_SECRET` - NextAuth 전용 시크릿
+
+#### OAuth 설정
+- Google OAuth (✅ 설정 완료)
+- Kakao OAuth (⏳ 추후 연동)
+- Naver OAuth (⏳ 추후 연동)
+
+#### 기타 서비스
+- Nicepay 결제 시스템
+- Vercel Blob Storage
+- Hiworks 이메일 서비스
+
+상세한 배포 가이드는 [PROJECT_GUIDE.md](./PROJECT_GUIDE.md)의 "Vercel 배포 가이드" 섹션을 참조하세요.
 
 ## 🔧 개발 가이드
 

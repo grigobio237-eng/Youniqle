@@ -18,7 +18,8 @@ import {
   Star,
   Users,
   FileText,
-  BarChart3
+  BarChart3,
+  Store
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -61,10 +62,87 @@ interface DashboardStats {
 function PartnerDashboardContent() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [partnerInfo, setPartnerInfo] = useState<any>(null);
+  const [partnerError, setPartnerError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 기존 파트너 토큰 삭제
+    document.cookie = 'partner-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    console.log('파트너 대시보드 페이지 접근, 기존 토큰 삭제 완료');
     fetchDashboardStats();
+    fetchPartnerInfo();
   }, []);
+
+  const fetchPartnerInfo = async () => {
+    try {
+      console.log('파트너 정보 가져오기 시작...');
+      const response = await fetch('/api/partner/auth/verify');
+      console.log('파트너 정보 응답 상태:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('파트너 정보 데이터:', data.partner);
+        setPartnerInfo(data.partner);
+        setPartnerError(null);
+      } else if (response.status === 401) {
+        console.log('파트너 토큰 없음, 소셜 로그인 사용자 확인 중...');
+        
+        // 소셜 로그인 사용자인지 확인
+        const sessionResponse = await fetch('/api/auth/session');
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json();
+          if (sessionData.user) {
+            console.log('소셜 로그인 사용자 발견:', sessionData.user);
+            
+            // 파트너 권한 확인
+            const checkResponse = await fetch('/api/partner/auth/check-partner-status');
+            const checkData = await checkResponse.json();
+            
+            if (checkResponse.ok && checkData.isPartner) {
+              console.log('파트너 권한 확인됨, 토큰 발급 시작');
+              
+              // 파트너 토큰 발급
+              const tokenResponse = await fetch('/api/partner/auth/social-login', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ provider: sessionData.user.provider || 'google' }),
+              });
+              
+              if (tokenResponse.ok) {
+                console.log('파트너 토큰 발급 성공, 파트너 정보 재조회');
+                // 토큰 발급 후 다시 파트너 정보 조회
+                setTimeout(() => {
+                  fetchPartnerInfo();
+                }, 1000);
+                return;
+              } else {
+                console.log('파트너 토큰 발급 실패:', tokenResponse.status);
+              }
+            } else {
+              console.log('파트너 권한 없음:', checkData);
+            }
+          } else {
+            console.log('소셜 로그인 사용자 없음');
+          }
+        } else {
+          console.log('세션 확인 실패:', sessionResponse.status);
+        }
+        
+        const errorData = await response.json();
+        console.log('파트너 정보 가져오기 실패:', errorData);
+        setPartnerError(errorData.error || '파트너 정보를 가져올 수 없습니다.');
+      } else {
+        const errorData = await response.json();
+        console.log('파트너 정보 가져오기 실패:', errorData);
+        setPartnerError(errorData.error || '파트너 정보를 가져올 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch partner info:', error);
+      setPartnerError('파트너 정보를 가져오는 중 오류가 발생했습니다.');
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -123,14 +201,6 @@ function PartnerDashboardContent() {
       icon: DollarSign,
       color: 'text-purple-600',
       href: '/partner/analytics'
-    },
-    {
-      title: '총 수수료',
-      value: `₩${(stats?.totalCommission || 0).toLocaleString()}`,
-      pending: `₩${(stats?.pendingCommission || 0).toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-orange-600',
-      href: '/partner/settings'
     }
   ];
 
@@ -153,12 +223,34 @@ function PartnerDashboardContent() {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {partnerError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800">파트너 정보 로드 실패</h3>
+              <p className="text-sm text-red-700 mt-1">{partnerError}</p>
+              <button 
+                onClick={() => {
+                  setPartnerError(null);
+                  fetchPartnerInfo();
+                }}
+                className="text-sm text-red-600 hover:text-red-800 underline mt-2"
+              >
+                다시 시도
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-text-primary">파트너 대시보드</h1>
           <p className="text-text-secondary mt-1">
-            나의 상점 현황 및 매출 통계
+            {partnerInfo ? `${partnerInfo.name}님의 상점 현황 및 매출 통계` : '상점 현황 및 매출 통계를 불러오는 중...'}
           </p>
         </div>
         <div className="flex space-x-2">
@@ -180,8 +272,32 @@ function PartnerDashboardContent() {
         </div>
       </div>
 
+      {/* Partner Info Card */}
+      {partnerInfo && partnerInfo.name && (
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md">
+                <Store className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-text-primary">
+                  안녕하세요, {partnerInfo.name}님! 👋
+                </h2>
+                <p className="text-text-secondary mt-1">
+                  {partnerInfo.businessName || '파트너샵'} | 수수료율 {partnerInfo.commissionRate}%
+                </p>
+                <p className="text-sm text-text-secondary mt-2">
+                  파트너 대시보드에 오신 것을 환영합니다. 오늘도 좋은 하루 되세요!
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           

@@ -217,7 +217,7 @@ const ABOUT_CONTENT = {
   phone?: string;
   avatar?: string;
   role: 'member' | 'partner' | 'admin';
-  grade: 'bronze' | 'silver' | 'gold';
+  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
   points: number;
   provider?: 'local' | 'google' | 'kakao' | 'naver';
   providerId?: string;
@@ -931,6 +931,21 @@ NEXTAUTH_URL=https://youniqle.vercel.app
 - **데이터베이스 모델 확장** - 재고 관리, 고객 분석, 자동화 규칙 필드 추가
 - **MongoDB 완전 연동** - 모든 기능의 MongoDB 데이터베이스 연동 확인
 
+### v1.7.0 (2024-12-28) - 관리자 분석 및 설정 시스템 완성 🚀
+- **관리자 분석 시스템** - 사용자/파트너 활동 실시간 모니터링 및 분석
+- **종합 통계 대시보드** - 전체 개요, 사용자 분석, 파트너 분석, 콘텐츠 분석
+- **성장률 계산 시스템** - 전월 대비 성장률 자동 계산 및 표시
+- **상위 사용자/파트너 랭킹** - 활성도 기반 TOP 5 랭킹 시스템
+- **관리자 시스템 설정** - 8개 카테고리 80+ 설정 항목 관리
+- **설정 카테고리**: 일반, 보안, 알림, 결제, 비즈니스, SEO, 성능, 백업
+- **실시간 설정 저장** - 설정 변경 시 즉시 저장 및 적용
+- **설정 초기화 기능** - 기본값으로 설정 복원
+- **비밀번호 필드 보안** - 토글 기능으로 비밀번호 보기/숨기기
+- **AdminSettings 모델** - MongoDB 기반 설정 저장 및 관리
+- **페이지 레이아웃 통일** - 모든 관리자 페이지 일관된 레이아웃 적용
+- **사이드바 중복 문제 해결** - 관리자 페이지 레이아웃 최적화
+- **반응형 모바일 최적화** - 모든 관리자 페이지 모바일 지원
+
 ### v1.5.0 (2024-12-28)
 - **주문 내역 페이지** - 사용자 주문 이력 조회 및 취소 기능
 - **위시리스트 시스템** - 상품 찜하기, 찜한 상품 관리
@@ -1054,13 +1069,34 @@ NEXTAUTH_URL=https://youniqle.vercel.app
 - JWT 토큰 기반 인증
 - 승인된 파트너만 접근 가능
 
-### 👨‍💼 관리자 파트너 관리
+### 👨‍💼 관리자 시스템
 
-#### 관리자 파트너 관리 페이지 (`/admin/partners`)
+#### 관리자 대시보드 (`/admin/dashboard`)
+- 전체 시스템 현황 대시보드
+- 실시간 통계 및 모니터링
+- 최근 활동 및 알림
+
+#### 관리자 파트너 관리 (`/admin/partners`)
 - 파트너 신청 목록 조회
 - 승인/거부/정지 기능
 - 파트너별 상세 정보 확인
 - 수수료율 설정
+
+#### 관리자 분석 시스템 (`/admin/analytics`)
+- 사용자 활동 분석 및 모니터링
+- 파트너 성과 분석
+- 콘텐츠 참여도 분석
+- 실시간 통계 및 트렌드
+
+#### 관리자 시스템 설정 (`/admin/settings`)
+- **일반 설정**: 사이트 정보, 언어, 통화, 유지보수 모드
+- **보안 설정**: 2단계 인증, 세션 관리, 파일 업로드 보안
+- **알림 설정**: SMTP 서버, 이메일 알림, 시스템 알림
+- **결제 설정**: 나이스페이, PayPal, 에스크로 설정
+- **비즈니스 설정**: 회사 정보, 세무 정책, 파트너 정책
+- **SEO 설정**: 메타 태그, Google Analytics, 사이트맵
+- **성능 설정**: 캐싱, 이미지 최적화, CDN 설정
+- **백업 설정**: 자동 백업, 백업 스케줄, 복원 기능
 
 #### 실시간 알림 시스템
 - 승인 대기 중인 파트너 수 표시
@@ -1356,6 +1392,15 @@ npm run create-test-data
 - `GET /api/admin/orders/analytics` - 주문 분석
 - `PATCH /api/admin/orders/[id]/status` - 주문 상태 변경
 
+#### 관리자 분석 시스템 API
+- `GET /api/admin/analytics` - 종합 분석 데이터 조회
+- `GET /api/admin/analytics?timeframe=7d` - 기간별 분석 데이터
+
+#### 관리자 시스템 설정 API
+- `GET /api/admin/settings` - 시스템 설정 조회
+- `PUT /api/admin/settings` - 시스템 설정 업데이트
+- `DELETE /api/admin/settings` - 시스템 설정 초기화
+
 #### 재고 관리 API
 - `GET /api/admin/inventory` - 전체 재고 현황
 - `GET /api/admin/inventory/[id]` - 특정 상품 재고 현황
@@ -1378,6 +1423,7 @@ npm run create-test-data
 - ✅ **Cart** - 장바구니 정보
 - ✅ **Review** - 리뷰 및 평점 시스템
 - ✅ **Question** - Q&A 시스템
+- ✅ **AdminSettings** - 시스템 설정 정보 (8개 카테고리)
 
 #### MongoDB 연결 및 사용
 - ✅ **MongoDB Atlas 연결**: 환경변수 기반 연결
@@ -1431,6 +1477,300 @@ npm run create-test-data
 
 ---
 
-**마지막 업데이트**: 2025년 1월 29일  
+## 🚀 Vercel 배포 가이드 (2025.10.01)
+
+### 📋 배포 현황
+
+- **프로덕션 도메인**: https://www.grigobio.co.kr ✅
+- **Vercel 기본 도메인**: https://youniqle.vercel.app ✅
+- **배포 상태**: 완료
+- **도메인 연동**: 완료
+
+### 🔐 JWT_SECRET 생성 방법
+
+프로덕션 배포 시 강력한 JWT_SECRET을 생성해야 합니다.
+
+#### PowerShell에서 생성:
+```powershell
+node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
+```
+
+#### 생성된 예시 (실제 사용 중):
+```
+JWT_SECRET=40de04570e0fa2776d13d4c5d76e15e3f738d4fcc2bb5910ebb0efe61ed190ff56d0de3ce1240116f77e412420bf0ecd8795df0e079a4fac61fe54048e611c09
+```
+
+**⚠️ 주의사항**:
+- 기본 예제 값(`your-super-secret-jwt-key-change-this-in-production`)은 절대 사용하지 않기
+- 64바이트(128자) 이상의 랜덤 문자열 사용
+- 외부에 노출되지 않도록 관리
+
+### 🌐 Vercel 환경변수 설정 가이드
+
+#### 설정 위치
+```
+Vercel Dashboard → 프로젝트 선택 → Settings → Environment Variables
+```
+
+#### 필수 환경변수 목록
+
+**1. 데이터베이스**
+```env
+MONGODB_URI=mongodb+srv://grigobio237_db_user:Youniqle2024!@cluster0.e78xeiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+```
+
+**2. 사이트 URL (프로덕션)**
+```env
+NEXT_PUBLIC_SITE_URL=https://www.grigobio.co.kr
+NEXTAUTH_URL=https://www.grigobio.co.kr
+```
+
+**3. JWT 및 인증 Secret**
+```env
+JWT_SECRET=40de04570e0fa2776d13d4c5d76e15e3f738d4fcc2bb5910ebb0efe61ed190ff56d0de3ce1240116f77e412420bf0ecd8795df0e079a4fac61fe54048e611c09
+NEXTAUTH_SECRET=b3ad62d24028fbc9ddd3bac5ba894096880bbff1dcd554da2841c7d4a2b573be
+```
+
+**4. Google OAuth (✅ 설정 완료)**
+```env
+GOOGLE_CLIENT_ID=102136527081-vljs45ri64p6vaigc756p0fe6nu9gkkg.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+```
+
+**5. Kakao OAuth (⏳ 추후 설정 예정)**
+```env
+KAKAO_CLIENT_ID=292bb80723d61732ae9237403465cf55
+KAKAO_CLIENT_SECRET=LwpDIEckWdudxToHMzBHMElccfIGSZNB
+```
+
+**6. Naver OAuth (⏳ 추후 설정 예정)**
+```env
+NAVER_CLIENT_ID=qB5siBSLu7NhKmwNgNEd
+NAVER_CLIENT_SECRET=A28fSF1SlH
+```
+
+**7. Nicepay 결제**
+```env
+NICEPAY_MERCHANT_ID=grigobio1m
+NICEPAY_MERCHANT_KEY=r7cCZeIK/YVD8Fw04T1NbUC8twGKSoUnEo72V680RwCxC+WQVQ8OG4mmRv8SPuXKtuQBcoHdMWBfDYd0zNU1+A==
+NICEPAY_RETURN_URL=https://www.grigobio.co.kr/api/payment/result
+NICEPAY_CANCEL_RETURN_URL=https://www.grigobio.co.kr/api/payment/cancel
+```
+
+**8. 이미지 스토리지**
+```env
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_QhlswIWiISfSeRTa_k0z1OGdbKZHGOVWjXz9unBz4sO4hsd
+```
+
+**9. 이메일 설정 (Hiworks)**
+```env
+SMTP_HOST=smtps.hiworks.com
+SMTP_PORT=465
+SMTP_USER=suchwawa@sapienet.com
+SMTP_PASS=BOWThAvYpjArHiqoTTNk
+EMAIL_FROM=suchwawa@sapienet.com
+```
+
+#### Environment 선택
+각 환경변수 추가 시:
+- ✅ **Production** (필수)
+- ✅ **Preview** (선택사항)
+- ✅ **Development** (선택사항)
+
+### 🔗 OAuth 리디렉션 URI 설정
+
+#### ✅ Google OAuth (설정 완료)
+
+**Google Cloud Console**: https://console.cloud.google.com/
+
+1. 프로젝트 선택
+2. "API 및 서비스" → "사용자 인증 정보"
+3. OAuth 2.0 클라이언트 ID 클릭
+4. **승인된 자바스크립트 원본** 추가:
+   ```
+   https://www.grigobio.co.kr
+   ```
+5. **승인된 리디렉션 URI** 추가:
+   ```
+   https://www.grigobio.co.kr/api/auth/callback/google
+   ```
+6. "저장" 클릭
+
+**✅ 상태**: 설정 완료, 정상 작동
+
+---
+
+#### ⏳ Kakao OAuth (추후 설정 예정)
+
+**Kakao Developers**: https://developers.kakao.com/
+
+**승인 신청 전 준비사항**:
+1. 카카오 개발자 사이트에서 앱 생성
+2. 사업자 정보 등록 (사업자등록번호 필요)
+3. 검수 신청 및 승인 대기
+
+**승인 후 설정 방법**:
+1. 내 애플리케이션 → 해당 앱 선택
+2. "앱 설정" → "플랫폼" → "Web 플랫폼 등록"
+3. **사이트 도메인** 추가:
+   ```
+   https://www.grigobio.co.kr
+   ```
+4. "제품 설정" → "카카오 로그인" → "Redirect URI" 추가:
+   ```
+   https://www.grigobio.co.kr/api/auth/callback/kakao
+   ```
+5. "동의항목" 설정:
+   - 닉네임 (필수)
+   - 카카오계정(이메일) (필수)
+6. 검수용 캡처 화면 업로드:
+   - 로그인 페이지
+   - 로그인 후 사용자 정보 표시 화면
+7. 검수 신청
+
+**⏳ 상태**: 승인 신청 전 (환경변수는 설정 완료)
+
+---
+
+#### ⏳ Naver OAuth (추후 설정 예정)
+
+**Naver Developers**: https://developers.naver.com/
+
+**승인 신청 전 준비사항**:
+1. 네이버 개발자 센터에서 앱 등록
+2. 서비스 URL 및 환경 설정
+3. 검수 신청 및 승인 대기
+
+**승인 후 설정 방법**:
+1. Application → 내 애플리케이션 선택
+2. "API 설정" 탭 클릭
+3. **서비스 URL** 수정:
+   ```
+   https://www.grigobio.co.kr
+   ```
+4. **Callback URL** 수정:
+   ```
+   https://www.grigobio.co.kr/api/auth/callback/naver
+   ```
+5. "제공 정보" 설정:
+   - 회원이름 (필수)
+   - 이메일 주소 (필수)
+   - 성별 (선택)
+   - 생일 (선택)
+   - 출생연도 (선택)
+   - 휴대전화번호 (선택)
+6. 검수용 캡처 파일 업로드:
+   - 로그인 페이지
+   - 로그인 후 사용자 정보 표시 화면
+   - 각 제공 정보 활용 화면
+7. 검수 신청
+
+**⏳ 상태**: 승인 신청 전 (환경변수는 설정 완료)
+
+---
+
+### 📋 배포 체크리스트
+
+#### ✅ 완료된 항목
+- [x] MongoDB Atlas 연결 확인
+- [x] 도메인 구입 (grigobio.co.kr)
+- [x] Vercel 도메인 연동
+- [x] DNS 설정 완료
+- [x] JWT_SECRET 생성
+- [x] Vercel 환경변수 설정 (19개 변수)
+- [x] Google OAuth 리디렉션 URI 설정
+- [x] 프로덕션 배포 완료
+
+#### ⏳ 추후 진행 예정
+- [ ] Kakao OAuth 승인 신청 및 리디렉션 URI 설정
+- [ ] Naver OAuth 승인 신청 및 리디렉션 URI 설정
+- [ ] 카카오 로그인 기능 테스트
+- [ ] 네이버 로그인 기능 테스트
+- [ ] 이메일 인증 기능 테스트 (프로덕션)
+- [ ] Nicepay 결제 테스트 (프로덕션)
+
+### 🔄 재배포 방법
+
+환경변수 변경 후 재배포:
+```
+1. Vercel Dashboard → Deployments 탭
+2. 최신 배포의 "..." 메뉴 클릭
+3. "Redeploy" 클릭
+4. "Use existing Build Cache" 체크 해제 (권장)
+5. "Redeploy" 버튼 클릭
+```
+
+### 🔍 OAuth 연동 테스트 방법
+
+#### Google 로그인 (현재 사용 가능)
+1. https://www.grigobio.co.kr 접속
+2. 로그인 페이지에서 "Google로 로그인" 클릭
+3. Google 계정 선택 및 권한 동의
+4. 로그인 성공 및 마이페이지 확인
+
+#### Kakao/Naver 로그인 (추후 연동)
+- 승인 완료 후 동일한 방법으로 테스트
+- 승인 전에는 테스트 계정으로만 로그인 가능
+- 일반 사용자는 승인 후 사용 가능
+
+### 📝 참고사항
+
+#### JWT_SECRET의 역할
+- **로그인 토큰 생성**: 사용자 로그인 시 JWT 토큰 생성
+- **토큰 검증**: 서버에서 토큰의 유효성 검증
+- **보안**: 해킹 방지를 위한 암호화 키
+- **세션 관리**: 로그인 상태 유지
+
+#### NextAuth.js 자동 경로
+다음 경로들은 NextAuth.js가 자동으로 생성합니다:
+```
+/api/auth/callback/google   (Google OAuth 콜백)
+/api/auth/callback/kakao    (Kakao OAuth 콜백)
+/api/auth/callback/naver    (Naver OAuth 콜백)
+/api/auth/signin            (로그인 페이지)
+/api/auth/signout           (로그아웃)
+/api/auth/session           (세션 조회)
+```
+
+**코드 수정 불필요**: `NEXTAUTH_URL` 환경변수만 올바르게 설정하면 자동으로 모든 URL이 생성됩니다.
+
+### ⚠️ 보안 주의사항
+
+1. **환경변수 노출 금지**
+   - .env.local 파일은 절대 GitHub에 업로드하지 않기
+   - .gitignore에 .env.local 포함 확인
+
+2. **JWT_SECRET 관리**
+   - 프로덕션과 개발 환경에서 다른 값 사용
+   - 정기적으로 변경 (6개월~1년 주기)
+
+3. **OAuth Secret 관리**
+   - Client Secret은 절대 프론트엔드에 노출하지 않기
+   - 서버 사이드에서만 사용
+
+4. **데이터베이스 보안**
+   - MongoDB Atlas IP 화이트리스트 설정
+   - 강력한 비밀번호 사용
+
+### 🆘 문제 해결
+
+#### 환경변수가 반영되지 않을 때
+1. Vercel에서 환경변수가 올바르게 설정되었는지 확인
+2. Production 환경에 체크되었는지 확인
+3. 재배포 실행 (Build Cache 사용 안 함)
+
+#### OAuth 로그인 실패 시
+1. 리디렉션 URI가 정확히 일치하는지 확인
+2. NEXTAUTH_URL이 올바르게 설정되었는지 확인
+3. OAuth 제공자 콘솔에서 앱 상태 확인
+
+#### 도메인 연결 문제
+1. DNS 설정 확인 (전파 시간 24-48시간 소요)
+2. Vercel에서 도메인 상태 확인
+3. HTTPS 인증서 발급 확인
+
+---
+
+**마지막 업데이트**: 2025년 10월 1일  
 **작성자**: AI Assistant  
-**프로젝트 상태**: 콘텐츠 관리 시스템 및 상품 표시 최적화 완성 (v2.1.0) 🎉
+**프로젝트 상태**: Vercel 프로덕션 배포 완료, Kakao/Naver OAuth 추후 연동 예정 🎉
