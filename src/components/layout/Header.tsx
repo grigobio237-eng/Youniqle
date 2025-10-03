@@ -84,21 +84,21 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="relative h-10 w-10">
+          <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
+            <div className="relative h-8 w-8 sm:h-10 sm:w-10">
               <CharacterImage
                 src="/character/youniqle-1.png"
                 alt="Youniqle 로고"
                 fill
                 className="object-contain"
                 priority
-                sizes="40px"
+                sizes="32px"
               />
             </div>
-            <span className="text-xl font-bold text-text-primary">Youniqle</span>
+            <span className="text-lg sm:text-xl font-bold text-text-primary">Youniqle</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -129,18 +129,20 @@ export default function Header() {
           </form>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            {/* Language Switcher - Hide on very small screens */}
+            <div className="hidden xs:block">
+              <LanguageSwitcher />
+            </div>
 
             {/* Cart */}
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href="/cart">
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
                 {cartCount > 0 && (
                   <Badge 
                     variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
+                    className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-xs p-0"
                   >
                     {cartCount > 99 ? '99+' : cartCount}
                   </Badge>
@@ -151,12 +153,12 @@ export default function Header() {
 
             {/* Auth Buttons */}
             {loading ? (
-              <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
+              <div className="w-16 sm:w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
             ) : session ? (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" asChild>
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <Button variant="ghost" size="icon" asChild className="h-8 w-8 sm:h-10 sm:w-10">
                   <Link href="/me">
-                    <User className="h-5 w-5" />
+                    <User className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span className="sr-only">{t('nav.myPage')}</span>
                   </Link>
                 </Button>
@@ -164,22 +166,24 @@ export default function Header() {
                   variant="ghost" 
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm px-2 sm:px-3"
                 >
-                  <LogOut className="h-4 w-4 mr-1" />
-                  {t('nav.logout')}
+                  <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden sm:inline">{t('nav.logout')}</span>
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" asChild>
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <Button variant="ghost" size="sm" asChild className="text-xs sm:text-sm px-2 sm:px-3">
                   <Link href="/auth/signin">
-                    {t('nav.login')}
+                    <span className="hidden sm:inline">{t('nav.login')}</span>
+                    <span className="sm:hidden">로그인</span>
                   </Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className="text-xs sm:text-sm px-2 sm:px-3">
                   <Link href="/auth/signup">
-                    {t('nav.signup')}
+                    <span className="hidden sm:inline">{t('nav.signup')}</span>
+                    <span className="sm:hidden">가입</span>
                   </Link>
                 </Button>
               </div>
@@ -189,10 +193,10 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden z-50 relative"
+              className="md:hidden z-50 relative h-8 w-8 sm:h-10 sm:w-10"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </Button>
           </div>
         </div>
