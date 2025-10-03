@@ -200,8 +200,16 @@ export default function AdminLoginPage() {
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800 text-center">
                 <strong>소셜 로그인 사용법:</strong><br />
-                구글, 카카오, 네이버로 가입한 후 관리자 권한이 부여된 계정만 이용 가능합니다.<br />
+                구글로 가입한 후 관리자 권한이 부여된 계정만 이용 가능합니다.<br />
                 <span className="text-xs text-blue-600">※ 소셜 로그인 시 자동으로 관리자 토큰이 발급됩니다.</span>
+              </p>
+            </div>
+
+            {/* 소셜 로그인 안내 문구 */}
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700 text-center">
+                <span className="font-medium">카카오톡과 네이버 로그인은 준비 중입니다.</span><br />
+                현재는 구글 로그인과 이메일 로그인만 이용 가능합니다.
               </p>
             </div>
 
@@ -218,20 +226,20 @@ export default function AdminLoginPage() {
 
               <Button
                 onClick={() => handleSocialLogin('kakao')}
-                className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black border-0 transition-all duration-200 font-medium"
-                disabled={loading}
+                disabled
+                className="w-full h-12 bg-yellow-400/50 text-black/50 border-0 transition-all duration-200 font-medium cursor-not-allowed"
               >
                 <KakaoIcon className="w-5 h-5 mr-3" />
-                {loading ? (loadingStep || '카카오 로그인 중...') : '카카오로 관리자 로그인'}
+                카카오로 관리자 로그인 (준비중)
               </Button>
 
               <Button
                 onClick={() => handleSocialLogin('naver')}
-                className="w-full h-12 bg-green-500 hover:bg-green-600 text-white border-0 transition-all duration-200 font-medium"
-                disabled={loading}
+                disabled
+                className="w-full h-12 bg-green-500/50 text-white/50 border-0 transition-all duration-200 font-medium cursor-not-allowed"
               >
                 <NaverIcon className="w-5 h-5 mr-3" />
-                {loading ? (loadingStep || '네이버 로그인 중...') : '네이버로 관리자 로그인'}
+                네이버로 관리자 로그인 (준비중)
               </Button>
             </div>
 
