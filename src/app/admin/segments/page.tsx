@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -93,11 +93,7 @@ export default function SegmentDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchSegments();
-  }, [currentPage, statusFilter, typeFilter, searchTerm]);
-
-  const fetchSegments = async () => {
+  const fetchSegments = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({

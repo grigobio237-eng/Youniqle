@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,11 +40,7 @@ export default function AdminRefundsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    fetchRefunds();
-  }, [page, statusFilter]);
-
-  const fetchRefunds = async () => {
+  const fetchRefunds = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -65,7 +61,11 @@ export default function AdminRefundsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, statusFilter]);
+
+  useEffect(() => {
+    fetchRefunds();
+  }, [fetchRefunds]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     if (!confirm('상태를 변경하시겠습니까?')) return;

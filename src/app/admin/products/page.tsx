@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -78,11 +78,7 @@ export default function AdminProductsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
 
-  useEffect(() => {
-    fetchProducts();
-  }, [searchQuery, categoryFilter, statusFilter, sortBy]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
@@ -100,7 +96,11 @@ export default function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, categoryFilter, statusFilter, sortBy]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
