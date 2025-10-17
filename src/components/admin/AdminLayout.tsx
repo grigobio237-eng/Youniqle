@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { getAdminApiUrl, logEnvironmentInfo } from '@/lib/apiUtils';
 import { 
   LayoutDashboard, 
   Users, 
@@ -221,10 +222,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const fetchNotifications = async () => {
     try {
-      // 프로덕션 환경에서는 절대 URL 사용
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `${window.location.origin}/api/admin/notifications`
-        : '/api/admin/notifications';
+      // 유틸리티 함수를 사용하여 API URL 생성
+      const apiUrl = getAdminApiUrl('/notifications');
       
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -247,10 +246,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const checkAdminAuth = async () => {
     try {
-      // 프로덕션 환경에서는 절대 URL 사용
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `${window.location.origin}/api/admin/auth/verify`
-        : '/api/admin/auth/verify';
+      // 환경 정보 로깅
+      logEnvironmentInfo();
+      
+      // 유틸리티 함수를 사용하여 API URL 생성
+      const apiUrl = getAdminApiUrl('/auth/verify');
       
       console.log('Admin auth check URL:', apiUrl);
       
@@ -287,10 +287,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      // 프로덕션 환경에서는 절대 URL 사용
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `${window.location.origin}/api/admin/auth/logout`
-        : '/api/admin/auth/logout';
+      // 유틸리티 함수를 사용하여 API URL 생성
+      const apiUrl = getAdminApiUrl('/auth/logout');
       
       const response = await fetch(apiUrl, { 
         method: 'POST',
