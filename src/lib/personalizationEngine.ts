@@ -2,6 +2,7 @@ import { UserProfile, PersonalizationRule, PersonalizationExperiment, Personaliz
 import User from '@/models/User';
 import UserBehavior from '@/models/UserBehavior';
 import Order from '@/models/Order';
+import connectDB from '@/lib/db';
 import mongoose from 'mongoose';
 
 export interface PersonalizationResult {
@@ -67,7 +68,11 @@ export class PersonalizationEngine {
   // 사용자 프로필 생성/업데이트
   static async createOrUpdateUserProfile(userId: string): Promise<any> {
     try {
-      const user = await User.findOne({ email: userId });
+      // MongoDB 연결 확인
+      await connectDB();
+      
+      // 타임아웃 설정으로 쿼리 실행
+      const user = await User.findOne({ email: userId }).maxTimeMS(5000);
       if (!user) {
         // 사용자가 없으면 익명 사용자로 처리
         console.log(`[PersonalizationEngine] 사용자를 찾을 수 없음: ${userId}, 익명 사용자로 처리`);
@@ -75,7 +80,7 @@ export class PersonalizationEngine {
       }
 
       // 기존 프로필 조회
-      let profile = await UserProfile.findOne({ userId });
+      let profile = await UserProfile.findOne({ userId }).maxTimeMS(5000);
       
       if (!profile) {
         // 새 프로필 생성
@@ -116,6 +121,13 @@ export class PersonalizationEngine {
 
     } catch (error) {
       console.error('User profile creation/update error:', error);
+      
+      // MongoDB 타임아웃 에러인 경우 null 반환 (익명 사용자로 처리)
+      if (error instanceof Error && error.message.includes('buffering timed out')) {
+        console.log(`[PersonalizationEngine] MongoDB 타임아웃으로 인해 익명 사용자로 처리: ${userId}`);
+        return null;
+      }
+      
       throw error;
     }
   }
@@ -123,7 +135,8 @@ export class PersonalizationEngine {
   // 사용자 프로필 업데이트 (외부에서 호출)
   static async updateUserProfile(userId: string, updateData: any): Promise<any> {
     try {
-      const profile = await UserProfile.findOne({ userId });
+      await connectDB();
+      const profile = await UserProfile.findOne({ userId }).maxTimeMS(5000);
       
       if (!profile) {
         throw new Error('Profile not found');

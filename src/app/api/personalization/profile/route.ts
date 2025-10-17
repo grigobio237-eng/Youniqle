@@ -56,6 +56,46 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Profile fetch error:', error);
+    
+    // MongoDB 타임아웃 에러인 경우 익명 사용자 프로필 반환
+    if (error instanceof Error && error.message.includes('buffering timed out')) {
+      console.log('[API] MongoDB 타임아웃으로 인해 익명 사용자 프로필 반환');
+      return NextResponse.json({
+        success: true,
+        data: {
+          userId: 'anonymous',
+          preferences: {
+            uiPreferences: {
+              layout: 'grid',
+              theme: 'light',
+              language: 'ko',
+              fontSize: 'medium',
+              showRecommendations: true,
+              showReviews: true
+            },
+            productCategories: [],
+            brands: [],
+            priceRange: { min: 0, max: 1000000 }
+          },
+          interests: {
+            categories: [],
+            brands: [],
+            priceRange: { min: 0, max: 1000000 }
+          },
+          behavior: {
+            browsingHistory: [],
+            purchaseHistory: [],
+            searchHistory: []
+          },
+          metadata: {
+            isAnonymous: true,
+            createdAt: new Date(),
+            lastActive: new Date()
+          }
+        }
+      });
+    }
+    
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 });
