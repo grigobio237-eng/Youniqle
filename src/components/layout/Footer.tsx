@@ -159,9 +159,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-primary transition-colors">
+                <button 
+                  onClick={() => alert('문의하기 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
+                  className="text-gray-400 hover:text-primary transition-colors cursor-pointer opacity-60"
+                >
                   문의하기
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
