@@ -22,7 +22,14 @@ export default function RealTimeChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // WebSocket 연결
+    // 프로덕션 환경에서는 WebSocket 연결 비활성화
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Real-time chat disabled in production environment');
+      setIsConnected(false);
+      return;
+    }
+
+    // WebSocket 연결 (개발 환경에서만)
     const connectWebSocket = () => {
       try {
         const ws = new WebSocket('ws://localhost:3001/api/chat/websocket');

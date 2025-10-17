@@ -63,6 +63,13 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   // WebSocket 연결
   useEffect(() => {
     const connectWebSocket = async () => {
+      // 프로덕션 환경에서는 WebSocket 연결 비활성화
+      if (process.env.NODE_ENV === 'production') {
+        console.log('WebSocket disabled in production environment');
+        setConnectionStatus('disabled');
+        return;
+      }
+
       try {
         setConnectionStatus('connecting');
 
@@ -78,7 +85,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
           return;
         }
 
-        // Socket.IO 클라이언트 연결
+        // Socket.IO 클라이언트 연결 (개발 환경에서만)
         const socket = io(process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3000', {
           auth: {
             token: token
