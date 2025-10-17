@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import { logServerError, getServerStatus } from '@/lib/serverErrorHandler';
+import jwt from 'jsonwebtoken';
 
 export async function GET(
   request: NextRequest,
@@ -13,19 +13,38 @@ export async function GET(
     const { id } = await params;
     console.log('Fetching product with ID:', id);
     
-    const session = await getServerSession(authOptions);
+    // JWT 토큰으로 인증 확인
+    const token = request.cookies.get('admin-token')?.value;
     
-    if (!session?.user?.email) {
-      console.log('No session found');
+    if (!token) {
+      console.log('No admin token found');
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    }
+
+    // JWT 토큰 검증
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not found');
+      return NextResponse.json({ error: '서버 설정 오류가 발생했습니다.' }, { status: 500 });
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+    } catch (jwtError) {
+      console.error('JWT token verification failed:', jwtError);
+      return NextResponse.json({ error: '유효하지 않은 인증 토큰입니다.' }, { status: 401 });
+    }
+
+    if (decoded.type !== 'admin') {
+      console.log('Token is not admin type:', decoded.type);
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
     await connectDB();
     console.log('Database connected');
     
     // 관리자 권한 확인
-    const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email }).maxTimeMS(5000);
+    const user = await User.findById(decoded.id).maxTimeMS(5000);
     
     if (!user || user.role !== 'admin') {
       console.log('User not found or not admin:', user?.role);
@@ -81,17 +100,34 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // JWT 토큰으로 인증 확인
+    const token = request.cookies.get('admin-token')?.value;
+    
+    if (!token) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    }
+
+    // JWT 토큰 검증
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: '서버 설정 오류가 발생했습니다.' }, { status: 500 });
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+    } catch (jwtError) {
+      return NextResponse.json({ error: '유효하지 않은 인증 토큰입니다.' }, { status: 401 });
+    }
+
+    if (decoded.type !== 'admin') {
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
     await connectDB();
     
     // 관리자 권한 확인
-    const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(decoded.id);
     
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
@@ -185,17 +221,34 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // JWT 토큰으로 인증 확인
+    const token = request.cookies.get('admin-token')?.value;
+    
+    if (!token) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    }
+
+    // JWT 토큰 검증
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: '서버 설정 오류가 발생했습니다.' }, { status: 500 });
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+    } catch (jwtError) {
+      return NextResponse.json({ error: '유효하지 않은 인증 토큰입니다.' }, { status: 401 });
+    }
+
+    if (decoded.type !== 'admin') {
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
     await connectDB();
     
     // 관리자 권한 확인
-    const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(decoded.id);
     
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
