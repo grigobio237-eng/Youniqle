@@ -120,7 +120,11 @@ export default function SegmentDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, statusFilter, typeFilter, searchTerm]);
+
+  useEffect(() => {
+    fetchSegments();
+  }, [fetchSegments]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

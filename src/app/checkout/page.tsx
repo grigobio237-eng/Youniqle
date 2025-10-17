@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -529,11 +530,14 @@ function CheckoutPageContent() {
                   <div key={item._id} className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                       {item.productId.images && item.productId.images.length > 0 ? (
-                        <img
-                          src={(item.productId.images[0] as any)?.url || item.productId.images[0]}
-                          alt={item.productId.name}
-                          className="w-10 h-10 object-cover rounded"
-                        />
+                        <div className="w-10 h-10 relative">
+                          <Image
+                            src={(item.productId.images[0] as any)?.url || item.productId.images[0]}
+                            alt={item.productId.name}
+                            fill
+                            className="object-cover rounded"
+                          />
+                        </div>
                       ) : (
                         <div className="w-10 h-10 bg-gray-200 rounded" />
                       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -299,11 +300,12 @@ export default function CartPage() {
                     />
 
                     {/* 상품 이미지 */}
-                    <div className="w-20 h-20 flex-shrink-0">
-                      <img
+                    <div className="w-20 h-20 flex-shrink-0 relative">
+                      <Image
                         src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
                         alt={item.productId.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        fill
+                        className="object-cover rounded-lg"
                       />
                     </div>
 
