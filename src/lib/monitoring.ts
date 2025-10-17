@@ -1,6 +1,7 @@
 // 실시간 성능 모니터링 시스템
 import os from 'os';
 import { NextRequest, NextResponse } from 'next/server';
+import { getMemoryOptimizedSettings, isMemoryUsageHigh } from './memoryOptimizer';
 
 interface PerformanceMetrics {
   timestamp: number;
@@ -101,12 +102,22 @@ class PerformanceMonitor {
   startMonitoring(intervalMs: number = 5000) {
     if (this.isMonitoring) return;
 
+    // 메모리 최적화 설정 가져오기
+    const memorySettings = getMemoryOptimizedSettings();
+    
+    if (!memorySettings.enableMonitoring) {
+      console.log('⚠️ 메모리 사용률이 높아 모니터링 시스템을 비활성화합니다.');
+      return;
+    }
+
     this.isMonitoring = true;
+    // 메모리 최적화된 간격 사용
+    const optimizedInterval = memorySettings.monitoringInterval;
     this.monitoringInterval = setInterval(() => {
       this.collectMetrics();
-    }, intervalMs);
+    }, optimizedInterval);
 
-    console.log('📊 성능 모니터링 시작');
+    console.log(`📊 성능 모니터링 시작 (간격: ${optimizedInterval}ms)`);
   }
 
   // 모니터링 중지
@@ -125,6 +136,14 @@ class PerformanceMonitor {
     const totalMemory = os.totalmem();
     const freeMemory = os.freemem();
     const usedMemory = totalMemory - freeMemory;
+    const memUsagePercent = (usedMemory / totalMemory) * 100;
+    
+    // 메모리 사용률이 95% 이상이면 메트릭 수집 중지
+    if (memUsagePercent > 95) {
+      console.log(`⚠️ 메모리 사용률이 ${memUsagePercent.toFixed(2)}%로 높아 메트릭 수집을 중지합니다.`);
+      this.stopMonitoring();
+      return;
+    }
 
     const metrics: PerformanceMetrics = {
       timestamp: Date.now(),
@@ -156,9 +175,10 @@ class PerformanceMonitor {
 
     this.metrics.push(metrics);
 
-    // 최대 메트릭 수 제한
-    if (this.metrics.length > this.maxMetrics) {
-      this.metrics = this.metrics.slice(-this.maxMetrics);
+    // 메모리 사용률이 높을 때 메트릭 수를 더 적게 유지
+    const maxMetrics = memUsagePercent > 85 ? 50 : this.maxMetrics;
+    if (this.metrics.length > maxMetrics) {
+      this.metrics = this.metrics.slice(-maxMetrics);
     }
 
     // 알림 체크
