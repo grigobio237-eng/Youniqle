@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
-import ProductList from '@/components/products/ProductList';
+import ServerProductList from '@/components/products/ServerProductList';
 import ProductFilters from '@/components/products/ProductFilters';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 function ProductListSkeleton() {
   return (
@@ -60,9 +61,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
         {/* Products Grid */}
         <main className="flex-1">
-          <Suspense fallback={<ProductListSkeleton />}>
-            <ProductList searchParams={params} />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<ProductListSkeleton />}>
+              <ServerProductList searchParams={params} />
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
     </div>
