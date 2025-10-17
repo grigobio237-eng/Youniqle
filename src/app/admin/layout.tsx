@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
+import ServerErrorBoundary from '@/components/ServerErrorBoundary';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -17,8 +18,14 @@ export default function Layout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <AdminLayout>
-      {children}
-    </AdminLayout>
+    <ServerErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('Admin Layout Error:', error, errorInfo);
+      }}
+    >
+      <AdminLayout>
+        {children}
+      </AdminLayout>
+    </ServerErrorBoundary>
   );
 }

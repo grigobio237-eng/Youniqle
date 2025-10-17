@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getAdminApiUrl, logEnvironmentInfo } from '@/lib/apiUtils';
+import { checkSystemHealth } from '@/lib/debug';
 import { 
   LayoutDashboard, 
   Users, 
@@ -209,6 +210,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   useEffect(() => {
     checkAdminAuth();
+    
+    // 시스템 상태 확인 (디버깅용)
+    if (process.env.NODE_ENV === 'development') {
+      checkSystemHealth().then(result => {
+        console.log('🔍 시스템 상태:', result);
+      });
+    }
   }, []);
 
   useEffect(() => {
