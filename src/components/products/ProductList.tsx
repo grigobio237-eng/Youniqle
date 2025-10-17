@@ -55,17 +55,32 @@ export default function ProductList({ searchParams }: ProductListProps) {
         if (searchParams.sort) params.append('sort', searchParams.sort);
         if (searchParams.page) params.append('page', searchParams.page);
 
-        const response = await fetch(`/api/products?${params.toString()}`);
+        const response = await fetch(`/api/products?${params.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // 10초 타임아웃
+          signal: AbortSignal.timeout(10000),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
-        if (response.ok) {
+        if (data && data.products) {
           setProducts(data.products);
-          setPagination(data.pagination);
+          setPagination(data.pagination || { page: 1, limit: 20, total: 0, pages: 0 });
         } else {
-          console.error('Failed to fetch products:', data.error);
+          console.error('Invalid response format:', data);
+          setProducts([]);
         }
       } catch (error) {
         console.error('Error fetching products:', error);
+        setProducts([]);
+        setPagination({ page: 1, limit: 20, total: 0, pages: 0 });
       } finally {
         setLoading(false);
       }

@@ -34,16 +34,21 @@ interface ServerProductListProps {
 
 async function fetchProducts(searchParams: any) {
   try {
+    // MongoDB 연결 확인
     await connectDB();
 
     // Build filter object
     const filter: any = { status: 'active' };
     
-    if (searchParams.q) {
-      filter.$text = { $search: searchParams.q };
+    if (searchParams.q && searchParams.q.trim()) {
+      // 텍스트 검색은 인덱스가 있어야 하므로 간단한 검색으로 대체
+      filter.$or = [
+        { name: { $regex: searchParams.q, $options: 'i' } },
+        { summary: { $regex: searchParams.q, $options: 'i' } }
+      ];
     }
     
-    if (searchParams.category) {
+    if (searchParams.category && searchParams.category !== 'all') {
       filter.category = searchParams.category;
     }
 
@@ -71,15 +76,17 @@ async function fetchProducts(searchParams: any) {
     const limit = 20;
     const skip = (page - 1) * limit;
 
-    // Execute query
-    const [products, total] = await Promise.all([
-      Product.find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Product.countDocuments(filter),
-    ]);
+    // Execute query with timeout
+    const queryPromise = Product.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .maxTimeMS(5000); // 5초 타임아웃
+
+    const countPromise = Product.countDocuments(filter).maxTimeMS(5000);
+
+    const [products, total] = await Promise.all([queryPromise, countPromise]);
 
     return {
       products: products.map((product: any) => ({
@@ -95,6 +102,7 @@ async function fetchProducts(searchParams: any) {
     };
   } catch (error) {
     console.error('Error fetching products:', error);
+    // 에러 발생 시 빈 결과 반환
     return { products: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } };
   }
 }

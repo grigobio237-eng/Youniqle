@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import ServerProductList from '@/components/products/ServerProductList';
+import ProductList from '@/components/products/ProductList';
 import ProductFilters from '@/components/products/ProductFilters';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -63,7 +63,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <main className="flex-1">
           <ErrorBoundary>
             <Suspense fallback={<ProductListSkeleton />}>
-              <ServerProductList searchParams={params} />
+              <ProductList searchParams={params} />
             </Suspense>
           </ErrorBoundary>
         </main>
