@@ -2,6 +2,7 @@ import { UserProfile } from '@/models/Personalization';
 import UserBehavior from '@/models/UserBehavior';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import mongoose from 'mongoose';
 
 export interface AdvancedRecommendationRequest {
@@ -73,9 +74,17 @@ export class AdvancedRecommendationEngine {
         .sort({ timestamp: -1 })
         .limit(1000);
 
-      // 구매 데이터 조회
+      // 구매 데이터 조회 (userId가 이메일인 경우 ObjectId로 변환)
+      let userObjectId = userId;
+      if (typeof userId === 'string' && userId.includes('@')) {
+        const user = await User.findOne({ email: userId });
+        if (user) {
+          userObjectId = user._id;
+        }
+      }
+      
       const orders = await Order.find({
-        userId,
+        userId: userObjectId,
         status: { $in: ['completed', 'delivered'] }
       }).sort({ createdAt: -1 });
 
@@ -181,8 +190,12 @@ export class AdvancedRecommendationEngine {
         .sort({ timestamp: -1 })
         .limit(500);
 
+      // 유사한 사용자의 ObjectId 조회
+      const similarUserObj = await User.findOne({ email: similarUser.userId });
+      if (!similarUserObj) continue;
+      
       const similarOrders = await Order.find({
-        userId: similarUser.userId,
+        userId: similarUserObj._id,
         status: { $in: ['completed', 'delivered'] }
       }).sort({ createdAt: -1 });
 

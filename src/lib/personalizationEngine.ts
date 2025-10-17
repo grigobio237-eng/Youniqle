@@ -637,16 +637,23 @@ export class PersonalizationEngine {
     for (const similarUser of similarUsers) {
       const similarProfile = await UserProfile.findOne({ userId: similarUser.userId });
       if (similarProfile) {
+        // 이메일 형태의 userId를 ObjectId로 변환
+        const similarUserObj = await User.findOne({ email: similarUser.userId });
+        if (!similarUserObj) continue;
+        
         const userOrders = await Order.find({
-          userId: similarUser.userId,
+          userId: similarUserObj._id,
           status: { $in: ['completed', 'delivered'] }
         });
 
         for (const order of userOrders) {
           for (const item of order.items) {
             // 현재 사용자가 구매하지 않은 상품인지 확인
+            const currentUserObj = await User.findOne({ email: profile.userId });
+            if (!currentUserObj) continue;
+            
             const hasPurchased = await Order.exists({
-              userId: profile.userId,
+              userId: currentUserObj._id,
               'items.productId': item.productId,
               status: { $in: ['completed', 'delivered'] }
             });
