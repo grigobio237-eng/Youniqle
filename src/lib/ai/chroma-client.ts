@@ -1,97 +1,37 @@
-import { ChromaClient } from 'chromadb';
-import { DefaultEmbeddingFunction } from '@chroma-core/default-embed';
-import path from 'path';
-
-// Chroma DB 클라이언트 싱글톤
-let chromaClient: ChromaClient | null = null;
-let collection: any = null;
+/**
+ * ChromaDB 클라이언트 - 모의 구현
+ * 
+ * 실제 ChromaDB 패키지는 Vercel 서버리스 함수 크기 제한(250MB)으로 인해
+ * 프로덕션 배포에서 제외되었습니다.
+ * 
+ * AI 챗봇 기능은 추후 다음 방식으로 구현 예정:
+ * 1. 외부 ChromaDB 서비스 사용 (ChromaDB Cloud)
+ * 2. Pinecone, Weaviate 등 다른 벡터 DB 서비스
+ * 3. OpenAI Embeddings API 직접 사용
+ */
 
 /**
- * Chroma DB 클라이언트 초기화
+ * Chroma DB 클라이언트 초기화 (모의)
  */
 export async function initializeChromaClient() {
-  if (!chromaClient) {
-    try {
-      // 절대 경로 사용
-      const chromaPath = path.join(process.cwd(), 'chroma_db');
-      console.log(`[Chroma Client] 경로: ${chromaPath}`);
-      
-      // ChromaDB v3.x에서는 host, port, ssl 옵션 사용
-      chromaClient = new ChromaClient({
-        host: 'localhost',
-        port: 8000,
-        ssl: false
-      });
-
-      // 기본 임베딩 함수 초기화
-      const embeddingFunction = new DefaultEmbeddingFunction();
-
-      // 컬렉션 가져오기 (이미 존재하는 컬렉션 사용)
-      try {
-        collection = await chromaClient.getCollection({
-          name: 'youniqle_knowledge',
-          embeddingFunction: embeddingFunction
-        });
-        console.log('✅ 기존 컬렉션 로드 완료');
-      } catch (error) {
-        console.log('⚠️ 컬렉션이 존재하지 않습니다. 새로 생성합니다.');
-        // 컬렉션이 없으면 새로 생성
-        collection = await chromaClient.createCollection({
-          name: 'youniqle_knowledge',
-          embeddingFunction: embeddingFunction,
-          metadata: {
-            description: 'Youniqle 웹사이트 지식베이스'
-          }
-        });
-        console.log('✅ 새 컬렉션 생성 완료');
-      }
-
-      console.log('✅ Chroma DB 클라이언트 초기화 완료');
-      return collection;
-    } catch (error) {
-      console.error('❌ Chroma DB 초기화 실패:', error);
-      throw error;
-    }
-  }
-  return collection;
+  console.log('[Chroma Client] 모의 모드 - AI 챗봇 기능은 현재 비활성화됨');
+  return null;
 }
 
 /**
- * 벡터 검색
+ * 벡터 검색 (모의)
  */
 export async function searchSimilarDocuments(
   embedding: number[],
   topK: number = 5
 ): Promise<any[]> {
-  try {
-    if (!collection) {
-      await initializeChromaClient();
-    }
-
-    // 벡터 검색
-    const results = await collection.query({
-      queryEmbeddings: [embedding],
-      nResults: topK,
-      include: ['documents', 'metadatas', 'distances']
-    });
-
-    // 결과 포맷팅
-    const formattedResults = results.documents[0].map((doc: string, index: number) => ({
-      content: doc,
-      metadata: results.metadatas[0][index],
-      distance: results.distances[0][index],
-      relevance: 1 - results.distances[0][index] // 거리를 관련성으로 변환
-    }));
-
-    return formattedResults;
-  } catch (error) {
-    console.error('❌ 벡터 검색 실패:', error);
-    throw error;
-  }
+  console.log('[Chroma Client] 모의 검색 - 빈 결과 반환');
+  // 빈 배열 반환 (AI 챗봇 비활성화)
+  return [];
 }
 
 /**
- * 문서 추가
+ * 문서 추가 (모의)
  */
 export async function addDocument(
   id: string,
@@ -99,43 +39,19 @@ export async function addDocument(
   embedding: number[],
   metadata: any
 ) {
-  try {
-    if (!collection) {
-      await initializeChromaClient();
-    }
-
-    await collection.add({
-      ids: [id],
-      documents: [text],
-      embeddings: [embedding],
-      metadatas: [metadata]
-    });
-
-    console.log(`✅ 문서 추가 완료: ${id}`);
-  } catch (error) {
-    console.error('❌ 문서 추가 실패:', error);
-    throw error;
-  }
+  console.log('[Chroma Client] 모의 문서 추가 - 아무 작업도 수행하지 않음');
+  // 아무 작업도 하지 않음
 }
 
 /**
- * 컬렉션 통계
+ * 컬렉션 통계 (모의)
  */
 export async function getCollectionStats() {
-  try {
-    if (!collection) {
-      await initializeChromaClient();
-    }
-
-    const count = await collection.count();
-    return {
-      name: collection.name,
-      count,
-      metadata: collection.metadata
-    };
-  } catch (error) {
-    console.error('❌ 컬렉션 통계 조회 실패:', error);
-    throw error;
-  }
+  console.log('[Chroma Client] 모의 통계 - 기본값 반환');
+  return {
+    name: 'youniqle_knowledge',
+    count: 0,
+    metadata: { description: 'AI 챗봇 기능은 현재 개발 중입니다' }
+  };
 }
 

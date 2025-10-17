@@ -1,88 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchSimilarDocuments } from '@/lib/ai/chroma-client';
 
 /**
  * POST /api/ai/search-context
  * 
- * 임베딩 벡터를 받아서 Chroma DB에서 관련 컨텍스트를 검색합니다.
- * 
- * Request Body:
- * {
- *   "embedding": [0.1, 0.2, ...],
- *   "inquiryId": "문의 ID",
- *   "content": "문의 내용" (선택),
- *   "type": "문의 유형" (선택),
- *   "subject": "문의 제목" (선택),
- *   "context": { "userInfo": {...} } (선택),
- *   "topK": 5 (선택, 기본값: 5)
- * }
- * 
- * Response:
- * {
- *   "success": true,
- *   "context": [...],
- *   "inquiryId": "문의 ID",
- *   "content": "문의 내용",
- *   "type": "문의 유형",
- *   "subject": "문의 제목",
- *   "userInfo": {...},
- *   "count": 5
- * }
+ * AI 챗봇 API - 현재 비활성화됨 (Vercel 배포 크기 제한)
+ * ChromaDB 벡터 검색 기능은 추후 외부 서비스로 이전 예정
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('[Search Context API] 요청 수신');
-
-    // Request Body 파싱
     const body = await request.json();
-    const { 
-      embedding, 
-      inquiryId, 
-      content, 
-      type, 
-      subject, 
-      context: inquiryContext 
-    } = body;
-    const topK = parseInt(body.topK) || 5; // topK를 숫자로 변환
+    const { inquiryId, content } = body;
 
-    // 입력 검증
-    if (!embedding || !Array.isArray(embedding)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'embedding 필드가 필요합니다 (배열 형태)'
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!inquiryId) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'inquiryId 필드가 필요합니다'
-        },
-        { status: 400 }
-      );
-    }
-
-    console.log(`[Search Context API] 문의 ID: ${inquiryId}, 임베딩 차원: ${embedding.length}`);
-
-    // 벡터 검색
-    const searchResults = await searchSimilarDocuments(embedding, topK);
-
-    console.log(`[Search Context API] 검색 결과: ${searchResults.length}개 문서`);
-
-    // 응답 반환 (원본 문의 데이터 포함)
+    // AI 챗봇 기능은 현재 비활성화됨
+    // 기본 응답만 반환
     return NextResponse.json({
       success: true,
-      context: searchResults,  // 검색된 관련 컨텍스트
+      context: [],
       inquiryId,
-      content: content || '',  // 문의 내용
-      type: type || '',        // 문의 유형
-      subject: subject || '',  // 문의 제목
-      inquiryContext: inquiryContext || {},  // 원본 문의 컨텍스트 (userInfo 포함)
-      count: searchResults.length
+      content: content || '',
+      count: 0,
+      message: 'AI 챗봇 기능은 현재 개발 중입니다. 관리자가 직접 답변드리겠습니다.'
     });
 
   } catch (error) {
