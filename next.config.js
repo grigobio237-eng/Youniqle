@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 서버 컴포넌트 렌더링 에러 방지 설정
-  experimental: {
-    serverComponentsExternalPackages: ['mongoose'],
-  },
   // 에러 처리 개선
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,

@@ -131,7 +131,15 @@ export async function checkSystemHealth() {
 export function diagnoseServerComponentError(error: Error) {
   console.log('🔍 서버 컴포넌트 렌더링 에러 진단 시작...');
   
-  const diagnosis = {
+  const diagnosis: {
+    errorMessage: string;
+    errorStack: string | undefined;
+    timestamp: string;
+    environment: string | undefined;
+    memoryUsage: NodeJS.MemoryUsage;
+    uptime: number;
+    suspectedCause?: string;
+  } = {
     errorMessage: error.message,
     errorStack: error.stack,
     timestamp: new Date().toISOString(),
