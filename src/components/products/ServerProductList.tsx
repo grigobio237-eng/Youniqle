@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatPrice } from '@/lib/utils';
 import { Heart, ShoppingCart } from 'lucide-react';
+import connectDB from '@/lib/db';
+import Product from '@/models/Product';
 
 interface Product {
   _id: string;
@@ -32,23 +34,65 @@ interface ServerProductListProps {
 
 async function fetchProducts(searchParams: any) {
   try {
-    const params = new URLSearchParams();
-    
-    if (searchParams.q) params.append('q', searchParams.q);
-    if (searchParams.category) params.append('category', searchParams.category);
-    if (searchParams.sort) params.append('sort', searchParams.sort);
-    if (searchParams.page) params.append('page', searchParams.page);
+    await connectDB();
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/products?${params.toString()}`, {
-      cache: 'no-store' // Always fetch fresh data
-    });
+    // Build filter object
+    const filter: any = { status: 'active' };
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch products');
+    if (searchParams.q) {
+      filter.$text = { $search: searchParams.q };
     }
     
-    const data = await response.json();
-    return data;
+    if (searchParams.category) {
+      filter.category = searchParams.category;
+    }
+
+    // Build sort object
+    let sort: any = { createdAt: -1 }; // default: newest first
+    
+    switch (searchParams.sort) {
+      case 'price_asc':
+        sort = { price: 1 };
+        break;
+      case 'price_desc':
+        sort = { price: -1 };
+        break;
+      case 'popular':
+        sort = { createdAt: -1 };
+        break;
+      case 'newest':
+      default:
+        sort = { createdAt: -1 };
+        break;
+    }
+
+    // Pagination
+    const page = parseInt(searchParams.page) || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    // Execute query
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(filter),
+    ]);
+
+    return {
+      products: products.map((product: any) => ({
+        ...product,
+        id: product._id,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   } catch (error) {
     console.error('Error fetching products:', error);
     return { products: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } };
@@ -56,18 +100,19 @@ async function fetchProducts(searchParams: any) {
 }
 
 export default async function ServerProductList({ searchParams }: ServerProductListProps) {
-  const { products, pagination } = await fetchProducts(searchParams);
+  try {
+    const { products, pagination } = await fetchProducts(searchParams);
 
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-text-secondary text-lg">상품을 찾을 수 없습니다.</p>
-        <p className="text-text-secondary text-sm mt-2">
-          다른 검색어로 시도해보세요.
-        </p>
-      </div>
-    );
-  }
+    if (products.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-text-secondary text-lg">상품을 찾을 수 없습니다.</p>
+          <p className="text-text-secondary text-sm mt-2">
+            다른 검색어로 시도해보세요.
+          </p>
+        </div>
+      );
+    }
 
   return (
     <>
@@ -158,4 +203,20 @@ export default async function ServerProductList({ searchParams }: ServerProductL
       )}
     </>
   );
+  } catch (error) {
+    console.error('ServerProductList error:', error);
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-red-600 mb-4">
+          문제가 발생했습니다
+        </h2>
+        <p className="text-gray-600 mb-4">
+          상품 목록을 불러오는 중 오류가 발생했습니다.
+        </p>
+        <p className="text-sm text-gray-500">
+          잠시 후 다시 시도해주세요.
+        </p>
+      </div>
+    );
+  }
 }
