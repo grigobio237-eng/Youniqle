@@ -91,3 +91,12 @@ scripts/backups/
 backups/
 *.backup
 *.bak
+
+# ChromaDB files (too large for git)
+chroma_db/
+chroma_test.py
+simple_chroma_query.py
+
+# N8N data files (too large for git)
+n8n-data/
+n8n-data-backup/

@@ -1,13 +1,8 @@
-// Redis 캐싱 시스템
-import Redis from 'ioredis';
-
+// 메모리 캐싱 시스템 (Vercel 서버리스 환경 최적화)
 class CacheManager {
-  private redis: Redis | null = null;
-  private isConnected = false;
-  private memoryCache = new Map<string, { value: any; expires: number }>(); // 메모리 캐시 fallback
+  private memoryCache = new Map<string, { value: any; expires: number }>();
 
   constructor() {
-    this.initializeRedis();
     this.startMemoryCacheCleanup();
   }
 
@@ -23,133 +18,22 @@ class CacheManager {
     }, 60000); // 1분마다 정리
   }
 
-  private initializeRedis() {
-    try {
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-      
-      this.redis = new Redis(redisUrl, {
-  maxRetriesPerRequest: 3,
-        retryStrategy: (times) => {
-          // 최대 5회만 재시도
-          if (times > 5) {
-            console.log('❌ Redis 연결 실패: 최대 재시도 횟수 초과, 메모리 캐시로 전환');
-            return null; // 재시도 중단
-          }
-          const delay = Math.min(times * 100, 2000);
-          console.log(`Redis 연결 재시도: ${times}회, ${delay}ms 후`);
-          return delay;
-        },
-  lazyConnect: true,
-        keepAlive: 30000,
-        connectTimeout: 5000, // 타임아웃 단축
-        commandTimeout: 3000,
-        enableReadyCheck: false, // Ready 체크 비활성화
-    });
-
-    this.redis.on('connect', () => {
-        console.log('✅ Redis 연결 성공');
-      this.isConnected = true;
-    });
-
-    this.redis.on('error', (error) => {
-        console.error('❌ Redis 연결 오류:', error.message);
-      this.isConnected = false;
-    });
-
-    this.redis.on('close', () => {
-        console.log('🔌 Redis 연결 종료');
-      this.isConnected = false;
-      });
-
-    } catch (error) {
-      console.error('❌ Redis 초기화 실패:', error);
-      this.redis = null;
-    }
-  }
-
-  // 캐시 연결 확인
-  private async ensureConnection(): Promise<boolean> {
-    if (!this.redis) {
-      console.log('⚠️ Redis가 초기화되지 않았습니다.');
-      return false;
-    }
-
-    if (!this.isConnected) {
-      try {
-        // 이미 연결 중인지 확인
-        if (this.redis.status === 'connecting') {
-          // 연결 중이면 잠시 대기 후 재시도
-          await new Promise(resolve => setTimeout(resolve, 100));
-          return this.isConnected;
-        }
-        
-        await this.redis.connect();
-        return true;
-      } catch (error) {
-        // 이미 연결된 경우 무시
-        if (error instanceof Error && error.message?.includes('already connecting/connected')) {
-          return true;
-        }
-        console.error('❌ Redis 연결 실패:', error);
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   // 캐시에 데이터 저장
   async set(key: string, value: any, ttl: number = 3600): Promise<boolean> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) {
-        // Redis 연결 실패 시 메모리 캐시 사용
-        const expires = Date.now() + (ttl * 1000);
-        this.memoryCache.set(key, { value, expires });
-        console.log(`📝 메모리 캐시 저장: ${key} (TTL: ${ttl}s)`);
-        return true;
-      }
-
-      const serializedValue = JSON.stringify(value);
-      await this.redis!.setex(key, ttl, serializedValue);
-      
-      console.log(`📝 Redis 캐시 저장: ${key} (TTL: ${ttl}s)`);
-      return true;
-    } catch (error) {
-      // Redis 오류 시 메모리 캐시로 fallback
       const expires = Date.now() + (ttl * 1000);
       this.memoryCache.set(key, { value, expires });
-      console.log(`📝 Redis 오류로 메모리 캐시 저장: ${key} (TTL: ${ttl}s)`);
+      console.log(`📝 메모리 캐시 저장: ${key} (TTL: ${ttl}s)`);
       return true;
+    } catch (error) {
+      console.error(`❌ 캐시 저장 실패: ${key}`, error);
+      return false;
     }
   }
 
   // 캐시에서 데이터 조회
   async get(key: string): Promise<any | null> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) {
-        // Redis 연결 실패 시 메모리 캐시에서 조회
-        const cached = this.memoryCache.get(key);
-        if (!cached) return null;
-        
-        if (Date.now() > cached.expires) {
-          this.memoryCache.delete(key);
-          return null;
-        }
-        
-        console.log(`📖 메모리 캐시 조회: ${key}`);
-        return cached.value;
-      }
-
-      const value = await this.redis!.get(key);
-      if (value === null) return null;
-
-      const parsedValue = JSON.parse(value);
-      console.log(`📖 Redis 캐시 조회: ${key}`);
-      return parsedValue;
-    } catch (error) {
-      // Redis 오류 시 메모리 캐시에서 조회
       const cached = this.memoryCache.get(key);
       if (!cached) return null;
       
@@ -158,20 +42,22 @@ class CacheManager {
         return null;
       }
       
-      console.log(`📖 Redis 오류로 메모리 캐시 조회: ${key}`);
+      console.log(`📖 메모리 캐시 조회: ${key}`);
       return cached.value;
+    } catch (error) {
+      console.error(`❌ 캐시 조회 실패: ${key}`, error);
+      return null;
     }
   }
 
   // 캐시에서 데이터 삭제
   async del(key: string): Promise<boolean> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return false;
-
-      await this.redis!.del(key);
-      console.log(`🗑️ 캐시 삭제: ${key}`);
-      return true;
+      const deleted = this.memoryCache.delete(key);
+      if (deleted) {
+        console.log(`🗑️ 캐시 삭제: ${key}`);
+      }
+      return deleted;
     } catch (error) {
       console.error(`❌ 캐시 삭제 실패: ${key}`, error);
       return false;
@@ -181,13 +67,18 @@ class CacheManager {
   // 패턴으로 캐시 삭제
   async delPattern(pattern: string): Promise<boolean> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return false;
-
-      const keys = await this.redis!.keys(pattern);
-      if (keys.length > 0) {
-        await this.redis!.del(...keys);
-        console.log(`🗑️ 패턴 캐시 삭제: ${pattern} (${keys.length}개)`);
+      let deletedCount = 0;
+      const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+      
+      for (const key of this.memoryCache.keys()) {
+        if (regex.test(key)) {
+          this.memoryCache.delete(key);
+          deletedCount++;
+        }
+      }
+      
+      if (deletedCount > 0) {
+        console.log(`🗑️ 패턴 캐시 삭제: ${pattern} (${deletedCount}개)`);
       }
       return true;
     } catch (error) {
@@ -199,10 +90,11 @@ class CacheManager {
   // 캐시 TTL 확인
   async ttl(key: string): Promise<number> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return -1;
-
-      return await this.redis!.ttl(key);
+      const cached = this.memoryCache.get(key);
+      if (!cached) return -1;
+      
+      const remaining = Math.max(0, Math.floor((cached.expires - Date.now()) / 1000));
+      return remaining;
     } catch (error) {
       console.error(`❌ TTL 조회 실패: ${key}`, error);
       return -1;
@@ -212,11 +104,15 @@ class CacheManager {
   // 캐시 존재 확인
   async exists(key: string): Promise<boolean> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return false;
-
-      const result = await this.redis!.exists(key);
-      return result === 1;
+      const cached = this.memoryCache.get(key);
+      if (!cached) return false;
+      
+      if (Date.now() > cached.expires) {
+        this.memoryCache.delete(key);
+        return false;
+      }
+      
+      return true;
     } catch (error) {
       console.error(`❌ 캐시 존재 확인 실패: ${key}`, error);
       return false;
@@ -226,10 +122,20 @@ class CacheManager {
   // 캐시 키 목록 조회
   async keys(pattern: string = '*'): Promise<string[]> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return [];
-
-      return await this.redis!.keys(pattern);
+      const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+      const matchingKeys: string[] = [];
+      
+      for (const key of this.memoryCache.keys()) {
+        if (regex.test(key)) {
+          // 만료된 키는 제외
+          const cached = this.memoryCache.get(key);
+          if (cached && Date.now() <= cached.expires) {
+            matchingKeys.push(key);
+          }
+        }
+      }
+      
+      return matchingKeys;
     } catch (error) {
       console.error(`❌ 키 목록 조회 실패: ${pattern}`, error);
       return [];
@@ -239,32 +145,40 @@ class CacheManager {
   // 캐시 통계 조회
   async getStats(): Promise<any> {
     try {
-      const connected = await this.ensureConnection();
-      if (!connected) return null;
-
-      const info = await this.redis!.info();
-      const keys = await this.redis!.keys('*');
-
+      const now = Date.now();
+      let validKeys = 0;
+      let totalMemory = 0;
+      
+      for (const [key, cached] of this.memoryCache.entries()) {
+        if (now <= cached.expires) {
+          validKeys++;
+          totalMemory += JSON.stringify(cached.value).length;
+        }
+      }
+      
       return {
-        connected: this.isConnected,
-        keyCount: keys.length,
-        memory: info.match(/used_memory_human:([^\r\n]+)/)?.[1] || 'N/A',
-        uptime: info.match(/uptime_in_seconds:(\d+)/)?.[1] || 'N/A',
-        connectedClients: info.match(/connected_clients:(\d+)/)?.[1] || 'N/A'
+        connected: true,
+        keyCount: validKeys,
+        memory: `${Math.round(totalMemory / 1024)}KB`,
+        uptime: 'N/A',
+        connectedClients: '1'
       };
     } catch (error) {
       console.error('❌ 캐시 통계 조회 실패:', error);
-      return null;
+      return {
+        connected: true,
+        keyCount: 0,
+        memory: '0KB',
+        uptime: 'N/A',
+        connectedClients: '1'
+      };
     }
   }
 
-  // 캐시 연결 종료
+  // 캐시 연결 종료 (메모리 캐시는 자동 정리됨)
   async disconnect(): Promise<void> {
-    if (this.redis) {
-      await this.redis.disconnect();
-      this.isConnected = false;
-      console.log('🔌 Redis 연결 종료');
-    }
+    this.memoryCache.clear();
+    console.log('🔌 메모리 캐시 정리 완료');
   }
 }
 

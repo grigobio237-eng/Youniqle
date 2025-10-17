@@ -37,7 +37,7 @@
 
 ### 🛡️ 보안 및 성능
 - **API 보안**: Rate Limiting, 입력 검증, CORS 보안
-- **캐싱 시스템**: Redis 기반 고성능 캐싱
+- **캐싱 시스템**: 메모리 기반 고성능 캐싱
 - **성능 모니터링**: 실시간 성능 추적, 알림
 - **이미지 최적화**: WebP/AVIF 변환, 자동 리사이징
 - **데이터베이스 최적화**: 인덱스 관리, 쿼리 최적화
@@ -53,7 +53,7 @@
 
 ### Backend & Database
 - **Database**: MongoDB Atlas, Mongoose ODM
-- **Caching**: Redis (ioredis)
+- **Caching**: 메모리 캐시 (Vercel 서버리스 최적화)
 - **Authentication**: NextAuth.js, JWT, bcryptjs
 - **File Storage**: Vercel Blob, Sharp (이미지 처리)
 
@@ -124,12 +124,7 @@ SMTP_USER=your-hiworks-email
 SMTP_PASS=your-hiworks-password
 EMAIL_FROM=noreply@grigobio.co.kr
 
-# Redis Cache
-REDIS_URL=redis://localhost:6379
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your-redis-password
-REDIS_DB=0
+# 캐시 시스템 (메모리 캐시 사용 - 환경변수 불필요)
 
 # AI Services
 OPENAI_API_KEY=your-openai-api-key
@@ -141,7 +136,6 @@ VAPID_PRIVATE_KEY=your-vapid-private-key
 VAPID_EMAIL=your-vapid-email
 
 # Security
-RATE_LIMIT_REDIS_URL=redis://localhost:6379
 CORS_ORIGIN=https://grigobio.co.kr
 ```
 
