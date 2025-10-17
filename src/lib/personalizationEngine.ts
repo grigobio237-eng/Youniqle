@@ -545,6 +545,7 @@ export class PersonalizationEngine {
       }
 
       // 사용자 프로필 조회/생성
+      await connectDB(); // MongoDB 연결 확인
       let profile = await UserProfile.findOne({ userId });
       if (!profile) {
         profile = await this.createOrUpdateUserProfile(userId);

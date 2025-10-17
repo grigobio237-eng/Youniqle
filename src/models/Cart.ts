@@ -44,7 +44,6 @@ const CartSchema = new Schema<ICart>({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true, // 한 사용자당 하나의 장바구니
   },
   items: [CartItemSchema],
   totalItems: {
@@ -66,8 +65,8 @@ CartSchema.pre('save', function(next) {
   next();
 });
 
-// 인덱스 설정
-CartSchema.index({ userId: 1 });
+// 인덱스 설정 (unique 인덱스로 한 사용자당 하나의 장바구니 보장)
+CartSchema.index({ userId: 1 }, { unique: true });
 CartSchema.index({ 'items.productId': 1 });
 
 export default mongoose.models.Cart || mongoose.model<ICart>('Cart', CartSchema);
