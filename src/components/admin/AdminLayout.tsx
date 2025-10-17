@@ -221,10 +221,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('/api/admin/notifications');
+      // 프로덕션 환경에서는 절대 URL 사용
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `${window.location.origin}/api/admin/notifications`
+        : '/api/admin/notifications';
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
+      } else {
+        console.error('Failed to fetch notifications, status:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
@@ -233,17 +247,38 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const checkAdminAuth = async () => {
     try {
-      const response = await fetch('/api/admin/auth/verify');
+      // 프로덕션 환경에서는 절대 URL 사용
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `${window.location.origin}/api/admin/auth/verify`
+        : '/api/admin/auth/verify';
+      
+      console.log('Admin auth check URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        // 10초 타임아웃
+        signal: AbortSignal.timeout(10000),
+      });
+      
+      console.log('Admin auth response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Admin auth success:', data.user?.email);
         setAdmin(data.user);
       } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Admin auth failed:', errorData);
         // 관리자 권한이 없으면 로그인 페이지로 리다이렉트
         router.push('/admin/login');
       }
     } catch (error) {
       console.error('Admin auth check failed:', error);
+      // 네트워크 에러나 타임아웃의 경우에도 로그인 페이지로 리다이렉트
       router.push('/admin/login');
     } finally {
       setLoading(false);
@@ -252,11 +287,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/auth/logout', { method: 'POST' });
-      setAdmin(null);
-      router.push('/admin/login');
+      // 프로덕션 환경에서는 절대 URL 사용
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `${window.location.origin}/api/admin/auth/logout`
+        : '/api/admin/auth/logout';
+      
+      const response = await fetch(apiUrl, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        setAdmin(null);
+        router.push('/admin/login');
+      } else {
+        console.error('Logout failed with status:', response.status);
+        // 로그아웃 실패해도 로그인 페이지로 이동
+        setAdmin(null);
+        router.push('/admin/login');
+      }
     } catch (error) {
       console.error('Logout failed:', error);
+      // 에러가 발생해도 로그인 페이지로 이동
+      setAdmin(null);
+      router.push('/admin/login');
     }
   };
 
