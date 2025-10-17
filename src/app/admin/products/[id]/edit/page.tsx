@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageManager from '@/components/products/ImageManager';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Product {
   _id: string;
@@ -137,53 +138,79 @@ export default function EditProductPage() {
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`/api/admin/products/${productId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setProduct(data.product);
-        
-        // 폼 데이터 설정
-        setFormData({
-          name: data.product.name || '',
-          slug: data.product.slug || '',
-          price: data.product.price || 0,
-          originalPrice: data.product.originalPrice || 0,
-          stock: data.product.stock || 0,
-          category: data.product.category || '',
-          status: data.product.status || 'active',
-          featured: data.product.featured || false,
-          summary: data.product.summary || '',
-          description: data.product.description || '',
-          nutritionInfo: data.product.nutritionInfo || {
-            calories: '',
-            protein: '',
-            fat: '',
-            carbohydrates: '',
-            sodium: '',
-          },
-          originInfo: data.product.originInfo || {
-            origin: '',
-            storageMethod: '',
-            shelfLife: '',
-            packagingMethod: '',
-          },
-          clothingInfo: data.product.clothingInfo || {
-            sizeGuide: '',
-            material: '',
-            careInstructions: '',
-          },
-          electronicsInfo: data.product.electronicsInfo || {
-            specifications: '',
-            includedItems: '',
-            warranty: '',
-          },
-        });
-        
-        setImages(data.product.images || []);
+      setLoading(true);
+      console.log('Fetching product with ID:', productId);
+      
+      const response = await fetch(`/api/admin/products/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        // 10초 타임아웃
+        signal: AbortSignal.timeout(10000),
+      });
+      
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      console.log('Product data received:', data);
+      
+      if (!data.product) {
+        throw new Error('상품 데이터가 없습니다.');
+      }
+      
+      setProduct(data.product);
+      
+      // 폼 데이터 설정
+      setFormData({
+        name: data.product.name || '',
+        slug: data.product.slug || '',
+        price: data.product.price || 0,
+        originalPrice: data.product.originalPrice || 0,
+        stock: data.product.stock || 0,
+        category: data.product.category || '',
+        status: data.product.status || 'active',
+        featured: data.product.featured || false,
+        summary: data.product.summary || '',
+        description: data.product.description || '',
+        nutritionInfo: data.product.nutritionInfo || {
+          calories: '',
+          protein: '',
+          fat: '',
+          carbohydrates: '',
+          sodium: '',
+        },
+        originInfo: data.product.originInfo || {
+          origin: '',
+          storageMethod: '',
+          shelfLife: '',
+          packagingMethod: '',
+        },
+        clothingInfo: data.product.clothingInfo || {
+          sizeGuide: '',
+          material: '',
+          careInstructions: '',
+        },
+        electronicsInfo: data.product.electronicsInfo || {
+          specifications: '',
+          includedItems: '',
+          warranty: '',
+        },
+      });
+      
+      setImages(data.product.images || []);
+      
     } catch (error) {
       console.error('Failed to fetch product:', error);
-      toast.error('상품 정보를 불러오는데 실패했습니다.');
+      toast.error(error instanceof Error ? error.message : '상품 정보를 불러오는데 실패했습니다.');
+      setProduct(null);
     } finally {
       setLoading(false);
     }
@@ -469,169 +496,171 @@ export default function EditProductPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4" />
+    <ErrorBoundary>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" size="icon" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">상품 수정</h1>
+              <p className="text-gray-600">{product?.name || '상품 정보 로딩 중...'}</p>
+            </div>
+          </div>
+          <Button onClick={handleSave} disabled={saving || !product}>
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? '저장 중...' : '저장'}
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold">상품 수정</h1>
-            <p className="text-gray-600">{product.name}</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 기본 정보 */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>기본 정보</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">상품명 *</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="상품명을 입력하세요"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="slug">URL 슬러그 *</Label>
+                    <Input
+                      id="slug"
+                      value={formData.slug}
+                      onChange={(e) => handleInputChange('slug', e.target.value)}
+                      placeholder="product-url-slug"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="price">판매가격 *</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', Number(e.target.value))}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="originalPrice">원가 (할인가 표시용)</Label>
+                    <Input
+                      id="originalPrice"
+                      type="number"
+                      value={formData.originalPrice}
+                      onChange={(e) => handleInputChange('originalPrice', Number(e.target.value))}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="stock">재고 *</Label>
+                    <Input
+                      id="stock"
+                      type="number"
+                      value={formData.stock}
+                      onChange={(e) => handleInputChange('stock', Number(e.target.value))}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="category">카테고리 *</Label>
+                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="카테고리를 선택하세요" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="summary">상품 요약 *</Label>
+                  <Input
+                    id="summary"
+                    value={formData.summary}
+                    onChange={(e) => handleInputChange('summary', e.target.value)}
+                    placeholder="상품에 대한 간단한 요약"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="description">상품 설명 *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="상품에 대한 자세한 설명"
+                    rows={6}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 카테고리별 특화 정보 */}
+            {renderCategorySpecificFields()}
+          </div>
+
+          {/* 사이드바 */}
+          <div className="space-y-6">
+            {/* 이미지 관리 */}
+            <ImageManager
+              images={images}
+              onImagesChange={setImages}
+              maxImages={10}
+            />
+
+            {/* 상태 설정 */}
+            <Card>
+              <CardHeader>
+                <CardTitle>상태 설정</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="status">상품 상태</Label>
+                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">활성</SelectItem>
+                      <SelectItem value="hidden">숨김</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="featured">인기 상품</Label>
+                  <Switch
+                    id="featured"
+                    checked={formData.featured}
+                    onCheckedChange={(checked) => handleInputChange('featured', checked)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          <Save className="h-4 w-4 mr-2" />
-          {saving ? '저장 중...' : '저장'}
-        </Button>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 기본 정보 */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>기본 정보</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">상품명 *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="상품명을 입력하세요"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="slug">URL 슬러그 *</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
-                    placeholder="product-url-slug"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="price">판매가격 *</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', Number(e.target.value))}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="originalPrice">원가 (할인가 표시용)</Label>
-                  <Input
-                    id="originalPrice"
-                    type="number"
-                    value={formData.originalPrice}
-                    onChange={(e) => handleInputChange('originalPrice', Number(e.target.value))}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stock">재고 *</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    value={formData.stock}
-                    onChange={(e) => handleInputChange('stock', Number(e.target.value))}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="category">카테고리 *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="카테고리를 선택하세요" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="summary">상품 요약 *</Label>
-                <Input
-                  id="summary"
-                  value={formData.summary}
-                  onChange={(e) => handleInputChange('summary', e.target.value)}
-                  placeholder="상품에 대한 간단한 요약"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">상품 설명 *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="상품에 대한 자세한 설명"
-                  rows={6}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 카테고리별 특화 정보 */}
-          {renderCategorySpecificFields()}
-        </div>
-
-        {/* 사이드바 */}
-        <div className="space-y-6">
-          {/* 이미지 관리 */}
-          <ImageManager
-            images={images}
-            onImagesChange={setImages}
-            maxImages={10}
-          />
-
-          {/* 상태 설정 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>상태 설정</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="status">상품 상태</Label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">활성</SelectItem>
-                    <SelectItem value="hidden">숨김</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Label htmlFor="featured">인기 상품</Label>
-                <Switch
-                  id="featured"
-                  checked={formData.featured}
-                  onCheckedChange={(checked) => handleInputChange('featured', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    </ErrorBoundary>
   );
 }

@@ -10,32 +10,50 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    console.log('Fetching product with ID:', id);
+    
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
+      console.log('No session found');
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
 
     await connectDB();
+    console.log('Database connected');
     
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findOne({ email: session.user.email }).maxTimeMS(5000);
     
     if (!user || user.role !== 'admin') {
+      console.log('User not found or not admin:', user?.role);
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
-    const product = await Product.findById(id);
+    console.log('Admin user verified, fetching product...');
+    const product = await Product.findById(id).maxTimeMS(5000);
     
     if (!product) {
+      console.log('Product not found for ID:', id);
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
 
+    console.log('Product found:', product.name);
     return NextResponse.json({ product });
 
   } catch (error) {
     console.error('Failed to fetch product:', error);
+    
+    // MongoDB 연결 에러인 경우
+    if (error instanceof Error && error.message.includes('buffering timed out')) {
+      console.log('[API] MongoDB 타임아웃으로 인해 상품 조회 실패');
+      return NextResponse.json(
+        { error: '데이터베이스 연결이 불안정합니다. 잠시 후 다시 시도해주세요.' },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
       { error: '상품 정보를 불러오는데 실패했습니다.' },
       { status: 500 }
