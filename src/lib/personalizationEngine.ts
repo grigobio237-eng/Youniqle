@@ -80,6 +80,7 @@ export class PersonalizationEngine {
       }
 
       // 기존 프로필 조회
+      await connectDB(); // MongoDB 연결 확인
       let profile = await UserProfile.findOne({ userId }).maxTimeMS(5000);
       
       if (!profile) {
@@ -636,6 +637,7 @@ export class PersonalizationEngine {
     const recommendations: any[] = [];
     
     for (const similarUser of similarUsers) {
+      await connectDB(); // MongoDB 연결 확인
       const similarProfile = await UserProfile.findOne({ userId: similarUser.userId });
       if (similarProfile) {
         // 이메일 형태의 userId를 ObjectId로 변환

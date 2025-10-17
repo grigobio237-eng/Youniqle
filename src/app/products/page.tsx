@@ -34,19 +34,13 @@ interface ProductsPageProps {
   }>;
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const params = await searchParams;
+export default function ProductsPage({ searchParams }: ProductsPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-text-primary mb-4">
           상품 목록
         </h1>
-        {params.q && (
-          <p className="text-text-secondary">
-            &ldquo;{params.q}&rdquo; 검색 결과
-          </p>
-        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -63,7 +57,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <main className="flex-1">
           <ErrorBoundary>
             <Suspense fallback={<ProductListSkeleton />}>
-              <ProductList searchParams={params} />
+              <ProductList searchParams={{}} />
             </Suspense>
           </ErrorBoundary>
         </main>
