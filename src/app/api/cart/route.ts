@@ -9,46 +9,51 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // JWT 토큰으로 사용자 인증
+    // JWT 토큰으로 사용자 인증 (선택적)
     const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: '인증 토큰이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
     let userId = null;
 
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      userId = decoded.userId;
-      console.log('JWT 디코딩 성공, userId:', userId);
-    } catch (error) {
-      console.log('JWT 토큰 검증 실패:', error);
-      return NextResponse.json(
-        { error: '유효하지 않은 토큰입니다.' },
-        { status: 401 }
-      );
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+        userId = decoded.userId;
+        console.log('JWT 디코딩 성공, userId:', userId);
+      } catch (error) {
+        console.log('JWT 토큰 검증 실패:', error);
+        // 토큰이 유효하지 않아도 계속 진행 (익명 사용자로 처리)
+      }
     }
 
-    // 사용자 확인
-    const user = await User.findById(userId);
-    if (!user) {
-      return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
-        { status: 404 }
-      );
+    // 사용자 확인 (선택적)
+    let user = null;
+    if (userId) {
+      user = await User.findById(userId);
+      if (!user) {
+        console.log('사용자를 찾을 수 없음, 익명 사용자로 처리');
+      }
     }
 
     // 장바구니 조회
-    const cart = await Cart.findOne({ userId: user._id })
-      .populate('items.productId', 'name price images slug')
-      .lean();
+    if (user) {
+      const cart = await Cart.findOne({ userId: user._id })
+        .populate('items.productId', 'name price images slug')
+        .lean();
 
-    if (!cart) {
+      if (!cart) {
+        return NextResponse.json({
+          cart: {
+            items: [],
+            totalItems: 0,
+            totalAmount: 0,
+          }
+        });
+      }
+
+      return NextResponse.json({ cart });
+    } else {
+      // 익명 사용자의 경우 빈 장바구니 반환
       return NextResponse.json({
         cart: {
           items: [],
@@ -57,8 +62,6 @@ export async function GET(request: NextRequest) {
         }
       });
     }
-
-    return NextResponse.json({ cart });
   } catch (error) {
     console.error('Get cart error:', error);
     return NextResponse.json(
