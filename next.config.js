@@ -69,8 +69,8 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value: process.env.NODE_ENV === 'production' 
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://t1.daumcdn.net https://t1.daumcdn.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https:; frame-src 'self' http://t1.daumcdn.net https://t1.daumcdn.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
-              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://t1.daumcdn.net https://t1.daumcdn.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https: ws://localhost:3001 ws://127.0.0.1:3001; frame-src 'self' http://t1.daumcdn.net https://t1.daumcdn.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://t1.daumcdn.net https://t1.daumcdn.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https:; frame-src 'self' http://t1.daumcdn.net https://t1.daumcdn.net; frame-ancestors 'self' http://t1.daumcdn.net https://t1.daumcdn.net; base-uri 'self'; form-action 'self'"
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://t1.daumcdn.net https://t1.daumcdn.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https: ws://localhost:3001 ws://127.0.0.1:3001; frame-src 'self' http://t1.daumcdn.net https://t1.daumcdn.net; frame-ancestors 'self' http://t1.daumcdn.net https://t1.daumcdn.net; base-uri 'self'; form-action 'self'",
           },
           {
             key: 'X-Permitted-Cross-Domain-Policies',
