@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import RealtimeNotificationCenter from '@/components/notifications/RealtimeNotificationCenter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Header() {
@@ -109,8 +110,17 @@ export default function Header() {
             <Link href="/content" className="text-text-primary hover:text-primary transition-colors">
               {t('nav.content')}
             </Link>
+            <Link href="/notices" className="text-text-primary hover:text-primary transition-colors">
+              공지사항
+            </Link>
             <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
               {t('nav.about')}
+            </Link>
+            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors">
+              문의하기
+            </Link>
+            <Link href="/chat" className="text-text-primary hover:text-primary transition-colors">
+              실시간 채팅
             </Link>
           </nav>
 
@@ -134,6 +144,11 @@ export default function Header() {
             <div className="hidden xs:block">
               <LanguageSwitcher />
             </div>
+
+            {/* Real-time Notifications */}
+            {session && (
+              <RealtimeNotificationCenter />
+            )}
 
             {/* Cart */}
             <Button variant="ghost" size="icon" asChild className="relative">
@@ -211,8 +226,17 @@ export default function Header() {
               <Link href="/content" className="text-text-primary hover:text-primary transition-colors">
                 {t('nav.content')}
               </Link>
+              <Link href="/notices" className="text-text-primary hover:text-primary transition-colors">
+                공지사항
+              </Link>
               <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
                 {t('nav.about')}
+              </Link>
+              <Link href="/contact" className="text-text-primary hover:text-primary transition-colors">
+                문의하기
+              </Link>
+              <Link href="/chat" className="text-text-primary hover:text-primary transition-colors">
+                실시간 채팅
               </Link>
               
               {/* Mobile Search */}

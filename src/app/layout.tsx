@@ -5,6 +5,12 @@ import ConditionalHeader from '@/components/layout/ConditionalHeader';
 import Footer from '@/components/layout/Footer';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { initializeMonitoring } from '@/lib/initializeMonitoring';
+
+// 모니터링 시스템 초기화
+if (typeof window === 'undefined') {
+  initializeMonitoring();
+}
 
 const inter = Inter({ subsets: ['latin'] });
 

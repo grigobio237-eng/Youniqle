@@ -85,3 +85,9 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Backup files (may contain sensitive data)
+scripts/backups/
+backups/
+*.backup
+*.bak

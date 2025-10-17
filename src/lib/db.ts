@@ -27,9 +27,17 @@ async function connectDB() {
   }
 
   if (!cached!.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
+        const opts = {
+          bufferCommands: true,
+          maxPoolSize: 10, // 최대 연결 수
+          minPoolSize: 2, // 최소 연결 수
+          maxIdleTimeMS: 30000, // 30초
+          serverSelectionTimeoutMS: 5000, // 5초
+          socketTimeoutMS: 45000, // 45초
+          connectTimeoutMS: 10000, // 10초
+          retryWrites: true,
+          retryReads: true,
+        };
 
     cached!.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       return mongoose;

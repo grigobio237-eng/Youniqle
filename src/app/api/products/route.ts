@@ -1,22 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { productQuerySchema } from '@/lib/validators';
+import { InputValidator, commonSchemas } from '@/lib/validators';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
+import cache, { CacheKeys } from '@/lib/cache';
+import { withRateLimit, rateLimiters } from '@/lib/rateLimiter';
 
-export async function GET(request: NextRequest) {
+async function getProductsHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = Object.fromEntries(searchParams);
     
-    const validatedQuery = productQuerySchema.parse(query);
+    const validator = new InputValidator(commonSchemas.productQuery);
+    const validationResult = validator.validate(query);
+    
+    if (!validationResult.isValid) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid query parameters',
+          details: validationResult.errors.map(err => ({
+            field: err.field,
+            message: err.message
+          }))
+        },
+        { status: 400 }
+      );
+    }
+    
+    const validatedQuery = validationResult.sanitizedData;
+    
+    // 캐시 키 생성
+    const cacheKey = CacheKeys.products(
+      validatedQuery.page || 1, 
+      validatedQuery.limit || 20, 
+      validatedQuery
+    );
+
+    // 캐시에서 데이터 조회
+    const cachedData = await cache.get(cacheKey);
+    if (cachedData) {
+      console.log('📖 상품 목록 캐시 히트');
+      return NextResponse.json(cachedData);
+    }
     
     await connectDB();
 
     // Build filter object
     const filter: any = { status: 'active' };
     
-    if (validatedQuery.q) {
-      filter.$text = { $search: validatedQuery.q };
+    if (validatedQuery.q || validatedQuery.search) {
+      const searchTerm = validatedQuery.q || validatedQuery.search;
+      filter.$text = { $search: searchTerm };
     }
     
     if (validatedQuery.category) {
@@ -64,7 +97,7 @@ export async function GET(request: NextRequest) {
       id: product._id,
     }));
 
-    return NextResponse.json({
+    const responseData = {
       products: transformedProducts,
       pagination: {
         page,
@@ -72,7 +105,13 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit),
       },
-    });
+    };
+
+    // 캐시에 저장 (30분)
+    await cache.set(cacheKey, responseData, 1800);
+    console.log('📝 상품 목록 캐시 저장');
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Get products error:', error);
     
@@ -89,5 +128,8 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// Rate Limiting 적용 (분당 200회)
+export const GET = withRateLimit(rateLimiters.search, getProductsHandler);
 
 

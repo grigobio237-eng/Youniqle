@@ -90,8 +90,8 @@ function CheckoutPageContent() {
     const fetchCart = async () => {
       try {
         // URL 파라미터에서 바로 구매하기 상품 정보 확인
-        const productId = searchParams.get('product');
-        const quantity = searchParams.get('quantity');
+        const productId = searchParams?.get('product');
+        const quantity = searchParams?.get('quantity');
         
         if (productId && quantity) {
           // 바로 구매하기: 상품 정보를 가져와서 임시 장바구니 생성
@@ -134,7 +134,7 @@ function CheckoutPageContent() {
             const data = await response.json();
             
             // 선택된 상품 ID들 확인
-            const selectedIds = searchParams.get('selectedItems');
+            const selectedIds = searchParams?.get('selectedItems');
             
             if (selectedIds) {
               // 선택된 상품만 필터링

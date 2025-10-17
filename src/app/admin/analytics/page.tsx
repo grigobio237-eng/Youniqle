@@ -1,602 +1,582 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Users, 
+  BarChart3, 
   TrendingUp, 
-  TrendingDown,
+  Users, 
   Eye, 
-  Heart, 
-  ShoppingCart, 
-  Package, 
+  MousePointer, 
   DollarSign,
-  Activity,
-  BarChart3,
-  PieChart,
-  Calendar,
+  ShoppingCart,
+  Target,
+  Globe,
+  Smartphone,
+  Mail,
+  Tag,
+  Megaphone,
+  RefreshCw,
   Download,
   Filter,
-  Search,
-  ArrowUpRight,
-  ArrowDownRight,
-  Minus,
-  Store,
-  Star,
-  MessageCircle,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle
+  Calendar
 } from 'lucide-react';
-import { toast } from 'sonner';
 
-interface AnalyticsData {
-  overview: {
-    totalUsers: number;
-    totalPartners: number;
-    totalOrders: number;
-    totalRevenue: number;
-    userGrowth: number;
-    partnerGrowth: number;
-    orderGrowth: number;
-    revenueGrowth: number;
-  };
-  userActivity: {
-    activeUsers: number;
-    newUsers: number;
-    inactiveUsers: number;
-    averageSessionTime: number;
-    bounceRate: number;
-    conversionRate: number;
-  };
-  partnerActivity: {
-    activePartners: number;
-    newPartners: number;
-    pendingPartners: number;
-    totalProducts: number;
-    averageRating: number;
-    totalSales: number;
-  };
-  contentStats: {
-    totalContent: number;
-    totalViews: number;
-    totalLikes: number;
-    totalComments: number;
-    averageEngagement: number;
-  };
-  recentActivity: Array<{
-    id: string;
-    type: 'user' | 'partner' | 'order' | 'content';
-    action: string;
-    user: string;
-    timestamp: string;
-    details?: string;
+interface RealtimeMetrics {
+  activeUsers: number;
+  pageViews: number;
+  events: number;
+  conversions: number;
+  revenue: number;
+  hourlyMetrics: Array<{
+    hour: string;
+    users: number;
+    pageViews: number;
+    events: number;
+    conversions: number;
+    revenue: number;
   }>;
-  topPerformers: {
-    topUsers: Array<{
-      name: string;
-      email: string;
-      orders: number;
-      spent: number;
-      joinDate: string;
-    }>;
-    topPartners: Array<{
-      name: string;
-      businessName: string;
-      products: number;
-      sales: number;
-      rating: number;
-      joinDate: string;
-    }>;
-  };
-  trends: {
-    dailyStats: Array<{
-      date: string;
-      users: number;
-      orders: number;
-      revenue: number;
-    }>;
-  };
+  channelPerformance: Array<{
+    channel: string;
+    users: number;
+    pageViews: number;
+    conversions: number;
+    revenue: number;
+    conversionRate: number;
+  }>;
+  devicePerformance: Array<{
+    device: string;
+    users: number;
+    pageViews: number;
+    conversions: number;
+    revenue: number;
+  }>;
+  locationPerformance: Array<{
+    country: string;
+    users: number;
+    pageViews: number;
+    conversions: number;
+    revenue: number;
+  }>;
+  topPages: Array<{
+    page: string;
+    title: string;
+    views: number;
+    uniqueViews: number;
+    avgTimeOnPage: number;
+    bounceRate: number;
+  }>;
+  topSearchTerms: Array<{
+    term: string;
+    searches: number;
+    results: number;
+    avgResults: number;
+  }>;
+  campaignPerformance: Array<{
+    campaign: string;
+    source: string;
+    medium: string;
+    users: number;
+    conversions: number;
+    revenue: number;
+    conversionRate: number;
+    costPerConversion: number;
+  }>;
+  abTestPerformance: Array<{
+    testName: string;
+    variant: string;
+    users: number;
+    conversions: number;
+    conversionRate: number;
+    lift: number;
+  }>;
+  segmentPerformance: Array<{
+    segmentName: string;
+    users: number;
+    conversions: number;
+    revenue: number;
+    avgOrderValue: number;
+    conversionRate: number;
+  }>;
 }
 
-export default function AdminAnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+export default function AnalyticsDashboard() {
+  const [metrics, setMetrics] = useState<RealtimeMetrics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('30d');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState('1h');
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange]);
+    fetchMetrics();
+    
+    // 자동 새로고침 설정
+    let interval: NodeJS.Timeout;
+    if (autoRefresh) {
+      interval = setInterval(fetchMetrics, 30000); // 30초마다 새로고침
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [autoRefresh, selectedPeriod]);
 
-  const fetchAnalytics = async () => {
+  const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
-        credentials: 'include'
-      });
+      setError(null);
       
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      } else {
-        toast.error('분석 데이터를 가져올 수 없습니다.');
+      const response = await fetch(`/api/admin/analytics/realtime?period=${selectedPeriod}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: 실시간 분석 데이터를 불러올 수 없습니다.`);
       }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'API 응답 오류가 발생했습니다.');
+      }
+      
+      if (!data.data) {
+        throw new Error('분석 데이터가 없습니다.');
+      }
+      
+      setMetrics(data.data);
+      setLastUpdated(new Date());
     } catch (error) {
-      console.error('분석 데이터 조회 오류:', error);
-      toast.error('분석 데이터 조회 중 오류가 발생했습니다.');
+      console.error('Failed to fetch metrics:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      setError(errorMessage);
+      
+      // 개발 중에는 기본 데이터 설정
+      if (process.env.NODE_ENV === 'development') {
+        setMetrics({
+          activeUsers: 0,
+          pageViews: 0,
+          events: 0,
+          conversions: 0,
+          revenue: 0,
+          hourlyMetrics: [],
+          channelPerformance: [],
+          devicePerformance: [],
+          locationPerformance: [],
+          topPages: [],
+          topSearchTerms: [],
+          campaignPerformance: [],
+          abTestPerformance: [],
+          segmentPerformance: []
+        });
+        setError(null);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const getGrowthIcon = (growth: number) => {
-    if (growth > 0) return <ArrowUpRight className="h-4 w-4 text-green-600" />;
-    if (growth < 0) return <ArrowDownRight className="h-4 w-4 text-red-600" />;
-    return <Minus className="h-4 w-4 text-gray-600" />;
-  };
-
-  const getGrowthColor = (growth: number) => {
-    if (growth > 0) return 'text-green-600';
-    if (growth < 0) return 'text-red-600';
-    return 'text-gray-600';
-  };
-
   const formatNumber = (num: number) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toLocaleString();
+    return new Intl.NumberFormat('ko-KR').format(num);
   };
 
-  const formatCurrency = (amount: number) => {
-    return `₩${amount.toLocaleString()}`;
+  const formatCurrency = (num: number) => {
+    return new Intl.NumberFormat('ko-KR', {
+      style: 'currency',
+      currency: 'KRW'
+    }).format(num);
   };
 
-  if (loading) {
+  const formatPercentage = (num: number) => {
+    return `${num.toFixed(1)}%`;
+  };
+
+  if (loading && !metrics) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">분석 데이터를 불러오는 중...</div>
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>실시간 분석 데이터를 불러오는 중...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (!analytics) {
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg text-red-600">분석 데이터를 불러올 수 없습니다.</div>
+      <div className="p-6">
+        <div className="text-center py-12">
+          <div className="text-red-500 mb-4">
+            <BarChart3 className="h-16 w-16 mx-auto mb-4" />
+            <p className="text-lg">실시간 분석 데이터를 불러올 수 없습니다</p>
+            <p className="text-sm text-gray-500 mt-2">{error}</p>
+          </div>
+          <Button onClick={fetchMetrics} variant="outline">
+            다시 시도
+          </Button>
+        </div>
       </div>
     );
   }
+
+  if (!metrics) return null;
 
   return (
-    <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-text-primary">분석 대시보드</h1>
-            <p className="text-gray-600 mt-1">사용자 및 파트너 활동 모니터링 및 분석</p>
-          </div>
-          <div className="flex gap-2">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="기간 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">최근 7일</SelectItem>
-                <SelectItem value="30d">최근 30일</SelectItem>
-                <SelectItem value="90d">최근 90일</SelectItem>
-                <SelectItem value="1y">최근 1년</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              리포트 다운로드
-            </Button>
-          </div>
+    <div className="p-6 space-y-6">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">실시간 분석 대시보드</h1>
+          <p className="text-gray-600 mt-1">마케팅 성과 실시간 모니터링</p>
+          {lastUpdated && (
+            <p className="text-sm text-gray-500 mt-1">
+              마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}
+            </p>
+          )}
         </div>
-
-        {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">총 사용자</p>
-                  <p className="text-2xl font-bold">{formatNumber(analytics.overview.totalUsers)}</p>
-                  <div className="flex items-center mt-1">
-                    {getGrowthIcon(analytics.overview.userGrowth)}
-                    <span className={`text-sm ml-1 ${getGrowthColor(analytics.overview.userGrowth)}`}>
-                      {Math.abs(analytics.overview.userGrowth)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">총 파트너</p>
-                  <p className="text-2xl font-bold">{formatNumber(analytics.overview.totalPartners)}</p>
-                  <div className="flex items-center mt-1">
-                    {getGrowthIcon(analytics.overview.partnerGrowth)}
-                    <span className={`text-sm ml-1 ${getGrowthColor(analytics.overview.partnerGrowth)}`}>
-                      {Math.abs(analytics.overview.partnerGrowth)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Store className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">총 주문</p>
-                  <p className="text-2xl font-bold">{formatNumber(analytics.overview.totalOrders)}</p>
-                  <div className="flex items-center mt-1">
-                    {getGrowthIcon(analytics.overview.orderGrowth)}
-                    <span className={`text-sm ml-1 ${getGrowthColor(analytics.overview.orderGrowth)}`}>
-                      {Math.abs(analytics.overview.orderGrowth)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <ShoppingCart className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">총 매출</p>
-                  <p className="text-2xl font-bold">{formatCurrency(analytics.overview.totalRevenue)}</p>
-                  <div className="flex items-center mt-1">
-                    {getGrowthIcon(analytics.overview.revenueGrowth)}
-                    <span className={`text-sm ml-1 ${getGrowthColor(analytics.overview.revenueGrowth)}`}>
-                      {Math.abs(analytics.overview.revenueGrowth)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-yellow-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex items-center space-x-4">
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="1h">최근 1시간</option>
+            <option value="24h">최근 24시간</option>
+            <option value="7d">최근 7일</option>
+            <option value="30d">최근 30일</option>
+          </select>
+          <Button
+            variant="outline"
+            onClick={fetchMetrics}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            새로고침
+          </Button>
+          <Button
+            variant={autoRefresh ? 'default' : 'outline'}
+            onClick={() => setAutoRefresh(!autoRefresh)}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            자동 새로고침
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            내보내기
+          </Button>
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-          {[
-            { id: 'overview', label: '전체 개요', icon: BarChart3 },
-            { id: 'users', label: '사용자 분석', icon: Users },
-            { id: 'partners', label: '파트너 분석', icon: Store },
-            { id: 'content', label: '콘텐츠 분석', icon: MessageCircle },
-            { id: 'activity', label: '최근 활동', icon: Activity }
-          ].map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-white text-primary shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="h-4 w-4 mr-2" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      {/* 실시간 지표 카드 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">활성 사용자</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatNumber(metrics.activeUsers)}</div>
+            <p className="text-xs text-muted-foreground">
+              현재 온라인
+            </p>
+          </CardContent>
+        </Card>
 
-        {/* Tab Content */}
-        {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* User Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
-                  사용자 활동
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{analytics.userActivity.activeUsers}</p>
-                    <p className="text-sm text-gray-600">활성 사용자</p>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">페이지 뷰</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatNumber(metrics.pageViews)}</div>
+            <p className="text-xs text-muted-foreground">
+              최근 {selectedPeriod}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">이벤트</CardTitle>
+            <MousePointer className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatNumber(metrics.events)}</div>
+            <p className="text-xs text-muted-foreground">
+              총 이벤트 수
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">전환</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatNumber(metrics.conversions)}</div>
+            <p className="text-xs text-muted-foreground">
+              전환율: {formatPercentage((metrics.conversions / metrics.pageViews) * 100)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">매출</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(metrics.revenue)}</div>
+            <p className="text-xs text-muted-foreground">
+              최근 {selectedPeriod}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 시간별 트렌드 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>시간별 사용자 활동</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.hourlyMetrics.slice(-6).map((metric, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                    <span className="text-sm font-medium">{metric.hour}</span>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{analytics.userActivity.newUsers}</p>
-                    <p className="text-sm text-gray-600">신규 사용자</p>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-gray-600">{analytics.userActivity.inactiveUsers}</p>
-                    <p className="text-sm text-gray-600">비활성 사용자</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{analytics.userActivity.conversionRate}%</p>
-                    <p className="text-sm text-gray-600">전환율</p>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{formatNumber(metric.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatNumber(metric.pageViews)} 뷰
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>평균 세션 시간</span>
-                    <span className="font-medium">{analytics.userActivity.averageSessionTime}분</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>이탈률</span>
-                    <span className="font-medium">{analytics.userActivity.bounceRate}%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Partner Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Store className="h-5 w-5 mr-2" />
-                  파트너 활동
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{analytics.partnerActivity.activePartners}</p>
-                    <p className="text-sm text-gray-600">활성 파트너</p>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{analytics.partnerActivity.newPartners}</p>
-                    <p className="text-sm text-gray-600">신규 파트너</p>
-                  </div>
-                  <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                    <p className="text-2xl font-bold text-yellow-600">{analytics.partnerActivity.pendingPartners}</p>
-                    <p className="text-sm text-gray-600">승인 대기</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{analytics.partnerActivity.averageRating.toFixed(1)}</p>
-                    <p className="text-sm text-gray-600">평균 평점</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>총 상품 수</span>
-                    <span className="font-medium">{formatNumber(analytics.partnerActivity.totalProducts)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>총 판매액</span>
-                    <span className="font-medium">{formatCurrency(analytics.partnerActivity.totalSales)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'users' && (
-          <div className="space-y-6">
-            {/* Top Users */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Star className="h-5 w-5 mr-2" />
-                  상위 사용자
-                </CardTitle>
-                <CardDescription>주문량과 구매금액 기준 상위 사용자</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {analytics.topPerformers.topUsers.map((user, index) => (
-                    <div key={user.email} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary">#{index + 1}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <p className="text-sm font-medium">{user.orders}회</p>
-                          <p className="text-xs text-gray-600">주문</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-medium">{formatCurrency(user.spent)}</p>
-                          <p className="text-xs text-gray-600">구매금액</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm text-gray-600">{new Date(user.joinDate).toLocaleDateString()}</p>
-                          <p className="text-xs text-gray-600">가입일</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'partners' && (
-          <div className="space-y-6">
-            {/* Top Partners */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Store className="h-5 w-5 mr-2" />
-                  상위 파트너
-                </CardTitle>
-                <CardDescription>상품 수와 판매액 기준 상위 파트너</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {analytics.topPerformers.topPartners.map((partner, index) => (
-                    <div key={partner.businessName} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-green-600">#{index + 1}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">{partner.name}</p>
-                          <p className="text-sm text-gray-600">{partner.businessName}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <p className="text-sm font-medium">{partner.products}개</p>
-                          <p className="text-xs text-gray-600">상품</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-medium">{formatCurrency(partner.sales)}</p>
-                          <p className="text-xs text-gray-600">판매액</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="flex items-center">
-                            <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                            <span className="text-sm font-medium">{partner.rating.toFixed(1)}</span>
-                          </div>
-                          <p className="text-xs text-gray-600">평점</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm text-gray-600">{new Date(partner.joinDate).toLocaleDateString()}</p>
-                          <p className="text-xs text-gray-600">가입일</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'content' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">총 콘텐츠</p>
-                      <p className="text-2xl font-bold">{formatNumber(analytics.contentStats.totalContent)}</p>
-                    </div>
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <MessageCircle className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">총 조회수</p>
-                      <p className="text-2xl font-bold">{formatNumber(analytics.contentStats.totalViews)}</p>
-                    </div>
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <Eye className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">총 좋아요</p>
-                      <p className="text-2xl font-bold">{formatNumber(analytics.contentStats.totalLikes)}</p>
-                    </div>
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <Heart className="h-6 w-6 text-red-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">평균 참여도</p>
-                      <p className="text-2xl font-bold">{analytics.contentStats.averageEngagement}%</p>
-                    </div>
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <Activity className="h-6 w-6 text-purple-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              ))}
             </div>
-          </div>
-        )}
+          </CardContent>
+        </Card>
 
-        {activeTab === 'activity' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
-                최근 활동
-              </CardTitle>
-              <CardDescription>실시간 사용자 및 파트너 활동 로그</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {analytics.recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-center space-x-4 p-3 border rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.type === 'user' ? 'bg-blue-100' :
-                      activity.type === 'partner' ? 'bg-green-100' :
-                      activity.type === 'order' ? 'bg-purple-100' :
-                      'bg-yellow-100'
-                    }`}>
-                      {activity.type === 'user' && <Users className="h-4 w-4 text-blue-600" />}
-                      {activity.type === 'partner' && <Store className="h-4 w-4 text-green-600" />}
-                      {activity.type === 'order' && <ShoppingCart className="h-4 w-4 text-purple-600" />}
-                      {activity.type === 'content' && <MessageCircle className="h-4 w-4 text-yellow-600" />}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{activity.action}</p>
-                      <p className="text-sm text-gray-600">{activity.user}</p>
-                      {activity.details && (
-                        <p className="text-xs text-gray-500 mt-1">{activity.details}</p>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(activity.timestamp).toLocaleString()}
+        <Card>
+          <CardHeader>
+            <CardTitle>채널별 성과</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.channelPerformance.slice(0, 5).map((channel, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium">{channel.channel}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{formatNumber(channel.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatPercentage(channel.conversionRate)} 전환율
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 디바이스 및 지역 분석 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>디바이스별 성과</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.devicePerformance.map((device, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    {device.device === 'desktop' ? (
+                      <Globe className="h-4 w-4 text-blue-500" />
+                    ) : device.device === 'mobile' ? (
+                      <Smartphone className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Smartphone className="h-4 w-4 text-purple-500" />
+                    )}
+                    <span className="text-sm font-medium capitalize">{device.device}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{formatNumber(device.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatNumber(device.conversions)} 전환
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>지역별 성과</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.locationPerformance.slice(0, 5).map((location, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span className="text-sm font-medium">{location.country || 'Unknown'}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{formatNumber(location.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatCurrency(location.revenue)} 매출
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 인기 콘텐츠 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>인기 페이지</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.topPages.slice(0, 5).map((page, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{page.title || page.page}</div>
+                    <div className="text-xs text-gray-500 truncate">{page.page}</div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="text-sm font-medium">{formatNumber(page.views)}</div>
+                    <div className="text-xs text-gray-500">
+                      {formatPercentage(page.bounceRate)} 이탈률
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>인기 검색어</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.topSearchTerms.slice(0, 5).map((term, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{term.term}</div>
+                    <div className="text-xs text-gray-500">
+                      평균 {term.avgResults.toFixed(0)}개 결과
+                    </div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="text-sm font-medium">{formatNumber(term.searches)}</div>
+                    <div className="text-xs text-gray-500">검색</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 마케팅 성과 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>캠페인 성과</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.campaignPerformance.slice(0, 5).map((campaign, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{campaign.campaign}</div>
+                    <div className="text-xs text-gray-500">
+                      {campaign.source} / {campaign.medium}
+                    </div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="text-sm font-medium">{formatNumber(campaign.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatPercentage(campaign.conversionRate)} 전환율
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>A/B 테스트 성과</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.abTestPerformance.slice(0, 5).map((test, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{test.testName}</div>
+                    <div className="text-xs text-gray-500">{test.variant}</div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="text-sm font-medium">{formatNumber(test.users)}명</div>
+                    <div className="text-xs text-gray-500">
+                      {formatPercentage(test.conversionRate)} 전환율
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 세그먼트 성과 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>세그먼트별 성과</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {metrics.segmentPerformance.slice(0, 10).map((segment, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">{segment.segmentName}</div>
+                  <div className="text-xs text-gray-500">
+                    {formatCurrency(segment.avgOrderValue)} 평균 주문 금액
+                  </div>
+                </div>
+                <div className="text-right ml-4">
+                  <div className="text-sm font-medium">{formatNumber(segment.users)}명</div>
+                  <div className="text-xs text-gray-500">
+                    {formatPercentage(segment.conversionRate)} 전환율
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

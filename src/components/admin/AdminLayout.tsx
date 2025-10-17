@@ -20,7 +20,15 @@ import {
   Search,
   Store,
   ShoppingCart,
-  Globe
+  Globe,
+  Mail,
+  Tag,
+  Megaphone,
+  TrendingUp,
+  Bot,
+  Zap,
+  Target,
+  Clock
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -58,16 +66,110 @@ const navigationItems = [
     description: '파트너 승인 및 관리'
   },
   {
+    name: '정산 관리',
+    href: '/admin/settlements',
+    icon: TrendingUp,
+    description: '파트너 정산 관리 및 처리'
+  },
+  {
     name: '주문 관리',
     href: '/admin/orders',
     icon: ShoppingCart,
     description: '전체 주문 관리 및 처리'
   },
   {
+    name: '환불/교환',
+    href: '/admin/refunds',
+    icon: Clock,
+    description: '환불 및 교환 요청 관리'
+  },
+  {
+    name: '공지사항',
+    href: '/admin/notices',
+    icon: Megaphone,
+    description: '공지사항 작성 및 관리'
+  },
+  {
     name: '상품 관리',
     href: '/admin/products',
     icon: Package,
     description: '상품 등록 및 관리'
+  },
+  {
+    name: '마케팅',
+    href: '/admin/marketing',
+    icon: TrendingUp,
+    description: '뉴스레터, 쿠폰, 프로모션 관리',
+    subItems: [
+      {
+        name: '뉴스레터',
+        href: '/admin/newsletter',
+        icon: Mail,
+        description: '뉴스레터 구독자 관리'
+      },
+      {
+        name: '쿠폰',
+        href: '/admin/coupons',
+        icon: Tag,
+        description: '쿠폰 생성 및 관리'
+      },
+      {
+        name: '프로모션',
+        href: '/admin/promotions',
+        icon: Megaphone,
+        description: '프로모션 관리'
+      },
+      {
+        name: '알림',
+        href: '/admin/notifications',
+        icon: Bell,
+        description: '알림 관리',
+        subItems: [
+          {
+            name: '알림 관리',
+            href: '/admin/notifications',
+            icon: Bell,
+            description: '알림 발송 및 관리'
+          },
+          {
+            name: '템플릿 관리',
+            href: '/admin/notifications/templates',
+            icon: FileText,
+            description: '알림 템플릿 생성 및 관리'
+          },
+          {
+            name: '스케줄 관리',
+            href: '/admin/notifications/schedules',
+            icon: Clock,
+            description: '예약 알림 스케줄 관리'
+          },
+          {
+            name: '알림 분석',
+            href: '/admin/notifications/analytics',
+            icon: BarChart3,
+            description: '알림 성과 분석'
+          }
+        ]
+      },
+      {
+        name: '자동화',
+        href: '/admin/automation',
+        icon: Bot,
+        description: '마케팅 자동화 규칙 관리'
+      },
+      {
+        name: '개인화',
+        href: '/admin/personalization',
+        icon: Target,
+        description: '사용자 개인화 및 추천 시스템'
+      },
+      {
+        name: '추천 관리',
+        href: '/admin/recommendations',
+        icon: BarChart3,
+        description: '추천 시스템 성과 분석 및 관리'
+      }
+    ]
   },
   {
     name: '콘텐츠 관리',

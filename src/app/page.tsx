@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
+import RecommendationSection from '@/components/recommendations/RecommendationSection';
+import PersonalizedRecommendations from '@/components/personalization/PersonalizedRecommendations';
+import NoticePopup from '@/components/ui/NoticePopup';
 import { ArrowRight, Star, Truck, Shield, Heart, ShoppingCart } from 'lucide-react';
 
 interface Product {
@@ -16,7 +19,7 @@ interface Product {
   price: number;
   images: Array<{
     url: string;
-    _id: string;
+    _id?: string;
   }>;
   category: string;
   featured?: boolean;
@@ -27,6 +30,9 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterMessage, setNewsletterMessage] = useState('');
 
   useEffect(() => {
     fetchProducts();
@@ -60,8 +66,50 @@ export default function HomePage() {
     // 장바구니 추가 로직 (추후 구현)
     console.log('Add to cart:', productId);
   };
+
+  const handleNewsletterSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newsletterEmail) {
+      setNewsletterMessage('이메일 주소를 입력해주세요.');
+      return;
+    }
+
+    setNewsletterLoading(true);
+    setNewsletterMessage('');
+
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: newsletterEmail,
+          source: 'website'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setNewsletterMessage(data.message);
+        setNewsletterEmail('');
+      } else {
+        setNewsletterMessage(data.error || '구독 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      setNewsletterMessage('구독 처리 중 오류가 발생했습니다.');
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen">
+      {/* 팝업 공지사항 */}
+      <NoticePopup />
+      
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 sm:py-20 overflow-hidden">
         <div className="container mx-auto px-4">
@@ -340,16 +388,32 @@ export default function HomePage() {
           <p className="text-xl mb-8 opacity-90">
             신규 회원가입 시 10% 할인 쿠폰을 드립니다.
           </p>
-          <div className="max-w-md mx-auto flex gap-4">
-            <input
-              type="email"
-              placeholder="이메일 주소를 입력하세요"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
-            />
-            <Button variant="secondary" size="lg">
-              구독하기
-            </Button>
-          </div>
+          <form onSubmit={handleNewsletterSubscribe} className="max-w-md mx-auto">
+            <div className="flex gap-4 mb-4">
+              <input
+                type="email"
+                placeholder="이메일 주소를 입력하세요"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
+                disabled={newsletterLoading}
+                required
+              />
+              <Button 
+                type="submit" 
+                variant="secondary" 
+                size="lg"
+                disabled={newsletterLoading}
+              >
+                {newsletterLoading ? '처리중...' : '구독하기'}
+              </Button>
+            </div>
+            {newsletterMessage && (
+              <p className={`text-sm ${newsletterMessage.includes('완료') ? 'text-green-200' : 'text-red-200'}`}>
+                {newsletterMessage}
+              </p>
+            )}
+          </form>
         </div>
         
         {/* Background Characters */}
@@ -369,6 +433,66 @@ export default function HomePage() {
             fill
             className="object-contain"
             sizes="80px"
+          />
+        </div>
+      </section>
+
+      {/* 추천 상품 섹션 */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">추천 상품</h2>
+          
+          <div className="space-y-12">
+            <PersonalizedRecommendations
+              title="🎯 AI가 분석한 당신만의 추천"
+              itemType="product"
+              limit={6}
+              algorithms={['collaborative', 'content_based', 'popular']}
+              showAlgorithm={false}
+              showReason={true}
+            />
+            
+            <RecommendationSection
+              title="지금 인기 상품"
+              algorithm="popular"
+              showAlgorithm={false}
+            />
+            
+            <RecommendationSection
+              title="지금 뜨는 상품"
+              algorithm="trending"
+              showAlgorithm={false}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 인기 상품 섹션 */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <RecommendationSection
+            title="지금 인기 상품"
+            itemType="product"
+            algorithm="popular"
+            limit={8}
+            showTitle={true}
+            showAlgorithm={true}
+            showRefresh={true}
+          />
+        </div>
+      </section>
+
+      {/* 트렌딩 상품 섹션 */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <RecommendationSection
+            title="지금 뜨는 상품"
+            itemType="product"
+            algorithm="trending"
+            limit={8}
+            showTitle={true}
+            showAlgorithm={true}
+            showRefresh={true}
           />
         </div>
       </section>

@@ -8,16 +8,34 @@ import { AutomationRuleManager } from '@/lib/automationRules';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
-    }
-
     await connectDB();
 
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
+    }
+
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    }
+
+    // 사용자 확인
+    const User = require('@/models/User').default;
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
+    }
+
     // 사용자의 주문 내역 조회
-    const orders = await Order.find({ userId: session.user.email })
+    const orders = await Order.find({ userId: user._id })
       .populate({
         path: 'items.productId',
         select: 'name images price category'
@@ -28,7 +46,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('주문 내역 조회 오류:', error);
     return NextResponse.json(
-      { error: '주문 내역 조회 중 오류가 발생했습니다.' },
+      { 
+        error: '주문 내역 조회 중 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
       { status: 500 }
     );
   }
@@ -36,12 +57,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
-    }
-
     const body = await request.json();
     const { items, shippingAddress, paymentMethod, totalAmount } = body;
 
@@ -55,27 +70,45 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // 사용자 ObjectId 찾기
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
+    }
+
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    }
+
+    // 사용자 확인
     const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(userId);
     
     if (!user) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 재고 예약 확인 및 처리
-    const reservationResults = [];
+    // 재고 확인 (단순화)
     for (const item of items) {
-      const result = await InventoryManager.reserveStock(item.productId, item.quantity);
-      reservationResults.push({ productId: item.productId, result });
+      const Product = (await import('@/models/Product')).default;
+      const product = await Product.findById(item.productId);
       
-      if (!result.success) {
-        // 예약 실패 시 이전 예약들 모두 취소
-        for (const prevItem of items.slice(0, items.indexOf(item))) {
-          await InventoryManager.cancelReservation(prevItem.productId, prevItem.quantity);
-        }
+      if (!product) {
         return NextResponse.json({ 
-          error: `재고 부족: ${result.message}` 
+          error: `상품을 찾을 수 없습니다: ${item.productId}` 
+        }, { status: 400 });
+      }
+      
+      if (product.stock < item.quantity) {
+        return NextResponse.json({ 
+          error: `재고가 부족합니다. (가능: ${product.stock}개, 요청: ${item.quantity}개)` 
         }, { status: 400 });
       }
     }
@@ -123,7 +156,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('주문 생성 오류:', error);
     return NextResponse.json(
-      { error: '주문 생성 중 오류가 발생했습니다.' },
+      { 
+        error: '주문 생성 중 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
       { status: 500 }
     );
   }

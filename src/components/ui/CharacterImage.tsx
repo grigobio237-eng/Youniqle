@@ -13,6 +13,7 @@ interface CharacterImageProps {
   priority?: boolean;
   fallbackText?: string;
   sizes?: string;
+  _id?: string;
 }
 
 export default function CharacterImage({

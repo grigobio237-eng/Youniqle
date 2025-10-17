@@ -3,15 +3,40 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
 
-export async function GET(request: NextRequest) {
+async function getUsersHandler(request: NextRequest) {
   try {
+    await connectDB();
+    
+    // 관리자 토큰 검증 (쿠키 방식)
+    const token = request.cookies.get('admin-token')?.value;
+    
+    if (!token) {
+      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
+    }
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      
+      if (!decoded || decoded.type !== 'admin') {
+        return NextResponse.json({ error: '유효하지 않은 관리자 토큰입니다.' }, { status: 401 });
+      }
+
+      // 관리자 권한 확인
+      const user = await User.findById(decoded.id);
+      
+      if (!user || user.role !== 'admin') {
+        return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
+      }
+    } catch (error) {
+      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const role = searchParams.get('role') || 'all';
     const grade = searchParams.get('grade') || 'all';
     const sort = searchParams.get('sort') || 'newest';
-
-    await connectDB();
 
     // 검색 조건 구성
     const filter: any = {};
@@ -95,6 +120,8 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = getUsersHandler;
 
 
 

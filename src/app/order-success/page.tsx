@@ -12,9 +12,9 @@ import Link from 'next/link';
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
-  const orderId = searchParams.get('orderId');
-  const amount = searchParams.get('amount');
-  const tid = searchParams.get('tid');
+  const orderId = searchParams?.get('orderId');
+  const amount = searchParams?.get('amount');
+  const tid = searchParams?.get('tid');
 
   // 결제 완료 후 장바구니 개수 업데이트
   useEffect(() => {

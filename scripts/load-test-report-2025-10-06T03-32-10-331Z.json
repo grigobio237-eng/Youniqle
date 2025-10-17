@@ -1,0 +1,452 @@
+{
+  "generatedAt": "2025-10-06T03:32:10.332Z",
+  "summary": {
+    "totalRequests": 47,
+    "successfulRequests": 45,
+    "failedRequests": 2,
+    "successRate": 95.74468085106383,
+    "totalTime": 23.654,
+    "requestsPerSecond": 1.986978946478397,
+    "responseTime": {
+      "min": 1794,
+      "max": 9371,
+      "avg": 4307.6,
+      "p50": 4250,
+      "p90": 6774,
+      "p95": 7161,
+      "p99": 9371
+    },
+    "statusCodes": {
+      "0": 2,
+      "200": 45
+    },
+    "errors": {
+      "Request timeout": 2
+    }
+  },
+  "rawResults": [
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2245,
+      "contentLength": 145,
+      "timestamp": 1759721506663
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2253,
+      "contentLength": 69,
+      "timestamp": 1759721506673
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2267,
+      "contentLength": 69,
+      "timestamp": 1759721506674
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2279,
+      "contentLength": 70,
+      "timestamp": 1759721506678
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4406,
+      "contentLength": 1347,
+      "timestamp": 1759721506662
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4563,
+      "contentLength": 1347,
+      "timestamp": 1759721506667
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2268,
+      "contentLength": 69,
+      "timestamp": 1759721509116
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4910,
+      "contentLength": 1347,
+      "timestamp": 1759721506658
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5460,
+      "contentLength": 1347,
+      "timestamp": 1759721506672
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5652,
+      "contentLength": 1347,
+      "timestamp": 1759721506656
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3560,
+      "contentLength": 145,
+      "timestamp": 1759721509131
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3660,
+      "contentLength": 70,
+      "timestamp": 1759721509164
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 6794,
+      "contentLength": 1347,
+      "timestamp": 1759721506679
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3088,
+      "contentLength": 145,
+      "timestamp": 1759721511432
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3386,
+      "contentLength": 69,
+      "timestamp": 1759721511276
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4415,
+      "contentLength": 145,
+      "timestamp": 1759721512348
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4250,
+      "contentLength": 69,
+      "timestamp": 1759721512522
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5015,
+      "contentLength": 69,
+      "timestamp": 1759721512905
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 0,
+      "responseTime": 0,
+      "error": "Request timeout",
+      "timestamp": 1759721519174
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 7161,
+      "contentLength": 145,
+      "timestamp": 1759721513040
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 6542,
+      "contentLength": 70,
+      "timestamp": 1759721513684
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 9371,
+      "contentLength": 1347,
+      "timestamp": 1759721511588
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 6774,
+      "contentLength": 70,
+      "timestamp": 1759721514723
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 6643,
+      "contentLength": 69,
+      "timestamp": 1759721514863
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 0,
+      "responseTime": 0,
+      "error": "Request timeout",
+      "timestamp": 1759721521790
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5472,
+      "contentLength": 69,
+      "timestamp": 1759721516975
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3039,
+      "contentLength": 70,
+      "timestamp": 1759721519416
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4327,
+      "contentLength": 69,
+      "timestamp": 1759721518136
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2457,
+      "contentLength": 145,
+      "timestamp": 1759721520405
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 1794,
+      "contentLength": 70,
+      "timestamp": 1759721521712
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2350,
+      "contentLength": 69,
+      "timestamp": 1759721521164
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2025,
+      "contentLength": 145,
+      "timestamp": 1759721522005
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 7217,
+      "contentLength": 1347,
+      "timestamp": 1759721516974
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4404,
+      "contentLength": 1347,
+      "timestamp": 1759721520439
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2489,
+      "contentLength": 145,
+      "timestamp": 1759721522671
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4030,
+      "contentLength": 1347,
+      "timestamp": 1759721521713
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2747,
+      "contentLength": 70,
+      "timestamp": 1759721523076
+    },
+    {
+      "name": "상품 페이지네이션",
+      "url": "/api/products?page=2&limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 2580,
+      "contentLength": 69,
+      "timestamp": 1759721524245
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5587,
+      "contentLength": 1347,
+      "timestamp": 1759721522655
+    },
+    {
+      "name": "상품 목록 조회",
+      "url": "/api/products?page=1&limit=10",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3414,
+      "contentLength": 70,
+      "timestamp": 1759721525054
+    },
+    {
+      "name": "추천 상품 조회",
+      "url": "/api/recommendations?limit=5",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3148,
+      "contentLength": 145,
+      "timestamp": 1759721525360
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 6144,
+      "contentLength": 1347,
+      "timestamp": 1759721522657
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5317,
+      "contentLength": 1347,
+      "timestamp": 1759721523713
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 5561,
+      "contentLength": 1347,
+      "timestamp": 1759721523714
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4949,
+      "contentLength": 1347,
+      "timestamp": 1759721524399
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 3746,
+      "contentLength": 1347,
+      "timestamp": 1759721525947
+    },
+    {
+      "name": "분석 데이터 조회",
+      "url": "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31",
+      "method": "GET",
+      "statusCode": 200,
+      "responseTime": 4083,
+      "contentLength": 1347,
+      "timestamp": 1759721526025
+    }
+  ]
+}

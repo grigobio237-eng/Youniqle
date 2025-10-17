@@ -7,6 +7,8 @@ import connectDB from './db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
+import { NextRequest } from 'next/server';
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -230,9 +232,12 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 
 // JWT 토큰 생성 함수
 export function generateToken(payload: any): string {
-  // 실제 구현에서는 JWT 라이브러리를 사용해야 합니다
-  // 여기서는 간단한 예시입니다
-  return Buffer.from(JSON.stringify(payload)).toString('base64');
+  const jwt = require('jsonwebtoken');
+  return jwt.sign(payload, process.env.JWT_SECRET!, { 
+    expiresIn: '7d',
+    issuer: 'youniqle',
+    audience: 'youniqle-users'
+  });
 }
 
 // 인증 쿠키 생성 함수
@@ -243,6 +248,120 @@ export function createAuthCookie(token: string): string {
 // 로그아웃 쿠키 생성 함수
 export function createLogoutCookie(): string {
   return `auth-token=; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+// 통합 인증 검증 함수 (사용자, 파트너, 관리자 모두 지원)
+export async function verifyAuth(request: NextRequest) {
+  try {
+    // 1. 관리자 토큰 확인
+    const adminToken = request.cookies.get('admin-token')?.value;
+    if (adminToken) {
+      try {
+        const decoded = jwt.verify(adminToken, process.env.JWT_SECRET!) as any;
+        if (decoded && decoded.type === 'admin') {
+          await connectDB();
+          const user = await User.findById(decoded.id);
+          if (user && user.role === 'admin') {
+            return {
+              id: user._id.toString(),
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            };
+          }
+        }
+      } catch (error) {
+        // 관리자 토큰이 유효하지 않으면 다음으로
+      }
+    }
+
+    // 2. 파트너 토큰 확인
+    const partnerToken = request.cookies.get('partner-token')?.value;
+    if (partnerToken) {
+      try {
+        const decoded = jwt.verify(partnerToken, process.env.JWT_SECRET!) as any;
+        if (decoded && decoded.type === 'partner') {
+          await connectDB();
+          const user = await User.findById(decoded.id);
+          if (user && user.role === 'partner') {
+            return {
+              id: user._id.toString(),
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            };
+          }
+        }
+      } catch (error) {
+        // 파트너 토큰이 유효하지 않으면 다음으로
+      }
+    }
+
+    // 3. 일반 사용자 토큰 확인
+    const authToken = request.cookies.get('auth-token')?.value;
+    if (authToken) {
+      try {
+        const decoded = jwt.verify(authToken, process.env.JWT_SECRET!) as any;
+        if (decoded) {
+          await connectDB();
+          const user = await User.findById(decoded.id);
+          if (user) {
+            return {
+              id: user._id.toString(),
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            };
+          }
+        }
+      } catch (error) {
+        // 토큰이 유효하지 않으면 null 반환
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('인증 검증 오류:', error);
+    return null;
+  }
+}
+
+// 관리자 토큰 검증 함수
+export async function verifyAdminToken(request: NextRequest) {
+  try {
+    const token = request.cookies.get('admin-token')?.value;
+    
+    if (!token) {
+      return { success: false, error: '관리자 토큰이 없습니다.' };
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    
+    if (!decoded || decoded.type !== 'admin') {
+      return { success: false, error: '유효하지 않은 관리자 토큰입니다.' };
+    }
+
+    await connectDB();
+    const user = await User.findById(decoded.id);
+    
+    if (!user || user.role !== 'admin') {
+      return { success: false, error: '관리자 권한이 없습니다.' };
+    }
+
+    return { 
+      success: true, 
+      userId: user._id.toString(),
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }
+    };
+  } catch (error) {
+    console.error('관리자 토큰 검증 오류:', error);
+    return { success: false, error: '토큰 검증에 실패했습니다.' };
+  }
 }
 
 export default NextAuth(authOptions);

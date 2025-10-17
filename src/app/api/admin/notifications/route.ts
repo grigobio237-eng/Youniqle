@@ -14,7 +14,26 @@ export async function GET(request: NextRequest) {
     // 기타 알림 카운트 (필요시 확장)
     // 예: 새로운 리뷰, 문의사항 등
 
+    // 프론트엔드가 기대하는 구조로 응답
     return NextResponse.json({
+      notifications: [], // 빈 배열로 초기화
+      stats: {
+        total: pendingPartnersCount,
+        unread: pendingPartnersCount,
+        recent: 0,
+        pending: pendingPartnersCount,
+        sent: 0,
+        delivered: 0,
+        failed: 0,
+        successRate: 0
+      },
+      pagination: {
+        pages: 1,
+        current: 1,
+        total: 0,
+        limit: 10
+      },
+      // 기존 호환성을 위해 유지
       pendingPartners: pendingPartnersCount,
       total: pendingPartnersCount
     });
@@ -27,6 +46,88 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
+    }
+
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    }
+    
+    // 관리자 권한 확인
+    const User = (await import('@/models/User')).default;
+    const user = await User.findById(userId);
+    
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
+    }
+
+    const { templateId, recipients, variables } = await request.json();
+
+    if (!templateId || !recipients || !Array.isArray(recipients)) {
+      return NextResponse.json(
+        { error: '템플릿 ID와 수신자 목록이 필요합니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 간단한 알림 발송 테스트
+    const { NotificationService } = await import('@/lib/notificationService');
+    
+    const results = [];
+    for (const recipient of recipients) {
+      try {
+        const result = await NotificationService.sendNotification({
+          userId: recipient,
+          type: 'marketing',
+          category: 'info',
+          title: '테스트 알림',
+          message: `안녕하세요! ${variables?.userName || '사용자'}님, ${variables?.productName || '상품'}에 대한 알림입니다.`,
+          data: variables,
+          priority: 5,
+          source: 'admin-panel'
+        });
+        results.push({ recipient, success: result });
+      } catch (error) {
+        results.push({ 
+          recipient, 
+          success: false, 
+          error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+        });
+      }
+    }
+
+    return NextResponse.json({
+      message: '알림 발송이 완료되었습니다.',
+      results
+    });
+
+  } catch (error) {
+    console.error('Send notification error:', error);
+    return NextResponse.json(
+      { 
+        error: '알림 발송 중 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
+      { status: 500 }
+    );
+  }
+}
+
 
 
 

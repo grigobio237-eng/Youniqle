@@ -91,7 +91,9 @@ export default function AdminUsersPage() {
       if (gradeFilter !== 'all') params.append('grade', gradeFilter);
       params.append('sort', sortBy);
 
-      const response = await fetch(`/api/admin/users?${params}`);
+      const response = await fetch(`/api/admin/users?${params}`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { signupSchema } from '@/lib/validators';
+// import { signupSchema } from '@/lib/validators';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignupForm() {
@@ -37,20 +37,17 @@ export default function SignupForm() {
         return;
       }
 
-      // Validate form data
-      const validatedData = signupSchema.parse({
-        email: formData.email,
-        password: formData.password,
-        name: formData.name,
-        phone: formData.phone || undefined,
-      });
-
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(validatedData),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phone || undefined,
+        }),
       });
 
       const data = await response.json();

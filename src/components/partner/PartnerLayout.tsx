@@ -93,6 +93,12 @@ const navigationItems = [
     description: '상품 재고 현황 및 관리'
   },
   {
+    name: '정산 내역',
+    href: '/partner/settlements',
+    icon: DollarSign,
+    description: '월별 정산 내역 및 수수료'
+  },
+  {
     name: '콘텐츠 관리',
     href: '/partner/content',
     icon: FileText,

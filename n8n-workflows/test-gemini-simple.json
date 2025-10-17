@@ -1,0 +1,101 @@
+{
+  "name": "Test Gemini API - Simple",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-gemini",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "test-gemini-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Gemini API 요청 구성\nconst geminiRequest = {\n  contents: [\n    {\n      role: \"user\",\n      parts: [\n        {\n          text: \"안녕하세요! 간단한 인사말을 한국어로 해주세요.\"\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    temperature: 0.7,\n    topK: 40,\n    topP: 0.9,\n    maxOutputTokens: 100,\n    responseMimeType: \"text/plain\"\n  }\n};\n\n// JSON을 문자열로 변환하여 반환\nreturn [{\n  json: {\n    geminiRequestJson: JSON.stringify(geminiRequest)\n  }\n}];"
+      },
+      "id": "build-request",
+      "name": "Build Gemini Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-goog-api-key",
+              "value": "={{$env.GEMINI_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "raw",
+        "body": "={{$json.geminiRequestJson}}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "call-gemini",
+      "name": "Call Gemini API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Gemini 응답 처리\nconst geminiResponse = items[0].json;\n\nlet aiAnswer = null;\nif (geminiResponse.candidates && geminiResponse.candidates[0] && geminiResponse.candidates[0].content) {\n  const content = geminiResponse.candidates[0].content;\n  if (content.parts && content.parts[0]) {\n    aiAnswer = content.parts[0].text;\n  }\n}\n\nreturn [{\n  json: {\n    success: !!aiAnswer,\n    answer: aiAnswer,\n    rawResponse: geminiResponse\n  }\n}];"
+      },
+      "id": "process-response",
+      "name": "Process Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Build Gemini Request", "type": "main", "index": 0 }]]
+    },
+    "Build Gemini Request": {
+      "main": [[{ "node": "Call Gemini API", "type": "main", "index": 0 }]]
+    },
+    "Call Gemini API": {
+      "main": [[{ "node": "Process Response", "type": "main", "index": 0 }]]
+    },
+    "Process Response": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    },
+    "Respond to Webhook": {
+      "main": [[]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "tags": ["test", "gemini"]
+}
+

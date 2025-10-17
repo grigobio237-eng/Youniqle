@@ -1,0 +1,71 @@
+# Artillery 성능 테스트 설정
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 10
+      name: "Load test"
+    - duration: 30
+      arrivalRate: 20
+      name: "Stress test"
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+
+scenarios:
+  - name: "상품 조회 테스트"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/products?page=1&limit=10"
+          name: "상품 목록 조회"
+      - think: 1
+      - get:
+          url: "/api/products?page=2&limit=5"
+          name: "상품 페이지네이션"
+
+  - name: "로그인 테스트"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          name: "사용자 로그인"
+          json:
+            email: "admin@youniqle.com"
+            password: "admin123!"
+      - think: 2
+
+  - name: "추천 시스템 테스트"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/recommendations?limit=5"
+          name: "추천 상품 조회"
+      - think: 1
+      - get:
+          url: "/api/recommendations/personalized?limit=10"
+          name: "개인화 추천 조회"
+
+  - name: "분석 데이터 테스트"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/admin/analytics?startDate=2024-01-01&endDate=2024-12-31"
+          name: "분석 데이터 조회"
+      - think: 3
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Cart from '@/models/Cart';
 import Product from '@/models/Product';
@@ -9,18 +7,35 @@ import User from '@/models/User';
 // 장바구니 조회
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    await connectDB();
+
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: '인증이 필요합니다.' },
+        { error: '인증 토큰이 필요합니다.' },
         { status: 401 }
       );
     }
 
-    await connectDB();
+    const token = authHeader.substring(7);
+    let userId = null;
 
-    // 사용자 ID를 이메일로 조회
-    const user = await User.findOne({ email: session.user.email });
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+      console.log('JWT 디코딩 성공, userId:', userId);
+    } catch (error) {
+      console.log('JWT 토큰 검증 실패:', error);
+      return NextResponse.json(
+        { error: '유효하지 않은 토큰입니다.' },
+        { status: 401 }
+      );
+    }
+
+    // 사용자 확인
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: '사용자를 찾을 수 없습니다.' },
@@ -28,6 +43,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 장바구니 조회
     const cart = await Cart.findOne({ userId: user._id })
       .populate('items.productId', 'name price images slug')
       .lean();
@@ -46,7 +62,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get cart error:', error);
     return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
+      { 
+        error: '서버 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
       { status: 500 }
     );
   }
@@ -55,14 +74,6 @@ export async function GET(request: NextRequest) {
 // 장바구니에 상품 추가
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
     const { productId, quantity = 1 } = await request.json();
 
     if (!productId) {
@@ -81,6 +92,40 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: '인증 토큰이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+      console.log('JWT 디코딩 성공, userId:', userId);
+    } catch (error) {
+      console.log('JWT 토큰 검증 실패:', error);
+      return NextResponse.json(
+        { error: '유효하지 않은 토큰입니다.' },
+        { status: 401 }
+      );
+    }
+
+    // 사용자 확인
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: '사용자를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
     // 상품 정보 조회
     const product = await Product.findById(productId);
     if (!product) {
@@ -90,26 +135,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (product.status !== 'active') {
-      return NextResponse.json(
-        { error: '판매 중이 아닌 상품입니다.' },
-        { status: 400 }
-      );
-    }
-
     if (product.stock < quantity) {
       return NextResponse.json(
         { error: '재고가 부족합니다.' },
         { status: 400 }
-      );
-    }
-
-    // 사용자 ID를 이메일로 조회
-    const user = await User.findOne({ email: session.user.email });
-    if (!user) {
-      return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
-        { status: 404 }
       );
     }
 
@@ -161,7 +190,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Add to cart error:', error);
     return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
+      { 
+        error: '서버 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
       { status: 500 }
     );
   }
@@ -170,14 +202,6 @@ export async function POST(request: NextRequest) {
 // 장바구니에서 상품 제거
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
     const { productId } = await request.json();
 
     if (!productId) {
@@ -189,8 +213,31 @@ export async function DELETE(request: NextRequest) {
 
     await connectDB();
 
-    // 사용자 ID를 이메일로 조회
-    const user = await User.findOne({ email: session.user.email });
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: '인증 토큰이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json(
+        { error: '유효하지 않은 토큰입니다.' },
+        { status: 401 }
+      );
+    }
+
+    // 사용자 확인
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: '사용자를 찾을 수 없습니다.' },
@@ -198,6 +245,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // 장바구니에서 상품 제거
     const cart = await Cart.findOne({ userId: user._id });
     if (!cart) {
       return NextResponse.json(
@@ -206,26 +254,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 상품 제거
     cart.items = cart.items.filter(
       (item: any) => item.productId.toString() !== productId
     );
 
     await cart.save();
 
-    // 업데이트된 장바구니 반환
-    const updatedCart = await Cart.findById(cart._id)
-      .populate('items.productId', 'name price images slug')
-      .lean();
-
     return NextResponse.json({
-      message: '상품이 장바구니에서 제거되었습니다.',
-      cart: updatedCart,
+      message: '장바구니에서 상품이 제거되었습니다.',
+      cart,
     });
   } catch (error) {
     console.error('Remove from cart error:', error);
     return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
+      { 
+        error: '서버 오류가 발생했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      },
       { status: 500 }
     );
   }

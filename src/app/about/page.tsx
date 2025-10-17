@@ -35,12 +35,16 @@ export default function AboutPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                    상품 둘러보기
-                    <ExternalLink className="ml-3 h-6 w-6" />
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105" asChild>
+                    <Link href="/products">
+                      상품 둘러보기
+                      <ExternalLink className="ml-3 h-6 w-6" />
+                    </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-10 py-5 text-xl font-bold transition-all duration-300 hover:scale-105">
-                    파트너십 문의
+                  <Button variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-10 py-5 text-xl font-bold transition-all duration-300 hover:scale-105" asChild>
+                    <Link href="/partner/inquiry">
+                      파트너십 문의
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -261,13 +265,17 @@ export default function AboutPage() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
-                  <Mail className="mr-2 h-5 w-5" />
-                  파트너십 문의
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" asChild>
+                  <Link href="/partner/inquiry">
+                    <Mail className="mr-2 h-5 w-5" />
+                    파트너십 문의
+                  </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 text-lg">
-                  <ExternalLink className="mr-2 h-5 w-5" />
-                  상품 둘러보기
+                <Button variant="outline" size="lg" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 text-lg" asChild>
+                  <Link href="/products">
+                    <ExternalLink className="mr-2 h-5 w-5" />
+                    상품 둘러보기
+                  </Link>
                 </Button>
               </div>
             </div>

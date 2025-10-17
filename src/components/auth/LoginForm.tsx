@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { loginSchema } from '@/lib/validators';
+// import { loginSchema } from '@/lib/validators';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginForm() {
@@ -25,15 +25,12 @@ export default function LoginForm() {
     setError('');
 
     try {
-      // Validate form data
-      const validatedData = loginSchema.parse(formData);
-
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(validatedData),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();

@@ -1,7 +1,101 @@
+'use client';
+
 import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { useState, useEffect } from 'react';
+
+interface PublicSettings {
+  siteName: string;
+  siteDescription: string;
+  companyInfo: {
+    companyName: string;
+    businessNumber: string;
+    ceoName: string;
+    businessType: string;
+    businessStatus: string;
+  };
+  businessRegistration: {
+    registrationNumber: string;
+    businessAddress: string;
+    businessAddressDetail: string;
+    businessPhone: string;
+    businessEmail: string;
+  };
+  ecommerceRegistration: {
+    reportNumber: string;
+    reportAuthority: string;
+  };
+  contactInfo: {
+    customerServicePhone: string;
+    customerServiceEmail: string;
+    address: string;
+    addressDetail: string;
+    postalCode: string;
+  };
+  legalInfo: {
+    privacyPolicyUrl: string;
+    termsOfServiceUrl: string;
+  };
+}
 
 export default function Footer() {
+  const [settings, setSettings] = useState<PublicSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data.settings);
+      }
+    } catch (error) {
+      console.error('설정 로드 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 기본값 설정
+  const defaultSettings: PublicSettings = {
+    siteName: 'Youniqle',
+    siteDescription: '고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰입니다.',
+    companyInfo: {
+      companyName: '그리고바이오',
+      businessNumber: '000-00-00000',
+      ceoName: '',
+      businessType: '통신판매업',
+      businessStatus: '영업중'
+    },
+    businessRegistration: {
+      registrationNumber: '000-00-00000',
+      businessAddress: '',
+      businessAddressDetail: '',
+      businessPhone: '',
+      businessEmail: 'admin@youniqle.com'
+    },
+    ecommerceRegistration: {
+      reportNumber: '제2024-서울강남-0000호',
+      reportAuthority: '서울특별시 강남구청'
+    },
+    contactInfo: {
+      customerServicePhone: '1588-0000',
+      customerServiceEmail: 'cs@youniqle.com',
+      address: '서울특별시 강남구 테헤란로 123',
+      addressDetail: '그리고바이오 빌딩 10층',
+      postalCode: '06292'
+    },
+    legalInfo: {
+      privacyPolicyUrl: '/privacy',
+      termsOfServiceUrl: '/terms'
+    }
+  };
+
+  const currentSettings = settings || defaultSettings;
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -18,10 +112,10 @@ export default function Footer() {
                   sizes="40px"
                 />
               </div>
-              <span className="text-xl font-bold">Youniqle</span>
+              <span className="text-xl font-bold">{currentSettings.siteName}</span>
             </div>
             <p className="text-gray-400 text-sm">
-              고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰입니다.
+              {currentSettings.siteDescription}
             </p>
           </div>
 
@@ -31,14 +125,14 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <span className="text-gray-400">전화: </span>
-                <a href="tel:1577-0729" className="hover:text-primary transition-colors">
-                  1577-0729
+                <a href={`tel:${currentSettings.contactInfo.customerServicePhone}`} className="hover:text-primary transition-colors">
+                  {currentSettings.contactInfo.customerServicePhone}
                 </a>
               </li>
               <li>
                 <span className="text-gray-400">이메일: </span>
-                <a href="mailto:suchwawa@sapienet.com" className="hover:text-primary transition-colors">
-                  suchwawa@sapienet.com
+                <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="hover:text-primary transition-colors">
+                  {currentSettings.contactInfo.customerServiceEmail}
                 </a>
               </li>
               <li className="text-gray-400">운영시간: 평일 09:00 - 18:00</li>
@@ -76,24 +170,26 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">회사 정보</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>상호: 주식회사 사피에넷</li>
-              <li>대표: 장범진</li>
-              <li>사업자등록번호: 838-88-02527</li>
-              <li>통신판매업신고: 제 2024-서울강동-1687 호</li>
-              <li>주소: 서울특별시 강동구 고덕비즈밸리로 26</li>
+              <li>상호: {currentSettings.companyInfo.companyName}</li>
+              {currentSettings.companyInfo.ceoName && <li>대표: {currentSettings.companyInfo.ceoName}</li>}
+              <li>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</li>
+              <li>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</li>
+              {(currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address) && (
+                <li>주소: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
+              )}
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 Youniqle. All rights reserved.
+            © 2024 {currentSettings.siteName}. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+            <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
               개인정보처리방침
             </Link>
-            <Link href="/terms" className="text-gray-400 hover:text-primary transition-colors text-sm">
+            <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
               이용약관
             </Link>
           </div>

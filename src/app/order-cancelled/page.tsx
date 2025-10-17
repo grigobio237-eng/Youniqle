@@ -12,8 +12,8 @@ import Link from 'next/link';
 function OrderCancelledContent() {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
-  const orderId = searchParams.get('orderId');
-  const error = searchParams.get('error');
+  const orderId = searchParams?.get('orderId');
+  const error = searchParams?.get('error');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">

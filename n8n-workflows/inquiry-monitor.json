@@ -1,0 +1,311 @@
+{
+  "name": "Inquiry Monitor - 1:1 문의 자동 감지",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inquiry-monitor",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "inquiry-monitor-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Webhook에서 받은 문의 데이터 추출 및 포맷팅\nconsole.log('[Extract Inquiry Data] 수신된 데이터:', JSON.stringify(items[0].json, null, 2));\n\nconst webhookData = items[0].json.body || items[0].json;\nconst inquiry = webhookData.inquiry || webhookData;\n\nconsole.log(`[Inquiry Monitor] 새 문의 감지: ${inquiry._id || inquiry.inquiryId || 'unknown'}`);\n\n// 문의 정보 추출\nconst inquiryData = {\n  inquiryId: inquiry._id ? inquiry._id.toString() : inquiry.inquiryId || 'temp-' + Date.now(),\n  userId: inquiry.userId ? inquiry.userId.toString() : null,\n  userEmail: inquiry.userEmail || 'test@example.com',\n  userName: inquiry.userName || '테스트 사용자',\n  type: inquiry.type || 'general',\n  subject: inquiry.subject || '테스트 문의',\n  content: inquiry.content || '테스트 내용',\n  status: inquiry.status || 'pending',\n  createdAt: inquiry.createdAt || new Date().toISOString(),\n  \n  // AI 답변 생성을 위한 컨텍스트\n  context: {\n    inquiryType: inquiry.type || 'general',\n    subject: inquiry.subject || '테스트 문의',\n    content: inquiry.content || '테스트 내용',\n    userInfo: {\n      email: inquiry.userEmail || 'test@example.com',\n      name: inquiry.userName || '테스트 사용자'\n    }\n  },\n  \n  // 검색용 텍스트 (임베딩에 사용)\n  searchText: `${inquiry.type || 'general'} ${inquiry.subject || '테스트 문의'} ${inquiry.content || '테스트 내용'}`.trim()\n};\n\nconsole.log(`[Inquiry Monitor] 처리할 문의: ${inquiryData.subject}`);\nconsole.log('[Extract Inquiry Data] 추출된 데이터:', JSON.stringify(inquiryData, null, 2));\n\nreturn [{\n  json: inquiryData\n}];"
+      },
+      "id": "extract-inquiry",
+      "name": "Extract Inquiry Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:1234/v1/embeddings",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{$json.searchText}}"
+            },
+            {
+              "name": "model",
+              "value": "text-embedding-ada-002"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "generate-embedding",
+      "name": "Generate Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "functionCode": "// 임베딩 결과 처리\n// 이전 노드들의 데이터를 모두 포함\nconst previousData = items[0].json;\nconst embeddingResponse = items[0].json.data;\n\n// 원본 inquiry 데이터 복원\nconst inquiryData = {\n  inquiryId: previousData.inquiryId,\n  userId: previousData.userId,\n  userEmail: previousData.userEmail,\n  userName: previousData.userName,\n  type: previousData.type,\n  subject: previousData.subject,\n  content: previousData.content,\n  status: previousData.status,\n  createdAt: previousData.createdAt,\n  context: previousData.context,\n  searchText: previousData.searchText\n};\n\n// 임베딩 추가\nif (embeddingResponse && embeddingResponse[0]) {\n  inquiryData.embedding = embeddingResponse[0].embedding;\n  console.log(`[Inquiry Monitor] 임베딩 생성 완료: ${inquiryData.inquiryId}`);\n} else {\n  console.warn(`[Inquiry Monitor] 임베딩 생성 실패: ${inquiryData.inquiryId}`);\n  inquiryData.embedding = null;\n}\n\nreturn [{ json: inquiryData }];"
+      },
+      "id": "process-embedding",
+      "name": "Process Embedding",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:3000/api/ai/search-context",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Key",
+              "value": "test-api-key-12345"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inquiryId",
+              "value": "={{$json.inquiryId}}"
+            },
+            {
+              "name": "query",
+              "value": "={{$json.searchText}}"
+            },
+            {
+              "name": "inquiryType",
+              "value": "={{$json.type}}"
+            },
+            {
+              "name": "topK",
+              "value": "5"
+            },
+            {
+              "name": "embedding",
+              "value": "={{$json.embedding}}"
+            }
+          ]
+        }
+      },
+      "id": "search-context",
+      "name": "Search Related Context",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1050, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "functionCode": "// 관련 컨텍스트와 문의 데이터 결합\nconst inquiryData = items[0].json;\nconst contextResponse = items[0].json;\n\n// 컨텍스트 정보 추출\nconst relatedContext = contextResponse.context || [];\nconst contextText = relatedContext.map(ctx => \n  `[${ctx.type}] ${ctx.title || ctx.name}: ${ctx.content}`\n).join('\\n\\n');\n\n// AI 답변 생성을 위한 최종 데이터 구성\nconst aiRequestData = {\n  inquiryId: inquiryData.inquiryId,\n  userQuery: inquiryData.content,\n  inquiryType: inquiryData.type,\n  subject: inquiryData.subject,\n  context: contextText,\n  userInfo: inquiryData.context.userInfo,\n  \n  // AI 프롬프트 구성\n  systemPrompt: `당신은 Youniqle 쇼핑몰의 친절한 고객 상담 AI입니다.\n\n고객 정보:\n- 이름: ${inquiryData.context.userInfo.name}\n- 이메일: ${inquiryData.context.userInfo.email}\n- 문의 유형: ${inquiryData.type}\n\n답변 원칙:\n1. 반드시 한국어로만 답변하세요\n2. 친절하고 전문적인 톤을 유지하세요\n3. 구체적이고 도움이 되는 정보를 제공하세요\n4. 추가 문의가 필요하면 고객센터 연락처를 안내하세요\n\n참고 정보를 바탕으로 고객의 문의에 정확하고 도움이 되는 답변을 작성해주세요.`,\n  \n  userPrompt: `문의 제목: ${inquiryData.subject}\\n\\n문의 내용: ${inquiryData.content}\\n\\n참고 정보:\\n${contextText}\\n\\n위 정보를 바탕으로 친절하고 정확한 답변을 작성해주세요.`\n};\n\nconsole.log(`[Inquiry Monitor] AI 답변 요청 준비 완료: ${inquiryData.inquiryId}`);\n\nreturn [{ json: aiRequestData }];"
+      },
+      "id": "prepare-ai-request",
+      "name": "Prepare AI Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Prepare AI Request 노드의 데이터를 받아서 Gemini API에 보낼 JSON 구성\nconst aiRequestData = items[0].json;\n\n// Gemini API에 보낼 요청 본문 구성\nconst geminiRequest = {\n  contents: [\n    {\n      role: \"user\",\n      parts: [\n        {\n          text: `${aiRequestData.systemPrompt}\\n\\n${aiRequestData.userPrompt}`\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    temperature: 0.7,\n    topK: 40,\n    topP: 0.9,\n    maxOutputTokens: 1000,\n    responseMimeType: \"text/plain\"\n  }\n};\n\nconsole.log('[Build Gemini Request] JSON 구성 완료');\nconsole.log('Model: gemini-2.5-flash');\n\n// JSON을 문자열로 변환하여 반환\nreturn [{\n  json: {\n    ...aiRequestData,\n    geminiRequestJson: JSON.stringify(geminiRequest)\n  }\n}];"
+      },
+      "id": "build-lm-studio-request",
+      "name": "Build Gemini Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-goog-api-key",
+              "value": "={{$env.GEMINI_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "raw",
+        "body": "{{$json.geminiRequestJson}}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "generate-ai-response",
+      "name": "Generate AI Response",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1650, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "functionCode": "// AI 응답 처리 및 데이터베이스 저장 준비\n// 이전 노드들의 데이터를 모두 포함\nconst previousData = items[0].json;\nconst geminiResponse = items[0].json;\n\n// Gemini API 응답 구조 확인\nconsole.log('[Process AI Response] Gemini API 응답 수신');\nconsole.log('Response keys:', Object.keys(geminiResponse));\n\n// Gemini API 응답에서 AI 답변 추출\nlet aiAnswer = null;\nif (geminiResponse.candidates && geminiResponse.candidates[0] && geminiResponse.candidates[0].content) {\n  const content = geminiResponse.candidates[0].content;\n  if (content.parts && content.parts[0]) {\n    aiAnswer = content.parts[0].text;\n    console.log(`[Process AI Response] AI 답변 추출 성공 (${aiAnswer.length}자)`);\n  }\n}\n\nif (!aiAnswer) {\n  console.error('[Process AI Response] AI 답변 추출 실패');\n  console.error('Response:', JSON.stringify(geminiResponse, null, 2));\n}\n\nif (aiAnswer) {\n  // 답변 데이터 구성\n  const answerData = {\n    inquiryId: previousData.inquiryId,\n    answer: aiAnswer,\n    status: 'ai_draft', // 관리자 검토 대기\n    generatedBy: 'ai',\n    generatedAt: new Date().toISOString(),\n    context: previousData.context,\n    userInfo: previousData.userInfo,\n    \n    // 관리자 검토용 메타데이터\n    metadata: {\n      aiModel: 'gemini-2.5-flash',\n      responseLength: aiAnswer.length,\n      confidence: 'high',\n      needsReview: true,\n      geminiResponse: {\n        finishReason: geminiResponse.candidates[0].finishReason,\n        usageMetadata: geminiResponse.usageMetadata\n      }\n    }\n  };\n  \n  console.log(`[Process AI Response] 답변 데이터 구성 완료: ${answerData.inquiryId}`);\n  return [{ json: answerData }];\n} else {\n  console.error(`[Process AI Response] AI 답변 생성 실패: ${previousData.inquiryId}`);\n  \n  // 실패 시 기본 응답\n  const fallbackData = {\n    inquiryId: previousData.inquiryId,\n    answer: '죄송합니다. 현재 시스템에 일시적인 문제가 발생했습니다. 고객센터로 직접 문의해 주시기 바랍니다.',\n    status: 'manual_review',\n    generatedBy: 'system',\n    generatedAt: new Date().toISOString(),\n    error: 'AI response generation failed',\n    rawResponse: geminiResponse\n  };\n  \n  return [{ json: fallbackData }];\n}"
+      },
+      "id": "process-ai-response",
+      "name": "Process AI Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:3000/api/admin/inquiries/ai-answer",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Key",
+              "value": "test-api-key-12345"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inquiryId",
+              "value": "={{$json.inquiryId}}"
+            },
+            {
+              "name": "answer",
+              "value": "={{$json.answer}}"
+            },
+            {
+              "name": "aiModel",
+              "value": "={{$json.metadata.aiModel || 'gemini-2.5-flash'}}"
+            },
+            {
+              "name": "confidence",
+              "value": "={{$json.metadata.confidence || 0.5}}"
+            },
+            {
+              "name": "needsReview",
+              "value": "={{$json.metadata.needsReview || true}}"
+            },
+            {
+              "name": "metadata",
+              "value": "={{JSON.stringify($json.metadata)}}"
+            }
+          ]
+        }
+      },
+      "id": "save-ai-answer",
+      "name": "Save AI Answer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// 성공 로그 및 알림\nconst answerData = items[0].json;\n\nconsole.log(`✅ [Inquiry Monitor] 완료: ${answerData.inquiryId}`);\nconsole.log(`   - 답변 상태: ${answerData.status}`);\nconsole.log(`   - 생성자: ${answerData.generatedBy}`);\nconsole.log(`   - 답변 길이: ${answerData.answer.length}자`);\nconsole.log(`   - 시각: ${answerData.generatedAt}`);\n\n// 관리자에게 알림 (선택사항)\nif (answerData.status === 'ai_draft') {\n  console.log(`📧 [Inquiry Monitor] 관리자 검토 필요: ${answerData.inquiryId}`);\n}\n\nreturn [{ json: answerData }];"
+      },
+      "id": "log-success",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2250, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond-to-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// 에러 로그\nconst error = $json.error || 'Unknown error';\nconsole.error(`❌ [Inquiry Monitor] 에러:`, error);\nconsole.error(`   - 데이터:`, JSON.stringify($json, null, 2));\n\n// 에러를 무시하고 계속 진행\nreturn [];"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [1250, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Extract Inquiry Data", "type": "main", "index": 0 }]]
+    },
+    "Extract Inquiry Data": {
+      "main": [[{ "node": "Generate Embedding", "type": "main", "index": 0 }]]
+    },
+    "Generate Embedding": {
+      "main": [[{ "node": "Process Embedding", "type": "main", "index": 0 }]]
+    },
+    "Process Embedding": {
+      "main": [[{ "node": "Search Related Context", "type": "main", "index": 0 }]]
+    },
+    "Search Related Context": {
+      "main": [[{ "node": "Prepare AI Request", "type": "main", "index": 0 }]]
+    },
+    "Prepare AI Request": {
+      "main": [[{ "node": "Build LM Studio Request", "type": "main", "index": 0 }]]
+    },
+    "Build LM Studio Request": {
+      "main": [[{ "node": "Generate AI Response", "type": "main", "index": 0 }]]
+    },
+    "Generate AI Response": {
+      "main": [[{ "node": "Process AI Response", "type": "main", "index": 0 }]]
+    },
+    "Process AI Response": {
+      "main": [[{ "node": "Save AI Answer", "type": "main", "index": 0 }]]
+    },
+    "Save AI Answer": {
+      "main": [[{ "node": "Log Success", "type": "main", "index": 0 }]]
+    },
+    "Log Success": {
+      "main": [[{ "node": "respond-to-webhook", "type": "main", "index": 0 }]]
+    },
+    "respond-to-webhook": {
+      "main": [[]]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "tags": ["ai", "inquiry", "monitoring", "automation"]
+}

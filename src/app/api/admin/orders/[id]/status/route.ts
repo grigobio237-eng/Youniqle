@@ -13,17 +13,28 @@ export async function PATCH(
   try {
     const { id: orderId } = await params;
     
-    const session = await getServerSession(authOptions);
+    await connectDB();
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    // JWT 토큰으로 사용자 인증
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
     }
 
-    await connectDB();
+    const token = authHeader.substring(7);
+    let userId = null;
+
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    }
     
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(userId);
     
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });

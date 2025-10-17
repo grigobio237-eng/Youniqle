@@ -47,10 +47,10 @@ export default function VideoDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (params.id) {
+    if (params?.id) {
       fetchVideoDetail(params.id as string);
     }
-  }, [params.id]);
+  }, [params?.id]);
 
   const fetchVideoDetail = async (id: string) => {
     try {
