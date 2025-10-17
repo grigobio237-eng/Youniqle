@@ -33,7 +33,7 @@ interface UseRealtimeNotificationsReturn {
   notifications: NotificationData[];
   unreadCount: number;
   isConnected: boolean;
-  connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
+  connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error' | 'disabled';
   subscribe: (settings: NotificationSettings) => void;
   unsubscribe: (settings: NotificationSettings) => void;
   markAsRead: (notificationId: string) => void;
@@ -48,7 +48,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error' | 'disabled'>('disconnected');
   
   const socketRef = useRef<Socket | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
