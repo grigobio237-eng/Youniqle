@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
+import { logServerError, getServerStatus } from '@/lib/serverErrorHandler';
 
 export async function GET(
   request: NextRequest,
@@ -45,17 +46,30 @@ export async function GET(
   } catch (error) {
     console.error('Failed to fetch product:', error);
     
+    // 상세 에러 로깅
+    const detailedError = logServerError(error as Error, request, {
+      productId: id,
+      operation: 'GET_PRODUCT',
+      serverStatus: getServerStatus(),
+    });
+    
     // MongoDB 연결 에러인 경우
     if (error instanceof Error && error.message.includes('buffering timed out')) {
       console.log('[API] MongoDB 타임아웃으로 인해 상품 조회 실패');
       return NextResponse.json(
-        { error: '데이터베이스 연결이 불안정합니다. 잠시 후 다시 시도해주세요.' },
+        { 
+          error: '데이터베이스 연결이 불안정합니다. 잠시 후 다시 시도해주세요.',
+          details: process.env.NODE_ENV === 'development' ? detailedError : undefined,
+        },
         { status: 503 }
       );
     }
     
     return NextResponse.json(
-      { error: '상품 정보를 불러오는데 실패했습니다.' },
+      { 
+        error: '상품 정보를 불러오는데 실패했습니다.',
+        details: process.env.NODE_ENV === 'development' ? detailedError : undefined,
+      },
       { status: 500 }
     );
   }
