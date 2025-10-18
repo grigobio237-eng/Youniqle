@@ -23,18 +23,32 @@ export default function Header() {
     // 세션 상태 확인 (최초 1회만)
     const checkSession = async () => {
       try {
+        // NextAuth 세션 확인
         const response = await fetch('/api/auth/session');
         if (response.ok) {
           const data = await response.json();
-          setSession(data.user ? data : null);
+          console.log('세션 확인 결과:', data);
           
-          // 로그인된 경우 장바구니 개수 가져오기 (최초 1회만)
           if (data.user) {
+            setSession(data);
             fetchCartCount();
+          } else {
+            setSession(null);
+            // localStorage 토큰도 확인하여 일관성 유지
+            const token = localStorage.getItem('token');
+            if (token) {
+              console.log('세션은 없지만 토큰이 있음, 토큰 제거');
+              localStorage.removeItem('token');
+            }
           }
+        } else {
+          setSession(null);
+          localStorage.removeItem('token');
         }
       } catch (error) {
         console.error('Session check failed:', error);
+        setSession(null);
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -75,13 +89,24 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      // NextAuth 로그아웃 (세션 제거)
+      await fetch('/api/auth/signout', { method: 'POST' });
+      
       // localStorage에서 토큰 제거
       localStorage.removeItem('token');
+      
+      // 상태 초기화
       setSession(null);
+      setCartCount(0);
+      
+      // 페이지 새로고침으로 완전한 로그아웃
       window.location.href = '/';
     } catch (error) {
       console.error('Sign out failed:', error);
+      // 에러가 발생해도 강제로 로그아웃 처리
+      localStorage.removeItem('token');
+      setSession(null);
+      window.location.href = '/';
     }
   };
 

@@ -42,9 +42,8 @@ export default function LoginForm() {
           console.log('JWT 토큰이 localStorage에 저장되었습니다.');
         }
         
-        // Redirect to intended page or home
-        router.push('/');
-        router.refresh();
+        // NextAuth 세션 새로고침을 위해 페이지 리로드
+        window.location.href = '/';
       } else {
         setError(data.error || '로그인에 실패했습니다.');
       }
