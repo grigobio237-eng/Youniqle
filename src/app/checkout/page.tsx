@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
-import SimpleAddressSearch from '@/components/ui/SimpleAddressSearch';
+import SimplePostcodeSearch from '@/components/ui/SimplePostcodeSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   CreditCard, 
@@ -410,7 +410,7 @@ function CheckoutPageContent() {
                   
                   {/* 간단한 주소 검색 */}
                   <div className="mb-3">
-                    <SimpleAddressSearch
+                    <SimplePostcodeSearch
                       onAddressSelect={(address) => {
                         setShippingAddress(prev => ({
                           ...prev,
