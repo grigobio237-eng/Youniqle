@@ -89,7 +89,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
         }
 
         // 공식 가이드에 따른 올바른 사용법
-        new window.daum.Postcode({
+        const postcode = new window.daum.Postcode({
           oncomplete: function(data: any) {
             console.log('Daum 주소 선택 완료:', data);
             
@@ -105,6 +105,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
             resolve();
           },
           onclose: function(state: string) {
+            console.log('Daum 우편번호 팝업 닫힘:', state);
             if (state === 'FORCE_CLOSE') {
               console.log('Daum 우편번호 검색이 강제로 닫혔습니다. 우체국 검색으로 대체합니다.');
               // 강제로 닫힌 경우 우체국 검색으로 대체
@@ -137,12 +138,25 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
             emphTextColor: '#008bd3',
             outlineColor: '#e0e0e0'
           }
-        }).open({
-          q: searchQuery,
-          popupTitle: '우편번호 검색',
-          popupKey: 'postcodePopup',
-          autoClose: true, // 기본값 true로 설정
         });
+
+        // 팝업 열기 시도
+        try {
+          postcode.open({
+            q: searchQuery,
+            popupTitle: '우편번호 검색',
+            popupKey: 'postcodePopup',
+            autoClose: true,
+          });
+        } catch (popupError) {
+          console.error('팝업 열기 실패:', popupError);
+          // 팝업 실패 시 레이어 모드로 대체 시도
+          const targetElement = document.getElementById('postcode-layer') || document.body;
+          postcode.embed(targetElement, {
+            q: searchQuery,
+            autoClose: true,
+          });
+        }
       } catch (error) {
         console.error('Daum 우편번호 서비스 오류:', error);
         // Daum 실패 시 우체국 검색으로 대체
@@ -224,9 +238,12 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
         </div>
       )}
       
+      {/* 레이어 모드를 위한 숨겨진 컨테이너 */}
+      <div id="postcode-layer" className="hidden"></div>
+      
       <div className="text-xs text-gray-500 space-y-1">
         <div>💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.</div>
-        <div>🔧 Daum 우편번호 서비스는 무료이며 Key 발급이 필요하지 않습니다.</div>
+        <div>🔧 팝업이 차단되면 자동으로 레이어 모드로 전환됩니다.</div>
       </div>
     </div>
   );
