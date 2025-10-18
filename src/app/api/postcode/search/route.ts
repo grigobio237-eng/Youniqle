@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       { 
         success: false,
         error: '주소 검색 중 오류가 발생했습니다.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined,
       },
       { status: 500 }
     );
