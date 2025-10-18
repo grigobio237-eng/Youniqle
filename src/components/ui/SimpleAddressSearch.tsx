@@ -28,7 +28,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 카카오 우편번호 서비스 로드
+  // Daum 우편번호 서비스 로드 (Key 발급 불필요)
   useEffect(() => {
     const loadDaumPostcode = () => {
       if (window.daum && window.daum.Postcode) {
@@ -36,13 +36,14 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
       }
 
       const script = document.createElement('script');
+      // 공식 가이드에 따른 올바른 스크립트 URL
       script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
       script.async = true;
       script.onload = () => {
-        console.log('카카오 우편번호 서비스 로드 완료');
+        console.log('Daum 우편번호 서비스 로드 완료');
       };
       script.onerror = () => {
-        console.error('카카오 우편번호 서비스 로드 실패');
+        console.error('Daum 우편번호 서비스 로드 실패');
         setError('주소 검색 서비스를 불러올 수 없습니다.');
       };
       
@@ -62,11 +63,11 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
     setIsLoading(true);
 
     try {
-      // 먼저 카카오 우편번호 서비스 시도
+      // 먼저 Daum 우편번호 서비스 시도
       if (window.daum && window.daum.Postcode) {
-        await searchWithKakao();
+        await searchWithDaum();
       } else {
-        // 카카오 서비스가 없으면 우체국 API 시도
+        // Daum 서비스가 없으면 우체국 API 시도
         await searchWithPostOffice();
       }
     } catch (error) {
@@ -77,19 +78,22 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
     }
   };
 
-  const searchWithKakao = () => {
+  const searchWithDaum = () => {
     return new Promise<void>((resolve, reject) => {
       try {
-        // 카카오 서비스가 로드되지 않았거나 연결 문제가 있는 경우
+        // Daum 우편번호 서비스가 로드되지 않은 경우
         if (!window.daum || !window.daum.Postcode) {
-          console.log('카카오 우편번호 서비스를 사용할 수 없습니다. 우체국 검색으로 대체합니다.');
+          console.log('Daum 우편번호 서비스를 사용할 수 없습니다. 우체국 검색으로 대체합니다.');
           searchWithPostOffice().then(resolve).catch(reject);
           return;
         }
 
+        // 공식 가이드에 따른 올바른 사용법
         new window.daum.Postcode({
           oncomplete: function(data: any) {
-            console.log('카카오 주소 선택 완료:', data);
+            console.log('Daum 주소 선택 완료:', data);
+            
+            // 주소 정보를 부모 컴포넌트로 전달
             onAddressSelect({
               zonecode: data.zonecode,
               address: data.address,
@@ -102,7 +106,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
           },
           onclose: function(state: string) {
             if (state === 'FORCE_CLOSE') {
-              console.log('카카오 우편번호 검색이 강제로 닫혔습니다. 우체국 검색으로 대체합니다.');
+              console.log('Daum 우편번호 검색이 강제로 닫혔습니다. 우체국 검색으로 대체합니다.');
               // 강제로 닫힌 경우 우체국 검색으로 대체
               searchWithPostOffice().then(resolve).catch(reject);
             } else {
@@ -110,7 +114,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
             }
           },
           onresize: function(size: any) {
-            console.log('카카오 팝업 크기 조정:', size);
+            console.log('Daum 팝업 크기 조정:', size);
           },
           width: '100%',
           height: '100%',
@@ -122,8 +126,6 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
           submitMode: false,
           useBanner: true,
           useSuggest: true,
-          popupName: 'postcodePopup',
-          popupKey: 'postcodePopup',
           theme: {
             bgColor: '#ffffff',
             searchBgColor: '#ffffff',
@@ -137,11 +139,13 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
           }
         }).open({
           q: searchQuery,
-          autoClose: false,
+          popupTitle: '우편번호 검색',
+          popupKey: 'postcodePopup',
+          autoClose: true, // 기본값 true로 설정
         });
       } catch (error) {
-        console.error('카카오 우편번호 서비스 오류:', error);
-        // 카카오 실패 시 우체국 검색으로 대체
+        console.error('Daum 우편번호 서비스 오류:', error);
+        // Daum 실패 시 우체국 검색으로 대체
         searchWithPostOffice().then(resolve).catch(reject);
       }
     });
@@ -222,7 +226,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
       
       <div className="text-xs text-gray-500 space-y-1">
         <div>💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.</div>
-        <div>🔧 카카오 서비스 연결 문제 시 자동으로 우체국 검색으로 전환됩니다.</div>
+        <div>🔧 Daum 우편번호 서비스는 무료이며 Key 발급이 필요하지 않습니다.</div>
       </div>
     </div>
   );
