@@ -234,10 +234,19 @@ function CheckoutPageContent() {
         totalAmount: totalAmount
       };
 
+      // JWT 토큰 가져오기
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        router.push('/auth/login');
+        return;
+      }
+
       const orderResponse = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(orderData),
       });

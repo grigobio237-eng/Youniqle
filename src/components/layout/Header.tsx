@@ -76,6 +76,8 @@ export default function Header() {
   const handleSignOut = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+      // localStorage에서 토큰 제거
+      localStorage.removeItem('token');
       setSession(null);
       window.location.href = '/';
     } catch (error) {

@@ -36,6 +36,12 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
+        // JWT 토큰을 localStorage에 저장
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          console.log('JWT 토큰이 localStorage에 저장되었습니다.');
+        }
+        
         // Redirect to intended page or home
         router.push('/');
         router.refresh();
