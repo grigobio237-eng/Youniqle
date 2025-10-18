@@ -37,10 +37,13 @@ export default function Header() {
           const data = await response.json();
           console.log('세션 확인 결과:', data);
           
-          if (data.user && isMounted) {
+          // 세션이 있고 사용자 정보가 유효한 경우에만 로그인 상태로 설정
+          if (data.user && data.user.email && data.user.name && isMounted) {
+            console.log('유효한 세션 확인됨, 로그인 상태 설정');
             setSession(data);
             fetchCartCount();
           } else if (isMounted) {
+            console.log('세션이 없거나 유효하지 않음, 로그아웃 상태 설정');
             setSession(null);
             // localStorage 토큰도 확인하여 일관성 유지
             const token = localStorage.getItem('token');
@@ -50,6 +53,7 @@ export default function Header() {
             }
           }
         } else if (isMounted) {
+          console.log('세션 확인 API 실패, 로그아웃 상태 설정');
           setSession(null);
           localStorage.removeItem('token');
         }
@@ -106,66 +110,59 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      console.log('로그아웃 시작...');
+      console.log('강제 로그아웃 시작...');
       
-      // 1. NextAuth 로그아웃 (세션 제거)
-      try {
-        const signoutResponse = await fetch('/api/auth/signout', { 
-          method: 'POST',
-          credentials: 'include'
-        });
-        console.log('NextAuth 로그아웃 응답:', signoutResponse.status);
-      } catch (signoutError) {
-        console.error('NextAuth 로그아웃 실패:', signoutError);
-      }
-      
-      // 2. 커스텀 로그아웃 API도 호출
-      try {
-        const customLogoutResponse = await fetch('/api/auth/logout', { 
-          method: 'POST',
-          credentials: 'include'
-        });
-        console.log('커스텀 로그아웃 응답:', customLogoutResponse.status);
-      } catch (customError) {
-        console.error('커스텀 로그아웃 실패:', customError);
-      }
-      
-      // 3. localStorage에서 토큰 제거
-      localStorage.removeItem('token');
-      localStorage.clear(); // 모든 localStorage 데이터 제거
-      console.log('localStorage 정리 완료');
-      
-      // 4. 세션 스토리지도 정리
-      sessionStorage.clear();
-      
-      // 5. 상태 초기화
+      // 1. 상태 즉시 초기화 (UI에서 먼저 로그아웃 상태로 변경)
       setSession(null);
       setCartCount(0);
       
-      // 6. 쿠키 직접 삭제 (강제)
-      document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-      });
-      console.log('쿠키 정리 완료');
+      // 2. 모든 저장소 데이터 즉시 정리
+      localStorage.clear();
+      sessionStorage.clear();
+      console.log('모든 저장소 데이터 정리 완료');
       
-      // 7. 페이지 새로고침으로 완전한 로그아웃
-      console.log('페이지 리다이렉트...');
-      window.location.href = '/';
+      // 3. 모든 쿠키 강제 삭제 (NextAuth 쿠키 포함)
+      const cookies = document.cookie.split(";");
+      cookies.forEach(function(cookie) {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        // 모든 경로와 도메인에서 쿠키 삭제
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+      });
+      console.log('모든 쿠키 강제 삭제 완료');
+      
+      // 4. NextAuth 로그아웃 API 호출 (비동기, 결과 무시)
+      fetch('/api/auth/signout', { 
+        method: 'POST',
+        credentials: 'include'
+      }).catch(() => {}); // 에러 무시
+      
+      // 5. 커스텀 로그아웃 API 호출 (비동기, 결과 무시)
+      fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'include'
+      }).catch(() => {}); // 에러 무시
+      
+      // 6. 즉시 페이지 리다이렉트 (API 응답 기다리지 않음)
+      console.log('즉시 페이지 리다이렉트...');
+      window.location.replace('/'); // replace로 히스토리에서 제거
       
     } catch (error) {
-      console.error('Sign out failed:', error);
+      console.error('로그아웃 중 오류:', error);
       // 에러가 발생해도 강제로 로그아웃 처리
       localStorage.clear();
       sessionStorage.clear();
       setSession(null);
       setCartCount(0);
       
-      // 쿠키 강제 삭제
+      // 모든 쿠키 강제 삭제
       document.cookie.split(";").forEach(function(c) { 
         document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
       });
       
-      window.location.href = '/';
+      window.location.replace('/');
     }
   };
 
