@@ -77,11 +77,6 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signOut({ token }) {
-      // 로그아웃 시 토큰 무효화
-      console.log('NextAuth signOut callback 실행, 토큰 무효화:', token);
-      return true;
-    },
     async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
       // 소셜 로그인 시 자동으로 회원가입 처리
       if (account?.provider === 'google' || account?.provider === 'kakao' || account?.provider === 'naver') {
