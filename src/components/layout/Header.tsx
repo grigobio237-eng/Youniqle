@@ -154,20 +154,25 @@ export default function Header() {
       });
       console.log('✅ 모든 쿠키 강제 삭제 완료');
       
-      // 5. NextAuth 로그아웃 API 호출 (임시 비활성화 - 500 에러 방지)
-      // try {
-      //   const signoutResponse = await fetch('/api/auth/signout', { 
-      //     method: 'POST',
-      //     credentials: 'include',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     }
-      //   });
-      //   console.log('NextAuth 로그아웃 응답:', signoutResponse.status);
-      // } catch (signoutError) {
-      //   console.error('NextAuth 로그아웃 실패:', signoutError);
-      // }
-      console.log('NextAuth 로그아웃 API 호출 생략 (500 에러 방지)');
+      // 5. NextAuth 로그아웃 API 호출 (복구됨)
+      try {
+        const signoutResponse = await fetch('/api/auth/signout', { 
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        if (signoutResponse.ok) {
+          const signoutData = await signoutResponse.json();
+          console.log('NextAuth 로그아웃 응답:', signoutResponse.status, signoutData);
+        } else {
+          console.error('NextAuth 로그아웃 실패:', signoutResponse.status);
+        }
+      } catch (signoutError) {
+        console.error('NextAuth 로그아웃 실패:', signoutError);
+      }
       
       // 6. 커스텀 로그아웃 API 호출
       try {
