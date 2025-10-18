@@ -9,8 +9,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     console.log('Fetching product with ID:', id);
     
     // JWT 토큰으로 인증 확인
