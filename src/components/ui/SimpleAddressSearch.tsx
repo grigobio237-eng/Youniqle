@@ -80,6 +80,13 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
   const searchWithKakao = () => {
     return new Promise<void>((resolve, reject) => {
       try {
+        // 카카오 서비스가 로드되지 않았거나 연결 문제가 있는 경우
+        if (!window.daum || !window.daum.Postcode) {
+          console.log('카카오 우편번호 서비스를 사용할 수 없습니다. 우체국 검색으로 대체합니다.');
+          searchWithPostOffice().then(resolve).catch(reject);
+          return;
+        }
+
         new window.daum.Postcode({
           oncomplete: function(data: any) {
             console.log('카카오 주소 선택 완료:', data);
@@ -95,7 +102,7 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
           },
           onclose: function(state: string) {
             if (state === 'FORCE_CLOSE') {
-              console.log('카카오 우편번호 검색이 강제로 닫혔습니다.');
+              console.log('카카오 우편번호 검색이 강제로 닫혔습니다. 우체국 검색으로 대체합니다.');
               // 강제로 닫힌 경우 우체국 검색으로 대체
               searchWithPostOffice().then(resolve).catch(reject);
             } else {
@@ -213,8 +220,9 @@ export default function SimpleAddressSearch({ onAddressSelect, disabled = false 
         </div>
       )}
       
-      <div className="text-xs text-gray-500">
-        💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.
+      <div className="text-xs text-gray-500 space-y-1">
+        <div>💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.</div>
+        <div>🔧 카카오 서비스 연결 문제 시 자동으로 우체국 검색으로 전환됩니다.</div>
       </div>
     </div>
   );

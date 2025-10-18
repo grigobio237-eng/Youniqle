@@ -426,14 +426,14 @@ function CheckoutPageContent() {
                     <div className="flex gap-2">
                       <Input
                         value={shippingAddress.zipCode}
-                        placeholder="우편번호"
-                        readOnly
+                        onChange={(e) => handleShippingChange('zipCode', e.target.value)}
+                        placeholder="우편번호 (직접 입력 가능)"
                         className="w-32"
                       />
                       <Input
                         value={shippingAddress.address1}
+                        onChange={(e) => handleShippingChange('address1', e.target.value)}
                         placeholder="도로명주소"
-                        readOnly
                         className="flex-1"
                       />
                     </div>
@@ -442,6 +442,9 @@ function CheckoutPageContent() {
                       onChange={(e) => handleShippingChange('address2', e.target.value)}
                       placeholder="상세주소를 입력하세요"
                     />
+                    <div className="text-xs text-gray-500">
+                      💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
+                    </div>
                   </div>
                 </div>
 
