@@ -154,19 +154,20 @@ export default function Header() {
       });
       console.log('✅ 모든 쿠키 강제 삭제 완료');
       
-      // 5. NextAuth 로그아웃 API 호출 (동기적으로 처리)
-      try {
-        const signoutResponse = await fetch('/api/auth/signout', { 
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        console.log('NextAuth 로그아웃 응답:', signoutResponse.status);
-      } catch (signoutError) {
-        console.error('NextAuth 로그아웃 실패:', signoutError);
-      }
+      // 5. NextAuth 로그아웃 API 호출 (임시 비활성화 - 500 에러 방지)
+      // try {
+      //   const signoutResponse = await fetch('/api/auth/signout', { 
+      //     method: 'POST',
+      //     credentials: 'include',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     }
+      //   });
+      //   console.log('NextAuth 로그아웃 응답:', signoutResponse.status);
+      // } catch (signoutError) {
+      //   console.error('NextAuth 로그아웃 실패:', signoutError);
+      // }
+      console.log('NextAuth 로그아웃 API 호출 생략 (500 에러 방지)');
       
       // 6. 커스텀 로그아웃 API 호출
       try {
@@ -185,7 +186,24 @@ export default function Header() {
       // 7. 추가 대기 시간 (서버 처리 완료 대기)
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // 8. 최종 페이지 리다이렉트
+      // 8. 추가 쿠키 정리 (NextAuth 특화)
+      const nextAuthSessionToken = document.cookie
+        .split(';')
+        .find(cookie => cookie.trim().startsWith('next-auth.session-token='));
+      
+      if (nextAuthSessionToken) {
+        console.log('⚠️ NextAuth 세션 토큰이 여전히 존재합니다. 강제 삭제 시도...');
+        const tokenName = nextAuthSessionToken.split('=')[0].trim();
+        // 모든 가능한 경로와 도메인에서 강제 삭제
+        document.cookie = `${tokenName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        document.cookie = `${tokenName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+        document.cookie = `${tokenName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+        document.cookie = `${tokenName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.grigobio.co.kr`;
+        document.cookie = `${tokenName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.www.grigobio.co.kr`;
+        console.log('✅ NextAuth 세션 토큰 강제 삭제 완료');
+      }
+      
+      // 9. 최종 페이지 리다이렉트
       console.log('🔄 최종 페이지 리다이렉트...');
       window.location.replace('/');
       
