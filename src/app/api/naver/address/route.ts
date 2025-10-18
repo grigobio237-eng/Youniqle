@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 네이버 주소 검색 API 호출
+    // 네이버 지역 검색 API 호출 (검색 API의 지역 검색 기능)
     const naverApiUrl = `https://openapi.naver.com/v1/search/local.json?query=${encodeURIComponent(query)}&display=20&start=1&sort=random`;
     
     console.log('네이버 주소 검색 API 호출:', naverApiUrl);

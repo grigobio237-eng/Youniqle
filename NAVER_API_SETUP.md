@@ -10,7 +10,7 @@
 1. "Application" → "애플리케이션 등록" 클릭
 2. 애플리케이션 정보 입력:
    - **애플리케이션 이름**: Youniqle 주소 검색
-   - **사용 API**: 검색 → 지역 검색 API 선택
+   - **사용 API**: **검색** 선택 (지역 검색 기능이 포함됨)
    - **서비스 환경**: Web 서비스
    - **서비스 URL**: https://www.grigobio.co.kr (또는 개발용 http://localhost:3000)
 
