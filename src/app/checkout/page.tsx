@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
-import NaverAddressSearch from '@/components/ui/NaverAddressSearch';
+import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   CreditCard, 
@@ -408,9 +408,9 @@ function CheckoutPageContent() {
                 <div>
                   <Label>주소 *</Label>
                   
-                  {/* 네이버 주소 검색 */}
+                  {/* Google 주소 검색 */}
                   <div className="mb-3">
-                    <NaverAddressSearch
+                    <GoogleAddressSearch
                       onAddressSelect={(address) => {
                         setShippingAddress(prev => ({
                           ...prev,
