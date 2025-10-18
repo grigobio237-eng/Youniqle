@@ -39,7 +39,10 @@ class Logger {
     this.logLevel = (process.env.LOG_LEVEL as LogLevel) || 'info';
     this.currentLogFile = this.getLogFileName();
     
-    this.ensureLogDirectory();
+    // Vercel 서버리스 환경에서는 파일 로깅 비활성화
+    if (process.env.VERCEL !== '1') {
+      this.ensureLogDirectory();
+    }
   }
 
   // 로그 디렉토리 생성
@@ -65,6 +68,11 @@ class Logger {
 
   // 로그 파일 로테이션
   private rotateLogFile() {
+    // Vercel 서버리스 환경에서는 로테이션 건너뛰기
+    if (process.env.VERCEL === '1') {
+      return;
+    }
+    
     if (!fs.existsSync(this.currentLogFile)) return;
 
     const stats = fs.statSync(this.currentLogFile);
@@ -131,6 +139,11 @@ class Logger {
 
   // 로그 파일에 쓰기
   private writeToFile(entry: LogEntry) {
+    // Vercel 서버리스 환경에서는 파일 로깅 비활성화
+    if (process.env.VERCEL === '1') {
+      return;
+    }
+    
     try {
       this.rotateLogFile();
       
@@ -315,6 +328,11 @@ class Logger {
 
   // 로그 파일 목록 조회
   getLogFiles(): string[] {
+    // Vercel 서버리스 환경에서는 빈 배열 반환
+    if (process.env.VERCEL === '1') {
+      return [];
+    }
+    
     try {
       return fs.readdirSync(this.logDir)
         .filter(file => file.startsWith('app-') && file.endsWith('.log'))
@@ -327,6 +345,11 @@ class Logger {
 
   // 로그 파일 읽기
   readLogFile(filename: string, lines: number = 100): string[] {
+    // Vercel 서버리스 환경에서는 빈 배열 반환
+    if (process.env.VERCEL === '1') {
+      return [];
+    }
+    
     try {
       const filePath = path.join(this.logDir, filename);
       const content = fs.readFileSync(filePath, 'utf8');
@@ -344,6 +367,11 @@ class Logger {
 
   // 로그 디렉토리 정리 (오래된 로그 파일 삭제)
   cleanupLogs(daysToKeep: number = 30) {
+    // Vercel 서버리스 환경에서는 정리 작업 건너뛰기
+    if (process.env.VERCEL === '1') {
+      return;
+    }
+    
     try {
       const files = fs.readdirSync(this.logDir);
       const cutoffDate = new Date();
