@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  let query: string = '';
+  
   try {
-    const { query } = await request.json();
+    const requestData = await request.json();
+    query = requestData.query || '';
 
     if (!query || typeof query !== 'string') {
       return NextResponse.json({
