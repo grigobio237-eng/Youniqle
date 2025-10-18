@@ -110,47 +110,87 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      console.log('강제 로그아웃 시작...');
+      console.log('🚨 완전 로그아웃 시작...');
       
       // 1. 상태 즉시 초기화 (UI에서 먼저 로그아웃 상태로 변경)
       setSession(null);
       setCartCount(0);
+      console.log('✅ UI 상태 초기화 완료');
       
       // 2. 모든 저장소 데이터 즉시 정리
       localStorage.clear();
       sessionStorage.clear();
-      console.log('모든 저장소 데이터 정리 완료');
+      console.log('✅ 모든 저장소 데이터 정리 완료');
       
-      // 3. 모든 쿠키 강제 삭제 (NextAuth 쿠키 포함)
-      const cookies = document.cookie.split(";");
-      cookies.forEach(function(cookie) {
+      // 3. NextAuth 세션 쿠키 특별 처리
+      const nextAuthCookies = [
+        'next-auth.session-token',
+        'next-auth.csrf-token', 
+        'next-auth.callback-url',
+        '__Secure-next-auth.session-token',
+        '__Host-next-auth.csrf-token'
+      ];
+      
+      nextAuthCookies.forEach(cookieName => {
+        // 모든 가능한 경로와 도메인에서 쿠키 삭제
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.grigobio.co.kr`;
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.www.grigobio.co.kr`;
+      });
+      
+      // 4. 모든 쿠키 강제 삭제
+      const allCookies = document.cookie.split(";");
+      allCookies.forEach(function(cookie) {
         const eqPos = cookie.indexOf("=");
         const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-        // 모든 경로와 도메인에서 쿠키 삭제
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+        if (name) {
+          // 모든 가능한 경로와 도메인에서 쿠키 삭제
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+        }
       });
-      console.log('모든 쿠키 강제 삭제 완료');
+      console.log('✅ 모든 쿠키 강제 삭제 완료');
       
-      // 4. NextAuth 로그아웃 API 호출 (비동기, 결과 무시)
-      fetch('/api/auth/signout', { 
-        method: 'POST',
-        credentials: 'include'
-      }).catch(() => {}); // 에러 무시
+      // 5. NextAuth 로그아웃 API 호출 (동기적으로 처리)
+      try {
+        const signoutResponse = await fetch('/api/auth/signout', { 
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        console.log('NextAuth 로그아웃 응답:', signoutResponse.status);
+      } catch (signoutError) {
+        console.error('NextAuth 로그아웃 실패:', signoutError);
+      }
       
-      // 5. 커스텀 로그아웃 API 호출 (비동기, 결과 무시)
-      fetch('/api/auth/logout', { 
-        method: 'POST',
-        credentials: 'include'
-      }).catch(() => {}); // 에러 무시
+      // 6. 커스텀 로그아웃 API 호출
+      try {
+        const customLogoutResponse = await fetch('/api/auth/logout', { 
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        console.log('커스텀 로그아웃 응답:', customLogoutResponse.status);
+      } catch (customError) {
+        console.error('커스텀 로그아웃 실패:', customError);
+      }
       
-      // 6. 즉시 페이지 리다이렉트 (API 응답 기다리지 않음)
-      console.log('즉시 페이지 리다이렉트...');
-      window.location.replace('/'); // replace로 히스토리에서 제거
+      // 7. 추가 대기 시간 (서버 처리 완료 대기)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 8. 최종 페이지 리다이렉트
+      console.log('🔄 최종 페이지 리다이렉트...');
+      window.location.replace('/');
       
     } catch (error) {
-      console.error('로그아웃 중 오류:', error);
+      console.error('❌ 로그아웃 중 오류:', error);
       // 에러가 발생해도 강제로 로그아웃 처리
       localStorage.clear();
       sessionStorage.clear();
