@@ -70,6 +70,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
     try {
       new window.daum.Postcode({
         oncomplete: function(data: any) {
+          console.log('주소 선택 완료:', data);
           // 주소 정보를 부모 컴포넌트로 전달
           onAddressSelect({
             zonecode: data.zonecode,
@@ -88,6 +89,9 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
             console.log('우편번호 검색이 강제로 닫혔습니다.');
           }
         },
+        onresize: function(size: any) {
+          console.log('팝업 크기 조정:', size);
+        },
         width: '100%',
         height: '100%',
         maxSuggestItems: 5,
@@ -98,6 +102,9 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
         submitMode: false,
         useBanner: true,
         useSuggest: true,
+        // 팝업이 제대로 표시되도록 설정 추가
+        popupName: 'postcodePopup',
+        popupKey: 'postcodePopup',
         theme: {
           bgColor: '#ffffff',
           searchBgColor: '#ffffff',
@@ -109,7 +116,10 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
           emphTextColor: '#008bd3',
           outlineColor: '#e0e0e0'
         }
-      }).open();
+      }).open({
+        q: '', // 초기 검색어
+        autoClose: false, // 자동 닫기 비활성화
+      });
     } catch (error) {
       console.error('우편번호 서비스 오류:', error);
       alert('우편번호 서비스에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.\n\n대안: 우편번호를 직접 입력하거나 다른 주소 검색 서비스를 이용해주세요.');

@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
 import PostcodeSearch from '@/components/ui/PostcodeSearch';
+import PostOfficeSearch from '@/components/ui/PostOfficeSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   CreditCard, 
@@ -424,6 +425,38 @@ function CheckoutPageContent() {
                       }}
                     />
                   </div>
+                  
+                  {/* 주소 검색 옵션 */}
+                  <div className="mb-2">
+                    <div className="text-sm text-gray-600 mb-2">주소 검색 방법을 선택하세요:</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div>
+                        <div className="text-xs text-gray-500 mb-1">카카오 우편번호 서비스</div>
+                        <PostcodeSearch
+                          onAddressSelect={(address) => {
+                            setShippingAddress(prev => ({
+                              ...prev,
+                              zipCode: address.zonecode,
+                              address1: address.address
+                            }));
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500 mb-1">우체국 주소 검색</div>
+                        <PostOfficeSearch
+                          onAddressSelect={(address) => {
+                            setShippingAddress(prev => ({
+                              ...prev,
+                              zipCode: address.zonecode,
+                              address1: address.address
+                            }));
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
                   <Input
                     value={shippingAddress.address1}
                     placeholder="도로명주소"
