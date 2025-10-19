@@ -201,10 +201,14 @@ export default function AdminSettingsPage() {
       const response = await fetch('/api/admin/settings');
       if (response.ok) {
         const data = await response.json();
-        setSettings(data.settings || settings);
+        if (data.settings) {
+          setSettings(data.settings);
+        }
+        // API에서 설정을 가져오지 못한 경우 기본값 유지
       }
     } catch (error) {
       console.error('설정 로드 실패:', error);
+      // 에러 발생 시 기본값 유지
     } finally {
       setLoading(false);
     }
@@ -238,13 +242,16 @@ export default function AdminSettingsPage() {
 
   const updateSettings = (section: keyof AdminSettings, key: string, value: any, subKey?: string) => {
     setSettings(prev => {
+      // 안전한 접근을 위해 기본값 보장
+      const currentSection = prev[section] || {};
+      
       if (subKey) {
         return {
           ...prev,
           [section]: {
-            ...prev[section],
+            ...currentSection,
             [key]: {
-              ...(prev[section] as any)[key],
+              ...(currentSection as any)[key] || {},
               [subKey]: value
             }
           }
@@ -253,7 +260,7 @@ export default function AdminSettingsPage() {
         return {
           ...prev,
           [section]: {
-            ...prev[section],
+            ...currentSection,
             [key]: value
           }
         };
@@ -334,7 +341,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="siteName">사이트 이름</Label>
                   <Input
                     id="siteName"
-                    value={settings.general.siteName}
+                    value={settings.general?.siteName || ''}
                     onChange={(e) => updateSettings('general', 'siteName', e.target.value)}
                   />
                 </div>
@@ -342,7 +349,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="siteUrl">사이트 URL</Label>
                   <Input
                     id="siteUrl"
-                    value={settings.general.siteUrl}
+                    value={settings.general?.siteUrl || ''}
                     onChange={(e) => updateSettings('general', 'siteUrl', e.target.value)}
                   />
                 </div>
@@ -351,7 +358,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="siteDescription">사이트 설명</Label>
                 <Textarea
                   id="siteDescription"
-                  value={settings.general.siteDescription}
+                  value={settings.general?.siteDescription || ''}
                   onChange={(e) => updateSettings('general', 'siteDescription', e.target.value)}
                 />
               </div>
@@ -361,14 +368,14 @@ export default function AdminSettingsPage() {
                   <Input
                     id="adminEmail"
                     type="email"
-                    value={settings.general.adminEmail}
+                    value={settings.general?.adminEmail || ''}
                     onChange={(e) => updateSettings('general', 'adminEmail', e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="timezone">시간대</Label>
                   <Select
-                    value={settings.general.timezone}
+                    value={settings.general?.timezone || ''}
                     onValueChange={(value) => updateSettings('general', 'timezone', value)}
                   >
                     <SelectTrigger>
@@ -397,7 +404,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="companyName">회사명</Label>
                   <Input
                     id="companyName"
-                    value={settings.general.companyInfo.companyName}
+                    value={settings.general?.companyInfo?.companyName || ''}
                     onChange={(e) => updateSettings('general', 'companyInfo', e.target.value, 'companyName')}
                   />
                 </div>
@@ -405,7 +412,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessNumber">사업자등록번호</Label>
                   <Input
                     id="businessNumber"
-                    value={settings.general.companyInfo.businessNumber}
+                    value={settings.general?.companyInfo?.businessNumber || ''}
                     onChange={(e) => updateSettings('general', 'companyInfo', e.target.value, 'businessNumber')}
                     placeholder="000-00-00000"
                   />
@@ -416,7 +423,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="ceoName">대표자명</Label>
                   <Input
                     id="ceoName"
-                    value={settings.general.companyInfo.ceoName}
+                    value={settings.general?.companyInfo?.ceoName}
                     onChange={(e) => updateSettings('general', 'companyInfo', e.target.value, 'ceoName')}
                   />
                 </div>
@@ -425,7 +432,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="establishmentDate"
                     type="date"
-                    value={settings.general.companyInfo.establishmentDate}
+                    value={settings.general?.companyInfo?.establishmentDate}
                     onChange={(e) => updateSettings('general', 'companyInfo', e.target.value, 'establishmentDate')}
                   />
                 </div>
@@ -435,14 +442,14 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessType">업종</Label>
                   <Input
                     id="businessType"
-                    value={settings.general.companyInfo.businessType}
+                    value={settings.general?.companyInfo?.businessType}
                     onChange={(e) => updateSettings('general', 'companyInfo', e.target.value, 'businessType')}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="businessStatus">사업상태</Label>
                   <Select
-                    value={settings.general.companyInfo.businessStatus}
+                    value={settings.general?.companyInfo?.businessStatus}
                     onValueChange={(value) => updateSettings('general', 'companyInfo', value, 'businessStatus')}
                   >
                     <SelectTrigger>
@@ -471,7 +478,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="registrationNumber">사업자등록번호</Label>
                   <Input
                     id="registrationNumber"
-                    value={settings.general.businessRegistration.registrationNumber}
+                    value={settings.general?.businessRegistration?.registrationNumber}
                     onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'registrationNumber')}
                     placeholder="000-00-00000"
                   />
@@ -481,7 +488,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="registrationDate"
                     type="date"
-                    value={settings.general.businessRegistration.registrationDate}
+                    value={settings.general?.businessRegistration?.registrationDate}
                     onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'registrationDate')}
                   />
                 </div>
@@ -490,7 +497,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="businessAddress">사업장 주소</Label>
                 <Input
                   id="businessAddress"
-                  value={settings.general.businessRegistration.businessAddress}
+                  value={settings.general?.businessRegistration?.businessAddress}
                   onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessAddress')}
                   placeholder="서울특별시 강남구 테헤란로 123"
                 />
@@ -499,7 +506,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="businessAddressDetail">상세주소</Label>
                 <Input
                   id="businessAddressDetail"
-                  value={settings.general.businessRegistration.businessAddressDetail}
+                  value={settings.general?.businessRegistration?.businessAddressDetail}
                   onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessAddressDetail')}
                   placeholder="그리고바이오 빌딩 10층"
                 />
@@ -509,7 +516,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessPostalCode">우편번호</Label>
                   <Input
                     id="businessPostalCode"
-                    value={settings.general.businessRegistration.businessPostalCode}
+                    value={settings.general?.businessRegistration?.businessPostalCode}
                     onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessPostalCode')}
                     placeholder="06292"
                   />
@@ -518,7 +525,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessPhone">사업장 전화번호</Label>
                   <Input
                     id="businessPhone"
-                    value={settings.general.businessRegistration.businessPhone}
+                    value={settings.general?.businessRegistration?.businessPhone}
                     onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessPhone')}
                     placeholder="02-0000-0000"
                   />
@@ -527,7 +534,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessFax">팩스번호</Label>
                   <Input
                     id="businessFax"
-                    value={settings.general.businessRegistration.businessFax}
+                    value={settings.general?.businessRegistration?.businessFax}
                     onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessFax')}
                     placeholder="02-0000-0001"
                   />
@@ -538,7 +545,7 @@ export default function AdminSettingsPage() {
                 <Input
                   id="businessEmail"
                   type="email"
-                  value={settings.general.businessRegistration.businessEmail}
+                  value={settings.general?.businessRegistration?.businessEmail}
                   onChange={(e) => updateSettings('general', 'businessRegistration', e.target.value, 'businessEmail')}
                   placeholder="admin@youniqle.com"
                 />
@@ -558,7 +565,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="reportNumber">신고번호</Label>
                   <Input
                     id="reportNumber"
-                    value={settings.general.ecommerceRegistration.reportNumber}
+                    value={settings.general?.ecommerceRegistration?.reportNumber}
                     onChange={(e) => updateSettings('general', 'ecommerceRegistration', e.target.value, 'reportNumber')}
                     placeholder="제2024-서울강남-0000호"
                   />
@@ -568,7 +575,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="reportDate"
                     type="date"
-                    value={settings.general.ecommerceRegistration.reportDate}
+                    value={settings.general?.ecommerceRegistration?.reportDate}
                     onChange={(e) => updateSettings('general', 'ecommerceRegistration', e.target.value, 'reportDate')}
                   />
                 </div>
@@ -578,7 +585,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="reportAuthority">신고기관</Label>
                   <Input
                     id="reportAuthority"
-                    value={settings.general.ecommerceRegistration.reportAuthority}
+                    value={settings.general?.ecommerceRegistration?.reportAuthority}
                     onChange={(e) => updateSettings('general', 'ecommerceRegistration', e.target.value, 'reportAuthority')}
                     placeholder="서울특별시 강남구청"
                   />
@@ -586,7 +593,7 @@ export default function AdminSettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="reportStatus">신고상태</Label>
                   <Select
-                    value={settings.general.ecommerceRegistration.reportStatus}
+                    value={settings.general?.ecommerceRegistration?.reportStatus}
                     onValueChange={(value) => updateSettings('general', 'ecommerceRegistration', value, 'reportStatus')}
                   >
                     <SelectTrigger>
@@ -615,7 +622,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="customerServicePhone">고객센터 전화번호</Label>
                   <Input
                     id="customerServicePhone"
-                    value={settings.general.contactInfo.customerServicePhone}
+                    value={settings.general?.contactInfo?.customerServicePhone}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'customerServicePhone')}
                     placeholder="1588-0000"
                   />
@@ -625,7 +632,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="customerServiceEmail"
                     type="email"
-                    value={settings.general.contactInfo.customerServiceEmail}
+                    value={settings.general?.contactInfo?.customerServiceEmail}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'customerServiceEmail')}
                     placeholder="cs@youniqle.com"
                   />
@@ -636,7 +643,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="businessInquiryPhone">업무 문의 전화번호</Label>
                   <Input
                     id="businessInquiryPhone"
-                    value={settings.general.contactInfo.businessInquiryPhone}
+                    value={settings.general?.contactInfo?.businessInquiryPhone}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'businessInquiryPhone')}
                     placeholder="02-0000-0000"
                   />
@@ -646,7 +653,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="businessInquiryEmail"
                     type="email"
-                    value={settings.general.contactInfo.businessInquiryEmail}
+                    value={settings.general?.contactInfo?.businessInquiryEmail}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'businessInquiryEmail')}
                     placeholder="business@youniqle.com"
                   />
@@ -656,7 +663,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="address">회사 주소</Label>
                 <Input
                   id="address"
-                  value={settings.general.contactInfo.address}
+                  value={settings.general?.contactInfo?.address}
                   onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'address')}
                   placeholder="서울특별시 강남구 테헤란로 123"
                 />
@@ -665,7 +672,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="addressDetail">상세주소</Label>
                 <Input
                   id="addressDetail"
-                  value={settings.general.contactInfo.addressDetail}
+                  value={settings.general?.contactInfo?.addressDetail}
                   onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'addressDetail')}
                   placeholder="그리고바이오 빌딩 10층"
                 />
@@ -675,7 +682,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="postalCode">우편번호</Label>
                   <Input
                     id="postalCode"
-                    value={settings.general.contactInfo.postalCode}
+                    value={settings.general?.contactInfo?.postalCode}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'postalCode')}
                     placeholder="06292"
                   />
@@ -684,7 +691,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="fax">팩스번호</Label>
                   <Input
                     id="fax"
-                    value={settings.general.contactInfo.fax}
+                    value={settings.general?.contactInfo?.fax}
                     onChange={(e) => updateSettings('general', 'contactInfo', e.target.value, 'fax')}
                     placeholder="02-0000-0001"
                   />
@@ -705,7 +712,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="privacyPolicyUrl">개인정보처리방침 URL</Label>
                   <Input
                     id="privacyPolicyUrl"
-                    value={settings.general.legalInfo.privacyPolicyUrl}
+                    value={settings.general?.legalInfo?.privacyPolicyUrl}
                     onChange={(e) => updateSettings('general', 'legalInfo', e.target.value, 'privacyPolicyUrl')}
                     placeholder="/privacy"
                   />
@@ -714,7 +721,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="termsOfServiceUrl">이용약관 URL</Label>
                   <Input
                     id="termsOfServiceUrl"
-                    value={settings.general.legalInfo.termsOfServiceUrl}
+                    value={settings.general?.legalInfo?.termsOfServiceUrl}
                     onChange={(e) => updateSettings('general', 'legalInfo', e.target.value, 'termsOfServiceUrl')}
                     placeholder="/terms"
                   />
@@ -725,7 +732,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="refundPolicyUrl">환불정책 URL</Label>
                   <Input
                     id="refundPolicyUrl"
-                    value={settings.general.legalInfo.refundPolicyUrl}
+                    value={settings.general?.legalInfo?.refundPolicyUrl}
                     onChange={(e) => updateSettings('general', 'legalInfo', e.target.value, 'refundPolicyUrl')}
                     placeholder="/refund"
                   />
@@ -734,7 +741,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="shippingPolicyUrl">배송정책 URL</Label>
                   <Input
                     id="shippingPolicyUrl"
-                    value={settings.general.legalInfo.shippingPolicyUrl}
+                    value={settings.general?.legalInfo?.shippingPolicyUrl}
                     onChange={(e) => updateSettings('general', 'legalInfo', e.target.value, 'shippingPolicyUrl')}
                     placeholder="/shipping"
                   />
@@ -744,7 +751,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="returnPolicyUrl">교환/반품정책 URL</Label>
                 <Input
                   id="returnPolicyUrl"
-                  value={settings.general.legalInfo.returnPolicyUrl}
+                  value={settings.general?.legalInfo?.returnPolicyUrl}
                   onChange={(e) => updateSettings('general', 'legalInfo', e.target.value, 'returnPolicyUrl')}
                   placeholder="/return"
                 />
@@ -766,7 +773,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">관리자 로그인 시 2단계 인증을 요구합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.security.enableTwoFactor}
+                  checked={settings.security?.enableTwoFactor || false}
                   onCheckedChange={(checked) => updateSettings('security', 'enableTwoFactor', checked)}
                 />
               </div>
@@ -776,7 +783,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="sessionTimeout"
                     type="number"
-                    value={settings.security.sessionTimeout}
+                    value={settings.security?.sessionTimeout || 24}
                     onChange={(e) => updateSettings('security', 'sessionTimeout', parseInt(e.target.value))}
                   />
                 </div>
@@ -785,7 +792,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="maxLoginAttempts"
                     type="number"
-                    value={settings.security.maxLoginAttempts}
+                    value={settings.security?.maxLoginAttempts || 5}
                     onChange={(e) => updateSettings('security', 'maxLoginAttempts', parseInt(e.target.value))}
                   />
                 </div>
@@ -796,7 +803,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="passwordMinLength"
                     type="number"
-                    value={settings.security.passwordMinLength}
+                    value={settings.security?.passwordMinLength || 8}
                     onChange={(e) => updateSettings('security', 'passwordMinLength', parseInt(e.target.value))}
                   />
                 </div>
@@ -806,7 +813,7 @@ export default function AdminSettingsPage() {
                     <p className="text-sm text-muted-foreground">특수문자, 숫자, 대소문자 포함</p>
                   </div>
                   <Switch
-                    checked={settings.security.requireStrongPassword}
+                    checked={settings.security?.requireStrongPassword || false}
                     onCheckedChange={(checked) => updateSettings('security', 'requireStrongPassword', checked)}
                   />
                 </div>
@@ -828,7 +835,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">이메일을 통한 알림을 활성화합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.emailNotifications}
+                  checked={settings.notifications?.emailNotifications || false}
                   onCheckedChange={(checked) => updateSettings('notifications', 'emailNotifications', checked)}
                 />
               </div>
@@ -838,7 +845,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">SMS를 통한 알림을 활성화합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.smsNotifications}
+                  checked={settings.notifications?.smsNotifications || false}
                   onCheckedChange={(checked) => updateSettings('notifications', 'smsNotifications', checked)}
                 />
               </div>
@@ -848,7 +855,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">브라우저 푸시 알림을 활성화합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.pushNotifications}
+                  checked={settings.notifications?.pushNotifications || false}
                   onCheckedChange={(checked) => updateSettings('notifications', 'pushNotifications', checked)}
                 />
               </div>
@@ -858,7 +865,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">관리자에게 중요한 알림을 전송합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.adminAlerts}
+                  checked={settings.notifications?.adminAlerts || false}
                   onCheckedChange={(checked) => updateSettings('notifications', 'adminAlerts', checked)}
                 />
               </div>
@@ -879,7 +886,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">시스템 캐싱을 활성화합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.performance.enableCaching}
+                  checked={settings.performance?.enableCaching || false}
                   onCheckedChange={(checked) => updateSettings('performance', 'enableCaching', checked)}
                 />
               </div>
@@ -889,7 +896,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="cacheTimeout"
                     type="number"
-                    value={settings.performance.cacheTimeout}
+                    value={settings.performance?.cacheTimeout || 3600}
                     onChange={(e) => updateSettings('performance', 'cacheTimeout', parseInt(e.target.value))}
                   />
                 </div>
@@ -898,7 +905,7 @@ export default function AdminSettingsPage() {
                   <Input
                     id="maxFileSize"
                     type="number"
-                    value={settings.performance.maxFileSize}
+                    value={settings.performance?.maxFileSize || 10}
                     onChange={(e) => updateSettings('performance', 'maxFileSize', parseInt(e.target.value))}
                   />
                 </div>
@@ -909,7 +916,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">응답 압축을 활성화합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.performance.enableCompression}
+                  checked={settings.performance?.enableCompression || false}
                   onCheckedChange={(checked) => updateSettings('performance', 'enableCompression', checked)}
                 />
               </div>
@@ -930,7 +937,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">사이트를 유지보수 모드로 전환합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.maintenance.maintenanceMode}
+                  checked={settings.maintenance?.maintenanceMode || false}
                   onCheckedChange={(checked) => updateSettings('maintenance', 'maintenanceMode', checked)}
                 />
               </div>
@@ -938,7 +945,7 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="maintenanceMessage">유지보수 메시지</Label>
                 <Textarea
                   id="maintenanceMessage"
-                  value={settings.maintenance.maintenanceMessage}
+                  value={settings.maintenance?.maintenanceMessage || ''}
                   onChange={(e) => updateSettings('maintenance', 'maintenanceMessage', e.target.value)}
                   placeholder="유지보수 중일 때 사용자에게 표시할 메시지를 입력하세요."
                 />
@@ -949,7 +956,7 @@ export default function AdminSettingsPage() {
                   <p className="text-sm text-muted-foreground">유지보수 모드에서도 관리자 접근을 허용합니다.</p>
                 </div>
                 <Switch
-                  checked={settings.maintenance.allowAdminAccess}
+                  checked={settings.maintenance?.allowAdminAccess || false}
                   onCheckedChange={(checked) => updateSettings('maintenance', 'allowAdminAccess', checked)}
                 />
               </div>
