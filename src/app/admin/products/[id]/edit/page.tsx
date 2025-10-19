@@ -24,6 +24,7 @@ import {
 import { toast } from 'sonner';
 import ImageManager from '@/components/products/ImageManager';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
 interface Product {
   _id: string;
@@ -69,15 +70,8 @@ interface Product {
   };
 }
 
-const categories = [
-  '신선식품',
-  '의류',
-  '신발',
-  '가방',
-  '액세서리',
-  '라이프스타일',
-  '전자제품'
-];
+// 카테고리 목록 (전체 프로젝트 공통 사용)
+const categories = PRODUCT_CATEGORIES;
 
 export default function EditProductPage() {
   const params = useParams();
@@ -264,7 +258,7 @@ export default function EditProductPage() {
 
   const renderCategorySpecificFields = () => {
     switch (formData.category) {
-      case '신선식품':
+      case 'fresh-food':
         return (
           <Card>
             <CardHeader>
@@ -361,7 +355,7 @@ export default function EditProductPage() {
           </Card>
         );
 
-      case '의류':
+      case 'clothing':
         return (
           <Card>
             <CardHeader>
@@ -401,7 +395,7 @@ export default function EditProductPage() {
           </Card>
         );
 
-      case '전자제품':
+      case 'electronics':
         return (
           <Card>
             <CardHeader>
@@ -585,8 +579,8 @@ export default function EditProductPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

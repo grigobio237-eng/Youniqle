@@ -18,6 +18,8 @@ import {
   X, 
   Shield,
   Bell,
+  CheckCircle,
+  Plus,
   Search,
   Store,
   ShoppingCart,
@@ -94,7 +96,27 @@ const navigationItems = [
     name: '상품 관리',
     href: '/admin/products',
     icon: Package,
-    description: '상품 등록 및 관리'
+    description: '상품 등록 및 관리',
+    subItems: [
+      {
+        name: '상품 목록',
+        href: '/admin/products',
+        icon: Package,
+        description: '전체 상품 목록'
+      },
+      {
+        name: '상품 승인 관리',
+        href: '/admin/products/approval',
+        icon: CheckCircle,
+        description: '파트너 상품 승인/거부'
+      },
+      {
+        name: '새 상품 등록',
+        href: '/admin/products/new',
+        icon: Plus,
+        description: '관리자 직접 상품 등록'
+      }
+    ]
   },
   {
     name: '마케팅',

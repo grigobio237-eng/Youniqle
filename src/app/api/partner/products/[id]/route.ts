@@ -12,14 +12,14 @@ export async function PUT(
   try {
     const { id: productId } = await params;
     
-    // 파트너 토큰 검증
-    const token = request.cookies.get('partner_token')?.value;
+    // 파트너 토큰 검증 (하이픈으로 통일)
+    const token = request.cookies.get('partner-token')?.value;
     
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { partnerId: string, partnerName: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string, name: string };
 
     const {
       name,
@@ -51,7 +51,7 @@ export async function PUT(
     // 상품 조회 및 권한 확인
     const product = await Product.findOne({ 
       _id: productId, 
-      partnerId: decoded.partnerId 
+      partnerId: decoded.id 
     });
 
     if (!product) {
@@ -74,7 +74,7 @@ export async function PUT(
       );
     }
 
-    // 상품 수정
+    // 상품 수정 (승인 상태 초기화 - 재검토 필요)
     product.name = name;
     product.slug = slug;
     product.price = price;
@@ -85,6 +85,9 @@ export async function PUT(
     product.description = description;
     product.images = (images || []).map((img: any) => typeof img === 'string' ? { url: img } : img);
     product.featured = featured || false;
+    // 상품 수정 시 다시 승인 대기 상태로 변경
+    product.approvalStatus = 'pending';
+    product.rejectionReason = undefined;
     // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
     product.nutritionInfo = nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined;
     product.originInfo = originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined;
@@ -120,21 +123,21 @@ export async function DELETE(
   try {
     const { id: productId } = await params;
     
-    // 파트너 토큰 검증
-    const token = request.cookies.get('partner_token')?.value;
+    // 파트너 토큰 검증 (하이픈으로 통일)
+    const token = request.cookies.get('partner-token')?.value;
     
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { partnerId: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
     await connectDB();
 
-    // 상품 조회 및 권한 확인
+    // 상품 조회 및 권한 확인 (파트너는 자신의 상품만 삭제 가능)
     const product = await Product.findOne({ 
       _id: productId, 
-      partnerId: decoded.partnerId 
+      partnerId: decoded.id 
     });
 
     if (!product) {
@@ -147,19 +150,34 @@ export async function DELETE(
     // 이미지 파일들 삭제 (Vercel Blob)
     if (product.images && product.images.length > 0) {
       try {
-        const deletePromises = product.images
-          .filter((img: any) => img.url && img.url.includes('blob.vercel-storage.com'))
-          .map(async (img: any) => {
-            await fetch('/api/upload/delete', {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ url: img.url }),
-            });
-          });
+        const blobImages = product.images.filter((img: any) => 
+          img.url && img.url.includes('blob.vercel-storage.com')
+        );
         
-        await Promise.all(deletePromises);
+        if (blobImages.length > 0) {
+          const deletePromises = blobImages.map(async (img: any) => {
+            try {
+              // Vercel Blob에서 직접 삭제
+              const { del } = await import('@vercel/blob');
+              
+              if (!process.env.BLOB_READ_WRITE_TOKEN) {
+                console.error('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다.');
+                return;
+              }
+
+              await del(img.url, {
+                token: process.env.BLOB_READ_WRITE_TOKEN,
+              });
+              
+              console.log(`이미지 삭제 성공: ${img.url}`);
+            } catch (error) {
+              console.error(`이미지 삭제 중 오류: ${img.url}`, error);
+            }
+          });
+          
+          await Promise.all(deletePromises);
+          console.log(`파트너 상품 삭제: ${blobImages.length}개 이미지 파일 삭제 완료`);
+        }
       } catch (error) {
         console.error('이미지 삭제 오류:', error);
         // 이미지 삭제 실패해도 상품은 삭제 진행

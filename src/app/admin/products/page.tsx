@@ -24,7 +24,11 @@ import {
   DollarSign,
   TrendingUp,
   ShoppingCart,
-  Star
+  Star,
+  Check,
+  X,
+  Clock,
+  AlertCircle
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -32,8 +36,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import Image from 'next/image';
+import { PRODUCT_CATEGORIES, getCategoryLabel } from '@/constants/categories';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -44,6 +60,8 @@ interface Product {
   stock: number;
   category: string;
   status: 'active' | 'hidden';
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
   featured: boolean;
   images: Array<{
     url: string;
@@ -53,6 +71,8 @@ interface Product {
   }>;
   summary: string;
   description: string;
+  partnerName?: string;
+  partnerEmail?: string;
   createdAt: string;
   updatedAt: string;
   sales: number;
@@ -60,15 +80,8 @@ interface Product {
   averageRating: number;
 }
 
-const categories = [
-  '신선식품',
-  '의류',
-  '신발',
-  '가방',
-  '액세서리',
-  '라이프스타일',
-  '전자제품'
-];
+// 카테고리 목록 (전체 프로젝트 공통 사용)
+const categories = PRODUCT_CATEGORIES;
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -76,7 +89,12 @@ export default function AdminProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [approvalFilter, setApprovalFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [processing, setProcessing] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -84,6 +102,7 @@ export default function AdminProductsPage() {
       if (searchQuery) params.append('search', searchQuery);
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
       if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (approvalFilter !== 'all') params.append('approvalStatus', approvalFilter);
       params.append('sort', sortBy);
 
       const response = await fetch(`/api/admin/products?${params}`);
@@ -96,7 +115,7 @@ export default function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, categoryFilter, statusFilter, sortBy]);
+  }, [searchQuery, categoryFilter, statusFilter, approvalFilter, sortBy]);
 
   useEffect(() => {
     fetchProducts();
@@ -120,6 +139,95 @@ export default function AdminProductsPage() {
       }
     } catch (error) {
       console.error('Product action failed:', error);
+    }
+  };
+
+  const handleApprove = async (productId: string) => {
+    setProcessing(true);
+    try {
+      const response = await fetch(`/api/admin/products/${productId}/approval`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'approve' }),
+      });
+
+      if (response.ok) {
+        toast.success('상품이 승인되었습니다.');
+        fetchProducts();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || '승인 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to approve product:', error);
+      toast.error('승인 처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!selectedProduct || !rejectionReason.trim()) {
+      toast.error('거부 사유를 입력해주세요.');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const response = await fetch(`/api/admin/products/${selectedProduct.id}/approval`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'reject',
+          rejectionReason 
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('상품이 거부되었습니다.');
+        setIsRejectDialogOpen(false);
+        setRejectionReason('');
+        setSelectedProduct(null);
+        fetchProducts();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || '거부 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to reject product:', error);
+      toast.error('거부 처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const getApprovalStatusBadge = (status: 'pending' | 'approved' | 'rejected') => {
+    switch (status) {
+      case 'pending':
+        return (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+            <Clock className="h-3 w-3 mr-1" />
+            승인 대기
+          </Badge>
+        );
+      case 'approved':
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+            <Check className="h-3 w-3 mr-1" />
+            승인됨
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
+            <X className="h-3 w-3 mr-1" />
+            거부됨
+          </Badge>
+        );
     }
   };
 
@@ -275,8 +383,8 @@ export default function AdminProductsPage() {
               <SelectContent>
                 <SelectItem value="all">모든 카테고리</SelectItem>
                 {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -291,6 +399,19 @@ export default function AdminProductsPage() {
                 <SelectItem value="all">모든 상태</SelectItem>
                 <SelectItem value="active">활성</SelectItem>
                 <SelectItem value="hidden">숨김</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Approval Status Filter */}
+            <Select value={approvalFilter} onValueChange={setApprovalFilter}>
+              <SelectTrigger className="w-full md:w-40">
+                <SelectValue placeholder="승인 상태" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">모든 승인 상태</SelectItem>
+                <SelectItem value="pending">승인 대기</SelectItem>
+                <SelectItem value="approved">승인됨</SelectItem>
+                <SelectItem value="rejected">거부됨</SelectItem>
               </SelectContent>
             </Select>
 
@@ -341,6 +462,7 @@ export default function AdminProductsPage() {
                 <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
                   {product.status === 'active' ? '활성' : '숨김'}
                 </Badge>
+                {getApprovalStatusBadge(product.approvalStatus)}
               </div>
 
               <div className="absolute top-3 right-3">
@@ -422,19 +544,66 @@ export default function AdminProductsPage() {
                   <span>재고: {product.stock}개</span>
                 </div>
 
+                {/* 파트너 상품 정보 표시 */}
+                {product.partnerName && (
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    <div>파트너: {product.partnerName}</div>
+                    {product.partnerEmail && <div>이메일: {product.partnerEmail}</div>}
+                  </div>
+                )}
+
+                {/* 거부 사유 표시 */}
+                {product.approvalStatus === 'rejected' && product.rejectionReason && (
+                  <div className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
+                    <div className="font-medium">거부 사유:</div>
+                    <div>{product.rejectionReason}</div>
+                  </div>
+                )}
+
                 <div className="flex space-x-2 pt-2">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={`/admin/products/${product.id}/edit`}>
-                      <Edit className="h-3 w-3 mr-1" />
-                      수정
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={`/products/${product.slug}`}>
-                      <Eye className="h-3 w-3 mr-1" />
-                      보기
-                    </Link>
-                  </Button>
+                  {product.approvalStatus === 'pending' && (
+                    <>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={() => handleApprove(product.id)}
+                        disabled={processing}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        <Check className="h-3 w-3 mr-1" />
+                        승인
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setIsRejectDialogOpen(true);
+                        }}
+                        disabled={processing}
+                        className="flex-1"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        거부
+                      </Button>
+                    </>
+                  )}
+                  {product.approvalStatus !== 'pending' && (
+                    <>
+                      <Button variant="outline" size="sm" asChild className="flex-1">
+                        <Link href={`/admin/products/${product.id}/edit`}>
+                          <Edit className="h-3 w-3 mr-1" />
+                          수정
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild className="flex-1">
+                        <Link href={`/products/${product.slug}`}>
+                          <Eye className="h-3 w-3 mr-1" />
+                          보기
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -461,6 +630,47 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* 거부 사유 입력 다이얼로그 */}
+      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>상품 거부 사유 입력</DialogTitle>
+            <DialogDescription>
+              상품 &quot;{selectedProduct?.name}&quot;을(를) 거부하는 사유를 입력해주세요. 파트너에게 전달됩니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="rejectionReason">거부 사유 *</Label>
+              <Textarea
+                id="rejectionReason"
+                placeholder="예: 이미지 품질이 낮습니다. 상품 설명이 불충분합니다."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>
+              취소
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={processing || !rejectionReason.trim()}
+            >
+              {processing ? (
+                <Clock className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <X className="h-4 w-4 mr-2" />
+              )}
+              거부 확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

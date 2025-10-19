@@ -254,11 +254,51 @@ export async function DELETE(
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
-    const deletedProduct = await Product.findByIdAndDelete(id);
+    const product = await Product.findById(id);
     
-    if (!deletedProduct) {
+    if (!product) {
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
+
+    // 이미지 파일들 삭제 (Vercel Blob)
+    if (product.images && product.images.length > 0) {
+      try {
+        const blobImages = product.images.filter((img: any) => 
+          img.url && img.url.includes('blob.vercel-storage.com')
+        );
+        
+        if (blobImages.length > 0) {
+          const deletePromises = blobImages.map(async (img: any) => {
+            try {
+              // Vercel Blob에서 직접 삭제
+              const { del } = await import('@vercel/blob');
+              
+              if (!process.env.BLOB_READ_WRITE_TOKEN) {
+                console.error('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다.');
+                return;
+              }
+
+              await del(img.url, {
+                token: process.env.BLOB_READ_WRITE_TOKEN,
+              });
+              
+              console.log(`이미지 삭제 성공: ${img.url}`);
+            } catch (error) {
+              console.error(`이미지 삭제 중 오류: ${img.url}`, error);
+            }
+          });
+          
+          await Promise.all(deletePromises);
+          console.log(`관리자 상품 삭제: ${blobImages.length}개 이미지 파일 삭제 완료`);
+        }
+      } catch (error) {
+        console.error('이미지 삭제 오류:', error);
+        // 이미지 삭제 실패해도 상품은 삭제 진행
+      }
+    }
+
+    // 상품 삭제
+    await Product.findByIdAndDelete(id);
 
     return NextResponse.json({ 
       message: '상품이 성공적으로 삭제되었습니다.' 

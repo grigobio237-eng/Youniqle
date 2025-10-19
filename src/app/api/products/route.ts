@@ -44,8 +44,11 @@ async function getProductsHandler(request: NextRequest) {
     
     await connectDB();
 
-    // Build filter object
-    const filter: any = { status: 'active' };
+    // Build filter object (승인된 활성 상품만 조회)
+    const filter: any = { 
+      status: 'active',
+      approvalStatus: 'approved' // 승인된 상품만 일반 사용자에게 노출
+    };
     
     if (validatedQuery.q || validatedQuery.search) {
       const searchTerm = validatedQuery.q || validatedQuery.search;

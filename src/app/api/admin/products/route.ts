@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || 'all';
     const status = searchParams.get('status') || 'all';
+    const approvalStatus = searchParams.get('approvalStatus') || 'all';
     const sort = searchParams.get('sort') || 'newest';
 
     await connectDB();
@@ -31,6 +32,10 @@ export async function GET(request: NextRequest) {
     
     if (status !== 'all') {
       filter.status = status;
+    }
+    
+    if (approvalStatus !== 'all') {
+      filter.approvalStatus = approvalStatus;
     }
 
     // 정렬 조건 구성
@@ -93,10 +98,14 @@ export async function GET(request: NextRequest) {
           stock: product.stock,
           category: product.category,
           status: product.status,
+          approvalStatus: product.approvalStatus,
+          rejectionReason: product.rejectionReason,
           featured: product.featured,
           images: product.images,
           summary: product.summary,
           description: product.description,
+          partnerName: product.partnerName,
+          partnerEmail: product.partnerEmail,
           createdAt: product.createdAt,
           updatedAt: product.updatedAt,
           sales,
@@ -134,7 +143,11 @@ export async function POST(request: NextRequest) {
       summary,
       description,
       images,
-      featured
+      featured,
+      nutritionInfo,
+      originInfo,
+      clothingInfo,
+      electronicsInfo
     } = await request.json();
 
     // 필수 필드 검증
@@ -156,7 +169,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 새 상품 생성
+    // 새 상품 생성 (관리자가 등록하면 자동 승인)
     const product = new Product({
       name,
       slug,
@@ -168,7 +181,13 @@ export async function POST(request: NextRequest) {
       description,
       images: images || [],
       featured: featured || false,
-      status: 'active'
+      status: 'active',
+      approvalStatus: 'approved', // 관리자가 직접 등록하면 자동 승인
+      // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
+      nutritionInfo: nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined,
+      originInfo: originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined,
+      clothingInfo: clothingInfo && Object.values(clothingInfo).some(v => v) ? clothingInfo : undefined,
+      electronicsInfo: electronicsInfo && Object.values(electronicsInfo).some(v => v) ? electronicsInfo : undefined,
     });
 
     await product.save();

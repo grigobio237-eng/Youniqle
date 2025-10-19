@@ -11,6 +11,8 @@ export interface IProduct extends Document {
   reservedStock?: number; // 예약된 재고 (주문은 했지만 아직 결제 안된)
   category: string;
   status: 'active' | 'hidden' | 'out_of_stock'; // 재고 부족 상태 추가
+  approvalStatus: 'pending' | 'approved' | 'rejected'; // 승인 상태 추가
+  rejectionReason?: string; // 거부 사유
   featured?: boolean;
   images: Array<{
     url: string;
@@ -103,6 +105,15 @@ const ProductSchema = new Schema<IProduct>({
     enum: ['active', 'hidden', 'out_of_stock'],
     default: 'active',
   },
+  approvalStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  },
+  rejectionReason: {
+    type: String,
+    trim: true,
+  },
   featured: {
     type: Boolean,
     default: false,
@@ -165,8 +176,9 @@ const ProductSchema = new Schema<IProduct>({
 
 // Index for search and filtering
 ProductSchema.index({ name: 'text', summary: 'text', description: 'text' });
-ProductSchema.index({ category: 1, status: 1 });
+ProductSchema.index({ category: 1, status: 1, approvalStatus: 1 });
 ProductSchema.index({ price: 1 });
+ProductSchema.index({ partnerId: 1 });
 
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 

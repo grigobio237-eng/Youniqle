@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Edit, Trash2, Upload } from 'lucide-react';
 import ImageManager from '@/components/products/ImageManager';
 import { toast } from 'sonner';
+import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
 interface Product {
   _id: string;
@@ -31,6 +32,8 @@ interface Product {
     type?: string;
   }>;
   status: string;
+  approvalStatus: 'pending' | 'approved' | 'rejected'; // 승인 상태
+  rejectionReason?: string; // 거부 사유
   featured: boolean;
   createdAt: string;
   // 카테고리별 특화 정보
@@ -108,16 +111,8 @@ function PartnerProductsContent() {
     },
   });
 
-  // 카테고리 목록
-  const categories = [
-    { value: 'fresh-food', label: '신선식품' },
-    { value: 'clothing', label: '의류' },
-    { value: 'shoes', label: '신발' },
-    { value: 'bags', label: '가방' },
-    { value: 'accessories', label: '액세서리' },
-    { value: 'lifestyle', label: '라이프스타일' },
-    { value: 'electronics', label: '전자제품' }
-  ];
+  // 카테고리 목록 (전체 프로젝트 공통 사용)
+  const categories = PRODUCT_CATEGORIES;
 
   // 카테고리별 특화 정보 입력 핸들러
   const handleCategorySpecificChange = (category: string, field: string, value: string) => {
@@ -723,8 +718,30 @@ function PartnerProductsContent() {
                           <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
                             {product.status === 'active' ? '판매중' : '비활성'}
                           </Badge>
+                          {/* 승인 상태 배지 */}
+                          {product.approvalStatus === 'pending' && (
+                            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                              승인 대기
+                            </Badge>
+                          )}
+                          {product.approvalStatus === 'approved' && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                              승인됨
+                            </Badge>
+                          )}
+                          {product.approvalStatus === 'rejected' && (
+                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
+                              거부됨
+                            </Badge>
+                          )}
                           {product.featured && <Badge variant="outline">추천</Badge>}
                         </div>
+                        {/* 거부 사유 표시 */}
+                        {product.approvalStatus === 'rejected' && product.rejectionReason && (
+                          <div className="mt-2 p-2 bg-red-50 rounded text-sm text-red-700">
+                            <strong>거부 사유:</strong> {product.rejectionReason}
+                          </div>
+                        )}
                         <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                           <span>재고: {product.stock}개</span>
                           <span>카테고리: {product.category}</span>

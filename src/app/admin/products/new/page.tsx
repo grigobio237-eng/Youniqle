@@ -20,6 +20,7 @@ import { ArrowLeft, Save, X } from 'lucide-react';
 import Link from 'next/link';
 import ImageManager from '@/components/products/ImageManager';
 import { toast } from 'sonner';
+import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -69,15 +70,8 @@ export default function NewProductPage() {
     },
   });
 
-  const categories = [
-    { value: 'food', label: '식품' },
-    { value: 'clothing', label: '의류' },
-    { value: 'electronics', label: '전자제품' },
-    { value: 'home', label: '홈&리빙' },
-    { value: 'beauty', label: '뷰티' },
-    { value: 'sports', label: '스포츠' },
-    { value: 'books', label: '도서' },
-  ];
+  // 카테고리 목록 (전체 프로젝트 공통 사용)
+  const categories = PRODUCT_CATEGORIES;
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -99,7 +93,7 @@ export default function NewProductPage() {
   // 카테고리별 특화 필드 렌더링
   const getCategorySpecificFields = (category: string) => {
     switch (category) {
-      case 'food':
+      case 'fresh-food':
         return (
           <div className="space-y-4">
             <h4 className="text-sm font-medium text-gray-700">영양 정보</h4>

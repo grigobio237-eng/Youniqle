@@ -35,6 +35,8 @@ export async function GET(request: NextRequest) {
         description: product.description,
         images: product.images, // 전체 이미지 객체 반환
         status: product.status,
+        approvalStatus: product.approvalStatus, // 승인 상태 추가
+        rejectionReason: product.rejectionReason, // 거부 사유 추가
         featured: product.featured,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
@@ -120,6 +122,7 @@ export async function POST(request: NextRequest) {
       images: (images || []).map((img: any) => typeof img === 'string' ? { url: img } : img),
       featured: featured || false,
       status: 'active',
+      approvalStatus: 'pending', // 파트너가 등록하면 승인 대기 상태
       partnerId: decoded.id,
       partnerName: decoded.name,
       partnerEmail,

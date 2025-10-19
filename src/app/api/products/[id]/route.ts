@@ -17,6 +17,7 @@ export async function GET(
         { slug: id },
       ],
       status: 'active',
+      approvalStatus: 'approved', // 승인된 상품만 일반 사용자에게 노출
     }).lean();
 
     if (!product) {
