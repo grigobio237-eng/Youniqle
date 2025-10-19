@@ -97,7 +97,9 @@ function CheckoutPageContent() {
         if (productId && quantity) {
           // 바로 구매하기: 상품 정보를 가져와서 임시 장바구니 생성
           console.log('바로 구매하기 - 상품 ID:', productId, '수량:', quantity);
-          const productResponse = await fetch(`/api/products/${productId}`);
+          const productResponse = await fetch(`/api/products/${productId}`, {
+            credentials: 'include', // NextAuth 세션 쿠키 포함
+          });
           console.log('상품 API 응답 상태:', productResponse.status);
           
           if (productResponse.ok) {
@@ -130,7 +132,9 @@ function CheckoutPageContent() {
           }
         } else {
           // 일반 장바구니에서 온 경우
-          const response = await fetch('/api/cart');
+          const response = await fetch('/api/cart', {
+            credentials: 'include', // NextAuth 세션 쿠키 포함
+          });
           if (response.ok) {
             const data = await response.json();
             
@@ -234,11 +238,10 @@ function CheckoutPageContent() {
         totalAmount: totalAmount
       };
 
-      // JWT 토큰 가져오기
-      const token = localStorage.getItem('token');
-      if (!token) {
+      // NextAuth 세션 확인 (JWT 토큰 대신 세션 사용)
+      if (!session?.user?.email) {
         alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        router.push('/auth/login');
+        router.push('/auth/signin');
         return;
       }
 
@@ -246,8 +249,8 @@ function CheckoutPageContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include', // NextAuth 세션 쿠키 포함
         body: JSON.stringify(orderData),
       });
 
@@ -282,6 +285,7 @@ function CheckoutPageContent() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // NextAuth 세션 쿠키 포함
         body: JSON.stringify(paymentData),
       });
 
@@ -292,6 +296,7 @@ function CheckoutPageContent() {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = paymentResult.authUrl;
+        form.acceptCharset = 'utf-8'; // UTF-8 인코딩 명시
         
         Object.entries(paymentResult.formData).forEach(([key, value]) => {
           const input = document.createElement('input');

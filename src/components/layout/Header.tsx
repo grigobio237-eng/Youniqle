@@ -91,7 +91,9 @@ export default function Header() {
 
   const fetchCartCount = async () => {
     try {
-      const response = await fetch('/api/cart');
+      const response = await fetch('/api/cart', {
+        credentials: 'include', // NextAuth 세션 쿠키 포함
+      });
       if (response.ok) {
         const data = await response.json();
         setCartCount(data.cart?.totalItems || 0);

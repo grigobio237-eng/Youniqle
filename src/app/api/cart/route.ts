@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Cart from '@/models/Cart';
 import Product from '@/models/Product';
@@ -9,27 +11,12 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // JWT 토큰으로 사용자 인증 (선택적)
-    const authHeader = request.headers.get('authorization');
-    let userId = null;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-        userId = decoded.userId;
-        console.log('JWT 디코딩 성공, userId:', userId);
-      } catch (error) {
-        console.log('JWT 토큰 검증 실패:', error);
-        // 토큰이 유효하지 않아도 계속 진행 (익명 사용자로 처리)
-      }
-    }
-
-    // 사용자 확인 (선택적)
+    // NextAuth 세션으로 사용자 인증 (선택적)
+    const session = await getServerSession(authOptions);
     let user = null;
-    if (userId) {
-      user = await User.findById(userId);
+
+    if (session?.user?.email) {
+      user = await User.findOne({ email: session.user.email });
       if (!user) {
         console.log('사용자를 찾을 수 없음, 익명 사용자로 처리');
       }
@@ -95,33 +82,18 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // JWT 토큰으로 사용자 인증
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // NextAuth 세션으로 사용자 인증
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { error: '인증 토큰이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    let userId = null;
-
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      userId = decoded.userId;
-      console.log('JWT 디코딩 성공, userId:', userId);
-    } catch (error) {
-      console.log('JWT 토큰 검증 실패:', error);
-      return NextResponse.json(
-        { error: '유효하지 않은 토큰입니다.' },
+        { error: '로그인이 필요합니다.' },
         { status: 401 }
       );
     }
 
     // 사용자 확인
-    const user = await User.findById(userId);
+    const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json(
         { error: '사용자를 찾을 수 없습니다.' },
@@ -216,31 +188,18 @@ export async function DELETE(request: NextRequest) {
 
     await connectDB();
 
-    // JWT 토큰으로 사용자 인증
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // NextAuth 세션으로 사용자 인증
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { error: '인증 토큰이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    let userId = null;
-
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      userId = decoded.userId;
-    } catch (error) {
-      return NextResponse.json(
-        { error: '유효하지 않은 토큰입니다.' },
+        { error: '로그인이 필요합니다.' },
         { status: 401 }
       );
     }
 
     // 사용자 확인
-    const user = await User.findById(userId);
+    const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json(
         { error: '사용자를 찾을 수 없습니다.' },
