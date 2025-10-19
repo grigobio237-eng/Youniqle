@@ -44,13 +44,39 @@ export async function validateCoupon(data: CouponValidationData): Promise<Coupon
       };
     }
 
-    // 2. 유효 기간 확인
+    // 2. 유효 기간 확인 (사용자별 유효기간 체크)
     const now = new Date();
-    if (coupon.validFrom > now || coupon.validUntil < now) {
-      return {
-        isValid: false,
-        error: '사용 기간이 만료된 쿠폰입니다.'
-      };
+    
+    if (userId) {
+      // 사용자가 다운로드한 쿠폰의 유효기간 확인
+      const UserCoupon = mongoose.model('UserCoupon');
+      const userCoupon = await UserCoupon.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+        code: code.toUpperCase(),
+        status: 'available'
+      });
+
+      if (!userCoupon) {
+        return {
+          isValid: false,
+          error: '다운로드하지 않은 쿠폰입니다.'
+        };
+      }
+
+      if (userCoupon.validUntil < now) {
+        return {
+          isValid: false,
+          error: '사용 기간이 만료된 쿠폰입니다.'
+        };
+      }
+    } else {
+      // 일반적인 쿠폰 유효기간 확인 (고정 기간)
+      if (coupon.validityType === 'fixed' && (coupon.validFrom > now || coupon.validUntil < now)) {
+        return {
+          isValid: false,
+          error: '사용 기간이 만료된 쿠폰입니다.'
+        };
+      }
     }
 
     // 3. 사용 횟수 제한 확인

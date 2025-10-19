@@ -26,7 +26,9 @@ import {
   Star,
   Share2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Tag,
+  Gift
 } from 'lucide-react';
 
 interface Product {
@@ -420,6 +422,33 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 </span>
               </div>
             </div>
+
+            {/* 쿠폰 안내 */}
+            <Card className="mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Gift className="h-5 w-5 text-orange-600" />
+                  <span className="font-semibold text-orange-800">쿠폰 혜택</span>
+                </div>
+                <p className="text-sm text-orange-700 mb-3">
+                  구매 시 쿠폰을 사용하여 추가 할인을 받을 수 있습니다!
+                </p>
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
+                    <Link href="/coupons">
+                      <Tag className="h-4 w-4 mr-1" />
+                      쿠폰 다운로드
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
+                    <Link href="/me/coupons">
+                      <Gift className="h-4 w-4 mr-1" />
+                      내 쿠폰함
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* 액션 버튼들 */}
             <div className="space-y-3">

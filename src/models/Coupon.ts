@@ -12,8 +12,10 @@ export interface ICoupon extends Document {
   usageCount: number; // 현재 사용된 횟수
   userUsageLimit?: number; // 사용자당 사용 가능 횟수
   status: 'active' | 'inactive' | 'expired';
+  validityType: 'fixed' | 'from_download'; // 유효기간 설정 방식
   validFrom: Date;
   validUntil: Date;
+  validityDurationDays?: number; // 다운로드 시점부터 유효기간 (일)
   applicableProducts?: mongoose.Types.ObjectId[]; // 적용 가능한 상품들
   applicableCategories?: string[]; // 적용 가능한 카테고리들
   excludedProducts?: mongoose.Types.ObjectId[]; // 제외할 상품들
@@ -85,14 +87,30 @@ const CouponSchema = new Schema<ICoupon>({
     enum: ['active', 'inactive', 'expired'],
     default: 'active'
   },
+  validityType: {
+    type: String,
+    enum: ['fixed', 'from_download'],
+    default: 'fixed'
+  },
   validFrom: {
     type: Date,
-    required: true,
+    required: function() {
+      return this.validityType === 'fixed';
+    },
     default: Date.now
   },
   validUntil: {
     type: Date,
-    required: true
+    required: function() {
+      return this.validityType === 'fixed';
+    }
+  },
+  validityDurationDays: {
+    type: Number,
+    min: 1,
+    required: function() {
+      return this.validityType === 'from_download';
+    }
   },
   applicableProducts: [{
     type: Schema.Types.ObjectId,

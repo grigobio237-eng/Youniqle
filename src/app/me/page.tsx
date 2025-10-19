@@ -597,13 +597,16 @@ export default function MyPage() {
                   <a href="/orders">주문 내역</a>
                 </Button>
                 <Button variant="ghost" className="w-full justify-start" asChild>
+                  <a href="/me/coupons">내 쿠폰함</a>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
                   <a href="/cart">장바구니</a>
                 </Button>
                 <Button variant="ghost" className="w-full justify-start" asChild>
                   <a href="/wishlist">위시리스트</a>
                 </Button>
                 <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/support">고객센터</a>
+                  <a href="/contact">문의하기</a>
                 </Button>
               </CardContent>
             </Card>

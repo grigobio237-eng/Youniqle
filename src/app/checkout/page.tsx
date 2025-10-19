@@ -22,7 +22,8 @@ import {
   Mail,
   ArrowLeft,
   ShoppingCart,
-  CheckCircle
+  CheckCircle,
+  Tag
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -74,6 +75,12 @@ function CheckoutPageContent() {
     privacy: false,
     marketing: false
   });
+
+  // 쿠폰 관련
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   // 사용자 정보 로드
   useEffect(() => {
@@ -192,6 +199,56 @@ function CheckoutPageContent() {
       ...prev,
       [field]: checked
     }));
+  };
+
+  // 쿠폰 적용
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      alert('쿠폰 코드를 입력해주세요.');
+      return;
+    }
+
+    if (!cart || cart.items.length === 0) {
+      alert('장바구니가 비어있습니다.');
+      return;
+    }
+
+    try {
+      setValidatingCoupon(true);
+      const response = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          cartItems: cart.items,
+          totalAmount: cart.totalAmount
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setAppliedCoupon(data.coupon);
+        setCouponDiscount(data.discountAmount || 0);
+        alert('쿠폰이 적용되었습니다!');
+      } else {
+        alert(data.error || '쿠폰 적용에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('쿠폰 검증 오류:', error);
+      alert('쿠폰 검증 중 오류가 발생했습니다.');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  // 쿠폰 제거
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+    setCouponCode('');
   };
 
   // 주문 처리 및 나이스페이 결제
@@ -359,7 +416,8 @@ function CheckoutPageContent() {
   }
 
   const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
-  const totalAmount = cart.totalAmount + deliveryFee;
+  const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
+  const totalAmount = subtotalAfterCoupon + deliveryFee;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -495,6 +553,68 @@ function CheckoutPageContent() {
               </CardContent>
             </Card>
 
+            {/* 쿠폰 적용 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Tag className="h-5 w-5 mr-2" />
+                  쿠폰 적용
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {appliedCoupon ? (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                        <span className="font-semibold text-green-800">
+                          쿠폰이 적용되었습니다
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemoveCoupon}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        제거
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-1">{appliedCoupon.name}</p>
+                    <p className="text-lg font-bold text-green-600">
+                      -{couponDiscount.toLocaleString()}원 할인
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex space-x-2">
+                      <Input
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="쿠폰 코드를 입력하세요"
+                        onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                      />
+                      <Button
+                        onClick={handleApplyCoupon}
+                        disabled={validatingCoupon || !couponCode.trim()}
+                        className="whitespace-nowrap"
+                      >
+                        {validatingCoupon ? '확인 중...' : '적용'}
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">쿠폰이 있으신가요?</span>
+                      <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/me/coupons">
+                          내 쿠폰함 보기
+                        </Link>
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
             {/* 약관 동의 */}
             <Card>
               <CardHeader>
@@ -591,6 +711,12 @@ function CheckoutPageContent() {
                   <span>상품 금액</span>
                   <span>{cart.totalAmount.toLocaleString()}원</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>쿠폰 할인</span>
+                    <span>-{couponDiscount.toLocaleString()}원</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>배송비</span>
                   <span>
@@ -600,8 +726,15 @@ function CheckoutPageContent() {
                 <hr />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>총 결제금액</span>
-                  <span>{totalAmount.toLocaleString()}원</span>
+                  <span className={couponDiscount > 0 ? 'text-green-600' : ''}>
+                    {totalAmount.toLocaleString()}원
+                  </span>
                 </div>
+                {couponDiscount > 0 && (
+                  <p className="text-sm text-green-600 text-center">
+                    쿠폰으로 {couponDiscount.toLocaleString()}원 절약했어요! 🎉
+                  </p>
+                )}
                 <Button 
                   className="w-full" 
                   size="lg"
