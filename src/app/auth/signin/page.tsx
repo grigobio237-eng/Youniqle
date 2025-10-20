@@ -10,8 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon, KakaoIcon, NaverIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SigninPage() {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -35,11 +37,11 @@ export default function SigninPage() {
       if (result?.ok) {
         window.location.href = '/';
       } else {
-        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+        alert(t('auth.form.loginError'));
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('로그인 중 오류가 발생했습니다.');
+      alert(t('auth.form.loginFailed'));
     }
   };
 
@@ -90,10 +92,10 @@ export default function SigninPage() {
               </div>
             </div>
             <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
-              로그인
+              {t('auth.login')}
             </CardTitle>
             <p className="text-gray-600">
-              Youniqle에 다시 오신 것을 환영합니다!
+              {t('auth.welcomeBack')}
             </p>
           </CardHeader>
 
@@ -105,7 +107,7 @@ export default function SigninPage() {
                 className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
-                구글로 계속하기
+                {t('auth.socialLogin.google')}
               </Button>
 
               <Button
@@ -114,7 +116,7 @@ export default function SigninPage() {
                 className="w-full h-12 bg-yellow-400/50 text-black/50 border-0 transition-all duration-200 cursor-not-allowed"
               >
                 <KakaoIcon className="w-5 h-5 mr-3" />
-                카카오로 계속하기 (준비중)
+                {t('auth.socialLogin.kakaoPreparing')}
               </Button>
 
               <Button
@@ -123,15 +125,15 @@ export default function SigninPage() {
                 className="w-full h-12 bg-green-500/50 text-white/50 border-0 transition-all duration-200 cursor-not-allowed"
               >
                 <NaverIcon className="w-5 h-5 mr-3" />
-                네이버로 계속하기 (준비중)
+                {t('auth.socialLogin.naverPreparing')}
               </Button>
             </div>
 
             {/* 소셜 로그인 안내 문구 */}
             <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-700 text-center">
-                <span className="font-medium">카카오톡과 네이버 로그인은 준비 중입니다.</span><br />
-                현재는 구글 로그인과 이메일 로그인만 이용 가능합니다.
+                <span className="font-medium">{t('auth.socialLogin.notice')}</span><br />
+                {t('auth.socialLogin.noticeDesc')}
               </p>
             </div>
 
@@ -141,7 +143,7 @@ export default function SigninPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">또는</span>
+                <span className="px-4 bg-white text-gray-500 font-medium">{t('auth.socialLogin.or')}</span>
               </div>
             </div>
 
@@ -149,7 +151,7 @@ export default function SigninPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
-                  이메일
+                  {t('auth.email')}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -161,14 +163,14 @@ export default function SigninPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="이메일을 입력하세요"
+                    placeholder={t('auth.emailPlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <Label htmlFor="password" className="text-sm font-medium text-gray-700 mb-2 block">
-                  비밀번호
+                  {t('auth.password')}
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -180,7 +182,7 @@ export default function SigninPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="pl-10 pr-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="비밀번호를 입력하세요"
+                    placeholder={t('auth.passwordPlaceholder')}
                   />
                   <button
                     type="button"
@@ -200,14 +202,14 @@ export default function SigninPage() {
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-600">
-                    로그인 상태 유지
+                    {t('auth.form.rememberMe')}
                   </Label>
                 </div>
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
                 >
-                  비밀번호 찾기
+                  {t('auth.form.forgotPassword')}
                 </Link>
               </div>
 
@@ -215,19 +217,19 @@ export default function SigninPage() {
                 type="submit"
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105"
               >
-                로그인
+                {t('auth.login')}
               </Button>
             </form>
 
             {/* 회원가입 링크 */}
             <div className="text-center mt-8">
               <p className="text-gray-600">
-                계정이 없으신가요?{' '}
+                {t('auth.noAccount')}{' '}
                 <Link
                   href="/auth/signup"
                   className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
                 >
-                  회원가입하기
+                  {t('auth.signup')}
                 </Link>
               </p>
             </div>

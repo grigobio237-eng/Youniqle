@@ -82,6 +82,7 @@ export default function AdminNoticesPage() {
     isPinned: false,
     isImportant: false,
     isPopup: false,
+    targetAudience: 'all',
     status: 'draft',
   });
 
@@ -207,6 +208,7 @@ export default function AdminNoticesPage() {
       isPinned: notice.isPinned,
       isImportant: notice.isImportant,
       isPopup: notice.isPopup,
+      targetAudience: notice.targetAudience || 'all',
       status: notice.status,
     });
     setShowEditDialog(true);
@@ -223,6 +225,7 @@ export default function AdminNoticesPage() {
       isPinned: false,
       isImportant: false,
       isPopup: false,
+      targetAudience: 'all',
       status: 'draft',
     });
   };
@@ -486,6 +489,25 @@ export default function AdminNoticesPage() {
             </div>
 
             <div>
+              <Label>노출 대상</Label>
+              <Select value={formData.targetAudience} onValueChange={(value) => setFormData(prev => ({ ...prev, targetAudience: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체 사용자</SelectItem>
+                  <SelectItem value="new">신규 회원만</SelectItem>
+                  <SelectItem value="existing">기존 회원만</SelectItem>
+                  <SelectItem value="partner">파트너만</SelectItem>
+                  <SelectItem value="admin">관리자만</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">
+                팝업 공지의 경우 선택한 대상에게만 표시됩니다
+              </p>
+            </div>
+
+            <div>
               <Label>태그 (쉼표로 구분)</Label>
               <Input
                 value={formData.tags}
@@ -609,6 +631,25 @@ export default function AdminNoticesPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div>
+              <Label>노출 대상</Label>
+              <Select value={formData.targetAudience} onValueChange={(value) => setFormData(prev => ({ ...prev, targetAudience: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체 사용자</SelectItem>
+                  <SelectItem value="new">신규 회원만</SelectItem>
+                  <SelectItem value="existing">기존 회원만</SelectItem>
+                  <SelectItem value="partner">파트너만</SelectItem>
+                  <SelectItem value="admin">관리자만</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">
+                팝업 공지의 경우 선택한 대상에게만 표시됩니다
+              </p>
             </div>
 
             <div className="space-y-2">

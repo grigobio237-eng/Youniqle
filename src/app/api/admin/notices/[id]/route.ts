@@ -73,7 +73,7 @@ export async function PATCH(
     // 수정 가능한 필드 업데이트
     const updateFields = [
       'title', 'content', 'summary', 'type', 'category', 'tags',
-      'isPinned', 'isImportant', 'isPopup', 'popupSettings',
+      'isPinned', 'isImportant', 'isPopup', 'targetAudience', 'popupSettings',
       'attachments', 'thumbnailImage', 'images', 'startDate', 'endDate', 'status'
     ];
 

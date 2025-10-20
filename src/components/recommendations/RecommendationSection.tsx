@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface RecommendationSectionProps {
   title?: string;
@@ -45,6 +46,7 @@ export default function RecommendationSection({
   showRefresh = true,
   className = ''
 }: RecommendationSectionProps) {
+  const { t } = useLanguage();
   const {
     recommendations,
     loading,
@@ -235,7 +237,7 @@ export default function RecommendationSection({
                 onClick={refreshRecommendations}
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                새로고침
+{t('recommendations.refresh')}
               </Button>
             )}
           </div>
@@ -243,8 +245,8 @@ export default function RecommendationSection({
         <Card>
           <CardContent className="text-center py-12">
             <Sparkles className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">추천 상품이 없습니다</h3>
-            <p className="text-gray-500">더 많은 상품을 둘러보시면 맞춤 추천을 받을 수 있습니다.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('recommendations.noRecommendations')}</h3>
+            <p className="text-gray-500">{t('recommendations.noRecommendationsDesc')}</p>
           </CardContent>
         </Card>
       </div>
@@ -273,7 +275,7 @@ export default function RecommendationSection({
                 onClick={refreshRecommendations}
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                새로고침
+{t('recommendations.refresh')}
               </Button>
             )}
             {totalPages > 1 && (
@@ -415,6 +417,7 @@ export default function RecommendationSection({
     </div>
   );
 }
+
 
 
 

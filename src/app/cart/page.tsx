@@ -137,11 +137,11 @@ export default function CartPage() {
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const errorData = await response.json();
-        alert(`수량 업데이트 실패: ${errorData.error}`);
+        alert(t('cart.updateFailed'));
       }
     } catch (error) {
       console.error('수량 업데이트 실패:', error);
-      alert('수량 업데이트 중 오류가 발생했습니다.');
+      alert(t('cart.updateFailed'));
     } finally {
       setUpdating(null);
     }
@@ -166,11 +166,11 @@ export default function CartPage() {
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const errorData = await response.json();
-        alert(`상품 제거 실패: ${errorData.error}`);
+        alert(t('cart.deleteFailed'));
       }
     } catch (error) {
       console.error('상품 제거 실패:', error);
-      alert('상품 제거 중 오류가 발생했습니다.');
+      alert(t('cart.deleteFailed'));
     }
   };
 
@@ -196,12 +196,12 @@ export default function CartPage() {
                 sizes="80px"
               />
             </div>
-            <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('cart.loginRequired')}</h2>
             <p className="text-gray-600 mb-6">
-              장바구니를 이용하려면 로그인해주세요.
+              {t('cart.loginRequiredDesc')}
             </p>
             <Button asChild>
-              <Link href="/auth/signin">로그인하기</Link>
+              <Link href="/auth/signin">{t('cart.goToLogin')}</Link>
             </Button>
           </CardContent>
         </Card>

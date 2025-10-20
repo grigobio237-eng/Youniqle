@@ -6,6 +6,9 @@ export type NoticeType = 'general' | 'important' | 'event' | 'maintenance' | 'up
 // 공지사항 상태
 export type NoticeStatus = 'draft' | 'published' | 'archived';
 
+// 노출 대상
+export type NoticeTarget = 'all' | 'new' | 'existing' | 'partner' | 'admin';
+
 // 공지사항 인터페이스
 export interface INotice extends Document {
   // 기본 정보
@@ -25,6 +28,9 @@ export interface INotice extends Document {
   isPinned: boolean;             // 상단 고정
   isImportant: boolean;          // 중요 공지
   isPopup: boolean;              // 팝업 노출
+  
+  // 노출 대상
+  targetAudience: NoticeTarget;  // 노출 대상 (전체, 신규회원, 기존회원, 파트너, 관리자)
   
   // 팝업 설정 (팝업인 경우)
   popupSettings?: {
@@ -116,6 +122,13 @@ const NoticeSchema = new Schema<INotice>(
     isPopup: {
       type: Boolean,
       default: false,
+    },
+    targetAudience: {
+      type: String,
+      enum: ['all', 'new', 'existing', 'partner', 'admin'],
+      default: 'all',
+      required: true,
+      index: true,
     },
     popupSettings: {
       width: {

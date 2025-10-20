@@ -1,9 +1,12 @@
+'use client';
+
 import { Suspense } from 'react';
 import ProductList from '@/components/products/ProductList';
 import ProductFilters from '@/components/products/ProductFilters';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 function ProductListSkeleton() {
   return (
@@ -35,11 +38,12 @@ interface ProductsPageProps {
 }
 
 export default function ProductsPage({ searchParams }: ProductsPageProps) {
+  const { t } = useLanguage();
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-text-primary mb-4">
-          상품 목록
+          {t('products.title')}
         </h1>
       </div>
 

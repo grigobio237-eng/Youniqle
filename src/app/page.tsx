@@ -10,6 +10,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import RecommendationSection from '@/components/recommendations/RecommendationSection';
 import PersonalizedRecommendations from '@/components/personalization/PersonalizedRecommendations';
 import NoticePopup from '@/components/ui/NoticePopup';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Star, Truck, Shield, Heart, ShoppingCart } from 'lucide-react';
 
 interface Product {
@@ -27,6 +28,7 @@ interface Product {
 }
 
 export default function HomePage() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export default function HomePage() {
       const response = await fetch('/api/products?limit=8&sort=newest');
       
       if (!response.ok) {
-        throw new Error('상품을 불러오는데 실패했습니다.');
+        throw new Error(t('home.products.errorLoading'));
       }
       
       const data = await response.json();
@@ -52,11 +54,11 @@ export default function HomePage() {
       if (data.products) {
         setProducts(data.products || []);
       } else {
-        throw new Error(data.error || '상품을 불러오는데 실패했습니다.');
+        throw new Error(data.error || t('home.products.errorLoading'));
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
-      setError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
+      setError(error instanceof Error ? error.message : t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ export default function HomePage() {
     e.preventDefault();
     
     if (!newsletterEmail) {
-      setNewsletterMessage('이메일 주소를 입력해주세요.');
+      setNewsletterMessage(t('home.newsletter.emailRequired'));
       return;
     }
 
@@ -93,14 +95,14 @@ export default function HomePage() {
       const data = await response.json();
 
       if (data.success) {
-        setNewsletterMessage(data.message);
+        setNewsletterMessage(t('home.newsletter.successMessage'));
         setNewsletterEmail('');
       } else {
-        setNewsletterMessage(data.error || '구독 처리 중 오류가 발생했습니다.');
+        setNewsletterMessage(data.error || t('home.newsletter.errorMessage'));
       }
     } catch (error) {
       console.error('Newsletter subscription error:', error);
-      setNewsletterMessage('구독 처리 중 오류가 발생했습니다.');
+      setNewsletterMessage(t('home.newsletter.errorMessage'));
     } finally {
       setNewsletterLoading(false);
     }
@@ -118,23 +120,23 @@ export default function HomePage() {
               {/* Left Content */}
               <div className="text-center lg:text-left">
                 <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary mb-6 animate-fade-in">
-                  프리미엄 쇼핑의<br />새로운 경험
+                  {t('home.hero.title')}<br />{t('home.hero.titleHighlight')}
                 </h1>
                 <p className="text-lg sm:text-xl text-text-secondary mb-8 animate-slide-up">
-                  Youniqle에서 특별한 상품들을 만나보세요. 
+                  {t('home.hero.subtitle')}
                   <br />
-                  고품질과 합리적인 가격을 동시에 경험하세요.
+                  {t('home.hero.description')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up">
                   <Button size="lg" asChild>
                     <Link href="/products">
-                      쇼핑 시작하기
+                      {t('home.hero.shopNow')}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
                   <Button variant="outline" size="lg" asChild>
                     <Link href="/about">
-                      더 알아보기
+                      {t('home.hero.learnMore')}
                     </Link>
                   </Button>
                 </div>
@@ -205,11 +207,11 @@ export default function HomePage() {
             <div className="text-center py-12">
               <div className="text-text-secondary mb-4">
                 <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">상품을 불러올 수 없습니다</p>
+                <p className="text-lg">{t('home.products.errorLoading')}</p>
                 <p className="text-sm text-gray-500 mt-2">{error}</p>
               </div>
               <Button onClick={fetchProducts} variant="outline">
-                다시 시도
+                {t('common.back')}
               </Button>
             </div>
           ) : products.length > 0 ? (
@@ -233,17 +235,17 @@ export default function HomePage() {
                       )}
                       {product.featured && (
                         <Badge className="absolute top-3 left-3" variant="secondary">
-                          인기
+                          {t('home.products.featured')}
                         </Badge>
                       )}
                       {product.stock <= 5 && product.stock > 0 && (
                         <Badge className="absolute top-3 right-3" variant="destructive">
-                          품절임박
+                          {t('products.stock')} {product.stock}
                         </Badge>
                       )}
                       {product.stock === 0 && (
                         <Badge className="absolute top-3 right-3" variant="outline">
-                          품절
+                          {t('products.soldOut')}
                         </Badge>
                       )}
                     </div>
@@ -267,7 +269,7 @@ export default function HomePage() {
                         disabled={product.stock === 0}
                       >
                         <ShoppingCart className="h-4 w-4 mr-1" />
-                        {product.stock === 0 ? '품절' : '장바구니'}
+                        {product.stock === 0 ? t('products.soldOut') : t('nav.cart')}
                       </Button>
                     </div>
                   </CardContent>
@@ -278,8 +280,8 @@ export default function HomePage() {
             <div className="text-center py-12">
               <div className="text-text-secondary mb-4">
                 <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">등록된 상품이 없습니다</p>
-                <p className="text-sm text-gray-500 mt-2">새로운 상품이 곧 등록될 예정입니다.</p>
+                <p className="text-lg">{t('home.products.noProducts')}</p>
+                <p className="text-sm text-gray-500 mt-2">{t('home.products.loadingProducts')}</p>
               </div>
             </div>
           )}
@@ -288,7 +290,7 @@ export default function HomePage() {
             <div className="text-center">
               <Button size="lg" asChild>
                 <Link href="/products">
-                  모든 상품 보기
+                  {t('home.products.viewAll')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -302,10 +304,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
-              왜 Youniqle을 선택해야 할까요?
+              {t('home.features.title')}
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              고객 만족을 최우선으로 하는 서비스와 품질을 경험해보세요.
+              {t('home.features.subtitle')}
             </p>
           </div>
           
@@ -315,9 +317,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Star className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">프리미엄 품질</h3>
+                <h3 className="text-xl font-semibold mb-4">{t('home.features.quality.title')}</h3>
                 <p className="text-text-secondary">
-                  엄선된 고품질 상품만을 선별하여 제공합니다.
+                  {t('home.features.quality.description')}
                 </p>
                 {/* Character 4 */}
                 <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
@@ -337,9 +339,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Truck className="h-8 w-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">빠른 배송</h3>
+                <h3 className="text-xl font-semibold mb-4">{t('home.features.shipping.title')}</h3>
                 <p className="text-text-secondary">
-                  전국 어디든 빠르고 안전한 배송 서비스를 제공합니다.
+                  {t('home.features.shipping.description')}
                 </p>
                 {/* Character 5 */}
                 <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
@@ -359,9 +361,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Shield className="h-8 w-8 text-accent" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">안전한 결제</h3>
+                <h3 className="text-xl font-semibold mb-4">{t('home.features.secure.title')}</h3>
                 <p className="text-text-secondary">
-                  안전한 결제 시스템으로 보호받는 쇼핑을 경험하세요.
+                  {t('home.features.secure.description')}
                 </p>
                 {/* Character 6 */}
                 <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
@@ -383,16 +385,16 @@ export default function HomePage() {
       <section className="py-20 bg-primary text-white relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            특별 할인 소식을 받아보세요
+            {t('home.newsletter.title')}
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            신규 회원가입 시 10% 할인 쿠폰을 드립니다.
+            {t('home.newsletter.subtitle')}
           </p>
           <form onSubmit={handleNewsletterSubscribe} className="max-w-md mx-auto">
             <div className="flex gap-4 mb-4">
               <input
                 type="email"
-                placeholder="이메일 주소를 입력하세요"
+                placeholder={t('home.newsletter.emailPlaceholder')}
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
@@ -405,11 +407,11 @@ export default function HomePage() {
                 size="lg"
                 disabled={newsletterLoading}
               >
-                {newsletterLoading ? '처리중...' : '구독하기'}
+                {newsletterLoading ? t('home.newsletter.subscribing') : t('home.newsletter.subscribe')}
               </Button>
             </div>
             {newsletterMessage && (
-              <p className={`text-sm ${newsletterMessage.includes('완료') ? 'text-green-200' : 'text-red-200'}`}>
+              <p className={`text-sm ${newsletterMessage.includes(t('home.newsletter.successMessage')) ? 'text-green-200' : 'text-red-200'}`}>
                 {newsletterMessage}
               </p>
             )}
@@ -440,11 +442,11 @@ export default function HomePage() {
       {/* 추천 상품 섹션 */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">추천 상품</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{t('home.products.recommended')}</h2>
           
           <div className="space-y-12">
             <PersonalizedRecommendations
-              title="🎯 AI가 분석한 당신만의 추천"
+              title={t('recommendations.personalizedTitle')}
               itemType="product"
               limit={6}
               algorithms={['collaborative', 'content_based', 'popular']}
@@ -453,13 +455,13 @@ export default function HomePage() {
             />
             
             <RecommendationSection
-              title="지금 인기 상품"
+              title={t('home.products.featured')}
               algorithm="popular"
               showAlgorithm={false}
             />
             
             <RecommendationSection
-              title="지금 뜨는 상품"
+              title={t('home.products.new')}
               algorithm="trending"
               showAlgorithm={false}
             />
@@ -471,7 +473,7 @@ export default function HomePage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <RecommendationSection
-            title="지금 인기 상품"
+            title={t('home.products.featured')}
             itemType="product"
             algorithm="popular"
             limit={8}
@@ -486,7 +488,7 @@ export default function HomePage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <RecommendationSection
-            title="지금 뜨는 상품"
+            title={t('home.products.new')}
             itemType="product"
             algorithm="trending"
             limit={8}

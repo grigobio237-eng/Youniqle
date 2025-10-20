@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -5,8 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { ABOUT_CONTENT } from '@/content/siteAbout';
 import { ExternalLink, Mail, Star, Zap, Heart } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AboutPage() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       {/* Hero Section */}
@@ -23,27 +27,27 @@ export default function AboutPage() {
               <div className="text-center lg:text-left">
                 <div className="inline-flex items-center px-6 py-3 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold mb-8 shadow-sm">
                   <Star className="w-4 h-4 mr-2" />
-                  프리미엄 큐레이션 몰
+                  {t('about.badge')}
                 </div>
                 
                 <h1 className="text-6xl md:text-8xl font-black tracking-[-0.02em] text-gray-900 mb-8 leading-tight drop-shadow-sm">
-                  {ABOUT_CONTENT.hero}
+                  {t('about.hero')}
                 </h1>
                 
                 <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-10 font-medium">
-                  {ABOUT_CONTENT.short}
+                  {t('about.short')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                   <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105" asChild>
                     <Link href="/products">
-                      상품 둘러보기
+                      {t('about.browseProducts')}
                       <ExternalLink className="ml-3 h-6 w-6" />
                     </Link>
                   </Button>
                   <Button variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-10 py-5 text-xl font-bold transition-all duration-300 hover:scale-105" asChild>
                     <Link href="/partner/inquiry">
-                      파트너십 문의
+                      {t('about.partnerInquiry')}
                     </Link>
                   </Button>
                 </div>
@@ -219,10 +223,10 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/20 text-white text-sm font-semibold mb-8 backdrop-blur-sm">
               <Star className="w-4 h-4 mr-2" />
-              브랜드 슬로건
+              {t('about.brandSlogan')}
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-12">
-              우리의 메시지
+              {t('about.ourMessage')}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -255,26 +259,26 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-blue-50 to-emerald-50 rounded-3xl p-12 text-center border border-blue-100 shadow-xl">
               <div className="inline-flex items-center px-6 py-3 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold mb-8">
                 <Heart className="w-4 h-4 mr-2" />
-                파트너십
+                {t('about.partnership')}
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-                함께 성장하는 파트너
+                {t('about.growingPartner')}
               </h2>
               <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-4xl mx-auto">
-                {ABOUT_CONTENT.partnerOneLiner}
+                {t('about.partnerOneLiner')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" asChild>
                   <Link href="/partner/inquiry">
                     <Mail className="mr-2 h-5 w-5" />
-                    파트너십 문의
+                    {t('about.partnerInquiry')}
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 text-lg" asChild>
                   <Link href="/products">
                     <ExternalLink className="mr-2 h-5 w-5" />
-                    상품 둘러보기
+                    {t('about.browseProducts')}
                   </Link>
                 </Button>
               </div>
@@ -294,25 +298,25 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/20 text-white text-sm font-semibold mb-8 backdrop-blur-sm">
               <Star className="w-4 h-4 mr-2" />
-              지금 시작하세요
+              {t('about.ctaTitle')}
             </div>
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight">
               Youniqle과 함께하세요
             </h2>
             <p className="text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-              프리미엄 쇼핑의 새로운 경험을 지금 시작해보세요
+              {t('about.ctaSubtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-50 px-10 py-5 text-xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105" asChild>
                 <Link href="/products">
-                  쇼핑 시작하기
+                  {t('about.ctaButton')}
                   <ExternalLink className="ml-3 h-6 w-6" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-10 py-5 text-xl font-semibold transition-all duration-300 hover:scale-105" asChild>
                 <Link href="/content">
-                  콘텐츠 보기
+                  {t('about.ctaButton')}
                 </Link>
               </Button>
             </div>

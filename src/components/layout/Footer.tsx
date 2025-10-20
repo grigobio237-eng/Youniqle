@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PublicSettings {
   siteName: string;
@@ -39,6 +40,7 @@ interface PublicSettings {
 }
 
 export default function Footer() {
+  const { t } = useLanguage();
   const [settings, setSettings] = useState<PublicSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -121,44 +123,44 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">고객센터</h3>
+            <h3 className="font-semibold text-lg">{t('footer.customerCenter')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <span className="text-gray-400">전화: </span>
+                <span className="text-gray-400">{t('footer.phone')}: </span>
                 <a href={`tel:${currentSettings.contactInfo.customerServicePhone}`} className="hover:text-primary transition-colors">
                   {currentSettings.contactInfo.customerServicePhone}
                 </a>
               </li>
               <li>
-                <span className="text-gray-400">이메일: </span>
+                <span className="text-gray-400">{t('footer.email')}: </span>
                 <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="hover:text-primary transition-colors">
                   {currentSettings.contactInfo.customerServiceEmail}
                 </a>
               </li>
-              <li className="text-gray-400">운영시간: 평일 09:00 - 18:00</li>
+              <li className="text-gray-400">{t('footer.operatingHours')}: {t('footer.operatingHoursDetail')}</li>
             </ul>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">빠른 링크</h3>
+            <h3 className="font-semibold text-lg">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/products" className="text-gray-400 hover:text-primary transition-colors">
-                  상품 보기
+                  {t('footer.viewProducts')}
                 </Link>
               </li>
               <li>
                 <Link href="/orders" className="text-gray-400 hover:text-primary transition-colors">
-                  주문 내역
+                  {t('footer.orderHistory')}
                 </Link>
               </li>
               <li>
                 <button 
-                  onClick={() => alert('문의하기 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
+                  onClick={() => alert(t('footer.contactAlert'))}
                   className="text-gray-400 hover:text-primary transition-colors cursor-pointer opacity-60"
                 >
-                  문의하기
+                  {t('footer.contactUs')}
                 </button>
               </li>
             </ul>
@@ -166,14 +168,14 @@ export default function Footer() {
 
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">회사 정보</h3>
+            <h3 className="font-semibold text-lg">{t('footer.companyInfo')}</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>상호: {currentSettings.companyInfo.companyName}</li>
-              {currentSettings.companyInfo.ceoName && <li>대표: {currentSettings.companyInfo.ceoName}</li>}
-              <li>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</li>
-              <li>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</li>
+              <li>{t('footer.companyName')}: {currentSettings.companyInfo.companyName}</li>
+              {currentSettings.companyInfo.ceoName && <li>{t('footer.ceo')}: {currentSettings.companyInfo.ceoName}</li>}
+              <li>{t('footer.businessNumber')}: {currentSettings.businessRegistration.registrationNumber}</li>
+              <li>{t('footer.ecommerceReport')}: {currentSettings.ecommerceRegistration.reportNumber}</li>
               {(currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address) && (
-                <li>주소: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
+                <li>{t('footer.address')}: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
               )}
             </ul>
           </div>
@@ -181,14 +183,14 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 {currentSettings.siteName}. All rights reserved.
+            © 2024 {currentSettings.siteName}. {t('footer.copyright')}
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              개인정보처리방침
+              {t('footer.privacyPolicy')}
             </Link>
             <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              이용약관
+              {t('footer.termsOfService')}
             </Link>
           </div>
         </div>

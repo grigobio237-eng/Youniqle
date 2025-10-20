@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, ThumbsUp, ThumbsDown, ShoppingCart, Eye } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PersonalizedRecommendationsProps {
   title?: string;
@@ -28,6 +29,7 @@ export default function PersonalizedRecommendations({
   onItemClick,
   onItemPurchase
 }: PersonalizedRecommendationsProps) {
+  const { t } = useLanguage();
   const { 
     recommendations, 
     loading, 
@@ -101,7 +103,7 @@ export default function PersonalizedRecommendations({
               disabled={refreshing}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              새로고침
+{t('recommendations.refresh')}
             </Button>
           </CardTitle>
         </CardHeader>
@@ -159,15 +161,15 @@ export default function PersonalizedRecommendations({
               disabled={refreshing}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              새로고침
+{t('recommendations.refresh')}
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">추천할 상품이 없습니다</p>
+            <p className="text-gray-500 mb-4">{t('recommendations.noPersonalizedRecommendations')}</p>
             <Button onClick={handleRefresh} disabled={refreshing}>
-              새로고침
+{t('recommendations.refresh')}
             </Button>
           </div>
         </CardContent>
@@ -310,6 +312,7 @@ export default function PersonalizedRecommendations({
     </Card>
   );
 }
+
 
 
 

@@ -8,11 +8,35 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const now = new Date();
+    const { searchParams } = new URL(request.url);
+    
+    // 사용자 타입 확인 (쿠키 또는 헤더에서)
+    const userType = searchParams.get('userType') || 'all';
+    const isNewUser = searchParams.get('isNewUser') === 'true';
+    const userRole = searchParams.get('role') || 'member';
+
+    // 노출 대상 필터 생성
+    let targetFilter: any = {};
+    
+    if (userType === 'new' || isNewUser) {
+      // 신규 회원인 경우
+      targetFilter = { $in: ['all', 'new'] };
+    } else if (userRole === 'partner') {
+      // 파트너인 경우
+      targetFilter = { $in: ['all', 'partner'] };
+    } else if (userRole === 'admin') {
+      // 관리자인 경우
+      targetFilter = { $in: ['all', 'admin'] };
+    } else {
+      // 기존 회원인 경우
+      targetFilter = { $in: ['all', 'existing'] };
+    }
 
     // 팝업으로 설정된 게시된 공지사항 조회
     const popupNotices = await Notice.find({
       status: 'published',
       isPopup: true,
+      targetAudience: targetFilter,
       $or: [
         { startDate: { $exists: false }, endDate: { $exists: false } },
         { startDate: { $lte: now }, endDate: { $gte: now } },

@@ -42,7 +42,17 @@ export default function NoticePopup() {
       // 오늘 보지 않기를 선택한 공지사항 ID 목록
       const hiddenNotices = getHiddenNotices();
       
-      const response = await fetch('/api/notices/popup');
+      // 사용자 정보 확인
+      const userInfo = await getUserInfo();
+      
+      // API 호출 시 사용자 타입 정보 전달
+      const params = new URLSearchParams({
+        userType: userInfo.userType,
+        isNewUser: userInfo.isNewUser.toString(),
+        role: userInfo.role,
+      });
+      
+      const response = await fetch(`/api/notices/popup?${params}`);
       const data = await response.json();
 
       if (data.success && data.data.notices.length > 0) {
@@ -58,6 +68,46 @@ export default function NoticePopup() {
       }
     } catch (error) {
       console.error('Error fetching popup notices:', error);
+    }
+  };
+
+  const getUserInfo = async () => {
+    try {
+      // 세션 정보 확인
+      const sessionResponse = await fetch('/api/auth/session', {
+        credentials: 'include',
+        cache: 'no-store'
+      });
+      
+      if (sessionResponse.ok) {
+        const session = await sessionResponse.json();
+        if (session.user) {
+          // 사용자 등록일 확인 (신규 회원 판단)
+          const registrationDate = new Date(session.user.createdAt || session.user.created_at);
+          const daysSinceRegistration = Math.floor((Date.now() - registrationDate.getTime()) / (1000 * 60 * 60 * 24));
+          const isNewUser = daysSinceRegistration <= 30; // 30일 이내면 신규 회원
+          
+          return {
+            userType: isNewUser ? 'new' : 'existing',
+            isNewUser,
+            role: session.user.role || 'member'
+          };
+        }
+      }
+      
+      // 로그인하지 않은 사용자는 기존 회원으로 처리
+      return {
+        userType: 'existing',
+        isNewUser: false,
+        role: 'member'
+      };
+    } catch (error) {
+      console.error('Error getting user info:', error);
+      return {
+        userType: 'existing',
+        isNewUser: false,
+        role: 'member'
+      };
     }
   };
 

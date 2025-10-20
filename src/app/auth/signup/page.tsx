@@ -10,8 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon, KakaoIcon, NaverIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SignupPage() {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +31,7 @@ export default function SignupPage() {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
+      alert(t('auth.form.passwordMismatch'));
       return;
     }
 
