@@ -8,8 +8,9 @@ const nextConfig = {
   // 번들 최적화
   swcMinify: true,
   compress: true,
-  // 빌드 출력 최적화
-  output: 'standalone',
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
   images: {
     remotePatterns: [
       {
