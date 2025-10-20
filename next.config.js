@@ -5,8 +5,14 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // 번들 최적화
-  swcMinify: true,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // 에러 처리 개선
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+  // 번들 최적화 (Next.js 15에서는 swcMinify가 기본값)
   compress: true,
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
