@@ -82,6 +82,11 @@ function CheckoutPageContent() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
 
+  // 포인트 관련
+  const [userPoints, setUserPoints] = useState(0);
+  const [usePoints, setUsePoints] = useState(0);
+  const [pointsError, setPointsError] = useState('');
+
   // 사용자 정보 로드
   useEffect(() => {
     if (session?.user) {
@@ -91,6 +96,27 @@ function CheckoutPageContent() {
         phone: (session.user as any)?.phone || ''
       }));
     }
+  }, [session]);
+
+  // 사용자 포인트 로드
+  useEffect(() => {
+    const fetchUserPoints = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch('/api/auth/me', {
+            credentials: 'include',
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            setUserPoints(userData.points || 0);
+          }
+        } catch (error) {
+          console.error('사용자 포인트 로드 오류:', error);
+        }
+      }
+    };
+
+    fetchUserPoints();
   }, [session]);
 
   // 장바구니 데이터 로드
@@ -251,6 +277,34 @@ function CheckoutPageContent() {
     setCouponCode('');
   };
 
+  // 포인트 사용 핸들러
+  const handleUsePoints = (value: number) => {
+    setUsePoints(value);
+    setPointsError('');
+    
+    if (value > userPoints) {
+      setPointsError('보유 포인트보다 많이 사용할 수 없습니다.');
+      return;
+    }
+    
+    if (cart) {
+      const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
+      const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
+      const maxUsable = Math.floor(subtotalAfterCoupon * 0.5); // 최대 50% 사용 가능
+      
+      if (value > maxUsable) {
+        setPointsError(`포인트는 주문 금액의 50%까지만 사용 가능합니다. (최대 ${maxUsable}P)`);
+        return;
+      }
+    }
+  };
+
+  // 포인트 사용 제거
+  const handleRemovePoints = () => {
+    setUsePoints(0);
+    setPointsError('');
+  };
+
   // 주문 처리 및 나이스페이 결제
   const handleOrder = async () => {
     if (!cart || cart.items.length === 0) {
@@ -274,7 +328,8 @@ function CheckoutPageContent() {
     try {
       // 1단계: 주문 생성
       const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
-      const totalAmount = cart.totalAmount + deliveryFee;
+      const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
+      const totalAmount = subtotalAfterCoupon + deliveryFee - usePoints; // 포인트 사용 반영
       
       const orderData = {
         items: cart.items.map(item => ({
@@ -292,7 +347,9 @@ function CheckoutPageContent() {
           addr2: shippingAddress.address2
         },
         paymentMethod: paymentMethod,
-        totalAmount: totalAmount
+        totalAmount: totalAmount,
+        usedPoints: usePoints, // 사용한 포인트 추가
+        couponDiscount: couponDiscount // 쿠폰 할인 추가
       };
 
       // NextAuth 세션 확인 (JWT 토큰 대신 세션 사용)
@@ -615,6 +672,71 @@ function CheckoutPageContent() {
               </CardContent>
             </Card>
 
+            {/* 포인트 사용 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <span className="text-yellow-600 mr-2">⭐</span>
+                  포인트 사용
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {usePoints > 0 ? (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <CheckCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                        <span className="font-semibold text-yellow-800">
+                          포인트가 적용되었습니다
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemovePoints}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        제거
+                      </Button>
+                    </div>
+                    <p className="text-lg font-bold text-yellow-600">
+                      -{usePoints.toLocaleString()}P 사용
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      남은 포인트: {(userPoints - usePoints).toLocaleString()}P
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="points">사용할 포인트</Label>
+                        <p className="text-sm text-gray-600 mb-2">
+                          보유 포인트: <span className="font-semibold text-yellow-600">{userPoints.toLocaleString()}P</span>
+                        </p>
+                        <Input
+                          id="points"
+                          type="number"
+                          value={usePoints || ''}
+                          onChange={(e) => handleUsePoints(Number(e.target.value))}
+                          placeholder="사용할 포인트를 입력하세요"
+                          max={userPoints}
+                          min="0"
+                        />
+                        {pointsError && (
+                          <p className="text-sm text-red-600 mt-1">{pointsError}</p>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>• 포인트는 주문 금액의 최대 50%까지만 사용 가능합니다</p>
+                        <p>• 포인트 사용 시 적립은 사용한 금액을 제외한 금액에 대해 지급됩니다</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
             {/* 약관 동의 */}
             <Card>
               <CardHeader>
@@ -717,6 +839,12 @@ function CheckoutPageContent() {
                     <span>-{couponDiscount.toLocaleString()}원</span>
                   </div>
                 )}
+                {usePoints > 0 && (
+                  <div className="flex justify-between text-yellow-600">
+                    <span>포인트 사용</span>
+                    <span>-{usePoints.toLocaleString()}P</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>배송비</span>
                   <span>
@@ -726,13 +854,18 @@ function CheckoutPageContent() {
                 <hr />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>총 결제금액</span>
-                  <span className={couponDiscount > 0 ? 'text-green-600' : ''}>
+                  <span className={couponDiscount > 0 || usePoints > 0 ? 'text-green-600' : ''}>
                     {totalAmount.toLocaleString()}원
                   </span>
                 </div>
-                {couponDiscount > 0 && (
+                {(couponDiscount > 0 || usePoints > 0) && (
                   <p className="text-sm text-green-600 text-center">
-                    쿠폰으로 {couponDiscount.toLocaleString()}원 절약했어요! 🎉
+                    {couponDiscount > 0 && usePoints > 0 
+                      ? `쿠폰과 포인트로 총 ${(couponDiscount + usePoints).toLocaleString()}원 절약했어요! 🎉`
+                      : couponDiscount > 0 
+                        ? `쿠폰으로 ${couponDiscount.toLocaleString()}원 절약했어요! 🎉`
+                        : `포인트로 ${usePoints.toLocaleString()}원 절약했어요! ⭐`
+                    }
                   </p>
                 )}
                 <Button 

@@ -12,6 +12,7 @@ import PostcodeSearch from '@/components/ui/PostcodeSearch';
 import AddressSearch from '@/components/ui/AddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
 import { User, Mail, Phone, MapPin, Settings, Save, Store, CheckCircle, Clock, XCircle, AlertCircle, X, Upload, FileImage } from 'lucide-react';
+import Link from 'next/link';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -531,6 +532,11 @@ export default function MyPage() {
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
                     현재 포인트: {userData?.points || 0}P
+                    <Button variant="link" asChild className="p-0 h-auto ml-2 text-blue-600">
+                      <Link href="/me/points">
+                        내역보기
+                      </Link>
+                    </Button>
                   </p>
                   <MembershipInfo 
                     currentGrade={userData?.grade || 'cedar'} 

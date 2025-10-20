@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, shippingAddress, paymentMethod, totalAmount } = body;
+    const { items, shippingAddress, paymentMethod, totalAmount, usedPoints, couponDiscount, couponCode } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: '주문 상품이 없습니다.' }, { status: 400 });
@@ -109,9 +109,45 @@ export async function POST(request: NextRequest) {
       paymentStatus: 'pending',
       shippingAddress,
       paymentMethod,
+      usedPoints: usedPoints || 0,
+      couponDiscount: couponDiscount || 0,
+      couponCode: couponCode || undefined
     });
 
     await order.save();
+
+    // 포인트 사용 처리
+    if (usedPoints && usedPoints > 0) {
+      try {
+        const { deductPoints } = await import('@/lib/pointManager');
+        const pointResult = await deductPoints(
+          user._id,
+          usedPoints,
+          `주문 사용 (주문번호: ${orderNumber})`,
+          order._id
+        );
+        
+        if (!pointResult.success) {
+          console.error('포인트 사용 실패:', pointResult.error);
+          // 포인트 사용 실패 시 주문 취소
+          await Order.findByIdAndDelete(order._id);
+          return NextResponse.json(
+            { error: pointResult.error },
+            { status: 400 }
+          );
+        }
+        
+        console.log(`포인트 사용 완료: ${pointResult.usedPoints}P 사용, 잔액 ${pointResult.newBalance}P`);
+      } catch (error) {
+        console.error('포인트 사용 처리 오류:', error);
+        // 포인트 사용 실패 시 주문 취소
+        await Order.findByIdAndDelete(order._id);
+        return NextResponse.json(
+          { error: '포인트 사용 처리 중 오류가 발생했습니다.' },
+          { status: 500 }
+        );
+      }
+    }
 
     // 자동화 규칙 실행
     try {

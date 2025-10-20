@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { connectDB } from '@/lib/db';
 import Order from '@/models/Order';
+import { earnPoints } from '@/lib/pointManager';
 
 export async function POST(request: NextRequest) {
   try {
@@ -141,6 +142,25 @@ export async function POST(request: NextRequest) {
               await cart.save();
               
               console.log('장바구니에서 주문한 상품 제거 완료:', orderedProductIds);
+            }
+
+            // 포인트 적립 처리
+            try {
+              const pointResult = await earnPoints(
+                order.userId,
+                order.totalAmount + (order.usedPoints || 0), // 사용한 포인트를 다시 더해서 원래 금액으로 계산
+                `구매 적립 (주문번호: ${order.orderNumber})`,
+                order._id
+              );
+              
+              if (pointResult.success) {
+                console.log(`포인트 적립 완료: ${pointResult.earnedPoints}P 적립, 잔액 ${pointResult.newBalance}P`);
+              } else {
+                console.error('포인트 적립 실패:', pointResult.error);
+              }
+            } catch (error) {
+              console.error('포인트 적립 처리 오류:', error);
+              // 포인트 적립 실패는 결제 완료를 막지 않음
             }
           }
 

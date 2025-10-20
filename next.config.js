@@ -5,6 +5,11 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
+  // 번들 최적화
+  swcMinify: true,
+  compress: true,
+  // 빌드 출력 최적화
+  output: 'standalone',
   images: {
     remotePatterns: [
       {

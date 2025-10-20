@@ -28,6 +28,7 @@ import {
   Percent
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Coupon {
   _id: string;
@@ -60,6 +61,7 @@ interface CouponStats {
 }
 
 export default function CouponDashboard() {
+  const router = useRouter();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [stats, setStats] = useState<CouponStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,6 +165,35 @@ export default function CouponDashboard() {
         return '무료배송';
       default:
         return type;
+    }
+  };
+
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      alert('쿠폰 코드가 복사되었습니다.');
+    } catch (err) {
+      alert('복사에 실패했습니다.');
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    router.push(`/admin/coupons/${id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('이 쿠폰을 삭제하시겠습니까? 사용된 쿠폰은 삭제할 수 없습니다.')) return;
+    try {
+      const res = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || '쿠폰 삭제에 실패했습니다.');
+        return;
+      }
+      alert('쿠폰이 삭제되었습니다.');
+      fetchCouponData();
+    } catch (e) {
+      alert('쿠폰 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -432,13 +463,13 @@ export default function CouponDashboard() {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-1">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleCopyCode(coupon.code)}>
                         <Copy className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(coupon._id)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-red-500">
+                      <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDelete(coupon._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

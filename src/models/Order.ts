@@ -31,6 +31,10 @@ export interface IOrder extends Document {
   };
   paymentMethod: string;
   paymentStatus: 'pending' | 'completed' | 'failed';
+  // 포인트 및 쿠폰 관련 필드
+  usedPoints?: number; // 사용한 포인트
+  couponDiscount?: number; // 쿠폰 할인 금액
+  couponCode?: string; // 사용한 쿠폰 코드
   // 파트너 관련 필드
   partnerOrders: Array<{
     partnerId: mongoose.Types.ObjectId;
@@ -92,6 +96,20 @@ const OrderSchema = new Schema<IOrder>({
     type: String,
     enum: ['pending', 'completed', 'failed'],
     default: 'pending'
+  },
+  // 포인트 및 쿠폰 관련 필드
+  usedPoints: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  couponDiscount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  couponCode: {
+    type: String
   },
   // 파트너 관련 필드
   partnerOrders: [{
