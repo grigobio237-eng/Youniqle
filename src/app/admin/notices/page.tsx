@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { INotice } from '@/models/Notice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,24 +44,10 @@ import {
   Trash2,
 } from 'lucide-react';
 
-interface Notice {
-  _id: string;
-  title: string;
-  content: string;
-  summary?: string;
-  type: 'general' | 'important' | 'event' | 'maintenance' | 'update';
-  status: 'draft' | 'published' | 'archived';
-  isPinned: boolean;
-  isImportant: boolean;
-  isPopup: boolean;
-  viewCount: number;
-  createdAt: string;
-  publishedAt?: string;
-  authorName: string;
-}
+// Notice 타입은 INotice를 사용
 
 export default function AdminNoticesPage() {
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [notices, setNotices] = useState<INotice[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -70,7 +57,7 @@ export default function AdminNoticesPage() {
   
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const [selectedNotice, setSelectedNotice] = useState<INotice | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -196,7 +183,7 @@ export default function AdminNoticesPage() {
     }
   };
 
-  const openEditDialog = (notice: Notice) => {
+  const openEditDialog = (notice: INotice) => {
     setSelectedNotice(notice);
     setFormData({
       title: notice.title,
@@ -347,7 +334,7 @@ export default function AdminNoticesPage() {
                 </TableHeader>
                 <TableBody>
                   {notices.map((notice) => (
-                    <TableRow key={notice._id}>
+                    <TableRow key={String(notice._id)}>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {notice.isPinned && <Pin className="w-4 h-4 text-red-500" />}
@@ -369,7 +356,7 @@ export default function AdminNoticesPage() {
                           {notice.viewCount}
                         </div>
                       </TableCell>
-                      <TableCell>{formatDate(notice.createdAt)}</TableCell>
+                      <TableCell>{formatDate(notice.createdAt.toString())}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex gap-2 justify-center">
                           <Button
@@ -383,7 +370,7 @@ export default function AdminNoticesPage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDelete(notice._id)}
+                            onClick={() => handleDelete(String(notice._id))}
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
