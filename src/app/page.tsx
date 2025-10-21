@@ -64,9 +64,31 @@ export default function HomePage() {
     }
   };
 
-  const handleAddToCart = (productId: string) => {
-    // 장바구니 추가 로직 (추후 구현)
-    console.log('Add to cart:', productId);
+  const handleAddToCart = async (productId: string) => {
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+        }),
+      });
+
+      if (response.ok) {
+        alert('장바구니에 추가되었습니다!');
+        // 헤더 장바구니 개수 업데이트
+        window.dispatchEvent(new Event('cartUpdated'));
+      } else {
+        const errorData = await response.json();
+        alert(`장바구니 추가 실패: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('장바구니 추가 중 오류:', error);
+      alert('장바구니 추가 중 오류가 발생했습니다.');
+    }
   };
 
   const handleNewsletterSubscribe = async (e: React.FormEvent) => {

@@ -119,6 +119,8 @@ export default function RecommendationSection({
 
   const handleItemClick = async (itemId: string, itemData: any) => {
     await trackBehavior(itemId, 'click', itemData);
+    // 상품 상세 페이지로 이동
+    window.location.href = `/products/${itemId}`;
   };
 
   const handleItemView = useCallback(async (itemId: string, itemData: any) => {
@@ -126,7 +128,34 @@ export default function RecommendationSection({
   }, [trackBehavior]);
 
   const handleAddToCart = async (itemId: string, itemData: any) => {
-    await trackBehavior(itemId, 'add_to_cart', itemData);
+    try {
+      // 행동 추적
+      await trackBehavior(itemId, 'add_to_cart', itemData);
+      
+      // 장바구니에 추가
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: itemId,
+          quantity: 1,
+        }),
+      });
+
+      if (response.ok) {
+        alert('장바구니에 추가되었습니다!');
+        // 헤더 장바구니 개수 업데이트
+        window.dispatchEvent(new Event('cartUpdated'));
+      } else {
+        const errorData = await response.json();
+        alert(`장바구니 추가 실패: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('장바구니 추가 중 오류:', error);
+      alert('장바구니 추가 중 오류가 발생했습니다.');
+    }
   };
 
   const handleLike = async (itemId: string, itemData: any) => {
@@ -311,28 +340,30 @@ export default function RecommendationSection({
         {currentItems.map((item, index) => (
           <Card 
             key={item.itemId} 
-            className="group hover:shadow-lg transition-shadow cursor-pointer"
+            className="cursor-pointer"
             data-item-id={item.itemId}
             data-item-data={JSON.stringify(item.metadata)}
             onClick={() => handleItemClick(item.itemId, item.metadata)}
           >
             <CardContent className="p-4">
               {/* 상품 이미지 */}
-              <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg overflow-hidden">
+              <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg">
                 {item.product?.images?.[0]?.url ? (
                   <Image 
                     src={item.product.images[0].url} 
                     alt={item.product.name}
                     width={400}
                     height={192}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    priority={index < 4}
                   />
                 ) : (
                   <CharacterImage
                     src="/character/youniqle-1.png"
                     alt={`추천 상품 ${index + 1}`}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 )}

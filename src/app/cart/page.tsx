@@ -133,6 +133,21 @@ export default function CartPage() {
       if (response.ok) {
         const data = await response.json();
         setCart(data.cart);
+        
+        // 업데이트된 장바구니의 아이템 ID로 선택 상태 동기화
+        if (data.cart?.items) {
+          const updatedItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
+          setSelectedItems(prev => {
+            const newSet = new Set<string>();
+            prev.forEach(id => {
+              if (updatedItemIds.has(id)) {
+                newSet.add(id);
+              }
+            });
+            return newSet;
+          });
+        }
+        
         // Update header cart count
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
@@ -162,6 +177,23 @@ export default function CartPage() {
       if (response.ok) {
         const data = await response.json();
         setCart(data.cart);
+        
+        // 삭제된 상품의 선택 상태도 함께 제거
+        if (data.cart?.items) {
+          const remainingItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
+          setSelectedItems(prev => {
+            const newSet = new Set(prev);
+            // 남아있는 아이템만 유지
+            const filtered = new Set<string>();
+            newSet.forEach(id => {
+              if (remainingItemIds.has(id)) {
+                filtered.add(id);
+              }
+            });
+            return filtered;
+          });
+        }
+        
         // Update header cart count
         window.dispatchEvent(new Event('cartUpdated'));
       } else {

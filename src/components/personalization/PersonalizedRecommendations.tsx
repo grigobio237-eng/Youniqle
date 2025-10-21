@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, ThumbsUp, ThumbsDown, ShoppingCart, Eye, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import CharacterImage from '@/components/ui/CharacterImage';
 
 interface PersonalizedRecommendationsProps {
   title?: string;
@@ -72,11 +73,40 @@ export default function PersonalizedRecommendations({
       true,
       false
     );
+    
+    // 상품 상세 페이지로 이동
+    window.location.href = `/products/${item.itemId}`;
   };
 
   const handleItemPurchase = async (item: any) => {
     if (onItemPurchase) {
       onItemPurchase(item);
+    }
+    
+    try {
+      // 장바구니에 추가
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: item.itemId,
+          quantity: 1,
+        }),
+      });
+
+      if (response.ok) {
+        alert('장바구니에 추가되었습니다!');
+        // 헤더 장바구니 개수 업데이트
+        window.dispatchEvent(new Event('cartUpdated'));
+      } else {
+        const errorData = await response.json();
+        alert(`장바구니 추가 실패: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('장바구니 추가 중 오류:', error);
+      alert('장바구니 추가 중 오류가 발생했습니다.');
     }
     
     // 구매 피드백 기록
@@ -210,11 +240,11 @@ export default function PersonalizedRecommendations({
           {recommendations.map((item, index) => (
             <div
               key={`${item.itemId}_${index}`}
-              className="group relative border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="relative border rounded-lg p-4 cursor-pointer"
               onClick={() => handleItemClick(item)}
             >
               {/* 상품 이미지 */}
-              <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+              <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center relative">
                 {item.product?.images?.[0]?.url ? (
                   <Image 
                     src={item.product.images[0].url} 
@@ -222,9 +252,17 @@ export default function PersonalizedRecommendations({
                     width={200}
                     height={200}
                     className="w-full h-full object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    priority={index < 3}
                   />
                 ) : (
-                  <div className="text-gray-400 text-sm">상품 이미지</div>
+                  <CharacterImage
+                    src="/character/youniqle-1.png"
+                    alt={`추천 상품 ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 )}
               </div>
 

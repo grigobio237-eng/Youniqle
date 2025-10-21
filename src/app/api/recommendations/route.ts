@@ -120,17 +120,21 @@ export const GET = withRateLimit(rateLimiters.recommendations, getRecommendation
 
 export async function POST(request: NextRequest) {
   try {
-    // 인증 확인
-    const token = request.cookies.get('token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     await connectDB();
+    
+    // NextAuth 세션으로 사용자 인증 (선택적)
+    const { getServerSession } = await import('next-auth');
+    const { authOptions } = await import('@/lib/auth');
+    const session = await getServerSession(authOptions);
+    
+    let userId = null;
+    if (session?.user?.email) {
+      const { default: User } = await import('@/models/User');
+      const user = await User.findOne({ email: session.user.email });
+      if (user) {
+        userId = user._id.toString();
+      }
+    }
 
     const { 
       itemId, 
@@ -150,7 +154,7 @@ export async function POST(request: NextRequest) {
 
     // 사용자 행동 데이터 저장
     const behaviorData = {
-      userId: decoded.userId,
+      userId: userId || 'anonymous',
       sessionId: context?.sessionId || 'unknown',
       eventType,
       itemId,

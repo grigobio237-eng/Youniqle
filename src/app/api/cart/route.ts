@@ -222,9 +222,14 @@ export async function DELETE(request: NextRequest) {
 
     await cart.save();
 
+    // 업데이트된 장바구니를 populate하여 반환
+    const updatedCart = await Cart.findById(cart._id)
+      .populate('items.productId', 'name price images slug')
+      .lean();
+
     return NextResponse.json({
       message: '장바구니에서 상품이 제거되었습니다.',
-      cart,
+      cart: updatedCart,
     });
   } catch (error) {
     console.error('Remove from cart error:', error);

@@ -72,11 +72,6 @@ export default function Header() {
 
     checkSession();
     
-    // 컴포넌트 언마운트 시 플래그 설정
-    return () => {
-      isMounted = false;
-    };
-
     // 장바구니 업데이트 이벤트 리스너 (사용자 액션 시에만 동작)
     const handleCartUpdate = () => {
       fetchCartCount();
@@ -84,7 +79,9 @@ export default function Header() {
 
     window.addEventListener('cartUpdated', handleCartUpdate);
 
+    // 컴포넌트 언마운트 시 정리
     return () => {
+      isMounted = false;
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, []); // session 의존성 제거 - 최초 1회만 실행
