@@ -358,6 +358,109 @@ export async function recordCouponUsage(
   }
 }
 
+// UserCoupon 상태를 'used'로 업데이트
+export async function markCouponAsUsed(
+  userId: string,
+  couponCode: string,
+  orderId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const UserCoupon = mongoose.model('UserCoupon');
+    
+    // 사용자의 사용 가능한 쿠폰 찾기
+    const userCoupon = await UserCoupon.findOne({
+      userId: new mongoose.Types.ObjectId(userId),
+      code: couponCode.toUpperCase(),
+      status: 'available'
+    });
+
+    if (!userCoupon) {
+      return {
+        success: false,
+        error: '사용 가능한 쿠폰을 찾을 수 없습니다.'
+      };
+    }
+
+    // 쿠폰 상태를 'used'로 업데이트
+    userCoupon.status = 'used';
+    userCoupon.usedAt = new Date();
+    userCoupon.orderId = new mongoose.Types.ObjectId(orderId);
+    
+    await userCoupon.save();
+
+    return { success: true };
+  } catch (error) {
+    console.error('Mark coupon as used error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '쿠폰 상태 업데이트 중 오류가 발생했습니다.'
+    };
+  }
+}
+
+// 쿠폰 사용 취소 (주문 취소/실패 시)
+export async function cancelCouponUsage(
+  userId: string,
+  couponCode: string,
+  orderId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const UserCoupon = mongoose.model('UserCoupon');
+    
+    // 해당 주문으로 사용된 쿠폰 찾기
+    const userCoupon = await UserCoupon.findOne({
+      userId: new mongoose.Types.ObjectId(userId),
+      code: couponCode.toUpperCase(),
+      orderId: new mongoose.Types.ObjectId(orderId),
+      status: 'used'
+    });
+
+    if (!userCoupon) {
+      return {
+        success: false,
+        error: '사용된 쿠폰을 찾을 수 없습니다.'
+      };
+    }
+
+    // 유효기간이 만료되지 않았다면 다시 사용 가능하도록
+    const now = new Date();
+    if (userCoupon.validUntil >= now) {
+      userCoupon.status = 'available';
+    } else {
+      userCoupon.status = 'expired';
+    }
+    
+    userCoupon.usedAt = undefined;
+    userCoupon.orderId = undefined;
+    
+    await userCoupon.save();
+
+    // CouponUsage 기록 삭제
+    await CouponUsage.deleteOne({
+      userId: new mongoose.Types.ObjectId(userId),
+      code: couponCode.toUpperCase(),
+      orderId: new mongoose.Types.ObjectId(orderId)
+    });
+
+    // Coupon usageCount 감소
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (coupon && coupon.usageCount > 0) {
+      await Coupon.updateOne(
+        { _id: coupon._id },
+        { $inc: { usageCount: -1 } }
+      );
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Cancel coupon usage error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '쿠폰 사용 취소 중 오류가 발생했습니다.'
+    };
+  }
+}
+
 
 
 

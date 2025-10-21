@@ -20,7 +20,8 @@
     "create-analytics-data": "node scripts/create-analytics-test-data.js",
     "test-mongodb": "node scripts/test-mongodb-connection.js",
     "diagnose-mongodb": "node scripts/diagnose-mongodb.js",
-    "test-correct-mongodb": "node scripts/test-correct-mongodb.js"
+    "test-correct-mongodb": "node scripts/test-correct-mongodb.js",
+    "test:coupon-usage": "node scripts/test-coupon-usage.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",

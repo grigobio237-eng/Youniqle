@@ -107,63 +107,156 @@ export async function POST(request: NextRequest) {
         }
         
         if (isPaymentSuccess) {
-          // DB 연결 및 주문 상태 업데이트
+          // DB 연결
           await connectDB();
           
-          // 주문번호로 주문 찾기
-          const order = await Order.findOne({ orderNumber: moid });
+          // MongoDB 트랜잭션 시작
+          const mongoose = await import('mongoose');
+          let mongoSession = null;
           
-          if (order) {
-            // 주문 상태 업데이트
-            order.paymentStatus = 'completed';
-            order.status = 'confirmed';
-            order.updatedAt = new Date();
-            await order.save();
-            
-            console.log('주문 상태 업데이트 완료:', moid);
-
-            // 결제 완료 후 주문한 상품만 장바구니에서 제거
-            const Cart = (await import('@/models/Cart')).default;
-            const cart = await Cart.findOne({ userId: order.userId });
-            
-            if (cart) {
-              // 주문한 상품 ID 목록
-              const orderedProductIds = order.items.map((item: any) => item.productId.toString());
-              
-              // 주문하지 않은 상품만 남기기
-              const remainingItems = cart.items.filter((item: any) => 
-                !orderedProductIds.includes(item.productId.toString())
-              );
-              
-              cart.items = remainingItems;
-              cart.totalItems = remainingItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
-              cart.totalAmount = remainingItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-              
-              await cart.save();
-              
-              console.log('장바구니에서 주문한 상품 제거 완료:', orderedProductIds);
-            }
-
-            // 포인트 적립 처리
-            try {
-              const pointResult = await earnPoints(
-                order.userId,
-                order.totalAmount + (order.usedPoints || 0), // 사용한 포인트를 다시 더해서 원래 금액으로 계산
-                `구매 적립 (주문번호: ${order.orderNumber})`,
-                order._id
-              );
-              
-              if (pointResult.success) {
-                console.log(`포인트 적립 완료: ${pointResult.earnedPoints}P 적립, 잔액 ${pointResult.newBalance}P`);
-              } else {
-                console.error('포인트 적립 실패:', pointResult.error);
-              }
-            } catch (error) {
-              console.error('포인트 적립 처리 오류:', error);
-              // 포인트 적립 실패는 결제 완료를 막지 않음
-            }
+          try {
+            mongoSession = await mongoose.default.startSession();
+            mongoSession.startTransaction();
+            console.log('🔄 결제 완료 처리 트랜잭션 시작');
+          } catch (sessionError) {
+            console.warn('⚠️  트랜잭션을 시작할 수 없습니다. 일반 모드로 진행합니다.');
+            mongoSession = null;
           }
 
+          try {
+            // 주문번호로 주문 찾기
+            const order = await Order.findOne({ orderNumber: moid });
+            
+            if (order) {
+              // 주문 상태 업데이트
+              order.paymentStatus = 'completed';
+              order.status = 'confirmed';
+              order.updatedAt = new Date();
+              await order.save(mongoSession ? { session: mongoSession } : {});
+              
+              console.log('✅ 주문 상태 업데이트 완료:', moid);
+
+              // 결제 완료 후 주문한 상품만 장바구니에서 제거
+              const Cart = (await import('@/models/Cart')).default;
+              const cart = await Cart.findOne({ userId: order.userId });
+              
+              if (cart) {
+                // 주문한 상품 ID 목록
+                const orderedProductIds = order.items.map((item: any) => item.productId.toString());
+                
+                // 주문하지 않은 상품만 남기기
+                const remainingItems = cart.items.filter((item: any) => 
+                  !orderedProductIds.includes(item.productId.toString())
+                );
+                
+                cart.items = remainingItems;
+                cart.totalItems = remainingItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
+                cart.totalAmount = remainingItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+                
+                await cart.save(mongoSession ? { session: mongoSession } : {});
+                
+                console.log('✅ 장바구니에서 주문한 상품 제거 완료:', orderedProductIds);
+              }
+
+              // 포인트 적립 처리
+              try {
+                const pointResult = await earnPoints(
+                  order.userId,
+                  order.totalAmount + (order.usedPoints || 0), // 사용한 포인트를 다시 더해서 원래 금액으로 계산
+                  `구매 적립 (주문번호: ${order.orderNumber})`,
+                  order._id
+                );
+                
+                if (pointResult.success) {
+                  console.log(`✅ 포인트 적립 완료: ${pointResult.earnedPoints}P 적립, 잔액 ${pointResult.newBalance}P`);
+                } else {
+                  console.error('포인트 적립 실패:', pointResult.error);
+                }
+              } catch (error) {
+                console.error('포인트 적립 처리 오류:', error);
+                // 포인트 적립 실패는 결제 완료를 막지 않음
+              }
+
+              // 쿠폰 사용 처리
+              if (order.couponCode && order.couponDiscount) {
+                try {
+                  const { markCouponAsUsed, recordCouponUsage } = await import('@/lib/couponValidator');
+                  const Coupon = (await import('@/models/Coupon')).default;
+                  
+                  // 쿠폰 정보 조회
+                  const coupon = await Coupon.findOne({ code: order.couponCode.toUpperCase() });
+                  
+                  if (coupon) {
+                    // 1. CouponUsage 기록 생성
+                    const usageRecorded = await recordCouponUsage(
+                      coupon._id.toString(),
+                      order.userId.toString(),
+                      order._id.toString(),
+                      order.couponCode,
+                      order.couponDiscount,
+                      order.totalAmount + order.couponDiscount,
+                      order.totalAmount
+                    );
+                    
+                    if (usageRecorded) {
+                      console.log(`✅ 쿠폰 사용 기록 생성 완료: ${order.couponCode}`);
+                    } else {
+                      console.error('쿠폰 사용 기록 생성 실패');
+                    }
+                    
+                    // 2. UserCoupon 상태 업데이트
+                    const couponResult = await markCouponAsUsed(
+                      order.userId.toString(),
+                      order.couponCode,
+                      order._id.toString()
+                    );
+                    
+                    if (couponResult.success) {
+                      console.log(`✅ 쿠폰 상태 업데이트 완료: ${order.couponCode}`);
+                    } else {
+                      console.error('쿠폰 상태 업데이트 실패:', couponResult.error);
+                    }
+                  } else {
+                    console.error('쿠폰을 찾을 수 없습니다:', order.couponCode);
+                  }
+                } catch (error) {
+                  console.error('쿠폰 사용 처리 오류:', error);
+                  // 쿠폰 사용 처리 실패는 결제 완료를 막지 않음
+                }
+              }
+
+              // 트랜잭션 커밋
+              if (mongoSession) {
+                await mongoSession.commitTransaction();
+                console.log('✅ 결제 완료 처리 트랜잭션 커밋 완료');
+              }
+            }
+          } catch (paymentProcessError) {
+            console.error('결제 처리 중 오류:', paymentProcessError);
+            
+            // 트랜잭션 롤백
+            if (mongoSession) {
+              try {
+                await mongoSession.abortTransaction();
+                console.log('❌ 결제 처리 트랜잭션 롤백');
+              } catch (abortError) {
+                console.error('트랜잭션 롤백 오류:', abortError);
+              }
+            }
+            
+            throw paymentProcessError;
+          } finally {
+            // 트랜잭션 세션 종료
+            if (mongoSession) {
+              try {
+                await mongoSession.endSession();
+                console.log('🔚 결제 처리 트랜잭션 세션 종료');
+              } catch (endError) {
+                console.error('세션 종료 오류:', endError);
+              }
+            }
+          }
+        
           // 결제 성공 시 HTML 응답으로 리다이렉트
           const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-success?orderId=${moid}&amount=${amt}&tid=${txTid}`;
           
