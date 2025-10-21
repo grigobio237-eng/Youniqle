@@ -14,6 +14,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
   const [messages, setMessages] = useState<Record<string, any>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   // 로컬스토리지에서 언어 설정 로드
   useEffect(() => {
@@ -27,10 +28,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadMessages = async () => {
       try {
+        setIsLoading(true);
         const msgs = await import(`@/locales/${locale}.json`);
         setMessages(msgs.default);
+        setIsLoading(false);
       } catch (error) {
         console.error('Failed to load messages:', error);
+        setIsLoading(false);
       }
     };
     loadMessages();
@@ -43,6 +47,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // 번역 함수
   const t = (key: string, params?: Record<string, any>): string => {
+    if (isLoading) {
+      return key; // 로딩 중일 때는 키 자체 반환
+    }
+
     const keys = key.split('.');
     let value: any = messages;
 

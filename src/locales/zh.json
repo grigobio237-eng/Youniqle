@@ -12,7 +12,9 @@
     "edit": "编辑",
     "search": "搜索",
     "home": "首页",
-    "back": "返回"
+    "back": "返回",
+    "currency": " SGD",
+    "days": " 天"
   },
   "nav": {
     "products": "商品",
@@ -43,7 +45,14 @@
     "addSuccess": "{quantity} 件 {name} 已添加到购物车！",
     "updateFailed": "更新数量失败",
     "removeFailed": "移除商品失败",
-    "continueShopping": "继续购物"
+    "continueShopping": "继续购物",
+    "loginRequired": "需要登录",
+    "loginRequiredDesc": "请登录以使用购物车",
+    "goToLogin": "去登录",
+    "quantity": "数量",
+    "items": " 件",
+    "selectAllWithCount": "全选 ({selected}/{total})",
+    "deleteFailed": "删除商品失败"
   },
   "checkout": {
     "title": "结账",
@@ -186,16 +195,6 @@
         "description": "随时准备为您提供帮助"
       }
     },
-    "products": {
-      "featured": "精选商品",
-      "new": "新品上市",
-      "recommended": "推荐商品",
-      "viewAll": "查看全部",
-      "loadingProducts": "加载商品中...",
-      "noProducts": "没有可显示的商品",
-      "errorLoading": "加载商品失败",
-      "addedToCart": "已加入购物车"
-    },
     "newsletter": {
       "title": "订阅新闻通讯",
       "subtitle": "获取最新商品和特别优惠信息",
@@ -205,6 +204,12 @@
       "successMessage": "成功订阅新闻通讯！",
       "errorMessage": "订阅过程中发生错误",
       "emailRequired": "请输入您的电子邮箱地址"
+    },
+    "products": {
+      "featured": "精选商品",
+      "new": "新品上市",
+      "recommended": "推荐商品",
+      "viewAll": "查看全部"
     },
     "about": {
       "title": "加入Youniqle",
@@ -239,58 +244,6 @@
     "refresh": "刷新",
     "personalizedTitle": "AI个性化推荐",
     "browseMoreProducts": "浏览更多商品"
-  },
-  "products": {
-    "title": "商品列表",
-    "filter": "筛选",
-    "category": "分类",
-    "all": "全部",
-    "sort": "排序",
-    "latest": "最新",
-    "priceLow": "价格：低到高",
-    "priceHigh": "价格：高到低",
-    "popular": "热门",
-    "loading": "正在加载商品...",
-    "noProducts": "暂无商品显示",
-    "errorLoading": "加载商品失败",
-    "addToCart": "加入购物车",
-    "viewDetails": "查看详情",
-    "price": "价格",
-    "stock": "库存",
-    "outOfStock": "缺货",
-    "inStock": "有库存"
-  },
-  "cart": {
-    "title": "购物车",
-    "emptyCart": "购物车为空",
-    "emptyCartDesc": "开始添加商品吧！",
-    "goShopping": "去购物",
-    "loginRequired": "需要登录",
-    "loginRequiredDesc": "请登录以使用购物车",
-    "goToLogin": "去登录",
-    "selectAll": "全选",
-    "deleteSelected": "删除选中",
-    "totalItems": "共 {count} 件商品",
-    "subtotal": "商品金额",
-    "shippingFee": "运费",
-    "freeShipping": "免费",
-    "totalAmount": "总金额",
-    "checkout": "去结算",
-    "selectItemsToCheckout": "请选择要结算的商品",
-    "quantity": "数量",
-    "updateSuccess": "数量已更新",
-    "updateFailed": "更新数量失败",
-    "deleteSuccess": "商品已删除",
-    "deleteFailed": "删除商品失败",
-    "loading": "正在加载购物车...",
-    "removeConfirm": "确定要从购物车中删除此商品吗？",
-    "addSuccess": "{name} {count} 件已加入购物车！",
-    "addFailed": "加入购物车失败：{error}",
-    "addError": "加入购物车时发生错误。",
-    "wishlistAddSuccess": "已加入愿望清单！",
-    "wishlistRemoveSuccess": "已从愿望清单中删除。",
-    "wishlistFailed": "愿望清单操作失败：{error}",
-    "wishlistError": "处理愿望清单时发生错误。"
   },
   "checkout": {
     "title": "订单结算",

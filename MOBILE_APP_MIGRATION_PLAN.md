@@ -1952,3 +1952,5 @@ const getRateLimit = (userAgent: string) => {
 **문서 버전**: 1.0.0  
 **다음 업데이트**: PWA 구현 완료 후
 
+
+
