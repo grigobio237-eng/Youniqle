@@ -129,10 +129,10 @@ class RateLimiter {
 
 // 미리 정의된 Rate Limiter들
 export const rateLimiters = {
-  // 일반 API 요청 (분당 100회)
+  // 일반 API 요청 (분당 1000회)
   general: new RateLimiter({
     windowMs: 60 * 1000, // 1분
-    maxRequests: 100,
+    maxRequests: 1000,
     message: 'API 요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.'
   }),
 

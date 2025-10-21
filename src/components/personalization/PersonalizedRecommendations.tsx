@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { usePersonalization } from '@/hooks/usePersonalization';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -212,19 +213,44 @@ export default function PersonalizedRecommendations({
               className="group relative border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => handleItemClick(item)}
             >
-              {/* 상품 이미지 (더미) */}
-              <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <div className="text-gray-400 text-sm">상품 이미지</div>
+              {/* 상품 이미지 */}
+              <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                {item.product?.images?.[0]?.url ? (
+                  <Image 
+                    src={item.product.images[0].url} 
+                    alt={item.product.name}
+                    width={200}
+                    height={200}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-gray-400 text-sm">상품 이미지</div>
+                )}
               </div>
 
               {/* 상품 정보 */}
               <div className="space-y-2">
                 <h4 className="font-medium text-sm line-clamp-2">
-                  {item.itemType === 'product' ? `상품 ${item.itemId}` : 
-                   item.itemType === 'content' ? `콘텐츠 ${item.itemId}` :
-                   item.itemType === 'category' ? `카테고리 ${item.itemId}` :
-                   `브랜드 ${item.itemId}`}
+                  {item.product?.name || 
+                   (item.itemType === 'product' ? `상품 ${item.itemId}` : 
+                    item.itemType === 'content' ? `콘텐츠 ${item.itemId}` :
+                    item.itemType === 'category' ? `카테고리 ${item.itemId}` :
+                    `브랜드 ${item.itemId}`)}
                 </h4>
+                
+                {/* 가격 정보 */}
+                {item.product?.price && (
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-blue-600">
+                      {item.product.price.toLocaleString()}원
+                    </span>
+                    {item.product.originalPrice && item.product.originalPrice > item.product.price && (
+                      <span className="text-sm text-gray-500 line-through">
+                        {item.product.originalPrice.toLocaleString()}원
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* 추천 점수 */}
                 <div className="flex items-center space-x-2">

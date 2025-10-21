@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -120,9 +121,9 @@ export default function RecommendationSection({
     await trackBehavior(itemId, 'click', itemData);
   };
 
-  const handleItemView = async (itemId: string, itemData: any) => {
+  const handleItemView = useCallback(async (itemId: string, itemData: any) => {
     await trackBehavior(itemId, 'view', itemData);
-  };
+  }, [trackBehavior]);
 
   const handleAddToCart = async (itemId: string, itemData: any) => {
     await trackBehavior(itemId, 'add_to_cart', itemData);
@@ -166,7 +167,7 @@ export default function RecommendationSection({
     items.forEach(item => observer.observe(item));
 
     return () => observer.disconnect();
-  }, [currentItems]);
+  }, [currentItems]); // handleItemView 제거
 
   if (loading) {
     return (
@@ -318,13 +319,23 @@ export default function RecommendationSection({
             <CardContent className="p-4">
               {/* 상품 이미지 */}
               <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg overflow-hidden">
-                <CharacterImage
-                  src="/character/youniqle-1.png"
-                  alt={`추천 상품 ${index + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
+                {item.product?.images?.[0]?.url ? (
+                  <Image 
+                    src={item.product.images[0].url} 
+                    alt={item.product.name}
+                    width={400}
+                    height={192}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <CharacterImage
+                    src="/character/youniqle-1.png"
+                    alt={`추천 상품 ${index + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                )}
                 <div className="absolute top-2 right-2">
                   <Badge className={getScoreColor(item.score)}>
                     {Math.round(item.score * 100)}%
@@ -335,15 +346,22 @@ export default function RecommendationSection({
               {/* 상품 정보 */}
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-900 line-clamp-2">
-                  추천 상품 {index + 1}
+                  {item.product?.name || `추천 상품 ${index + 1}`}
                 </h3>
                 <p className="text-sm text-gray-600 line-clamp-2">
                   {item.reason}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-primary">
-                    ₩{(Math.random() * 100000 + 10000).toLocaleString()}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-lg font-bold text-primary">
+                      ₩{item.product?.price?.toLocaleString() || (Math.random() * 100000 + 10000).toLocaleString()}
+                    </span>
+                    {item.product?.originalPrice && item.product.originalPrice > item.product.price && (
+                      <span className="text-sm text-gray-500 line-through">
+                        ₩{item.product.originalPrice.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center space-x-1">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
                     <span className="text-sm text-gray-600">

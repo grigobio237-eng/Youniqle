@@ -9,6 +9,7 @@ interface RecommendationItem {
   reason: string;
   recommendationType: string;
   metadata: any;
+  product?: any; // 실제 상품 정보 (선택적)
 }
 
 interface RecommendationRequest {
@@ -20,6 +21,7 @@ interface RecommendationRequest {
     pageUrl?: string;
     sessionId?: string;
     deviceType?: string;
+    category?: string;
   };
 }
 
@@ -47,23 +49,49 @@ export function useRecommendations(initialRequest?: RecommendationRequest): UseR
       const requestData = { ...currentRequest, ...request };
       setCurrentRequest(requestData);
 
-      const params = new URLSearchParams();
-      if (requestData.itemType) params.append('itemType', requestData.itemType);
-      if (requestData.algorithm) params.append('algorithm', requestData.algorithm);
-      if (requestData.limit) params.append('limit', requestData.limit.toString());
-      if (requestData.excludeIds?.length) params.append('excludeIds', requestData.excludeIds.join(','));
-      if (requestData.context?.pageUrl) params.append('pageUrl', requestData.context.pageUrl);
-      if (requestData.context?.sessionId) params.append('sessionId', requestData.context.sessionId);
-      if (requestData.context?.deviceType) params.append('deviceType', requestData.context.deviceType);
+      let response;
+      
+      // 신상품 알고리즘인 경우 최신 상품 API 사용
+      if (requestData.algorithm === 'trending') {
+        const params = new URLSearchParams();
+        if (requestData.limit) params.append('limit', requestData.limit.toString());
+        if (requestData.context?.category) params.append('category', requestData.context.category);
+        
+        response = await fetch(`/api/products/latest?${params}`);
+      } else {
+        // 기존 추천 API 사용
+        const params = new URLSearchParams();
+        if (requestData.itemType) params.append('itemType', requestData.itemType);
+        if (requestData.algorithm) params.append('algorithm', requestData.algorithm);
+        if (requestData.limit) params.append('limit', requestData.limit.toString());
+        if (requestData.excludeIds?.length) params.append('excludeIds', requestData.excludeIds.join(','));
+        if (requestData.context?.pageUrl) params.append('pageUrl', requestData.context.pageUrl);
+        if (requestData.context?.sessionId) params.append('sessionId', requestData.context.sessionId);
+        if (requestData.context?.deviceType) params.append('deviceType', requestData.context.deviceType);
 
-      const response = await fetch(`/api/recommendations?${params}`);
+        response = await fetch(`/api/recommendations?${params}`);
+      }
       
       if (!response.ok) {
         throw new Error('추천을 불러올 수 없습니다.');
       }
 
       const data = await response.json();
-      setRecommendations(data.data.recommendations || []);
+      
+      if (requestData.algorithm === 'trending') {
+        // 신상품 데이터를 추천 형식으로 변환
+        const recommendations = data.data.products.map((product: any, index: number) => ({
+          itemId: product._id.toString(),
+          itemType: 'product',
+          score: 0.8 - (index * 0.05),
+          reason: '최신 상품',
+          algorithm: 'trending',
+          product: product
+        }));
+        setRecommendations(recommendations);
+      } else {
+        setRecommendations(data.data.recommendations || []);
+      }
 
     } catch (error) {
       console.error('Failed to fetch recommendations:', error);
@@ -118,12 +146,12 @@ export function useRecommendations(initialRequest?: RecommendationRequest): UseR
     await fetchRecommendations();
   }, [fetchRecommendations]);
 
-  // 초기 로드
+  // 초기 로드 (한 번만 실행)
   useEffect(() => {
     if (Object.keys(currentRequest).length > 0) {
       fetchRecommendations();
     }
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   // 세션 ID 생성/가져오기
   const getSessionId = () => {

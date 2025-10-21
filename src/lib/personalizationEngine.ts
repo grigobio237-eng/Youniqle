@@ -542,7 +542,7 @@ export class PersonalizationEngine {
 
       // 익명 사용자 처리
       if (userId === 'anonymous') {
-        return this.generateDefaultRecommendations(itemType, limit);
+        return await this.generateDefaultRecommendations(itemType, limit);
       }
 
       // 사용자 프로필 조회/생성
@@ -554,11 +554,41 @@ export class PersonalizationEngine {
 
       // 프로필이 여전히 null인 경우 기본 추천 반환
       if (!profile) {
-        return this.generateDefaultRecommendations(itemType, limit);
+        return await this.generateDefaultRecommendations(itemType, limit);
       }
 
-      // 추천 생성
-      const recommendations = await this.generateRecommendations(profile, itemType, limit, context, algorithms);
+      // 사용자 활동 이력 확인
+      const hasActivity = await this.checkUserActivity(userId);
+      
+      let recommendations: any[] = [];
+      
+      if (!hasActivity) {
+        // 활동 이력이 없는 신규 사용자: 관리자 추천 상품 우선 노출
+        const adminProducts = await this.getAdminRecommendedProducts(Math.ceil(limit * 0.7));
+        const popularProducts = await this.getPopularProducts(Math.ceil(limit * 0.3));
+        
+        recommendations = [
+          ...adminProducts.map((product, index) => ({
+            itemId: product._id.toString(),
+            itemType: 'product',
+            score: 0.9 - (index * 0.05),
+            reason: product.adminRecommendationReason || '관리자 추천 상품',
+            algorithm: 'admin_recommended',
+            product: product
+          })),
+          ...popularProducts.map((product, index) => ({
+            itemId: product._id.toString(),
+            itemType: 'product',
+            score: 0.7 - (index * 0.05),
+            reason: '인기 상품',
+            algorithm: 'popular',
+            product: product
+          }))
+        ];
+      } else {
+        // 활동 이력이 있는 사용자: 개인화된 추천
+        recommendations = await this.generateRecommendations(profile, itemType, limit, context, algorithms);
+      }
 
       // 개인화된 콘텐츠 설정
       const content = this.generatePersonalizedContent(profile);
@@ -574,7 +604,7 @@ export class PersonalizationEngine {
 
       return {
         userId,
-        recommendations,
+        recommendations: recommendations.slice(0, limit),
         content,
         pricing,
         marketing,
@@ -684,16 +714,17 @@ export class PersonalizationEngine {
     
     // 선호하는 카테고리 기반 추천
     for (const category of profile.preferences.productCategories.slice(0, 3)) {
-      // 해당 카테고리의 상품 조회 (실제로는 상품 데이터베이스에서 조회)
+      // 해당 카테고리의 상품 조회
       const categoryProducts = await this.getProductsByCategory(category.category);
       
       for (const product of categoryProducts.slice(0, 5)) {
         recommendations.push({
-          itemId: product.id,
+          itemId: product._id.toString(),
           itemType: 'product',
           score: category.preferenceScore * 0.9,
           reason: `선호하는 ${category.category} 카테고리 상품`,
-          algorithm: 'content_based'
+          algorithm: 'content_based',
+          product: product
         });
       }
     }
@@ -704,11 +735,12 @@ export class PersonalizationEngine {
       
       for (const product of brandProducts.slice(0, 3)) {
         recommendations.push({
-          itemId: product.id,
+          itemId: product._id.toString(),
           itemType: 'product',
           score: brand.preferenceScore * 0.8,
           reason: `선호하는 ${brand.brand} 브랜드 상품`,
-          algorithm: 'content_based'
+          algorithm: 'content_based',
+          product: product
         });
       }
     }
@@ -718,61 +750,104 @@ export class PersonalizationEngine {
 
   // 인기 상품 추천
   private static async generatePopularRecommendations(itemType: string, limit: number): Promise<any[]> {
-    // 실제로는 상품 데이터베이스에서 인기 상품 조회
     const popularProducts = await this.getPopularProducts(limit);
     
     return popularProducts.map((product, index) => ({
-      itemId: product.id,
+      itemId: product._id.toString(),
       itemType: 'product',
       score: 0.7 - (index * 0.05), // 순위에 따라 점수 감소
       reason: '인기 상품',
-      algorithm: 'popular'
+      algorithm: 'popular',
+      product: product
     }));
   }
 
   // 트렌딩 상품 추천
   private static async generateTrendingRecommendations(itemType: string, limit: number): Promise<any[]> {
-    // 실제로는 최근 인기 급상승 상품 조회
     const trendingProducts = await this.getTrendingProducts(limit);
     
     return trendingProducts.map((product, index) => ({
-      itemId: product.id,
+      itemId: product._id.toString(),
       itemType: 'product',
       score: 0.8 - (index * 0.05),
       reason: '지금 뜨는 상품',
-      algorithm: 'trending'
+      algorithm: 'trending',
+      product: product
     }));
   }
 
   // 기본 추천 (익명 사용자용)
-  private static generateDefaultRecommendations(itemType: string, limit: number): any {
-    return {
-      recommendations: [], // 실제 상품이 없으면 빈 배열 반환
-      content: {
-        layout: 'grid',
-        theme: 'light',
-        language: 'ko',
-        fontSize: 'medium',
-        showRecommendations: true,
-        showReviews: true
-      },
-      pricing: {
-        discountRate: 0,
-        personalizedPricing: false,
-        priceRange: { min: 0, max: 1000000 }
-      },
-      marketing: {
-        personalizedOffers: [],
-        recommendedPromotions: [],
-        crossSellItems: []
-      },
-      metadata: {
-        generatedAt: new Date(),
-        algorithm: 'default',
-        confidence: 0.5,
-        fallback: true
-      }
-    };
+  private static async generateDefaultRecommendations(itemType: string, limit: number): Promise<any> {
+    try {
+      // 관리자가 추천한 상품 조회
+      const adminRecommendedProducts = await this.getAdminRecommendedProducts(limit);
+      
+      const recommendations = adminRecommendedProducts.map((product, index) => ({
+        itemId: product._id.toString(),
+        itemType: 'product',
+        score: 0.9 - (index * 0.05), // 관리자 추천은 높은 점수
+        reason: product.adminRecommendationReason || '관리자 추천 상품',
+        algorithm: 'admin_recommended',
+        product: product // 실제 상품 정보 포함
+      }));
+
+      return {
+        recommendations,
+        content: {
+          layout: 'grid',
+          theme: 'light',
+          language: 'ko',
+          fontSize: 'medium',
+          showRecommendations: true,
+          showReviews: true
+        },
+        pricing: {
+          discountRate: 0,
+          personalizedPricing: false,
+          priceRange: { min: 0, max: 1000000 }
+        },
+        marketing: {
+          personalizedOffers: [],
+          recommendedPromotions: [],
+          crossSellItems: []
+        },
+        metadata: {
+          generatedAt: new Date(),
+          algorithm: 'admin_recommended',
+          confidence: 0.9,
+          fallback: true
+        }
+      };
+    } catch (error) {
+      console.error('Admin recommendations error:', error);
+      return {
+        recommendations: [],
+        content: {
+          layout: 'grid',
+          theme: 'light',
+          language: 'ko',
+          fontSize: 'medium',
+          showRecommendations: true,
+          showReviews: true
+        },
+        pricing: {
+          discountRate: 0,
+          personalizedPricing: false,
+          priceRange: { min: 0, max: 1000000 }
+        },
+        marketing: {
+          personalizedOffers: [],
+          recommendedPromotions: [],
+          crossSellItems: []
+        },
+        metadata: {
+          generatedAt: new Date(),
+          algorithm: 'default',
+          confidence: 0.5,
+          fallback: true
+        }
+      };
+    }
   }
 
   // 개인화된 콘텐츠 생성
@@ -899,6 +974,42 @@ export class PersonalizationEngine {
     return insights;
   }
 
+  // 사용자 활동 이력 확인
+  private static async checkUserActivity(userId: string): Promise<boolean> {
+    try {
+      await connectDB();
+      
+      // 사용자 조회
+      const user = await User.findOne({ email: userId });
+      if (!user) return false;
+      
+      // 구매 이력 확인
+      const orderCount = await Order.countDocuments({
+        userId: user._id,
+        status: { $in: ['completed', 'delivered'] }
+      });
+      
+      // 행동 이력 확인
+      const behaviorCount = await UserBehavior.countDocuments({
+        userId: user._id
+      });
+      
+      // 프로필 생성 후 7일 이상 경과 확인
+      const profile = await UserProfile.findOne({ userId });
+      if (profile) {
+        const daysSinceProfile = (Date.now() - profile.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceProfile < 7) return false; // 프로필 생성 후 7일 미만이면 신규 사용자로 간주
+      }
+      
+      // 구매 이력이 1개 이상이거나 행동 이력이 10개 이상이면 활동 있는 사용자
+      return orderCount > 0 || behaviorCount >= 10;
+      
+    } catch (error) {
+      console.error('User activity check error:', error);
+      return false; // 오류 시 신규 사용자로 간주
+    }
+  }
+
   // 유틸리티 메서드들
   private static calculateMedian(values: number[]): number {
     if (values.length === 0) return 0;
@@ -964,24 +1075,113 @@ export class PersonalizationEngine {
     });
   }
 
+  // 관리자 추천 상품 조회
+  private static async getAdminRecommendedProducts(limit: number): Promise<any[]> {
+    try {
+      await connectDB();
+      const Product = (await import('@/models/Product')).default;
+      
+      const products = await Product.find({
+        featuredByAdmin: true,
+        status: 'active',
+        approvalStatus: 'approved'
+      })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+      return products;
+    } catch (error) {
+      console.error('Admin recommended products fetch error:', error);
+      return [];
+    }
+  }
+
   // 더미 데이터 메서드들 (실제로는 데이터베이스에서 조회)
   private static async getProductsByCategory(category: string): Promise<any[]> {
-    // 실제 상품이 없으면 빈 배열 반환
-    return [];
+    try {
+      await connectDB();
+      const Product = (await import('@/models/Product')).default;
+      
+      const products = await Product.find({
+        category: category,
+        status: 'active',
+        approvalStatus: 'approved'
+      })
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(10)
+      .lean();
+
+      return products;
+    } catch (error) {
+      console.error('Products by category fetch error:', error);
+      return [];
+    }
   }
 
   private static async getProductsByBrand(brand: string): Promise<any[]> {
-    // 실제 상품이 없으면 빈 배열 반환
-    return [];
+    try {
+      await connectDB();
+      const Product = (await import('@/models/Product')).default;
+      
+      const products = await Product.find({
+        partnerName: brand,
+        status: 'active',
+        approvalStatus: 'approved'
+      })
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(10)
+      .lean();
+
+      return products;
+    } catch (error) {
+      console.error('Products by brand fetch error:', error);
+      return [];
+    }
   }
 
   private static async getPopularProducts(limit: number): Promise<any[]> {
-    // 실제 상품이 없으면 빈 배열 반환
-    return [];
+    try {
+      await connectDB();
+      const Product = (await import('@/models/Product')).default;
+      
+      const products = await Product.find({
+        status: 'active',
+        approvalStatus: 'approved'
+      })
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+      return products;
+    } catch (error) {
+      console.error('Popular products fetch error:', error);
+      return [];
+    }
   }
 
   private static async getTrendingProducts(limit: number): Promise<any[]> {
-    // 실제 상품이 없으면 빈 배열 반환
-    return [];
+    try {
+      await connectDB();
+      const Product = (await import('@/models/Product')).default;
+      
+      // 최근 7일 내에 생성된 상품 중 인기 상품
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const products = await Product.find({
+        status: 'active',
+        approvalStatus: 'approved',
+        createdAt: { $gte: sevenDaysAgo }
+      })
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+      return products;
+    } catch (error) {
+      console.error('Trending products fetch error:', error);
+      return [];
+    }
   }
 }

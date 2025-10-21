@@ -19,7 +19,7 @@ class CacheManager {
   }
 
   // 캐시에 데이터 저장
-  async set(key: string, value: any, ttl: number = 3600): Promise<boolean> {
+  async set(key: string, value: any, ttl: number = 300): Promise<boolean> {
     try {
       const expires = Date.now() + (ttl * 1000);
       this.memoryCache.set(key, { value, expires });

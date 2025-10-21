@@ -46,8 +46,10 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProductRecommendationManager from '@/components/admin/ProductRecommendationManager';
 import { PRODUCT_CATEGORIES, getCategoryLabel } from '@/constants/categories';
 import { toast } from 'sonner';
 
@@ -291,6 +293,15 @@ export default function AdminProductsPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="products" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="products">상품 목록</TabsTrigger>
+          <TabsTrigger value="recommendations">추천 관리</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products" className="space-y-6">
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -671,6 +682,13 @@ export default function AdminProductsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+        </TabsContent>
+
+        <TabsContent value="recommendations" className="space-y-6">
+          <ProductRecommendationManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

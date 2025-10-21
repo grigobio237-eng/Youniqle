@@ -82,6 +82,7 @@ export interface PersonalizationRecommendation {
   score: number;
   reason: string;
   algorithm: string;
+  product?: any; // 실제 상품 정보 (선택적)
 }
 
 export interface PersonalizationResult {

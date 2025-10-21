@@ -14,6 +14,8 @@ export interface IProduct extends Document {
   approvalStatus: 'pending' | 'approved' | 'rejected'; // 승인 상태 추가
   rejectionReason?: string; // 거부 사유
   featured?: boolean;
+  featuredByAdmin?: boolean; // 관리자가 추천한 상품
+  adminRecommendationReason?: string; // 관리자 추천 이유
   images: Array<{
     url: string;
     w?: number;
@@ -117,6 +119,14 @@ const ProductSchema = new Schema<IProduct>({
   featured: {
     type: Boolean,
     default: false,
+  },
+  featuredByAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  adminRecommendationReason: {
+    type: String,
+    trim: true,
   },
   images: [{
     url: { type: String, required: true },
