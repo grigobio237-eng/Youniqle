@@ -12,7 +12,9 @@
     "edit": "Edit",
     "search": "Search",
     "home": "Home",
-    "back": "Back"
+    "back": "Back",
+    "currency": " KRW",
+    "days": " days"
   },
   "nav": {
     "products": "Products",
@@ -42,8 +44,14 @@
     "removeConfirm": "Remove this product from cart?",
     "addSuccess": "{quantity} {name} added to cart!",
     "updateFailed": "Failed to update quantity",
-    "removeFailed": "Failed to remove product",
-    "continueShopping": "Continue Shopping"
+    "deleteFailed": "Failed to remove product",
+    "continueShopping": "Continue Shopping",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "Please login to use the shopping cart",
+    "goToLogin": "Go to Login",
+    "quantity": "Quantity",
+    "items": " items",
+    "selectAllWithCount": "Select All ({selected}/{total})"
   },
   "checkout": {
     "title": "Checkout",

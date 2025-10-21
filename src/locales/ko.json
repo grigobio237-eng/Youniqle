@@ -12,7 +12,9 @@
     "edit": "수정",
     "search": "검색",
     "home": "홈",
-    "back": "뒤로가기"
+    "back": "뒤로가기",
+    "currency": "원",
+    "days": "일"
   },
   "nav": {
     "products": "상품",
@@ -42,8 +44,14 @@
     "removeConfirm": "상품을 장바구니에서 제거하시겠습니까?",
     "addSuccess": "{name} {quantity}개가 장바구니에 추가되었습니다!",
     "updateFailed": "수량 업데이트 실패",
-    "removeFailed": "상품 제거 실패",
-    "continueShopping": "쇼핑 계속하기"
+    "deleteFailed": "상품 제거 실패",
+    "continueShopping": "쇼핑 계속하기",
+    "loginRequired": "로그인이 필요합니다",
+    "loginRequiredDesc": "장바구니를 사용하려면 로그인해주세요",
+    "goToLogin": "로그인하러 가기",
+    "quantity": "수량",
+    "items": "개",
+    "selectAllWithCount": "전체선택 ({selected}/{total})"
   },
   "checkout": {
     "title": "주문/결제",
