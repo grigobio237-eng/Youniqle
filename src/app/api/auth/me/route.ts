@@ -62,9 +62,17 @@ export async function PUT(request: NextRequest) {
 
     await connectDB();
 
-    const { phone, marketingConsent, zipCode, address1, address2 } = await request.json();
+    const { phone, marketingConsent, zipCode, address1, address2, referralCode } = await request.json();
 
     const user = await User.findOne({ email: session.user.email });
+    // 추천 코드 최초 등록 (본인 referralCode 생성은 회원가입 시 가능, 여기서는 referredBy 설정을 허용)
+    if (referralCode && !user.referredBy) {
+      // 자기 자신의 코드 사용 방지
+      if (user.referralCode && user.referralCode === referralCode) {
+        return NextResponse.json({ error: '자기 자신의 추천 코드는 사용할 수 없습니다.' }, { status: 400 });
+      }
+      user.referredBy = referralCode;
+    }
     if (!user) {
       return NextResponse.json(
         { error: '사용자를 찾을 수 없습니다.' },

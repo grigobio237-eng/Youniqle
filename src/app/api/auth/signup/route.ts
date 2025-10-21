@@ -64,6 +64,11 @@ export async function POST(request: NextRequest) {
       emailVerificationExpires: verificationExpiry,
     });
 
+    // 추천 코드 자동 생성 (간단 규칙)
+    if (!user.referralCode) {
+      const base = user._id.toString().slice(-6).toUpperCase();
+      user.referralCode = `RF${base}`;
+    }
     await user.save();
 
     // 인증 이메일 발송

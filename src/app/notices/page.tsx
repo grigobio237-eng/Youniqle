@@ -22,6 +22,7 @@ import {
   Calendar,
   ChevronRight,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Notice {
   _id: string;
@@ -36,6 +37,7 @@ interface Notice {
 }
 
 export default function NoticesPage() {
+  const { t } = useLanguage();
   const [pinnedNotices, setPinnedNotices] = useState<Notice[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,9 +147,9 @@ export default function NoticesPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Megaphone className="w-10 h-10 text-blue-600" />
-          <h1 className="text-4xl font-bold">공지사항</h1>
+          <h1 className="text-4xl font-bold">{t('notices.title')}</h1>
         </div>
-        <p className="text-gray-600">Youniqle의 최신 소식과 공지사항을 확인하세요</p>
+        <p className="text-gray-600">{t('notices.subtitle')}</p>
       </div>
 
       {/* 검색 및 필터 */}
@@ -156,7 +158,7 @@ export default function NoticesPage() {
           <div className="flex gap-2">
             <div className="flex-1">
               <Input
-                placeholder="공지사항 검색..."
+                placeholder={t('notices.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -164,20 +166,20 @@ export default function NoticesPage() {
             </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="전체" />
+                <SelectValue placeholder={t('notices.all')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">전체</SelectItem>
-                <SelectItem value="general">일반</SelectItem>
-                <SelectItem value="important">중요</SelectItem>
-                <SelectItem value="event">이벤트</SelectItem>
-                <SelectItem value="maintenance">점검</SelectItem>
-                <SelectItem value="update">업데이트</SelectItem>
+                <SelectItem value="">{t('notices.all')}</SelectItem>
+                <SelectItem value="general">{t('notices.general')}</SelectItem>
+                <SelectItem value="important">{t('notices.important')}</SelectItem>
+                <SelectItem value="event">{t('notices.event')}</SelectItem>
+                <SelectItem value="maintenance">{t('notices.maintenance')}</SelectItem>
+                <SelectItem value="update">{t('notices.update')}</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleSearch}>
               <Search className="w-4 h-4 mr-2" />
-              검색
+              {t('notices.search')}
             </Button>
           </div>
         </CardContent>
@@ -186,7 +188,7 @@ export default function NoticesPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <p className="mt-4 text-gray-600">{t('notices.loading')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -195,7 +197,7 @@ export default function NoticesPage() {
             <div>
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Pin className="w-5 h-5 text-red-500" />
-                고정 공지사항
+                {t('notices.pinned')}
               </h2>
               <div className="space-y-3">
                 {pinnedNotices.map((notice) => (
@@ -208,11 +210,11 @@ export default function NoticesPage() {
           {/* 일반 공지사항 */}
           <div>
             {pinnedNotices.length > 0 && (
-              <h2 className="text-xl font-bold mb-4">전체 공지사항</h2>
+              <h2 className="text-xl font-bold mb-4">{t('notices.allNotices')}</h2>
             )}
             {notices.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                공지사항이 없습니다
+                {t('notices.noNotices')}
               </div>
             ) : (
               <div className="space-y-3">
@@ -231,7 +233,7 @@ export default function NoticesPage() {
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
-                이전
+                {t('notices.previous')}
               </Button>
               <span className="py-2 px-4 bg-gray-100 rounded">
                 {page} / {Math.ceil(total / 10)}
@@ -241,7 +243,7 @@ export default function NoticesPage() {
                 onClick={() => setPage(p => p + 1)}
                 disabled={page >= Math.ceil(total / 10)}
               >
-                다음
+                {t('notices.next')}
               </Button>
             </div>
           )}

@@ -25,6 +25,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface VideoContent {
   id: string;
@@ -55,6 +56,7 @@ const categories = [
 ];
 
 export default function VideoContentPage() {
+  const { t } = useLanguage();
   const [contents, setContents] = useState<VideoContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -128,7 +130,7 @@ export default function VideoContentPage() {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-text-secondary">동영상 콘텐츠를 불러오는 중...</p>
+              <p className="text-text-secondary">{t('content.video.loading')}</p>
             </div>
           </div>
         </div>
@@ -145,7 +147,7 @@ export default function VideoContentPage() {
             <Link href="/content">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                콘텐츠 홈
+                {t('content.video.backToContent')}
               </Button>
             </Link>
           </div>
@@ -155,9 +157,9 @@ export default function VideoContentPage() {
               <Play className="h-8 w-8 text-red-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-text-primary">동영상 콘텐츠</h1>
+              <h1 className="text-3xl font-bold text-text-primary">{t('content.video.title')}</h1>
               <p className="text-text-secondary mt-1">
-                제품 리뷰, 사용법 가이드, 브랜드 스토리 등 다양한 동영상 콘텐츠를 만나보세요
+                {t('content.video.subtitle')}
               </p>
             </div>
           </div>
@@ -168,7 +170,7 @@ export default function VideoContentPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
                 <Input
-                  placeholder="동영상 검색..."
+                  placeholder={t('content.video.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -182,7 +184,7 @@ export default function VideoContentPage() {
             <div className="flex gap-2">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="카테고리" />
+                  <SelectValue placeholder={t('content.video.category')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(category => (
@@ -195,13 +197,13 @@ export default function VideoContentPage() {
 
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="정렬" />
+                  <SelectValue placeholder={t('content.video.sort')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">최신순</SelectItem>
-                  <SelectItem value="oldest">오래된순</SelectItem>
-                  <SelectItem value="views">조회수순</SelectItem>
-                  <SelectItem value="likes">좋아요순</SelectItem>
+                  <SelectItem value="newest">{t('content.video.newest')}</SelectItem>
+                  <SelectItem value="oldest">{t('content.video.oldest')}</SelectItem>
+                  <SelectItem value="views">{t('content.video.views')}</SelectItem>
+                  <SelectItem value="likes">{t('content.video.likes')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

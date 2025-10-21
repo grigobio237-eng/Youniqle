@@ -84,8 +84,10 @@ function CheckoutPageContent() {
 
   // 포인트 관련
   const [userPoints, setUserPoints] = useState(0);
+  const [userGrade, setUserGrade] = useState<string>('cedar');
   const [usePoints, setUsePoints] = useState(0);
   const [pointsError, setPointsError] = useState('');
+  const [expectedEarnPoints, setExpectedEarnPoints] = useState<number>(0);
 
   // 사용자 정보 로드
   useEffect(() => {
@@ -98,7 +100,7 @@ function CheckoutPageContent() {
     }
   }, [session]);
 
-  // 사용자 포인트 로드
+  // 사용자 포인트/등급 로드
   useEffect(() => {
     const fetchUserPoints = async () => {
       if (session?.user?.email) {
@@ -107,8 +109,10 @@ function CheckoutPageContent() {
             credentials: 'include',
           });
           if (response.ok) {
-            const userData = await response.json();
-            setUserPoints(userData.points || 0);
+            const data = await response.json();
+            const u = data.user || data;
+            setUserPoints(u.points || 0);
+            setUserGrade(u.grade || 'cedar');
           }
         } catch (error) {
           console.error('사용자 포인트 로드 오류:', error);
@@ -118,6 +122,22 @@ function CheckoutPageContent() {
 
     fetchUserPoints();
   }, [session]);
+
+  // 예상 적립 포인트 계산 (등급별 적립률, 배송비/포인트/쿠폰 제외 금액 기준)
+  useEffect(() => {
+    if (!cart) return;
+    const earnRateMap: Record<string, number> = {
+      cedar: 0.01,
+      rooter: 0.015,
+      bloomer: 0.02,
+      glower: 0.025,
+      ecosoul: 0.03,
+    };
+    const rate = earnRateMap[userGrade] ?? earnRateMap.cedar;
+    const baseAmount = Math.max(0, cart.totalAmount - (couponDiscount || 0) - (usePoints || 0));
+    const expected = Math.floor(baseAmount * rate);
+    setExpectedEarnPoints(expected);
+  }, [cart, couponDiscount, usePoints, userGrade]);
 
   // 장바구니 데이터 로드
   useEffect(() => {
@@ -291,9 +311,15 @@ function CheckoutPageContent() {
       const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
       const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
       const maxUsable = Math.floor(subtotalAfterCoupon * 0.5); // 최대 50% 사용 가능
+      const MIN_UNIT = 10; // 최소 사용 단위
       
       if (value > maxUsable) {
         setPointsError(`포인트는 주문 금액의 50%까지만 사용 가능합니다. (최대 ${maxUsable}P)`);
+        return;
+      }
+
+      if (value > 0 && value % MIN_UNIT !== 0) {
+        setPointsError(`포인트는 ${MIN_UNIT}P 단위로만 사용할 수 있습니다.`);
         return;
       }
     }
@@ -857,6 +883,10 @@ function CheckoutPageContent() {
                   <span className={couponDiscount > 0 || usePoints > 0 ? 'text-green-600' : ''}>
                     {totalAmount.toLocaleString()}원
                   </span>
+                </div>
+                <div className="flex justify-between text-sm text-yellow-700">
+                  <span>예상 적립</span>
+                  <span>{expectedEarnPoints.toLocaleString()}P (등급: {userGrade})</span>
                 </div>
                 {(couponDiscount > 0 || usePoints > 0) && (
                   <p className="text-sm text-green-600 text-center">

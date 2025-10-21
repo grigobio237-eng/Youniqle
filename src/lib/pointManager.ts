@@ -53,7 +53,7 @@ export async function earnPoints(
     user.points = newBalance;
     await user.save();
 
-    // 포인트 거래 내역 기록
+    // 포인트 거래 내역 기록 (earned)
     await PointTransaction.create({
       userId: user._id,
       type: 'earned',
@@ -70,6 +70,124 @@ export async function earnPoints(
   } catch (error) {
     console.error('포인트 적립 오류:', error);
     return { success: false, earnedPoints: 0, newBalance: 0, error: '포인트 적립 중 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * 고정 포인트 지급 (구매 금액과 무관한 이벤트성 지급: 리뷰, 이벤트 등)
+ */
+export async function grantFixedPoints(
+  userId: string | mongoose.Types.ObjectId,
+  fixedPoints: number,
+  description: string
+): Promise<{ success: boolean; grantedPoints: number; newBalance: number; error?: string }> {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, grantedPoints: 0, newBalance: 0, error: '사용자를 찾을 수 없습니다.' };
+    }
+
+    if (fixedPoints <= 0) {
+      return { success: true, grantedPoints: 0, newBalance: user.points };
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + POINT_EXPIRY_DAYS);
+
+    const newBalance = user.points + fixedPoints;
+    user.points = newBalance;
+    await user.save();
+
+    await PointTransaction.create({
+      userId: user._id,
+      type: 'earned',
+      amount: fixedPoints,
+      description,
+      balance: newBalance,
+      expiresAt
+    });
+
+    return { success: true, grantedPoints: fixedPoints, newBalance };
+  } catch (error) {
+    console.error('고정 포인트 지급 오류:', error);
+    return { success: false, grantedPoints: 0, newBalance: 0, error: '포인트 지급 중 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * 관리자 지급 (admin_grant)
+ */
+export async function adminGrantPoints(
+  userId: string | mongoose.Types.ObjectId,
+  fixedPoints: number,
+  description: string
+): Promise<{ success: boolean; grantedPoints: number; newBalance: number; error?: string }> {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, grantedPoints: 0, newBalance: 0, error: '사용자를 찾을 수 없습니다.' };
+    }
+    if (fixedPoints <= 0) {
+      return { success: false, grantedPoints: 0, newBalance: user.points, error: '지급 포인트는 0보다 커야 합니다.' };
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + POINT_EXPIRY_DAYS);
+
+    user.points += fixedPoints;
+    await user.save();
+
+    await PointTransaction.create({
+      userId: user._id,
+      type: 'admin_grant',
+      amount: fixedPoints,
+      description,
+      balance: user.points,
+      expiresAt
+    });
+
+    return { success: true, grantedPoints: fixedPoints, newBalance: user.points };
+  } catch (error) {
+    console.error('관리자 포인트 지급 오류:', error);
+    return { success: false, grantedPoints: 0, newBalance: 0, error: '관리자 포인트 지급 중 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * 관리자 차감 (admin_deduct)
+ */
+export async function adminDeductPoints(
+  userId: string | mongoose.Types.ObjectId,
+  fixedPoints: number,
+  description: string
+): Promise<{ success: boolean; deductedPoints: number; newBalance: number; error?: string }> {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, deductedPoints: 0, newBalance: 0, error: '사용자를 찾을 수 없습니다.' };
+    }
+    if (fixedPoints <= 0) {
+      return { success: false, deductedPoints: 0, newBalance: user.points, error: '차감 포인트는 0보다 커야 합니다.' };
+    }
+    if (user.points < fixedPoints) {
+      return { success: false, deductedPoints: 0, newBalance: user.points, error: '보유 포인트가 부족합니다.' };
+    }
+
+    user.points -= fixedPoints;
+    await user.save();
+
+    await PointTransaction.create({
+      userId: user._id,
+      type: 'admin_deduct',
+      amount: -fixedPoints,
+      description,
+      balance: user.points
+    });
+
+    return { success: true, deductedPoints: fixedPoints, newBalance: user.points };
+  } catch (error) {
+    console.error('관리자 포인트 차감 오류:', error);
+    return { success: false, deductedPoints: 0, newBalance: 0, error: '관리자 포인트 차감 중 오류가 발생했습니다.' };
   }
 }
 
@@ -132,6 +250,8 @@ export async function validatePointUsage(
 
     // 최대 사용 가능 포인트 (주문 금액의 50%)
     const maxUsable = Math.floor(orderAmount * 0.5);
+    // 최소 사용 단위 (예: 10P)
+    const MIN_UNIT = 10;
     
     if (amount > user.points) {
       return { isValid: false, error: '포인트가 부족합니다.', maxUsable: Math.min(user.points, maxUsable) };
@@ -143,6 +263,10 @@ export async function validatePointUsage(
 
     if (amount < 0) {
       return { isValid: false, error: '사용할 포인트는 0 이상이어야 합니다.' };
+    }
+
+    if (amount > 0 && amount % MIN_UNIT !== 0) {
+      return { isValid: false, error: `포인트는 ${MIN_UNIT}P 단위로만 사용할 수 있습니다.` };
     }
 
     return { isValid: true, maxUsable };

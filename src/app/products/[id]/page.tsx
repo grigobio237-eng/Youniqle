@@ -15,6 +15,7 @@ import CategorySpecificInfo from '@/components/products/CategorySpecificInfo';
 import QuestionSection from '@/components/qa/QuestionSection';
 import SocialSharing from '@/components/products/SocialSharing';
 import { addToRecentlyViewed } from '@/components/products/RecentlyViewed';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Heart, 
   ShoppingCart, 
@@ -54,6 +55,7 @@ interface Product {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -125,7 +127,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleAddToCart = async () => {
     if (!session?.user) {
-      alert('로그인이 필요합니다.');
+      alert(t('auth.loginRequired'));
       return;
     }
 
@@ -143,16 +145,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       });
 
       if (response.ok) {
-        alert(`${product?.name} ${quantity}개가 장바구니에 추가되었습니다!`);
+        alert(t('cart.addSuccess', { name: product?.name, count: quantity }));
         // 헤더 장바구니 개수 업데이트
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const errorData = await response.json();
-        alert(`장바구니 추가 실패: ${errorData.error}`);
+        alert(t('cart.addFailed', { error: errorData.error }));
       }
     } catch (error) {
       console.error('장바구니 추가 중 오류:', error);
-      alert('장바구니 추가 중 오류가 발생했습니다.');
+      alert(t('cart.addError'));
     } finally {
       setAddingToCart(false);
     }
@@ -160,7 +162,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleToggleWishlist = async () => {
     if (!session?.user) {
-      alert('로그인이 필요합니다.');
+      alert(t('auth.loginRequired'));
       return;
     }
 
@@ -179,14 +181,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
       if (response.ok) {
         setIsInWishlist(!isInWishlist);
-        alert(isInWishlist ? '위시리스트에서 제거되었습니다.' : '위시리스트에 추가되었습니다!');
+        alert(isInWishlist ? t('cart.wishlistRemoveSuccess') : t('cart.wishlistAddSuccess'));
       } else {
         const errorData = await response.json();
-        alert(`위시리스트 처리 실패: ${errorData.error}`);
+        alert(t('cart.wishlistFailed', { error: errorData.error }));
       }
     } catch (error) {
       console.error('위시리스트 처리 중 오류:', error);
-      alert('위시리스트 처리 중 오류가 발생했습니다.');
+      alert(t('cart.wishlistError'));
     } finally {
       setAddingToWishlist(false);
     }
@@ -226,7 +228,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">{t('productDetail.loading')}</p>
+        </div>
       </div>
     );
   }
@@ -236,12 +241,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">상품을 찾을 수 없습니다</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('productDetail.notFound')}</h2>
             <p className="text-gray-600 mb-6">
               요청하신 상품이 존재하지 않거나 삭제되었습니다.
             </p>
               <Button asChild>
-                <Link href="/products">상품 목록으로 돌아가기</Link>
+                <Link href="/products">{t('productDetail.backToList')}</Link>
               </Button>
           </CardContent>
         </Card>
@@ -351,10 +356,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <div className="flex items-center space-x-2 mb-2">
                 <Badge variant="secondary">{product.category}</Badge>
                 {product.featured && (
-                  <Badge className="bg-yellow-100 text-yellow-800">인기</Badge>
+                  <Badge className="bg-yellow-100 text-yellow-800">{t('products.popular')}</Badge>
                 )}
                 {discountRate > 0 && (
-                  <Badge className="bg-red-100 text-red-800">{discountRate}% 할인</Badge>
+                  <Badge className="bg-red-100 text-red-800">{t('productDetail.discount', { percent: discountRate })}</Badge>
                 )}
               </div>
               
@@ -376,19 +381,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 재고 상태 */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">재고:</span>
+              <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
               <span className={`font-medium ${
                 product.stock > 10 ? 'text-green-600' :
                 product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
               }`}>
-                {product.stock > 0 ? `${product.stock}개 남음` : '품절'}
+                {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
               </span>
             </div>
 
             {/* 수량 선택 */}
             {product.stock > 0 && (
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-700">수량:</span>
+                <span className="text-sm font-medium text-gray-700">{t('productDetail.quantity')}:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <Button
                     variant="ghost"
@@ -416,7 +421,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* 총 가격 */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">총 상품금액</span>
+                <span className="text-lg font-medium text-gray-700">{t('productDetail.totalPrice')}</span>
                 <span className="text-2xl font-bold text-blue-600">
                   {formatPrice(product.price * quantity)}원
                 </span>
@@ -458,7 +463,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 disabled={product.stock === 0}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
               >
-                {product.stock === 0 ? '품절' : '바로 구매하기'}
+                {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.buyNow')}
               </Button>
               
               {/* 보조 버튼들 */}
@@ -470,7 +475,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="flex-1"
                 >
                   <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
-                  {isInWishlist ? '위시리스트 제거' : '위시리스트'}
+                  {isInWishlist ? t('productDetail.removeFromWishlist') : t('productDetail.addToWishlist')}
                 </Button>
                 
                 <Button
@@ -479,7 +484,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="flex-1"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.stock === 0 ? '품절' : '장바구니 담기'}
+                  {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.addToCart')}
                 </Button>
               </div>
             </div>

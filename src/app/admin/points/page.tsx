@@ -23,6 +23,7 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 interface PointStats {
   totalUsers: number;
@@ -433,56 +434,7 @@ export default function AdminPointManagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    포인트 관리 기능은 별도 API 구현이 필요합니다. 현재는 UI만 제공됩니다.
-                  </AlertDescription>
-                </Alert>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">포인트 지급</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="userId">사용자 ID</Label>
-                        <Input id="userId" placeholder="사용자 ID 또는 이메일" />
-                      </div>
-                      <div>
-                        <Label htmlFor="points">지급 포인트</Label>
-                        <Input id="points" type="number" placeholder="지급할 포인트" />
-                      </div>
-                      <div>
-                        <Label htmlFor="reason">사유</Label>
-                        <Input id="reason" placeholder="지급 사유" />
-                      </div>
-                      <Button className="w-full">
-                        포인트 지급
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">포인트 차감</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="userId2">사용자 ID</Label>
-                        <Input id="userId2" placeholder="사용자 ID 또는 이메일" />
-                      </div>
-                      <div>
-                        <Label htmlFor="points2">차감 포인트</Label>
-                        <Input id="points2" type="number" placeholder="차감할 포인트" />
-                      </div>
-                      <div>
-                        <Label htmlFor="reason2">사유</Label>
-                        <Input id="reason2" placeholder="차감 사유" />
-                      </div>
-                      <Button variant="destructive" className="w-full">
-                        포인트 차감
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <PointAdjustForm />
               </CardContent>
             </Card>
           </TabsContent>
@@ -551,6 +503,72 @@ export default function AdminPointManagementPage() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
+    </div>
+  );
+}
+
+function PointAdjustForm() {
+  const { addToast } = useToast();
+  const [userId, setUserId] = useState('');
+  const [amount, setAmount] = useState<number | ''>('');
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState<'grant' | 'deduct' | null>(null);
+
+  const submit = async (action: 'grant' | 'deduct') => {
+    if (!userId || !amount || Number(amount) <= 0) {
+      addToast({ title: '유효하지 않은 입력', description: '사용자와 금액을 확인하세요.', variant: 'error' });
+      return;
+    }
+    try {
+      setLoading(action);
+      const res = await fetch('/api/admin/points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId, action, amount: Number(amount), description: reason })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        addToast({ title: '실패', description: data.error || '처리에 실패했습니다.', variant: 'error' });
+        return;
+      }
+      addToast({ title: '완료', description: `새 잔액: ${data.newBalance?.toLocaleString?.() ?? data.newBalance}P`, variant: 'success' });
+      setReason('');
+      setAmount('');
+    } catch (e) {
+      addToast({ title: '오류', description: '요청 중 문제가 발생했습니다.', variant: 'error' });
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">포인트 지급</h3>
+        <Label htmlFor="userId">사용자 ID</Label>
+        <Input id="userId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="사용자 ObjectId" />
+        <Label htmlFor="grantAmount">지급 포인트</Label>
+        <Input id="grantAmount" type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value) || '')} placeholder="지급할 포인트" />
+        <Label htmlFor="grantReason">사유</Label>
+        <Input id="grantReason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="지급 사유" />
+        <Button className="w-full" disabled={loading !== null} onClick={() => submit('grant')}>
+          {loading === 'grant' ? '처리 중...' : '포인트 지급'}
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">포인트 차감</h3>
+        <Label htmlFor="deductUserId">사용자 ID</Label>
+        <Input id="deductUserId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="사용자 ObjectId" />
+        <Label htmlFor="deductAmount">차감 포인트</Label>
+        <Input id="deductAmount" type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value) || '')} placeholder="차감할 포인트" />
+        <Label htmlFor="deductReason">사유</Label>
+        <Input id="deductReason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="차감 사유" />
+        <Button variant="destructive" className="w-full" disabled={loading !== null} onClick={() => submit('deduct')}>
+          {loading === 'deduct' ? '처리 중...' : '포인트 차갑'}
+        </Button>
       </div>
     </div>
   );

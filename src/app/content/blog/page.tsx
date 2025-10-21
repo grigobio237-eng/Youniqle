@@ -26,6 +26,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlogContent {
   id: string;
@@ -57,6 +58,7 @@ const categories = [
 ];
 
 export default function BlogContentPage() {
+  const { t } = useLanguage();
   const [contents, setContents] = useState<BlogContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -107,7 +109,7 @@ export default function BlogContentPage() {
   };
 
   const formatReadTime = (readTime: number) => {
-    return `${readTime}분 읽기`;
+    return t('content.blog.readTime', { minutes: readTime });
   };
 
   if (loading) {
@@ -117,7 +119,7 @@ export default function BlogContentPage() {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-text-secondary">블로그 콘텐츠를 불러오는 중...</p>
+              <p className="text-text-secondary">{t('content.blog.loading')}</p>
             </div>
           </div>
         </div>
@@ -134,7 +136,7 @@ export default function BlogContentPage() {
             <Link href="/content">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                콘텐츠 홈
+                {t('content.blog.backToContent')}
               </Button>
             </Link>
           </div>
@@ -144,9 +146,9 @@ export default function BlogContentPage() {
               <FileText className="h-8 w-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-text-primary">블로그 콘텐츠</h1>
+              <h1 className="text-3xl font-bold text-text-primary">{t('content.blog.title')}</h1>
               <p className="text-text-secondary mt-1">
-                상세한 제품 정보, 사용 후기, 브랜드 뉴스 등 다양한 블로그 콘텐츠를 만나보세요
+                {t('content.blog.subtitle')}
               </p>
             </div>
           </div>
@@ -157,7 +159,7 @@ export default function BlogContentPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary h-4 w-4" />
                 <Input
-                  placeholder="블로그 검색..."
+                  placeholder={t('content.blog.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -171,7 +173,7 @@ export default function BlogContentPage() {
             <div className="flex gap-2">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="카테고리" />
+                  <SelectValue placeholder={t('content.blog.category')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(category => (
@@ -184,13 +186,13 @@ export default function BlogContentPage() {
 
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="정렬" />
+                  <SelectValue placeholder={t('content.blog.sort')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">최신순</SelectItem>
-                  <SelectItem value="oldest">오래된순</SelectItem>
-                  <SelectItem value="views">조회수순</SelectItem>
-                  <SelectItem value="likes">좋아요순</SelectItem>
+                  <SelectItem value="newest">{t('content.blog.newest')}</SelectItem>
+                  <SelectItem value="oldest">{t('content.blog.oldest')}</SelectItem>
+                  <SelectItem value="views">{t('content.blog.views')}</SelectItem>
+                  <SelectItem value="likes">{t('content.blog.likes')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -205,15 +207,15 @@ export default function BlogContentPage() {
             <CardContent className="p-12 text-center">
               <FileText className="h-12 w-12 text-text-secondary mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-text-primary mb-2">
-                블로그 콘텐츠가 없습니다
+                {t('content.blog.noContent')}
               </h3>
               <p className="text-text-secondary mb-4">
-                아직 등록된 블로그 콘텐츠가 없습니다
+                {t('content.blog.noContentDesc')}
               </p>
               <Button asChild>
                 <Link href="/content">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  콘텐츠 홈으로 돌아가기
+                  {t('content.blog.backToContent')}
                 </Link>
               </Button>
             </CardContent>
@@ -233,7 +235,7 @@ export default function BlogContentPage() {
                     />
                     {content.featured && (
                       <Badge className="absolute top-4 right-4 bg-yellow-500 text-white">
-                        추천
+                        {t('content.blog.featured')}
                       </Badge>
                     )}
                   </div>

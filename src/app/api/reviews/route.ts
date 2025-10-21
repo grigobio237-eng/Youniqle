@@ -148,6 +148,16 @@ export async function POST(request: NextRequest) {
       .populate('userId', 'name avatar')
       .populate('replies.userId', 'name avatar role');
 
+    // 포인트 지급 (텍스트 50P, 이미지 포함 100P). 지급 실패해도 리뷰는 성공 처리
+    try {
+      const { grantFixedPoints } = await import('@/lib/pointManager');
+      const hasImages = Array.isArray(images) && images.length > 0;
+      const points = hasImages ? 100 : 50;
+      await grantFixedPoints(user._id, points, hasImages ? '포토 리뷰 적립' : '리뷰 작성 적립');
+    } catch (earnError) {
+      console.error('리뷰 포인트 지급 실패:', earnError);
+    }
+
     return NextResponse.json({ 
       message: '리뷰가 작성되었습니다. 관리자 승인 후 게시됩니다.',
       review: savedReview 

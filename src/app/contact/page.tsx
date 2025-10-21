@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageCircle, Mail, User, FileText, CheckCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     userName: '',
     userEmail: '',
@@ -23,7 +25,7 @@ export default function ContactPage() {
     e.preventDefault();
     
     if (!formData.userName || !formData.userEmail || !formData.type || !formData.subject || !formData.content) {
-      setSubmitMessage('모든 필드를 입력해주세요.');
+      setSubmitMessage(t('contact.fillAllFields'));
       return;
     }
 
@@ -74,7 +76,7 @@ export default function ContactPage() {
           console.error('n8n 워크플로우 트리거 실패:', error);
         }
 
-        setSubmitMessage('문의가 성공적으로 접수되었습니다! 빠른 시일 내에 답변드리겠습니다.');
+        setSubmitMessage(t('contact.submitSuccess'));
         setFormData({
           userName: '',
           userEmail: '',
@@ -83,11 +85,11 @@ export default function ContactPage() {
           content: ''
         });
       } else {
-        setSubmitMessage(`문의 접수 실패: ${data.error}`);
+        setSubmitMessage(t('contact.submitFailed', { error: data.error }));
       }
     } catch (error) {
       console.error('문의 접수 오류:', error);
-      setSubmitMessage('문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setSubmitMessage(t('contact.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -104,9 +106,9 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">문의하기</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('contact.title')}</h1>
           <p className="text-gray-600">
-            궁금한 점이 있으시면 언제든지 문의해주세요. 빠른 시일 내에 답변드리겠습니다.
+            {t('contact.subtitle')}
           </p>
         </div>
 
@@ -114,10 +116,10 @@ export default function ContactPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
-              문의 양식
+              {t('contact.formTitle')}
             </CardTitle>
             <CardDescription>
-              아래 양식을 작성하여 문의사항을 보내주세요.
+              {t('contact.formDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -126,28 +128,28 @@ export default function ContactPage() {
                 <div>
                   <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
                     <User className="h-4 w-4 inline mr-1" />
-                    이름 *
+                    {t('contact.name')} *
                   </label>
                   <Input
                     id="userName"
                     type="text"
                     value={formData.userName}
                     onChange={(e) => handleInputChange('userName', e.target.value)}
-                    placeholder="이름을 입력해주세요"
+                    placeholder={t('contact.namePlaceholder')}
                     required
                   />
                 </div>
                 <div>
                   <label htmlFor="userEmail" className="block text-sm font-medium text-gray-700 mb-2">
                     <Mail className="h-4 w-4 inline mr-1" />
-                    이메일 *
+                    {t('contact.email')} *
                   </label>
                   <Input
                     id="userEmail"
                     type="email"
                     value={formData.userEmail}
                     onChange={(e) => handleInputChange('userEmail', e.target.value)}
-                    placeholder="이메일을 입력해주세요"
+                    placeholder={t('contact.emailPlaceholder')}
                     required
                   />
                 </div>
@@ -155,20 +157,20 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                  문의 유형 *
+                  {t('contact.type')} *
                 </label>
                 <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="문의 유형을 선택해주세요" />
+                    <SelectValue placeholder={t('contact.typePlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">일반 문의</SelectItem>
-                    <SelectItem value="delivery">배송 문의</SelectItem>
-                    <SelectItem value="payment">결제 문의</SelectItem>
-                    <SelectItem value="product">상품 문의</SelectItem>
-                    <SelectItem value="technical">기술 문의</SelectItem>
-                    <SelectItem value="refund">환불 문의</SelectItem>
-                    <SelectItem value="partnership">파트너십 문의</SelectItem>
+                    <SelectItem value="general">{t('contact.general')}</SelectItem>
+                    <SelectItem value="delivery">{t('contact.delivery')}</SelectItem>
+                    <SelectItem value="payment">{t('contact.payment')}</SelectItem>
+                    <SelectItem value="product">{t('contact.product')}</SelectItem>
+                    <SelectItem value="technical">{t('contact.technical')}</SelectItem>
+                    <SelectItem value="refund">{t('contact.refund')}</SelectItem>
+                    <SelectItem value="partnership">{t('contact.partnership')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -176,27 +178,27 @@ export default function ContactPage() {
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
                   <FileText className="h-4 w-4 inline mr-1" />
-                  제목 *
+                  {t('contact.subject')} *
                 </label>
                 <Input
                   id="subject"
                   type="text"
                   value={formData.subject}
                   onChange={(e) => handleInputChange('subject', e.target.value)}
-                  placeholder="문의 제목을 입력해주세요"
+                  placeholder={t('contact.subjectPlaceholder')}
                   required
                 />
               </div>
 
               <div>
                 <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                  문의 내용 *
+                  {t('contact.content')} *
                 </label>
                 <Textarea
                   id="content"
                   value={formData.content}
                   onChange={(e) => handleInputChange('content', e.target.value)}
-                  placeholder="문의 내용을 자세히 입력해주세요"
+                  placeholder={t('contact.contentPlaceholder')}
                   rows={6}
                   required
                 />
@@ -224,15 +226,15 @@ export default function ContactPage() {
                 className="w-full" 
                 disabled={isSubmitting}
               >
-                {isSubmitting ? '문의 접수 중...' : '문의 접수하기'}
+                {isSubmitting ? t('contact.submitting') : t('contact.submit')}
               </Button>
             </form>
           </CardContent>
         </Card>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>문의 접수 후 24시간 이내에 답변드리겠습니다.</p>
-          <p>긴급한 문의사항은 고객센터로 연락해주세요.</p>
+          <p>{t('contact.responseTime')}</p>
+          <p>{t('contact.urgentContact')}</p>
         </div>
       </div>
     </div>

@@ -283,7 +283,14 @@
     "deleteSuccess": "商品已删除",
     "deleteFailed": "删除商品失败",
     "loading": "正在加载购物车...",
-    "removeConfirm": "确定要从购物车中删除此商品吗？"
+    "removeConfirm": "确定要从购物车中删除此商品吗？",
+    "addSuccess": "{name} {count} 件已加入购物车！",
+    "addFailed": "加入购物车失败：{error}",
+    "addError": "加入购物车时发生错误。",
+    "wishlistAddSuccess": "已加入愿望清单！",
+    "wishlistRemoveSuccess": "已从愿望清单中删除。",
+    "wishlistFailed": "愿望清单操作失败：{error}",
+    "wishlistError": "处理愿望清单时发生错误。"
   },
   "checkout": {
     "title": "订单结算",

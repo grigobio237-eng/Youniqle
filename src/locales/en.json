@@ -283,7 +283,14 @@
     "deleteSuccess": "Item removed from cart",
     "deleteFailed": "Failed to remove item",
     "loading": "Loading cart...",
-    "removeConfirm": "Remove this item from cart?"
+    "removeConfirm": "Remove this item from cart?",
+    "addSuccess": "{name} {count} items added to cart!",
+    "addFailed": "Failed to add to cart: {error}",
+    "addError": "An error occurred while adding to cart.",
+    "wishlistAddSuccess": "Added to wishlist!",
+    "wishlistRemoveSuccess": "Removed from wishlist.",
+    "wishlistFailed": "Wishlist operation failed: {error}",
+    "wishlistError": "An error occurred while processing wishlist."
   },
   "checkout": {
     "title": "Checkout",

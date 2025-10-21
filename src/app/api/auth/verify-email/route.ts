@@ -41,12 +41,31 @@ export async function GET(request: NextRequest) {
 
     // 이메일 인증 완료
     user.emailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
+    user.emailVerificationToken = undefined as any;
+    user.emailVerificationExpires = undefined as any;
+    // 추천 코드가 없으면 생성
+    if (!user.referralCode) {
+      const base = user._id.toString().slice(-6).toUpperCase();
+      user.referralCode = `RF${base}`;
+    }
     await user.save();
 
     // 환영 이메일 발송
     await sendWelcomeEmail(user.email, user.name);
+
+    // 추천 보상 지급 (referredBy가 설정되어 있으면 추천인/피추천인 모두 보상)
+    try {
+      if (user.referredBy) {
+        const referrer = await User.findOne({ referralCode: user.referredBy });
+        if (referrer) {
+          const { adminGrantPoints } = await import('@/lib/pointManager');
+          await adminGrantPoints(referrer._id, 1000, '친구 추천 보상');
+          await adminGrantPoints(user._id, 1000, '친구 추천 보상(피추천)');
+        }
+      }
+    } catch (e) {
+      console.error('추천 보상 처리 실패:', e);
+    }
 
     return NextResponse.json(
       { 

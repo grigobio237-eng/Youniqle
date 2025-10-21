@@ -103,6 +103,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 보강: 추천 코드가 없으면 생성
+    if (!user.referralCode) {
+      const base = user._id.toString().slice(-6).toUpperCase();
+      user.referralCode = `RF${base}`;
+      await user.save();
+    }
+
     // Generate JWT token
     const token = generateToken({
       userId: user._id.toString(),
