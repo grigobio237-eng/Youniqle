@@ -477,6 +477,21 @@
     "short": "Youniqle is an online shopping mall that offers premium brands and high-quality products at reasonable prices. We provide a new shopping experience through customer-centered values and transparent transactions.",
     "browseProducts": "Browse Products",
     "partnerInquiry": "Partnership Inquiry",
+    "brandStory": "Brand Story",
+    "ourStory": "Our Story",
+    "ourStoryDesc": "Introducing the values and vision that Youniqle pursues",
+    "brandSloganSection": "Brand Slogan",
+    "ourMessage": "Our Message",
+    "slogans": [
+      "Better things, more correctly, Youniqle.",
+      "Premium, now in the realm of reason.",
+      "Choose lightly, trust firmly."
+    ],
+    "storyParagraphs": [
+      "Youniqle is a curation commerce that connects premium to 'affordable prices'. We provide honest information through direct collaboration with partners, data-based demand forecasting, and standardized quality inspection.",
+      "We consider customer time and trust as our greatest assets. It is Youniqle's basic principle to transparently guide price, origin, composition, and A/S scope, and to help quickly even after purchase.",
+      "Benefits are simple, payment is safe. We increase rationality with membership grades and points, and payment is safely processed with Nicepay. Operating company: Sapienet Co., Ltd."
+    ],
     "customerValues": "Customer-Centered Values",
     "coreValues": "Youniqle's Core Values",
     "transparency": "Transparency",

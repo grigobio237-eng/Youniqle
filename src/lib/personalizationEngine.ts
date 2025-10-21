@@ -747,13 +747,7 @@ export class PersonalizationEngine {
   // 기본 추천 (익명 사용자용)
   private static generateDefaultRecommendations(itemType: string, limit: number): any {
     return {
-      recommendations: Array.from({ length: limit }, (_, i) => ({
-        itemId: `default_${i + 1}`,
-        itemType,
-        score: 0.7 - (i * 0.05),
-        reason: '인기 상품',
-        algorithm: 'popular'
-      })),
+      recommendations: [], // 실제 상품이 없으면 빈 배열 반환
       content: {
         layout: 'grid',
         theme: 'light',
@@ -972,35 +966,22 @@ export class PersonalizationEngine {
 
   // 더미 데이터 메서드들 (실제로는 데이터베이스에서 조회)
   private static async getProductsByCategory(category: string): Promise<any[]> {
-    // 실제로는 상품 데이터베이스에서 조회
-    return [
-      { id: `product_${category}_1`, name: `${category} 상품 1` },
-      { id: `product_${category}_2`, name: `${category} 상품 2` },
-      { id: `product_${category}_3`, name: `${category} 상품 3` }
-    ];
+    // 실제 상품이 없으면 빈 배열 반환
+    return [];
   }
 
   private static async getProductsByBrand(brand: string): Promise<any[]> {
-    // 실제로는 상품 데이터베이스에서 조회
-    return [
-      { id: `product_${brand}_1`, name: `${brand} 상품 1` },
-      { id: `product_${brand}_2`, name: `${brand} 상품 2` }
-    ];
+    // 실제 상품이 없으면 빈 배열 반환
+    return [];
   }
 
   private static async getPopularProducts(limit: number): Promise<any[]> {
-    // 실제로는 상품 데이터베이스에서 조회
-    return Array.from({ length: limit }, (_, i) => ({
-      id: `popular_product_${i + 1}`,
-      name: `인기 상품 ${i + 1}`
-    }));
+    // 실제 상품이 없으면 빈 배열 반환
+    return [];
   }
 
   private static async getTrendingProducts(limit: number): Promise<any[]> {
-    // 실제로는 상품 데이터베이스에서 조회
-    return Array.from({ length: limit }, (_, i) => ({
-      id: `trending_product_${i + 1}`,
-      name: `트렌딩 상품 ${i + 1}`
-    }));
+    // 실제 상품이 없으면 빈 배열 반환
+    return [];
   }
 }

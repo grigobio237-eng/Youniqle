@@ -456,46 +456,24 @@ export default function HomePage() {
             
             <RecommendationSection
               title={t('home.products.featured')}
+              itemType="product"
               algorithm="popular"
-              showAlgorithm={false}
+              limit={8}
+              showTitle={true}
+              showAlgorithm={true}
+              showRefresh={true}
             />
             
             <RecommendationSection
               title={t('home.products.new')}
+              itemType="product"
               algorithm="trending"
-              showAlgorithm={false}
+              limit={8}
+              showTitle={true}
+              showAlgorithm={true}
+              showRefresh={true}
             />
           </div>
-        </div>
-      </section>
-
-      {/* 인기 상품 섹션 */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <RecommendationSection
-            title={t('home.products.featured')}
-            itemType="product"
-            algorithm="popular"
-            limit={8}
-            showTitle={true}
-            showAlgorithm={true}
-            showRefresh={true}
-          />
-        </div>
-      </section>
-
-      {/* 트렌딩 상품 섹션 */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <RecommendationSection
-            title={t('home.products.new')}
-            itemType="product"
-            algorithm="trending"
-            limit={8}
-            showTitle={true}
-            showAlgorithm={true}
-            showRefresh={true}
-          />
         </div>
       </section>
     </div>

@@ -477,6 +477,21 @@
     "short": "Youniqle是一个在线购物商城，以合理的价格提供高端品牌和高质量产品。我们通过以客户为中心的价值观和透明的交易提供全新的购物体验。",
     "browseProducts": "浏览商品",
     "partnerInquiry": "合作伙伴咨询",
+    "brandStory": "品牌故事",
+    "ourStory": "我们的故事",
+    "ourStoryDesc": "介绍Youniqle追求的价值和愿景",
+    "brandSloganSection": "品牌口号",
+    "ourMessage": "我们的信息",
+    "slogans": [
+      "好东西，更正确，Youniqle。",
+      "高端，现在进入理性领域。",
+      "选择轻松，信任坚定。"
+    ],
+    "storyParagraphs": [
+      "Youniqle是一个将高端产品与'可承受价格'连接起来的策展电商。我们通过与合作伙伴的直接协作、基于数据的需求预测和标准化的质量检验来提供诚实的信息。",
+      "我们将客户的时间和信任视为最大的资产。透明地指导价格、原产地、构成和A/S范围，并在购买后快速提供帮助是Youniqle的基本原则。",
+      "福利简单，支付安全。我们通过会员等级和积分提高合理性，并通过Nicepay安全处理支付。运营公司：Sapienet有限公司。"
+    ],
     "customerValues": "以客户为中心的价值观",
     "coreValues": "Youniqle的核心价值观",
     "transparency": "透明度",

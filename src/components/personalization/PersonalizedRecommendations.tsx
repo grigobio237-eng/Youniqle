@@ -5,7 +5,7 @@ import { usePersonalization } from '@/hooks/usePersonalization';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, ThumbsUp, ThumbsDown, ShoppingCart, Eye } from 'lucide-react';
+import { RefreshCw, ThumbsUp, ThumbsDown, ShoppingCart, Eye, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PersonalizedRecommendationsProps {
@@ -47,6 +47,7 @@ export default function PersonalizedRecommendations({
       algorithms
     });
   }, [itemType, limit, algorithms, generateRecommendations]);
+
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -148,7 +149,8 @@ export default function PersonalizedRecommendations({
     );
   }
 
-  if (recommendations.length === 0) {
+  // 추천 상품이 없거나 로딩이 완료된 상태에서 빈 배열인 경우
+  if (!loading && recommendations.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -167,9 +169,15 @@ export default function PersonalizedRecommendations({
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">{t('recommendations.noPersonalizedRecommendations')}</p>
+            <div className="text-gray-400 mb-4">
+              <Sparkles className="h-16 w-16 mx-auto mb-4" />
+              <p className="text-lg font-medium">{t('recommendations.noPersonalizedRecommendations')}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                더 많은 상품을 둘러보시면 맞춤 추천을 받을 수 있습니다
+              </p>
+            </div>
             <Button onClick={handleRefresh} disabled={refreshing}>
-{t('recommendations.refresh')}
+              {t('recommendations.refresh')}
             </Button>
           </div>
         </CardContent>
