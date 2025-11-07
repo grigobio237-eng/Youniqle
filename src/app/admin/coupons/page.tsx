@@ -29,6 +29,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Coupon {
   _id: string;
@@ -168,12 +177,15 @@ export default function CouponDashboard() {
     }
   };
 
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
+
   const handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
-      alert('쿠폰 코드가 복사되었습니다.');
+      toast.success('쿠폰 코드가 복사되었습니다.');
     } catch (err) {
-      alert('복사에 실패했습니다.');
+      toast.error('복사에 실패했습니다.');
     }
   };
 
@@ -181,19 +193,26 @@ export default function CouponDashboard() {
     router.push(`/admin/coupons/${id}`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('이 쿠폰을 삭제하시겠습니까? 사용된 쿠폰은 삭제할 수 없습니다.')) return;
+  const handleDelete = (id: string) => {
+    setCouponToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!couponToDelete) return;
     try {
-      const res = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/coupons/${couponToDelete}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || '쿠폰 삭제에 실패했습니다.');
+        toast.error(data.error || '쿠폰 삭제에 실패했습니다.');
         return;
       }
-      alert('쿠폰이 삭제되었습니다.');
+      toast.success('쿠폰이 삭제되었습니다.');
+      setDeleteConfirmOpen(false);
+      setCouponToDelete(null);
       fetchCouponData();
     } catch (e) {
-      alert('쿠폰 삭제 중 오류가 발생했습니다.');
+      toast.error('쿠폰 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -507,6 +526,26 @@ export default function CouponDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>쿠폰 삭제 확인</DialogTitle>
+            <DialogDescription>
+              이 쿠폰을 삭제하시겠습니까? 사용된 쿠폰은 삭제할 수 없습니다. 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setDeleteConfirmOpen(false); setCouponToDelete(null); }}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

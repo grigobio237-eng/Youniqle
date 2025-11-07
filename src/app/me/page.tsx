@@ -57,6 +57,7 @@ export default function MyPage() {
       });
       fetchUserData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const fetchUserData = async () => {
@@ -613,6 +614,29 @@ export default function MyPage() {
                 </Button>
                 <Button variant="ghost" className="w-full justify-start" asChild>
                   <a href="/contact">문의하기</a>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Link href="/me/addresses">배송지 관리</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Link href="/me/refunds">환불 내역</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Link href="/me/points">포인트 내역</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Link href="/me/notifications">알림 설정</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <Link href="/me/payment-methods">결제 수단 관리</Link>
+                </Button>
+                <hr className="my-2" />
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-red-600 hover:text-red-700" 
+                  asChild
+                >
+                  <Link href="/me/delete-account">회원 탈퇴</Link>
                 </Button>
               </CardContent>
             </Card>

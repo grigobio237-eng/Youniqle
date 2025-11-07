@@ -14,6 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
 import { 
   FileText, 
   Search, 
@@ -38,14 +47,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -106,6 +107,7 @@ function PartnerContentPageContent() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<Content | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; contentId: string | null }>({ open: false, contentId: null });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -141,11 +143,14 @@ function PartnerContentPageContent() {
         const data = await response.json();
         setContents(data.contents || []);
       } else {
-        console.error('Failed to fetch contents');
+        const errorData = await response.json();
+        console.error('Failed to fetch contents:', errorData);
+        toast.error(errorData.error || '콘텐츠를 불러오는데 실패했습니다.');
         setContents([]);
       }
     } catch (error) {
       console.error('Failed to fetch contents:', error);
+      toast.error('콘텐츠를 불러오는 중 오류가 발생했습니다.');
       setContents([]);
     } finally {
       setLoading(false);
@@ -240,40 +245,42 @@ function PartnerContentPageContent() {
       if (response.ok) {
         setIsDialogOpen(false);
         fetchContents();
-        // 성공 메시지 표시
-        alert(editingContent ? '콘텐츠가 수정되었습니다.' : '콘텐츠가 등록되었습니다.');
+        toast.success(editingContent ? '콘텐츠가 수정되었습니다.' : '콘텐츠가 등록되었습니다.');
       } else {
         const error = await response.json();
-        alert(error.error || '콘텐츠 저장에 실패했습니다.');
+        toast.error(error.error || '콘텐츠 저장에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error saving content:', error);
-      alert('콘텐츠 저장 중 오류가 발생했습니다.');
+      toast.error('콘텐츠 저장 중 오류가 발생했습니다.');
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDeleteContent = async (contentId: string) => {
-    if (!confirm('정말로 이 콘텐츠를 삭제하시겠습니까?')) {
-      return;
-    }
+  const handleDeleteClick = (contentId: string) => {
+    setDeleteConfirmDialog({ open: true, contentId });
+  };
+
+  const handleDeleteContent = async () => {
+    if (!deleteConfirmDialog.contentId) return;
 
     try {
-      const response = await fetch(`/api/partner/content/${contentId}`, {
+      const response = await fetch(`/api/partner/content/${deleteConfirmDialog.contentId}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
         fetchContents();
-        alert('콘텐츠가 삭제되었습니다.');
+        toast.success('콘텐츠가 삭제되었습니다.');
+        setDeleteConfirmDialog({ open: false, contentId: null });
       } else {
         const error = await response.json();
-        alert(error.error || '콘텐츠 삭제에 실패했습니다.');
+        toast.error(error.error || '콘텐츠 삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error deleting content:', error);
-      alert('콘텐츠 삭제 중 오류가 발생했습니다.');
+      toast.error('콘텐츠 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -308,7 +315,7 @@ function PartnerContentPageContent() {
       }));
     } catch (error) {
       console.error('Error uploading images:', error);
-      alert('이미지 업로드 중 오류가 발생했습니다.');
+      toast.error('이미지 업로드 중 오류가 발생했습니다.');
     } finally {
       setUploading(false);
     }
@@ -566,7 +573,7 @@ function PartnerContentPageContent() {
                           수정
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleDeleteContent(content.id)}
+                          onClick={() => handleDeleteClick(content.id)}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />

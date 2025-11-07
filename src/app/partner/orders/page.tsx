@@ -20,6 +20,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { canTransitionTo, STATUS_INFO } from '@/lib/orderStatusRules';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface Order {
   _id: string;
@@ -46,6 +55,10 @@ interface Order {
     detail: string;
     zipCode: string;
   };
+  trackingNumber?: string;
+  courierCompany?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -88,6 +101,21 @@ export default function PartnerOrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('all');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isTrackingDialogOpen, setIsTrackingDialogOpen] = useState(false);
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  const [trackingInfo, setTrackingInfo] = useState({
+    trackingNumber: '',
+    courierCompany: '',
+  });
+  const [downloadFilters, setDownloadFilters] = useState({
+    format: 'csv' as 'csv' | 'json',
+    status: 'all',
+    paymentStatus: 'all',
+    startDate: '',
+    endDate: '',
+  });
 
   useEffect(() => {
     fetchOrders();
@@ -114,6 +142,20 @@ export default function PartnerOrdersPage() {
   };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    // 배송중 상태로 변경할 때는 송장 번호 입력 다이얼로그 열기
+    if (newStatus === 'shipped') {
+      const order = orders.find(o => o._id === orderId);
+      if (order) {
+        setSelectedOrder(order);
+        setTrackingInfo({
+          trackingNumber: order.trackingNumber || '',
+          courierCompany: order.courierCompany || '',
+        });
+        setIsTrackingDialogOpen(true);
+      }
+      return;
+    }
+
     try {
       const response = await fetch(`/api/partner/orders/${orderId}/status`, {
         method: 'PATCH',
@@ -134,6 +176,111 @@ export default function PartnerOrdersPage() {
     } catch (error) {
       console.error('주문 상태 업데이트 오류:', error);
       toast.error('주문 상태 업데이트 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleViewDetail = (order: Order) => {
+    setSelectedOrder(order);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleSaveTracking = async () => {
+    if (!selectedOrder) return;
+
+    if (!trackingInfo.trackingNumber || !trackingInfo.courierCompany) {
+      toast.error('송장 번호와 택배사를 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 송장 정보 저장과 함께 상태를 배송중으로 변경
+      const response = await fetch(`/api/partner/orders/${selectedOrder._id}/tracking`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(trackingInfo),
+      });
+
+      if (response.ok) {
+        toast.success('송장 정보가 저장되었고 주문 상태가 배송중으로 변경되었습니다.');
+        setIsTrackingDialogOpen(false);
+        setTrackingInfo({ trackingNumber: '', courierCompany: '' });
+        fetchOrders();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || '송장 정보 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('송장 정보 저장 오류:', error);
+      toast.error('송장 정보 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  const courierCompanies = [
+    'CJ대한통운',
+    '한진택배',
+    '롯데택배',
+    '로젠택배',
+    '일양로지스',
+    'CU편의점택배',
+    '한서울택배',
+    '경동택배',
+    '대신택배',
+    '합동택배',
+    '한의사랑택배',
+    '기타',
+  ];
+
+  const handleDownload = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('format', downloadFilters.format);
+      if (downloadFilters.status !== 'all') params.append('status', downloadFilters.status);
+      if (downloadFilters.paymentStatus !== 'all') params.append('paymentStatus', downloadFilters.paymentStatus);
+      if (downloadFilters.startDate) params.append('startDate', downloadFilters.startDate);
+      if (downloadFilters.endDate) params.append('endDate', downloadFilters.endDate);
+
+      const response = await fetch(`/api/partner/orders/export?${params}`, {
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        if (downloadFilters.format === 'csv') {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `partner_orders_${new Date().toISOString().split('T')[0]}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          toast.success('주문 내역이 다운로드되었습니다.');
+        } else {
+          const data = await response.json();
+          // JSON 파일 생성
+          const jsonData = JSON.stringify(data.data, null, 2);
+          const blob = new Blob([jsonData], { type: 'application/json' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `partner_orders_${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          toast.success('주문 내역이 다운로드되었습니다. (JSON 형식)');
+        }
+        setIsDownloadDialogOpen(false);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || '다운로드에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('다운로드 오류:', error);
+      toast.error('다운로드 중 오류가 발생했습니다.');
     }
   };
 
@@ -180,7 +327,7 @@ export default function PartnerOrdersPage() {
             <h1 className="text-3xl font-bold">주문 관리</h1>
             <p className="text-gray-600 mt-1">파트너 상품의 주문을 관리하고 처리하세요</p>
           </div>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setIsDownloadDialogOpen(true)}>
             <Download className="h-4 w-4 mr-2" />
             주문 내역 다운로드
           </Button>
@@ -305,7 +452,16 @@ export default function PartnerOrdersPage() {
 
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-gray-600">
-                          주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}
+                          <div>주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}</div>
+                          {order.trackingNumber && (
+                            <div className="mt-1">
+                              <span className="font-medium">송장번호: </span>
+                              <span>{order.trackingNumber}</span>
+                              {order.courierCompany && (
+                                <span className="text-gray-500"> ({order.courierCompany})</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="text-lg font-bold text-primary">
                           총 ₩{order.totalAmount.toLocaleString()}
@@ -319,6 +475,7 @@ export default function PartnerOrdersPage() {
                         variant="outline"
                         size="sm"
                         className="w-full"
+                        onClick={() => handleViewDetail(order)}
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         상세보기
@@ -349,6 +506,262 @@ export default function PartnerOrdersPage() {
           )}
         </div>
       </div>
+
+      {/* 주문 상세보기 다이얼로그 */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>주문 상세 정보</DialogTitle>
+            <DialogDescription>
+              주문번호: {selectedOrder?.orderNumber}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-6">
+              {/* 주문 상태 */}
+              <div>
+                <Label>주문 상태</Label>
+                <div className="flex gap-2 mt-2">
+                  <Badge className={statusColors[selectedOrder.status]}>
+                    {getStatusIcon(selectedOrder.status)}
+                    <span className="ml-1">{statusLabels[selectedOrder.status]}</span>
+                  </Badge>
+                  <Badge className={paymentStatusColors[selectedOrder.paymentStatus]}>
+                    {paymentStatusLabels[selectedOrder.paymentStatus]}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* 고객 정보 */}
+              <div>
+                <Label>고객 정보</Label>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm">이름: {selectedOrder.customer.name}</p>
+                  <p className="text-sm">이메일: {selectedOrder.customer.email}</p>
+                  <p className="text-sm">전화번호: {selectedOrder.customer.phone}</p>
+                </div>
+              </div>
+
+              {/* 배송지 정보 */}
+              <div>
+                <Label>배송지 정보</Label>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm">받는 분: {selectedOrder.shippingAddress.name}</p>
+                  <p className="text-sm">전화번호: {selectedOrder.shippingAddress.phone}</p>
+                  <p className="text-sm">
+                    주소: {selectedOrder.shippingAddress.address} {selectedOrder.shippingAddress.detail}
+                  </p>
+                  <p className="text-sm">우편번호: {selectedOrder.shippingAddress.zipCode}</p>
+                </div>
+              </div>
+
+              {/* 송장 정보 */}
+              {selectedOrder.trackingNumber && (
+                <div>
+                  <Label>송장 정보</Label>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm">택배사: {selectedOrder.courierCompany}</p>
+                    <p className="text-sm">송장번호: {selectedOrder.trackingNumber}</p>
+                    {selectedOrder.shippedAt && (
+                      <p className="text-sm">배송 시작일: {new Date(selectedOrder.shippedAt).toLocaleDateString('ko-KR')}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 주문 상품 */}
+              <div>
+                <Label>주문 상품</Label>
+                <div className="mt-2 space-y-2">
+                  {selectedOrder.items.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <img
+                        src={item.image}
+                        alt={item.productName}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{item.productName}</p>
+                        <p className="text-sm text-gray-600">
+                          {item.quantity}개 × ₩{item.price.toLocaleString()}
+                        </p>
+                      </div>
+                      <p className="font-semibold">
+                        ₩{(item.quantity * item.price).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 주문 정보 */}
+              <div>
+                <Label>주문 정보</Label>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm">주문일: {new Date(selectedOrder.createdAt).toLocaleDateString('ko-KR')}</p>
+                  <p className="text-sm">최종 수정일: {new Date(selectedOrder.updatedAt).toLocaleDateString('ko-KR')}</p>
+                  <p className="text-lg font-bold text-primary mt-2">
+                    총 주문 금액: ₩{selectedOrder.totalAmount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+              닫기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 송장 번호 입력 다이얼로그 */}
+      <Dialog open={isTrackingDialogOpen} onOpenChange={setIsTrackingDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>송장 번호 입력</DialogTitle>
+            <DialogDescription>
+              주문번호: {selectedOrder?.orderNumber}<br />
+              배송 중 상태로 변경하려면 송장 번호를 입력해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="courierCompany">택배사 *</Label>
+              <Select
+                value={trackingInfo.courierCompany}
+                onValueChange={(value) => setTrackingInfo(prev => ({ ...prev, courierCompany: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="택배사 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {courierCompanies.map((company) => (
+                    <SelectItem key={company} value={company}>
+                      {company}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>송장 번호 *</Label>
+              <Input
+                value={trackingInfo.trackingNumber}
+                onChange={(e) => setTrackingInfo(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                placeholder="송장 번호를 입력하세요"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTrackingDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={handleSaveTracking}>
+              저장 및 배송중으로 변경
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 다운로드 다이얼로그 */}
+      <Dialog open={isDownloadDialogOpen} onOpenChange={setIsDownloadDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>주문 내역 다운로드</DialogTitle>
+            <DialogDescription>
+              주문 내역을 CSV 또는 JSON 형식으로 다운로드합니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>다운로드 형식</Label>
+              <Select
+                value={downloadFilters.format}
+                onValueChange={(value) => setDownloadFilters(prev => ({ ...prev, format: value as 'csv' | 'json' }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="csv">CSV (Excel 호환)</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>주문 상태</Label>
+              <Select
+                value={downloadFilters.status}
+                onValueChange={(value) => setDownloadFilters(prev => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="pending">주문 대기</SelectItem>
+                  <SelectItem value="confirmed">주문 확인</SelectItem>
+                  <SelectItem value="preparing">상품 준비중</SelectItem>
+                  <SelectItem value="shipped">배송중</SelectItem>
+                  <SelectItem value="delivered">배송완료</SelectItem>
+                  <SelectItem value="cancelled">주문 취소</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>결제 상태</Label>
+              <Select
+                value={downloadFilters.paymentStatus}
+                onValueChange={(value) => setDownloadFilters(prev => ({ ...prev, paymentStatus: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="pending">결제 대기</SelectItem>
+                  <SelectItem value="paid">결제완료</SelectItem>
+                  <SelectItem value="failed">결제실패</SelectItem>
+                  <SelectItem value="refunded">환불완료</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">시작일</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={downloadFilters.startDate}
+                  onChange={(e) => setDownloadFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="endDate">종료일</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={downloadFilters.endDate}
+                  onChange={(e) => setDownloadFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDownloadDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={handleDownload}>
+              <Download className="h-4 w-4 mr-2" />
+              다운로드
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PartnerLayout>
   );
 }

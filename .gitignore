@@ -100,3 +100,8 @@ simple_chroma_query.py
 # N8N data files (too large for git)
 n8n-data/
 n8n-data-backup/
+
+# Build log files
+build-log.txt
+build-output.txt
+*.log.txt

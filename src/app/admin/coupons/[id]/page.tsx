@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Save, Tag, Percent, DollarSign, Truck, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface CouponDetail {
   _id: string;
@@ -50,7 +51,7 @@ export default function EditCouponPage() {
       const res = await fetch(`/api/admin/coupons/${couponId}`);
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || '쿠폰 정보를 불러오지 못했습니다.');
+        toast.error(data.error || '쿠폰 정보를 불러오지 못했습니다.');
         router.push('/admin/coupons');
         return;
       }
@@ -72,7 +73,7 @@ export default function EditCouponPage() {
         targetAudience: d.targetAudience || 'all'
       });
     } catch (e) {
-      alert('쿠폰 정보를 불러오는 중 오류가 발생했습니다.');
+      toast.error('쿠폰 정보를 불러오는 중 오류가 발생했습니다.');
       router.push('/admin/coupons');
     } finally {
       setLoading(false);
@@ -111,13 +112,13 @@ export default function EditCouponPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || '수정에 실패했습니다.');
+        toast.error(data.error || '수정에 실패했습니다.');
         return;
       }
-      alert('수정되었습니다.');
+      toast.success('수정되었습니다.');
       router.push('/admin/coupons');
     } catch (e) {
-      alert('저장 중 오류가 발생했습니다.');
+      toast.error('저장 중 오류가 발생했습니다.');
     } finally {
       setSaving(false);
     }

@@ -20,7 +20,7 @@ export interface IOrder extends Document {
     addr1: string;
     addr2?: string;
   };
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: {
     label: string;
     recipient: string;
@@ -31,6 +31,11 @@ export interface IOrder extends Document {
   };
   paymentMethod: string;
   paymentStatus: 'pending' | 'completed' | 'failed';
+  // 배송 추적 정보
+  trackingNumber?: string;
+  courierCompany?: string;
+  shippedAt?: Date;
+  deliveredAt?: Date;
   // 포인트 및 쿠폰 관련 필드
   usedPoints?: number; // 사용한 포인트
   couponDiscount?: number; // 쿠폰 할인 금액
@@ -77,7 +82,7 @@ const OrderSchema = new Schema<IOrder>({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending',
   },
   shippingAddress: {
@@ -110,6 +115,19 @@ const OrderSchema = new Schema<IOrder>({
   },
   couponCode: {
     type: String
+  },
+  // 배송 추적 정보
+  trackingNumber: {
+    type: String
+  },
+  courierCompany: {
+    type: String
+  },
+  shippedAt: {
+    type: Date
+  },
+  deliveredAt: {
+    type: Date
   },
   // 파트너 관련 필드
   partnerOrders: [{

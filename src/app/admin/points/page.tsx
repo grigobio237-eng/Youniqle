@@ -21,9 +21,14 @@ import {
   Gift,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  Calendar,
+  Download
 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { toast } from 'sonner';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface PointStats {
   totalUsers: number;
@@ -34,23 +39,141 @@ interface PointStats {
   averagePointsPerUser: number;
 }
 
+interface PointAnalytics {
+  overview: {
+    totalUsers: number;
+    usersWithPoints: number;
+    totalPoints: number;
+    averagePoints: number;
+    maxPoints: number;
+    minPoints: number;
+  };
+  stats: {
+    totalEarned: number;
+    totalUsed: number;
+    totalExpired: number;
+    usageRate: number;
+  };
+  dailyTrend: Array<{
+    date: string;
+    earned: number;
+    used: number;
+  }>;
+  typeStats: Array<{
+    type: string;
+    total: number;
+    count: number;
+  }>;
+  expiringPoints: {
+    total: number;
+    count: number;
+  };
+  weeklyPattern: Array<{
+    dayOfWeek: number;
+    total: number;
+    count: number;
+  }>;
+}
+
+const typeLabels: Record<string, string> = {
+  earned: '구매 적립',
+  used: '사용',
+  expired: '만료',
+  admin_grant: '관리자 지급',
+  admin_deduct: '관리자 차감',
+};
+
+const dayLabels: Record<number, string> = {
+  1: '일요일',
+  2: '월요일',
+  3: '화요일',
+  4: '수요일',
+  5: '목요일',
+  6: '금요일',
+  7: '토요일',
+};
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
 export default function AdminPointManagementPage() {
   const [stats, setStats] = useState<PointStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [analytics, setAnalytics] = useState<PointAnalytics | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState('30');
 
   useEffect(() => {
-    // 실제 구현에서는 API에서 통계 데이터를 가져옴
-    setStats({
-      totalUsers: 1250,
-      totalPoints: 1250000,
-      totalEarned: 2500000,
-      totalUsed: 800000,
-      totalExpired: 450000,
-      averagePointsPerUser: 1000
-    });
-    setLoading(false);
+    fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (analyticsPeriod) {
+      fetchAnalytics();
+    }
+  }, [analyticsPeriod]);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/admin/points/stats');
+      const data = await response.json();
+
+      if (data.success) {
+        setStats({
+          totalUsers: data.data.totalUsers,
+          totalPoints: data.data.totalPoints,
+          totalEarned: data.data.totalEarned,
+          totalUsed: data.data.totalUsed,
+          totalExpired: data.data.totalExpired,
+          averagePointsPerUser: data.data.averagePointsPerUser,
+        });
+      } else {
+        toast.error('통계 데이터를 불러오는데 실패했습니다.');
+        // 기본값 설정
+        setStats({
+          totalUsers: 0,
+          totalPoints: 0,
+          totalEarned: 0,
+          totalUsed: 0,
+          totalExpired: 0,
+          averagePointsPerUser: 0,
+        });
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('통계 조회 오류:', error);
+      toast.error('통계를 불러오는 중 오류가 발생했습니다.');
+      // 기본값 설정
+      setStats({
+        totalUsers: 0,
+        totalPoints: 0,
+        totalEarned: 0,
+        totalUsed: 0,
+        totalExpired: 0,
+        averagePointsPerUser: 0,
+      });
+      setLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch(`/api/admin/points/analytics?period=${analyticsPeriod}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setAnalytics(data.data);
+      } else {
+        toast.error('분석 데이터를 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('분석 데이터 조회 오류:', error);
+      toast.error('분석 데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -443,62 +566,241 @@ export default function AdminPointManagementPage() {
           <TabsContent value="analytics" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calculator className="h-5 w-5 mr-2" />
-                  포인트 분석
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    포인트 분석 기능은 별도 구현이 필요합니다. 현재는 기본 통계만 표시됩니다.
-                  </AlertDescription>
-                </Alert>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-3">포인트 현황</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>총 보유 포인트</span>
-                        <span className="font-semibold">{stats?.totalPoints.toLocaleString()}P</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 적립 포인트</span>
-                        <span className="font-semibold text-green-600">+{stats?.totalEarned.toLocaleString()}P</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 사용 포인트</span>
-                        <span className="font-semibold text-red-600">-{stats?.totalUsed.toLocaleString()}P</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 만료 포인트</span>
-                        <span className="font-semibold text-gray-600">-{stats?.totalExpired.toLocaleString()}P</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-3">회원별 평균</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>평균 보유 포인트</span>
-                        <span className="font-semibold">{stats?.averagePointsPerUser.toLocaleString()}P</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 회원 수</span>
-                        <span className="font-semibold">{stats?.totalUsers.toLocaleString()}명</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>포인트 사용률</span>
-                        <span className="font-semibold">
-                          {stats ? Math.round((stats.totalUsed / stats.totalEarned) * 100) : 0}%
-                        </span>
-                      </div>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center">
+                    <Calculator className="h-5 w-5 mr-2" />
+                    포인트 분석
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Select value={analyticsPeriod} onValueChange={setAnalyticsPeriod}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7">최근 7일</SelectItem>
+                        <SelectItem value="30">최근 30일</SelectItem>
+                        <SelectItem value="90">최근 90일</SelectItem>
+                        <SelectItem value="365">최근 1년</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">분석 데이터를 불러오는 중...</p>
+                  </div>
+                ) : analytics ? (
+                  <div className="space-y-6">
+                    {/* 개요 통계 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-2 text-sm text-gray-600">포인트 보유자</h4>
+                        <p className="text-2xl font-bold">{analytics.overview.usersWithPoints.toLocaleString()}명</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          전체 회원 대비 {((analytics.overview.usersWithPoints / analytics.overview.totalUsers) * 100).toFixed(1)}%
+                        </p>
+                      </div>
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-2 text-sm text-gray-600">평균 보유 포인트</h4>
+                        <p className="text-2xl font-bold">{Math.round(analytics.overview.averagePoints).toLocaleString()}P</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          최대 {analytics.overview.maxPoints.toLocaleString()}P
+                        </p>
+                      </div>
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-2 text-sm text-gray-600">포인트 사용률</h4>
+                        <p className="text-2xl font-bold">{analytics.stats.usageRate.toFixed(1)}%</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          적립 대비 사용 비율
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 일별 추이 그래프 */}
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-semibold mb-4">포인트 적립/사용 추이</h4>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={analytics.dailyTrend}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis 
+                            dataKey="date" 
+                            tickFormatter={(value) => {
+                              const date = new Date(value);
+                              return `${date.getMonth() + 1}/${date.getDate()}`;
+                            }}
+                          />
+                          <YAxis />
+                          <Tooltip 
+                            formatter={(value: number) => `${value.toLocaleString()}P`}
+                            labelFormatter={(label) => {
+                              const date = new Date(label);
+                              return date.toLocaleDateString('ko-KR');
+                            }}
+                          />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="earned" 
+                            stroke="#10b981" 
+                            name="적립"
+                            strokeWidth={2}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="used" 
+                            stroke="#ef4444" 
+                            name="사용"
+                            strokeWidth={2}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* 타입별 통계 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-4">타입별 포인트 통계</h4>
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                              data={analytics.typeStats}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry: any) => `${typeLabels[entry.type] || entry.type}: ${entry.total.toLocaleString()}P`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="total"
+                            >
+                              {analytics.typeStats.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(value: number) => `${value.toLocaleString()}P`} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="mt-4 space-y-2">
+                          {analytics.typeStats.map((stat, index) => (
+                            <div key={stat.type} className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                />
+                                <span>{typeLabels[stat.type] || stat.type}</span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <span className="text-gray-600">{stat.count.toLocaleString()}건</span>
+                                <span className="font-semibold">{stat.total.toLocaleString()}P</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-4">요일별 사용 패턴</h4>
+                        {analytics.weeklyPattern.length > 0 ? (
+                          <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={analytics.weeklyPattern
+                              .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+                              .map(item => ({
+                                ...item,
+                                day: dayLabels[item.dayOfWeek] || `요일 ${item.dayOfWeek}`,
+                              }))}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="day" />
+                              <YAxis />
+                              <Tooltip 
+                                formatter={(value: number) => `${value.toLocaleString()}P`}
+                              />
+                              <Legend />
+                              <Bar dataKey="total" fill="#8884d8" name="사용 포인트" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="text-center py-12 text-gray-500">
+                            <p>데이터가 없습니다.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 만료 예정 포인트 */}
+                    {analytics.expiringPoints.total > 0 && (
+                      <div className="p-4 border rounded-lg bg-yellow-50">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold mb-2 text-yellow-900">만료 예정 포인트</h4>
+                            <p className="text-2xl font-bold text-yellow-700">
+                              {analytics.expiringPoints.total.toLocaleString()}P
+                            </p>
+                            <p className="text-sm text-yellow-600 mt-1">
+                              향후 30일 내 만료 예정 (총 {analytics.expiringPoints.count}건)
+                            </p>
+                          </div>
+                          <AlertCircle className="h-12 w-12 text-yellow-600" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 상세 통계 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-3">포인트 현황</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>총 보유 포인트</span>
+                            <span className="font-semibold">{analytics.overview.totalPoints.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>총 적립 포인트</span>
+                            <span className="font-semibold text-green-600">+{analytics.stats.totalEarned.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>총 사용 포인트</span>
+                            <span className="font-semibold text-red-600">-{analytics.stats.totalUsed.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>총 만료 포인트</span>
+                            <span className="font-semibold text-gray-600">-{analytics.stats.totalExpired.toLocaleString()}P</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h4 className="font-semibold mb-3">회원별 통계</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>평균 보유 포인트</span>
+                            <span className="font-semibold">{Math.round(analytics.overview.averagePoints).toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>최대 보유 포인트</span>
+                            <span className="font-semibold">{analytics.overview.maxPoints.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>최소 보유 포인트</span>
+                            <span className="font-semibold">{analytics.overview.minPoints.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>포인트 보유자</span>
+                            <span className="font-semibold">{analytics.overview.usersWithPoints.toLocaleString()}명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      분석 데이터를 불러오지 못했습니다. 다시 시도해주세요.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

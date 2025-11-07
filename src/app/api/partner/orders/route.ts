@@ -50,6 +50,10 @@ export async function GET(request: NextRequest) {
       status: order.status,
       paymentStatus: order.paymentStatus,
       shippingAddress: order.shippingAddress,
+      trackingNumber: (order as any).trackingNumber,
+      courierCompany: (order as any).courierCompany,
+      shippedAt: (order as any).shippedAt,
+      deliveredAt: (order as any).deliveredAt,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt
     }));

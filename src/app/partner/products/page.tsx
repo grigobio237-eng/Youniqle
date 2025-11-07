@@ -9,7 +9,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Upload } from 'lucide-react';
 import ImageManager from '@/components/products/ImageManager';
 import { toast } from 'sonner';
@@ -500,11 +508,17 @@ function PartnerProductsContent() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (productId: string) => {
-    if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; productId: string | null }>({ open: false, productId: null });
+
+  const handleDeleteClick = (productId: string) => {
+    setDeleteConfirmDialog({ open: true, productId });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirmDialog.productId) return;
 
     try {
-      const response = await fetch(`/api/partner/products/${productId}`, {
+      const response = await fetch(`/api/partner/products/${deleteConfirmDialog.productId}`, {
         method: 'DELETE',
         credentials: 'include' // 쿠키 포함
       });
@@ -759,7 +773,7 @@ function PartnerProductsContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => handleDeleteClick(product._id)}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
                           삭제
@@ -773,6 +787,26 @@ function PartnerProductsContent() {
           ))
         )}
       </div>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog({ open, productId: open ? deleteConfirmDialog.productId : null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>상품 삭제</DialogTitle>
+            <DialogDescription>
+              정말로 이 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setDeleteConfirmDialog({ open: false, productId: null })}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              삭제
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

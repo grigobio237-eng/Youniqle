@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
-import { Package, Calendar, CreditCard, MapPin, Eye, RefreshCw } from 'lucide-react';
+import { Package, Calendar, CreditCard, MapPin, Eye, RefreshCw, RotateCcw, Truck, ShoppingCart, X } from 'lucide-react';
 
 interface OrderItem {
   _id: string;
@@ -37,6 +37,20 @@ interface Order {
   paymentMethod: string;
   createdAt: string;
   updatedAt: string;
+  // 배송 추적 관련
+  partnerOrders?: Array<{
+    trackingNumber?: string;
+    courierCompany?: string;
+    shippedAt?: string;
+    deliveredAt?: string;
+  }>;
+  trackingNumber?: string;
+  courierCompany?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  // 쿠폰/포인트
+  couponDiscount?: number;
+  usedPoints?: number;
 }
 
 const statusLabels = {
@@ -102,6 +116,39 @@ export default function OrdersPage() {
     } catch (error) {
       console.error('주문 취소 중 오류:', error);
       alert('주문 취소 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleReorder = async (order: Order) => {
+    try {
+      // 재주문할 상품들을 장바구니에 추가
+      const addToCartPromises = order.items.map(item =>
+        fetch('/api/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            productId: item.productId._id,
+            quantity: item.quantity,
+          }),
+        })
+      );
+
+      const results = await Promise.all(addToCartPromises);
+      const failed = results.filter(r => !r.ok);
+
+      if (failed.length === 0) {
+        alert('재주문할 상품이 장바구니에 추가되었습니다.');
+        window.dispatchEvent(new Event('cartUpdated'));
+        // 장바구니로 이동
+        window.location.href = '/cart';
+      } else {
+        alert('일부 상품을 장바구니에 추가하지 못했습니다. (품절 또는 삭제된 상품일 수 있습니다)');
+      }
+    } catch (error) {
+      console.error('재주문 중 오류:', error);
+      alert('재주문 중 오류가 발생했습니다.');
     }
   };
 
@@ -276,8 +323,32 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
+                  {/* 송장 번호 표시 */}
+                  {(order.trackingNumber || order.partnerOrders?.some((po: any) => po.trackingNumber)) && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Truck className="h-4 w-4 text-blue-600" />
+                        <span className="font-semibold text-blue-900">배송 정보</span>
+                      </div>
+                      {order.trackingNumber && (
+                        <div className="text-sm text-blue-800">
+                          <p>택배사: {order.courierCompany || '미지정'}</p>
+                          <p>송장 번호: {order.trackingNumber}</p>
+                        </div>
+                      )}
+                      {order.partnerOrders?.map((po: any, index: number) => 
+                        po.trackingNumber && (
+                          <div key={index} className="text-sm text-blue-800 mt-2">
+                            <p>택배사: {po.courierCompany || '미지정'}</p>
+                            <p>송장 번호: {po.trackingNumber}</p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+
                   {/* 액션 버튼 */}
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
+                  <div className="flex flex-wrap justify-end gap-2 pt-4 border-t">
                     <Button
                       variant="outline"
                       onClick={() => setSelectedOrder(order)}
@@ -286,11 +357,56 @@ export default function OrdersPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       상세 보기
                     </Button>
+                    
+                    {/* 배송 추적 버튼 */}
+                    {(order.status === 'shipped' || order.status === 'delivered') && 
+                     (order.trackingNumber || order.partnerOrders?.some((po: any) => po.trackingNumber)) && (
+                      <Button
+                        variant="outline"
+                        asChild
+                        className="flex items-center"
+                      >
+                        <Link href={`/orders/${order._id}/tracking`}>
+                          <Truck className="h-4 w-4 mr-2" />
+                          배송 추적
+                        </Link>
+                      </Button>
+                    )}
+                    
+                    {/* 환불 신청 버튼 */}
+                    {order.status === 'delivered' && order.paymentStatus === 'completed' && (
+                      <Button
+                        variant="outline"
+                        asChild
+                        className="flex items-center"
+                      >
+                        <Link href={`/orders/${order._id}/refund`}>
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          환불 신청
+                        </Link>
+                      </Button>
+                    )}
+                    
+                    {/* 재주문 버튼 */}
+                    {(order.status === 'delivered' || order.status === 'cancelled') && (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleReorder(order)}
+                        className="flex items-center"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        재주문
+                      </Button>
+                    )}
+                    
+                    {/* 주문 취소 버튼 */}
                     {order.status === 'pending' && (
                       <Button
                         variant="destructive"
                         onClick={() => handleCancelOrder(order._id)}
+                        className="flex items-center"
                       >
+                        <X className="h-4 w-4 mr-2" />
                         주문 취소
                       </Button>
                     )}

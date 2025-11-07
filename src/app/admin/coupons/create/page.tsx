@@ -28,6 +28,7 @@ import {
   Package
 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function CreateCouponPage() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function CreateCouponPage() {
     e.preventDefault();
     
     if (!formData.code || !formData.name || !formData.value) {
-      alert('필수 필드를 모두 입력해주세요.');
+      toast.error('필수 필드를 모두 입력해주세요.');
       return;
     }
 
@@ -130,15 +131,15 @@ export default function CreateCouponPage() {
       });
 
       if (response.ok) {
-        alert('쿠폰이 성공적으로 생성되었습니다!');
+        toast.success('쿠폰이 성공적으로 생성되었습니다!');
         router.push('/admin/coupons');
       } else {
         const error = await response.json();
-        alert(error.error || '쿠폰 생성에 실패했습니다.');
+        toast.error(error.error || '쿠폰 생성에 실패했습니다.');
       }
     } catch (error) {
       console.error('쿠폰 생성 오류:', error);
-      alert('쿠폰 생성 중 오류가 발생했습니다.');
+      toast.error('쿠폰 생성 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import CharacterImage from '@/components/ui/CharacterImage';
 import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -65,7 +66,9 @@ function CheckoutPageContent() {
     zipCode: '',
     address1: '',
     address2: '',
-    memo: ''
+    memo: '',
+    shippingMethod: 'standard', // 배송 방법
+    shippingRequest: '' // 배송 요청사항
   });
   
   // 결제 정보
@@ -81,6 +84,8 @@ function CheckoutPageContent() {
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
 
   // 포인트 관련
   const [userPoints, setUserPoints] = useState(0);
@@ -122,6 +127,38 @@ function CheckoutPageContent() {
 
     fetchUserPoints();
   }, [session]);
+
+  // 사용 가능한 쿠폰 목록 로드
+  useEffect(() => {
+    const fetchAvailableCoupons = async () => {
+      if (!session?.user || !cart) return;
+
+      setLoadingCoupons(true);
+      try {
+        const response = await fetch('/api/me/coupons?status=available', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          // 현재 장바구니 금액에 적용 가능한 쿠폰만 필터링
+          const usableCoupons = (data.coupons || []).filter((uc: any) => {
+            const coupon = uc.couponId || uc;
+            const minAmount = coupon.minOrderAmount || 0;
+            return cart.totalAmount >= minAmount;
+          });
+          setAvailableCoupons(usableCoupons);
+        }
+      } catch (error) {
+        console.error('사용 가능한 쿠폰 로드 오류:', error);
+      } finally {
+        setLoadingCoupons(false);
+      }
+    };
+
+    if (status === 'authenticated' && cart) {
+      fetchAvailableCoupons();
+    }
+  }, [session, cart, status]);
 
   // 예상 적립 포인트 계산 (등급별 적립률, 배송비/포인트/쿠폰 제외 금액 기준)
   useEffect(() => {
@@ -247,7 +284,7 @@ function CheckoutPageContent() {
     }));
   };
 
-  // 쿠폰 적용
+  // 쿠폰 적용 (코드로)
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       alert('쿠폰 코드를 입력해주세요.');
@@ -278,9 +315,49 @@ function CheckoutPageContent() {
       if (response.ok && data.success) {
         setAppliedCoupon(data.coupon);
         setCouponDiscount(data.discountAmount || 0);
-        alert('쿠폰이 적용되었습니다!');
+        setCouponCode('');
       } else {
         alert(data.error || '쿠폰 적용에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('쿠폰 검증 오류:', error);
+      alert('쿠폰 검증 중 오류가 발생했습니다.');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  // 쿠폰 선택 (드롭다운에서)
+  const handleSelectCoupon = async (couponCode: string) => {
+    if (couponCode === 'none') {
+      handleRemoveCoupon();
+      return;
+    }
+
+    setCouponCode(couponCode);
+    setValidatingCoupon(true);
+    try {
+      const response = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: couponCode,
+          cartItems: cart?.items || [],
+          totalAmount: cart?.totalAmount || 0
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setAppliedCoupon(data.coupon);
+        setCouponDiscount(data.discountAmount || 0);
+        setCouponCode('');
+      } else {
+        alert(data.error || '쿠폰 적용에 실패했습니다.');
+        setCouponCode('');
       }
     } catch (error) {
       console.error('쿠폰 검증 오류:', error);
@@ -370,7 +447,10 @@ function CheckoutPageContent() {
           phone: shippingAddress.phone,
           zip: shippingAddress.zipCode,
           addr1: shippingAddress.address1,
-          addr2: shippingAddress.address2
+          addr2: shippingAddress.address2,
+          memo: shippingAddress.memo,
+          shippingMethod: shippingAddress.shippingMethod,
+          shippingRequest: shippingAddress.shippingRequest
         },
         paymentMethod: paymentMethod,
         totalAmount: totalAmount,
@@ -498,9 +578,17 @@ function CheckoutPageContent() {
     );
   }
 
-  const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
+  // 배송비 계산 (배송 방법에 따라)
+  const getDeliveryFee = () => {
+    if (cart.totalAmount >= 50000) return 0; // 5만원 이상 무료배송
+    if (shippingAddress.shippingMethod === 'express') return 5000; // 당일배송
+    if (shippingAddress.shippingMethod === 'nextday') return 3000; // 익일배송
+    return 3000; // 기본 배송
+  };
+
+  const deliveryFee = getDeliveryFee();
   const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
-  const totalAmount = subtotalAfterCoupon + deliveryFee;
+  const totalAmount = Math.max(0, subtotalAfterCoupon + deliveryFee - usePoints);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -604,12 +692,53 @@ function CheckoutPageContent() {
                 </div>
 
                 <div>
+                  <Label htmlFor="shippingMethod">배송 방법</Label>
+                  <Select
+                    value={shippingAddress.shippingMethod}
+                    onValueChange={(value) => handleShippingChange('shippingMethod', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="배송 방법을 선택하세요" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">일반 배송 (1-2일) - 3,000원</SelectItem>
+                      <SelectItem value="nextday">익일 배송 - 3,000원</SelectItem>
+                      <SelectItem value="express">당일 배송 - 5,000원</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {cart.totalAmount >= 50000 && (
+                    <p className="text-sm text-green-600 mt-1">
+                      💡 5만원 이상 구매 시 배송비 무료!
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="shippingRequest">배송 요청사항</Label>
+                  <Select
+                    value={shippingAddress.shippingRequest}
+                    onValueChange={(value) => handleShippingChange('shippingRequest', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="배송 요청사항 선택 (선택사항)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">선택 안 함</SelectItem>
+                      <SelectItem value="door">문 앞에 놓아주세요</SelectItem>
+                      <SelectItem value="security">경비실에 맡겨주세요</SelectItem>
+                      <SelectItem value="delivery-box">택배함에 넣어주세요</SelectItem>
+                      <SelectItem value="call">배송 전 연락 부탁드립니다</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <Label htmlFor="memo">배송 메모 (선택사항)</Label>
                   <Input
                     id="memo"
                     value={shippingAddress.memo}
                     onChange={(e) => handleShippingChange('memo', e.target.value)}
-                    placeholder="배송 시 요청사항을 입력하세요"
+                    placeholder="기타 요청사항을 입력하세요"
                   />
                 </div>
               </CardContent>
@@ -670,23 +799,71 @@ function CheckoutPageContent() {
                   </div>
                 ) : (
                   <>
-                    <div className="flex space-x-2">
-                      <Input
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="쿠폰 코드를 입력하세요"
-                        onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                      />
-                      <Button
-                        onClick={handleApplyCoupon}
-                        disabled={validatingCoupon || !couponCode.trim()}
-                        className="whitespace-nowrap"
-                      >
-                        {validatingCoupon ? '확인 중...' : '적용'}
-                      </Button>
+                    {/* 쿠폰 선택 드롭다운 */}
+                    {availableCoupons.length > 0 && (
+                      <div className="space-y-2">
+                        <Label>사용 가능한 쿠폰 선택</Label>
+                        <Select
+                          value={appliedCoupon?.code || 'none'}
+                          onValueChange={handleSelectCoupon}
+                          disabled={loadingCoupons || validatingCoupon}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="쿠폰을 선택하세요" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">쿠폰 사용 안 함</SelectItem>
+                            {availableCoupons.map((uc: any) => {
+                              const coupon = uc.couponId || uc;
+                              const discountText = coupon.type === 'percentage' 
+                                ? `${coupon.value}% 할인`
+                                : coupon.type === 'free_shipping'
+                                ? '무료배송'
+                                : `${coupon.value.toLocaleString()}원 할인`;
+                              const minAmountText = coupon.minOrderAmount 
+                                ? ` (${coupon.minOrderAmount.toLocaleString()}원 이상)`
+                                : '';
+                              return (
+                                <SelectItem key={uc._id} value={coupon.code}>
+                                  {coupon.name} - {discountText}{minAmountText}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                        {loadingCoupons && (
+                          <p className="text-sm text-gray-500">쿠폰 목록을 불러오는 중...</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 쿠폰 코드 직접 입력 */}
+                    <div className="space-y-2">
+                      <Label>또는 쿠폰 코드 직접 입력</Label>
+                      <div className="flex space-x-2">
+                        <Input
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="쿠폰 코드를 입력하세요"
+                          onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                          disabled={validatingCoupon}
+                        />
+                        <Button
+                          onClick={handleApplyCoupon}
+                          disabled={validatingCoupon || !couponCode.trim()}
+                          className="whitespace-nowrap"
+                        >
+                          {validatingCoupon ? '확인 중...' : '적용'}
+                        </Button>
+                      </div>
                     </div>
+
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">쿠폰이 있으신가요?</span>
+                      <span className="text-gray-600">
+                        {availableCoupons.length > 0 
+                          ? `사용 가능한 쿠폰 ${availableCoupons.length}개`
+                          : '사용 가능한 쿠폰이 없습니다'}
+                      </span>
                       <Button variant="link" asChild className="p-0 h-auto">
                         <Link href="/me/coupons">
                           내 쿠폰함 보기
@@ -740,21 +917,49 @@ function CheckoutPageContent() {
                         <p className="text-sm text-gray-600 mb-2">
                           보유 포인트: <span className="font-semibold text-yellow-600">{userPoints.toLocaleString()}P</span>
                         </p>
-                        <Input
-                          id="points"
-                          type="number"
-                          value={usePoints || ''}
-                          onChange={(e) => handleUsePoints(Number(e.target.value))}
-                          placeholder="사용할 포인트를 입력하세요"
-                          max={userPoints}
-                          min="0"
-                        />
+                        <div className="flex space-x-2">
+                          <Input
+                            id="points"
+                            type="number"
+                            value={usePoints || ''}
+                            onChange={(e) => handleUsePoints(Number(e.target.value))}
+                            placeholder="사용할 포인트를 입력하세요"
+                            max={userPoints}
+                            min="0"
+                            step="10"
+                          />
+                          {cart && (
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
+                                const maxUsable = Math.floor(subtotalAfterCoupon * 0.5);
+                                const actualMax = Math.min(maxUsable, userPoints);
+                                const roundedMax = Math.floor(actualMax / 10) * 10; // 10의 배수로
+                                handleUsePoints(roundedMax);
+                              }}
+                              disabled={!cart || userPoints === 0}
+                              className="whitespace-nowrap"
+                            >
+                              최대 사용
+                            </Button>
+                          )}
+                        </div>
                         {pointsError && (
                           <p className="text-sm text-red-600 mt-1">{pointsError}</p>
                         )}
+                        {cart && !pointsError && usePoints === 0 && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            최대 사용 가능: {Math.min(
+                              Math.floor((cart.totalAmount - couponDiscount) * 0.5),
+                              userPoints
+                            ).toLocaleString()}P
+                          </div>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 space-y-1">
                         <p>• 포인트는 주문 금액의 최대 50%까지만 사용 가능합니다</p>
+                        <p>• 포인트는 10P 단위로만 사용할 수 있습니다</p>
                         <p>• 포인트 사용 시 적립은 사용한 금액을 제외한 금액에 대해 지급됩니다</p>
                       </div>
                     </div>

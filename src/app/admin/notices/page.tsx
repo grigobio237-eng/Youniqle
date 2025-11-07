@@ -43,6 +43,7 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Notice 타입은 INotice를 사용
 
@@ -58,6 +59,7 @@ export default function AdminNoticesPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState<INotice | null>(null);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   
   const [formData, setFormData] = useState({
     title: '',
@@ -120,16 +122,16 @@ export default function AdminNoticesPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert('공지사항이 생성되었습니다.');
+        toast.success('공지사항이 생성되었습니다.');
         setShowCreateDialog(false);
         resetForm();
         fetchNotices();
       } else {
-        alert(data.error.message);
+        toast.error(data.error?.message || '공지사항 생성에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error creating notice:', error);
-      alert('생성 실패');
+      toast.error('공지사항 생성 중 오류가 발생했습니다.');
     }
   };
 
@@ -148,38 +150,43 @@ export default function AdminNoticesPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert('공지사항이 수정되었습니다.');
+        toast.success('공지사항이 수정되었습니다.');
         setShowEditDialog(false);
         setSelectedNotice(null);
         resetForm();
         fetchNotices();
       } else {
-        alert(data.error.message);
+        toast.error(data.error?.message || '공지사항 수정에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error updating notice:', error);
-      alert('수정 실패');
+      toast.error('공지사항 수정 중 오류가 발생했습니다.');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+  const handleDeleteClick = (id: string) => {
+    setDeleteConfirmDialog({ open: true, id });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirmDialog.id) return;
 
     try {
-      const response = await fetch(`/api/admin/notices/${id}`, {
+      const response = await fetch(`/api/admin/notices/${deleteConfirmDialog.id}`, {
         method: 'DELETE',
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('공지사항이 삭제되었습니다.');
+        toast.success('공지사항이 삭제되었습니다.');
+        setDeleteConfirmDialog({ open: false, id: null });
         fetchNotices();
       } else {
-        alert(data.error.message);
+        toast.error(data.error?.message || '공지사항 삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error deleting notice:', error);
-      alert('삭제 실패');
+      toast.error('공지사항 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -370,7 +377,7 @@ export default function AdminNoticesPage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDelete(String(notice._id))}
+                            onClick={() => handleDeleteClick(String(notice._id))}
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
@@ -685,6 +692,26 @@ export default function AdminNoticesPage() {
               취소
             </Button>
             <Button onClick={handleEdit}>수정</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog({ open, id: open ? deleteConfirmDialog.id : null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>공지사항 삭제</DialogTitle>
+            <DialogDescription>
+              정말 이 공지사항을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmDialog({ open: false, id: null })}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              삭제
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

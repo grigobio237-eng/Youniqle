@@ -29,7 +29,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Tag,
-  Gift
+  Gift,
+  Bell,
+  MessageCircle,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
 interface Product {
@@ -63,6 +67,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [addingToWishlist, setAddingToWishlist] = useState(false);
+  const [stockAlertRegistered, setStockAlertRegistered] = useState(false);
+  const [registeringStockAlert, setRegisteringStockAlert] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -71,8 +77,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     if (session?.user && product) {
       checkWishlistStatus();
+      checkStockAlertStatus();
     }
   }, [session, product]);
+
+  const checkStockAlertStatus = async () => {
+    if (!session?.user || !product || product.stock > 0) return;
+
+    try {
+      const response = await fetch(`/api/stock-alerts?productId=${product._id}`);
+      if (response.ok) {
+        const data = await response.json();
+        // 이미 알림이 등록되어 있는지 확인
+        if (data.alerts && data.alerts.some((alert: any) => 
+          alert.product?._id === product._id && !alert.notified
+        )) {
+          setStockAlertRegistered(true);
+        }
+      }
+    } catch (error) {
+      console.error('재입고 알림 상태 확인 오류:', error);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -223,6 +249,51 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const calculateDiscount = () => {
     if (!product?.originalPrice || !product?.price) return 0;
     return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  };
+
+  const handleStockAlert = async () => {
+    if (!session?.user) {
+      alert('재입고 알림은 로그인이 필요합니다.');
+      return;
+    }
+
+    setRegisteringStockAlert(true);
+    try {
+      const response = await fetch('/api/stock-alerts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: product?._id,
+        }),
+      });
+
+      if (response.ok) {
+        setStockAlertRegistered(true);
+        alert('재입고 알림이 등록되었습니다. 재입고 시 이메일로 알려드리겠습니다.');
+      } else {
+        const errorData = await response.json();
+        if (errorData.error?.includes('이미 등록')) {
+          setStockAlertRegistered(true);
+          alert('이미 재입고 알림이 등록되어 있습니다.');
+        } else {
+          alert(errorData.error || '재입고 알림 등록에 실패했습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('재입고 알림 등록 중 오류:', error);
+      alert('재입고 알림 등록 중 오류가 발생했습니다.');
+    } finally {
+      setRegisteringStockAlert(false);
+    }
+  };
+
+  const scrollToQnA = () => {
+    const qnaSection = document.getElementById('product-qna');
+    if (qnaSection) {
+      qnaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   if (loading) {
@@ -380,14 +451,40 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* 재고 상태 */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
-              <span className={`font-medium ${
-                product.stock > 10 ? 'text-green-600' :
-                product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-                {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
+                <span className={`font-medium ${
+                  product.stock > 10 ? 'text-green-600' :
+                  product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
+                }`}>
+                  {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
+                </span>
+              </div>
+              {/* 재입고 알림 버튼 (품절 시) */}
+              {product.stock === 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleStockAlert}
+                  disabled={registeringStockAlert || stockAlertRegistered}
+                  className={`flex items-center space-x-2 ${
+                    stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
+                  }`}
+                >
+                  {stockAlertRegistered ? (
+                    <>
+                      <CheckCircle className="h-4 w-4" />
+                      <span>알림 등록됨</span>
+                    </>
+                  ) : (
+                    <>
+                      <Bell className="h-4 w-4" />
+                      <span>{registeringStockAlert ? '등록 중...' : '재입고 알림 받기'}</span>
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
 
             {/* 수량 선택 */}
@@ -490,12 +587,20 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* 추가 기능 버튼들 */}
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <SocialSharing
                 productName={product.name}
-                productUrl={`${window.location.origin}/products/${product._id}`}
+                productUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/products/${product._id}`}
                 productPrice={product.price}
               />
+              <Button
+                variant="outline"
+                onClick={scrollToQnA}
+                className="flex items-center space-x-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>상품 문의하기</span>
+              </Button>
             </div>
 
             {/* 배송 정보 */}
@@ -522,6 +627,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <p>• Nicepay 보안 결제 시스템</p>
                 <p>• SSL 암호화 통신</p>
                 <p>• 7일 무조건 환불 보장</p>
+              </div>
+            </div>
+
+            {/* 교환/반품 안내 */}
+            <div className="bg-purple-50 p-4 rounded-lg space-y-2">
+              <h3 className="font-semibold text-purple-900 flex items-center">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                교환/반품 안내
+              </h3>
+              <div className="text-sm text-purple-800 space-y-1">
+                <p>• <strong>반품 가능 기간:</strong> 배송 완료 후 7일 이내</p>
+                <p>• <strong>반품 불가:</strong> 고객 단순 변심 (단, 미개봉 제품은 가능)</p>
+                <p>• <strong>교환 가능:</strong> 상품 불량, 오배송 시 무료 교환</p>
+                <p>• <strong>반품 배송비:</strong> 단순 변심 시 5,000원 (상품 불량 시 무료)</p>
+                <p>• <strong>반품 주소:</strong> 서울특별시 강동구 고덕비즈밸리로 26</p>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-purple-700 underline text-xs mt-2"
+                  onClick={() => window.open('/terms', '_blank')}
+                >
+                  자세한 교환/반품 정책 보기 →
+                </Button>
               </div>
             </div>
           </div>
@@ -562,7 +689,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Q&A 섹션 */}
-        <div className="mt-12">
+        <div id="product-qna" className="mt-12 scroll-mt-20">
           <QuestionSection 
             productId={product._id}
             productName={product.name}

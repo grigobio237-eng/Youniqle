@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Mail, Phone, MapPin, Building, FileText, Send, CheckCircle } from 'lucide-react';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { toast } from 'sonner';
 
 interface PartnerInquiryData {
   name: string;
@@ -59,14 +60,15 @@ export default function PartnerInquiryPage() {
         const result = await response.json();
         console.log('문의 전송 성공:', result);
         setIsSubmitted(true);
+        toast.success('문의가 성공적으로 전송되었습니다.');
       } else {
         const errorData = await response.json();
         console.error('문의 전송 실패:', errorData);
-        alert(`문의 전송 실패: ${errorData.error || '알 수 없는 오류가 발생했습니다.'}`);
+        toast.error(`문의 전송 실패: ${errorData.error || '알 수 없는 오류가 발생했습니다.'}`);
       }
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      alert('문의 전송 중 오류가 발생했습니다. 다시 시도해주세요.');
+      toast.error('문의 전송 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }

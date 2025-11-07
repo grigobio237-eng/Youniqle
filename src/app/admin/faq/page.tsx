@@ -1,0 +1,529 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  ThumbsUp,
+  ThumbsDown,
+  MoreVertical,
+  HelpCircle,
+  ArrowUp,
+  ArrowDown,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+interface FAQ {
+  _id: string;
+  question: string;
+  answer: string;
+  category: 'order' | 'payment' | 'shipping' | 'member' | 'product' | 'refund' | 'other';
+  order: number;
+  views: number;
+  helpful: number;
+  notHelpful: number;
+  status: 'active' | 'hidden';
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+const categoryLabels = {
+  order: '주문',
+  payment: '결제',
+  shipping: '배송',
+  member: '회원',
+  product: '상품',
+  refund: '환불/교환',
+  other: '기타',
+};
+
+export default function AdminFAQPage() {
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
+  const [formData, setFormData] = useState({
+    question: '',
+    answer: '',
+    category: 'other' as FAQ['category'],
+    order: 0,
+    status: 'active' as 'active' | 'hidden',
+    tags: [] as string[],
+  });
+
+  useEffect(() => {
+    fetchFAQs();
+  }, [categoryFilter, statusFilter]);
+
+  const fetchFAQs = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (categoryFilter !== 'all') {
+        params.append('category', categoryFilter);
+      }
+      if (statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      const response = await fetch(`/api/faq?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setFaqs(data.data.faqs || []);
+      }
+    } catch (error) {
+      console.error('FAQ 조회 오류:', error);
+      toast.error('FAQ를 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = () => {
+    setEditingFAQ(null);
+    setFormData({
+      question: '',
+      answer: '',
+      category: 'other',
+      order: 0,
+      status: 'active',
+      tags: [],
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (faq: FAQ) => {
+    setEditingFAQ(faq);
+    setFormData({
+      question: faq.question,
+      answer: faq.answer,
+      category: faq.category,
+      order: faq.order,
+      status: faq.status,
+      tags: faq.tags || [],
+    });
+    setIsDialogOpen(true);
+  };
+
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [faqToDelete, setFaqToDelete] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    setFaqToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!faqToDelete) return;
+
+    try {
+      const response = await fetch(`/api/faq/${faqToDelete}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('FAQ가 삭제되었습니다.');
+        setDeleteConfirmOpen(false);
+        setFaqToDelete(null);
+        fetchFAQs();
+      } else {
+        toast.error(data.error || 'FAQ 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('FAQ 삭제 오류:', error);
+      toast.error('FAQ 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleSave = async () => {
+    if (!formData.question || !formData.answer) {
+      toast.error('질문과 답변을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      const url = editingFAQ ? `/api/faq/${editingFAQ._id}` : '/api/faq';
+      const method = editingFAQ ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(editingFAQ ? 'FAQ가 수정되었습니다.' : 'FAQ가 생성되었습니다.');
+        setIsDialogOpen(false);
+        fetchFAQs();
+      } else {
+        toast.error(data.error || 'FAQ 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('FAQ 저장 오류:', error);
+      toast.error('FAQ 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleOrderChange = async (id: string, direction: 'up' | 'down') => {
+    const faq = faqs.find(f => f._id === id);
+    if (!faq) return;
+
+    const newOrder = direction === 'up' ? faq.order - 1 : faq.order + 1;
+    
+    try {
+      const response = await fetch(`/api/faq/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: newOrder }),
+      });
+
+      if (response.ok) {
+        fetchFAQs();
+      }
+    } catch (error) {
+      console.error('순서 변경 오류:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">FAQ 관리</h1>
+          <p className="text-gray-600 mt-1">자주 묻는 질문을 관리하세요</p>
+        </div>
+        <Button onClick={handleCreate}>
+          <Plus className="h-4 w-4 mr-2" />
+          FAQ 추가
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="FAQ 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      fetchFAQs();
+                    }
+                  }}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="카테고리" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">전체 카테고리</SelectItem>
+                <SelectItem value="order">주문</SelectItem>
+                <SelectItem value="payment">결제</SelectItem>
+                <SelectItem value="shipping">배송</SelectItem>
+                <SelectItem value="member">회원</SelectItem>
+                <SelectItem value="product">상품</SelectItem>
+                <SelectItem value="refund">환불/교환</SelectItem>
+                <SelectItem value="other">기타</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="상태" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">전체 상태</SelectItem>
+                <SelectItem value="active">활성</SelectItem>
+                <SelectItem value="hidden">비활성</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={fetchFAQs} variant="outline">
+              검색
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* FAQ List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>FAQ 목록</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">로딩 중...</div>
+          ) : faqs.length === 0 ? (
+            <div className="text-center py-8">
+              <HelpCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-600">FAQ가 없습니다.</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">순서</TableHead>
+                  <TableHead>카테고리</TableHead>
+                  <TableHead>질문</TableHead>
+                  <TableHead className="w-24">조회수</TableHead>
+                  <TableHead className="w-24">도움이됨</TableHead>
+                  <TableHead className="w-24">상태</TableHead>
+                  <TableHead className="w-32">작성일</TableHead>
+                  <TableHead className="w-32">액션</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {faqs.map((faq) => (
+                  <TableRow key={faq._id}>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => handleOrderChange(faq._id, 'up')}
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </Button>
+                        <span className="text-center text-sm">{faq.order}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => handleOrderChange(faq._id, 'down')}
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {categoryLabels[faq.category]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-md">
+                        <p className="font-medium truncate">{faq.question}</p>
+                        <p className="text-sm text-gray-500 truncate">{faq.answer}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4 text-gray-400" />
+                        {faq.views}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <ThumbsUp className="h-4 w-4 text-green-500" />
+                        {faq.helpful}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={faq.status === 'active' ? 'default' : 'secondary'}>
+                        {faq.status === 'active' ? '활성' : '비활성'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-500">
+                      {new Date(faq.createdAt).toLocaleDateString('ko-KR')}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleEdit(faq)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            수정
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(faq._id)}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            삭제
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingFAQ ? 'FAQ 수정' : 'FAQ 추가'}</DialogTitle>
+            <DialogDescription>
+              FAQ 질문과 답변을 입력하세요
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="category">카테고리 *</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value: any) => setFormData(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="order">주문</SelectItem>
+                  <SelectItem value="payment">결제</SelectItem>
+                  <SelectItem value="shipping">배송</SelectItem>
+                  <SelectItem value="member">회원</SelectItem>
+                  <SelectItem value="product">상품</SelectItem>
+                  <SelectItem value="refund">환불/교환</SelectItem>
+                  <SelectItem value="other">기타</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="question">질문 *</Label>
+              <Input
+                id="question"
+                value={formData.question}
+                onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
+                placeholder="질문을 입력하세요"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="answer">답변 *</Label>
+              <Textarea
+                id="answer"
+                value={formData.answer}
+                onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
+                placeholder="답변을 입력하세요"
+                rows={8}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="order">정렬 순서</Label>
+                <Input
+                  id="order"
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 0 }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="status">상태</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value: any) => setFormData(prev => ({ ...prev, status: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">활성</SelectItem>
+                    <SelectItem value="hidden">비활성</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={handleSave}>
+              {editingFAQ ? '수정' : '생성'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>FAQ 삭제 확인</DialogTitle>
+            <DialogDescription>
+              이 FAQ를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setDeleteConfirmOpen(false); setFaqToDelete(null); }}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+

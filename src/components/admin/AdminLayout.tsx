@@ -32,7 +32,8 @@ import {
   Zap,
   Target,
   Clock,
-  DollarSign
+  DollarSign,
+  MessageCircle
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -86,6 +87,18 @@ const navigationItems = [
     href: '/admin/refunds',
     icon: Clock,
     description: '환불 및 교환 요청 관리'
+  },
+  {
+    name: '문의 관리',
+    href: '/admin/inquiries',
+    icon: MessageCircle,
+    description: '고객 문의 관리 및 답변'
+  },
+  {
+    name: 'FAQ 관리',
+    href: '/admin/faq',
+    icon: FileText,
+    description: 'FAQ 작성 및 관리'
   },
   {
     name: '포인트 관리',

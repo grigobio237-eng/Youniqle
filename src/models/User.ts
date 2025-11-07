@@ -67,6 +67,45 @@ export interface IUser extends Document {
     totalCommission: number;
     lastSettlementAt?: Date;
   };
+  notificationSettings?: {
+    email: {
+      order: boolean;
+      shipping: boolean;
+      coupon: boolean;
+      point: boolean;
+      promotion: boolean;
+      newsletter: boolean;
+    };
+    sms: {
+      order: boolean;
+      shipping: boolean;
+      coupon: boolean;
+      promotion: boolean;
+    };
+    push: {
+      order: boolean;
+      shipping: boolean;
+      coupon: boolean;
+      point: boolean;
+      promotion: boolean;
+    };
+  };
+  paymentMethods?: Array<{
+    cardType: 'visa' | 'mastercard' | 'amex' | 'other';
+    cardHolder: string;
+    expiryMonth: string;
+    expiryYear: string;
+    encryptedCardNumber: string;
+    last4: string;
+    isDefault: boolean;
+  }>;
+  isDeleted?: boolean;
+  deletedAt?: Date;
+  deleteReason?: {
+    reason: string;
+    reasonDetail?: string;
+    deletedAt: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -194,6 +233,45 @@ const UserSchema = new Schema<IUser>({
     totalRevenue: { type: Number, default: 0 },
     totalCommission: { type: Number, default: 0 },
     lastSettlementAt: { type: Date }
+  },
+  notificationSettings: {
+    email: {
+      order: { type: Boolean, default: true },
+      shipping: { type: Boolean, default: true },
+      coupon: { type: Boolean, default: true },
+      point: { type: Boolean, default: true },
+      promotion: { type: Boolean, default: false },
+      newsletter: { type: Boolean, default: false },
+    },
+    sms: {
+      order: { type: Boolean, default: true },
+      shipping: { type: Boolean, default: true },
+      coupon: { type: Boolean, default: false },
+      promotion: { type: Boolean, default: false },
+    },
+    push: {
+      order: { type: Boolean, default: true },
+      shipping: { type: Boolean, default: true },
+      coupon: { type: Boolean, default: true },
+      point: { type: Boolean, default: true },
+      promotion: { type: Boolean, default: false },
+    },
+  },
+  paymentMethods: [{
+    cardType: { type: String, enum: ['visa', 'mastercard', 'amex', 'other'], default: 'other' },
+    cardHolder: { type: String, required: true },
+    expiryMonth: { type: String, required: true },
+    expiryYear: { type: String, required: true },
+    encryptedCardNumber: { type: String, required: true },
+    last4: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
+  }],
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date },
+  deleteReason: {
+    reason: { type: String },
+    reasonDetail: { type: String },
+    deletedAt: { type: Date },
   }
 }, {
   timestamps: true,

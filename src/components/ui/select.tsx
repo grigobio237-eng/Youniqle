@@ -8,11 +8,13 @@ interface SelectProps {
   children: React.ReactNode;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 interface SelectContentProps {
@@ -31,13 +33,14 @@ const SelectContext = React.createContext<{
   onValueChange: (value: string) => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  disabled?: boolean;
 } | null>(null);
 
-export function Select({ value, onValueChange, children, placeholder, className }: SelectProps) {
+export function Select({ value, onValueChange, children, placeholder, className, disabled }: SelectProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <SelectContext.Provider value={{ value, onValueChange, isOpen, setIsOpen }}>
+    <SelectContext.Provider value={{ value, onValueChange, isOpen, setIsOpen, disabled }}>
       <div className={cn('relative', className)}>
         {children}
       </div>
@@ -45,20 +48,22 @@ export function Select({ value, onValueChange, children, placeholder, className 
   );
 }
 
-export function SelectTrigger({ children, className }: SelectTriggerProps) {
+export function SelectTrigger({ children, className, disabled: triggerDisabled }: SelectTriggerProps) {
   const context = React.useContext(SelectContext);
   if (!context) throw new Error('SelectTrigger must be used within Select');
 
-  const { isOpen, setIsOpen } = context;
+  const { isOpen, setIsOpen, disabled: contextDisabled } = context;
+  const isDisabled = triggerDisabled !== undefined ? triggerDisabled : contextDisabled;
 
   return (
     <button
       type="button"
+      disabled={isDisabled}
       className={cn(
         'flex h-12 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm ring-offset-background placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={() => !isDisabled && setIsOpen(!isOpen)}
     >
       {children}
       {isOpen ? (
