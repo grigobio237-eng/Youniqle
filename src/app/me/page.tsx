@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
 import PostcodeSearch from '@/components/ui/PostcodeSearch';
-import AddressSearch from '@/components/ui/AddressSearch';
+import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
 import { User, Mail, Phone, MapPin, Settings, Save, Store, CheckCircle, Clock, XCircle, AlertCircle, X, Upload, FileImage } from 'lucide-react';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ export default function MyPage() {
   const [partnerApplicationData, setPartnerApplicationData] = useState({
     businessName: '',
     businessNumber: '',
+    businessZipCode: '',
     businessAddress: '',
     businessDetailAddress: '',
     businessPhone: '',
@@ -212,10 +213,14 @@ export default function MyPage() {
   const handlePartnerApplicationSubmit = async () => {
     setPartnerApplicationLoading(true);
     try {
-      // 전체 주소를 결합 (기본 주소 + 상세주소)
-      const fullBusinessAddress = partnerApplicationData.businessDetailAddress 
-        ? `${partnerApplicationData.businessAddress} ${partnerApplicationData.businessDetailAddress}`
-        : partnerApplicationData.businessAddress;
+      // 전체 주소를 결합 (우편번호 + 기본 주소 + 상세주소)
+      let fullBusinessAddress = partnerApplicationData.businessAddress;
+      if (partnerApplicationData.businessZipCode) {
+        fullBusinessAddress = `[${partnerApplicationData.businessZipCode}] ${fullBusinessAddress}`;
+      }
+      if (partnerApplicationData.businessDetailAddress) {
+        fullBusinessAddress = `${fullBusinessAddress} ${partnerApplicationData.businessDetailAddress}`;
+      }
 
       const response = await fetch('/api/partner/auth/apply', {
         method: 'POST',
@@ -703,18 +708,42 @@ export default function MyPage() {
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="businessAddress">사업장 주소 *</Label>
-                        <AddressSearch
-                          value={partnerApplicationData.businessAddress}
-                          detailValue={partnerApplicationData.businessDetailAddress}
-                          onAddressSelect={(address, detailAddress) => {
-                            handlePartnerApplicationChange('businessAddress', address);
-                            if (detailAddress !== undefined) {
-                              handlePartnerApplicationChange('businessDetailAddress', detailAddress);
-                            }
-                          }}
-                          placeholder="사업장 주소를 검색하세요"
-                          detailPlaceholder="상세주소를 입력하세요 (예: 101호, 2층)"
-                        />
+                        
+                        {/* Google 주소 검색 */}
+                        <div className="mb-3">
+                          <GoogleAddressSearch
+                            onAddressSelect={(address) => {
+                              handlePartnerApplicationChange('businessZipCode', address.zonecode);
+                              handlePartnerApplicationChange('businessAddress', address.address);
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 주소 입력 필드들 */}
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <Input
+                              value={partnerApplicationData.businessZipCode}
+                              onChange={(e) => handlePartnerApplicationChange('businessZipCode', e.target.value)}
+                              placeholder="우편번호 (직접 입력 가능)"
+                              className="w-32"
+                            />
+                            <Input
+                              value={partnerApplicationData.businessAddress}
+                              onChange={(e) => handlePartnerApplicationChange('businessAddress', e.target.value)}
+                              placeholder="도로명주소"
+                              className="flex-1"
+                            />
+                          </div>
+                          <Input
+                            value={partnerApplicationData.businessDetailAddress}
+                            onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)}
+                            placeholder="상세주소를 입력하세요 (예: 101호, 2층)"
+                          />
+                          <div className="text-xs text-gray-500">
+                            💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
+                          </div>
+                        </div>
                       </div>
                       <div>
                         <Label htmlFor="businessDescription">사업 설명 *</Label>
