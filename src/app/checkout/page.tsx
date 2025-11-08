@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CharacterImage from '@/components/ui/CharacterImage';
 import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +25,8 @@ import {
   ArrowLeft,
   ShoppingCart,
   CheckCircle,
-  Tag
+  Tag,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -93,6 +95,14 @@ function CheckoutPageContent() {
   const [usePoints, setUsePoints] = useState(0);
   const [pointsError, setPointsError] = useState('');
   const [expectedEarnPoints, setExpectedEarnPoints] = useState<number>(0);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      const mobileRegex = /android|iphone|ipad|ipod|windows phone|blackberry/i;
+      setIsMobileDevice(mobileRegex.test(navigator.userAgent));
+    }
+  }, []);
 
   // 사용자 정보 로드
   useEffect(() => {
@@ -536,10 +546,7 @@ function CheckoutPageContent() {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = paymentResult.authUrl;
-        const isMobile = /android|iphone|ipad|ipod|windows phone|blackberry/i.test(
-          navigator.userAgent || ''
-        );
-        form.acceptCharset = isMobile ? 'euc-kr' : 'utf-8';
+        form.acceptCharset = 'euc-kr';
         
         Object.entries(paymentResult.formData).forEach(([key, value]) => {
           const input = document.createElement('input');
@@ -782,6 +789,15 @@ function CheckoutPageContent() {
                     <Label htmlFor="card">카드결제</Label>
                   </div>
                 </RadioGroup>
+              {!isMobileDevice && (
+                <Alert className="mt-4 border-yellow-300 bg-yellow-50 text-yellow-900">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>PC 결제 안내</AlertTitle>
+                  <AlertDescription>
+                    PC 환경에서는 신한 SOL페이 등 일부 간편결제가 지원되지 않을 수 있습니다. 일반 카드 결제를 이용해 주세요.
+                  </AlertDescription>
+                </Alert>
+              )}
                 <p className="text-sm text-gray-600 mt-2">
                   안전한 나이스페이 결제 시스템을 사용합니다.
                 </p>

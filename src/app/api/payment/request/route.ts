@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       PayMethod: normalizedMethod,
       GoodsCl: goodsClassification,
       TransType: transType,
-      CharSet: 'UTF-8',
+      CharSet: 'EUC-KR',
       Language: 'KOREAN',
       Currency: 'KRW',
       ReqReserved: reservedPayload,
