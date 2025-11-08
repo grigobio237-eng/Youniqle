@@ -19,6 +19,8 @@ export async function POST(request: NextRequest) {
     const amt = formData.get('Amt') as string;
     const txTid = formData.get('TxTid') as string;
     const nextAppURL = formData.get('NextAppURL') as string;
+    const netCancelURL = formData.get('NetCancelURL') as string;
+    const responseSignature = formData.get('Signature') as string;
     
     console.log('나이스페이 결과 수신:', {
       authResultCode,
@@ -29,6 +31,52 @@ export async function POST(request: NextRequest) {
 
     // 인증 성공 여부 확인
     const isAuthSuccess = authResultCode === '0000';
+
+    const merchantKey = process.env.NICEPAY_MERCHANT_KEY || '';
+
+    if (isAuthSuccess && responseSignature) {
+      const authSignature = crypto
+        .createHash('sha256')
+        .update(authToken + mid + amt + merchantKey)
+        .digest('hex');
+
+      if (authSignature !== responseSignature) {
+        console.error('⚠️ 나이스페이 인증 응답 서명 검증 실패', {
+          expected: authSignature,
+          received: responseSignature,
+        });
+
+        const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-failed?orderId=${moid}&error=${encodeURIComponent(
+          '인증 응답 무결성 검증에 실패했습니다.'
+        )}`;
+
+        const htmlResponse = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>결제 실패</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div style="text-align: center; padding: 50px;">
+        <h2>결제 무결성 검증에 실패했습니다</h2>
+        <p>잠시 후 주문 페이지로 이동합니다...</p>
+        <script>
+            setTimeout(function() {
+                window.location.href = '${redirectUrl}';
+            }, 2000);
+        </script>
+    </div>
+</body>
+</html>`;
+
+        return new Response(htmlResponse, {
+          status: 200,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        });
+      }
+    }
     
     if (isAuthSuccess && nextAppURL) {
       try {
@@ -42,7 +90,6 @@ export async function POST(request: NextRequest) {
           now.getSeconds().toString().padStart(2, '0');
         
         // 승인 서명 생성 (AuthToken + MID + Amt + EdiDate + MerchantKey)
-        const merchantKey = process.env.NICEPAY_MERCHANT_KEY || '';
         const signData = crypto.createHash('sha256')
           .update(authToken + mid + amt + ediDate + merchantKey)
           .digest('hex');
@@ -65,16 +112,57 @@ export async function POST(request: NextRequest) {
         });
 
         // 승인 요청 전송
-        const response = await fetch(nextAppURL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: approvalData.toString(),
-        });
-        
-        const approvalResult = await response.text();
-        
+        const approvalRequestBody = approvalData.toString();
+        let approvalResult = '';
+        let approvalResponseOk = true;
+
+        try {
+          const response = await fetch(nextAppURL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: approvalRequestBody,
+          });
+
+          approvalResponseOk = response.ok;
+          approvalResult = await response.text();
+        } catch (networkError) {
+          approvalResponseOk = false;
+          console.error('나이스페이 승인 요청 네트워크 오류:', networkError);
+        }
+
+        if (!approvalResponseOk || approvalResult.trim() === '9999' || !approvalResult.trim()) {
+          console.error('나이스페이 승인 요청 실패, 망취소 시도', {
+            approvalResponseOk,
+            approvalResult,
+          });
+
+          if (netCancelURL) {
+            try {
+              const netCancelData = new URLSearchParams(approvalData);
+              netCancelData.append('NetCancel', '1');
+
+              const netCancelResponse = await fetch(netCancelURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: netCancelData.toString(),
+              });
+
+              const netCancelResult = await netCancelResponse.text();
+              console.log('나이스페이 망취소 결과:', netCancelResult);
+            } catch (netCancelError) {
+              console.error('망취소 요청 실패:', netCancelError);
+            }
+          } else {
+            console.warn('망취소 URL이 제공되지 않았습니다.');
+          }
+
+          throw new Error('나이스페이 승인 요청에 실패했습니다.');
+        }
+
         // 승인 결과 파싱
         let approvalDataObj: any = {};
         try {
@@ -87,6 +175,9 @@ export async function POST(request: NextRequest) {
         const resultCode = approvalDataObj.ResultCode || approvalDataObj.resultCode;
         const resultMsg = approvalDataObj.ResultMsg || approvalDataObj.resultMsg;
         const payMethodResult = approvalDataObj.PayMethod || approvalDataObj.payMethod;
+        const resultSignature = approvalDataObj.Signature || approvalDataObj.signature;
+        const resultTid = approvalDataObj.TID || approvalDataObj.tid || txTid;
+        const resultAmt = approvalDataObj.Amt || approvalDataObj.amt || amt;
         
         console.log('나이스페이 승인 결과:', {
           resultCode,
@@ -94,16 +185,42 @@ export async function POST(request: NextRequest) {
           payMethodResult
         });
 
+        if (resultSignature) {
+          const approvalSignature = crypto
+            .createHash('sha256')
+            .update(`${resultTid}${mid}${resultAmt}${merchantKey}`)
+            .digest('hex');
+
+          if (approvalSignature !== resultSignature) {
+            console.error('⚠️ 나이스페이 승인 응답 서명 검증 실패', {
+              expected: approvalSignature,
+              received: resultSignature,
+            });
+            throw new Error('승인 응답 무결성 검증에 실패했습니다.');
+          }
+        }
+
         // 결제 성공 여부 확인
         let isPaymentSuccess = false;
-        if (payMethodResult === 'CARD' && resultCode === '3001') {
-          isPaymentSuccess = true; // 신용카드
-        } else if (payMethodResult === 'BANK' && resultCode === '4000') {
-          isPaymentSuccess = true; // 계좌이체
-        } else if (payMethodResult === 'CELLPHONE' && resultCode === 'A000') {
-          isPaymentSuccess = true; // 휴대폰
-        } else if (payMethodResult === 'VBANK' && resultCode === '4100') {
-          isPaymentSuccess = true; // 가상계좌
+        switch (payMethodResult) {
+          case 'CARD':
+            isPaymentSuccess = resultCode === '3001';
+            break;
+          case 'BANK':
+            isPaymentSuccess = resultCode === '4000';
+            break;
+          case 'CELLPHONE':
+            isPaymentSuccess = resultCode === 'A000';
+            break;
+          case 'VBANK':
+            isPaymentSuccess = resultCode === '4100';
+            break;
+          case 'SSG_BANK':
+          case 'CMS_BANK':
+            isPaymentSuccess = resultCode === '0000';
+            break;
+          default:
+            isPaymentSuccess = false;
         }
         
         if (isPaymentSuccess) {

@@ -1,10 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+type SupportedPayMethod =
+  | 'CARD'
+  | 'BANK'
+  | 'VBANK'
+  | 'CELLPHONE'
+  | 'SSG_BANK'
+  | 'CMS_BANK';
+
+const methodMap: Record<string, SupportedPayMethod> = {
+  card: 'CARD',
+  CARD: 'CARD',
+  bank: 'BANK',
+  BANK: 'BANK',
+  vbank: 'VBANK',
+  VBANK: 'VBANK',
+  cellphone: 'CELLPHONE',
+  CELLPHONE: 'CELLPHONE',
+  ssg_bank: 'SSG_BANK',
+  SSG_BANK: 'SSG_BANK',
+  cms_bank: 'CMS_BANK',
+  CMS_BANK: 'CMS_BANK',
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { orderId, amount, productName, buyerName, buyerEmail, buyerTel } = body;
+    const {
+      orderId,
+      amount,
+      productName,
+      buyerName,
+      buyerEmail,
+      buyerTel,
+      payMethod,
+      paymentMethod,
+      reqReserved,
+      goodsClass,
+      transactionType,
+    } = body;
 
     // 입력값 검증
     if (!orderId || !amount || !productName || !buyerName || !buyerEmail) {
@@ -23,6 +58,28 @@ export async function POST(request: NextRequest) {
     // 나이스페이 공식 문서 기준 파라미터 생성
     const ediDate = new Date().toISOString()
         .replace(/[-:T.]/g, '').substring(0, 14);
+
+    // 결제수단 매핑 (기본값: CARD)
+    const requestedMethod = (payMethod || paymentMethod || 'CARD') as string;
+    const normalizedMethod = methodMap[requestedMethod] || 'CARD';
+
+    const goodsClassification =
+      typeof goodsClass === 'string' && ['0', '1'].includes(goodsClass)
+        ? goodsClass
+        : '1'; // 실물 상품: 1, 컨텐츠: 0
+    const transType =
+      typeof transactionType === 'string' && ['0', '1'].includes(transactionType)
+        ? transactionType
+        : '0'; // 일반거래: 0, 에스크로:1
+
+    const reservedPayload =
+      typeof reqReserved === 'string'
+        ? reqReserved
+        : JSON.stringify({
+            orderId,
+            buyerEmail,
+            generatedAt: ediDate,
+          });
     
     // 서명 생성 (EdiDate + MID + Amt + MerchantKey)
     const signatureData = `${ediDate}${merchantId}${amount}${merchantKey}`;
@@ -42,10 +99,13 @@ export async function POST(request: NextRequest) {
       BuyerTel: buyerTel || '',
       ReturnURL: returnUrl,
       CancelURL: cancelUrl,
-      PayMethod: 'CARD',
+      PayMethod: normalizedMethod,
+      GoodsCl: goodsClassification,
+      TransType: transType,
       CharSet: 'UTF-8',
       Language: 'KOREAN',
       Currency: 'KRW',
+      ReqReserved: reservedPayload,
     };
 
     console.log('나이스페이 결제 요청:', {

@@ -496,6 +496,14 @@ function CheckoutPageContent() {
         buyerName: shippingAddress.recipient,
         buyerEmail: session?.user?.email || '',
         buyerTel: shippingAddress.phone,
+        payMethod: paymentMethod,
+        goodsClass: '1',
+        transactionType: '0',
+        reqReserved: JSON.stringify({
+          orderId: order.orderNumber || order._id,
+          userId: order.userId || session?.user?.id || '',
+          email: session?.user?.email || '',
+        }),
       };
 
       console.log('나이스페이 결제 요청 데이터:', paymentData);
@@ -516,7 +524,10 @@ function CheckoutPageContent() {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = paymentResult.authUrl;
-        form.acceptCharset = 'utf-8'; // UTF-8 인코딩 명시
+        const isMobile = /android|iphone|ipad|ipod|windows phone|blackberry/i.test(
+          navigator.userAgent || ''
+        );
+        form.acceptCharset = isMobile ? 'euc-kr' : 'utf-8';
         
         Object.entries(paymentResult.formData).forEach(([key, value]) => {
           const input = document.createElement('input');

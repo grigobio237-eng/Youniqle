@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import iconv from 'iconv-lite';
 import { connectDB } from '@/lib/db';
 import Order from '@/models/Order';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { orderId, tid, amount, reason } = body;
+    const { orderId, tid, amount, reason, partialCancelCode } = body;
 
     // 입력값 검증
     if (!tid || !amount) {
@@ -34,17 +35,42 @@ export async function POST(request: NextRequest) {
     const signature = crypto.createHash('sha256')
       .update(signatureData).digest('hex');
 
-    // 취소 요청 데이터 생성
-    const cancelData = new URLSearchParams();
-    cancelData.append('TID', tid);
-    cancelData.append('MID', merchantId);
-    cancelData.append('Moid', orderId || '');
-    cancelData.append('CancelAmt', amount.toString());
-    cancelData.append('CancelMsg', reason || '사용자 요청에 의한 취소');
-    cancelData.append('PartialCancelCode', '0'); // 전체 취소
-    cancelData.append('EdiDate', ediDate);
-    cancelData.append('CharSet', 'utf-8');
-    cancelData.append('SignData', signature);
+    const cancelMessage = reason && reason.trim() ? reason.trim() : '사용자 요청 취소';
+    const partialCode = partialCancelCode === '1' || partialCancelCode === 1 ? '1' : '0';
+
+    const encodeEucKr = (value: string) => {
+      const buffer = iconv.encode(value, 'euc-kr');
+      let result = '';
+      for (const byte of buffer) {
+        const char = String.fromCharCode(byte);
+        if (
+          (byte >= 0x30 && byte <= 0x39) || // 0-9
+          (byte >= 0x41 && byte <= 0x5a) || // A-Z
+          (byte >= 0x61 && byte <= 0x7a) || // a-z
+          char === '-' ||
+          char === '_' ||
+          char === '.' ||
+          char === '~'
+        ) {
+          result += char;
+        } else {
+          result += `%${byte.toString(16).toUpperCase().padStart(2, '0')}`;
+        }
+      }
+      return result;
+    };
+
+    const cancelPayload = [
+      `TID=${encodeURIComponent(tid)}`,
+      `MID=${encodeURIComponent(merchantId)}`,
+      `Moid=${encodeURIComponent(orderId || '')}`,
+      `CancelAmt=${encodeURIComponent(amount.toString())}`,
+      `CancelMsg=${encodeEucKr(cancelMessage)}`,
+      `PartialCancelCode=${encodeURIComponent(partialCode)}`,
+      `EdiDate=${encodeURIComponent(ediDate)}`,
+      `CharSet=${encodeURIComponent('utf-8')}`,
+      `SignData=${encodeURIComponent(signature)}`,
+    ].join('&');
 
     console.log('나이스페이 취소 요청:', {
       TID: tid,
@@ -54,12 +80,12 @@ export async function POST(request: NextRequest) {
     });
 
     // 나이스페이 취소 API 호출
-    const response = await fetch('https://web.nicepay.co.kr/v3/cancel.jsp', {
+    const response = await fetch('https://webapi.nicepay.co.kr/webapi/cancel_process.jsp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: cancelData.toString(),
+      body: cancelPayload,
     });
 
     const cancelResult = await response.text();
@@ -88,20 +114,28 @@ export async function POST(request: NextRequest) {
         const order = await Order.findOne({ orderNumber: orderId });
         
         if (order) {
-          order.paymentStatus = 'failed';
-          order.status = 'cancelled';
+          if (partialCode === '1') {
+            order.paymentStatus = 'completed';
+            console.log('부분 취소 처리 완료:', orderId);
+          } else {
+            order.paymentStatus = 'failed';
+            order.status = 'cancelled';
+            console.log('주문 취소 완료:', orderId);
+          }
           order.updatedAt = new Date();
           await order.save();
-          
-          console.log('주문 취소 완료:', orderId);
         }
       }
 
       return NextResponse.json({
         success: true,
-        message: '결제가 성공적으로 취소되었습니다.',
+        message:
+          partialCode === '1'
+            ? '결제가 부분 취소되었습니다.'
+            : '결제가 성공적으로 취소되었습니다.',
         resultCode,
         resultMsg,
+        partialCancel: partialCode === '1',
       });
     } else {
       // 취소 실패
