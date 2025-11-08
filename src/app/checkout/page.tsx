@@ -487,6 +487,18 @@ function CheckoutPageContent() {
       console.log('주문 생성 결과:', order);
 
       // 2단계: 나이스페이 결제 요청
+      const resolvedOrderUserId =
+        typeof order.userId === 'string'
+          ? order.userId
+          : order.userId && typeof (order.userId as any).toString === 'function'
+          ? (order.userId as any).toString()
+          : '';
+
+      const sessionUserId =
+        session?.user && typeof (session.user as any).id === 'string'
+          ? (session.user as any).id
+          : '';
+
       const paymentData = {
         orderId: order.orderNumber || order._id,
         amount: totalAmount,
@@ -501,7 +513,7 @@ function CheckoutPageContent() {
         transactionType: '0',
         reqReserved: JSON.stringify({
           orderId: order.orderNumber || order._id,
-          userId: order.userId || session?.user?.id || '',
+          userId: resolvedOrderUserId || sessionUserId,
           email: session?.user?.email || '',
         }),
       };
