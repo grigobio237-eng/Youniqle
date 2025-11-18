@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import connectDB from '@/lib/db';
 import Inquiry from '@/models/Inquiry';
+import User from '@/models/User';
 import { authOptions } from '@/lib/auth';
 
 const ALLOWED_TYPES = new Set([
@@ -99,6 +100,16 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    // 사용자 정보 조회 (userId를 얻기 위해)
+    const user = await User.findOne({ email: session.user.email }).lean().exec() as { _id: any } | null;
+    
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: { code: 'USER_NOT_FOUND', message: '사용자를 찾을 수 없습니다.' } },
+        { status: 404 }
+      );
+    }
+
     const inquiryId = await generateInquiryId();
 
     if (Array.isArray(attachments) && attachments.length > 5) {
@@ -120,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     const inquiry = await Inquiry.create({
       inquiryId,
-      userId: session.user.id,
+      userId: user._id,
       userEmail: session.user.email,
       userName: session.user.name || '고객',
       type: ALLOWED_TYPES.has(type) ? type : 'general',
@@ -167,6 +178,9 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
+    // 사용자 정보 조회 (userId를 얻기 위해)
+    const user = await User.findOne({ email: session.user.email }).lean().exec() as { _id?: any } | null;
+    
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const type = searchParams.get('type');
@@ -174,7 +188,9 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '10', 10), 1), 50);
 
     const filter: Record<string, any> = {
-      $or: [{ userId: session.user.id }, { userEmail: session.user.email }],
+      $or: user?._id 
+        ? [{ userId: user._id }, { userEmail: session.user.email }]
+        : [{ userEmail: session.user.email }],
     };
 
     if (status && ALLOWED_STATUSES.has(status)) {

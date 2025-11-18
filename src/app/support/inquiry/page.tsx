@@ -222,7 +222,7 @@ export default function SupportInquiryPage() {
                 <div className="space-y-2">
                   <Label htmlFor="type">문의 유형</Label>
                   <Select value={type} onValueChange={setType}>
-                    <SelectTrigger id="type">
+                    <SelectTrigger>
                       <SelectValue placeholder="문의 유형을 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
@@ -238,7 +238,7 @@ export default function SupportInquiryPage() {
                 <div className="space-y-2">
                   <Label htmlFor="priority">우선순위</Label>
                   <Select value={priority} onValueChange={setPriority}>
-                    <SelectTrigger id="priority">
+                    <SelectTrigger>
                       <SelectValue placeholder="우선순위를 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
