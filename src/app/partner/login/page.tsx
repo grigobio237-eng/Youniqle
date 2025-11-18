@@ -48,8 +48,10 @@ export default function PartnerLoginPage() {
             errorMessage = '파트너 신청이 거부되었습니다. 관리자에게 문의해주세요.';
           } else if (status === 'suspended') {
             errorMessage = '파트너 계정이 정지되었습니다. 관리자에게 문의해주세요.';
+          } else if (status === 'none') {
+            errorMessage = '파트너 신청이 필요합니다. 파트너 신청을 먼저 해주세요.';
           } else {
-            errorMessage = '파트너 승인이 필요한 서비스입니다. 파트너 신청을 먼저 해주세요.';
+            errorMessage = `파트너 승인이 필요한 서비스입니다. 현재 상태: ${status || 'none'}. 파트너 신청을 먼저 해주세요.`;
           }
           break;
         case 'callback-failed':
@@ -172,7 +174,62 @@ export default function PartnerLoginPage() {
           <CardContent>
             {error && (
               <Alert variant="destructive" className="mb-6">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <div>{error}</div>
+                    {error.includes('파트너 승인') && (
+                      <div className="mt-3 pt-3 border-t border-red-200">
+                        <p className="text-xs text-red-700 mb-2">디버깅 도구:</p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('/api/partner/auth/debug-status');
+                                const data = await response.json();
+                                if (data.success) {
+                                  alert(`현재 상태: ${data.user.partnerStatus}\n이메일: ${data.user.email}\n신청 여부: ${data.user.hasPartnerApplication ? '있음' : '없음'}`);
+                                } else {
+                                  alert('상태 확인 실패: ' + (data.error || '알 수 없는 오류'));
+                                }
+                              } catch (err) {
+                                alert('상태 확인 중 오류 발생');
+                              }
+                            }}
+                            className="text-xs"
+                          >
+                            내 상태 확인
+                          </Button>
+                          {process.env.NODE_ENV === 'development' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                if (!confirm('테스트용으로 파트너를 승인하시겠습니까? (개발 환경만 가능)')) return;
+                                try {
+                                  const response = await fetch('/api/partner/auth/test-approve', { method: 'POST' });
+                                  const data = await response.json();
+                                  if (data.success) {
+                                    alert('파트너로 승인되었습니다! 다시 로그인해주세요.');
+                                    window.location.reload();
+                                  } else {
+                                    alert('승인 실패: ' + (data.error || '알 수 없는 오류'));
+                                  }
+                                } catch (err) {
+                                  alert('승인 처리 중 오류 발생');
+                                }
+                              }}
+                              className="text-xs"
+                            >
+                              테스트 승인
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </AlertDescription>
               </Alert>
             )}
 

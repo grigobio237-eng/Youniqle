@@ -32,12 +32,13 @@ export async function GET(request: NextRequest) {
       email: user.email,
       partnerStatus: user.partnerStatus,
       role: user.role,
-      hasPartnerApplication: !!user.partnerApplication
+      hasPartnerApplication: !!user.partnerApplication,
+      _id: user._id.toString()
     });
 
     // 파트너 권한 확인
     if (user.partnerStatus !== 'approved') {
-      console.log('파트너 권한 없음:', {
+      const debugInfo = {
         currentStatus: user.partnerStatus,
         expectedStatus: 'approved',
         hasApplication: !!user.partnerApplication,
@@ -46,8 +47,13 @@ export async function GET(request: NextRequest) {
           approvedAt: user.partnerApplication.approvedAt,
           rejectedAt: user.partnerApplication.rejectedAt,
           rejectedReason: user.partnerApplication.rejectedReason
-        } : null
-      });
+        } : null,
+        userId: user._id.toString(),
+        userEmail: user.email
+      };
+      
+      console.error('❌ 파트너 권한 없음:', JSON.stringify(debugInfo, null, 2));
+      console.error('💡 해결 방법: 관리자 페이지(/admin/partners)에서 해당 사용자를 승인하거나, MongoDB에서 직접 partnerStatus를 "approved"로 변경하세요.');
       
       // 상태에 따른 상세 에러 메시지
       let errorParam = 'not-partner';
@@ -57,6 +63,8 @@ export async function GET(request: NextRequest) {
         errorParam = 'not-partner&status=rejected';
       } else if (user.partnerStatus === 'suspended') {
         errorParam = 'not-partner&status=suspended';
+      } else if (user.partnerStatus === 'none' || !user.partnerStatus) {
+        errorParam = 'not-partner&status=none';
       }
       
       return NextResponse.redirect(new URL(`/partner/login?error=${errorParam}`, request.url));
