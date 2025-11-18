@@ -24,7 +24,8 @@ const generateInquiryId = async () => {
 
   const latest = await Inquiry.findOne({ inquiryId: new RegExp(`^INQ-${date}`) })
     .sort({ inquiryId: -1 })
-    .lean();
+    .lean()
+    .exec() as { inquiryId?: string } | null;
 
   if (latest?.inquiryId) {
     const parts = latest.inquiryId.split('-');
