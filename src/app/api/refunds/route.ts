@@ -84,9 +84,21 @@ export async function POST(request: NextRequest) {
     // 금액 계산
     let totalAmount = 0;
     let refundAmount = 0;
+    const partnerIds = new Set<string>();
+    const partnerNameById = new Map<string, string>();
+
+    if (Array.isArray(order.partnerOrders)) {
+      order.partnerOrders.forEach((po: any) => {
+        if (po?.partnerId) {
+          partnerNameById.set(po.partnerId.toString(), po.partnerName);
+        }
+      });
+    }
+
     const refundItems = items.map((item: any) => {
       const orderItem = order.items.find(
-        (oi: any) => oi.productId._id.toString() === item.productId
+        (oi: any) =>
+          (oi.productId?._id?.toString?.() || oi.productId?.toString?.()) === item.productId
       );
       if (!orderItem) {
         throw new Error('주문 상품을 찾을 수 없습니다.');
@@ -95,6 +107,19 @@ export async function POST(request: NextRequest) {
       const itemTotal = orderItem.price * item.quantity;
       totalAmount += itemTotal;
       refundAmount += itemTotal;
+
+      const matchedPartnerId =
+        orderItem.partnerId?.toString?.() ||
+        order.partnerOrders?.find((po: any) =>
+          po.items?.some?.(
+            (poItem: any) =>
+              (poItem.productId?._id?.toString?.() || poItem.productId?.toString?.()) === item.productId
+          )
+        )?.partnerId?.toString?.();
+
+      if (matchedPartnerId) {
+        partnerIds.add(matchedPartnerId);
+      }
 
       return {
         productId: item.productId,
@@ -124,8 +149,11 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       userName: user.name,
       userEmail: user.email,
-      partnerId: order.partnerId,
-      partnerName: order.partnerName,
+      partnerId: partnerIds.size === 1 ? Array.from(partnerIds)[0] : undefined,
+      partnerName:
+        partnerIds.size === 1
+          ? partnerNameById.get(Array.from(partnerIds)[0]) || order.partnerName
+          : undefined,
       items: refundItems,
       reason,
       reasonDetail,

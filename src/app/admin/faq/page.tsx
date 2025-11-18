@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -83,6 +83,12 @@ export default function AdminFAQPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [analytics, setAnalytics] = useState<{
+    totalCount: number;
+    statusBreakdown?: Record<string, number>;
+    categoryBreakdown?: Record<string, number>;
+    topHelpful?: Array<Pick<FAQ, '_id' | 'question' | 'helpful' | 'views' | 'category' | 'status' | 'updatedAt'>>;
+  }>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
   const [formData, setFormData] = useState({
@@ -93,12 +99,9 @@ export default function AdminFAQPage() {
     status: 'active' as 'active' | 'hidden',
     tags: [] as string[],
   });
+  const [previewFAQ, setPreviewFAQ] = useState<FAQ | null>(null);
 
-  useEffect(() => {
-    fetchFAQs();
-  }, [categoryFilter, statusFilter]);
-
-  const fetchFAQs = async () => {
+  const fetchFAQs = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -108,8 +111,8 @@ export default function AdminFAQPage() {
       if (statusFilter !== 'all') {
         params.append('status', statusFilter);
       }
-      if (searchQuery) {
-        params.append('search', searchQuery);
+      if (searchQuery.trim()) {
+        params.append('search', searchQuery.trim());
       }
 
       const response = await fetch(`/api/faq?${params.toString()}`);
@@ -117,6 +120,9 @@ export default function AdminFAQPage() {
 
       if (data.success) {
         setFaqs(data.data.faqs || []);
+        if (data.data.analytics) {
+          setAnalytics(data.data.analytics);
+        }
       }
     } catch (error) {
       console.error('FAQ 조회 오류:', error);
@@ -124,7 +130,14 @@ export default function AdminFAQPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryFilter, statusFilter, searchQuery]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchFAQs();
+    }, 200);
+    return () => clearTimeout(handler);
+  }, [fetchFAQs]);
 
   const handleCreate = () => {
     setEditingFAQ(null);
@@ -236,6 +249,28 @@ export default function AdminFAQPage() {
     }
   };
 
+  const handleStatusToggle = async (faq: FAQ) => {
+    const nextStatus = faq.status === 'active' ? 'hidden' : 'active';
+    try {
+      const response = await fetch(`/api/faq/${faq._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+
+      if (response.ok) {
+        toast.success(`FAQ가 ${nextStatus === 'active' ? '활성화' : '숨김 처리'}되었습니다.`);
+        fetchFAQs();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || '상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('FAQ 상태 변경 오류:', error);
+      toast.error('상태 변경 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -250,6 +285,52 @@ export default function AdminFAQPage() {
         </Button>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">전체 FAQ</p>
+            <p className="text-2xl font-semibold mt-2">
+              {(analytics?.totalCount ?? faqs.length).toLocaleString()}건
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              활성 {analytics?.statusBreakdown?.active ?? 0} / 숨김 {analytics?.statusBreakdown?.hidden ?? 0}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">많이 찾는 카테고리</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {analytics?.categoryBreakdown
+                ? Object.entries(analytics.categoryBreakdown)
+                    .sort(([, a], [, b]) => (b as number) - (a as number))
+                    .slice(0, 4)
+                    .map(([key, count]) => (
+                      <Badge key={key} variant="outline" className="text-xs font-medium">
+                        {categoryLabels[key as keyof typeof categoryLabels] || key} {count}
+                      </Badge>
+                    ))
+                : <span className="text-xs text-gray-400">집계 데이터 없음</span>}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <p className="text-sm text-gray-500">도움이 많이 된 질문</p>
+            {analytics?.topHelpful && analytics.topHelpful.length > 0 ? (
+              analytics.topHelpful.map((item) => (
+                <div key={String(item._id)} className="flex items-center justify-between text-xs text-gray-600">
+                  <span className="truncate max-w-[160px]">{item.question}</span>
+                  <span className="text-green-600 font-medium">+{item.helpful}</span>
+                </div>
+              ))
+            ) : (
+              <span className="text-xs text-gray-400">집계 데이터 없음</span>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Filters */}
       <Card>
         <CardContent className="p-6">
@@ -261,11 +342,6 @@ export default function AdminFAQPage() {
                   placeholder="FAQ 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      fetchFAQs();
-                    }
-                  }}
                   className="pl-10"
                 />
               </div>
@@ -354,14 +430,25 @@ export default function AdminFAQPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {categoryLabels[faq.category]}
-                      </Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="outline">
+                          {categoryLabels[faq.category]}
+                        </Badge>
+                        {faq.tags && faq.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {faq.tags.map((tag) => (
+                              <Badge key={tag} variant="outline" className="text-[10px] font-normal">
+                                #{tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <div className="max-w-md">
+                      <div className="max-w-md space-y-1">
                         <p className="font-medium truncate">{faq.question}</p>
-                        <p className="text-sm text-gray-500 truncate">{faq.answer}</p>
+                        <p className="text-sm text-gray-500 line-clamp-2 whitespace-pre-wrap">{faq.answer}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -377,9 +464,13 @@ export default function AdminFAQPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={faq.status === 'active' ? 'default' : 'secondary'}>
-                        {faq.status === 'active' ? '활성' : '비활성'}
-                      </Badge>
+                      <Button
+                        size="sm"
+                        variant={faq.status === 'active' ? 'outline' : 'secondary'}
+                        onClick={() => handleStatusToggle(faq)}
+                      >
+                        {faq.status === 'active' ? '활성' : '숨김'}
+                      </Button>
                     </TableCell>
                     <TableCell className="text-sm text-gray-500">
                       {new Date(faq.createdAt).toLocaleDateString('ko-KR')}
@@ -392,6 +483,10 @@ export default function AdminFAQPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => setPreviewFAQ(faq)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            미리보기
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEdit(faq)}>
                             <Edit className="h-4 w-4 mr-2" />
                             수정
@@ -492,6 +587,24 @@ export default function AdminFAQPage() {
                 </Select>
               </div>
             </div>
+
+            <div>
+              <Label htmlFor="tags">태그 (쉼표로 구분)</Label>
+              <Input
+                id="tags"
+                value={formData.tags.join(', ')}
+                onChange={(e) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    tags: e.target.value
+                      .split(',')
+                      .map(tag => tag.trim())
+                      .filter(Boolean),
+                  }))
+                }
+                placeholder="배송, 쿠폰, 로그인"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -521,6 +634,45 @@ export default function AdminFAQPage() {
               삭제
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 미리보기 다이얼로그 */}
+      <Dialog open={!!previewFAQ} onOpenChange={(open) => !open && setPreviewFAQ(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>FAQ 미리보기</DialogTitle>
+            <DialogDescription>사용자 화면에서 표시되는 형태를 확인하세요.</DialogDescription>
+          </DialogHeader>
+          {previewFAQ && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">{categoryLabels[previewFAQ.category]}</Badge>
+                <Badge variant={previewFAQ.status === 'active' ? 'default' : 'secondary'}>
+                  {previewFAQ.status === 'active' ? '활성' : '숨김'}
+                </Badge>
+              </div>
+              <h3 className="text-xl font-semibold">{previewFAQ.question}</h3>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                {previewFAQ.answer}
+              </p>
+              {previewFAQ.tags && previewFAQ.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {previewFAQ.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs font-normal">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-4 text-xs text-gray-500 border-t pt-3">
+                <span>조회 {previewFAQ.views}</span>
+                <span>도움이 됨 {previewFAQ.helpful}</span>
+                <span>도움이 안 됨 {previewFAQ.notHelpful}</span>
+                <span>업데이트 {new Date(previewFAQ.updatedAt).toLocaleString('ko-KR')}</span>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

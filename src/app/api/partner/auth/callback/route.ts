@@ -27,12 +27,39 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/partner/login?error=user-not-found', request.url));
     }
 
-    console.log('사용자 확인됨:', user.name, user.partnerStatus);
+    console.log('사용자 확인됨:', {
+      name: user.name,
+      email: user.email,
+      partnerStatus: user.partnerStatus,
+      role: user.role,
+      hasPartnerApplication: !!user.partnerApplication
+    });
 
     // 파트너 권한 확인
     if (user.partnerStatus !== 'approved') {
-      console.log('파트너 권한 없음, 파트너 로그인 페이지로 리다이렉트');
-      return NextResponse.redirect(new URL('/partner/login?error=not-partner', request.url));
+      console.log('파트너 권한 없음:', {
+        currentStatus: user.partnerStatus,
+        expectedStatus: 'approved',
+        hasApplication: !!user.partnerApplication,
+        applicationStatus: user.partnerApplication ? {
+          appliedAt: user.partnerApplication.appliedAt,
+          approvedAt: user.partnerApplication.approvedAt,
+          rejectedAt: user.partnerApplication.rejectedAt,
+          rejectedReason: user.partnerApplication.rejectedReason
+        } : null
+      });
+      
+      // 상태에 따른 상세 에러 메시지
+      let errorParam = 'not-partner';
+      if (user.partnerStatus === 'pending') {
+        errorParam = 'not-partner&status=pending';
+      } else if (user.partnerStatus === 'rejected') {
+        errorParam = 'not-partner&status=rejected';
+      } else if (user.partnerStatus === 'suspended') {
+        errorParam = 'not-partner&status=suspended';
+      }
+      
+      return NextResponse.redirect(new URL(`/partner/login?error=${errorParam}`, request.url));
     }
 
     // 파트너 토큰 생성

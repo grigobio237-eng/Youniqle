@@ -13,18 +13,17 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const status = searchParams.get('status'); // 관리자용
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
+    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20', 10), 1), 100);
 
-    const query: any = {};
-
-    // 사용자는 active만 볼 수 있음
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user && (session.user as any).role === 'admin';
-    
+
+    const query: Record<string, any> = {};
+
     if (!isAdmin) {
       query.status = 'active';
-    } else if (status) {
+    } else if (status && status !== 'all') {
       query.status = status;
     }
 
@@ -32,13 +31,13 @@ export async function GET(request: NextRequest) {
       query.category = category;
     }
 
-    if (search) {
-      query.$text = { $search: search };
+    if (search && search.trim()) {
+      query.$text = { $search: search.trim() };
     }
 
     const skip = (page - 1) * limit;
 
-    const [faqs, total] = await Promise.all([
+    const [faqs, total, analytics] = await Promise.all([
       FAQ.find(query)
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
@@ -47,15 +46,34 @@ export async function GET(request: NextRequest) {
         .populate('updatedBy', 'name email')
         .lean(),
       FAQ.countDocuments(query),
+      isAdmin
+        ? Promise.all([
+            FAQ.aggregate([
+              { $group: { _id: '$status', count: { $sum: 1 } } },
+            ]),
+            FAQ.aggregate([
+              { $group: { _id: '$category', count: { $sum: 1 } } },
+            ]),
+            FAQ.find({})
+              .sort({ helpful: -1, views: -1 })
+              .limit(5)
+              .select('question helpful views status category updatedAt')
+              .lean(),
+            FAQ.countDocuments({}),
+          ]).then(([statusAgg, categoryAgg, topFaqs, totalCount]) => ({
+            totalCount,
+            statusBreakdown: statusAgg.reduce<Record<string, number>>((acc, item) => {
+              acc[item._id as string] = item.count;
+              return acc;
+            }, {}),
+            categoryBreakdown: categoryAgg.reduce<Record<string, number>>((acc, item) => {
+              acc[item._id as string] = item.count;
+              return acc;
+            }, {}),
+            topHelpful: topFaqs,
+          }))
+        : Promise.resolve(undefined),
     ]);
-
-    // 조회수 증가 (사용자만)
-    if (!isAdmin && faqs.length > 0) {
-      await FAQ.updateMany(
-        { _id: { $in: faqs.map((f: any) => f._id) } },
-        { $inc: { views: 1 } }
-      );
-    }
 
     return NextResponse.json({
       success: true,
@@ -67,6 +85,7 @@ export async function GET(request: NextRequest) {
           total,
           totalPages: Math.ceil(total / limit),
         },
+        analytics,
       },
     });
   } catch (error: any) {

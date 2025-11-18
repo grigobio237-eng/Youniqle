@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { INotice } from '@/models/Notice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -42,6 +48,7 @@ import {
   Eye,
   Edit,
   Trash2,
+  MoreVertical,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -55,6 +62,7 @@ export default function AdminNoticesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [analytics, setAnalytics] = useState<{ status?: Record<string, number> }>({});
   
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -74,12 +82,9 @@ export default function AdminNoticesPage() {
     targetAudience: 'all',
     status: 'draft',
   });
+  const [previewNotice, setPreviewNotice] = useState<INotice | null>(null);
 
-  useEffect(() => {
-    fetchNotices();
-  }, [page, statusFilter, typeFilter]);
-
-  const fetchNotices = async () => {
+  const fetchNotices = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -96,17 +101,27 @@ export default function AdminNoticesPage() {
       if (data.success) {
         setNotices(data.data.notices);
         setTotal(data.data.pagination.total);
+        if (data.data.stats) {
+          const statusSummary = data.data.stats.reduce((acc: Record<string, number>, item: { _id: string; count: number }) => {
+            acc[item._id] = item.count;
+            return acc;
+          }, {});
+          setAnalytics({ status: statusSummary });
+        }
       }
     } catch (error) {
       console.error('Error fetching notices:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, statusFilter, typeFilter, search]);
+
+  useEffect(() => {
+    fetchNotices();
+  }, [fetchNotices]);
 
   const handleSearch = () => {
     setPage(1);
-    fetchNotices();
   };
 
   const handleCreate = async () => {
@@ -224,6 +239,26 @@ export default function AdminNoticesPage() {
     });
   };
 
+  const handleQuickUpdate = useCallback(async (id: string, payload: Partial<INotice>) => {
+    try {
+      const response = await fetch(`/api/admin/notices/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success('공지사항이 업데이트되었습니다.');
+        fetchNotices();
+      } else {
+        toast.error(data.error?.message || '공지사항 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('공지사항 업데이트 오류:', error);
+      toast.error('공지사항 업데이트 중 오류가 발생했습니다.');
+    }
+  }, [fetchNotices]);
+
   const getTypeBadge = (type: string) => {
     const config: Record<string, { variant: any; label: string }> = {
       general: { variant: 'secondary', label: '일반' },
@@ -254,6 +289,15 @@ export default function AdminNoticesPage() {
     });
   };
 
+  const statusSummary = useMemo(() => {
+    const counts = analytics.status || {};
+    return {
+      draft: counts.draft ?? 0,
+      published: counts.published ?? 0,
+      archived: counts.archived ?? 0,
+    };
+  }, [analytics]);
+
   return (
     <div className="p-6 space-y-6">
       {/* 헤더 */}
@@ -275,6 +319,34 @@ export default function AdminNoticesPage() {
             새로고침
           </Button>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">총 공지</p>
+            <p className="text-2xl font-semibold mt-2">{total.toLocaleString()}건</p>
+            <p className="text-xs text-gray-400 mt-1">
+              게시 {statusSummary.published} · 임시 {statusSummary.draft} · 보관 {statusSummary.archived}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">고정/팝업 공지</p>
+            <p className="text-2xl font-semibold mt-2">
+              {notices.filter(n => n.isPinned).length} / {notices.filter(n => n.isPopup).length}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">고정된 공지와 팝업 공지 수</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">검색어</p>
+            <p className="text-xl font-semibold mt-2 truncate">{search ? `"${search}"` : '전체'}</p>
+            <p className="text-xs text-gray-400 mt-1">필터 적용: {typeFilter || '전체 유형'}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* 필터 및 검색 */}
@@ -365,23 +437,56 @@ export default function AdminNoticesPage() {
                       </TableCell>
                       <TableCell>{formatDate(notice.createdAt.toString())}</TableCell>
                       <TableCell className="text-center">
-                        <div className="flex gap-2 justify-center">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openEditDialog(notice)}
-                          >
-                            <Edit className="w-3 h-3 mr-1" />
-                            수정
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleDeleteClick(String(notice._id))}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setPreviewNotice(notice)}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              미리보기
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openEditDialog(notice)}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              수정
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleQuickUpdate(String(notice._id), { isPinned: !notice.isPinned })
+                              }
+                            >
+                              <Pin className="w-4 h-4 mr-2" />
+                              {notice.isPinned ? '고정 해제' : '상단 고정'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleQuickUpdate(String(notice._id), { isPopup: !notice.isPopup })
+                              }
+                            >
+                              <Megaphone className="w-4 h-4 mr-2" />
+                              {notice.isPopup ? '팝업 해제' : '팝업 설정'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleQuickUpdate(String(notice._id), {
+                                  status: notice.status === 'published' ? 'draft' : 'published',
+                                })
+                              }
+                            >
+                              <RefreshCw className="w-4 h-4 mr-2" />
+                              {notice.status === 'published' ? '임시저장으로 전환' : '즉시 게시'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteClick(String(notice._id))}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              삭제
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -713,6 +818,56 @@ export default function AdminNoticesPage() {
               삭제
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 미리보기 다이얼로그 */}
+      <Dialog open={!!previewNotice} onOpenChange={(open) => !open && setPreviewNotice(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>공지사항 미리보기</DialogTitle>
+            <DialogDescription>사용자에게 노출되는 형태를 확인하세요.</DialogDescription>
+          </DialogHeader>
+          {previewNotice && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                {previewNotice.isPinned && <Badge variant="outline">고정</Badge>}
+                {previewNotice.isPopup && <Badge variant="outline">팝업</Badge>}
+                {getTypeBadge(previewNotice.type)}
+                {getStatusBadge(previewNotice.status)}
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold mb-2">{previewNotice.title}</h2>
+                {previewNotice.summary && (
+                  <p className="text-sm text-gray-500 mb-3">{previewNotice.summary}</p>
+                )}
+                <div className="prose max-w-none whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                  {previewNotice.content}
+                </div>
+              </div>
+              {previewNotice.tags && previewNotice.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {previewNotice.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-4 text-xs text-gray-500 border-t pt-3">
+                <span>조회 {previewNotice.viewCount}</span>
+                {previewNotice.publishedAt && (
+                  <span>게시일 {new Date(previewNotice.publishedAt).toLocaleString('ko-KR')}</span>
+                )}
+                {previewNotice.startDate && (
+                  <span>시작 {new Date(previewNotice.startDate).toLocaleDateString('ko-KR')}</span>
+                )}
+                {previewNotice.endDate && (
+                  <span>종료 {new Date(previewNotice.endDate).toLocaleDateString('ko-KR')}</span>
+                )}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

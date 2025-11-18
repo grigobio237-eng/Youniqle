@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,9 +31,12 @@ interface Notice {
   type: 'general' | 'important' | 'event' | 'maintenance' | 'update';
   isPinned: boolean;
   isImportant: boolean;
+  isPopup?: boolean;
   viewCount: number;
   createdAt: string;
   publishedAt?: string;
+  targetAudience?: string;
+  tags?: string[];
 }
 
 export default function NoticesPage() {
@@ -45,19 +48,39 @@ export default function NoticesPage() {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [summary, setSummary] = useState<{ typeCounts?: Record<string, number> }>({});
+
+  const formatNumber = useCallback((value: number) => value.toLocaleString('ko-KR'), []);
+
+  const typeBreakdown = useMemo(() => {
+    if (!summary.typeCounts) return [];
+    return Object.entries(summary.typeCounts).map(([key, count]) => ({
+      key,
+      label: t(`notices.${key}` as any) || key,
+      count,
+    }));
+  }, [summary.typeCounts, t]);
 
   useEffect(() => {
-    fetchNotices();
-  }, [page, typeFilter]);
+    if (page !== 1) {
+      setPage(1);
+    }
+  }, [typeFilter]);
 
-  const fetchNotices = async () => {
+  useEffect(() => {
+    if (page !== 1) {
+      setPage(1);
+    }
+  }, [search]);
+
+  const fetchNotices = useCallback(async (nextPage: number, nextType: string, nextSearch: string) => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: page.toString(),
+        page: nextPage.toString(),
         limit: '10',
-        ...(typeFilter && { type: typeFilter }),
-        ...(search && { search }),
+        ...(nextType && { type: nextType }),
+        ...(nextSearch && { search: nextSearch }),
       });
 
       const response = await fetch(`/api/notices?${params}`);
@@ -67,17 +90,28 @@ export default function NoticesPage() {
         setPinnedNotices(data.data.pinnedNotices);
         setNotices(data.data.notices);
         setTotal(data.data.pagination.total);
+        setSummary(data.data.summary || {});
       }
     } catch (error) {
       console.error('Error fetching notices:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchNotices(page, typeFilter, search.trim());
+    }, 200);
+    return () => clearTimeout(handler);
+  }, [fetchNotices, page, typeFilter, search]);
 
   const handleSearch = () => {
-    setPage(1);
-    fetchNotices();
+    const trimmed = search.trim();
+    if (page !== 1) {
+      setPage(1);
+    }
+    fetchNotices(1, typeFilter, trimmed);
   };
 
   const getTypeBadge = (type: string) => {
@@ -110,6 +144,7 @@ export default function NoticesPage() {
                 {isPinned && <Pin className="w-4 h-4 text-red-500" />}
                 {notice.isImportant && <AlertCircle className="w-4 h-4 text-orange-500" />}
                 {getTypeBadge(notice.type)}
+                {notice.isPopup && <Badge variant="outline">팝업</Badge>}
               </div>
               
               <h3 className="text-lg font-semibold mb-2 hover:text-blue-600">
@@ -129,8 +164,13 @@ export default function NoticesPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
-                  {notice.viewCount}
+                  {formatNumber(notice.viewCount)}
                 </div>
+                {notice.targetAudience && notice.targetAudience !== 'all' && (
+                  <Badge variant="outline" className="text-xs">
+                    {notice.targetAudience.toUpperCase()}
+                  </Badge>
+                )}
               </div>
             </div>
             
@@ -152,9 +192,54 @@ export default function NoticesPage() {
         <p className="text-gray-600">{t('notices.subtitle')}</p>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">총 공지사항</p>
+            <p className="text-2xl font-semibold mt-2">{formatNumber(total)}</p>
+            <p className="text-xs text-gray-400 mt-1">
+              고정 {pinnedNotices.length}건 · 일반 {Math.max(total - pinnedNotices.length, 0)}건
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">유형별 비중</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {typeBreakdown.length === 0 ? (
+                <span className="text-xs text-gray-400">통계 준비 중</span>
+              ) : (
+                typeBreakdown.slice(0, 4).map((item) => (
+                  <Badge key={item.key} variant="outline" className="text-xs font-medium">
+                    {item.label} {formatNumber(item.count)}
+                  </Badge>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <p className="text-sm text-gray-500">빠른 안내</p>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+            >
+              고객센터 안내 보기
+            </Button>
+            <Button className="w-full" asChild>
+              <Link href="/support/inquiry">
+                1:1 문의 남기기
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* 검색 및 필터 */}
       <Card className="mb-6">
-        <CardContent className="p-4">
+        <CardContent className="p-4 space-y-4">
           <div className="flex gap-2">
             <div className="flex-1">
               <Input
@@ -181,6 +266,25 @@ export default function NoticesPage() {
               <Search className="w-4 h-4 mr-2" />
               {t('notices.search')}
             </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={typeFilter === '' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTypeFilter('')}
+            >
+              {t('notices.all')}
+            </Button>
+            {typeBreakdown.map((item) => (
+              <Button
+                key={item.key}
+                variant={typeFilter === item.key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTypeFilter(item.key)}
+              >
+                {item.label} {formatNumber(item.count)}
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>

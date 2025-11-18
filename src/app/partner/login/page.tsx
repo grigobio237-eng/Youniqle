@@ -32,6 +32,8 @@ export default function PartnerLoginPage() {
       console.log('소셜 로그인 오류:', error);
       let errorMessage = '소셜 로그인 중 오류가 발생했습니다.';
       
+      const status = urlParams.get('status');
+      
       switch (error) {
         case 'no-session':
           errorMessage = '세션을 찾을 수 없습니다. 다시 로그인해주세요.';
@@ -40,7 +42,15 @@ export default function PartnerLoginPage() {
           errorMessage = '사용자를 찾을 수 없습니다.';
           break;
         case 'not-partner':
-          errorMessage = '파트너 승인이 필요한 서비스입니다. 파트너 신청을 먼저 해주세요.';
+          if (status === 'pending') {
+            errorMessage = '파트너 신청이 검토 중입니다. 승인 완료 후 이용 가능합니다.';
+          } else if (status === 'rejected') {
+            errorMessage = '파트너 신청이 거부되었습니다. 관리자에게 문의해주세요.';
+          } else if (status === 'suspended') {
+            errorMessage = '파트너 계정이 정지되었습니다. 관리자에게 문의해주세요.';
+          } else {
+            errorMessage = '파트너 승인이 필요한 서비스입니다. 파트너 신청을 먼저 해주세요.';
+          }
           break;
         case 'callback-failed':
           errorMessage = '로그인 처리 중 오류가 발생했습니다.';

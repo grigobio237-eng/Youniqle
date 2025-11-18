@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         $or: [
           { title: new RegExp(search, 'i') },
           { content: new RegExp(search, 'i') },
+          { summary: new RegExp(search, 'i') },
           { tags: new RegExp(search, 'i') },
         ],
       });
@@ -54,7 +55,13 @@ export async function GET(request: NextRequest) {
       .select('-content')
       .lean();
 
-    const total = await Notice.countDocuments({ ...filter, isPinned: false });
+    const [total, typeCounts] = await Promise.all([
+      Notice.countDocuments({ ...filter, isPinned: false }),
+      Notice.aggregate([
+        { $match: { ...filter, isPinned: false } },
+        { $group: { _id: '$type', count: { $sum: 1 } } },
+      ]),
+    ]);
 
     return NextResponse.json({
       success: true,
@@ -66,6 +73,12 @@ export async function GET(request: NextRequest) {
           limit,
           total,
           pages: Math.ceil(total / limit),
+        },
+        summary: {
+          typeCounts: typeCounts.reduce<Record<string, number>>((acc, item) => {
+            acc[item._id as string] = item.count;
+            return acc;
+          }, {}),
         },
       },
     });

@@ -6,15 +6,15 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  FileText, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X, 
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  FileText,
+  BarChart3,
+  Settings,
+  LogOut,
+  Menu,
+  X,
   Store,
   Bell,
   Search,
@@ -23,7 +23,8 @@ import {
   AlertCircle,
   DollarSign,
   Megaphone,
-  Globe
+  Globe,
+  RotateCcw
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -85,6 +86,12 @@ const navigationItems = [
     href: '/partner/orders',
     icon: ShoppingCart,
     description: '주문 처리 및 배송 관리'
+  },
+  {
+    name: '환불/교환',
+    href: '/partner/returns',
+    icon: RotateCcw,
+    description: '환불·교환 요청 처리'
   },
   {
     name: '재고 관리',

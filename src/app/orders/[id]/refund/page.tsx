@@ -230,7 +230,7 @@ export default function RefundRequestPage() {
     });
 
     const selectedReason = refundReasons.find(r => r.value === refundReason);
-    const refundShippingFee = selectedReason?.value === 'change_of_mind' ? 5000 : 0;
+    const refundShippingFee = selectedReason?.value === 'change_of_mind' ? 3000 : 0;
     const finalAmount = Math.max(0, totalAmount - refundShippingFee);
 
     return {

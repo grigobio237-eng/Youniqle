@@ -40,6 +40,7 @@ import {
   AlertTriangle,
   Send,
   Sparkles,
+  Paperclip,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -57,6 +58,12 @@ interface Inquiry {
   adminAnswer?: string;
   createdAt: string;
   answeredAt?: string;
+  attachments?: Array<{
+    filename: string;
+    url: string;
+    size: number;
+    type: string;
+  }>;
 }
 
 const typeLabels = {
@@ -389,6 +396,30 @@ export default function AdminInquiriesPage() {
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="whitespace-pre-wrap">{selectedInquiry.content}</p>
                 </div>
+                {selectedInquiry.attachments && selectedInquiry.attachments.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h5 className="font-semibold text-sm">첨부 파일</h5>
+                    <div className="space-y-2">
+                      {selectedInquiry.attachments.map((file, index) => (
+                        <a
+                          key={index}
+                          href={file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Paperclip className="h-4 w-4 text-blue-600" />
+                            <span>{file.filename}</span>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* AI 답변 (있는 경우) */}

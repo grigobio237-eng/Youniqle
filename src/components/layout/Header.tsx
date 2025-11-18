@@ -261,18 +261,12 @@ export default function Header() {
             <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
               {t('nav.about')}
             </Link>
-            <button 
-              onClick={() => alert('문의하기 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
-              className="text-text-primary hover:text-primary transition-colors cursor-pointer opacity-60"
-            >
+            <Link href="/support/inquiry" className="text-text-primary hover:text-primary transition-colors">
               문의하기
-            </button>
-            <button 
-              onClick={() => alert('실시간 채팅 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
-              className="text-text-primary hover:text-primary transition-colors cursor-pointer opacity-60"
-            >
-              실시간 채팅
-            </button>
+            </Link>
+            <Link href="/support/my-inquiries" className="text-text-primary hover:text-primary transition-colors">
+              문의내역
+            </Link>
           </nav>
 
           {/* Search Bar */}
@@ -383,18 +377,12 @@ export default function Header() {
               <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
                 {t('nav.about')}
               </Link>
-              <button 
-                onClick={() => alert('문의하기 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
-                className="text-text-primary hover:text-primary transition-colors cursor-pointer opacity-60 text-left"
-              >
+              <Link href="/support/inquiry" className="text-text-primary hover:text-primary transition-colors">
                 문의하기
-              </button>
-              <button 
-                onClick={() => alert('실시간 채팅 기능은 현재 준비 중입니다. 곧 서비스할 예정입니다.')}
-                className="text-text-primary hover:text-primary transition-colors cursor-pointer opacity-60 text-left"
-              >
-                실시간 채팅
-              </button>
+              </Link>
+              <Link href="/support/my-inquiries" className="text-text-primary hover:text-primary transition-colors">
+                문의내역
+              </Link>
               
               {/* Mobile Search */}
               <form onSubmit={handleSearch} className="mt-4">
