@@ -201,7 +201,8 @@ export default function PartnerLoginPage() {
                           >
                             내 상태 확인
                           </Button>
-                          {process.env.NODE_ENV === 'development' && (
+                          {/* 개발 환경에서만 테스트 승인 버튼 표시 */}
+                          {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
                             <Button
                               variant="outline"
                               size="sm"

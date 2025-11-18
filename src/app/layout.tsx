@@ -5,11 +5,16 @@ import ConditionalHeader from '@/components/layout/ConditionalHeader';
 import Footer from '@/components/layout/Footer';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { initializeMonitoring } from '@/lib/initializeMonitoring';
-
-// 모니터링 시스템 초기화
-if (typeof window === 'undefined') {
-  initializeMonitoring();
+// 모니터링 시스템 초기화는 서버 사이드에서만 실행
+// Vercel 환경에서는 필요시에만 활성화
+if (typeof window === 'undefined' && process.env.ENABLE_MONITORING === 'true') {
+  try {
+    const { initializeMonitoring } = require('@/lib/initializeMonitoring');
+    initializeMonitoring();
+  } catch (error) {
+    // 모니터링 초기화 실패해도 앱은 계속 실행
+    console.warn('모니터링 시스템 초기화 실패:', error);
+  }
 }
 
 const inter = Inter({ subsets: ['latin'] });
