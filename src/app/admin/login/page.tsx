@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { GoogleIcon, KakaoIcon, NaverIcon } from '@/components/ui/social-icons';
-import { Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Shield, ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
+import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -21,7 +22,12 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loadingStep, setLoadingStep] = useState('');
+  const [isInWebView, setIsInWebView] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsInWebView(isWebView());
+  }, []);
 
   // URL 파라미터에서 오류 확인
   React.useEffect(() => {
@@ -90,6 +96,14 @@ export default function AdminLoginPage() {
   };
 
   const handleSocialLogin = async (provider: string) => {
+    // WebView 환경에서 Google 로그인 시도 시 경고
+    if (provider === 'google') {
+      const handled = await handleWebViewOAuth(provider, '/api/admin/auth/callback');
+      if (handled) {
+        return; // WebView 처리 완료 또는 사용자 취소
+      }
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
@@ -204,6 +218,22 @@ export default function AdminLoginPage() {
                 <span className="text-xs text-blue-600">※ 소셜 로그인 시 자동으로 관리자 토큰이 발급됩니다.</span>
               </p>
             </div>
+
+            {/* WebView 경고 메시지 */}
+            {isInWebView && (
+              <div className="mb-4 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+                <div className="flex items-start">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-yellow-800">
+                    <p className="font-semibold mb-1">앱 내 브라우저 감지됨</p>
+                    <p className="text-xs">
+                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다. 
+                      브라우저에서 직접 열어주세요.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 소셜 로그인 안내 문구 */}
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">

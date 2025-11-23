@@ -18,7 +18,13 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: 'openid email profile',
+          prompt: 'select_account',
+          access_type: 'online',
+          response_type: 'code',
         },
+      },
+      httpOptions: {
+        timeout: 10000,
       },
     }),
     KakaoProvider({
