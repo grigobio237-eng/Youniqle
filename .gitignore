@@ -55,7 +55,6 @@ jspm_packages/
 .env
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -71,14 +70,14 @@ ehthumbs.db
 Thumbs.db
 
 # Payment system samples and sensitive files
-*나이스페이*
+*?�이?�페??
 *NICEPAY*
 *payment-sample*
-*결제샘플*
-*결제시스템*
+*결제?�플*
+*결제?�스??
 
 # Sensitive documentation
-*연동*가이드*
+*?�동*가?�드*
 *integration*guide*
 *setup*guide*
 
