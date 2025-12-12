@@ -6,23 +6,27 @@
 @layer base {
   html {
     font-family: 'Pretendard', 'Inter', system-ui, sans-serif;
-    overflow-x: hidden; /* 가로 스크롤 방지 */
+    overflow-x: hidden;
+    /* 가로 스크롤 방지 */
   }
-  
+
   body {
     @apply bg-background text-text-primary;
     letter-spacing: -0.01em;
     line-height: 1.5;
-    overflow-x: hidden; /* 가로 스크롤 방지 */
-    width: 100%; /* 전체 너비 사용 */
+    overflow-x: hidden;
+    /* 가로 스크롤 방지 */
+    width: 100%;
+    /* 전체 너비 사용 */
   }
-  
+
   /* 모바일 최적화 */
   @media (max-width: 768px) {
     body {
-      font-size: 14px; /* 모바일에서 폰트 크기 조정 */
+      font-size: 14px;
+      /* 모바일에서 폰트 크기 조정 */
     }
-    
+
     /* 모든 요소가 화면 너비를 초과하지 않도록 */
     * {
       max-width: 100%;
@@ -35,42 +39,59 @@
   .btn-primary {
     @apply bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
-  
+
   .btn-secondary {
     @apply bg-secondary hover:bg-secondary/90 text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
-  
+
   .btn-outline {
     @apply border-2 border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
-  
+
   .card {
     @apply bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
   }
-  
+
   .input-field {
     @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
   }
-  
+
   .badge-primary {
     @apply bg-primary/10 text-primary;
   }
-  
+
   .badge-secondary {
     @apply bg-secondary/10 text-secondary;
   }
-  
+
   .badge-success {
     @apply bg-accent/10 text-accent;
   }
-  
+
   .badge-danger {
     @apply bg-danger/10 text-danger;
   }
 }
 
 
+
+@layer components {
+  /* ... existing classes ... */
+
+  .file-upload-input {
+    @apply block w-full text-sm text-gray-500;
+  }
+
+
+  .file-upload-input::file-selector-button {
+    @apply mr-4 py-2 px-4 rounded-full border-0 text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200 cursor-pointer;
+  }
+
+  .shadcn-input::file-selector-button {
+    @apply border-0 bg-transparent text-sm font-medium;
+  }
+}

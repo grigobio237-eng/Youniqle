@@ -63,14 +63,14 @@ export default function MyPage() {
 
   const fetchUserData = async () => {
     if (!session?.user) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUserData(data.user);
-        
+
         // 사용자 데이터로 폼 초기화
         if (data.user.addresses && data.user.addresses.length > 0) {
           const defaultAddress = data.user.addresses[0];
@@ -400,9 +400,9 @@ export default function MyPage() {
                     {session.user?.image && (
                       <div className="flex items-center">
                         <span className="text-sm text-gray-600">프로필 이미지: </span>
-                        <img 
-                          src={session.user.image} 
-                          alt="프로필" 
+                        <img
+                          src={session.user.image}
+                          alt="프로필"
                           className="w-8 h-8 rounded-full ml-2"
                         />
                       </div>
@@ -413,7 +413,7 @@ export default function MyPage() {
                 {/* 추가 정보 (쇼핑 시 필요) */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-gray-700">쇼핑을 위한 추가 정보</h3>
-                  
+
                   <div>
                     <Label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-2 block">
                       휴대폰 번호
@@ -477,7 +477,7 @@ export default function MyPage() {
                       id="marketingConsent"
                       name="marketingConsent"
                       checked={formData.marketingConsent}
-                      onCheckedChange={(checked) => setFormData(prev => ({...prev, marketingConsent: checked as boolean}))}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, marketingConsent: checked as boolean }))}
                       disabled={!isEditing}
                     />
                     <Label htmlFor="marketingConsent" className="text-sm text-gray-600">
@@ -516,25 +516,24 @@ export default function MyPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                    userData?.grade === 'ecosoul' ? 'bg-purple-100' : 
-                    userData?.grade === 'glower' ? 'bg-pink-100' : 
-                    userData?.grade === 'bloomer' ? 'bg-green-100' : 
-                    userData?.grade === 'rooter' ? 'bg-blue-100' : 'bg-amber-100'
-                  }`}>
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${userData?.grade === 'ecosoul' ? 'bg-purple-100' :
+                      userData?.grade === 'glower' ? 'bg-pink-100' :
+                        userData?.grade === 'bloomer' ? 'bg-green-100' :
+                          userData?.grade === 'rooter' ? 'bg-blue-100' : 'bg-amber-100'
+                    }`}>
                     <span className="text-2xl">
-                      {userData?.grade === 'ecosoul' ? '🌿' : 
-                       userData?.grade === 'glower' ? '🌸' : 
-                       userData?.grade === 'bloomer' ? '🌺' : 
-                       userData?.grade === 'rooter' ? '🌱' : '🌲'}
+                      {userData?.grade === 'ecosoul' ? '🌿' :
+                        userData?.grade === 'glower' ? '🌸' :
+                          userData?.grade === 'bloomer' ? '🌺' :
+                            userData?.grade === 'rooter' ? '🌱' : '🌲'}
                     </span>
                   </div>
                   <h3 className="font-semibold text-lg mb-2 uppercase">
                     {userData?.grade === 'cedar' ? 'CEDAR' :
-                     userData?.grade === 'rooter' ? 'ROOTER' :
-                     userData?.grade === 'bloomer' ? 'BLOOMER' :
-                     userData?.grade === 'glower' ? 'GLOWER' :
-                     userData?.grade === 'ecosoul' ? 'ECOSOUL' : 'CEDAR'}
+                      userData?.grade === 'rooter' ? 'ROOTER' :
+                        userData?.grade === 'bloomer' ? 'BLOOMER' :
+                          userData?.grade === 'glower' ? 'GLOWER' :
+                            userData?.grade === 'ecosoul' ? 'ECOSOUL' : 'CEDAR'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
                     현재 포인트: {userData?.points || 0}P
@@ -544,9 +543,9 @@ export default function MyPage() {
                       </Link>
                     </Button>
                   </p>
-                  <MembershipInfo 
-                    currentGrade={userData?.grade || 'cedar'} 
-                    currentPoints={userData?.points || 0} 
+                  <MembershipInfo
+                    currentGrade={userData?.grade || 'cedar'}
+                    currentPoints={userData?.points || 0}
                   />
                 </div>
               </CardContent>
@@ -564,9 +563,9 @@ export default function MyPage() {
                 {(() => {
                   const partnerInfo = getPartnerStatusInfo();
                   if (!partnerInfo) return null;
-                  
+
                   const Icon = partnerInfo.icon;
-                  
+
                   return (
                     <div className={`p-4 rounded-lg ${partnerInfo.bgColor} border`}>
                       <div className="flex items-start space-x-3">
@@ -581,14 +580,14 @@ export default function MyPage() {
                             {partnerInfo.description}
                           </p>
                           {partnerInfo.action && (
-                            <Button 
+                            <Button
                               onClick={partnerInfo.action}
                               size="sm"
                               className="w-full"
                             >
-                              {partnerInfo.status === 'approved' ? '파트너 대시보드' : 
-                               partnerInfo.status === 'rejected' ? '재신청하기' : 
-                               '파트너 신청하기'}
+                              {partnerInfo.status === 'approved' ? '파트너 대시보드' :
+                                partnerInfo.status === 'rejected' ? '재신청하기' :
+                                  '파트너 신청하기'}
                             </Button>
                           )}
                         </div>
@@ -636,9 +635,9 @@ export default function MyPage() {
                   <Link href="/me/payment-methods">결제 수단 관리</Link>
                 </Button>
                 <hr className="my-2" />
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-red-600 hover:text-red-700" 
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-red-600 hover:text-red-700"
                   asChild
                 >
                   <Link href="/me/delete-account">회원 탈퇴</Link>
@@ -708,7 +707,7 @@ export default function MyPage() {
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="businessAddress">사업장 주소 *</Label>
-                        
+
                         {/* Google 주소 검색 */}
                         <div className="mb-3">
                           <GoogleAddressSearch
@@ -718,7 +717,7 @@ export default function MyPage() {
                             }}
                           />
                         </div>
-                        
+
                         {/* 주소 입력 필드들 */}
                         <div className="space-y-2">
                           <div className="flex gap-2">
@@ -810,7 +809,7 @@ export default function MyPage() {
                             id="businessRegistration"
                             accept="image/*"
                             onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
-                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="file-upload-input"
                           />
                           {partnerApplicationData.businessRegistrationImage && (
                             <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
@@ -830,7 +829,7 @@ export default function MyPage() {
                             id="bankStatement"
                             accept="image/*"
                             onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
-                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="file-upload-input"
                           />
                           {partnerApplicationData.bankStatementImage && (
                             <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
@@ -844,7 +843,7 @@ export default function MyPage() {
                     <p className="text-xs text-gray-500 mt-2">
                       * 사업자등록증과 통장사본을 업로드해주세요. 이미지 파일만 업로드 가능합니다.
                     </p>
-                    
+
                     {/* 업로드 완료 안내 */}
                     {partnerApplicationData.businessRegistrationImage && partnerApplicationData.bankStatementImage ? (
                       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
