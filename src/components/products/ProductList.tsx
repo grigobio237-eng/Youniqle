@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,7 +51,7 @@ export default function ProductList({ searchParams }: ProductListProps) {
       try {
         setLoading(true);
         const params = new URLSearchParams();
-        
+
         if (searchParams.q) params.append('q', searchParams.q);
         if (searchParams.category) params.append('category', searchParams.category);
         if (searchParams.sort) params.append('sort', searchParams.sort);
@@ -89,9 +91,18 @@ export default function ProductList({ searchParams }: ProductListProps) {
     fetchProducts();
   }, [searchParams]);
 
+  const { data: session } = useSession();
+  const router = useRouter();
   const { addToCart, loading: cartLoading } = useCart();
 
   const handleAddToCart = async (productId: string) => {
+    if (!session) {
+      if (confirm('로그인이 필요한 서비스입니다. 회원가입 하시겠습니까?')) {
+        router.push(`/auth/signup?callbackUrl=${encodeURIComponent(window.location.href)}`);
+      }
+      return;
+    }
+
     const success = await addToCart(productId, 1);
     if (success) {
       alert('장바구니에 추가되었습니다.');
@@ -156,27 +167,27 @@ export default function ProductList({ searchParams }: ProductListProps) {
                 )}
               </div>
             </Link>
-            
+
             <CardContent className="p-6">
               <div className="mb-2">
                 <Badge variant="outline" className="text-xs">
                   {product.category}
                 </Badge>
               </div>
-              
+
               <h3 className="font-semibold mb-2 line-clamp-2">
-                <Link 
+                <Link
                   href={`/products/${product._id}`}
                   className="hover:text-primary transition-colors"
                 >
                   {product.name}
                 </Link>
               </h3>
-              
+
               <p className="text-text-secondary text-sm mb-4 line-clamp-2">
                 {product.summary}
               </p>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-xl font-bold text-primary">
                   {formatPrice(product.price)}

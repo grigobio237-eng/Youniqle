@@ -108,3 +108,10 @@ build-output.txt
 
 # Documentation files (not stored in git for security)
 docs/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

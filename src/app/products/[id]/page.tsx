@@ -16,13 +16,13 @@ import QuestionSection from '@/components/qa/QuestionSection';
 import SocialSharing from '@/components/products/SocialSharing';
 import { addToRecentlyViewed } from '@/components/products/RecentlyViewed';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  Heart, 
-  ShoppingCart, 
-  Minus, 
-  Plus, 
-  Truck, 
-  Shield, 
+import {
+  Heart,
+  ShoppingCart,
+  Minus,
+  Plus,
+  Truck,
+  Shield,
   RotateCcw,
   Star,
   Share2,
@@ -89,7 +89,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       if (response.ok) {
         const data = await response.json();
         // 이미 알림이 등록되어 있는지 확인
-        if (data.alerts && data.alerts.some((alert: any) => 
+        if (data.alerts && data.alerts.some((alert: any) =>
           alert.product?._id === product._id && !alert.notified
         )) {
           setStockAlertRegistered(true);
@@ -141,7 +141,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       const response = await fetch('/api/wishlist');
       if (response.ok) {
         const data = await response.json();
-        const isInList = data.wishlist?.some((item: any) => 
+        const isInList = data.wishlist?.some((item: any) =>
           item.productId._id === product._id
         );
         setIsInWishlist(isInList);
@@ -153,7 +153,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleAddToCart = async () => {
     if (!session?.user) {
-      alert(t('auth.loginRequired'));
+      if (confirm('로그인이 필요한 서비스입니다. 회원가입 하시겠습니까?')) {
+        // 현재 페이지 URL을 callbackUrl로 전달
+        window.location.href = `/auth/signup?callbackUrl=${encodeURIComponent(window.location.href)}`;
+      }
       return;
     }
 
@@ -229,14 +232,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleImageNavigation = (direction: 'prev' | 'next') => {
     if (!product?.images) return;
-    
+
     const totalImages = product.images.length;
     if (direction === 'prev') {
-      setSelectedImageIndex(prev => 
+      setSelectedImageIndex(prev =>
         prev === 0 ? totalImages - 1 : prev - 1
       );
     } else {
-      setSelectedImageIndex(prev => 
+      setSelectedImageIndex(prev =>
         prev === totalImages - 1 ? 0 : prev + 1
       );
     }
@@ -316,9 +319,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <p className="text-gray-600 mb-6">
               요청하신 상품이 존재하지 않거나 삭제되었습니다.
             </p>
-              <Button asChild>
-                <Link href="/products">{t('productDetail.backToList')}</Link>
-              </Button>
+            <Button asChild>
+              <Link href="/products">{t('productDetail.backToList')}</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -400,11 +403,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                      selectedImageIndex === index 
-                        ? 'border-blue-500' 
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index
+                        ? 'border-blue-500'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     <Image
                       src={image.url}
@@ -433,11 +435,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   <Badge className="bg-red-100 text-red-800">{t('productDetail.discount', { percent: discountRate })}</Badge>
                 )}
               </div>
-              
+
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              
+
               <p className="text-gray-600 text-lg mb-4">{product.summary}</p>
-              
+
               <div className="flex items-center space-x-4 mb-4">
                 {product.originalPrice && product.originalPrice > product.price && (
                   <span className="text-lg text-gray-500 line-through">
@@ -454,10 +456,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
-                <span className={`font-medium ${
-                  product.stock > 10 ? 'text-green-600' :
-                  product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
-                }`}>
+                <span className={`font-medium ${product.stock > 10 ? 'text-green-600' :
+                    product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
                   {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
                 </span>
               </div>
@@ -468,9 +469,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   size="sm"
                   onClick={handleStockAlert}
                   disabled={registeringStockAlert || stockAlertRegistered}
-                  className={`flex items-center space-x-2 ${
-                    stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
-                  }`}
+                  className={`flex items-center space-x-2 ${stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
+                    }`}
                 >
                   {stockAlertRegistered ? (
                     <>
@@ -562,7 +562,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               >
                 {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.buyNow')}
               </Button>
-              
+
               {/* 보조 버튼들 */}
               <div className="flex space-x-3">
                 <Button
@@ -574,7 +574,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
                   {isInWishlist ? t('productDetail.removeFromWishlist') : t('productDetail.addToWishlist')}
                 </Button>
-                
+
                 <Button
                   onClick={handleAddToCart}
                   disabled={product.stock === 0 || addingToCart}
@@ -678,7 +678,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
         {/* 리뷰 작성 폼 */}
         <div className="mt-12">
-          <ReviewForm 
+          <ReviewForm
             productId={product._id}
             productName={product.name}
             onReviewSubmitted={() => {
@@ -690,7 +690,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Q&A 섹션 */}
         <div id="product-qna" className="mt-12 scroll-mt-20">
-          <QuestionSection 
+          <QuestionSection
             productId={product._id}
             productName={product.name}
           />
@@ -698,7 +698,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
         {/* 관련 상품 섹션 */}
         <div className="mt-12">
-          <RelatedProducts 
+          <RelatedProducts
             productId={product._id}
             currentProductName={product.name}
             currentProductCategory={product.category}

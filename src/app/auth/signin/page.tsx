@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +17,9 @@ import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
 
 export default function SigninPage() {
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const callbackUrl = searchParams?.get('callbackUrl') || '/';
   const [showPassword, setShowPassword] = useState(false);
   const [isInWebView, setIsInWebView] = useState(false);
   const [formData, setFormData] = useState({
@@ -35,22 +39,22 @@ export default function SigninPage() {
         return; // WebView 처리 완료 또는 사용자 취소
       }
     }
-    
-    signIn(provider, { callbackUrl: '/' });
+
+    signIn(provider, { callbackUrl: callbackUrl });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
-      
+
       if (result?.ok) {
-        window.location.href = '/';
+        window.location.href = callbackUrl;
       } else {
         alert(t('auth.form.loginError'));
       }
@@ -123,7 +127,7 @@ export default function SigninPage() {
                   <div className="text-sm text-yellow-800">
                     <p className="font-semibold mb-1">앱 내 브라우저 감지됨</p>
                     <p className="text-xs">
-                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다. 
+                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다.
                       브라우저에서 직접 열어주세요.
                     </p>
                   </div>
@@ -257,7 +261,7 @@ export default function SigninPage() {
               <p className="text-gray-600">
                 {t('auth.noAccount')}{' '}
                 <Link
-                  href="/auth/signup"
+                  href={`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
                   className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
                 >
                   {t('auth.signup')}
