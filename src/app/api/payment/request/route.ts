@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // 나이스페이 공식 문서 기준 파라미터 생성
     const ediDate = new Date().toISOString()
-        .replace(/[-:T.]/g, '').substring(0, 14);
+      .replace(new RegExp('[-:T' + '.]', 'g'), '').substring(0, 14);
 
     // 결제수단 매핑 (기본값: CARD)
     const requestedMethod = (payMethod || paymentMethod || 'CARD') as string;
@@ -76,15 +76,15 @@ export async function POST(request: NextRequest) {
       typeof reqReserved === 'string'
         ? reqReserved
         : JSON.stringify({
-            orderId,
-            buyerEmail,
-            generatedAt: ediDate,
-          });
-    
+          orderId,
+          buyerEmail,
+          generatedAt: ediDate,
+        });
+
     // 서명 생성 (EdiDate + MID + Amt + MerchantKey)
     const signatureData = `${ediDate}${merchantId}${amount}${merchantKey}`;
     const signature = crypto.createHash('sha256')
-        .update(signatureData).digest('hex');
+      .update(signatureData).digest('hex');
 
     // 인증 요청 파라미터
     const authParams = {
