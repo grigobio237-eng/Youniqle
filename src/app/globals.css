@@ -94,4 +94,9 @@
   .shadcn-input::file-selector-button {
     @apply border-0 bg-transparent text-sm font-medium;
   }
+
+  .shadcn-input::placeholder,
+  .shadcn-textarea::placeholder {
+    @apply text-gray-500 opacity-100;
+  }
 }

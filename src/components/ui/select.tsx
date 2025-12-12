@@ -60,7 +60,7 @@ export function SelectTrigger({ children, className, disabled: triggerDisabled }
       type="button"
       disabled={isDisabled}
       className={cn(
-        'flex h-12 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm ring-offset-background placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-12 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       onClick={() => !isDisabled && setIsOpen(!isOpen)}
