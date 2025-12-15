@@ -1,504 +1,399 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import CharacterImage from '@/components/ui/CharacterImage';
-import RecommendationSection from '@/components/recommendations/RecommendationSection';
-import PersonalizedRecommendations from '@/components/personalization/PersonalizedRecommendations';
-import NoticePopup from '@/components/ui/NoticePopup';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { ArrowRight, Star, Truck, Shield, Heart, ShoppingCart } from 'lucide-react';
+import { ChevronRight, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  images: Array<{
-    url: string;
-    _id?: string;
-  }>;
+// ---------------------------
+// 1. Data & Types
+// ---------------------------
+type Question = {
+  id: number;
   category: string;
-  featured?: boolean;
-  stock: number;
+  text: string;
+  options: { label: string; score: number }[];
+};
+
+const QUESTIONS: Question[] = [
+  {
+    id: 1,
+    category: '피로',
+    text: '요즘 하루를 마치고 나면 어떤가요?',
+    options: [
+      { label: '거의 매일 녹초가 돼요 (늘 피곤)', score: 5 },
+      { label: '종종 피곤하지만 쉴만 해요', score: 3 },
+      { label: '거뜬하고 개운해요 (안 피곤)', score: 0 },
+    ],
+  },
+  {
+    id: 2,
+    category: '수면',
+    text: '최근 1주일 잠은 어떤가요?',
+    options: [
+      { label: '잠들기 힘들고 자주 깨요', score: 5 },
+      { label: '그럭저럭 자는데 개운하진 않아요', score: 3 },
+      { label: '머리만 대면 자고 아침에 개운해요', score: 0 },
+    ],
+  },
+  {
+    id: 3,
+    category: '몸의 무거움/붓기',
+    text: '내 몸(다리, 발, 어깨 등)은 어떤 느낌인가요?',
+    options: [
+      { label: '돌덩이처럼 무겁고 퉁퉁 부어요', score: 5 },
+      { label: '오후 되면 좀 붓고 뻐근해요', score: 3 },
+      { label: '가볍고 편안해요', score: 0 },
+    ],
+  },
+  {
+    id: 4,
+    category: '마음과 감정',
+    text: '요즘 마음 상태는 어떤가요?',
+    options: [
+      { label: '아무것도 하기 싫고 짜증만 나요', score: 5 },
+      { label: '가끔 답답하지만 컨트롤 가능해요', score: 3 },
+      { label: '평안하고 의욕이 있어요', score: 0 },
+    ],
+  },
+  {
+    id: 5,
+    category: '집중력',
+    text: '머리(생각)가 어떤 느낌인가요?',
+    options: [
+      { label: '늘 안개 낀 것처럼 멍해요', score: 5 },
+      { label: '중요한 일에는 집중할 수 있어요', score: 3 },
+      { label: '맑고 집중이 아주 잘 돼요', score: 0 },
+    ],
+  },
+];
+
+// ---------------------------
+// 2. Sub-Components
+// ---------------------------
+
+// A. Gate Intro View
+function GateIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md space-y-8"
+      >
+        <h1 className="text-3xl font-bold text-gray-800">
+          안녕하세요.<br />
+          잠시 멈춰서,<br />
+          <span className="text-primary">나를 돌아볼 시간</span>입니다.
+        </h1>
+        <p className="text-gray-600">
+          1분이면 충분합니다.<br />
+          오늘 당신의 몸은 어떤 말을 하고 있나요?
+        </p>
+        <Button size="lg" onClick={onStart} className="w-full text-lg h-14 rounded-full">
+          오늘의 회복 점수 체크하기
+        </Button>
+        <p className="text-xs text-gray-400">
+          * 이 과정은 광고가 아니며, 당신의 회복을 설계하기 위한 첫 단계입니다.
+        </p>
+      </motion.div>
+    </div>
+  );
 }
 
-export default function HomePage() {
-  const { t } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterLoading, setNewsletterLoading] = useState(false);
-  const [newsletterMessage, setNewsletterMessage] = useState('');
+// B. Question Form View
+function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any[]) => void }) {
+  const [step, setStep] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
+  const [answers, setAnswers] = useState<any[]>([]);
+
+  const handleAnswer = (score: number, label: string) => {
+    const currentQ = QUESTIONS[step];
+    const newAnswers = [...answers, {
+      questionId: currentQ.id,
+      category: currentQ.category,
+      score: score,
+      answer: label
+    }];
+    setAnswers(newAnswers);
+
+    const newScore = totalScore + score;
+    if (step < QUESTIONS.length - 1) {
+      setTotalScore(newScore);
+      setStep(step + 1);
+    } else {
+      // Finished
+      onComplete(newScore, newAnswers);
+    }
+  };
+
+  const currentQ = QUESTIONS[step];
+  const progress = ((step + 1) / QUESTIONS.length) * 100;
+
+  return (
+    <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-12">
+      {/* Progress */}
+      <div className="w-full bg-gray-100 h-2 rounded-full mb-12">
+        <motion.div
+          className="bg-primary h-full rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* Question */}
+      <AnimatePresence mode='wait'>
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="space-y-8"
+        >
+          <div className="space-y-2">
+            <span className="text-primary font-bold text-sm">Q{currentQ.id}. {currentQ.category}</span>
+            <h2 className="text-2xl font-bold text-gray-800 leading-snug">
+              {currentQ.text}
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {currentQ.options.map((opt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleAnswer(opt.score, opt.label)}
+                className="w-full p-4 text-left border rounded-xl hover:bg-primary/5 hover:border-primary transition-all active:scale-98"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">{opt.label}</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// C. Result & Metaphor View
+function ResultView({ score, answers, onEnter }: { score: number; answers: any[]; onEnter: () => void }) {
+  // Logic: 0-7 (Low), 8-15 (Mid), 16+ (High)
+  let level = 'LOW';
+  let title = '아직은 버틸 만한 상태예요.';
+  let metaphorTitle = '튼튼한 기초 위에 쌓는 탑';
+  let metaphor = 'TOWER';
+  let message = '지금의 관리가 더 멋진 미래를 만듭니다. 기초를 단단히 하세요.';
+  let icon = <CheckCircle className="w-20 h-20 text-green-500" />;
+
+  if (score >= 8 && score <= 15) {
+    level = 'MID';
+    title = '요즘, 몸과 마음이 꽤 지쳐 있어요.';
+    metaphorTitle = '멈춰 선 시계와 녹슨 부품';
+    metaphor = 'CLOCK';
+    message = '작은 멈춤이 고장을 막습니다. 지금은 정비가 필요한 시간입니다.';
+    icon = <RefreshCw className="w-20 h-20 text-yellow-500" />;
+  } else if (score >= 16) {
+    level = 'HIGH';
+    title = '지금은 ‘버티는 시간’이 아니라 ‘돌아봐야 할 시간’입니다.';
+    metaphorTitle = '함께 걷는 두 발자국';
+    metaphor = 'FOOTPRINTS';
+    message = '혼자 버티지 마세요. 이제 함께 회복을 설계할 때입니다.';
+    icon = <div className="text-6xl">👣</div>;
+  }
+
+  // Convert raw score (0-25) to 100 scale roughly
+  // Raw 0 (Best) -> 100.
+  // Raw 25 (Worst) -> 0.
+  const recoveryScore = 100 - (score * 4);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const saveData = async () => {
+      // 1. Local Storage (Immediate feedback)
+      localStorage.setItem('recovery_last_check', new Date().toISOString().split('T')[0]);
+      localStorage.setItem('recovery_last_score', recoveryScore.toString());
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/products?limit=8&sort=newest');
-      
-      if (!response.ok) {
-        throw new Error(t('home.products.errorLoading'));
+      // 2. Dispatch event to open header
+      window.dispatchEvent(new Event('recovery-gate-passed'));
+
+      // 3. Save to DB (Background)
+      try {
+        await fetch('/api/recovery/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: new Date(),
+            rawScore: score,
+            totalScore: recoveryScore,
+            metaphor: metaphor,
+            answers: answers
+          })
+        });
+      } catch (e) {
+        console.error('Failed to save recovery score to DB', e);
       }
-      
-      const data = await response.json();
-      
-      if (data.products) {
-        setProducts(data.products || []);
-      } else {
-        throw new Error(data.error || t('home.products.errorLoading'));
-      }
-    } catch (error) {
-      console.error('Failed to fetch products:', error);
-      setError(error instanceof Error ? error.message : t('common.error'));
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    saveData();
+  }, [recoveryScore, score, metaphor, answers]);
 
-  const handleAddToCart = async (productId: string) => {
-    try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: 1,
-        }),
-      });
-
-      if (response.ok) {
-        alert('장바구니에 추가되었습니다!');
-        // 헤더 장바구니 개수 업데이트
-        window.dispatchEvent(new Event('cartUpdated'));
-      } else {
-        const errorData = await response.json();
-        alert(`장바구니 추가 실패: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error('장바구니 추가 중 오류:', error);
-      alert('장바구니 추가 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleNewsletterSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newsletterEmail) {
-      setNewsletterMessage(t('home.newsletter.emailRequired'));
-      return;
-    }
-
-    setNewsletterLoading(true);
-    setNewsletterMessage('');
-
-    try {
-      const response = await fetch('/api/newsletter/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: newsletterEmail,
-          source: 'website'
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setNewsletterMessage(t('home.newsletter.successMessage'));
-        setNewsletterEmail('');
-      } else {
-        setNewsletterMessage(data.error || t('home.newsletter.errorMessage'));
-      }
-    } catch (error) {
-      console.error('Newsletter subscription error:', error);
-      setNewsletterMessage(t('home.newsletter.errorMessage'));
-    } finally {
-      setNewsletterLoading(false);
-    }
-  };
   return (
-    <div className="min-h-screen">
-      {/* 팝업 공지사항 */}
-      <NoticePopup />
-      
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 sm:py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              {/* Left Content */}
-              <div className="text-center lg:text-left">
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary mb-6 animate-fade-in">
-                  {t('home.hero.title')}<br />{t('home.hero.titleHighlight')}
-                </h1>
-                <p className="text-lg sm:text-xl text-text-secondary mb-8 animate-slide-up">
-                  {t('home.hero.subtitle')}
-                  <br />
-                  {t('home.hero.description')}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up">
-                  <Button size="lg" asChild>
-                    <Link href="/products">
-                      {t('home.hero.shopNow')}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" asChild>
-                    <Link href="/about">
-                      {t('home.hero.learnMore')}
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Right Content - Character Images */}
-              <div className="flex justify-center lg:justify-end">
-                <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
-                  {/* Main Character */}
-                  <div className="absolute inset-0">
-                    <CharacterImage
-                      src="/character/youniqle-1.png"
-                      alt="Youniqle 대표 캐릭터"
-                      fill
-                      className="object-contain animate-fade-in"
-                      priority
-                      sizes="(max-width: 768px) 320px, 384px"
-                    />
-                  </div>
-                  
-                  {/* Floating Characters */}
-                  <div className="absolute -top-4 -right-4 w-16 h-16 opacity-60 animate-bounce">
-                    <CharacterImage
-                      src="/character/youniqle-2.png"
-                      alt="Youniqle 캐릭터 2"
-                      fill
-                      className="object-contain"
-                      sizes="64px"
-                    />
-                  </div>
-                  <div className="absolute -bottom-4 -left-4 w-20 h-20 opacity-50 animate-pulse">
-                    <CharacterImage
-                      src="/character/youniqle-3.png"
-                      alt="Youniqle 캐릭터 3"
-                      fill
-                      className="object-contain"
-                      sizes="80px"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 text-center space-y-8 animate-fade-in">
+      <div className="space-y-2">
+        <h2 className="text-xl font-bold text-gray-600">오늘의 회복 점수</h2>
+        <div className="text-6xl font-black text-primary">{recoveryScore}점</div>
+      </div>
+
+      <div className="p-8 bg-gray-50 rounded-2xl space-y-4">
+        <div className="flex justify-center">{icon}</div>
+        <h3 className="text-xl font-bold">{metaphorTitle}</h3>
+        <p className="text-gray-600 word-keep-all">{title}</p>
+        <p className="text-sm text-gray-500 pt-4 border-t">{message}</p>
+      </div>
+
+      <Button size="lg" onClick={onEnter} className="w-full text-lg h-14 rounded-full animate-bounce">
+        나의 회복 OS 입장하기 <ArrowRight className="ml-2" />
+      </Button>
+    </div>
+  );
+}
+
+// D. Main Dashboard (Recovery OS)
+function RecoveryDashboard({ score }: { score: number }) {
+  // Use stored score if not passed directly (revisit)
+  const displayScore = score;
+
+  return (
+    <div className="min-h-screen pb-20">
+      {/* Top Banner / Summary */}
+      <section className="bg-primary/5 py-12 px-4 text-center">
+        <h1 className="text-2xl font-bold mb-2">오늘의 회복 컨디션</h1>
+        <div className="text-5xl font-black text-primary mb-4">{displayScore}점</div>
+        <p className="text-gray-600 mb-8">
+          "오늘 딱 하나만 해보세요: <b>3분 리셋 스트레칭</b>"
+        </p>
+        <div className="flex justify-center gap-4">
+          <Button asChild variant="outline">
+            <Link href="/ai-navigator">AI 코치에게 조언 듣기</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/cases">다른 사람의 회복 보기</Link>
+          </Button>
         </div>
       </section>
 
-      {/* Featured Products Preview */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              {[1, 2, 3, 4].map((item) => (
-                <Card key={item} className="overflow-hidden animate-pulse">
-                  <div className="aspect-square bg-gray-200"></div>
-                  <CardContent className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                    <div className="flex items-center justify-between">
-                      <div className="h-6 bg-gray-200 rounded w-20"></div>
-                      <div className="h-8 bg-gray-200 rounded w-16"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12">
-              <div className="text-text-secondary mb-4">
-                <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">{t('home.products.errorLoading')}</p>
-                <p className="text-sm text-gray-500 mt-2">{error}</p>
-              </div>
-              <Button onClick={fetchProducts} variant="outline">
-                {t('common.back')}
-              </Button>
-            </div>
-          ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              {products.slice(0, 8).map((product) => (
-                <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link href={`/products/${product.id}`}>
-                    <div className="aspect-square bg-gray-100 relative">
-                      {product.images && product.images.length > 0 && product.images[0].url ? (
-                        <Image
-                          src={product.images[0].url}
-                          alt={product.name}
-                          fill
-                          className="object-cover hover:scale-105 transition-transform duration-300"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                          <Heart className="h-12 w-12" />
-                        </div>
-                      )}
-                      {product.featured && (
-                        <Badge className="absolute top-3 left-3" variant="secondary">
-                          {t('home.products.featured')}
-                        </Badge>
-                      )}
-                      {product.stock <= 5 && product.stock > 0 && (
-                        <Badge className="absolute top-3 right-3" variant="destructive">
-                          {t('products.stock')} {product.stock}
-                        </Badge>
-                      )}
-                      {product.stock === 0 && (
-                        <Badge className="absolute top-3 right-3" variant="outline">
-                          {t('products.soldOut')}
-                        </Badge>
-                      )}
-                    </div>
-                  </Link>
-                  <CardContent className="p-6">
-                    <Link href={`/products/${product.id}`}>
-                      <h3 className="font-semibold mb-2 hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-text-secondary text-sm mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-                    </Link>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-primary">
-                        ₩{product.price.toLocaleString()}
-                      </span>
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleAddToCart(product.id)}
-                        disabled={product.stock === 0}
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-1" />
-                        {product.stock === 0 ? t('products.soldOut') : t('nav.cart')}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-text-secondary mb-4">
-                <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">{t('home.products.noProducts')}</p>
-                <p className="text-sm text-gray-500 mt-2">{t('home.products.loadingProducts')}</p>
-              </div>
-            </div>
-          )}
-          
-          {products.length > 0 && (
-            <div className="text-center">
-              <Button size="lg" asChild>
-                <Link href="/products">
-                  {t('home.products.viewAll')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
-              {t('home.features.title')}
-            </h2>
-            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              {t('home.features.subtitle')}
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center p-8 relative">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Star className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{t('home.features.quality.title')}</h3>
-                <p className="text-text-secondary">
-                  {t('home.features.quality.description')}
-                </p>
-                {/* Character 4 */}
-                <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
-                  <CharacterImage
-                    src="/character/youniqle-4.png"
-                    alt="품질 캐릭터"
-                    fill
-                    className="object-contain"
-                    sizes="48px"
-                  />
-                </div>
+      {/* 6 Categories Preview/Links */}
+      <section className="container mx-auto px-4 py-12">
+        <h2 className="text-xl font-bold mb-6">회복 OS 메뉴</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link href="/start" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">🌱</span>
+                <h3 className="font-bold mb-2">회복 시작하기</h3>
+                <p className="text-sm text-gray-500">회복의 철학과 기초</p>
               </CardContent>
             </Card>
-            
-            <Card className="text-center p-8 relative">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Truck className="h-8 w-8 text-secondary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{t('home.features.shipping.title')}</h3>
-                <p className="text-text-secondary">
-                  {t('home.features.shipping.description')}
-                </p>
-                {/* Character 5 */}
-                <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
-                  <CharacterImage
-                    src="/character/youniqle-5.png"
-                    alt="배송 캐릭터"
-                    fill
-                    className="object-contain"
-                    sizes="48px"
-                  />
-                </div>
+          </Link>
+          <Link href="/cases" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">🔍</span>
+                <h3 className="font-bold mb-2">리얼 회복 케이스</h3>
+                <p className="text-sm text-gray-500">신뢰와 동기부여</p>
               </CardContent>
             </Card>
-            
-            <Card className="text-center p-8 relative">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Shield className="h-8 w-8 text-accent" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{t('home.features.secure.title')}</h3>
-                <p className="text-text-secondary">
-                  {t('home.features.secure.description')}
-                </p>
-                {/* Character 6 */}
-                <div className="absolute -top-2 -right-2 w-12 h-12 opacity-30">
-                  <CharacterImage
-                    src="/character/youniqle-6.png"
-                    alt="보안 캐릭터"
-                    fill
-                    className="object-contain"
-                    sizes="48px"
-                  />
-                </div>
+          </Link>
+          <Link href="/lounge" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">👩‍⚕️</span>
+                <h3 className="font-bold mb-2">원장 라운지</h3>
+                <p className="text-sm text-gray-500">전문가 칼럼 & FAQ</p>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-20 bg-primary text-white relative overflow-hidden">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            {t('home.newsletter.title')}
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            {t('home.newsletter.subtitle')}
-          </p>
-          <form onSubmit={handleNewsletterSubscribe} className="max-w-md mx-auto">
-            <div className="flex gap-4 mb-4">
-              <input
-                type="email"
-                placeholder={t('home.newsletter.emailPlaceholder')}
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
-                disabled={newsletterLoading}
-                required
-              />
-              <Button 
-                type="submit" 
-                variant="secondary" 
-                size="lg"
-                disabled={newsletterLoading}
-              >
-                {newsletterLoading ? t('home.newsletter.subscribing') : t('home.newsletter.subscribe')}
-              </Button>
-            </div>
-            {newsletterMessage && (
-              <p className={`text-sm ${newsletterMessage.includes(t('home.newsletter.successMessage')) ? 'text-green-200' : 'text-red-200'}`}>
-                {newsletterMessage}
-              </p>
-            )}
-          </form>
-        </div>
-        
-        {/* Background Characters */}
-        <div className="absolute top-4 left-4 w-16 h-16 opacity-20">
-          <CharacterImage
-            src="/character/youniqle-2.png"
-            alt="뉴스레터 캐릭터"
-            fill
-            className="object-contain"
-            sizes="64px"
-          />
-        </div>
-        <div className="absolute bottom-4 right-4 w-20 h-20 opacity-20">
-          <CharacterImage
-            src="/character/youniqle-3.png"
-            alt="뉴스레터 캐릭터"
-            fill
-            className="object-contain"
-            sizes="80px"
-          />
-        </div>
-      </section>
-
-      {/* 추천 상품 섹션 */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('home.products.recommended')}</h2>
-          
-          <div className="space-y-12">
-            <PersonalizedRecommendations
-              title={t('recommendations.personalizedTitle')}
-              itemType="product"
-              limit={6}
-              algorithms={['collaborative', 'content_based', 'popular']}
-              showAlgorithm={false}
-              showReason={true}
-            />
-            
-            <RecommendationSection
-              title={t('home.products.featured')}
-              itemType="product"
-              algorithm="popular"
-              limit={8}
-              showTitle={true}
-              showAlgorithm={true}
-              showRefresh={true}
-            />
-            
-            <RecommendationSection
-              title={t('home.products.new')}
-              itemType="product"
-              algorithm="trending"
-              limit={8}
-              showTitle={true}
-              showAlgorithm={true}
-              showRefresh={true}
-            />
-          </div>
+          </Link>
+          <Link href="/ai-navigator" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow border-primary/20 bg-primary/5">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">🤖</span>
+                <h3 className="font-bold mb-2">AI 회복 네비게이터</h3>
+                <p className="text-sm text-gray-500">매일의 맞춤 코칭</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/membership" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">🎁</span>
+                <h3 className="font-bold mb-2">멤버십 & 상점</h3>
+                <p className="text-sm text-gray-500">리워드 확인 및 쇼핑</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/omakase" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow border-gray-900 bg-gray-900 text-white">
+              <CardContent className="p-6">
+                <span className="text-2xl mb-2 block">🧬</span>
+                <h3 className="font-bold mb-2 text-white">비밀 회복 오마카세</h3>
+                <p className="text-sm text-gray-400">1:1 맞춤 설계 (비공개)</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </section>
     </div>
   );
 }
 
+// ---------------------------
+// 3. Main Component
+// ---------------------------
+export default function HomePage() {
+  const [viewState, setViewState] = useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT' | 'DASHBOARD'>('CHECK');
+  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Initial Check
+    const today = new Date().toISOString().split('T')[0];
+    const lastCheck = localStorage.getItem('recovery_last_check');
+    const storedScore = localStorage.getItem('recovery_last_score');
+
+    if (lastCheck === today && storedScore) {
+      setScore(parseInt(storedScore)); // Stored is already 0-100
+      setViewState('DASHBOARD');
+      // Ensure header is shown
+      window.dispatchEvent(new Event('recovery-gate-passed'));
+    } else {
+      setViewState('INTRO');
+    }
+  }, []);
+
+  const handleStart = () => setViewState('QUESTION');
+
+  const handleComplete = (rawScore: number, finalAnswers: any[]) => {
+    setScore(rawScore); // This is 0-25 raw score
+    setAnswers(finalAnswers);
+    setViewState('RESULT');
+  };
+
+  const handleEnterDashboard = () => {
+    // recalculate stored score to pass (since dashboard expects 0-100)
+    // Actually ResultView saves the 100-scale score to localStorage and state needs it too?
+    // Let's grab it from localStorage to be safe or calc
+    const s = 100 - (score * 4);
+    setScore(s);
+    setViewState('DASHBOARD');
+  };
+
+  // Render appropriate view
+  if (viewState === 'CHECK') return <div className="min-h-screen bg-white" />; // Loading
+  if (viewState === 'INTRO') return <GateIntro onStart={handleStart} />;
+  if (viewState === 'QUESTION') return <QuestionForm onComplete={handleComplete} />;
+  if (viewState === 'RESULT') return <ResultView score={score} answers={answers} onEnter={handleEnterDashboard} />;
+
+  return <RecoveryDashboard score={score} />;
+}

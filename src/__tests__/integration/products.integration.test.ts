@@ -1,3 +1,5 @@
+import { NextRequest } from 'next/server';
+
 // Mock all dependencies
 jest.mock('@/lib/db');
 jest.mock('@/models/Product');
@@ -20,7 +22,7 @@ describe('Products API Integration Tests', () => {
   describe('Products API Tests', () => {
     it('should handle products list request', () => {
       const request = createMockRequest();
-      
+
       expect(request).toBeDefined();
       expect(request.json).toBeDefined();
     });
@@ -34,21 +36,21 @@ describe('Products API Integration Tests', () => {
         category: 'electronics',
         stock: 100
       };
-      
+
       const headers = {
         'authorization': 'Bearer valid-admin-token',
         'content-type': 'application/json'
       };
-      
+
       const request = createMockRequest(requestBody, headers);
-      
+
       expect(request).toBeDefined();
       expect(request.json).toBeDefined();
     });
 
     it('should validate request structure', () => {
       const request = createMockRequest({});
-      
+
       expect(request.json).toBeDefined();
       expect(request.headers).toBeDefined();
     });

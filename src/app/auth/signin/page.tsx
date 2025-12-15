@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleIcon, KakaoIcon, NaverIcon } from '@/components/ui/social-icons';
+import { GoogleIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -143,24 +143,6 @@ function SigninContent() {
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
                 {t('auth.socialLogin.google')}
-              </Button>
-
-              <Button
-                onClick={() => handleSocialLogin('kakao')}
-                disabled
-                className="w-full h-12 bg-yellow-400/50 text-black/50 border-0 transition-all duration-200 cursor-not-allowed"
-              >
-                <KakaoIcon className="w-5 h-5 mr-3" />
-                {t('auth.socialLogin.kakaoPreparing')}
-              </Button>
-
-              <Button
-                onClick={() => handleSocialLogin('naver')}
-                disabled
-                className="w-full h-12 bg-green-500/50 text-white/50 border-0 transition-all duration-200 cursor-not-allowed"
-              >
-                <NaverIcon className="w-5 h-5 mr-3" />
-                {t('auth.socialLogin.naverPreparing')}
               </Button>
             </div>
 

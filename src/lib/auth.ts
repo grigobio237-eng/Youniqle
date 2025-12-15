@@ -1,7 +1,5 @@
 import NextAuth, { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import KakaoProvider from 'next-auth/providers/kakao';
-import NaverProvider from 'next-auth/providers/naver';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import connectDB from './db';
 import User from '@/models/User';
@@ -26,14 +24,6 @@ export const authOptions: AuthOptions = {
       httpOptions: {
         timeout: 10000,
       },
-    }),
-    KakaoProvider({
-      clientId: process.env.KAKAO_CLIENT_ID!,
-      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
-    }),
-    NaverProvider({
-      clientId: process.env.NAVER_CLIENT_ID!,
-      clientSecret: process.env.NAVER_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: 'credentials',
@@ -85,10 +75,10 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
       // 소셜 로그인 시 자동으로 회원가입 처리
-      if (account?.provider === 'google' || account?.provider === 'kakao' || account?.provider === 'naver') {
+      if (account?.provider === 'google') {
         try {
           await connectDB();
-          
+
           // 사용자 정보 추출
           let userData = {
             name: user.name || '',
@@ -100,33 +90,12 @@ export const authOptions: AuthOptions = {
             marketingConsent: false,
           };
 
-          // 카카오 로그인 시 추가 정보 매핑
-          if (account.provider === 'kakao' && profile) {
-            const kakaoProfile = profile as any;
-            console.log('카카오 프로필 데이터:', JSON.stringify(profile, null, 2));
-            console.log('카카오 사용자 데이터:', JSON.stringify(user, null, 2));
-            
-            userData.name = kakaoProfile.kakao_account?.profile?.nickname || kakaoProfile.properties?.nickname || user.name || '';
-            userData.email = kakaoProfile.kakao_account?.email || user.email || '';
-            userData.avatar = kakaoProfile.kakao_account?.profile?.profile_image_url || kakaoProfile.properties?.profile_image || user.image || '';
-            
-            console.log('매핑된 사용자 데이터:', userData);
-          }
-
           // 구글 로그인 시 추가 정보 매핑
           if (account.provider === 'google' && profile) {
             const googleProfile = profile as any;
             userData.name = googleProfile.name || user.name || '';
             userData.email = googleProfile.email || user.email || '';
             userData.avatar = googleProfile.picture || user.image || '';
-          }
-
-          // 네이버 로그인 시 추가 정보 매핑
-          if (account.provider === 'naver' && profile) {
-            const naverProfile = profile as any;
-            userData.name = naverProfile.name || user.name || '';
-            userData.email = naverProfile.email || user.email || '';
-            userData.avatar = naverProfile.profile_image || user.image || '';
           }
 
           // 사용자 데이터 검증
@@ -136,7 +105,7 @@ export const authOptions: AuthOptions = {
           }
 
           // 기존 사용자 확인
-          const existingUser = await User.findOne({ 
+          const existingUser = await User.findOne({
             $or: [
               { email: userData.email },
               { providerId: userData.providerId }
@@ -176,15 +145,7 @@ export const authOptions: AuthOptions = {
         token.provider = account.provider;
         token.providerId = account.providerAccountId;
       }
-      
-      // 카카오 로그인 시 사용자 정보 매핑
-      if (account?.provider === 'kakao' && profile) {
-        const kakaoProfile = profile as any;
-        token.name = kakaoProfile.kakao_account?.profile?.nickname || kakaoProfile.properties?.nickname || user.name;
-        token.email = kakaoProfile.kakao_account?.email || user.email;
-        token.image = kakaoProfile.kakao_account?.profile?.profile_image_url || kakaoProfile.properties?.profile_image || user.image;
-      }
-      
+
       // 구글 로그인 시 사용자 정보 매핑
       if (account?.provider === 'google' && profile) {
         const googleProfile = profile as any;
@@ -192,15 +153,7 @@ export const authOptions: AuthOptions = {
         token.email = googleProfile.email || user.email;
         token.image = googleProfile.picture || user.image;
       }
-      
-      // 네이버 로그인 시 사용자 정보 매핑
-      if (account?.provider === 'naver' && profile) {
-        const naverProfile = profile as any;
-        token.name = naverProfile.name || user.name;
-        token.email = naverProfile.email || user.email;
-        token.image = naverProfile.profile_image || user.image;
-      }
-      
+
       if (user) {
         token.id = user.id;
         token.name = token.name || user.name;
@@ -243,7 +196,7 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 // JWT 토큰 생성 함수
 export function generateToken(payload: any): string {
   const jwt = require('jsonwebtoken');
-  return jwt.sign(payload, process.env.JWT_SECRET!, { 
+  return jwt.sign(payload, process.env.JWT_SECRET!, {
     expiresIn: '7d',
     issuer: 'youniqle',
     audience: 'youniqle-users'
@@ -340,26 +293,26 @@ export async function verifyAuth(request: NextRequest) {
 export async function verifyAdminToken(request: NextRequest) {
   try {
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       return { success: false, error: '관리자 토큰이 없습니다.' };
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
+
     if (!decoded || decoded.type !== 'admin') {
       return { success: false, error: '유효하지 않은 관리자 토큰입니다.' };
     }
 
     await connectDB();
     const user = await User.findById(decoded.id);
-    
+
     if (!user || user.role !== 'admin') {
       return { success: false, error: '관리자 권한이 없습니다.' };
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       userId: user._id.toString(),
       user: {
         id: user._id.toString(),

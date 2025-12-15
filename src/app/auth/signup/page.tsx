@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleIcon, KakaoIcon, NaverIcon } from '@/components/ui/social-icons';
+import { GoogleIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -167,31 +167,13 @@ function SignupContent() {
                 <GoogleIcon className="w-5 h-5 mr-3" />
                 구글로 계속하기
               </Button>
-
-              <Button
-                onClick={() => handleSocialLogin('kakao')}
-                disabled
-                className="w-full h-12 bg-yellow-400/50 text-black/50 border-0 transition-all duration-200 cursor-not-allowed"
-              >
-                <KakaoIcon className="w-5 h-5 mr-3" />
-                카카오로 계속하기 (준비중)
-              </Button>
-
-              <Button
-                onClick={() => handleSocialLogin('naver')}
-                disabled
-                className="w-full h-12 bg-green-500/50 text-white/50 border-0 transition-all duration-200 cursor-not-allowed"
-              >
-                <NaverIcon className="w-5 h-5 mr-3" />
-                네이버로 계속하기 (준비중)
-              </Button>
             </div>
 
             {/* 소셜 로그인 안내 문구 */}
             <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-700 text-center">
-                <span className="font-medium">카카오톡과 네이버 로그인은 준비 중입니다.</span><br />
-                현재는 구글 로그인과 이메일 회원가입만 이용 가능합니다.
+                <span className="font-medium">구글 계정으로 간편하게 시작하세요.</span><br />
+                또는 이메일로 직접 가입할 수도 있습니다.
               </p>
             </div>
 

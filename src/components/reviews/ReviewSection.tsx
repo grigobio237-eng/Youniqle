@@ -106,15 +106,15 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
       if (response.ok) {
         const data = await response.json();
-        setReviews(prev => prev.map(review => 
-          review._id === reviewId 
-            ? { 
-                ...review, 
-                helpfulCount: data.helpfulCount,
-                helpfulUsers: data.hasVoted 
-                  ? [...review.helpfulUsers, 'current-user']
-                  : review.helpfulUsers.filter(id => id !== 'current-user')
-              }
+        setReviews(prev => prev.map(review =>
+          review._id === reviewId
+            ? {
+              ...review,
+              helpfulCount: data.helpfulCount,
+              helpfulUsers: data.hasVoted
+                ? [...review.helpfulUsers, 'current-user']
+                : review.helpfulUsers.filter(id => id !== 'current-user')
+            }
             : review
         ));
       }
@@ -135,9 +135,8 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`${sizeClass[size]} ${
-              star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-            }`}
+            className={`${sizeClass[size]} ${star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+              }`}
           />
         ))}
       </div>
@@ -174,7 +173,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
               {[5, 4, 3, 2, 1].map((rating) => {
                 const count = stats.ratingStats[rating] || 0;
                 const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
-                
+
                 return (
                   <div key={rating} className="flex items-center space-x-2">
                     <span className="text-sm text-gray-600 w-2">{rating}</span>
@@ -318,9 +317,9 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
                 {/* 관리자/파트너 답변 */}
                 {review.replies.length > 0 && (
-                  <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                  <div className="bg-blue-50 p-4 rounded-lg mb-4 space-y-2">
                     {review.replies.map((reply, index) => (
-                      <div key={index} className="mb-2 last:mb-0">
+                      <div key={index}>
                         <div className="flex items-center space-x-2 mb-1">
                           <span className="font-medium text-blue-900">
                             {reply.userId.name}

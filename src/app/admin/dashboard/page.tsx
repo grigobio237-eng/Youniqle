@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Users, 
-  Package, 
-  ShoppingCart, 
-  TrendingUp, 
-  Eye, 
+import {
+  Users,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Eye,
   MessageCircle,
   DollarSign,
   Activity,
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           const isPositive = stat.change >= 0;
-          
+
           return (
             <Card key={index} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
@@ -163,9 +163,8 @@ export default function AdminDashboard() {
                       {stat.value}
                     </p>
                     {stat.change !== 0 && (
-                      <div className={`flex items-center text-sm ${
-                        isPositive ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                      <div className={`flex items-center text-sm ${isPositive ? 'text-green-600' : 'text-red-600'
+                        }`}>
                         {isPositive ? (
                           <ArrowUpRight className="h-4 w-4 mr-1" />
                         ) : (
@@ -315,7 +314,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge 
+                    <Badge
                       variant={order.status === 'completed' ? 'default' : 'secondary'}
                       className="text-xs"
                     >
@@ -356,9 +355,9 @@ export default function AdminDashboard() {
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 flex-col">
-              <Link href="/admin/content/new">
-                <MessageCircle className="h-6 w-6 mb-2" />
-                콘텐츠 작성
+              <Link href="/admin/omakase">
+                <Activity className="h-6 w-6 mb-2" />
+                오마카세 신청 관리
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 flex-col">
@@ -368,9 +367,9 @@ export default function AdminDashboard() {
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 flex-col">
-              <Link href="/admin/analytics">
+              <Link href="/admin/recovery">
                 <TrendingUp className="h-6 w-6 mb-2" />
-                분석 보기
+                회복 현황 분석
               </Link>
             </Button>
           </div>
