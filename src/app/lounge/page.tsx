@@ -4,6 +4,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function LoungePage() {
     return (
@@ -12,10 +20,15 @@ export default function LoungePage() {
             <section className="mb-20">
                 <div className="flex flex-col md:flex-row gap-12 items-center bg-gradient-to-r from-gray-50 to-white p-8 md:p-12 rounded-3xl">
                     <div className="w-48 h-48 md:w-64 md:h-64 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-xl">
-                        {/* Placeholder for Doctor Image - using a generic avatar or placeholder if specific assets missing */}
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                            <span className="text-4xl">👩‍⚕️</span>
-                        </div>
+                        {/* Doctor Image */}
+                        <Image
+                            src="/images/kim-mijeong-profile.jpg"
+                            alt="김미정 원장 프로필"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 192px, 256px"
+                            priority
+                        />
                     </div>
                     <div className="flex-1 text-center md:text-left">
                         <Badge variant="outline" className="mb-4 px-4 py-1 border-primary text-primary">Representative Director</Badge>
@@ -28,7 +41,32 @@ export default function LoungePage() {
                             유니클(Youniqle)의 모든 프로그램은 '어떻게 하면 시술을 덜 하게 할까'를 고민하며 설계되었습니다.
                             스스로 회복할 수 있는 힘을 길러드리는 것이 저의 진짜 처방입니다.
                         </p>
-                        <Button variant="outline">원장 이력 전체보기</Button>
+
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">원장 이력 전체보기</Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle className="text-2xl font-bold mb-4">김미정 원장 프로필</DialogTitle>
+                                    <DialogDescription className="text-base text-gray-700 space-y-2">
+                                        <ul className="list-disc pl-5 space-y-2">
+                                            <li>고려대학교 외래교수 역임</li>
+                                            <li>대한 발란스의학회 부회장</li>
+                                            <li>세계얼굴 총회 상임회장</li>
+                                            <li>춘사 영화제 운영위원</li>
+                                            <li>국제 항노화 협회장 역임</li>
+                                            <li>미스코리아 심사위원</li>
+                                            <li>미래경희 병원장 역임</li>
+                                            <li>일본 중입자 크리닉 대표원장 역임</li>
+                                            <li>사랑의 크리닉 대원장 역임</li>
+                                            <li>독일 프리덴바일 병원 연수</li>
+                                            <li>독일 웨셀브 면역병원 연수</li>
+                                        </ul>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </section>

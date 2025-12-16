@@ -16,6 +16,9 @@ export interface IProduct extends Document {
   featured?: boolean;
   featuredByAdmin?: boolean; // 관리자가 추천한 상품
   adminRecommendationReason?: string; // 관리자 추천 이유
+  isFunding?: boolean; // 펀딩 상품 여부
+  fundingEndDate?: Date; // 펀딩 종료일 (옵션)
+  fundingGoal?: number; // 펀딩 목표 금액 (옵션)
   images: Array<{
     url: string;
     w?: number;
@@ -127,6 +130,17 @@ const ProductSchema = new Schema<IProduct>({
   adminRecommendationReason: {
     type: String,
     trim: true,
+  },
+  isFunding: {
+    type: Boolean,
+    default: false,
+  },
+  fundingEndDate: {
+    type: Date,
+  },
+  fundingGoal: {
+    type: Number,
+    min: 0,
   },
   images: [{
     url: { type: String, required: true },

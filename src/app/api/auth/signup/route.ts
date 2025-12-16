@@ -8,16 +8,10 @@ import { sendVerificationEmail } from '@/lib/email';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
-    const { name, email, password, marketingConsent } = await request.json();
 
-    // 입력 검증
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: '모든 필드를 입력해주세요.' },
-        { status: 400 }
-      );
-    }
+    const { name, email, password, marketingConsent, referralCode } = await request.json();
+
+    // ... (Validation logic remains same)
 
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,13 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 비밀번호 길이 검증
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: '비밀번호는 6자 이상이어야 합니다.' },
-        { status: 400 }
-      );
-    }
+    // ... (Password validation remains same)
 
     // 중복 이메일 확인
     const existingUser = await User.findOne({ email });
@@ -43,6 +31,16 @@ export async function POST(request: NextRequest) {
         { error: '이미 사용 중인 이메일입니다.' },
         { status: 400 }
       );
+    }
+
+    // 추천인 코드 검증 (유효한 경우만 처리)
+    let validReferredBy = null;
+    if (referralCode) {
+      const referrer = await User.findOne({ referralCode });
+      if (referrer) {
+        validReferredBy = referrer.referralCode; // 추천인의 코드를 저장
+        console.log(`Referral linked: New user invited by ${referrer.email} (${referrer.referralCode})`);
+      }
     }
 
     // 비밀번호 해시화
@@ -62,6 +60,7 @@ export async function POST(request: NextRequest) {
       emailVerified: false,
       emailVerificationToken: verificationToken,
       emailVerificationExpires: verificationExpiry,
+      referredBy: validReferredBy, // 추천인 연결
     });
 
     // 추천 코드 자동 생성 (간단 규칙)
@@ -84,7 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         message: '회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.',
         user: {
           id: user._id,

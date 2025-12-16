@@ -13,6 +13,7 @@ import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
 import { User, Mail, Phone, MapPin, Settings, Save, Store, CheckCircle, Clock, XCircle, AlertCircle, X, Upload, FileImage } from 'lucide-react';
 import Link from 'next/link';
+import ReferralSection from '@/components/ui/ReferralSection';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -517,9 +518,9 @@ export default function MyPage() {
               <CardContent>
                 <div className="text-center">
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${userData?.grade === 'ecosoul' ? 'bg-purple-100' :
-                      userData?.grade === 'glower' ? 'bg-pink-100' :
-                        userData?.grade === 'bloomer' ? 'bg-green-100' :
-                          userData?.grade === 'rooter' ? 'bg-blue-100' : 'bg-amber-100'
+                    userData?.grade === 'glower' ? 'bg-pink-100' :
+                      userData?.grade === 'bloomer' ? 'bg-green-100' :
+                        userData?.grade === 'rooter' ? 'bg-blue-100' : 'bg-amber-100'
                     }`}>
                     <span className="text-2xl">
                       {userData?.grade === 'ecosoul' ? '🌿' :
@@ -598,6 +599,10 @@ export default function MyPage() {
               </CardContent>
             </Card>
 
+            {/* [NEW] 친구 초대 (추천인) 섹션 */}
+            <ReferralSection referralCode={userData?.referralCode} />
+
+
             {/* 빠른 링크 */}
             <Card className="shadow-lg">
               <CardHeader>
@@ -648,263 +653,265 @@ export default function MyPage() {
         </div>
 
         {/* 파트너 신청 모달 */}
-        {showPartnerApplication && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-text-primary">파트너 신청</h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPartnerApplication(false)}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-6">
-                  {/* 기본 정보 */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 text-text-primary">기본 정보</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="businessName">상호명 *</Label>
-                        <Input
-                          id="businessName"
-                          value={partnerApplicationData.businessName}
-                          onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)}
-                          required
-                          placeholder="상호명을 입력하세요"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="businessNumber">사업자등록번호 *</Label>
-                        <Input
-                          id="businessNumber"
-                          value={partnerApplicationData.businessNumber}
-                          onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)}
-                          required
-                          placeholder="123-45-67890"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="businessPhone">사업장 전화번호 *</Label>
-                        <Input
-                          id="businessPhone"
-                          value={partnerApplicationData.businessPhone}
-                          onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)}
-                          required
-                          placeholder="02-1234-5678"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 사업장 정보 */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 text-text-primary">사업장 정보</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="businessAddress">사업장 주소 *</Label>
-
-                        {/* Google 주소 검색 */}
-                        <div className="mb-3">
-                          <GoogleAddressSearch
-                            onAddressSelect={(address) => {
-                              handlePartnerApplicationChange('businessZipCode', address.zonecode);
-                              handlePartnerApplicationChange('businessAddress', address.address);
-                            }}
-                          />
-                        </div>
-
-                        {/* 주소 입력 필드들 */}
-                        <div className="space-y-2">
-                          <div className="flex gap-2">
-                            <Input
-                              value={partnerApplicationData.businessZipCode}
-                              onChange={(e) => handlePartnerApplicationChange('businessZipCode', e.target.value)}
-                              placeholder="우편번호 (직접 입력 가능)"
-                              className="w-32"
-                            />
-                            <Input
-                              value={partnerApplicationData.businessAddress}
-                              onChange={(e) => handlePartnerApplicationChange('businessAddress', e.target.value)}
-                              placeholder="도로명주소"
-                              className="flex-1"
-                            />
-                          </div>
-                          <Input
-                            value={partnerApplicationData.businessDetailAddress}
-                            onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)}
-                            placeholder="상세주소를 입력하세요 (예: 101호, 2층)"
-                          />
-                          <div className="text-xs text-gray-500">
-                            💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="businessDescription">사업 설명 *</Label>
-                        <textarea
-                          id="businessDescription"
-                          value={partnerApplicationData.businessDescription}
-                          onChange={(e) => handlePartnerApplicationChange('businessDescription', e.target.value)}
-                          required
-                          rows={4}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="사업 내용을 자세히 설명해주세요 (판매 상품, 경험, 특장점 등)"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 정산 정보 */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 text-text-primary">정산 정보</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="bankName">은행명 *</Label>
-                        <Input
-                          id="bankName"
-                          value={partnerApplicationData.bankName}
-                          onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)}
-                          required
-                          placeholder="국민은행"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="accountHolder">예금주 *</Label>
-                        <Input
-                          id="accountHolder"
-                          value={partnerApplicationData.accountHolder}
-                          onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)}
-                          required
-                          placeholder="홍길동"
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label htmlFor="bankAccount">계좌번호 *</Label>
-                        <Input
-                          id="bankAccount"
-                          value={partnerApplicationData.bankAccount}
-                          onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)}
-                          required
-                          placeholder="123456-78-901234"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 서류 업로드 */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 text-text-primary">서류 업로드</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* 사업자등록증 */}
-                      <div>
-                        <Label htmlFor="businessRegistration">사업자등록증 *</Label>
-                        <div className="space-y-2">
-                          <input
-                            type="file"
-                            id="businessRegistration"
-                            accept="image/*"
-                            onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
-                            className="file-upload-input"
-                          />
-                          {partnerApplicationData.businessRegistrationImage && (
-                            <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                              <FileImage className="h-4 w-4 text-green-600" />
-                              <span className="text-sm text-green-700">사업자등록증 업로드 완료</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 통장사본 */}
-                      <div>
-                        <Label htmlFor="bankStatement">통장사본 *</Label>
-                        <div className="space-y-2">
-                          <input
-                            type="file"
-                            id="bankStatement"
-                            accept="image/*"
-                            onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
-                            className="file-upload-input"
-                          />
-                          {partnerApplicationData.bankStatementImage && (
-                            <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                              <FileImage className="h-4 w-4 text-green-600" />
-                              <span className="text-sm text-green-700">통장사본 업로드 완료</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      * 사업자등록증과 통장사본을 업로드해주세요. 이미지 파일만 업로드 가능합니다.
-                    </p>
-
-                    {/* 업로드 완료 안내 */}
-                    {partnerApplicationData.businessRegistrationImage && partnerApplicationData.bankStatementImage ? (
-                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">
-                            모든 서류 업로드가 완료되었습니다!
-                          </span>
-                        </div>
-                        <p className="text-xs text-blue-600 mt-1">
-                          아래 &quot;파트너 신청하기&quot; 버튼을 클릭하여 신청을 완료해주세요.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <AlertCircle className="h-5 w-5 text-yellow-600" />
-                          <span className="text-sm font-medium text-yellow-800">
-                            서류 업로드 필요
-                          </span>
-                        </div>
-                        <p className="text-xs text-yellow-600 mt-1">
-                          사업자등록증과 통장사본을 모두 업로드한 후 &quot;파트너 신청하기&quot; 버튼을 클릭해주세요.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 제출 버튼 */}
-                  <div className="flex justify-end space-x-3 pt-6 border-t">
+        {
+          showPartnerApplication && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-text-primary">파트너 신청</h2>
                     <Button
-                      type="button"
-                      variant="outline"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowPartnerApplication(false)}
                     >
-                      취소
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={partnerApplicationLoading}
-                      className="flex items-center"
-                    >
-                      {partnerApplicationLoading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          신청 중...
-                        </>
-                      ) : (
-                        <>
-                          <Store className="h-4 w-4 mr-2" />
-                          파트너 신청하기
-                        </>
-                      )}
+                      <X className="h-5 w-5" />
                     </Button>
                   </div>
-                </form>
+
+                  <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-6">
+                    {/* 기본 정보 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-text-primary">기본 정보</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="businessName">상호명 *</Label>
+                          <Input
+                            id="businessName"
+                            value={partnerApplicationData.businessName}
+                            onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)}
+                            required
+                            placeholder="상호명을 입력하세요"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="businessNumber">사업자등록번호 *</Label>
+                          <Input
+                            id="businessNumber"
+                            value={partnerApplicationData.businessNumber}
+                            onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)}
+                            required
+                            placeholder="123-45-67890"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="businessPhone">사업장 전화번호 *</Label>
+                          <Input
+                            id="businessPhone"
+                            value={partnerApplicationData.businessPhone}
+                            onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)}
+                            required
+                            placeholder="02-1234-5678"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 사업장 정보 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-text-primary">사업장 정보</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="businessAddress">사업장 주소 *</Label>
+
+                          {/* Google 주소 검색 */}
+                          <div className="mb-3">
+                            <GoogleAddressSearch
+                              onAddressSelect={(address) => {
+                                handlePartnerApplicationChange('businessZipCode', address.zonecode);
+                                handlePartnerApplicationChange('businessAddress', address.address);
+                              }}
+                            />
+                          </div>
+
+                          {/* 주소 입력 필드들 */}
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input
+                                value={partnerApplicationData.businessZipCode}
+                                onChange={(e) => handlePartnerApplicationChange('businessZipCode', e.target.value)}
+                                placeholder="우편번호 (직접 입력 가능)"
+                                className="w-32"
+                              />
+                              <Input
+                                value={partnerApplicationData.businessAddress}
+                                onChange={(e) => handlePartnerApplicationChange('businessAddress', e.target.value)}
+                                placeholder="도로명주소"
+                                className="flex-1"
+                              />
+                            </div>
+                            <Input
+                              value={partnerApplicationData.businessDetailAddress}
+                              onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)}
+                              placeholder="상세주소를 입력하세요 (예: 101호, 2층)"
+                            />
+                            <div className="text-xs text-gray-500">
+                              💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="businessDescription">사업 설명 *</Label>
+                          <textarea
+                            id="businessDescription"
+                            value={partnerApplicationData.businessDescription}
+                            onChange={(e) => handlePartnerApplicationChange('businessDescription', e.target.value)}
+                            required
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="사업 내용을 자세히 설명해주세요 (판매 상품, 경험, 특장점 등)"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 정산 정보 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-text-primary">정산 정보</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="bankName">은행명 *</Label>
+                          <Input
+                            id="bankName"
+                            value={partnerApplicationData.bankName}
+                            onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)}
+                            required
+                            placeholder="국민은행"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="accountHolder">예금주 *</Label>
+                          <Input
+                            id="accountHolder"
+                            value={partnerApplicationData.accountHolder}
+                            onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)}
+                            required
+                            placeholder="홍길동"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <Label htmlFor="bankAccount">계좌번호 *</Label>
+                          <Input
+                            id="bankAccount"
+                            value={partnerApplicationData.bankAccount}
+                            onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)}
+                            required
+                            placeholder="123456-78-901234"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 서류 업로드 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-text-primary">서류 업로드</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 사업자등록증 */}
+                        <div>
+                          <Label htmlFor="businessRegistration">사업자등록증 *</Label>
+                          <div className="space-y-2">
+                            <input
+                              type="file"
+                              id="businessRegistration"
+                              accept="image/*"
+                              onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
+                              className="file-upload-input"
+                            />
+                            {partnerApplicationData.businessRegistrationImage && (
+                              <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
+                                <FileImage className="h-4 w-4 text-green-600" />
+                                <span className="text-sm text-green-700">사업자등록증 업로드 완료</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 통장사본 */}
+                        <div>
+                          <Label htmlFor="bankStatement">통장사본 *</Label>
+                          <div className="space-y-2">
+                            <input
+                              type="file"
+                              id="bankStatement"
+                              accept="image/*"
+                              onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
+                              className="file-upload-input"
+                            />
+                            {partnerApplicationData.bankStatementImage && (
+                              <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
+                                <FileImage className="h-4 w-4 text-green-600" />
+                                <span className="text-sm text-green-700">통장사본 업로드 완료</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        * 사업자등록증과 통장사본을 업로드해주세요. 이미지 파일만 업로드 가능합니다.
+                      </p>
+
+                      {/* 업로드 완료 안내 */}
+                      {partnerApplicationData.businessRegistrationImage && partnerApplicationData.bankStatementImage ? (
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="h-5 w-5 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-800">
+                              모든 서류 업로드가 완료되었습니다!
+                            </span>
+                          </div>
+                          <p className="text-xs text-blue-600 mt-1">
+                            아래 &quot;파트너 신청하기&quot; 버튼을 클릭하여 신청을 완료해주세요.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <AlertCircle className="h-5 w-5 text-yellow-600" />
+                            <span className="text-sm font-medium text-yellow-800">
+                              서류 업로드 필요
+                            </span>
+                          </div>
+                          <p className="text-xs text-yellow-600 mt-1">
+                            사업자등록증과 통장사본을 모두 업로드한 후 &quot;파트너 신청하기&quot; 버튼을 클릭해주세요.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 제출 버튼 */}
+                    <div className="flex justify-end space-x-3 pt-6 border-t">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowPartnerApplication(false)}
+                      >
+                        취소
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={partnerApplicationLoading}
+                        className="flex items-center"
+                      >
+                        {partnerApplicationLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            신청 중...
+                          </>
+                        ) : (
+                          <>
+                            <Store className="h-4 w-4 mr-2" />
+                            파트너 신청하기
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+          )
+        }
+      </div >
+    </div >
   );
 }

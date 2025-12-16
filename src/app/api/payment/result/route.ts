@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     // 나이스페이는 form-data 형식으로 데이터를 전송
     const formData = await request.formData();
-    
+
     // 나이스페이 결과 파라미터 추출
     const authResultCode = formData.get('AuthResultCode') as string;
     const authResultMsg = formData.get('AuthResultMsg') as string;
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const nextAppURL = formData.get('NextAppURL') as string;
     const netCancelURL = formData.get('NetCancelURL') as string;
     const responseSignature = formData.get('Signature') as string;
-    
+
     console.log('나이스페이 결과 수신:', {
       authResultCode,
       authResultMsg,
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         });
       }
     }
-    
+
     if (isAuthSuccess && nextAppURL) {
       try {
         // 승인 요청 로직
@@ -88,12 +88,12 @@ export async function POST(request: NextRequest) {
           now.getHours().toString().padStart(2, '0') +
           now.getMinutes().toString().padStart(2, '0') +
           now.getSeconds().toString().padStart(2, '0');
-        
+
         // 승인 서명 생성 (AuthToken + MID + Amt + EdiDate + MerchantKey)
         const signData = crypto.createHash('sha256')
           .update(authToken + mid + amt + ediDate + merchantKey)
           .digest('hex');
-        
+
         // 승인 요청 데이터 생성
         const approvalData = new URLSearchParams();
         approvalData.append('TID', txTid);
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         approvalData.append('EdiDate', ediDate);
         approvalData.append('CharSet', 'utf-8');
         approvalData.append('SignData', signData);
-        
+
         console.log('나이스페이 승인 요청:', {
           TID: txTid,
           MID: mid,
@@ -171,14 +171,14 @@ export async function POST(request: NextRequest) {
           const params = new URLSearchParams(approvalResult);
           approvalDataObj = Object.fromEntries(params);
         }
-        
+
         const resultCode = approvalDataObj.ResultCode || approvalDataObj.resultCode;
         const resultMsg = approvalDataObj.ResultMsg || approvalDataObj.resultMsg;
         const payMethodResult = approvalDataObj.PayMethod || approvalDataObj.payMethod;
         const resultSignature = approvalDataObj.Signature || approvalDataObj.signature;
         const resultTid = approvalDataObj.TID || approvalDataObj.tid || txTid;
         const resultAmt = approvalDataObj.Amt || approvalDataObj.amt || amt;
-        
+
         console.log('나이스페이 승인 결과:', {
           resultCode,
           resultMsg,
@@ -222,15 +222,15 @@ export async function POST(request: NextRequest) {
           default:
             isPaymentSuccess = false;
         }
-        
+
         if (isPaymentSuccess) {
           // DB 연결
           await connectDB();
-          
+
           // MongoDB 트랜잭션 시작
           const mongoose = await import('mongoose');
           let mongoSession = null;
-          
+
           try {
             mongoSession = await mongoose.default.startSession();
             mongoSession.startTransaction();
@@ -243,39 +243,39 @@ export async function POST(request: NextRequest) {
           try {
             // 주문번호로 주문 찾기
             const order = await Order.findOne({ orderNumber: moid });
-            
+
             if (order) {
               // 주문 상태 업데이트
               order.paymentStatus = 'completed';
               order.status = 'confirmed';
               order.updatedAt = new Date();
               await order.save(mongoSession ? { session: mongoSession } : {});
-              
+
               console.log('✅ 주문 상태 업데이트 완료:', moid);
 
               // 결제 완료 후 주문한 상품만 장바구니에서 제거
               const Cart = (await import('@/models/Cart')).default;
               const cart = await Cart.findOne({ userId: order.userId });
-              
+
               if (cart) {
                 // 주문한 상품 ID 목록
                 const orderedProductIds = order.items.map((item: any) => item.productId.toString());
-                
+
                 // 주문하지 않은 상품만 남기기
-                const remainingItems = cart.items.filter((item: any) => 
+                const remainingItems = cart.items.filter((item: any) =>
                   !orderedProductIds.includes(item.productId.toString())
                 );
-                
+
                 cart.items = remainingItems;
                 cart.totalItems = remainingItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
                 cart.totalAmount = remainingItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-                
+
                 await cart.save(mongoSession ? { session: mongoSession } : {});
-                
+
                 console.log('✅ 장바구니에서 주문한 상품 제거 완료:', orderedProductIds);
               }
 
-              // 포인트 적립 처리
+              // 포인트 적립 처리 (구매자)
               try {
                 const pointResult = await earnPoints(
                   order.userId,
@@ -283,14 +283,82 @@ export async function POST(request: NextRequest) {
                   `구매 적립 (주문번호: ${order.orderNumber})`,
                   order._id
                 );
-                
+
                 if (pointResult.success) {
                   console.log(`✅ 포인트 적립 완료: ${pointResult.earnedPoints}P 적립, 잔액 ${pointResult.newBalance}P`);
                 } else {
                   console.error('포인트 적립 실패:', pointResult.error);
                 }
+
+                // [추천인 리워드 지급 로직] (2단계: 2% -> 1%)
+                // 1. 구매자 정보 조회 (referredBy 확인)
+                const User = (await import('@/models/User')).default;
+                const buyer = await User.findById(order.userId);
+
+                if (buyer && buyer.referredBy) {
+                  // 2. 1단계 추천인 (직접 추천) 찾기
+                  const referrerLv1 = await User.findOne({ referralCode: buyer.referredBy });
+
+                  if (referrerLv1) {
+                    // 2-1. 1단계 리워드 계산 (결제 금액의 2%)
+                    const rewardLv1 = Math.floor(order.totalAmount * 0.02);
+
+                    if (rewardLv1 > 0) {
+                      referrerLv1.points = (referrerLv1.points || 0) + rewardLv1;
+                      await referrerLv1.save(mongoSession ? { session: mongoSession } : {});
+                      console.log(`🎁 1단계 추천인 리워드 지급: ${referrerLv1.email}에게 ${rewardLv1}P 지급 (구매자: ${buyer.name})`);
+
+                      // [FIX] 포인트 내역 기록 (PointTransaction)
+                      const PointTransaction = (await import('@/models/PointTransaction')).default;
+                      const expiresAt = new Date();
+                      expiresAt.setDate(expiresAt.getDate() + 365); // 1년 유효기간
+
+                      await PointTransaction.create([{
+                        userId: referrerLv1._id,
+                        type: 'earned',
+                        amount: rewardLv1,
+                        description: `1단계 추천인 리워드 (${buyer.name}님 구매)`,
+                        orderId: order._id,
+                        balance: referrerLv1.points,
+                        expiresAt
+                      }], mongoSession ? { session: mongoSession } : {});
+                    }
+
+                    // 3. 2단계 추천인 (1단계 추천인의 추천인) 찾기
+                    if (referrerLv1.referredBy) {
+                      const referrerLv2 = await User.findOne({ referralCode: referrerLv1.referredBy });
+
+                      if (referrerLv2) {
+                        // 3-1. 2단계 리워드 계산 (결제 금액의 1%)
+                        const rewardLv2 = Math.floor(order.totalAmount * 0.01);
+
+                        if (rewardLv2 > 0) {
+                          referrerLv2.points = (referrerLv2.points || 0) + rewardLv2;
+                          await referrerLv2.save(mongoSession ? { session: mongoSession } : {});
+                          console.log(`🎁 2단계 추천인 리워드 지급: ${referrerLv2.email}에게 ${rewardLv2}P 지급 (1단계: ${referrerLv1.name}, 구매자: ${buyer.name})`);
+
+                          // [FIX] 포인트 내역 기록 (PointTransaction)
+                          const PointTransaction = (await import('@/models/PointTransaction')).default;
+                          const expiresAt = new Date();
+                          expiresAt.setDate(expiresAt.getDate() + 365); // 1년 유효기간
+
+                          await PointTransaction.create([{
+                            userId: referrerLv2._id,
+                            type: 'earned',
+                            amount: rewardLv2,
+                            description: `2단계 추천인 리워드 (1단계: ${referrerLv1.name}, 구매자: ${buyer.name})`,
+                            orderId: order._id,
+                            balance: referrerLv2.points,
+                            expiresAt
+                          }], mongoSession ? { session: mongoSession } : {});
+                        }
+                      }
+                    }
+                  }
+                }
+
               } catch (error) {
-                console.error('포인트 적립 처리 오류:', error);
+                console.error('포인트/리워드 적립 처리 오류:', error);
                 // 포인트 적립 실패는 결제 완료를 막지 않음
               }
 
@@ -299,10 +367,10 @@ export async function POST(request: NextRequest) {
                 try {
                   const { markCouponAsUsed, recordCouponUsage } = await import('@/lib/couponValidator');
                   const Coupon = (await import('@/models/Coupon')).default;
-                  
+
                   // 쿠폰 정보 조회
                   const coupon = await Coupon.findOne({ code: order.couponCode.toUpperCase() });
-                  
+
                   if (coupon) {
                     // 1. CouponUsage 기록 생성
                     const usageRecorded = await recordCouponUsage(
@@ -314,20 +382,20 @@ export async function POST(request: NextRequest) {
                       order.totalAmount + order.couponDiscount,
                       order.totalAmount
                     );
-                    
+
                     if (usageRecorded) {
                       console.log(`✅ 쿠폰 사용 기록 생성 완료: ${order.couponCode}`);
                     } else {
                       console.error('쿠폰 사용 기록 생성 실패');
                     }
-                    
+
                     // 2. UserCoupon 상태 업데이트
                     const couponResult = await markCouponAsUsed(
                       order.userId.toString(),
                       order.couponCode,
                       order._id.toString()
                     );
-                    
+
                     if (couponResult.success) {
                       console.log(`✅ 쿠폰 상태 업데이트 완료: ${order.couponCode}`);
                     } else {
@@ -350,7 +418,7 @@ export async function POST(request: NextRequest) {
             }
           } catch (paymentProcessError) {
             console.error('결제 처리 중 오류:', paymentProcessError);
-            
+
             // 트랜잭션 롤백
             if (mongoSession) {
               try {
@@ -360,7 +428,7 @@ export async function POST(request: NextRequest) {
                 console.error('트랜잭션 롤백 오류:', abortError);
               }
             }
-            
+
             throw paymentProcessError;
           } finally {
             // 트랜잭션 세션 종료
@@ -373,10 +441,10 @@ export async function POST(request: NextRequest) {
               }
             }
           }
-        
+
           // 결제 성공 시 HTML 응답으로 리다이렉트
           const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-success?orderId=${moid}&amount=${amt}&tid=${txTid}`;
-          
+
           const htmlResponse = `
 <!DOCTYPE html>
 <html>
@@ -434,7 +502,7 @@ export async function POST(request: NextRequest) {
     </script>
 </body>
 </html>`;
-          
+
           return new Response(htmlResponse, {
             status: 200,
             headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -442,7 +510,7 @@ export async function POST(request: NextRequest) {
         } else {
           // 결제 실패 시 처리
           const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-failed?orderId=${moid}&error=${encodeURIComponent(resultMsg)}`;
-          
+
           const htmlResponse = `
 <!DOCTYPE html>
 <html>
@@ -486,18 +554,18 @@ export async function POST(request: NextRequest) {
     </script>
 </body>
 </html>`;
-          
+
           return new Response(htmlResponse, {
             status: 200,
             headers: { 'Content-Type': 'text/html; charset=utf-8' },
           });
         }
-        
+
       } catch (approvalError) {
         console.error('승인 요청 오류:', approvalError);
-        
+
         const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-failed?orderId=${moid}&error=${encodeURIComponent('승인 처리 중 오류가 발생했습니다.')}`;
-        
+
         const htmlResponse = `
 <!DOCTYPE html>
 <html>
@@ -518,7 +586,7 @@ export async function POST(request: NextRequest) {
     </div>
 </body>
 </html>`;
-        
+
         return new Response(htmlResponse, {
           status: 200,
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -527,7 +595,7 @@ export async function POST(request: NextRequest) {
     } else {
       // 인증 실패 시 처리
       const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/order-cancelled?orderId=${moid}&error=${encodeURIComponent(authResultMsg)}`;
-      
+
       const htmlResponse = `
 <!DOCTYPE html>
 <html>
@@ -571,13 +639,13 @@ export async function POST(request: NextRequest) {
     </script>
 </body>
 </html>`;
-      
+
       return new Response(htmlResponse, {
         status: 200,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       });
     }
-    
+
   } catch (error) {
     console.error('결제 결과 처리 오류:', error);
     return NextResponse.json(

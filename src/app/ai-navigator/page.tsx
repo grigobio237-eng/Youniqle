@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Sun, Moon, Coffee, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AiNavigatorPage() {
     const [scoreHistory, setScoreHistory] = useState<any[]>([]);
@@ -160,8 +161,8 @@ export default function AiNavigatorPage() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-gray-400 text-sm">12월 2주차 분석</span>
-                            <Button size="sm" variant="outline" className="text-black bg-white hover:bg-gray-200">
-                                전체 리포트 보기
+                            <Button size="sm" variant="outline" className="text-black bg-white hover:bg-gray-200" asChild>
+                                <Link href="/ai-navigator/report">전체 리포트 보기</Link>
                             </Button>
                         </div>
                         <h3 className="text-lg font-bold mb-2">"주말 수면 패턴이 불규칙해요."</h3>

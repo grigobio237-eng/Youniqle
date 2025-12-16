@@ -5,6 +5,7 @@ import PartnerLayout from '@/components/partner/PartnerLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -43,6 +44,9 @@ interface Product {
   approvalStatus: 'pending' | 'approved' | 'rejected'; // 승인 상태
   rejectionReason?: string; // 거부 사유
   featured: boolean;
+  isFunding?: boolean;
+  fundingGoal?: number;
+  fundingEndDate?: string; // API often returns dates as strings
   createdAt: string;
   // 카테고리별 특화 정보
   nutritionInfo?: {
@@ -93,6 +97,9 @@ function PartnerProductsContent() {
       type?: string;
     }>,
     featured: false,
+    isFunding: false,
+    fundingGoal: '',
+    fundingEndDate: '',
     // 카테고리별 특화 정보
     nutritionInfo: {
       calories: '',
@@ -187,7 +194,7 @@ function PartnerProductsContent() {
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="origin">원산지</Label>
@@ -357,7 +364,7 @@ function PartnerProductsContent() {
 
   useEffect(() => {
     fetchProducts();
-    
+
     // URL 파라미터 확인하여 다이얼로그 열기
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'new') {
@@ -385,7 +392,7 @@ function PartnerProductsContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // 상품 데이터 준비
       const productData = {
@@ -398,6 +405,9 @@ function PartnerProductsContent() {
         originInfo: formData.originInfo && Object.values(formData.originInfo).some(v => v) ? formData.originInfo : undefined,
         clothingInfo: formData.clothingInfo && Object.values(formData.clothingInfo).some(v => v) ? formData.clothingInfo : undefined,
         electronicsInfo: formData.electronicsInfo && Object.values(formData.electronicsInfo).some(v => v) ? formData.electronicsInfo : undefined,
+        isFunding: formData.isFunding,
+        fundingGoal: formData.isFunding && formData.fundingGoal ? parseInt(formData.fundingGoal) : undefined,
+        fundingEndDate: formData.isFunding && formData.fundingEndDate ? new Date(formData.fundingEndDate) : undefined,
       };
 
       const url = editingProduct ? `/api/partner/products/${editingProduct._id}` : '/api/partner/products';
@@ -440,6 +450,9 @@ function PartnerProductsContent() {
       description: '',
       images: [],
       featured: false,
+      isFunding: false,
+      fundingGoal: '',
+      fundingEndDate: '',
       // 카테고리별 특화 정보 초기화
       nutritionInfo: {
         calories: '',
@@ -480,6 +493,9 @@ function PartnerProductsContent() {
       description: product.description,
       images: product.images || [],
       featured: product.featured,
+      isFunding: product.isFunding || false,
+      fundingGoal: product.fundingGoal?.toString() || '',
+      fundingEndDate: product.fundingEndDate ? new Date(product.fundingEndDate).toISOString().split('T')[0] : '',
       // 카테고리별 특화 정보 로드
       nutritionInfo: {
         calories: product.nutritionInfo?.calories || '',
@@ -655,6 +671,45 @@ function PartnerProductsContent() {
 
               {/* 카테고리별 고도화 입력 필드 */}
               {formData.category && getCategorySpecificFields(formData.category)}
+
+              {/* Funding Fields */}
+              <div className="flex items-center space-x-2 border p-4 rounded-lg bg-gray-50 my-4">
+                <Checkbox
+                  id="isFunding"
+                  checked={formData.isFunding}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFunding: checked as boolean }))}
+                />
+                <div className="space-y-1">
+                  <Label htmlFor="isFunding" className="font-semibold">펀딩 프로젝트로 등록</Label>
+                  <p className="text-sm text-gray-500">
+                    이 상품을 크라우드 펀딩 형태로 진행합니다. 목표 금액과 종료일을 설정해주세요.
+                  </p>
+                </div>
+              </div>
+
+              {formData.isFunding && (
+                <div className="grid grid-cols-2 gap-4 border-l-2 border-primary pl-4 ml-2 mb-4">
+                  <div>
+                    <Label htmlFor="fundingGoal">목표 금액</Label>
+                    <Input
+                      id="fundingGoal"
+                      type="number"
+                      value={formData.fundingGoal}
+                      onChange={(e) => setFormData(prev => ({ ...prev, fundingGoal: e.target.value }))}
+                      placeholder="예: 1000000"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="fundingEndDate">펀딩 종료일</Label>
+                    <Input
+                      id="fundingEndDate"
+                      type="date"
+                      value={formData.fundingEndDate}
+                      onChange={(e) => setFormData(prev => ({ ...prev, fundingEndDate: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="summary">상품 요약 *</Label>

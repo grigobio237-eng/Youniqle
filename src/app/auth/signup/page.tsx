@@ -54,6 +54,8 @@ function SignupContent() {
       return;
     }
 
+    const referralCode = searchParams?.get('ref') || ''; // Capture referral code
+
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -65,6 +67,7 @@ function SignupContent() {
           email: formData.email,
           password: formData.password,
           marketingConsent: formData.marketingConsent,
+          referralCode, // Send to API
         }),
       });
 

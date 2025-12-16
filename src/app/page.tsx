@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 // ---------------------------
@@ -106,30 +106,39 @@ function GateIntro({ onStart }: { onStart: () => void }) {
 // B. Question Form View
 function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any[]) => void }) {
   const [step, setStep] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
-  const [answers, setAnswers] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<any[]>(new Array(QUESTIONS.length).fill(null));
 
-  const handleAnswer = (score: number, label: string) => {
+  const handleOptionSelect = (score: number, label: string) => {
     const currentQ = QUESTIONS[step];
-    const newAnswers = [...answers, {
+    const newAnswers = [...answers];
+    newAnswers[step] = {
       questionId: currentQ.id,
       category: currentQ.category,
       score: score,
       answer: label
-    }];
+    };
     setAnswers(newAnswers);
+  };
 
-    const newScore = totalScore + score;
+  const handleNext = () => {
     if (step < QUESTIONS.length - 1) {
-      setTotalScore(newScore);
       setStep(step + 1);
     } else {
-      // Finished
-      onComplete(newScore, newAnswers);
+      // Calculate total score and finish
+      const totalScore = answers.reduce((acc, curr) => acc + (curr?.score || 0), 0);
+      const finalAnswers = answers.filter(a => a !== null);
+      onComplete(totalScore, finalAnswers);
+    }
+  };
+
+  const handlePrev = () => {
+    if (step > 0) {
+      setStep(step - 1);
     }
   };
 
   const currentQ = QUESTIONS[step];
+  const currentAnswer = answers[step];
   const progress = ((step + 1) / QUESTIONS.length) * 100;
 
   return (
@@ -160,21 +169,51 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
           </div>
 
           <div className="space-y-3">
-            {currentQ.options.map((opt, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleAnswer(opt.score, opt.label)}
-                className="w-full p-4 text-left border rounded-xl hover:bg-primary/5 hover:border-primary transition-all active:scale-98"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">{opt.label}</span>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
-                </div>
-              </button>
-            ))}
+            {currentQ.options.map((opt, idx) => {
+              const isSelected = currentAnswer?.answer === opt.label;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleOptionSelect(opt.score, opt.label)}
+                  className={`w-full p-4 text-left border rounded-xl transition-all active:scale-98 
+                    ${isSelected
+                      ? 'bg-primary/10 border-primary text-primary ring-1 ring-primary'
+                      : 'hover:bg-primary/5 hover:border-primary text-gray-700'
+                    }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={isSelected ? 'font-bold' : ''}>{opt.label}</span>
+                    {isSelected ? (
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-gray-300" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
       </AnimatePresence>
+
+      {/* Navigation Buttons */}
+      <div className="flex gap-3 mt-8 pt-4 border-t border-gray-100">
+        <Button
+          variant="outline"
+          onClick={handlePrev}
+          disabled={step === 0}
+          className="flex-1 h-12 text-lg rounded-xl"
+        >
+          <ChevronLeft className="w-5 h-5 mr-1" /> 이전
+        </Button>
+        <Button
+          onClick={handleNext}
+          disabled={!currentAnswer}
+          className="flex-1 h-12 text-lg rounded-xl"
+        >
+          {step === QUESTIONS.length - 1 ? '결과 보기' : '다음'} <ChevronRight className="w-5 h-5 ml-1" />
+        </Button>
+      </div>
     </div>
   );
 }

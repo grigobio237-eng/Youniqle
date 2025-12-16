@@ -9,13 +9,13 @@ async function getProductsHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = Object.fromEntries(searchParams);
-    
+
     const validator = new InputValidator(commonSchemas.productQuery);
     const validationResult = validator.validate(query);
-    
+
     if (!validationResult.isValid) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid query parameters',
           details: validationResult.errors.map(err => ({
             field: err.field,
@@ -25,13 +25,13 @@ async function getProductsHandler(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     const validatedQuery = validationResult.sanitizedData;
-    
+
     // 캐시 키 생성
     const cacheKey = CacheKeys.products(
-      validatedQuery.page || 1, 
-      validatedQuery.limit || 20, 
+      validatedQuery.page || 1,
+      validatedQuery.limit || 20,
       validatedQuery
     );
 
@@ -41,27 +41,43 @@ async function getProductsHandler(request: NextRequest) {
       console.log('📖 상품 목록 캐시 히트');
       return NextResponse.json(cachedData);
     }
-    
+
     await connectDB();
 
     // Build filter object (승인된 활성 상품만 조회)
-    const filter: any = { 
+    const filter: any = {
       status: 'active',
       approvalStatus: 'approved' // 승인된 상품만 일반 사용자에게 노출
     };
-    
+
     if (validatedQuery.q || validatedQuery.search) {
       const searchTerm = validatedQuery.q || validatedQuery.search;
       filter.$text = { $search: searchTerm };
     }
-    
+
     if (validatedQuery.category) {
       filter.category = validatedQuery.category;
     }
 
+    // Funding Filter (Default: Show Non-Funding products in Shop, unless specified)
+    if (validatedQuery.isFunding !== undefined) {
+      filter.isFunding = validatedQuery.isFunding;
+    } else {
+      // If not specified, default to non-funding (regular products)
+      // BUT if requesting specifically by ID or other specific filters we might need adjustment.
+      // For general shop listing, we want to separate them.
+      // Let's make it optional but usually the frontend will send explicit false/true
+      // If purely optional, it defaults to showing EVERYTHING? No, user asked for separation.
+      // Let's assume if not passed, we don't filter (show all), OR we strictly separate?
+      // Better: Front-end sends isFunding=false for Shop, isFunding=true for Funding page.
+      // If API consumer (admin) wants all, they can omit. 
+      // Wait, standard shop behavior usually hides funding items.
+      // Let's leave it as optional filter. Front-end MUST send isFunding=false/true.
+    }
+
     // Build sort object
     let sort: any = { createdAt: -1 }; // default: newest first
-    
+
     switch (validatedQuery.sort) {
       case 'price_asc':
         sort = { price: 1 };
@@ -117,7 +133,7 @@ async function getProductsHandler(request: NextRequest) {
     return NextResponse.json(responseData);
   } catch (error) {
     console.error('Get products error:', error);
-    
+
     if (error instanceof Error && error.name === 'ValidationError') {
       return NextResponse.json(
         { error: '검색 조건을 확인해주세요.' },

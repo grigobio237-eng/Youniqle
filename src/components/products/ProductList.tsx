@@ -33,6 +33,7 @@ interface ProductListProps {
     category?: string;
     sort?: string;
     page?: string;
+    isFunding?: string; // Added isFunding parameter
   };
 }
 
@@ -55,7 +56,9 @@ export default function ProductList({ searchParams }: ProductListProps) {
         if (searchParams.q) params.append('q', searchParams.q);
         if (searchParams.category) params.append('category', searchParams.category);
         if (searchParams.sort) params.append('sort', searchParams.sort);
+        if (searchParams.sort) params.append('sort', searchParams.sort);
         if (searchParams.page) params.append('page', searchParams.page);
+        if (searchParams.isFunding) params.append('isFunding', searchParams.isFunding); // Pass isFunding
 
         const response = await fetch(`/api/products?${params.toString()}`, {
           method: 'GET',

@@ -46,7 +46,7 @@ export class InputValidator {
 
     for (const [field, rules] of Object.entries(this.schema)) {
       const value = data[field];
-      
+
       try {
         const sanitizedValue = this.validateField(field, value, rules);
         sanitizedData[field] = sanitizedValue;
@@ -137,20 +137,20 @@ export class InputValidator {
     switch (type) {
       case 'string':
         return String(value);
-      
+
       case 'number':
         const num = Number(value);
         if (isNaN(num)) {
           throw new ValidationError(field, value, 'type', `${field} must be a valid number`);
         }
         return num;
-      
+
       case 'boolean':
         if (typeof value === 'boolean') return value;
         if (value === 'true' || value === '1') return true;
         if (value === 'false' || value === '0') return false;
         throw new ValidationError(field, value, 'type', `${field} must be a boolean`);
-      
+
       case 'email':
         const email = String(value).toLowerCase();
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -158,7 +158,7 @@ export class InputValidator {
           throw new ValidationError(field, value, 'type', `${field} must be a valid email address`);
         }
         return email;
-      
+
       case 'url':
         const url = String(value);
         try {
@@ -167,26 +167,26 @@ export class InputValidator {
         } catch {
           throw new ValidationError(field, value, 'type', `${field} must be a valid URL`);
         }
-      
+
       case 'date':
         const date = new Date(value);
         if (isNaN(date.getTime())) {
           throw new ValidationError(field, value, 'type', `${field} must be a valid date`);
         }
         return date;
-      
+
       case 'array':
         if (!Array.isArray(value)) {
           throw new ValidationError(field, value, 'type', `${field} must be an array`);
         }
         return value;
-      
+
       case 'object':
         if (typeof value !== 'object' || Array.isArray(value)) {
           throw new ValidationError(field, value, 'type', `${field} must be an object`);
         }
         return value;
-      
+
       default:
         return value;
     }
@@ -194,7 +194,7 @@ export class InputValidator {
 
   private sanitizeString(str: string): string {
     if (!this.sanitizeHtml) return str;
-    
+
     // 기본적인 HTML 태그 제거
     return str
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -290,6 +290,19 @@ export const commonSchemas = {
         if (value.length > 10) return 'Maximum 10 images allowed';
         return true;
       }
+    },
+    isFunding: {
+      required: false,
+      type: 'boolean' as const
+    },
+    fundingGoal: {
+      required: false,
+      type: 'number' as const,
+      min: 0
+    },
+    fundingEndDate: {
+      required: false,
+      type: 'date' as const
     }
   },
 
@@ -420,6 +433,10 @@ export const commonSchemas = {
       required: false,
       type: 'string' as const,
       enum: ['asc', 'desc']
+    },
+    isFunding: {
+      required: false,
+      type: 'boolean' as const
     }
   }
 };
@@ -431,7 +448,7 @@ export function validateRequest(schema: ValidationSchema) {
       const validator = new InputValidator(schema);
       const body = req.body ? JSON.parse(JSON.stringify(req.body)) : {};
       const result = validator.validate(body);
-      
+
       if (!result.isValid) {
         return {
           error: 'Validation failed',
@@ -442,7 +459,7 @@ export function validateRequest(schema: ValidationSchema) {
           }))
         };
       }
-      
+
       return { data: result.sanitizedData };
     } catch (error) {
       return {

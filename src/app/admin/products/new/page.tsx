@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Link from 'next/link';
@@ -38,6 +39,9 @@ export default function NewProductPage() {
     category: '',
     status: 'active',
     featured: false,
+    isFunding: false,
+    fundingGoal: '',
+    fundingEndDate: '',
     images: [] as Array<{
       url: string;
       w?: number;
@@ -326,6 +330,9 @@ export default function NewProductPage() {
         price: parseFloat(formData.price.replace(/[^0-9]/g, '')), // 천단위 구분기호 제거
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice.replace(/[^0-9]/g, '')) : undefined,
         stock: parseInt(formData.stock),
+        isFunding: formData.isFunding,
+        fundingGoal: formData.isFunding && formData.fundingGoal ? parseInt(formData.fundingGoal) : undefined,
+        fundingEndDate: formData.isFunding && formData.fundingEndDate ? new Date(formData.fundingEndDate) : undefined,
         // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
         nutritionInfo: formData.nutritionInfo && Object.values(formData.nutritionInfo).some(v => v) ? formData.nutritionInfo : undefined,
         originInfo: formData.originInfo && Object.values(formData.originInfo).some(v => v) ? formData.originInfo : undefined,
@@ -456,6 +463,47 @@ export default function NewProductPage() {
           </div>
         </div>
 
+        {/* Funding Fields */}
+        <div className="flex items-center space-x-2 border p-4 rounded-lg bg-gray-50">
+          <Checkbox
+            id="isFunding"
+            checked={formData.isFunding}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFunding: checked as boolean }))}
+          />
+          <div className="space-y-1">
+            <Label htmlFor="isFunding" className="font-semibold">펀딩 프로젝트로 등록</Label>
+            <p className="text-sm text-gray-500">
+              이 상품을 크라우드 펀딩 형태로 진행합니다. 목표 금액과 종료일을 설정해주세요.
+            </p>
+          </div>
+        </div>
+
+        {
+          formData.isFunding && (
+            <div className="grid grid-cols-2 gap-4 border-l-2 border-primary pl-4 ml-2">
+              <div>
+                <Label htmlFor="fundingGoal">목표 금액</Label>
+                <Input
+                  id="fundingGoal"
+                  type="number"
+                  value={formData.fundingGoal}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fundingGoal: e.target.value }))}
+                  placeholder="예: 1000000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fundingEndDate">펀딩 종료일</Label>
+                <Input
+                  id="fundingEndDate"
+                  type="date"
+                  value={formData.fundingEndDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fundingEndDate: e.target.value }))}
+                />
+              </div>
+            </div>
+          )
+        }
+
         <div>
           <Label htmlFor="category">카테고리 *</Label>
           <Select
@@ -520,7 +568,7 @@ export default function NewProductPage() {
             )}
           </Button>
         </div>
-      </form>
-    </div>
+      </form >
+    </div >
   );
 }

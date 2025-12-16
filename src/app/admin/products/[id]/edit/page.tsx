@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { 
-  ArrowLeft, 
-  Save, 
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  ArrowLeft,
+  Save,
   Package,
   AlertCircle
 } from 'lucide-react';
@@ -36,6 +37,9 @@ interface Product {
   category: string;
   status: 'active' | 'hidden';
   featured: boolean;
+  isFunding?: boolean;
+  fundingGoal?: number;
+  fundingEndDate?: string;
   images: Array<{
     url: string;
     w?: number;
@@ -90,6 +94,9 @@ export default function EditProductPage() {
     category: '',
     status: 'active' as 'active' | 'hidden',
     featured: false,
+    isFunding: false,
+    fundingGoal: '',
+    fundingEndDate: '',
     summary: '',
     description: '',
     // 카테고리별 특화 정보
@@ -134,7 +141,7 @@ export default function EditProductPage() {
     try {
       setLoading(true);
       console.log('Fetching product with ID:', productId);
-      
+
       const response = await fetch(`/api/admin/products/${productId}`, {
         method: 'GET',
         headers: {
@@ -144,24 +151,24 @@ export default function EditProductPage() {
         // 10초 타임아웃
         signal: AbortSignal.timeout(10000),
       });
-      
+
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('API Error:', errorData);
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('Product data received:', data);
-      
+
       if (!data.product) {
         throw new Error('상품 데이터가 없습니다.');
       }
-      
+
       setProduct(data.product);
-      
+
       // 폼 데이터 설정
       setFormData({
         name: data.product.name || '',
@@ -172,6 +179,9 @@ export default function EditProductPage() {
         category: data.product.category || '',
         status: data.product.status || 'active',
         featured: data.product.featured || false,
+        isFunding: data.product.isFunding || false,
+        fundingGoal: data.product.fundingGoal?.toString() || '',
+        fundingEndDate: data.product.fundingEndDate ? new Date(data.product.fundingEndDate).toISOString().split('T')[0] : '',
         summary: data.product.summary || '',
         description: data.product.description || '',
         nutritionInfo: data.product.nutritionInfo || {
@@ -198,9 +208,9 @@ export default function EditProductPage() {
           warranty: '',
         },
       });
-      
+
       setImages(data.product.images || []);
-      
+
     } catch (error) {
       console.error('Failed to fetch product:', error);
       toast.error(error instanceof Error ? error.message : '상품 정보를 불러오는데 실패했습니다.');
@@ -237,6 +247,9 @@ export default function EditProductPage() {
         },
         body: JSON.stringify({
           ...formData,
+          isFunding: formData.isFunding,
+          fundingGoal: formData.isFunding && formData.fundingGoal ? parseInt(formData.fundingGoal) : undefined,
+          fundingEndDate: formData.isFunding && formData.fundingEndDate ? new Date(formData.fundingEndDate) : undefined,
           images,
         }),
       });
@@ -312,7 +325,7 @@ export default function EditProductPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="origin">원산지</Label>
@@ -453,7 +466,7 @@ export default function EditProductPage() {
             <p className="text-gray-600">상품 정보를 수정하고 있습니다...</p>
           </div>
         </div>
-        
+
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-gray-200 rounded w-1/4"></div>
           <div className="h-32 bg-gray-200 rounded"></div>
@@ -474,7 +487,7 @@ export default function EditProductPage() {
             <p className="text-gray-600">상품을 찾을 수 없습니다.</p>
           </div>
         </div>
-        
+
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -650,6 +663,47 @@ export default function EditProductPage() {
                     onCheckedChange={(checked) => handleInputChange('featured', checked)}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Funding Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle>펀딩 설정</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isFunding"
+                    checked={formData.isFunding}
+                    onCheckedChange={(checked) => handleInputChange('isFunding', checked)}
+                  />
+                  <Label htmlFor="isFunding">펀딩 프로젝트로 등록</Label>
+                </div>
+
+                {formData.isFunding && (
+                  <>
+                    <div className="space-y-1">
+                      <Label htmlFor="fundingGoal">목표 금액</Label>
+                      <Input
+                        id="fundingGoal"
+                        type="number"
+                        value={formData.fundingGoal}
+                        onChange={(e) => handleInputChange('fundingGoal', e.target.value)}
+                        placeholder="예: 1000000"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="fundingEndDate">종료일</Label>
+                      <Input
+                        id="fundingEndDate"
+                        type="date"
+                        value={formData.fundingEndDate}
+                        onChange={(e) => handleInputChange('fundingEndDate', e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

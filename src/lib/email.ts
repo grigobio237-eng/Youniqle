@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify-email?token=${token}`;
-  
+
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
@@ -65,6 +65,12 @@ export async function sendVerificationEmail(email: string, token: string, name: 
       </div>
     `,
   };
+
+  // 개발 환경에서는 실제 이메일 발송을 스킵하고 성공으로 처리
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] Verification Email Skipped. URL:', verificationUrl);
+    return { success: true };
+  }
 
   try {
     await transporter.sendMail(mailOptions);
@@ -122,6 +128,12 @@ export async function sendWelcomeEmail(email: string, name: string) {
     `,
   };
 
+  // 개발 환경에서는 실제 이메일 발송을 스킵하고 성공으로 처리
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] Welcome Email Skipped for:', email);
+    return { success: true };
+  }
+
   try {
     await transporter.sendMail(mailOptions);
     return { success: true };
@@ -135,7 +147,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
 export async function sendNewsletterVerificationEmail(email: string, token: string, name: string) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/newsletter/verify?token=${token}&email=${encodeURIComponent(email)}`;
   const unsubscribeUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/newsletter/unsubscribe?token=${token}&email=${encodeURIComponent(email)}`;
-  
+
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
@@ -195,6 +207,12 @@ export async function sendNewsletterVerificationEmail(email: string, token: stri
     `,
   };
 
+  // 개발 환경에서는 실제 이메일 발송을 스킵하고 성공으로 처리
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] Newsletter Verification Email Skipped. URL:', verificationUrl);
+    return { success: true };
+  }
+
   try {
     await transporter.sendMail(mailOptions);
     return { success: true };
@@ -206,13 +224,13 @@ export async function sendNewsletterVerificationEmail(email: string, token: stri
 
 // 뉴스레터 발송
 export async function sendNewsletterEmail(
-  email: string, 
-  name: string, 
-  subject: string, 
+  email: string,
+  name: string,
+  subject: string,
   content: string,
   unsubscribeToken?: string
 ) {
-  const unsubscribeUrl = unsubscribeToken 
+  const unsubscribeUrl = unsubscribeToken
     ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/newsletter/unsubscribe?token=${unsubscribeToken}&email=${encodeURIComponent(email)}`
     : `${process.env.NEXT_PUBLIC_SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
