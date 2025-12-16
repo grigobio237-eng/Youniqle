@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { MockAIEngine } from '@/lib/ai/mock-engine';
+import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 
 export async function POST(request: NextRequest) {
     try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Required fields missing' }, { status: 400 });
         }
 
-        const plans = await MockAIEngine.generateOmakasePlans({
+        const plans = await GeminiAIEngine.generateOmakasePlans({
             userId: session?.user?.email || 'anonymous',
             painPoint,
             goal,

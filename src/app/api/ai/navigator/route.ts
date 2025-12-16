@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { MockAIEngine } from '@/lib/ai/mock-engine';
+import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Scores are required' }, { status: 400 });
         }
 
-        const advice = await MockAIEngine.generateNavigatorAdvice({
+        const advice = await GeminiAIEngine.generateNavigatorAdvice({
             userId: session?.user?.email || 'anonymous',
             date: new Date().toISOString(),
             scores,
