@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Users, DollarSign, Copy, Check } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { User, Users, Share2, Copy, Check, Link as LinkIcon } from 'lucide-react';
 
 interface ReferralStats {
     referralCount: number;
@@ -22,6 +23,7 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
     const [stats, setStats] = useState<ReferralStats>({ referralCount: 0, totalEarned: 0, referrals: [] });
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchStats();
@@ -42,11 +44,28 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
         }
     };
 
+    const link = typeof window !== 'undefined' ? `${window.location.origin}/auth/signup?ref=${referralCode}` : '';
+
+    const handleShare = async () => {
+        // Mobile Native Share if available
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Youniqle 초대',
+                    text: 'Youniqle에 초대합니다! 가입하고 혜택을 받아보세요.',
+                    url: link,
+                });
+                return;
+            } catch (err) {
+                console.log('Share canceled or failed', err);
+            }
+        }
+    };
+
     const copyLink = async () => {
         if (!referralCode) return;
-        const link = `${window.location.origin}/auth/signup?ref=${referralCode}`;
 
-        // 1. Try Modern API (Navigator Clipboard)
+        // 1. Try Modern API
         if (navigator.clipboard && window.isSecureContext) {
             try {
                 await navigator.clipboard.writeText(link);
@@ -58,37 +77,25 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
             }
         }
 
-        // 2. Try Legacy API (execCommand)
-        try {
-            const textArea = document.createElement("textarea");
-            textArea.value = link;
+        // 2. Fallback using the visible input
+        if (inputRef.current) {
+            try {
+                inputRef.current.select();
+                inputRef.current.setSelectionRange(0, 99999); // For mobile
 
-            // Ensure element is part of DOM but not affecting layout significantly
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            textArea.style.top = "0";
-            textArea.setAttribute('readonly', '');
-
-            document.body.appendChild(textArea);
-
-            textArea.focus();
-            textArea.select();
-            textArea.setSelectionRange(0, 99999); // For mobile devices
-
-            const successful = document.execCommand("copy");
-            document.body.removeChild(textArea);
-
-            if (successful) {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-                return;
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                    return;
+                }
+            } catch (err) {
+                console.error('ExecCommand failed', err);
             }
-        } catch (err) {
-            console.error('Fallback copy failed', err);
         }
 
-        // 3. Final Fallback: Prompt user to copy manually
-        window.prompt("Ctrl+C를 눌러 링크를 복사해주세요:", link);
+        // 3. Final fallback logic is implicit: text remains selected in the input for manual copy
+        alert('링크가 선택되었습니다. Ctrl+C를 눌러 복사해주세요.');
     };
 
     return (
@@ -108,18 +115,41 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
                         친구가 초대한 사람이 구매하면 <b>1%</b>가 나에게 추가 적립됩니다!
                     </p>
 
-                    <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border border-indigo-200">
-                        <div className="flex-1 px-2 text-xs text-gray-500 truncate">
-                            {typeof window !== 'undefined' ? `${window.location.origin}/auth/signup?ref=${referralCode || '...'}` : '...'}
-                        </div>
-                        <Button
-                            size="sm"
-                            onClick={copyLink}
-                            className={copied ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700"}
-                        >
-                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                            <span className="ml-2">{copied ? '복사됨' : '복사'}</span>
-                        </Button>
+                    <div className="flex justify-center">
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button
+                                    className="bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+                                    onClick={handleShare}
+                                >
+                                    <Share2 className="h-4 w-4 mr-2" />
+                                    친구 초대 링크 공유하기
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>친구 초대 링크 공유</DialogTitle>
+                                </DialogHeader>
+                                <div className="flex items-center space-x-2 mt-4">
+                                    <div className="grid flex-1 gap-2">
+                                        <Input
+                                            ref={inputRef}
+                                            id="link"
+                                            defaultValue={link}
+                                            readOnly
+                                            className="bg-gray-50"
+                                        />
+                                    </div>
+                                    <Button onClick={copyLink} size="sm" className="px-3">
+                                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                        <span className="sr-only">Copy</span>
+                                    </Button>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-2">
+                                    버튼을 눌러 링크를 복사하거나, 링크를 직접 선택하여 복사(Ctrl+C)하세요.
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
 
