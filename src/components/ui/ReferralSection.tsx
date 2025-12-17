@@ -42,11 +42,31 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
         }
     };
 
-    const copyLink = () => {
+    const copyLink = async () => {
         if (!referralCode) return;
         const link = `${window.location.origin}/auth/signup?ref=${referralCode}`;
-        navigator.clipboard.writeText(link);
-        setCopied(true);
+
+        try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+        } catch (err) {
+            // Fallback for browsers that don't support clipboard API or when not in HTTPS
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = link;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                setCopied(true);
+            } catch (fallbackErr) {
+                console.error('Failed to copy:', fallbackErr);
+                alert('링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+            }
+        }
+
         setTimeout(() => setCopied(false), 2000);
     };
 
