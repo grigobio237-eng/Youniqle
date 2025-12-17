@@ -46,28 +46,49 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
         if (!referralCode) return;
         const link = `${window.location.origin}/auth/signup?ref=${referralCode}`;
 
-        try {
-            await navigator.clipboard.writeText(link);
-            setCopied(true);
-        } catch (err) {
-            // Fallback for browsers that don't support clipboard API or when not in HTTPS
+        // 1. Try Modern API (Navigator Clipboard)
+        if (navigator.clipboard && window.isSecureContext) {
             try {
-                const textArea = document.createElement("textarea");
-                textArea.value = link;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-9999px";
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
+                await navigator.clipboard.writeText(link);
                 setCopied(true);
-            } catch (fallbackErr) {
-                console.error('Failed to copy:', fallbackErr);
-                alert('링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+                setTimeout(() => setCopied(false), 2000);
+                return;
+            } catch (err) {
+                console.error('Clipboard API failed', err);
             }
         }
 
-        setTimeout(() => setCopied(false), 2000);
+        // 2. Try Legacy API (execCommand)
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = link;
+
+            // Ensure element is part of DOM but not affecting layout significantly
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            textArea.setAttribute('readonly', '');
+
+            document.body.appendChild(textArea);
+
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+
+            const successful = document.execCommand("copy");
+            document.body.removeChild(textArea);
+
+            if (successful) {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+                return;
+            }
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+        }
+
+        // 3. Final Fallback: Prompt user to copy manually
+        window.prompt("Ctrl+C를 눌러 링크를 복사해주세요:", link);
     };
 
     return (
