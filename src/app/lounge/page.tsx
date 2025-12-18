@@ -183,7 +183,13 @@ export default function LoungePage() {
                             </div>
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-0 overflow-hidden bg-gray-50 border-0 rounded-2xl">
+                    <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-0 overflow-hidden bg-gray-50 border-0 rounded-2xl" aria-describedby="chat-desc">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>김미정 원장 1:1 채팅</DialogTitle>
+                            <DialogDescription id="chat-desc">
+                                프라이빗 라운지 채팅 창입니다.
+                            </DialogDescription>
+                        </DialogHeader>
                         <div className="flex-1 overflow-hidden relative">
                             <ChatInterface
                                 session={session}

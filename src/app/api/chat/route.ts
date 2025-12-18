@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// POST: Send a message (Fallback or persistence)
+// POST: Send a message + Generate AI Response
 export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -63,15 +63,11 @@ export async function POST(req: NextRequest) {
         const user = await User.findOne({ email: session.user.email });
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-        // Assuming the receiver is the "Director" (Admin)
-        // We need to find an admin user to set as receiver, or just leave it generic if using rooms?
-        // But Message model requires senderId.
-        // Let's find the main admin or Director.
-        // For now, let's assume the first admin found is the Director.
+        // Find Admin/Director
         const director = await User.findOne({ role: 'admin' });
-        // If no admin, maybe we can't send? Or self-message for testing.
-        const receiverId = director ? director._id : user._id; // Fallback to self if no admin (for testing)
+        const receiverId = director ? director._id : user._id; // Fallback to self for testing
 
+        // 1. Save User Message
         const newMessage = await Message.create({
             senderId: user._id,
             receiverId: receiverId,
@@ -80,7 +76,41 @@ export async function POST(req: NextRequest) {
             read: false
         });
 
-        return NextResponse.json({ message: newMessage });
+        // 2. Generate AI Response (Director Kim)
+        let aiMessage = null;
+        try {
+            // Check if message should be replied by AI (e.g. if receiver is director/admin)
+            // For now, ALWAYS reply if user is not admin
+            if (user.role !== 'admin') {
+                const GeminiAIEngine = (await import('@/lib/ai/gemini-engine')).GeminiAIEngine;
+
+                // Fetch user name and grade for context
+                const userName = user.name || '회원님';
+                const userGrade = user.subscription?.status === 'active' ? 'Premium' : 'Standard';
+
+                const aiResponseText = await GeminiAIEngine.generateChatResponse(content, {
+                    userName,
+                    grade: userGrade
+                });
+
+                // Save AI Message
+                aiMessage = await Message.create({
+                    senderId: receiverId, // AI speaks as Director
+                    receiverId: user._id,
+                    content: aiResponseText,
+                    type: 'text',
+                    read: false
+                });
+            }
+        } catch (aiError) {
+            console.error('AI Response Generation Error:', aiError);
+            // Don't fail the request if AI fails, just return user message
+        }
+
+        return NextResponse.json({
+            userMessage: newMessage,
+            aiMessage: aiMessage
+        });
 
     } catch (error) {
         console.error('Send message error:', error);

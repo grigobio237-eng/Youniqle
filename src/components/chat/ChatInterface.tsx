@@ -95,30 +95,50 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
     }, [messages]);
 
     const handleSendMessage = async () => {
-        if (!inputMessage.trim() || !socket) return;
+        if (!inputMessage.trim()) return;
 
-        const tempId = Date.now().toString();
         const content = inputMessage;
+        setInputMessage(''); // Clear input immediately
 
         // Optimistic update
-        const tempMessage: any = {
+        const tempId = Date.now().toString();
+        const optimisticMsg: any = {
             _id: tempId,
             senderId: (session?.user as any).id || (session?.user as any)._id,
             content: content,
             createdAt: new Date().toISOString(),
             type: 'text'
         };
+        setMessages(prev => [...prev, optimisticMsg]);
 
-        // Don't add optimistic message yet if we rely on socket echo back or separate logic?
-        // Actually, socket echo back logic in my server code: 
-        // It emits 'receive_chat_message' to receiver AND 'chat_message_sent' to sender.
-        // 'receive_chat_message' goes to receiver room. If I am sender, I am not in receiver room usually unless self-chat.
-        // So I should listen to 'chat_message_sent'.
+        try {
+            // Send via REST API for reliability (especially for AI response)
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
 
-        // Let's just emit and clear input.
-        socket.emit('send_chat_message', { content });
-        setMessages(prev => [...prev, tempMessage]); // Add optimistically
-        setInputMessage('');
+            if (res.ok) {
+                const data = await res.json();
+
+                // If AI responded, append it
+                if (data.aiMessage) {
+                    setMessages(prev => [...prev, data.aiMessage]);
+                } else if (data.message) {
+                    // Fallback for just user message confirmation (replace optimistic? not strictly needed unless ID needed)
+                }
+            } else {
+                console.error('Failed to send message via API');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+
+        // Also emit to socket for real-time updates to admins (if connected)
+        if (socket && isConnected) {
+            socket.emit('send_chat_message', { content });
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
