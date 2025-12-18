@@ -106,6 +106,11 @@ export interface IUser extends Document {
     reasonDetail?: string;
     deletedAt: Date;
   };
+  subscription?: {
+    status: 'active' | 'inactive';
+    plan: 'lounge_chat';
+    expiresAt: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -120,7 +125,7 @@ const UserSchema = new Schema<IUser>({
   },
   passwordHash: {
     type: String,
-    required: function() {
+    required: function () {
       return this.provider === 'local';
     },
   },
@@ -272,6 +277,11 @@ const UserSchema = new Schema<IUser>({
     reason: { type: String },
     reasonDetail: { type: String },
     deletedAt: { type: Date },
+  },
+  subscription: {
+    status: { type: String, enum: ['active', 'inactive'], default: 'inactive' },
+    plan: { type: String, enum: ['lounge_chat'] },
+    expiresAt: { type: Date }
   }
 }, {
   timestamps: true,

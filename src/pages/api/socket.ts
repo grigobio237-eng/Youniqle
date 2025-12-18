@@ -33,8 +33,8 @@ class WebSocketServer {
   constructor(server: NetServer) {
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: process.env.NODE_ENV === 'production' 
-          ? process.env.FRONTEND_URL 
+        origin: process.env.NODE_ENV === 'production'
+          ? process.env.FRONTEND_URL
           : "http://localhost:3000",
         methods: ["GET", "POST"],
         credentials: true
@@ -50,13 +50,13 @@ class WebSocketServer {
     this.io.use(async (socket: AuthenticatedSocket, next) => {
       try {
         const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
-        
+
         if (!token) {
           return next(new Error('Authentication token required'));
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-        
+
         if (!decoded.userId) {
           return next(new Error('Invalid token'));
         }
@@ -112,6 +112,56 @@ class WebSocketServer {
 
       socket.on('error', (error) => {
         console.error('WebSocket error:', error);
+      });
+
+      // --- Chat Events ---
+      socket.on('join_chat', () => {
+        if (socket.userId) {
+          socket.join(`chat_user_${socket.userId}`);
+          console.log(`User ${socket.userId} joined chat`);
+        }
+      });
+
+      socket.on('send_chat_message', async (data) => {
+        try {
+          const { content, receiverId } = data;
+          if (!socket.userId) return;
+
+          // 1. Save to DB
+          // Dynamic import to avoid build issues in pages/api
+          const Message = (await import('@/models/Message')).default;
+
+          // If receiver is not specified, assume admin/director
+          let finalReceiverId = receiverId;
+          if (!finalReceiverId) {
+            const User = (await import('@/models/User')).default;
+            const director = await User.findOne({ role: 'admin' });
+            finalReceiverId = director ? director._id : socket.userId;
+          }
+
+          const newMessage = await Message.create({
+            senderId: socket.userId,
+            receiverId: finalReceiverId,
+            content,
+            type: 'text',
+            read: false
+          });
+
+          // 2. Emit to receiver
+          this.io.to(`chat_user_${finalReceiverId}`).emit('receive_chat_message', newMessage);
+
+          // 3. Emit to sender confirmation (optional, or just rely on optimistic UI)
+          socket.emit('chat_message_sent', newMessage);
+
+          // Also emit to admin room if it's a message to admin
+          if (!receiverId || receiverId === finalReceiverId) {
+            this.io.to('admin').emit('receive_chat_message', newMessage);
+          }
+
+        } catch (error) {
+          console.error('Chat message error:', error);
+          socket.emit('chat_error', { message: 'Failed to send message' });
+        }
       });
     });
   }
@@ -250,8 +300,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Socket is initializing');
   const io = new SocketIOServer((res.socket as any).server, {
     cors: {
-      origin: process.env.NODE_ENV === 'production' 
-        ? process.env.FRONTEND_URL 
+      origin: process.env.NODE_ENV === 'production'
+        ? process.env.FRONTEND_URL
         : "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true

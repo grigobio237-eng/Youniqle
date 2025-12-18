@@ -12,8 +12,61 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import ChatInterface from '@/components/chat/ChatInterface';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoungePage() {
+    const { data: session, update: updateSession } = useSession();
+    const [subscriptionActive, setSubscriptionActive] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (session?.user) {
+            checkSubscription();
+        }
+    }, [session]);
+
+    const checkSubscription = async () => {
+        try {
+            // Need a dedicated endpoint for checking subscription or just check user profile
+            const res = await fetch('/api/me');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.user?.subscription?.status === 'active') {
+                    setSubscriptionActive(true);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleSubscribe = async () => {
+        if (!session) {
+            router.push('/auth/signin');
+            return;
+        }
+
+        if (confirm('월 19,900원 멤버십을 구독하시겠습니까? (테스트: 즉시 승인됨)')) {
+            try {
+                const res = await fetch('/api/subscription', { method: 'POST' });
+                if (res.ok) {
+                    alert('구독이 완료되었습니다! 이제 프라이빗 라운지를 이용하실 수 있습니다.');
+                    setSubscriptionActive(true);
+                    // Force session update if needed, or simple clean reload
+                    window.location.reload();
+                } else {
+                    alert('구독 처리에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('오류가 발생했습니다.');
+            }
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-12">
             {/* 1. Profile Section */}
@@ -109,6 +162,7 @@ export default function LoungePage() {
             <section className="max-w-3xl mx-auto mb-20">
                 <h2 className="text-2xl font-bold text-center mb-12">자주 묻는 질문 (FAQ)</h2>
                 <Accordion type="single" collapsible className="w-full">
+                    {/* ... existing FAQ items ... */}
                     <AccordionItem value="item-1">
                         <AccordionTrigger className="text-lg">Q. 시술은 언제 받는 것이 좋은가요?</AccordionTrigger>
                         <AccordionContent className="text-gray-600 leading-relaxed text-base p-4 bg-gray-50 rounded-lg">
@@ -133,10 +187,23 @@ export default function LoungePage() {
                 </Accordion>
             </section>
 
+            {/* 4. Chat Section */}
+            <section className="max-w-4xl mx-auto mb-20" id="lounge-chat">
+                <div className="flex items-center justify-center mb-8">
+                    <h2 className="text-2xl font-bold text-center">김미정 원장 1:1 프라이빗 라운지</h2>
+                    <Badge className="ml-3 bg-primary text-white">Premium</Badge>
+                </div>
+                <ChatInterface
+                    session={session}
+                    subscriptionActive={subscriptionActive}
+                    onSubscribe={handleSubscribe}
+                />
+            </section>
+
             <section className="text-center">
                 <p className="text-gray-400 text-sm">
                     더 궁금한 점이 있으신가요? <br />
-                    하단의 '문의하기'를 통해 메시지를 남겨주세요. 김미정 원장이 직접 확인합니다.
+                    위의 채팅창을 통해 실시간으로 문의하실 수 있습니다.
                 </p>
             </section>
         </div>
