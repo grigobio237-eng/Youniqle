@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Link from 'next/link';
 import ImageManager from '@/components/products/ImageManager';
+import ProductDescriptionEditor from '@/components/admin/ProductDescriptionEditor';
 import { toast } from 'sonner';
 import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
@@ -33,6 +34,7 @@ export default function NewProductPage() {
     slug: '',
     summary: '',
     description: '',
+    descriptionIsHtml: false,
     price: '',
     originalPrice: '',
     stock: '',
@@ -338,6 +340,7 @@ export default function NewProductPage() {
         originInfo: formData.originInfo && Object.values(formData.originInfo).some(v => v) ? formData.originInfo : undefined,
         clothingInfo: formData.clothingInfo && Object.values(formData.clothingInfo).some(v => v) ? formData.clothingInfo : undefined,
         electronicsInfo: formData.electronicsInfo && Object.values(formData.electronicsInfo).some(v => v) ? formData.electronicsInfo : undefined,
+        descriptionIsHtml: formData.descriptionIsHtml,
       };
 
       const response = await fetch('/api/admin/products', {
@@ -537,13 +540,11 @@ export default function NewProductPage() {
         </div>
 
         <div>
-          <Label htmlFor="description">상품 설명 *</Label>
-          <Textarea
-            id="description"
+          <ProductDescriptionEditor
             value={formData.description}
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            rows={4}
-            required
+            onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+            isHtml={formData.descriptionIsHtml}
+            onIsHtmlChange={(isHtml) => setFormData(prev => ({ ...prev, descriptionIsHtml: isHtml }))}
           />
         </div>
 

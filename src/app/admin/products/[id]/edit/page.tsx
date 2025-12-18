@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageManager from '@/components/products/ImageManager';
+import ProductDescriptionEditor from '@/components/admin/ProductDescriptionEditor';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
@@ -48,6 +49,7 @@ interface Product {
   }>;
   summary: string;
   description: string;
+  descriptionIsHtml?: boolean;
   // 카테고리별 특화 정보
   nutritionInfo?: {
     calories?: string;
@@ -99,6 +101,7 @@ export default function EditProductPage() {
     fundingEndDate: '',
     summary: '',
     description: '',
+    descriptionIsHtml: false,
     // 카테고리별 특화 정보
     nutritionInfo: {
       calories: '',
@@ -184,6 +187,8 @@ export default function EditProductPage() {
         fundingEndDate: data.product.fundingEndDate ? new Date(data.product.fundingEndDate).toISOString().split('T')[0] : '',
         summary: data.product.summary || '',
         description: data.product.description || '',
+        descriptionIsHtml: data.product.descriptionIsHtml || false,
+        // 카테고리별 특화 정보
         nutritionInfo: data.product.nutritionInfo || {
           calories: '',
           protein: '',
@@ -248,6 +253,9 @@ export default function EditProductPage() {
         body: JSON.stringify({
           ...formData,
           isFunding: formData.isFunding,
+          clothingInfo: formData.clothingInfo && Object.values(formData.clothingInfo).some(v => v) ? formData.clothingInfo : undefined,
+          electronicsInfo: formData.electronicsInfo && Object.values(formData.electronicsInfo).some(v => v) ? formData.electronicsInfo : undefined,
+          descriptionIsHtml: formData.descriptionIsHtml,
           fundingGoal: formData.isFunding && formData.fundingGoal ? parseInt(formData.fundingGoal) : undefined,
           fundingEndDate: formData.isFunding && formData.fundingEndDate ? new Date(formData.fundingEndDate) : undefined,
           images,
@@ -612,13 +620,14 @@ export default function EditProductPage() {
 
                 <div>
                   <Label htmlFor="description">상품 설명 *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="상품에 대한 자세한 설명"
-                    rows={6}
-                  />
+                  <div>
+                    <ProductDescriptionEditor
+                      value={formData.description}
+                      onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                      isHtml={formData.descriptionIsHtml}
+                      onIsHtmlChange={(isHtml) => setFormData(prev => ({ ...prev, descriptionIsHtml: isHtml }))}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

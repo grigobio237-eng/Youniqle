@@ -19,6 +19,7 @@ export interface IProduct extends Document {
   isFunding?: boolean; // 펀딩 상품 여부
   fundingEndDate?: Date; // 펀딩 종료일 (옵션)
   fundingGoal?: number; // 펀딩 목표 금액 (옵션)
+  descriptionIsHtml?: boolean; // HTML 설명 여부
   images: Array<{
     url: string;
     w?: number;
@@ -156,6 +157,10 @@ const ProductSchema = new Schema<IProduct>({
   description: {
     type: String,
     required: true,
+  },
+  descriptionIsHtml: {
+    type: Boolean,
+    default: false,
   },
   // 카테고리별 특화 정보 (선택적)
   nutritionInfo: {

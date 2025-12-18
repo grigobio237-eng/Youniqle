@@ -148,6 +148,7 @@ export async function PUT(
       fundingEndDate,
       summary,
       description,
+      descriptionIsHtml,
       images,
       nutritionInfo,
       originInfo,
@@ -193,6 +194,7 @@ export async function PUT(
         fundingEndDate: fundingEndDate || undefined,
         summary,
         description,
+        descriptionIsHtml: descriptionIsHtml || false,
         images: images || [],
         // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
         nutritionInfo: nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined,

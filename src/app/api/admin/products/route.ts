@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // 검색 조건 구성
     const filter: any = {};
-    
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -25,15 +25,15 @@ export async function GET(request: NextRequest) {
         { description: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (category !== 'all') {
       filter.category = category;
     }
-    
+
     if (status !== 'all') {
       filter.status = status;
     }
-    
+
     if (approvalStatus !== 'all') {
       filter.approvalStatus = approvalStatus;
     }
@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
         // 리뷰 통계 계산
         const reviews = await Review.find({ productId: product._id });
         const totalReviews = reviews.length;
-        const averageRating = totalReviews > 0 
-          ? reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews 
+        const averageRating = totalReviews > 0
+          ? reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
           : 0;
 
         return {
@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
       category,
       summary,
       description,
+      descriptionIsHtml,
       images,
       featured,
       nutritionInfo,

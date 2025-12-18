@@ -46,6 +46,7 @@ interface Product {
   category: string;
   summary: string;
   description: string;
+  descriptionIsHtml?: boolean;
   images: Array<{
     url: string;
     w?: number;
@@ -749,10 +750,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <Card className="shadow-lg">
           <CardContent className="p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">상품 설명</h2>
-            <div className="prose prose-gray max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {product.description}
-              </p>
+            <div className={`prose prose-gray max-w-none ${product.descriptionIsHtml ? 'prose-img:rounded-xl prose-img:shadow-md' : ''}`}>
+              {product.descriptionIsHtml ? (
+                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+              ) : (
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {product.description}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
