@@ -194,4 +194,55 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             }
         };
     }
+    // Daily Question Generator
+    static async generateDailyQuestions(theme: string, keywords: string): Promise<any[]> {
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('GEMINI_API_KEY is missing');
+            throw new Error('GEMINI_API_KEY is not set');
+        }
+
+        try {
+            // Updated to use gemini-2.0-flash as it is confirmed available
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+            const prompt = `당신은 회복 심리학 전문가입니다.
+오늘의 테마는 "${theme}"이며, 핵심 키워드는 "${keywords}"입니다.
+이 테마에 맞춰 사용자의 하루 컨디션을 점검할 수 있는 **5개의 객관식 질문**을 만들어주세요.
+
+## 요구사항
+1. 질문은 따뜻하고 공감가는 어조로 작성해주세요.
+2. 각 질문에는 3개의 선택지가 있어야 합니다. (점수: 0=좋음, 3=보통, 5=나쁨)
+3. 카테고리는 [피로, 수면, 몸, 감정, 집중, 관계, 자존감] 중에서 적절히 선택하거나 테마에 맞게 정해주세요.
+
+## 응답 형식 (JSON Array)
+[
+  {
+    "id": 1,
+    "category": "카테고리",
+    "text": "질문 내용",
+    "options": [
+      { "label": "나쁜 상태 (예: 너무 피곤해요)", "score": 5 },
+      { "label": "보통 상태", "score": 3 },
+      { "label": "좋은 상태", "score": 0 }
+    ]
+  },
+  ...
+]`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            const jsonMatch = text.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+
+            // Fallback
+            throw new Error('Failed to parse questions');
+        } catch (error) {
+            console.error('Gemini Question Error:', error);
+            throw error; // Re-throw to be handled by API route
+        }
+    }
 }

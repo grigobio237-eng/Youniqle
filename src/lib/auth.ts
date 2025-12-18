@@ -123,6 +123,7 @@ export const authOptions: AuthOptions = {
             });
             await newUser.save();
             console.log('새 사용자 생성:', newUser);
+            return '/?welcome=true'; // 신규 가입 시 환영 메시지 표시를 위해 리다이렉트
           } else {
             // 기존 사용자 업데이트
             existingUser.name = userData.name;

@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ChevronRight, ChevronLeft, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // ---------------------------
 // 1. Data & Types
@@ -16,59 +18,6 @@ type Question = {
   text: string;
   options: { label: string; score: number }[];
 };
-
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    category: '피로',
-    text: '요즘 하루를 마치고 나면 어떤가요?',
-    options: [
-      { label: '거의 매일 녹초가 돼요 (늘 피곤)', score: 5 },
-      { label: '종종 피곤하지만 쉴만 해요', score: 3 },
-      { label: '거뜬하고 개운해요 (안 피곤)', score: 0 },
-    ],
-  },
-  {
-    id: 2,
-    category: '수면',
-    text: '최근 1주일 잠은 어떤가요?',
-    options: [
-      { label: '잠들기 힘들고 자주 깨요', score: 5 },
-      { label: '그럭저럭 자는데 개운하진 않아요', score: 3 },
-      { label: '머리만 대면 자고 아침에 개운해요', score: 0 },
-    ],
-  },
-  {
-    id: 3,
-    category: '몸의 무거움/붓기',
-    text: '내 몸(다리, 발, 어깨 등)은 어떤 느낌인가요?',
-    options: [
-      { label: '돌덩이처럼 무겁고 퉁퉁 부어요', score: 5 },
-      { label: '오후 되면 좀 붓고 뻐근해요', score: 3 },
-      { label: '가볍고 편안해요', score: 0 },
-    ],
-  },
-  {
-    id: 4,
-    category: '마음과 감정',
-    text: '요즘 마음 상태는 어떤가요?',
-    options: [
-      { label: '아무것도 하기 싫고 짜증만 나요', score: 5 },
-      { label: '가끔 답답하지만 컨트롤 가능해요', score: 3 },
-      { label: '평안하고 의욕이 있어요', score: 0 },
-    ],
-  },
-  {
-    id: 5,
-    category: '집중력',
-    text: '머리(생각)가 어떤 느낌인가요?',
-    options: [
-      { label: '늘 안개 낀 것처럼 멍해요', score: 5 },
-      { label: '중요한 일에는 집중할 수 있어요', score: 3 },
-      { label: '맑고 집중이 아주 잘 돼요', score: 0 },
-    ],
-  },
-];
 
 // ---------------------------
 // 2. Sub-Components
@@ -104,12 +53,13 @@ function GateIntro({ onStart }: { onStart: () => void }) {
 }
 
 // B. Question Form View
-function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any[]) => void }) {
+function QuestionForm({ questions, onComplete }: { questions: Question[]; onComplete: (score: number, answers: any[], userNote: string) => void }) {
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<any[]>(new Array(QUESTIONS.length).fill(null));
+  const [answers, setAnswers] = useState<any[]>(new Array(questions.length).fill(null));
+  const [userNote, setUserNote] = useState('');
 
   const handleOptionSelect = (score: number, label: string) => {
-    const currentQ = QUESTIONS[step];
+    const currentQ = questions[step];
     const newAnswers = [...answers];
     newAnswers[step] = {
       questionId: currentQ.id,
@@ -121,13 +71,13 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
   };
 
   const handleNext = () => {
-    if (step < QUESTIONS.length - 1) {
+    if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
       // Calculate total score and finish
       const totalScore = answers.reduce((acc, curr) => acc + (curr?.score || 0), 0);
       const finalAnswers = answers.filter(a => a !== null);
-      onComplete(totalScore, finalAnswers);
+      onComplete(totalScore, finalAnswers, userNote);
     }
   };
 
@@ -137,9 +87,10 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
     }
   };
 
-  const currentQ = QUESTIONS[step];
+  const currentQ = questions[step];
   const currentAnswer = answers[step];
-  const progress = ((step + 1) / QUESTIONS.length) * 100;
+  const progress = ((step + 1) / questions.length) * 100;
+  const isLastStep = step === questions.length - 1;
 
   return (
     <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-12">
@@ -193,6 +144,22 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
               );
             })}
           </div>
+
+          {/* User Note Input (Last Step Only) */}
+          {isLastStep && (
+            <div className="pt-6 border-t animate-fade-in-up">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                더 하고 싶은 말이 있나요? (선택)
+              </label>
+              <textarea
+                value={userNote}
+                onChange={(e) => setUserNote(e.target.value)}
+                placeholder="오늘 나의 상태나 궁금한 점을 자유롭게 적어주세요."
+                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm"
+              />
+            </div>
+          )}
+
         </motion.div>
       </AnimatePresence>
 
@@ -211,7 +178,7 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
           disabled={!currentAnswer}
           className="flex-1 h-12 text-lg rounded-xl"
         >
-          {step === QUESTIONS.length - 1 ? '결과 보기' : '다음'} <ChevronRight className="w-5 h-5 ml-1" />
+          {isLastStep ? '결과 보기' : '다음'} <ChevronRight className="w-5 h-5 ml-1" />
         </Button>
       </div>
     </div>
@@ -219,7 +186,7 @@ function QuestionForm({ onComplete }: { onComplete: (score: number, answers: any
 }
 
 // C. Result & Metaphor View
-function ResultView({ score, answers, onEnter }: { score: number; answers: any[]; onEnter: () => void }) {
+function ResultView({ score, answers, userNote, onEnter }: { score: number; answers: any[]; userNote: string; onEnter: () => void }) {
   // Logic: 0-7 (Low), 8-15 (Mid), 16+ (High)
   let level = 'LOW';
   let title = '아직은 버틸 만한 상태예요.';
@@ -250,6 +217,10 @@ function ResultView({ score, answers, onEnter }: { score: number; answers: any[]
   const recoveryScore = 100 - (score * 4);
 
   useEffect(() => {
+    /* 
+       Note: We removed immediate local storage set here or kept it?
+       Previously it was:
+    */
     const saveData = async () => {
       // 1. Local Storage (Immediate feedback)
       localStorage.setItem('recovery_last_check', new Date().toISOString().split('T')[0]);
@@ -268,7 +239,8 @@ function ResultView({ score, answers, onEnter }: { score: number; answers: any[]
             rawScore: score,
             totalScore: recoveryScore,
             metaphor: metaphor,
-            answers: answers
+            answers: answers,
+            userNote: userNote
           })
         });
       } catch (e) {
@@ -276,7 +248,7 @@ function ResultView({ score, answers, onEnter }: { score: number; answers: any[]
       }
     };
     saveData();
-  }, [recoveryScore, score, metaphor, answers]);
+  }, [recoveryScore, score, metaphor, answers, userNote]);
 
   return (
     <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 text-center space-y-8 animate-fade-in">
@@ -388,12 +360,53 @@ function RecoveryDashboard({ score }: { score: number }) {
 }
 
 // ---------------------------
-// 3. Main Component
+// 3. Welcome Modal Component
+// ---------------------------
+function WelcomeModal() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (searchParams?.get('welcome') === 'true') {
+      setShowWelcome(true);
+      // URL clean up
+      router.replace('/');
+    }
+  }, [searchParams, router]);
+
+  return (
+    <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+      <DialogContent className="sm:max-w-md text-center">
+        <DialogHeader>
+          <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+            <span className="text-3xl">🎉</span>
+          </div>
+          <DialogTitle className="text-xl font-bold text-center">가입을 축하합니다!</DialogTitle>
+          <DialogDescription className="text-center pt-2">
+            Youniqle의 회원이 되신 것을 환영합니다.<br />
+            이제 당신만의 회복 여정을 시작해보세요.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center pt-4">
+          <Button onClick={() => setShowWelcome(false)} className="w-full">
+            확인
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ---------------------------
+// 4. Main Component
 // ---------------------------
 export default function HomePage() {
   const [viewState, setViewState] = useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT' | 'DASHBOARD'>('CHECK');
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<any[]>([]);
+  const [userNote, setUserNote] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]);
 
   useEffect(() => {
     // Initial Check
@@ -401,38 +414,79 @@ export default function HomePage() {
     const lastCheck = localStorage.getItem('recovery_last_check');
     const storedScore = localStorage.getItem('recovery_last_score');
 
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch('/api/questions/daily');
+        if (res.ok) {
+          const data = await res.json();
+          setQuestions(data.questions);
+        } else {
+          console.error("Failed to load questions");
+        }
+      } catch (error) {
+        console.error('Failed to fetch daily questions:', error);
+      }
+    };
+
     if (lastCheck === today && storedScore) {
       setScore(parseInt(storedScore)); // Stored is already 0-100
       setViewState('DASHBOARD');
       // Ensure header is shown
       window.dispatchEvent(new Event('recovery-gate-passed'));
     } else {
+      fetchQuestions();
       setViewState('INTRO');
     }
   }, []);
 
-  const handleStart = () => setViewState('QUESTION');
+  const handleStart = () => {
+    if (questions.length > 0) {
+      setViewState('QUESTION');
+    } else {
+      // Retry fetching? or just feedback
+      fetch('/api/questions/daily')
+        .then(res => res.json())
+        .then(data => {
+          if (data.questions) {
+            setQuestions(data.questions);
+            setViewState('QUESTION');
+          } else {
+            alert('질문을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+          }
+        })
+        .catch(() => alert('네트워크 오류가 발생했습니다.'));
+    }
+  };
 
-  const handleComplete = (rawScore: number, finalAnswers: any[]) => {
+  const handleComplete = (rawScore: number, finalAnswers: any[], note: string) => {
     setScore(rawScore); // This is 0-25 raw score
     setAnswers(finalAnswers);
+    setUserNote(note);
     setViewState('RESULT');
   };
 
   const handleEnterDashboard = () => {
     // recalculate stored score to pass (since dashboard expects 0-100)
-    // Actually ResultView saves the 100-scale score to localStorage and state needs it too?
-    // Let's grab it from localStorage to be safe or calc
     const s = 100 - (score * 4);
     setScore(s);
     setViewState('DASHBOARD');
   };
 
   // Render appropriate view
-  if (viewState === 'CHECK') return <div className="min-h-screen bg-white" />; // Loading
-  if (viewState === 'INTRO') return <GateIntro onStart={handleStart} />;
-  if (viewState === 'QUESTION') return <QuestionForm onComplete={handleComplete} />;
-  if (viewState === 'RESULT') return <ResultView score={score} answers={answers} onEnter={handleEnterDashboard} />;
+  const renderContent = () => {
+    if (viewState === 'CHECK') return <div className="min-h-screen bg-white" />; // Loading
+    if (viewState === 'INTRO') return <GateIntro onStart={handleStart} />;
+    if (viewState === 'QUESTION') return <QuestionForm questions={questions} onComplete={handleComplete} />;
+    if (viewState === 'RESULT') return <ResultView score={score} answers={answers} userNote={userNote} onEnter={handleEnterDashboard} />;
+    return <RecoveryDashboard score={score} />;
+  }
 
-  return <RecoveryDashboard score={score} />;
+  return (
+    <>
+      <React.Suspense fallback={null}>
+        <WelcomeModal />
+      </React.Suspense>
+      {renderContent()}
+    </>
+  );
 }

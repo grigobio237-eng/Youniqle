@@ -11,6 +11,7 @@ export interface IRecoveryScore extends Document {
         category: string;
         score: number;
     }>;
+    userNote?: string; // 사용자의 자유 텍스트 상태 기록
     createdAt: Date;
     updatedAt: Date;
 }
@@ -45,6 +46,10 @@ const RecoveryScoreSchema = new Schema<IRecoveryScore>({
         category: { type: String, required: true },
         score: { type: Number, required: true },
     }],
+    userNote: {
+        type: String,
+        required: false
+    },
 }, {
     timestamps: true,
 });

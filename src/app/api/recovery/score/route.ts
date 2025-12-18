@@ -3,37 +3,44 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import RecoveryScore from '@/models/RecoveryScore';
+import User from '@/models/User';
 
 export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user) {
+        if (!session || !session.user || !session.user.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         await dbConnect();
 
+        // Find the user to get the correct ObjectId
+        const user = await User.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
         const body = await req.json();
-        const { rawScore, totalScore, metaphor, answers, date } = body;
+        const { rawScore, totalScore, metaphor, answers, date, userNote } = body;
 
         // Use provided date or today (normalized to start of day)
         const targetDate = date ? new Date(date) : new Date();
         targetDate.setHours(0, 0, 0, 0);
 
         // Upsert: Update if exists for today, insert if not
-        const userId = (session.user as any).id || session.user.email;
         const score = await RecoveryScore.findOneAndUpdate(
             {
-                userId: userId,
+                userId: user._id,
                 date: targetDate
             },
             {
-                userId: userId,
+                userId: user._id,
                 date: targetDate,
                 rawScore,
                 totalScore,
                 metaphor,
-                answers
+                answers,
+                userNote // Save user note
             },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
@@ -48,17 +55,22 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user) {
+        if (!session || !session.user || !session.user.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         await dbConnect();
 
+        // Find the user to get the correct ObjectId
+        const user = await User.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
         const { searchParams } = new URL(req.url);
         const dateParam = searchParams.get('date');
 
-        const userId = (session.user as any).id || session.user.email;
-        const query: any = { userId: userId };
+        const query: any = { userId: user._id };
 
         if (dateParam) {
             const targetDate = new Date(dateParam);

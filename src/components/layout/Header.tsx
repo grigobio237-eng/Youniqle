@@ -156,38 +156,39 @@ export default function Header() {
                 Actually, let's hide everything to focus on the question. 
             */}
             {!isGateMode && (
-              <>
-                <Link href="/membership/shop">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {cartCount > 0 && (
-                      <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
-                        {cartCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </Link>
-
-                {session ? (
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href="/me"><User className="h-5 w-5" /></Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/auth/signin">로그인</Link>
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Link href="/membership/shop">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                      {cartCount}
+                    </Badge>
+                  )}
                 </Button>
-              </>
+              </Link>
+            )}
+
+            {session ? (
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href="/me"><User className="h-5 w-5" /></Link>
+                </Button>
+              </div>
+            ) : (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/auth/signin">로그인</Link>
+              </Button>
+            )}
+
+            {!isGateMode && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
             )}
 
             {/* If Gate Mode, we might want a 'Skip' or 'Login' for returning users? 
