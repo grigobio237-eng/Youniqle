@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import CharacterImage from '@/components/ui/CharacterImage';
 import ReviewSection from '@/components/reviews/ReviewSection';
 import ReviewForm from '@/components/reviews/ReviewForm';
@@ -53,9 +54,32 @@ interface Product {
   }>;
   status: 'active' | 'inactive';
   featured: boolean;
+  isFunding?: boolean;
+  fundingGoal?: number;
+  fundingEndDate?: string;
+  participantCount?: number;
+  totalFundingAmount?: number;
   createdAt: string;
   updatedAt: string;
 }
+
+// Helper function to calculate funding status
+const getFundingStatus = (product: Product) => {
+  if (!product.isFunding || !product.fundingGoal || !product.fundingEndDate) return null;
+
+  const now = new Date();
+  const endDate = new Date(product.fundingEndDate);
+  const timeLeft = endDate.getTime() - now.getTime();
+  const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+
+  const currentAmount = product.totalFundingAmount || 0;
+  const goal = product.fundingGoal;
+  const percent = Math.min(Math.round((currentAmount / goal) * 100), 100);
+  // Display percent can be over 100%
+  const displayPercent = Math.round((currentAmount / goal) * 100);
+
+  return { daysLeft, percent, displayPercent, currentAmount, goal };
+};
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session } = useSession();
@@ -329,6 +353,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const discountRate = calculateDiscount();
+  const fundingStatus = product && product.isFunding ? getFundingStatus(product) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-8">
@@ -404,8 +429,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index
-                        ? 'border-blue-500'
-                        : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue-500'
+                      : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
                     <Image
@@ -431,66 +456,100 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 {product.featured && (
                   <Badge className="bg-yellow-100 text-yellow-800">{t('products.popular')}</Badge>
                 )}
-                {discountRate > 0 && (
+                {product.isFunding && (
+                  <Badge className="bg-orange-500 text-white">펀딩 진행중</Badge>
+                )}
+                {!product.isFunding && discountRate > 0 && (
                   <Badge className="bg-red-100 text-red-800">{t('productDetail.discount', { percent: discountRate })}</Badge>
                 )}
               </div>
 
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-
               <p className="text-gray-600 text-lg mb-4">{product.summary}</p>
 
-              <div className="flex items-center space-x-4 mb-4">
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-lg text-gray-500 line-through">
-                    {formatPrice(product.originalPrice)}원
-                  </span>
-                )}
-                <span className="text-3xl font-bold text-blue-600">
-                  {formatPrice(product.price)}원
-                </span>
-              </div>
-            </div>
+              {product.isFunding && fundingStatus ? (
+                <div className="space-y-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">모인 금액</p>
+                      <span className="text-3xl font-bold text-orange-600">
+                        {formatPrice(fundingStatus.currentAmount)}원
+                      </span>
+                      <span className="text-sm text-gray-500 ml-2">
+                        {fundingStatus.displayPercent}% 달성
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500 mb-1">남은 시간</p>
+                      <span className="text-2xl font-bold text-gray-800">
+                        {fundingStatus.daysLeft > 0 ? `${fundingStatus.daysLeft}일` : '마감임박'}
+                      </span>
+                    </div>
+                  </div>
 
-            {/* 재고 상태 */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
-                <span className={`font-medium ${product.stock > 10 ? 'text-green-600' :
-                    product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                  {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
-                </span>
-              </div>
-              {/* 재입고 알림 버튼 (품절 시) */}
-              {product.stock === 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleStockAlert}
-                  disabled={registeringStockAlert || stockAlertRegistered}
-                  className={`flex items-center space-x-2 ${stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
-                    }`}
-                >
-                  {stockAlertRegistered ? (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      <span>알림 등록됨</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bell className="h-4 w-4" />
-                      <span>{registeringStockAlert ? '등록 중...' : '재입고 알림 받기'}</span>
-                    </>
+                  <div className="space-y-1">
+                    <Progress value={fundingStatus.percent} className="h-3 bg-orange-100" indicatorClassName="bg-orange-500" />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>목표 금액 {formatPrice(fundingStatus.goal)}원</span>
+                      <span>{product.participantCount || 0}명 참여</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4 mb-4">
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <span className="text-lg text-gray-500 line-through">
+                      {formatPrice(product.originalPrice)}원
+                    </span>
                   )}
-                </Button>
+                  <span className="text-3xl font-bold text-blue-600">
+                    {formatPrice(product.price)}원
+                  </span>
+                </div>
               )}
             </div>
 
+            {/* 재고 상태 (펀딩일 때는 숨기거나 다르게 표시) */}
+            {!product.isFunding && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
+                  <span className={`font-medium ${product.stock > 10 ? 'text-green-600' :
+                    product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                    {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
+                  </span>
+                </div>
+                {/* 재입고 알림 버튼 (품절 시) */}
+                {product.stock === 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleStockAlert}
+                    disabled={registeringStockAlert || stockAlertRegistered}
+                    className={`flex items-center space-x-2 ${stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
+                      }`}
+                  >
+                    {stockAlertRegistered ? (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>알림 등록됨</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bell className="h-4 w-4" />
+                        <span>{registeringStockAlert ? '등록 중...' : '재입고 알림 받기'}</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
+
             {/* 수량 선택 */}
             {product.stock > 0 && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-700">{t('productDetail.quantity')}:</span>
+              <div className="flex items-center space-x-4 mt-4">
+                <span className="text-sm font-medium text-gray-700">{product.isFunding ? '참여 수량' : t('productDetail.quantity')}:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <Button
                     variant="ghost"
@@ -516,51 +575,56 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {/* 총 가격 */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-4 rounded-lg mt-4">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">{t('productDetail.totalPrice')}</span>
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-lg font-medium text-gray-700">{product.isFunding ? '총 펀딩 금액' : t('productDetail.totalPrice')}</span>
+                <span className={`text-2xl font-bold ${product.isFunding ? 'text-orange-600' : 'text-blue-600'}`}>
                   {formatPrice(product.price * quantity)}원
                 </span>
               </div>
             </div>
 
-            {/* 쿠폰 안내 */}
-            <Card className="mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Gift className="h-5 w-5 text-orange-600" />
-                  <span className="font-semibold text-orange-800">쿠폰 혜택</span>
-                </div>
-                <p className="text-sm text-orange-700 mb-3">
-                  구매 시 쿠폰을 사용하여 추가 할인을 받을 수 있습니다!
-                </p>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
-                    <Link href="/coupons">
-                      <Tag className="h-4 w-4 mr-1" />
-                      쿠폰 다운로드
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
-                    <Link href="/me/coupons">
-                      <Gift className="h-4 w-4 mr-1" />
-                      내 쿠폰함
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* 쿠폰 안내 (펀딩 제외) */}
+            {!product.isFunding && (
+              <Card className="mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 mt-4">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Gift className="h-5 w-5 text-orange-600" />
+                    <span className="font-semibold text-orange-800">쿠폰 혜택</span>
+                  </div>
+                  <p className="text-sm text-orange-700 mb-3">
+                    구매 시 쿠폰을 사용하여 추가 할인을 받을 수 있습니다!
+                  </p>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
+                      <Link href="/coupons">
+                        <Tag className="h-4 w-4 mr-1" />
+                        쿠폰 다운로드
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
+                      <Link href="/me/coupons">
+                        <Gift className="h-4 w-4 mr-1" />
+                        내 쿠폰함
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* 액션 버튼들 */}
-            <div className="space-y-3">
+            <div className="space-y-3 mt-6">
               {/* 메인 구매 버튼 */}
               <Button
                 onClick={() => window.location.href = `/checkout?product=${product._id}&quantity=${quantity}`}
                 disabled={product.stock === 0}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
+                className={`w-full text-lg py-6 font-bold ${product.isFunding
+                  ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-200 shadow-lg'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
               >
-                {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.buyNow')}
+                {product.stock === 0 ? t('productDetail.outOfStock') : (product.isFunding ? '펀딩 참여하기' : t('productDetail.buyNow'))}
               </Button>
 
               {/* 보조 버튼들 */}
@@ -572,22 +636,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="flex-1"
                 >
                   <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
-                  {isInWishlist ? t('productDetail.removeFromWishlist') : t('productDetail.addToWishlist')}
+                  {isInWishlist ? (product.isFunding ? '찜 취소' : t('productDetail.removeFromWishlist')) : (product.isFunding ? '찜하기' : t('productDetail.addToWishlist'))}
                 </Button>
 
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0 || addingToCart}
-                  className="flex-1"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.addToCart')}
-                </Button>
+                {!product.isFunding && (
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0 || addingToCart}
+                    className="flex-1"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.addToCart')}
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* 추가 기능 버튼들 */}
-            <div className="flex flex-wrap gap-2">
+            {/* 추가 기능 버튼들 (공유 등) */}
+            <div className="flex flex-wrap gap-2 mt-4">
               <SocialSharing
                 productName={product.name}
                 productUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/products/${product._id}`}
@@ -603,54 +669,74 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             </div>
 
-            {/* 배송 정보 */}
-            <div className="bg-blue-50 p-4 rounded-lg space-y-2">
-              <h3 className="font-semibold text-blue-900 flex items-center">
-                <Truck className="h-4 w-4 mr-2" />
-                배송 정보
-              </h3>
-              <div className="text-sm text-blue-800 space-y-1">
-                <p>• 무료배송 (3만원 이상 구매시, 국내배송 한정)</p>
-                <p>• 평일 오후 2시 이전 주문시 당일 발송</p>
-                <p>• 배송 기간: 1-2일 (주말/공휴일 제외)</p>
-                <p>• 섬지역 추가 배송비: 5,000원</p>
-              </div>
-            </div>
+            {/* 배송/결제/교환 안내 (펀딩 제외, 펀딩 설명 추가) */}
+            {!product.isFunding ? (
+              <div className="space-y-4 mt-8">
+                {/* 배송 정보 */}
+                <div className="bg-blue-50 p-4 rounded-lg space-y-2">
+                  <h3 className="font-semibold text-blue-900 flex items-center">
+                    <Truck className="h-4 w-4 mr-2" />
+                    배송 정보
+                  </h3>
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <p>• 무료배송 (3만원 이상 구매시, 국내배송 한정)</p>
+                    <p>• 평일 오후 2시 이전 주문시 당일 발송</p>
+                    <p>• 배송 기간: 1-2일 (주말/공휴일 제외)</p>
+                    <p>• 섬지역 추가 배송비: 5,000원</p>
+                  </div>
+                </div>
 
-            {/* 안전 결제 정보 */}
-            <div className="bg-green-50 p-4 rounded-lg space-y-2">
-              <h3 className="font-semibold text-green-900 flex items-center">
-                <Shield className="h-4 w-4 mr-2" />
-                안전 결제
-              </h3>
-              <div className="text-sm text-green-800 space-y-1">
-                <p>• Nicepay 보안 결제 시스템</p>
-                <p>• SSL 암호화 통신</p>
-                <p>• 7일 무조건 환불 보장</p>
-              </div>
-            </div>
+                {/* 안전 결제 정보 */}
+                <div className="bg-green-50 p-4 rounded-lg space-y-2">
+                  <h3 className="font-semibold text-green-900 flex items-center">
+                    <Shield className="h-4 w-4 mr-2" />
+                    안전 결제
+                  </h3>
+                  <div className="text-sm text-green-800 space-y-1">
+                    <p>• Nicepay 보안 결제 시스템</p>
+                    <p>• SSL 암호화 통신</p>
+                    <p>• 7일 무조건 환불 보장</p>
+                  </div>
+                </div>
 
-            {/* 교환/반품 안내 */}
-            <div className="bg-purple-50 p-4 rounded-lg space-y-2">
-              <h3 className="font-semibold text-purple-900 flex items-center">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                교환/반품 안내
-              </h3>
-              <div className="text-sm text-purple-800 space-y-1">
-                <p>• <strong>반품 가능 기간:</strong> 배송 완료 후 7일 이내</p>
-                <p>• <strong>반품 불가:</strong> 고객 단순 변심 (단, 미개봉 제품은 가능)</p>
-                <p>• <strong>교환 가능:</strong> 상품 불량, 오배송 시 무료 교환</p>
-                <p>• <strong>반품 배송비:</strong> 단순 변심 시 5,000원 (상품 불량 시 무료)</p>
-                <p>• <strong>반품 주소:</strong> 서울특별시 강동구 고덕비즈밸리로 26</p>
-                <Button
-                  variant="link"
-                  className="p-0 h-auto text-purple-700 underline text-xs mt-2"
-                  onClick={() => window.open('/terms', '_blank')}
-                >
-                  자세한 교환/반품 정책 보기 →
-                </Button>
+                {/* 교환/반품 안내 */}
+                <div className="bg-purple-50 p-4 rounded-lg space-y-2">
+                  <h3 className="font-semibold text-purple-900 flex items-center">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    교환/반품 안내
+                  </h3>
+                  <div className="text-sm text-purple-800 space-y-1">
+                    <p>• <strong>반품 가능 기간:</strong> 배송 완료 후 7일 이내</p>
+                    <p>• <strong>반품 불가:</strong> 고객 단순 변심 (단, 미개봉 제품은 가능)</p>
+                    <p>• <strong>교환 가능:</strong> 상품 불량, 오배송 시 무료 교환</p>
+                    <p>• <strong>반품 배송비:</strong> 단순 변심 시 5,000원 (상품 불량 시 무료)</p>
+                    <p>• <strong>반품 주소:</strong> 서울특별시 강동구 고덕비즈밸리로 26</p>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-purple-700 underline text-xs mt-2"
+                      onClick={() => window.open('/terms', '_blank')}
+                    >
+                      자세한 교환/반품 정책 보기 →
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-4 mt-8">
+                <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                  <h3 className="font-bold text-gray-900 mb-3 flex items-center">
+                    <Shield className="h-5 w-5 mr-2 text-gray-700" />
+                    펀딩/후원 안내
+                  </h3>
+                  <div className="text-sm text-gray-600 space-y-2">
+                    <p>• 펀딩은 일반 쇼핑과 달리 예약 구매의 성격을 띱니다.</p>
+                    <p>• 목표 달성 시 결제가 진행되며, 종료일 이후 순차 발송됩니다.</p>
+                    <p>• 단순 변심에 의한 환불은 펀딩 종료 전까지만 가능합니다.</p>
+                    <p>• 프로젝트 사정에 따라 발송이 지연될 수 있습니다.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
