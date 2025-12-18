@@ -549,7 +549,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* 수량 선택 */}
             {product.stock > 0 && (
               <div className="flex items-center space-x-4 mt-4">
-                <span className="text-sm font-medium text-gray-700">{product.isFunding ? '참여 수량' : t('productDetail.quantity')}:</span>
+                <span className="text-sm font-medium text-gray-700">{product.isFunding ? '참여 구좌 수' : t('productDetail.quantity')}:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <Button
                     variant="ghost"
@@ -577,7 +577,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* 총 가격 */}
             <div className="bg-gray-50 p-4 rounded-lg mt-4">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">{product.isFunding ? '총 펀딩 금액' : t('productDetail.totalPrice')}</span>
+                <span className="text-lg font-medium text-gray-700">{product.isFunding ? '총 펀딩 참여 금액' : t('productDetail.totalPrice')}</span>
                 <span className={`text-2xl font-bold ${product.isFunding ? 'text-orange-600' : 'text-blue-600'}`}>
                   {formatPrice(product.price * quantity)}원
                 </span>
