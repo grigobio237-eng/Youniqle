@@ -59,20 +59,12 @@ async function getProductsHandler(request: NextRequest) {
       filter.category = validatedQuery.category;
     }
 
-    // Funding Filter (Default: Show Non-Funding products in Shop, unless specified)
+    // Funding Filter
     if (validatedQuery.isFunding !== undefined) {
       filter.isFunding = validatedQuery.isFunding;
     } else {
-      // If not specified, default to non-funding (regular products)
-      // BUT if requesting specifically by ID or other specific filters we might need adjustment.
-      // For general shop listing, we want to separate them.
-      // Let's make it optional but usually the frontend will send explicit false/true
-      // If purely optional, it defaults to showing EVERYTHING? No, user asked for separation.
-      // Let's assume if not passed, we don't filter (show all), OR we strictly separate?
-      // Better: Front-end sends isFunding=false for Shop, isFunding=true for Funding page.
-      // If API consumer (admin) wants all, they can omit. 
-      // Wait, standard shop behavior usually hides funding items.
-      // Let's leave it as optional filter. Front-end MUST send isFunding=false/true.
+      // 기본값: 일반 상점에서는 펀딩 상품 제외 (isFunding이 true가 아닌 것들)
+      filter.isFunding = { $ne: true };
     }
 
     // Build sort object
