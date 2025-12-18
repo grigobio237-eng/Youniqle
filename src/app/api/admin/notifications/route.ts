@@ -4,19 +4,18 @@ import User from '@/models/User';
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
+    // DB 연결 시 타임아웃 설정 (3초)
+    const dbPromise = connectDB();
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('DB Connection Timeout')), 3000));
+    await Promise.race([dbPromise, timeoutPromise]);
 
     // 승인 대기 중인 파트너 수 조회
     const pendingPartnersCount = await User.countDocuments({
       partnerStatus: 'pending'
-    });
+    }).maxTimeMS(3000); // 쿼리 타임아웃 3초
 
-    // 기타 알림 카운트 (필요시 확장)
-    // 예: 새로운 리뷰, 문의사항 등
-
-    // 프론트엔드가 기대하는 구조로 응답
     return NextResponse.json({
-      notifications: [], // 빈 배열로 초기화
+      notifications: [],
       stats: {
         total: pendingPartnersCount,
         unread: pendingPartnersCount,
@@ -33,17 +32,19 @@ export async function GET(request: NextRequest) {
         total: 0,
         limit: 10
       },
-      // 기존 호환성을 위해 유지
       pendingPartners: pendingPartnersCount,
       total: pendingPartnersCount
     });
 
   } catch (error) {
     console.error('Notifications fetch error:', error);
-    return NextResponse.json(
-      { error: '알림 정보를 가져올 수 없습니다.' },
-      { status: 500 }
-    );
+    // 에러 발생 시 520/500 대신 빈 데이터 반환하여 프론트엔드 크래시 방지
+    return NextResponse.json({
+      notifications: [],
+      stats: { total: 0, unread: 0, pending: 0, recent: 0 },
+      pendingPartners: 0,
+      total: 0
+    });
   }
 }
 
@@ -67,11 +68,11 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
     }
-    
+
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
     const user = await User.findById(userId);
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // 간단한 알림 발송 테스트
     const { NotificationService } = await import('@/lib/notificationService');
-    
+
     const results = [];
     for (const recipient of recipients) {
       try {
@@ -103,10 +104,10 @@ export async function POST(request: NextRequest) {
         });
         results.push({ recipient, success: result });
       } catch (error) {
-        results.push({ 
-          recipient, 
-          success: false, 
-          error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+        results.push({
+          recipient,
+          success: false,
+          error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
         });
       }
     }
@@ -119,9 +120,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Send notification error:', error);
     return NextResponse.json(
-      { 
-        error: '알림 발송 중 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '알림 발송 중 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );
