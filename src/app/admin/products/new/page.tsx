@@ -545,6 +545,12 @@ export default function NewProductPage() {
             onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
             isHtml={formData.descriptionIsHtml}
             onIsHtmlChange={(isHtml) => setFormData(prev => ({ ...prev, descriptionIsHtml: isHtml }))}
+            productContext={{
+              name: formData.name,
+              category: formData.category,
+              price: formData.price,
+              images: formData.images
+            }}
           />
         </div>
 

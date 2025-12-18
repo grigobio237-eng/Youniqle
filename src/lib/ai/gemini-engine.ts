@@ -288,4 +288,75 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             return "저런, 잠시 연결 상태가 좋지 않네요. 잠시후 다시 말씀해 주시겠어요? 😌";
         }
     }
+    // Product Description Generator
+    static async generateProductDescriptionHtml(
+        info: {
+            name: string;
+            price: string | number;
+            category: string;
+            keywords: string;
+            images: string[];
+            tone?: string;
+            target?: string;
+        }
+    ): Promise<string> {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not set');
+        }
+
+        try {
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+            const imagePrompt = info.images.length > 0
+                ? `\n## 사용 가능한 이미지 (반드시 HTML 내에 적절히 배치할 것):\n${info.images.map((url, i) => `- 이미지${i + 1}: ${url}`).join('\n')}`
+                : '\n## 이미지 없음: 텍스트 위주로 세련되게 디자인하세요.';
+
+            const prompt = `
+당신은 세계적인 이커머스 웹 에이전시의 수석 퍼블리셔이자 디자이너입니다.
+다음 상품 정보를 바탕으로 **구매 전환율을 극대화할 수 있는 고품질의 HTML 상세페이지 소스**를 작성해주세요.
+
+## 상품 정보
+- 상품명: ${info.name}
+- 카테고리: ${info.category}
+- 가격: ${info.price}원
+- 핵심 키워드/특징: ${info.keywords}
+- 타겟 고객: ${info.target || '일반 대중'}
+- 톤앤매너: ${info.tone || '신뢰감 있고 고급스러운'}
+${imagePrompt}
+
+## 디자인 요구사항 (필수)
+1. **스타일링**: 
+   - 외부 CSS 의존도를 낮추기 위해 **인라인 스타일(inline style)** 또는 범위가 지정된 **<style> 태그**를 사용하세요.
+   - 모바일 친화적인 **반응형 디자인(max-width: 100%)**을 적용하세요.
+   - 폰트는 가독성 좋은 산세리프 계열(Apple SD Gothic Neo, Pretendard, sans-serif)을 사용하세요.
+2. **레이아웃 구조**:
+   - **인트로**: 상품의 매력을 한눈에 보여주는 헤더 섹션 (메인 이미지 활용 권장).
+   - **문제 제기 및 공감**: 소비자의 니즈를 자극하는 문구.
+   - **솔루션/특징**: 핵심 기능을 아이콘이나 이미지와 함께 시각적으로 설명.
+   - **디테일**: 스펙, 소재, 사이즈 등 상세 정보.
+   - **아웃트로**: 브랜드 신뢰도를 높이는 마무리.
+3. **이미지 배치**:
+   - 제공된 이미지 URL을 \`<img src="...">\` 태그에 사용하여 적절한 위치에 배치하세요.
+   - 이미지는 \`width: 100%; style="max-width: 800px; display: block; margin: 20px auto; border-radius: 12px;"\` 등의 스타일로 깔끔하게 처리하세요.
+   - 이미지가 부족하면 섹션 배경색이나 타이포그래피로 디자인을 보완하세요.
+
+## 출력 형식
+- \`<!DOCTYPE html>\`, \`<html>\`, \`<body>\` 태그는 **제외**하고, \`<div>\`로 시작하는 본문 내용만 작성하세요.
+- 마크다운 코드 블록(\`\`\`html) 없이 **순수 HTML 코드만** 반환하세요.
+`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            let text = response.text();
+
+            // 마크다운 코드 블록 제거 (혹시 포함될 경우)
+            text = text.replace(/```html/g, '').replace(/```/g, '');
+
+            return text;
+
+        } catch (error) {
+            console.error('Gemini Product HTML Error:', error);
+            throw new Error('상세페이지 생성 중 오류가 발생했습니다.');
+        }
+    }
 }

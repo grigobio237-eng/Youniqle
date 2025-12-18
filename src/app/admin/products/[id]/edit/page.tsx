@@ -626,6 +626,12 @@ export default function EditProductPage() {
                       onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
                       isHtml={formData.descriptionIsHtml}
                       onIsHtmlChange={(isHtml) => setFormData(prev => ({ ...prev, descriptionIsHtml: isHtml }))}
+                      productContext={{
+                        name: formData.name,
+                        category: formData.category,
+                        price: formData.price,
+                        images: images // Using local state 'images' which is synced with ImageManager
+                      }}
                     />
                   </div>
                 </div>
