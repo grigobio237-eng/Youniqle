@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
       category,
       summary,
       description,
+      descriptionIsHtml: descriptionIsHtml || false,
       images: images || [],
       featured: featured || false,
       status: 'active',
