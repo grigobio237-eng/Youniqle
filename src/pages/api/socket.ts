@@ -33,9 +33,7 @@ class WebSocketServer {
   constructor(server: NetServer) {
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: process.env.NODE_ENV === 'production'
-          ? process.env.FRONTEND_URL
-          : "http://localhost:3000",
+        origin: "*", // Allow all for troubleshooting, or strictly match
         methods: ["GET", "POST"],
         credentials: true
       },
@@ -341,9 +339,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Socket is initializing');
   const io = new SocketIOServer((res.socket as any).server, {
     cors: {
-      origin: process.env.NODE_ENV === 'production'
-        ? process.env.FRONTEND_URL
-        : "http://localhost:3000",
+      origin: "*",
       methods: ["GET", "POST"],
       credentials: true
     },

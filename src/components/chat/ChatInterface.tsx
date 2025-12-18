@@ -38,7 +38,12 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
 
         fetch('/api/socket'); // Ensure socket server is ready
 
-        const socketInstance = io(process.env.NEXT_PUBLIC_URL || 'http://localhost:3000', {
+        // Use dynamic origin if on client, or fallbacks
+        const socketUrl = process.env.NEXT_PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+
+        console.log('Connecting to socket at:', socketUrl);
+
+        const socketInstance = io(socketUrl, {
             path: '/api/socket',
             addTrailingSlash: false,
             transports: ['websocket', 'polling'],
