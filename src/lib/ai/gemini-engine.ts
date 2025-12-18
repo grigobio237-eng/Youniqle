@@ -305,7 +305,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            // Using gemini-1.5-flash for better stability and speed
+            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
             const imagePrompt = info.images.length > 0
                 ? `\n## 사용 가능한 이미지 (반드시 HTML 내에 적절히 배치할 것):\n${info.images.map((url, i) => `- 이미지${i + 1}: ${url}`).join('\n')}`
@@ -335,10 +336,11 @@ ${imagePrompt}
    - **솔루션/특징**: 핵심 기능을 아이콘이나 이미지와 함께 시각적으로 설명.
    - **디테일**: 스펙, 소재, 사이즈 등 상세 정보.
    - **아웃트로**: 브랜드 신뢰도를 높이는 마무리.
+   - **구매 유도**: 하단에 구매 버튼 스타일의 요소 배치 (실제 버튼이 아닌 시각적 요소).
 3. **이미지 배치**:
    - 제공된 이미지 URL을 \`<img src="...">\` 태그에 사용하여 적절한 위치에 배치하세요.
    - 이미지는 \`width: 100%; style="max-width: 800px; display: block; margin: 20px auto; border-radius: 12px;"\` 등의 스타일로 깔끔하게 처리하세요.
-   - 이미지가 부족하면 섹션 배경색이나 타이포그래피로 디자인을 보완하세요.
+   - 이미지가 부족하면 섹션 배경색이나 타이포그래피(Typography)로 디자인을 보완하세요.
 
 ## 출력 형식
 - \`<!DOCTYPE html>\`, \`<html>\`, \`<body>\` 태그는 **제외**하고, \`<div>\`로 시작하는 본문 내용만 작성하세요.
@@ -349,14 +351,15 @@ ${imagePrompt}
             const response = await result.response;
             let text = response.text();
 
-            // 마크다운 코드 블록 제거 (혹시 포함될 경우)
+            // 마크다운 코드 블록 제거
             text = text.replace(/```html/g, '').replace(/```/g, '');
 
             return text;
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Gemini Product HTML Error:', error);
-            throw new Error('상세페이지 생성 중 오류가 발생했습니다.');
+            // 에러 메시지를 더 구체적으로 전달
+            throw new Error(`AI 생성 오류: ${error.message || '알 수 없는 오류'}`);
         }
     }
 }

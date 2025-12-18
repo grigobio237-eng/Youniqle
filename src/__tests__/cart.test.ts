@@ -50,7 +50,7 @@ describe('Cart Model', () => {
   it('should create a cart with valid data', () => {
     const { Cart } = require('@/models/Cart');
     const cart = new Cart(mockCart);
-    
+
     expect(cart.userId).toBe(mockCart.userId);
     expect(cart.items).toHaveLength(2);
     expect(cart.items[0].quantity).toBe(2);
@@ -60,16 +60,16 @@ describe('Cart Model', () => {
   it('should calculate total items correctly', () => {
     const { Cart } = require('@/models/Cart');
     const cart = new Cart(mockCart);
-    
-    const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    const totalItems = cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
     expect(totalItems).toBe(3);
   });
 
   it('should calculate total amount correctly', () => {
     const { Cart } = require('@/models/Cart');
     const cart = new Cart(mockCart);
-    
-    const totalAmount = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const totalAmount = cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     expect(totalAmount).toBe(25000); // (2 * 10000) + (1 * 5000)
   });
 
@@ -86,7 +86,7 @@ describe('Cart Model', () => {
         }
       ]
     });
-    
+
     const validationError = cart.validateSync();
     expect(validationError?.errors['items.0.quantity']).toBeDefined();
   });
@@ -104,7 +104,7 @@ describe('Cart Model', () => {
         }
       ]
     });
-    
+
     const validationError = cart.validateSync();
     expect(validationError?.errors['items.0.quantity']).toBeDefined();
   });
