@@ -2,13 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Leaf, 
-  MapPin, 
-  Calendar, 
-  Thermometer, 
-  Shirt, 
-  Ruler, 
+import {
+  Leaf,
+  MapPin,
+  Calendar,
+  Thermometer,
+  Shirt,
+  Ruler,
   Palette,
   Cpu,
   Battery,
@@ -57,17 +57,17 @@ interface CategorySpecificInfoProps {
 export default function CategorySpecificInfo({ product }: CategorySpecificInfoProps) {
   const renderFreshFoodInfo = () => {
     const hasNutritionInfo = product.nutritionInfo && (
-      product.nutritionInfo.calories || 
-      product.nutritionInfo.protein || 
-      product.nutritionInfo.fat || 
-      product.nutritionInfo.carbohydrates || 
+      product.nutritionInfo.calories ||
+      product.nutritionInfo.protein ||
+      product.nutritionInfo.fat ||
+      product.nutritionInfo.carbohydrates ||
       product.nutritionInfo.sodium
     );
 
     const hasOriginInfo = product.originInfo && (
-      product.originInfo.origin || 
-      product.originInfo.storageMethod || 
-      product.originInfo.shelfLife || 
+      product.originInfo.origin ||
+      product.originInfo.storageMethod ||
+      product.originInfo.shelfLife ||
       product.originInfo.packagingMethod
     );
 
@@ -169,8 +169,8 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
 
   const renderClothingInfo = () => {
     const hasClothingInfo = product.clothingInfo && (
-      product.clothingInfo.sizeGuide || 
-      product.clothingInfo.material || 
+      product.clothingInfo.sizeGuide ||
+      product.clothingInfo.material ||
       product.clothingInfo.careInstructions
     );
 
@@ -198,7 +198,7 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
                     {product.clothingInfo.sizeGuide}
                   </div>
                 </div>
-                
+
                 <div className="bg-yellow-50 p-3 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <Info className="h-3 w-3 inline mr-1" />
@@ -245,8 +245,8 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
 
   const renderElectronicsInfo = () => {
     const hasElectronicsInfo = product.electronicsInfo && (
-      product.electronicsInfo.specifications || 
-      product.electronicsInfo.includedItems || 
+      product.electronicsInfo.specifications ||
+      product.electronicsInfo.includedItems ||
       product.electronicsInfo.warranty
     );
 
@@ -329,10 +329,7 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
             <span className="font-medium text-gray-700">재고:</span>
             <span className="ml-2">{product.stock}개</span>
           </div>
-          <div>
-            <span className="font-medium text-gray-700">상품 설명:</span>
-            <p className="mt-1 text-gray-600">{product.description}</p>
-          </div>
+
         </div>
       </CardContent>
     </Card>
@@ -366,7 +363,7 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
           {product.name}에 대한 자세한 정보를 확인하세요
         </p>
       </div>
-      
+
       {getCategorySpecificInfo()}
     </div>
   );
