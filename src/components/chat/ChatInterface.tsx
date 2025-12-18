@@ -46,7 +46,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
         const socketInstance = io(socketUrl, {
             path: '/api/socket',
             addTrailingSlash: false,
-            transports: ['websocket', 'polling'],
+            transports: ['polling', 'websocket'], // Force polling first for better compatibility
             auth: {
                 token: (session as any).accessToken // Or handle extraction logic if token not in session props directly
             }

@@ -3,6 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
     Dialog,
@@ -167,17 +168,31 @@ export default function LoungePage() {
                 </Accordion>
             </section>
 
-            {/* 4. Chat Section */}
-            <section className="max-w-4xl mx-auto mb-20" id="lounge-chat">
-                <div className="flex items-center justify-center mb-8">
-                    <h2 className="text-2xl font-bold text-center">김미정 원장 1:1 프라이빗 라운지</h2>
-                    <Badge className="ml-3 bg-primary text-white">Premium</Badge>
-                </div>
-                <ChatInterface
-                    session={session}
-                    subscriptionActive={subscriptionActive}
-                    onSubscribe={handleSubscribe}
-                />
+            {/* 4. Private Lounge Entrance (Modal) */}
+            <section className="max-w-4xl mx-auto mb-20 flex justify-center py-10">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button
+                            size="lg"
+                            className="h-20 px-12 text-xl font-bold rounded-full shadow-2xl bg-gradient-to-r from-[#2c3e50] to-[#34495e] hover:shadow-xl hover:scale-105 transition-all duration-300 border-4 border-white/20 ring-4 ring-black/5"
+                        >
+                            <span className="mr-3 text-3xl">💬</span>
+                            <div className="flex flex-col items-start">
+                                <span className="text-sm font-normal opacity-80 mb-0.5">김미정 원장 1:1</span>
+                                <span>프라이빗 라운지 입장하기</span>
+                            </div>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-0 overflow-hidden bg-gray-50 border-0 rounded-2xl">
+                        <div className="flex-1 overflow-hidden relative">
+                            <ChatInterface
+                                session={session}
+                                subscriptionActive={subscriptionActive}
+                                onSubscribe={handleSubscribe}
+                            />
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </section>
 
             <section className="text-center">
@@ -190,10 +205,4 @@ export default function LoungePage() {
     );
 }
 
-function Badge({ children, variant, className }: any) {
-    return (
-        <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className} ${variant === 'outline' ? 'text-foreground' : 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80'}`}>
-            {children}
-        </span>
-    );
-}
+
