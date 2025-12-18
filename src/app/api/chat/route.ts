@@ -22,9 +22,9 @@ export async function GET(req: NextRequest) {
         }
 
         // Check subscription
-        if (user.role !== 'admin' && user.subscription?.status !== 'active') { // Admin always allowed
-            return NextResponse.json({ error: 'Subscription required' }, { status: 403 });
-        }
+        // if (user.role !== 'admin' && user.subscription?.status !== 'active') { // Admin always allowed
+        //     return NextResponse.json({ error: 'Subscription required' }, { status: 403 });
+        // }
 
         // Find messages between user and admin (or Director Kim)
         // Assuming Director Kim is an admin or a specific user. 

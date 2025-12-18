@@ -19,12 +19,12 @@ import { useRouter } from 'next/navigation';
 
 export default function LoungePage() {
     const { data: session, update: updateSession } = useSession();
-    const [subscriptionActive, setSubscriptionActive] = useState(false);
+    const [subscriptionActive, setSubscriptionActive] = useState(true); // TEST MODE: Always active for testing
     const router = useRouter();
 
     useEffect(() => {
         if (session?.user) {
-            checkSubscription();
+            // checkSubscription(); // Disabled for testing
         }
     }, [session]);
 
@@ -43,28 +43,8 @@ export default function LoungePage() {
         }
     };
 
-    const handleSubscribe = async () => {
-        if (!session) {
-            router.push('/auth/signin');
-            return;
-        }
-
-        if (confirm('월 19,900원 멤버십을 구독하시겠습니까? (테스트: 즉시 승인됨)')) {
-            try {
-                const res = await fetch('/api/subscription', { method: 'POST' });
-                if (res.ok) {
-                    alert('구독이 완료되었습니다! 이제 프라이빗 라운지를 이용하실 수 있습니다.');
-                    setSubscriptionActive(true);
-                    // Force session update if needed, or simple clean reload
-                    window.location.reload();
-                } else {
-                    alert('구독 처리에 실패했습니다.');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('오류가 발생했습니다.');
-            }
-        }
+    const handleSubscribe = () => {
+        router.push('/lounge/subscribe');
     };
 
     return (

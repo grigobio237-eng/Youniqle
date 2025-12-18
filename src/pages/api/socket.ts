@@ -158,6 +158,47 @@ class WebSocketServer {
             this.io.to('admin').emit('receive_chat_message', newMessage);
           }
 
+          // --- AI Auto-Response (Director Persona) ---
+          // If the message is sent TO the Director (admin/null receiver) AND the sender is NOT an admin
+          if (socket.userType !== 'admin' && (!receiverId || receiverId === finalReceiverId)) {
+            // Determine user context (simple for now)
+            const userName = '회원님'; // Ideally fetch user name from socket.decoded or DB
+            const userGrade = 'Premium';
+
+            // Process AI response asynchronously
+            (async () => {
+              try {
+                const GeminiAIEngine = (await import('@/lib/ai/gemini-engine')).GeminiAIEngine;
+
+                // Simulate "typing" delay for realism (1~2 seconds)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                const aiResponseText = await GeminiAIEngine.generateChatResponse(content, {
+                  userName,
+                  grade: userGrade
+                });
+
+                // Save AI response to DB
+                const aiMessage = await Message.create({
+                  senderId: finalReceiverId, // AI speaks as the Director
+                  receiverId: socket.userId,
+                  content: aiResponseText,
+                  type: 'text',
+                  read: false
+                });
+
+                // Emit AI response to User
+                this.io.to(`chat_user_${socket.userId}`).emit('receive_chat_message', aiMessage);
+
+                // Also emit to admin room so real admins can see the AI replied
+                this.io.to('admin').emit('receive_chat_message', aiMessage);
+
+              } catch (aiError) {
+                console.error('AI Response Error:', aiError);
+              }
+            })();
+          }
+
         } catch (error) {
           console.error('Chat message error:', error);
           socket.emit('chat_error', { message: 'Failed to send message' });

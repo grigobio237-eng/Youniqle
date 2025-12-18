@@ -160,7 +160,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                             <p>✓ 우선 예약 서비스</p>
                         </div>
                         <Button size="lg" className="w-full font-bold text-lg h-12" onClick={onSubscribe}>
-                            월 19,900원으로 시작하기
+                            월 9,900원으로 시작하기
                         </Button>
                     </div>
                 </div>
