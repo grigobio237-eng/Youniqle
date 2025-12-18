@@ -751,91 +751,123 @@ function PartnerProductsContent() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {products.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">등록된 상품이 없습니다</h3>
-              <p className="text-gray-600 mb-4">첫 번째 상품을 등록해보세요.</p>
-            </CardContent>
-          </Card>
+          <div className="col-span-full">
+            <Card>
+              <CardContent className="text-center py-8">
+                <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">등록된 상품이 없습니다</h3>
+                <p className="text-gray-600 mb-4">첫 번째 상품을 등록해보세요.</p>
+                <Button onClick={resetForm}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  상품 등록
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           products.map((product) => (
-            <Card key={product._id}>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  {product.images.length > 0 && (
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
+            <Card key={product._id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="aspect-square relative bg-gray-100">
+                {product.images?.[0] ? (
+                  <img
+                    src={product.images[0].url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Upload className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                  {product.featured && (
+                    <Badge variant="default" className="text-[10px] px-1 py-0 h-5">인기</Badge>
                   )}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">{product.name}</h3>
-                        <p className="text-gray-600 text-sm">{product.summary}</p>
-                        <div className="flex items-center space-x-4 mt-2">
-                          <span className="font-semibold text-lg">₩{product.price.toLocaleString()}</span>
-                          {product.originalPrice && (
-                            <span className="text-gray-500 line-through">
-                              ₩{product.originalPrice.toLocaleString()}
-                            </span>
-                          )}
-                          <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
-                            {product.status === 'active' ? '판매중' : '비활성'}
-                          </Badge>
-                          {/* 승인 상태 배지 */}
-                          {product.approvalStatus === 'pending' && (
-                            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                              승인 대기
-                            </Badge>
-                          )}
-                          {product.approvalStatus === 'approved' && (
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
-                              승인됨
-                            </Badge>
-                          )}
-                          {product.approvalStatus === 'rejected' && (
-                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
-                              거부됨
-                            </Badge>
-                          )}
-                          {product.featured && <Badge variant="outline">추천</Badge>}
-                        </div>
-                        {/* 거부 사유 표시 */}
-                        {product.approvalStatus === 'rejected' && product.rejectionReason && (
-                          <div className="mt-2 p-2 bg-red-50 rounded text-sm text-red-700">
-                            <strong>거부 사유:</strong> {product.rejectionReason}
-                          </div>
-                        )}
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                          <span>재고: {product.stock}개</span>
-                          <span>카테고리: {product.category}</span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          수정
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteClick(product._id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          삭제
-                        </Button>
-                      </div>
+                  {product.stock < 10 && (
+                    <Badge variant="destructive" className="text-[10px] px-1 py-0 h-5">재고부족</Badge>
+                  )}
+                  <Badge variant={product.status === 'active' ? 'default' : 'secondary'} className="text-[10px] px-1 py-0 h-5">
+                    {product.status === 'active' ? '판매중' : '비활성'}
+                  </Badge>
+                  {product.isFunding && (
+                    <Badge className="bg-orange-500 text-[10px] px-1 py-0 h-5">펀딩</Badge>
+                  )}
+                  {/* 승인 상태 배지 */}
+                  {product.approvalStatus === 'pending' && (
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-[10px] px-1 py-0 h-5">
+                      승인 대기
+                    </Badge>
+                  )}
+                  {product.approvalStatus === 'rejected' && (
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300 text-[10px] px-1 py-0 h-5">
+                      거절됨
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="absolute top-1 right-1">
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 bg-white/80 hover:bg-white rounded-full text-gray-700"
+                      onClick={() => handleEdit(product)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 bg-white/80 hover:bg-red-100 rounded-full text-red-600"
+                      onClick={() => handleDeleteClick(product._id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <CardContent className="p-3">
+                <div className="space-y-2">
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                      {product.summary}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                      <span className="text-sm font-bold text-gray-900">
+                        ₩{product.price.toLocaleString()}
+                      </span>
                     </div>
                   </div>
+
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>재고: {product.stock}</span>
+                    <span className="text-[10px] px-1 bg-gray-100 rounded text-gray-600">
+                      {categories.find(c => c.value === product.category)?.label || product.category}
+                    </span>
+                  </div>
+
+                  {product.approvalStatus === 'rejected' && product.rejectionReason && (
+                    <div className="text-xs text-red-600 bg-red-50 p-1.5 rounded border border-red-100 mt-1 line-clamp-2">
+                      사유: {product.rejectionReason}
+                    </div>
+                  )}
+
+                  {product.isFunding && product.fundingGoal && (
+                    <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden mt-2">
+                      {/* 펀딩 진행률 바 (임시 0% 표시, 실제 데이터 연동 필요 시 추가) */}
+                      <div className="bg-orange-500 h-full w-0" />
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -843,23 +875,25 @@ function PartnerProductsContent() {
         )}
       </div>
 
-      {/* 삭제 확인 다이얼로그 */}
-      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog({ open, productId: open ? deleteConfirmDialog.productId : null })}>
+      <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog(prev => ({ ...prev, open }))}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>상품 삭제</DialogTitle>
+            <DialogTitle>상품 삭제 확인</DialogTitle>
             <DialogDescription>
               정말로 이 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end gap-2 mt-4">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteConfirmDialog({ open: false, productId: null })}>
               취소
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={() => {
+              handleDelete();
+              setDeleteConfirmDialog({ open: false, productId: null });
+            }}>
               삭제
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

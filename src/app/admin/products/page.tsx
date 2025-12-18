@@ -5,20 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Package, 
-  Search, 
-  Filter, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Package,
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
   Eye,
   MoreVertical,
   DollarSign,
@@ -65,6 +65,9 @@ interface Product {
   approvalStatus: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;
   featured: boolean;
+  isFunding?: boolean;
+  fundingGoal?: number;
+  fundingEndDate?: string;
   images: Array<{
     url: string;
     w?: number;
@@ -183,9 +186,9 @@ export default function AdminProductsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action: 'reject',
-          rejectionReason 
+          rejectionReason
         }),
       });
 
@@ -234,13 +237,13 @@ export default function AdminProductsPage() {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = 
+    const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
     const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -259,7 +262,7 @@ export default function AdminProductsPage() {
             </p>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <Card key={i}>
@@ -303,385 +306,327 @@ export default function AdminProductsPage() {
 
         <TabsContent value="products" className="space-y-6">
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-text-secondary">총 상품 수</p>
-                <p className="text-2xl font-bold text-text-primary">{products.length}</p>
-              </div>
-              <div className="p-3 rounded-full bg-blue-100 text-blue-600">
-                <Package className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-text-secondary">총 매출</p>
-                <p className="text-2xl font-bold text-text-primary">
-                  ₩{totalRevenue.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 rounded-full bg-green-100 text-green-600">
-                <DollarSign className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-text-secondary">총 재고</p>
-                <p className="text-2xl font-bold text-text-primary">
-                  {totalStock.toLocaleString()}개
-                </p>
-              </div>
-              <div className="p-3 rounded-full bg-orange-100 text-orange-600">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-text-secondary">재고 부족</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {lowStockProducts}개
-                </p>
-              </div>
-              <div className="p-3 rounded-full bg-red-100 text-red-600">
-                <ShoppingCart className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <form onSubmit={handleSearch} className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  type="text"
-                  placeholder="상품명 또는 설명으로 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </form>
-
-            {/* Category Filter */}
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full md:w-40">
-                <SelectValue placeholder="카테고리" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 카테고리</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-40">
-                <SelectValue placeholder="상태" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 상태</SelectItem>
-                <SelectItem value="active">활성</SelectItem>
-                <SelectItem value="hidden">숨김</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Approval Status Filter */}
-            <Select value={approvalFilter} onValueChange={setApprovalFilter}>
-              <SelectTrigger className="w-full md:w-40">
-                <SelectValue placeholder="승인 상태" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 승인 상태</SelectItem>
-                <SelectItem value="pending">승인 대기</SelectItem>
-                <SelectItem value="approved">승인됨</SelectItem>
-                <SelectItem value="rejected">거부됨</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort */}
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-40">
-                <SelectValue placeholder="정렬" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">최신순</SelectItem>
-                <SelectItem value="oldest">오래된순</SelectItem>
-                <SelectItem value="price-high">가격 높은순</SelectItem>
-                <SelectItem value="price-low">가격 낮은순</SelectItem>
-                <SelectItem value="sales">판매순</SelectItem>
-                <SelectItem value="name">이름순</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="aspect-square relative bg-gray-100">
-              {product.images[0] ? (
-                <Image
-                  src={product.images[0].url}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Package className="h-12 w-12 text-gray-400" />
-                </div>
-              )}
-              
-              <div className="absolute top-3 left-3 flex flex-col gap-2">
-                {product.featured && (
-                  <Badge variant="default">인기</Badge>
-                )}
-                {product.stock < 10 && (
-                  <Badge variant="destructive">재고부족</Badge>
-                )}
-                <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
-                  {product.status === 'active' ? '활성' : '숨김'}
-                </Badge>
-                {getApprovalStatusBadge(product.approvalStatus)}
-              </div>
-
-              <div className="absolute top-3 right-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="bg-white/80 hover:bg-white">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/admin/products/${product.id}`}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        상세보기
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/admin/products/${product.id}/edit`}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        수정
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleProductAction(product.id, 'toggle-status')}
-                    >
-                      {product.status === 'active' ? '숨기기' : '활성화'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleProductAction(product.id, 'delete')}
-                      className="text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      삭제
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div>
-                  <h3 className="font-semibold text-text-primary line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-text-secondary line-clamp-2 mt-1">
-                    {product.summary}
-                  </p>
-                </div>
-
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-primary">
-                      ₩{product.price.toLocaleString()}
-                    </span>
-                    {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-sm text-text-secondary line-through">
-                        ₩{product.originalPrice.toLocaleString()}
-                      </span>
-                    )}
+                  <div>
+                    <p className="text-sm font-medium text-text-secondary">총 상품 수</p>
+                    <p className="text-2xl font-bold text-text-primary">{products.length}</p>
                   </div>
-                  <Badge variant="outline">
-                    {product.category}
-                  </Badge>
+                  <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <Package className="h-6 w-6" />
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
 
-                <div className="flex items-center justify-between text-sm text-text-secondary">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <ShoppingCart className="h-3 w-3" />
-                      <span>{product.sales}개</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-3 w-3" />
-                      <span>{product.averageRating.toFixed(1)}</span>
-                      <span>({product.reviews})</span>
-                    </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-text-secondary">총 매출</p>
+                    <p className="text-2xl font-bold text-text-primary">
+                      ₩{totalRevenue.toLocaleString()}
+                    </p>
                   </div>
-                  <span>재고: {product.stock}개</span>
+                  <div className="p-3 rounded-full bg-green-100 text-green-600">
+                    <DollarSign className="h-6 w-6" />
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* 파트너 상품 정보 표시 */}
-                {product.partnerName && (
-                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                    <div>파트너: {product.partnerName}</div>
-                    {product.partnerEmail && <div>이메일: {product.partnerEmail}</div>}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-text-secondary">총 재고</p>
+                    <p className="text-2xl font-bold text-text-primary">
+                      {totalStock.toLocaleString()}개
+                    </p>
                   </div>
-                )}
-
-                {/* 거부 사유 표시 */}
-                {product.approvalStatus === 'rejected' && product.rejectionReason && (
-                  <div className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
-                    <div className="font-medium">거부 사유:</div>
-                    <div>{product.rejectionReason}</div>
+                  <div className="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <TrendingUp className="h-6 w-6" />
                   </div>
-                )}
-
-                <div className="flex space-x-2 pt-2">
-                  {product.approvalStatus === 'pending' && (
-                    <>
-                      <Button 
-                        variant="default" 
-                        size="sm" 
-                        onClick={() => handleApprove(product.id)}
-                        disabled={processing}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                      >
-                        <Check className="h-3 w-3 mr-1" />
-                        승인
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        onClick={() => {
-                          setSelectedProduct(product);
-                          setIsRejectDialogOpen(true);
-                        }}
-                        disabled={processing}
-                        className="flex-1"
-                      >
-                        <X className="h-3 w-3 mr-1" />
-                        거부
-                      </Button>
-                    </>
-                  )}
-                  {product.approvalStatus !== 'pending' && (
-                    <>
-                      <Button variant="outline" size="sm" asChild className="flex-1">
-                        <Link href={`/admin/products/${product.id}/edit`}>
-                          <Edit className="h-3 w-3 mr-1" />
-                          수정
-                        </Link>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild className="flex-1">
-                        <Link href={`/products/${product.slug}`}>
-                          <Eye className="h-3 w-3 mr-1" />
-                          보기
-                        </Link>
-                      </Button>
-                    </>
-                  )}
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-text-secondary">재고 부족</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {lowStockProducts}개
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-red-100 text-red-600">
+                    <ShoppingCart className="h-6 w-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search */}
+                <form onSubmit={handleSearch} className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder="상품명 또는 설명으로 검색..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </form>
+
+                {/* Category Filter */}
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="카테고리" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">모든 카테고리</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Status Filter */}
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">모든 상태</SelectItem>
+                    <SelectItem value="active">활성</SelectItem>
+                    <SelectItem value="hidden">숨김</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Approval Status Filter */}
+                <Select value={approvalFilter} onValueChange={setApprovalFilter}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="승인 상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">모든 승인 상태</SelectItem>
+                    <SelectItem value="pending">승인 대기</SelectItem>
+                    <SelectItem value="approved">승인됨</SelectItem>
+                    <SelectItem value="rejected">거부됨</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Sort */}
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="정렬" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">최신순</SelectItem>
+                    <SelectItem value="oldest">오래된순</SelectItem>
+                    <SelectItem value="price-high">가격 높은순</SelectItem>
+                    <SelectItem value="price-low">가격 낮은순</SelectItem>
+                    <SelectItem value="sales">판매순</SelectItem>
+                    <SelectItem value="name">이름순</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {filteredProducts.length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-text-primary mb-2">
-              상품이 없습니다
-            </h3>
-            <p className="text-text-secondary mb-4">
-              검색 조건에 맞는 상품을 찾을 수 없습니다.
-            </p>
-            <Button asChild>
-              <Link href="/admin/products/new">
-                <Plus className="h-4 w-4 mr-2" />
-                첫 번째 상품 등록하기
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+          {/* Products Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="aspect-square relative bg-gray-100">
+                  {product.images[0] ? (
+                    <Image
+                      src={product.images[0].url}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Package className="h-8 w-8 text-gray-400" />
+                    </div>
+                  )}
 
-      {/* 거부 사유 입력 다이얼로그 */}
-      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>상품 거부 사유 입력</DialogTitle>
-            <DialogDescription>
-              상품 &quot;{selectedProduct?.name}&quot;을(를) 거부하는 사유를 입력해주세요. 파트너에게 전달됩니다.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="rejectionReason">거부 사유 *</Label>
-              <Textarea
-                id="rejectionReason"
-                placeholder="예: 이미지 품질이 낮습니다. 상품 설명이 불충분합니다."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows={4}
-              />
-            </div>
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {product.featured && (
+                      <Badge variant="default" className="text-[10px] px-1 py-0 h-5">인기</Badge>
+                    )}
+                    {product.stock < 10 && (
+                      <Badge variant="destructive" className="text-[10px] px-1 py-0 h-5">재고부족</Badge>
+                    )}
+                    <Badge variant={product.status === 'active' ? 'default' : 'secondary'} className="text-[10px] px-1 py-0 h-5">
+                      {product.status === 'active' ? '활성' : '숨김'}
+                    </Badge>
+                    {product.isFunding && (
+                      <Badge className="bg-orange-500 text-[10px] px-1 py-0 h-5">펀딩</Badge>
+                    )}
+                  </div>
+
+                  <div className="absolute top-1 right-1">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 bg-white/80 hover:bg-white rounded-full">
+                          <MoreVertical className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/products/${product.id}`}>
+                            <Eye className="h-3 w-3 mr-2" />
+                            상세보기
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/products/${product.id}/edit`}>
+                            <Edit className="h-3 w-3 mr-2" />
+                            수정
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleProductAction(product.id, 'toggle-status')}
+                        >
+                          {product.status === 'active' ? '숨기기' : '활성화'}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleProductAction(product.id, 'delete')}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-3 w-3 mr-2" />
+                          삭제
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+
+                <CardContent className="p-3">
+                  <div className="space-y-2">
+                    <div>
+                      <h3 className="font-semibold text-sm text-text-primary line-clamp-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-text-secondary line-clamp-1 mt-0.5">
+                        {product.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-sm font-bold text-primary">
+                          ₩{product.price.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-text-secondary">
+                      <span>{product.sales}개 판매</span>
+                      <span>재고: {product.stock}</span>
+                    </div>
+
+                    {/* 버튼 그룹 축소 */}
+                    <div className="flex gap-1 pt-1">
+                      {product.approvalStatus === 'pending' ? (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="h-7 text-xs flex-1 bg-green-600 hover:bg-green-700 px-0"
+                          onClick={() => handleApprove(product.id)}
+                        >
+                          승인
+                        </Button>
+                      ) : (
+                        <Button variant="outline" size="sm" asChild className="h-7 text-xs flex-1 px-0">
+                          <Link href={`/admin/products/${product.id}/edit`}>
+                            수정
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>
-              취소
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleReject}
-              disabled={processing || !rejectionReason.trim()}
-            >
-              {processing ? (
-                <Clock className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <X className="h-4 w-4 mr-2" />
-              )}
-              거부 확인
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+          {filteredProducts.length === 0 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  상품이 없습니다
+                </h3>
+                <p className="text-text-secondary mb-4">
+                  검색 조건에 맞는 상품을 찾을 수 없습니다.
+                </p>
+                <Button asChild>
+                  <Link href="/admin/products/new">
+                    <Plus className="h-4 w-4 mr-2" />
+                    첫 번째 상품 등록하기
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 거부 사유 입력 다이얼로그 */}
+          <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>상품 거부 사유 입력</DialogTitle>
+                <DialogDescription>
+                  상품 &quot;{selectedProduct?.name}&quot;을(를) 거부하는 사유를 입력해주세요. 파트너에게 전달됩니다.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="rejectionReason">거부 사유 *</Label>
+                  <Textarea
+                    id="rejectionReason"
+                    placeholder="예: 이미지 품질이 낮습니다. 상품 설명이 불충분합니다."
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>
+                  취소
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleReject}
+                  disabled={processing || !rejectionReason.trim()}
+                >
+                  {processing ? (
+                    <Clock className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <X className="h-4 w-4 mr-2" />
+                  )}
+                  거부 확인
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
         </TabsContent>
 

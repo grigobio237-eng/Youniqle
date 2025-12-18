@@ -9,13 +9,13 @@ export async function GET(request: NextRequest) {
   try {
     // 파트너 토큰 검증
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-    
+
     await connectDB();
 
     // 파트너의 상품만 조회
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   try {
     // 파트너 토큰 검증
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
@@ -79,6 +79,9 @@ export async function POST(request: NextRequest) {
       description,
       images,
       featured,
+      isFunding,
+      fundingGoal,
+      fundingEndDate,
       nutritionInfo,
       originInfo,
       clothingInfo,
@@ -126,6 +129,9 @@ export async function POST(request: NextRequest) {
       partnerId: decoded.id,
       partnerName: decoded.name,
       partnerEmail,
+      isFunding: isFunding || false,
+      fundingGoal: fundingGoal || undefined,
+      fundingEndDate: fundingEndDate || undefined,
       // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
       nutritionInfo: nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined,
       originInfo: originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined,

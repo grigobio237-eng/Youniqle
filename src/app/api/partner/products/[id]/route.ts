@@ -11,10 +11,10 @@ export async function PUT(
 ) {
   try {
     const { id: productId } = await params;
-    
+
     // 파트너 토큰 검증 (하이픈으로 통일)
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
@@ -32,6 +32,9 @@ export async function PUT(
       description,
       images,
       featured,
+      isFunding,
+      fundingGoal,
+      fundingEndDate,
       nutritionInfo,
       originInfo,
       clothingInfo,
@@ -49,9 +52,9 @@ export async function PUT(
     await connectDB();
 
     // 상품 조회 및 권한 확인
-    const product = await Product.findOne({ 
-      _id: productId, 
-      partnerId: decoded.id 
+    const product = await Product.findOne({
+      _id: productId,
+      partnerId: decoded.id
     });
 
     if (!product) {
@@ -62,11 +65,11 @@ export async function PUT(
     }
 
     // 슬러그 중복 확인 (자신의 상품 제외)
-    const existingProduct = await Product.findOne({ 
-      slug, 
-      _id: { $ne: productId } 
+    const existingProduct = await Product.findOne({
+      slug,
+      _id: { $ne: productId }
     });
-    
+
     if (existingProduct) {
       return NextResponse.json(
         { error: '이미 존재하는 상품 슬러그입니다.' },
@@ -85,6 +88,11 @@ export async function PUT(
     product.description = description;
     product.images = (images || []).map((img: any) => typeof img === 'string' ? { url: img } : img);
     product.featured = featured || false;
+    // 펀딩 정보 업데이트
+    product.isFunding = isFunding || false;
+    product.fundingGoal = fundingGoal || undefined;
+    product.fundingEndDate = fundingEndDate || undefined;
+
     // 상품 수정 시 다시 승인 대기 상태로 변경
     product.approvalStatus = 'pending';
     product.rejectionReason = undefined;
@@ -122,10 +130,10 @@ export async function DELETE(
 ) {
   try {
     const { id: productId } = await params;
-    
+
     // 파트너 토큰 검증 (하이픈으로 통일)
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
@@ -135,9 +143,9 @@ export async function DELETE(
     await connectDB();
 
     // 상품 조회 및 권한 확인 (파트너는 자신의 상품만 삭제 가능)
-    const product = await Product.findOne({ 
-      _id: productId, 
-      partnerId: decoded.id 
+    const product = await Product.findOne({
+      _id: productId,
+      partnerId: decoded.id
     });
 
     if (!product) {
@@ -150,16 +158,16 @@ export async function DELETE(
     // 이미지 파일들 삭제 (Vercel Blob)
     if (product.images && product.images.length > 0) {
       try {
-        const blobImages = product.images.filter((img: any) => 
+        const blobImages = product.images.filter((img: any) =>
           img.url && img.url.includes('blob.vercel-storage.com')
         );
-        
+
         if (blobImages.length > 0) {
           const deletePromises = blobImages.map(async (img: any) => {
             try {
               // Vercel Blob에서 직접 삭제
               const { del } = await import('@vercel/blob');
-              
+
               if (!process.env.BLOB_READ_WRITE_TOKEN) {
                 console.error('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다.');
                 return;
@@ -168,13 +176,13 @@ export async function DELETE(
               await del(img.url, {
                 token: process.env.BLOB_READ_WRITE_TOKEN,
               });
-              
+
               console.log(`이미지 삭제 성공: ${img.url}`);
             } catch (error) {
               console.error(`이미지 삭제 중 오류: ${img.url}`, error);
             }
           });
-          
+
           await Promise.all(deletePromises);
           console.log(`파트너 상품 삭제: ${blobImages.length}개 이미지 파일 삭제 완료`);
         }

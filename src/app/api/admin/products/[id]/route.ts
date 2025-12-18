@@ -12,10 +12,10 @@ export async function GET(
   const { id } = await params;
   try {
     console.log('Fetching product with ID:', id);
-    
+
     // JWT 토큰으로 인증 확인
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       console.log('No admin token found');
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
@@ -42,10 +42,10 @@ export async function GET(
 
     await connectDB();
     console.log('Database connected');
-    
+
     // 관리자 권한 확인
     const user = await User.findById(decoded.id).maxTimeMS(5000);
-    
+
     if (!user || user.role !== 'admin') {
       console.log('User not found or not admin:', user?.role);
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
@@ -53,7 +53,7 @@ export async function GET(
 
     console.log('Admin user verified, fetching product...');
     const product = await Product.findById(id).maxTimeMS(5000);
-    
+
     if (!product) {
       console.log('Product not found for ID:', id);
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
@@ -64,28 +64,28 @@ export async function GET(
 
   } catch (error) {
     console.error('Failed to fetch product:', error);
-    
+
     // 상세 에러 로깅
     const detailedError = logServerError(error as Error, request, {
       productId: id,
       operation: 'GET_PRODUCT',
       serverStatus: getServerStatus(),
     });
-    
+
     // MongoDB 연결 에러인 경우
     if (error instanceof Error && error.message.includes('buffering timed out')) {
       console.log('[API] MongoDB 타임아웃으로 인해 상품 조회 실패');
       return NextResponse.json(
-        { 
+        {
           error: '데이터베이스 연결이 불안정합니다. 잠시 후 다시 시도해주세요.',
           details: process.env.NODE_ENV === 'development' ? detailedError : undefined,
         },
         { status: 503 }
       );
     }
-    
+
     return NextResponse.json(
-      { 
+      {
         error: '상품 정보를 불러오는데 실패했습니다.',
         details: process.env.NODE_ENV === 'development' ? detailedError : undefined,
       },
@@ -100,10 +100,10 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    
+
     // JWT 토큰으로 인증 확인
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -125,10 +125,10 @@ export async function PUT(
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const user = await User.findById(decoded.id);
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -143,6 +143,9 @@ export async function PUT(
       category,
       status,
       featured,
+      isFunding,
+      fundingGoal,
+      fundingEndDate,
       summary,
       description,
       images,
@@ -161,11 +164,11 @@ export async function PUT(
     }
 
     // 슬러그 중복 확인 (자신 제외)
-    const existingProduct = await Product.findOne({ 
-      slug, 
-      _id: { $ne: id } 
+    const existingProduct = await Product.findOne({
+      slug,
+      _id: { $ne: id }
     });
-    
+
     if (existingProduct) {
       return NextResponse.json(
         { error: '이미 사용 중인 URL 슬러그입니다.' },
@@ -185,6 +188,9 @@ export async function PUT(
         category,
         status,
         featured: featured || false,
+        isFunding: isFunding || false,
+        fundingGoal: fundingGoal || undefined,
+        fundingEndDate: fundingEndDate || undefined,
         summary,
         description,
         images: images || [],
@@ -201,9 +207,9 @@ export async function PUT(
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: '상품이 성공적으로 수정되었습니다.',
-      product: updatedProduct 
+      product: updatedProduct
     });
 
   } catch (error) {
@@ -221,10 +227,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    
+
     // JWT 토큰으로 인증 확인
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -246,16 +252,16 @@ export async function DELETE(
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const user = await User.findById(decoded.id);
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
     const product = await Product.findById(id);
-    
+
     if (!product) {
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -263,16 +269,16 @@ export async function DELETE(
     // 이미지 파일들 삭제 (Vercel Blob)
     if (product.images && product.images.length > 0) {
       try {
-        const blobImages = product.images.filter((img: any) => 
+        const blobImages = product.images.filter((img: any) =>
           img.url && img.url.includes('blob.vercel-storage.com')
         );
-        
+
         if (blobImages.length > 0) {
           const deletePromises = blobImages.map(async (img: any) => {
             try {
               // Vercel Blob에서 직접 삭제
               const { del } = await import('@vercel/blob');
-              
+
               if (!process.env.BLOB_READ_WRITE_TOKEN) {
                 console.error('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다.');
                 return;
@@ -281,13 +287,13 @@ export async function DELETE(
               await del(img.url, {
                 token: process.env.BLOB_READ_WRITE_TOKEN,
               });
-              
+
               console.log(`이미지 삭제 성공: ${img.url}`);
             } catch (error) {
               console.error(`이미지 삭제 중 오류: ${img.url}`, error);
             }
           });
-          
+
           await Promise.all(deletePromises);
           console.log(`관리자 상품 삭제: ${blobImages.length}개 이미지 파일 삭제 완료`);
         }
@@ -300,8 +306,8 @@ export async function DELETE(
     // 상품 삭제
     await Product.findByIdAndDelete(id);
 
-    return NextResponse.json({ 
-      message: '상품이 성공적으로 삭제되었습니다.' 
+    return NextResponse.json({
+      message: '상품이 성공적으로 삭제되었습니다.'
     });
 
   } catch (error) {
