@@ -305,8 +305,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            // Using gemini-1.5-flash for better stability and speed
-            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            // Using gemini-2.0-flash-exp (Verified working)
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
             const imagePrompt = info.images.length > 0
                 ? `\n## 사용 가능한 이미지 (반드시 HTML 내에 적절히 배치할 것):\n${info.images.map((url, i) => `- 이미지${i + 1}: ${url}`).join('\n')}`
