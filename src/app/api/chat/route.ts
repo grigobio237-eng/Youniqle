@@ -26,17 +26,30 @@ export async function GET(req: NextRequest) {
         //     return NextResponse.json({ error: 'Subscription required' }, { status: 403 });
         // }
 
-        // Find messages between user and admin (or Director Kim)
-        // Assuming Director Kim is an admin or a specific user. 
-        // For simplicity, let's assume we are chatting with an Admin. 
-        // In a real scenario, we might want to specify which admin we are chatting with.
-        // Here we fetch all messages where the user is sender OR receiver.
-        const messages = await Message.find({
-            $or: [
-                { senderId: user._id },
-                { receiverId: user._id }
-            ]
-        })
+        // Find Admin/Director
+        const director = await User.findOne({ role: 'admin' });
+        const directorId = director ? director._id : null;
+
+        let query = {};
+
+        // If user is Admin/Director, ONLY show messages sent to self (Self-Test)
+        // Otherwise, they see ALL messages from ALL users, which is chaotic in the Lounge view.
+        if (directorId && user._id.toString() === directorId.toString()) {
+            query = {
+                senderId: user._id,
+                receiverId: user._id
+            };
+        } else {
+            // Normal User: See messages valid for this user
+            query = {
+                $or: [
+                    { senderId: user._id },
+                    { receiverId: user._id }
+                ]
+            };
+        }
+
+        const messages = await Message.find(query)
             .sort({ createdAt: 1 })
             .limit(50); // Limit to last 50 messages
 
@@ -79,29 +92,28 @@ export async function POST(req: NextRequest) {
         // 2. Generate AI Response (Director Kim)
         let aiMessage = null;
         try {
-            // Check if message should be replied by AI (e.g. if receiver is director/admin)
-            // For now, ALWAYS reply if user is not admin
-            if (user.role !== 'admin') {
-                const GeminiAIEngine = (await import('@/lib/ai/gemini-engine')).GeminiAIEngine;
+            // Updated: AI now replies to EVERYONE (including Admin for testing)
+            // if (user.role !== 'admin') { 
+            const GeminiAIEngine = (await import('@/lib/ai/gemini-engine')).GeminiAIEngine;
 
-                // Fetch user name and grade for context
-                const userName = user.name || '회원님';
-                const userGrade = user.subscription?.status === 'active' ? 'Premium' : 'Standard';
+            // Fetch user name and grade for context
+            const userName = user.name || '회원님';
+            const userGrade = user.subscription?.status === 'active' ? 'Premium' : 'Standard';
 
-                const aiResponseText = await GeminiAIEngine.generateChatResponse(content, {
-                    userName,
-                    grade: userGrade
-                });
+            const aiResponseText = await GeminiAIEngine.generateChatResponse(content, {
+                userName,
+                grade: userGrade
+            });
 
-                // Save AI Message
-                aiMessage = await Message.create({
-                    senderId: receiverId, // AI speaks as Director
-                    receiverId: user._id,
-                    content: aiResponseText,
-                    type: 'text',
-                    read: false
-                });
-            }
+            // Save AI Message
+            aiMessage = await Message.create({
+                senderId: receiverId, // AI speaks as Director
+                receiverId: user._id,
+                content: aiResponseText,
+                type: 'text',
+                read: false
+            });
+            // } <--- Removed this restriction
         } catch (aiError) {
             console.error('AI Response Generation Error:', aiError);
             // Don't fail the request if AI fails, just return user message
