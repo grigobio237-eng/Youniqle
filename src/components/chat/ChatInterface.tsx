@@ -225,7 +225,10 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                         </div>
 
                         {messages.map((msg, idx) => {
-                            const isMe = msg.senderId === ((session.user as any).id || (session.user as any)._id);
+                            // Robust ID comparison
+                            const currentUserId = (session?.user as any)?.id || (session?.user as any)?._id;
+                            const isMe = msg.senderId.toString() === currentUserId?.toString();
+
                             return (
                                 <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                     {!isMe && (
@@ -233,7 +236,9 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                                             <img src="/images/kim-mijeong-profile.jpg" alt="원장" className="w-full h-full object-cover" />
                                         </div>
                                     )}
-                                    <div className={`max-w-[70%] p-3 rounded-lg shadow-sm text-sm whitespace-pre-wrap ${isMe ? 'bg-[#ffeeb3] text-black' : 'bg-white text-black border border-gray-100'
+                                    <div className={`max-w-[70%] p-3 rounded-lg shadow-sm text-sm whitespace-pre-wrap ${isMe
+                                            ? 'bg-yellow-100 text-black rounded-tr-none' // User: Yellow, Right
+                                            : 'bg-white text-black border border-gray-100 rounded-tl-none' // AI/Admin: White, Left
                                         }`}>
                                         {msg.content}
                                     </div>
