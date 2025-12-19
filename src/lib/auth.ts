@@ -58,6 +58,11 @@ export const authOptions: AuthOptions = {
             throw new Error('이메일 인증이 필요합니다. 이메일을 확인해주세요.');
           }
 
+          // 소셜 로그인 계정으로 비밀번호 로그인 시도 시 에러 처리
+          if (user.provider !== 'local') {
+            throw new Error(`${user.provider} 계정으로 가입된 이메일입니다. 소셜 로그인을 이용해주세요.`);
+          }
+
           return {
             id: user._id.toString(),
             email: user.email,

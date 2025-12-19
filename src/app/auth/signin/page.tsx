@@ -154,7 +154,7 @@ function SigninContent() {
                 className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
-                {t('auth.socialLogin.google')}
+                {isInWebView ? 'Google 계정으로 로그인 (외부 브라우저)' : t('auth.socialLogin.google')}
               </Button>
             </div>
 

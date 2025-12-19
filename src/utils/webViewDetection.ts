@@ -40,8 +40,9 @@ export const openExternalBrowser = (targetUrl: string) => {
 
   if (isAndroid) {
     // Android: Chrome으로 강제 오픈 (Intent Scheme)
+    // S.browser_fallback_url은 크롬이 없을 경우 대비
     const urlWithoutProtocol = targetUrl.replace(/^https?:\/\//, '');
-    const intentUrl = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
+    const intentUrl = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(targetUrl)};end`;
 
     // Chrome이 없으면 기본 브라우저로 
     window.location.href = intentUrl;
