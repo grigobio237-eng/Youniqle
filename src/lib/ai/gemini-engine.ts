@@ -7,20 +7,54 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 // Real Gemini AI Engine for Recovery OS
 export class GeminiAIEngine {
 
+    // AI Model Configuration
+    // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
+    // Secondary: gemini-1.5-flash (Stable, Reliable fallback)
+    private static async generateWithFallback(
+        prompt: string,
+        systemInstruction?: string,
+        temperature: number = 0.7
+    ): Promise<string> {
+        const models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash'];
+        let lastError: any;
+
+        for (const modelName of models) {
+            try {
+                const model = genAI.getGenerativeModel({
+                    model: modelName,
+                    safetySettings: [
+                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    ],
+                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "model" } : undefined
+                });
+
+                const result = await model.generateContent({
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: temperature
+                    }
+                });
+                const response = await result.response;
+                const text = response.text();
+
+                if (text) return text;
+
+            } catch (error) {
+                console.warn(`Model ${modelName} failed. Trying next...`, error);
+                lastError = error;
+                continue;
+            }
+        }
+
+        throw lastError || new Error('All AI models failed');
+    }
+
     // AI Navigator: Generate daily advice based on recovery scores
     static async generateNavigatorAdvice(input: NavigatorInput): Promise<NavigatorOutput> {
         try {
-            // Using gemini-flash-latest (Verified working)
-            const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
-                safetySettings: [
-                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                ]
-            });
-
             const totalScore = Math.round(
                 (input.scores.q1 + input.scores.q2 + input.scores.q3 + input.scores.q4 + input.scores.q5) / 5
             );
@@ -43,9 +77,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
   "actionItem": "오늘 딱 하나만 실천할 수 있는 회복 행동 추천 (50자 이내)"
 }`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+            const text = await this.generateWithFallback(prompt);
 
             // Parse JSON from response
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -82,17 +114,6 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
     // Omakase: Generate 3-tier recovery plans
     static async generateOmakasePlans(input: OmakaseInput): Promise<OmakaseOutput> {
         try {
-            // Using gemini-flash-latest (Verified working)
-            const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
-                safetySettings: [
-                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                ]
-            });
-
             const prompt = `당신은 프리미엄 회복 컨시어지 서비스의 AI 플래너입니다. 고객의 상담 신청서를 바탕으로 3가지 맞춤형 회복 플랜을 설계해주세요.
 
 ## 고객 정보
@@ -136,9 +157,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
   }
 }`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+            const text = await this.generateWithFallback(prompt);
 
             // Parse JSON from response
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -202,9 +221,6 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            // Updated to use gemini-2.0-flash as it is confirmed available
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
             const prompt = `당신은 회복 심리학 전문가입니다.
 오늘의 테마는 "${theme}"이며, 핵심 키워드는 "${keywords}"입니다.
 이 테마에 맞춰 사용자의 하루 컨디션을 점검할 수 있는 **5개의 객관식 질문**을 만들어주세요.
@@ -229,9 +245,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
   ...
 ]`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+            const text = await this.generateWithFallback(prompt);
 
             const jsonMatch = text.match(/\[[\s\S]*\]/);
             if (jsonMatch) {
@@ -252,8 +266,6 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
             const prompt = `
 당신은 '유니클(Youniqle)' 회복 센터의 대표원장 **김미정**입니다.
 사용자(${context.userName}, 등급: ${context.grade})가 1:1 라운지에서 당신에게 메시지를 보냈습니다.
@@ -279,9 +291,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 ## 답변 작성
 위 페르소나를 유지하며 사용자에게 답변해주세요. 지금 막 인사를 나눈 상태가 아니라면, 바로 본론으로 들어가도 좋습니다.
 `;
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return response.text();
+
+            return await this.generateWithFallback(prompt);
 
         } catch (error) {
             console.error('Gemini Chat Error:', error);
@@ -305,9 +316,6 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            // Using gemini-2.0-flash-exp (Verified working)
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
             const imagePrompt = info.images.length > 0
                 ? `\n## 사용 가능한 이미지 (반드시 HTML 내에 적절히 배치할 것):\n${info.images.map((url, i) => `- 이미지${i + 1}: ${url}`).join('\n')}`
                 : '\n## 이미지 없음: 텍스트 위주로 세련되게 디자인하세요.';
@@ -347,9 +355,7 @@ ${imagePrompt}
 - 마크다운 코드 블록(\`\`\`html) 없이 **순수 HTML 코드만** 반환하세요.
 `;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            let text = response.text();
+            let text = await this.generateWithFallback(prompt);
 
             // 마크다운 코드 블록 제거
             text = text.replace(/```html/g, '').replace(/```/g, '');
