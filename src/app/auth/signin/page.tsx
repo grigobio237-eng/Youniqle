@@ -13,7 +13,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
+import { isWebView, handleWebViewOAuth, openExternalBrowser } from '@/utils/webViewDetection';
 
 function SigninContent() {
   const { t } = useLanguage();
@@ -30,6 +30,12 @@ function SigninContent() {
   useEffect(() => {
     setIsInWebView(isWebView());
   }, []);
+
+  const handleOpenExternalBrowser = () => {
+    if (typeof window !== 'undefined') {
+      openExternalBrowser(window.location.href);
+    }
+  };
 
   const handleSocialLogin = async (provider: string) => {
     // WebView 환경에서 Google 로그인 시도 시 경고
@@ -122,23 +128,29 @@ function SigninContent() {
             {/* WebView 경고 메시지 */}
             {isInWebView && (
               <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
-                <div className="flex items-start">
+                <div className="flex items-start mb-3">
                   <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-yellow-800">
                     <p className="font-semibold mb-1">앱 내 브라우저 감지됨</p>
-                    <p className="text-xs">
+                    <p className="text-xs mb-2">
                       Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다.
-                      브라우저에서 직접 열어주세요.
+                      아래 버튼을 눌러 브라우저에서 열어주세요.
                     </p>
                   </div>
                 </div>
+                <Button
+                  onClick={handleOpenExternalBrowser}
+                  className="w-full bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-300 font-semibold"
+                >
+                  외부 브라우저에서 열기
+                </Button>
               </div>
             )}
 
             {/* 소셜 로그인 버튼들 */}
             <div className="space-y-4 mb-8">
               <Button
-                onClick={() => handleSocialLogin('google')}
+                onClick={() => isInWebView ? handleOpenExternalBrowser() : handleSocialLogin('google')}
                 className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />

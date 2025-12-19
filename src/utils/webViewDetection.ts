@@ -9,9 +9,9 @@
  */
 export const isWebView = (): boolean => {
   if (typeof window === 'undefined') return false;
-  
+
   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-  
+
   // WebView 감지 패턴
   const webViewPatterns = [
     /wv/i, // Android WebView
@@ -23,8 +23,32 @@ export const isWebView = (): boolean => {
     /NAVER/i, // Naver in-app browser
     /KAKAOTALK/i, // KakaoTalk in-app browser
   ];
-  
+
   return webViewPatterns.some(pattern => pattern.test(userAgent));
+};
+
+/**
+ * 외부 브라우저로 강제 전환을 시도합니다.
+ * Android: Chrome Intent 사용
+ * iOS: 안내 메시지 또는 클립보드 복사 유도 (제한적)
+ */
+export const openExternalBrowser = (targetUrl: string) => {
+  if (typeof window === 'undefined') return;
+
+  const userAgent = navigator.userAgent;
+  const isAndroid = /Android/i.test(userAgent);
+
+  if (isAndroid) {
+    // Android: Chrome으로 강제 오픈 (Intent Scheme)
+    const urlWithoutProtocol = targetUrl.replace(/^https?:\/\//, '');
+    const intentUrl = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
+
+    // Chrome이 없으면 기본 브라우저로 
+    window.location.href = intentUrl;
+  } else {
+    // iOS 및 기타: 새 창 열기 시도 (팝업 차단될 수 있음)
+    window.location.href = targetUrl;
+  }
 };
 
 /**
@@ -54,7 +78,7 @@ export const handleWebViewOAuth = async (
     const baseUrl = window.location.origin;
     const encodedCallbackUrl = encodeURIComponent(`${baseUrl}${callbackUrl}`);
     const authUrl = `${baseUrl}/api/auth/signin/${provider}?callbackUrl=${encodedCallbackUrl}`;
-    
+
     // 모바일에서 외부 브라우저로 열기
     window.open(authUrl, '_blank', 'noopener,noreferrer');
     return true; // 외부 브라우저로 열기 성공
