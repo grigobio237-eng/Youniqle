@@ -114,3 +114,8 @@ docs/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Security: Ignore test scripts
+test-*.js
+list-models.js
+scripts/test*.js
