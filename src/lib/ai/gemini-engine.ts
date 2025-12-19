@@ -12,7 +12,7 @@ export class GeminiAIEngine {
         try {
             // Using gemini-flash-latest (Verified working)
             const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-2.0-flash-exp',
                 safetySettings: [
                     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -84,7 +84,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         try {
             // Using gemini-flash-latest (Verified working)
             const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-2.0-flash-exp',
                 safetySettings: [
                     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -203,7 +203,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 
         try {
             // Updated to use gemini-2.0-flash as it is confirmed available
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
             const prompt = `당신은 회복 심리학 전문가입니다.
 오늘의 테마는 "${theme}"이며, 핵심 키워드는 "${keywords}"입니다.
@@ -252,7 +252,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
 
         try {
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
             const prompt = `
 당신은 '유니클(Youniqle)' 회복 센터의 대표원장 **김미정**입니다.
