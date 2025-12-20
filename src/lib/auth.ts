@@ -1,5 +1,6 @@
 import NextAuth, { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import KakaoProvider from 'next-auth/providers/kakao';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import connectDB from './db';
 import User from '@/models/User';
@@ -24,6 +25,10 @@ export const authOptions: AuthOptions = {
       httpOptions: {
         timeout: 10000,
       },
+    }),
+    KakaoProvider({
+      clientId: process.env.KAKAO_CLIENT_ID!,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: 'credentials',
