@@ -85,7 +85,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
       // 소셜 로그인 시 자동으로 회원가입 처리
-      if (account?.provider === 'google') {
+      if (account?.provider === 'google' || account?.provider === 'kakao') {
         try {
           await connectDB();
 
@@ -108,10 +108,33 @@ export const authOptions: AuthOptions = {
             userData.avatar = googleProfile.picture || user.image || '';
           }
 
+          // 카카오 로그인 시 추가 정보 매핑
+          if (account.provider === 'kakao' && profile) {
+            console.log('Kakao Profile:', profile); // 디버깅용 로그
+            // 카카오 프로필 구조에 따라 필요한 경우 추가 매핑
+            // NextAuth의 기본 매핑이 user 객체에 잘 들어오는지 확인 필요
+            const kakaoProfile = profile as any;
+            if (kakaoProfile?.properties?.nickname) {
+              userData.name = kakaoProfile.properties.nickname;
+            }
+            if (kakaoProfile?.kakao_account?.email) {
+              userData.email = kakaoProfile.kakao_account.email;
+            }
+            if (kakaoProfile?.properties?.profile_image) {
+              userData.avatar = kakaoProfile.properties.profile_image;
+            }
+          }
+
           // 사용자 데이터 검증
           if (!userData.name || !userData.email) {
             console.error('사용자 정보가 부족합니다:', userData);
-            return false; // 로그인 실패
+            // 카카오의 경우 이메일 동의가 필수인지 확인 필요
+            // 이메일이 없는 경우 가짜 이메일 생성 등으로 처리하거나 에러 리턴
+            if (account.provider === 'kakao' && !userData.email) {
+              userData.email = `${userData.providerId}@kakao.placeholder.com`; // 이메일 없을 경우 임시 처리
+            } else if (!userData.email) {
+              return false; // 다른 제공자는 이메일 필수
+            }
           }
 
           // 기존 사용자 확인
@@ -127,7 +150,7 @@ export const authOptions: AuthOptions = {
             const newUser = new User({
               ...userData,
               role: 'member',
-              grade: 'cedar',
+              grade: 'cedar', // 신규 회원은 Cedar 등급
               points: 0,
               addresses: [],
             });
@@ -136,9 +159,15 @@ export const authOptions: AuthOptions = {
             return '/?welcome=true'; // 신규 가입 시 환영 메시지 표시를 위해 리다이렉트
           } else {
             // 기존 사용자 업데이트
+            // 기존 데이터가 있으면 유지하고, 없으면 업데이트 (선택 사항)
+            // 여기서는 최신 프로필로 업데이트
             existingUser.name = userData.name;
-            existingUser.email = userData.email;
             existingUser.avatar = userData.avatar;
+            // providerId가 없던 기존 이메일 가입자와 연동
+            if (!existingUser.providerId) {
+              existingUser.provider = userData.provider;
+              existingUser.providerId = userData.providerId;
+            }
             existingUser.emailVerified = true;
             await existingUser.save();
             console.log('기존 사용자 업데이트:', existingUser);
