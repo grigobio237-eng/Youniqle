@@ -87,115 +87,65 @@ export const authOptions: AuthOptions = {
       // 소셜 로그인 시 자동으로 회원가입 처리
       if (account?.provider === 'google' || account?.provider === 'kakao') {
         try {
+          console.log(`[SignIn] Starting sign in for provider: ${account.provider}`);
           await connectDB();
 
-          // 사용자 정보 추출
-          let userData = {
-            name: user.name || '',
-            email: user.email || '',
-            avatar: user.image || '',
-            provider: account.provider,
-            providerId: account.providerAccountId,
-            emailVerified: true,
-            marketingConsent: false,
-          };
+          // 기본 사용자 정보 (NextAuth가 매핑한 user 객체 우선 사용)
+          // Kakao의 경우 profile 구조가 다를 수 있으므로 안전하게 접근
+          const email = user.email || (profile as any)?.kakao_account?.email || `${account.providerAccountId}@${account.provider}.placeholder.com`;
 
-          // 구글 로그인 시 추가 정보 매핑
-          if (account.provider === 'google' && profile) {
-            const googleProfile = profile as any;
-            userData.name = googleProfile.name || user.name || '';
-            userData.email = googleProfile.email || user.email || '';
-            userData.avatar = googleProfile.picture || user.image || '';
+          let name = user.name;
+          if (!name) {
+            name = (profile as any)?.properties?.nickname || (profile as any)?.kakao_account?.profile?.nickname || 'New User';
           }
 
-          // 카카오 로그인 시 추가 정보 매핑
-          if (account.provider === 'kakao' && profile) {
-            console.log('Kakao Profile:', profile); // 디버깅용 로그
-            // 카카오 프로필 구조에 따라 필요한 경우 추가 매핑
-            // NextAuth의 기본 매핑이 user 객체에 잘 들어오는지 확인 필요
-            const kakaoProfile = profile as any;
-            if (kakaoProfile?.properties?.nickname) {
-              userData.name = kakaoProfile.properties.nickname;
-            }
-            if (kakaoProfile?.kakao_account?.email) {
-              userData.email = kakaoProfile.kakao_account.email;
-            }
-            if (kakaoProfile?.properties?.profile_image) {
-              userData.avatar = kakaoProfile.properties.profile_image;
-            }
+          let avatar = user.image;
+          if (!avatar) {
+            avatar = (profile as any)?.properties?.profile_image || (profile as any)?.kakao_account?.profile?.profile_image_url || '';
           }
 
-          // 사용자 데이터 검증 (강력한 폴백 추가)
-          if (!userData.name) {
-            userData.name = 'Kakao User'; // 이름이 없을 경우 기본값
-          }
+          console.log(`[SignIn] User Data: email=${email}, name=${name}`);
 
-          if (!userData.email) {
-            // 카카오 등 이메일이 없는 경우 가짜 이메일 생성
-            userData.email = `${userData.providerId}@kakao.placeholder.com`;
-          }
-
-          // 기존 사용자 확인
-          const existingUser = await User.findOne({
-            $or: [
-              { email: userData.email },
-              { providerId: userData.providerId }
-            ]
-          });
-
-          if (!existingUser) {
-            // 추천인 쿠키 확인 (디버깅을 위해 잠시 비활성화)
-            let validReferredBy = null;
-            /*
-            const cookieStore = await cookies();
-            const referralCode = cookieStore.get('referral_code')?.value;
-            
-            if (referralCode) {
-              const referrer = await User.findOne({ referralCode });
-              if (referrer) {
-                validReferredBy = referrer.referralCode;
+          // upsert 옵션을 사용하여 사용자 생성 또는 업데이트 (Atomic Operation)
+          const result = await User.findOneAndUpdate(
+            { email: email },
+            {
+              $set: {
+                name: name,
+                avatar: avatar,
+                provider: account.provider,
+                providerId: account.providerAccountId,
+                emailVerified: true,
+                updatedAt: new Date()
+              },
+              $setOnInsert: {
+                role: 'member',
+                grade: 'cedar',
+                points: 0,
+                marketingConsent: false,
+                addresses: [],
+                createdAt: new Date()
               }
-            }
-            */
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          );
 
-            // 새 사용자 생성
-            const newUser = new User({
-              ...userData,
-              role: 'member',
-              grade: 'cedar', // 신규 회원은 Cedar 등급
-              points: 0,
-              addresses: [],
-              referredBy: validReferredBy, // 추천인 연결
-            });
+          console.log('[SignIn] DB Operation Result:', result ? 'Success' : 'Failed');
 
-            // 추천 코드 자동 생성
-            if (!newUser.referralCode) {
-              const base = newUser._id.toString().slice(-6).toUpperCase();
-              newUser.referralCode = `RF${base}`;
-            }
+          // 추천인 연결 (별도 로직으로 분리하여 에러 영향 최소화)
+          // 쿠키 접근 로직은 DB 생성 후 시도
+          /*
+          try {
+             // 쿠키 접근 로직
+          } catch (e) { console.error('Referral Error', e); }
+          */
 
-            await newUser.save();
-            console.log('새 사용자 생성:', newUser);
-            return '/?welcome=true'; // 신규 가입 시 환영 메시지 표시를 위해 리다이렉트
-          } else {
-            // 기존 사용자 업데이트
-            // 기존 데이터가 있으면 유지하고, 없으면 업데이트 (선택 사항)
-            // 여기서는 최신 프로필로 업데이트
-            existingUser.name = userData.name;
-            existingUser.avatar = userData.avatar;
-            // providerId가 없던 기존 이메일 가입자와 연동
-            if (!existingUser.providerId) {
-              existingUser.provider = userData.provider;
-              existingUser.providerId = userData.providerId;
-            }
-            existingUser.emailVerified = true;
-            await existingUser.save();
-            console.log('기존 사용자 업데이트:', existingUser);
-          }
+          return true;
         } catch (error) {
-          console.error('사용자 저장 오류:', error);
+          console.error('[SignIn] Critical Error:', error);
+          // 디버깅을 위해 에러 발생 시에도 true 반환하여 로그인이 진행되게 함
+          return true;
         }
-        return true;
       }
       return true;
     },
