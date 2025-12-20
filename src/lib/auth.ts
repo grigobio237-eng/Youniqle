@@ -125,16 +125,14 @@ export const authOptions: AuthOptions = {
             }
           }
 
-          // 사용자 데이터 검증
-          if (!userData.name || !userData.email) {
-            console.error('사용자 정보가 부족합니다:', userData);
-            // 카카오의 경우 이메일 동의가 필수인지 확인 필요
-            // 이메일이 없는 경우 가짜 이메일 생성 등으로 처리하거나 에러 리턴
-            if (account.provider === 'kakao' && !userData.email) {
-              userData.email = `${userData.providerId}@kakao.placeholder.com`; // 이메일 없을 경우 임시 처리
-            } else if (!userData.email) {
-              return false; // 다른 제공자는 이메일 필수
-            }
+          // 사용자 데이터 검증 (강력한 폴백 추가)
+          if (!userData.name) {
+            userData.name = 'Kakao User'; // 이름이 없을 경우 기본값
+          }
+
+          if (!userData.email) {
+            // 카카오 등 이메일이 없는 경우 가짜 이메일 생성
+            userData.email = `${userData.providerId}@kakao.placeholder.com`;
           }
 
           // 기존 사용자 확인
@@ -146,17 +144,19 @@ export const authOptions: AuthOptions = {
           });
 
           if (!existingUser) {
-            // 추천인 쿠키 확인
+            // 추천인 쿠키 확인 (디버깅을 위해 잠시 비활성화)
+            let validReferredBy = null;
+            /*
             const cookieStore = await cookies();
             const referralCode = cookieStore.get('referral_code')?.value;
-            let validReferredBy = null;
-
+            
             if (referralCode) {
               const referrer = await User.findOne({ referralCode });
               if (referrer) {
                 validReferredBy = referrer.referralCode;
               }
             }
+            */
 
             // 새 사용자 생성
             const newUser = new User({
