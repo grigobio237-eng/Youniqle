@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleIcon } from '@/components/ui/social-icons';
+import { GoogleIcon, KakaoIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -163,6 +163,13 @@ function SignupContent() {
 
             {/* 소셜 로그인 버튼들 */}
             <div className="space-y-4 mb-8">
+              <Button
+                onClick={() => handleSocialLogin('kakao')}
+                className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none font-medium transition-all duration-200"
+              >
+                <KakaoIcon className="w-5 h-5 mr-3" />
+                카카오로 계속하기
+              </Button>
               <Button
                 onClick={() => handleSocialLogin('google')}
                 className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"

@@ -165,14 +165,6 @@ function SigninContent() {
               </Button>
             </div>
 
-            {/* 소셜 로그인 안내 문구 */}
-            <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-700 text-center">
-                <span className="font-medium">{t('auth.socialLogin.notice')}</span><br />
-                {t('auth.socialLogin.noticeDesc')}
-              </p>
-            </div>
-
             {/* 구분선 */}
             <div className="relative mb-8">
               <div className="absolute inset-0 flex items-center">
