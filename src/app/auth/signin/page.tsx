@@ -14,6 +14,7 @@ import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 import { isWebView, handleWebViewOAuth, openExternalBrowser } from '@/utils/webViewDetection';
+import ReferralTracker from '@/components/auth/ReferralTracker';
 
 function SigninContent() {
   const { t } = useLanguage();
@@ -278,6 +279,7 @@ export default function SigninPage() {
         </div>
       </div>
     }>
+      <ReferralTracker />
       <SigninContent />
     </Suspense>
   );

@@ -146,6 +146,18 @@ export const authOptions: AuthOptions = {
           });
 
           if (!existingUser) {
+            // 추천인 쿠키 확인
+            const cookieStore = await cookies();
+            const referralCode = cookieStore.get('referral_code')?.value;
+            let validReferredBy = null;
+
+            if (referralCode) {
+              const referrer = await User.findOne({ referralCode });
+              if (referrer) {
+                validReferredBy = referrer.referralCode;
+              }
+            }
+
             // 새 사용자 생성
             const newUser = new User({
               ...userData,
@@ -153,7 +165,15 @@ export const authOptions: AuthOptions = {
               grade: 'cedar', // 신규 회원은 Cedar 등급
               points: 0,
               addresses: [],
+              referredBy: validReferredBy, // 추천인 연결
             });
+
+            // 추천 코드 자동 생성
+            if (!newUser.referralCode) {
+              const base = newUser._id.toString().slice(-6).toUpperCase();
+              newUser.referralCode = `RF${base}`;
+            }
+
             await newUser.save();
             console.log('새 사용자 생성:', newUser);
             return '/?welcome=true'; // 신규 가입 시 환영 메시지 표시를 위해 리다이렉트

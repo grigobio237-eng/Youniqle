@@ -13,6 +13,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
+import ReferralTracker from '@/components/auth/ReferralTracker';
 
 function SignupContent() {
   const { t } = useLanguage();
@@ -333,6 +334,7 @@ export default function SignupPage() {
         </div>
       </div>
     }>
+      <ReferralTracker />
       <SignupContent />
     </Suspense>
   );
