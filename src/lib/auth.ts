@@ -29,6 +29,7 @@ export const authOptions: AuthOptions = {
     KakaoProvider({
       clientId: process.env.KAKAO_CLIENT_ID!,
       clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+      checks: ['none'], // State cookie mismatch 해결을 위해 checks 비활성화
     }),
     CredentialsProvider({
       name: 'credentials',
