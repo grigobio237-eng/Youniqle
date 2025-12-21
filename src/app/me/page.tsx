@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
-import PostcodeSearch from '@/components/ui/PostcodeSearch';
 import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
 import { User, Mail, Phone, MapPin, Settings, Save, Store, CheckCircle, Clock, XCircle, AlertCircle, X, Upload, FileImage } from 'lucide-react';
@@ -439,6 +438,10 @@ export default function MyPage() {
                       기본 배송지
                     </Label>
                     <div className="space-y-3">
+                      <GoogleAddressSearch
+                        onAddressSelect={handleAddressSelect}
+                        disabled={!isEditing}
+                      />
                       <div className="flex space-x-2">
                         <div className="relative flex-1">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -450,19 +453,16 @@ export default function MyPage() {
                             readOnly
                           />
                         </div>
-                        <PostcodeSearch
-                          onAddressSelect={handleAddressSelect}
+                        <Input
+                          value={formData.address1}
+                          onChange={handleInputChange}
+                          name="address1"
                           disabled={!isEditing}
+                          placeholder="기본 주소"
+                          readOnly
+                          className="flex-1"
                         />
                       </div>
-                      <Input
-                        value={formData.address1}
-                        onChange={handleInputChange}
-                        name="address1"
-                        disabled={!isEditing}
-                        placeholder="기본 주소"
-                        readOnly
-                      />
                       <Input
                         value={formData.address2}
                         onChange={handleInputChange}
