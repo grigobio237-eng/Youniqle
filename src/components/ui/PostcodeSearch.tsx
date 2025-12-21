@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface PostcodeSearchProps {
   onAddressSelect: (data: {
@@ -45,7 +45,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
       script.onerror = () => {
         console.error('카카오 우편번호 서비스 로드 실패');
       };
-      
+
       document.head.appendChild(script);
       scriptRef.current = script;
     };
@@ -69,7 +69,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
 
     try {
       new window.daum.Postcode({
-        oncomplete: function(data: any) {
+        oncomplete: function (data: any) {
           console.log('주소 선택 완료:', data);
           // 주소 정보를 부모 컴포넌트로 전달
           onAddressSelect({
@@ -81,7 +81,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
             buildingName: data.buildingName || '',
           });
         },
-        onclose: function(state: string) {
+        onclose: function (state: string) {
           // 팝업이 닫힐 때 상태 확인
           if (state === 'COMPLETE_CLOSE') {
             console.log('우편번호 검색이 완료되었습니다.');
@@ -89,7 +89,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
             console.log('우편번호 검색이 강제로 닫혔습니다.');
           }
         },
-        onresize: function(size: any) {
+        onresize: function (size: any) {
           console.log('팝업 크기 조정:', size);
         },
         width: '100%',
@@ -133,7 +133,7 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
       'postcode',
       'width=500,height=600,scrollbars=yes,resizable=yes'
     );
-    
+
     if (newWindow) {
       newWindow.focus();
     } else {
@@ -142,27 +142,15 @@ export default function PostcodeSearch({ onAddressSelect, disabled = false }: Po
   };
 
   return (
-    <div className="flex gap-2">
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleSearch}
-        disabled={disabled}
-        className="flex items-center justify-center space-x-2 whitespace-nowrap"
-      >
-        <Search className="h-4 w-4" />
-        <span>검색</span>
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={handleAlternativeSearch}
-        disabled={disabled}
-        className="flex items-center justify-center space-x-2 whitespace-nowrap text-xs"
-      >
-        <MapPin className="h-3 w-3" />
-        <span>우체국</span>
-      </Button>
-    </div>
+    <Button
+      type="button"
+      variant="outline"
+      onClick={handleSearch}
+      disabled={disabled}
+      className="flex items-center justify-center space-x-2 whitespace-nowrap"
+    >
+      <Search className="h-4 w-4" />
+      <span>주소 검색</span>
+    </Button>
   );
 }

@@ -133,13 +133,39 @@ export const authOptions: AuthOptions = {
 
           console.log('[SignIn] DB Operation Result:', result ? 'Success' : 'Failed');
 
-          // 추천인 연결 (별도 로직으로 분리하여 에러 영향 최소화)
-          // 쿠키 접근 로직은 DB 생성 후 시도
-          /*
+          // 추천인 연결 (신규 가입자에게만 적용)
           try {
-             // 쿠키 접근 로직
-          } catch (e) { console.error('Referral Error', e); }
-          */
+            // createdAt과 updatedAt이 같으면 방금 생성된 신규 사용자
+            const isNewUser = result.createdAt.getTime() === result.updatedAt.getTime();
+
+            if (isNewUser) {
+              console.log('[SignIn] New user detected, checking referral cookie...');
+              const cookieStore = await cookies();
+              const referralCode = cookieStore.get('referral_code')?.value;
+
+              if (referralCode) {
+                console.log(`[SignIn] Referral code found: ${referralCode}`);
+
+                // 추천인 존재 확인
+                const referrer = await User.findOne({ referralCode: referralCode });
+                if (referrer) {
+                  console.log(`[SignIn] Referrer found: ${referrer.email}`);
+                  result.referredBy = referralCode;
+                  await result.save();
+                  console.log('[SignIn] Referral connection saved successfully');
+                } else {
+                  console.log('[SignIn] Referral code invalid - referrer not found');
+                }
+              } else {
+                console.log('[SignIn] No referral code in cookies');
+              }
+            } else {
+              console.log('[SignIn] Existing user, skipping referral connection');
+            }
+          } catch (referralError) {
+            console.error('[SignIn] Referral Error:', referralError);
+            // 추천인 연결 실패해도 로그인은 성공
+          }
 
           return true;
         } catch (error) {

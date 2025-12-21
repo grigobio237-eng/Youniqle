@@ -33,13 +33,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 추천인 코드 검증 (유효한 경우만 처리)
+    // 추천인 코드 검증 (쿠키 또는 직접 입력)
     let validReferredBy = null;
-    if (referralCode) {
-      const referrer = await User.findOne({ referralCode });
+
+    // 1. 직접 입력된 추천인 코드 확인
+    let codeToCheck = referralCode;
+
+    // 2. 입력된 코드가 없으면 쿠키에서 확인
+    if (!codeToCheck) {
+      const cookieStore = request.cookies;
+      codeToCheck = cookieStore.get('referral_code')?.value;
+      if (codeToCheck) {
+        console.log(`Referral code from cookie: ${codeToCheck}`);
+      }
+    }
+
+    // 3. 코드가 있으면 유효성 검증
+    if (codeToCheck) {
+      const referrer = await User.findOne({ referralCode: codeToCheck });
       if (referrer) {
-        validReferredBy = referrer.referralCode; // 추천인의 코드를 저장
+        validReferredBy = referrer.referralCode;
         console.log(`Referral linked: New user invited by ${referrer.email} (${referrer.referralCode})`);
+      } else {
+        console.log(`Invalid referral code: ${codeToCheck}`);
       }
     }
 
