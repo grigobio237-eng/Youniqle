@@ -4,6 +4,7 @@ import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePathname } from 'next/navigation';
 
 interface PublicSettings {
   siteName: string;
@@ -41,6 +42,7 @@ interface PublicSettings {
 
 export default function Footer() {
   const { t } = useLanguage();
+  const pathname = usePathname();
   const [settings, setSettings] = useState<PublicSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -61,6 +63,17 @@ export default function Footer() {
       setLoading(false);
     }
   };
+
+  // 모바일에서 푸터를 표시할 경로들
+  const showFooterOnMobilePaths = [
+    '/membership',
+    '/membership/shop',
+  ];
+
+  // 현재 경로가 푸터 표시 경로인지 확인
+  const shouldShowFooterOnMobile = showFooterOnMobilePaths.some(path =>
+    pathname === path || pathname?.startsWith(path + '/')
+  );
 
   // 기본값 설정
   const defaultSettings: PublicSettings = {
@@ -98,8 +111,9 @@ export default function Footer() {
   };
 
   const currentSettings = settings || defaultSettings;
+
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className={`bg-gray-900 text-white ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -156,7 +170,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <button 
+                <button
                   onClick={() => alert(t('footer.contactAlert'))}
                   className="text-gray-400 hover:text-primary transition-colors cursor-pointer opacity-60"
                 >
