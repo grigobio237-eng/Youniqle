@@ -15,15 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import ChatInterface from '@/components/chat/ChatInterface';
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoungePage() {
     const { data: session, update: updateSession } = useSession();
-    const [subscriptionActive, setSubscriptionActive] = useState(true); // TEST MODE: Always active for testing
+    const [subscriptionActive, setSubscriptionActive] = React.useState(true); // TEST MODE: Always active for testing
     const router = useRouter();
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (session?.user) {
             // checkSubscription(); // Disabled for testing
         }
@@ -152,9 +152,9 @@ export default function LoungePage() {
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
-                        <AccordionTrigger className="text-lg">Q. 오마카세 프로그램은 누구나 신청 가능한가요?</AccordionTrigger>
+                        <AccordionTrigger className="text-lg">Q. 컨시어지 프로그램은 누구나 신청 가능한가요?</AccordionTrigger>
                         <AccordionContent className="text-gray-600 leading-relaxed text-base p-4 bg-gray-50 rounded-lg">
-                            아니요, 오마카세는 1:1 맞춤 설계의 밀도가 높기 때문에 매월 한정된 인원만 초대제로 운영됩니다.
+                            아니요, 컨시어지는 1:1 맞춤 설계의 밀도가 높기 때문에 매월 한정된 인원만 초대제로 운영됩니다.
                             신청 폼을 작성해 주시면, 현재 상태와 시급성을 원장이 직접 검토하여 초대를 드립니다.
                         </AccordionContent>
                     </AccordionItem>

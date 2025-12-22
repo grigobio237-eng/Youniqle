@@ -43,3 +43,24 @@ export interface OmakaseOutput {
         planC: OmakasePlan; // Premium/Intensive
     };
 }
+
+export interface RecoveryCaseInput {
+    symptom: string;
+    age?: string;
+    gender?: string;
+}
+
+export interface RecoveryCaseOutput {
+    title: string;
+    category: string;
+    period: string;
+    emotion: string; // "Before -> After"
+    summary: string;
+    graphData: { name: string; score: number }[];
+    tags: string[];
+    productRecommendation: {
+        name: string;
+        price: string;
+        reason: string;
+    };
+}

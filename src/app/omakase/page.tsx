@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,14 +29,37 @@ interface AIPlans {
 }
 
 export default function OmakasePage() {
-    const [step, setStep] = useState('INTRO'); // INTRO, FORM, LOADING, RESULT, SUBMITTED
-    const [formData, setFormData] = useState({
+    const [step, setStep] = React.useState('INTRO'); // INTRO, FORM, LOADING, RESULT, SUBMITTED
+    const [formStep, setFormStep] = React.useState(1); // 1, 2, 3
+    const [formData, setFormData] = React.useState({
         painPoint: 'fatigue',
         goal: '',
-        budget: 'mid'
+        budget: '50',
+        habits: '',
+        history: ''
     });
-    const [aiPlans, setAiPlans] = useState<AIPlans | null>(null);
-    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+    const [aiPlans, setAiPlans] = React.useState<AIPlans | null>(null);
+    const [selectedPlan, setSelectedPlan] = React.useState<string | null>(null);
+
+    // Load draft from localStorage on mount
+    React.useEffect(() => {
+        const savedDraft = localStorage.getItem('omakase_draft');
+        if (savedDraft) {
+            try {
+                const parsed = JSON.parse(savedDraft);
+                setFormData(prev => ({ ...prev, ...parsed }));
+            } catch (e) {
+                console.error('Failed to parse draft', e);
+            }
+        }
+    }, []);
+
+    // Save to localStorage whenever formData changes
+    React.useEffect(() => {
+        if (Object.values(formData).some(v => v !== '')) {
+            localStorage.setItem('omakase_draft', JSON.stringify(formData));
+        }
+    }, [formData]);
 
     const handleSubmitForm = async () => {
         setStep('LOADING');
@@ -48,7 +71,7 @@ export default function OmakasePage() {
                     painPoint: formData.painPoint,
                     goal: formData.goal,
                     budget: formData.budget,
-                    symptoms: [formData.painPoint]
+                    symptoms: [formData.painPoint, formData.habits, formData.history]
                 })
             });
 
@@ -56,6 +79,7 @@ export default function OmakasePage() {
                 const data = await response.json();
                 setAiPlans(data);
                 setStep('RESULT');
+                localStorage.removeItem('omakase_draft'); // Clear on success
             } else {
                 alert('AI 분석에 실패했습니다. 다시 시도해주세요.');
                 setStep('FORM');
@@ -68,7 +92,6 @@ export default function OmakasePage() {
     };
 
     const handleFinalSubmit = () => {
-        // In production: save to DB
         setStep('SUBMITTED');
     };
 
@@ -79,17 +102,20 @@ export default function OmakasePage() {
                     <Lock className="w-8 h-8" />
                 </div>
                 <h1 className="text-4xl font-bold mb-4 font-serif">Secret Recovery Omakase</h1>
-                <p className="text-xl text-gray-600 mb-12 max-w-2xl leading-relaxed">
-                    이곳은 아무나 들어올 수 없는 비밀 연구소입니다.<br />
-                    당신의 예산, 목표, 그리고 가장 깊은 고민에 맞춰 <br />
-                    <b>단 하나뿐인 회복 플랜(Plan A/B/C)</b>을 설계해 드립니다.
+                <p className="text-xl text-gray-600 mb-8 max-w-2xl leading-relaxed">
+                    이곳은 소수의 선택된 분들을 위한 비밀 연구소입니다.<br />
+                    당신의 회복 데이터와 의지를 검토하여 <br />
+                    <b>매월 오직 50분께만</b> 프라이빗 플랜을 제안합니다.
                 </p>
+                <div className="bg-red-50 text-red-800 px-6 py-3 rounded-lg text-sm font-bold mb-8 inline-block border border-red-100 animate-pulse">
+                    ⚠️ 현재 12월 신청 마감 임박 (잔여 TO: 3명)
+                </div>
                 <div className="space-y-4">
-                    <Button size="lg" className="h-14 px-8 rounded-full text-lg bg-black hover:bg-gray-800" onClick={() => setStep('FORM')}>
-                        입장 신청서 작성하기 <ArrowRight className="ml-2" />
+                    <Button size="lg" className="h-14 px-8 rounded-full text-lg bg-black hover:bg-gray-800 shadow-xl" onClick={() => setStep('FORM')}>
+                        입장 자격 심사 신청하기 <ArrowRight className="ml-2" />
                     </Button>
                     <p className="text-sm text-gray-400">
-                        * 작성 내용은 원장님만 열람 가능한 1급 보안 문서로 취급됩니다.
+                        * 심사는 100% 데이터 기반으로 진행되며, 기준 미달 시 반려될 수 있습니다.
                     </p>
                 </div>
             </div>
@@ -187,71 +213,126 @@ export default function OmakasePage() {
     // FORM STEP
     return (
         <div className="container mx-auto px-4 py-12 max-w-2xl">
-            <div className="mb-8">
-                <span className="text-sm font-bold text-gray-400">STEP 1 / 1</span>
-                <h2 className="text-2xl font-bold mt-2">회복 설계 의뢰서</h2>
-                <p className="text-gray-500">솔직하게 작성할수록 더 정확한 플랜이 나옵니다.</p>
+            {/* Progress Bar */}
+            <div className="mb-10">
+                <div className="flex justify-between items-center mb-4">
+                    <div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mb-2 inline-block">STAGE {formStep}</span>
+                        <h2 className="text-2xl font-bold">회복 설계 의뢰서</h2>
+                    </div>
+                    <span className="text-sm text-gray-400 font-bold">{formStep} / 3</span>
+                </div>
+                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div
+                        className="bg-primary h-full transition-all duration-500 ease-out"
+                        style={{ width: `${(formStep / 3) * 100}%` }}
+                    />
+                </div>
             </div>
 
-            <Card>
-                <CardContent className="p-8 space-y-8">
-                    {/* Q1. Pain Point */}
-                    <div className="space-y-4">
-                        <Label className="text-lg font-bold">1. 현재 가장 힘든 점은 무엇인가요?</Label>
-                        <RadioGroup value={formData.painPoint} onValueChange={(v) => setFormData({ ...formData, painPoint: v })}>
-                            <div className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-gray-50">
-                                <RadioGroupItem value="fatigue" id="r1" />
-                                <Label htmlFor="r1" className="cursor-pointer flex-1">만성 피로 (자도 자도 힘들다)</Label>
+            <Card className="overflow-hidden border-2 border-gray-100">
+                <CardContent className="p-8">
+                    {formStep === 1 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="space-y-4">
+                                <Label className="text-lg font-bold">1. 현재 가장 힘든 점은 무엇인가요?</Label>
+                                <RadioGroup value={formData.painPoint} onValueChange={(v) => setFormData({ ...formData, painPoint: v })}>
+                                    <div className="flex items-center space-x-2 border p-5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, painPoint: 'fatigue' })}>
+                                        <RadioGroupItem value="fatigue" id="r1" />
+                                        <Label htmlFor="r1" className="cursor-pointer flex-1 font-medium italic">만성 피로 (자도 자도 힘들다)</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2 border p-5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, painPoint: 'pain' })}>
+                                        <RadioGroupItem value="pain" id="r2" />
+                                        <Label htmlFor="r2" className="cursor-pointer flex-1 font-medium">통증 / 붓기 (몸이 무겁고 아프다)</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2 border p-5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, painPoint: 'mental' })}>
+                                        <RadioGroupItem value="mental" id="r3" />
+                                        <Label htmlFor="r3" className="cursor-pointer flex-1 font-medium">멘탈 / 수면 (잠 못 들고 예민하다)</Label>
+                                    </div>
+                                </RadioGroup>
                             </div>
-                            <div className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-gray-50">
-                                <RadioGroupItem value="pain" id="r2" />
-                                <Label htmlFor="r2" className="cursor-pointer flex-1">통증 / 붓기 (몸이 무겁고 아프다)</Label>
-                            </div>
-                            <div className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-gray-50">
-                                <RadioGroupItem value="mental" id="r3" />
-                                <Label htmlFor="r3" className="cursor-pointer flex-1">멘탈 / 수면 (잠 못 들고 예민하다)</Label>
-                            </div>
-                        </RadioGroup>
-                    </div>
+                            <Button className="w-full h-14 text-lg rounded-xl" onClick={() => setFormStep(2)}>
+                                다음 단계로 <ArrowRight className="ml-2 w-5 h-5" />
+                            </Button>
+                        </div>
+                    )}
 
-                    {/* Q2. Goal */}
-                    <div className="space-y-4">
-                        <Label className="text-lg font-bold">2. 어떤 변화를 기대하시나요? (현실적 목표)</Label>
-                        <Textarea
-                            placeholder="예: 3개월 안에 아침에 알람 없이 일어나고 싶어요. 다리 붓기가 빠져서 치마를 입고 싶어요."
-                            className="min-h-[100px]"
-                            value={formData.goal}
-                            onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
-                        />
-                    </div>
+                    {formStep === 2 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <Label className="text-lg font-bold">2. 어떤 변화를 기대하시나요?</Label>
+                                    <Textarea
+                                        placeholder="예: 3개월 안에 아침에 알람 없이 일어나고 싶어요. 다리 붓기가 빠져서 치마를 입고 싶어요."
+                                        className="min-h-[120px] rounded-xl text-base p-4"
+                                        value={formData.goal}
+                                        onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-4">
+                                    <Label className="text-lg font-bold">3. 평소 생활 습관은 어떠신가요?</Label>
+                                    <Textarea
+                                        placeholder="예: 하루 커피 3잔 이상, 야식 주 3회, 주 1회 운동 등"
+                                        className="min-h-[100px] rounded-xl"
+                                        value={formData.habits}
+                                        onChange={(e) => setFormData({ ...formData, habits: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <Button variant="outline" className="h-14 flex-1 rounded-xl" onClick={() => setFormStep(1)}>
+                                    이전
+                                </Button>
+                                <Button className="h-14 flex-[2] rounded-xl" onClick={() => setFormStep(3)} disabled={!formData.goal}>
+                                    다음 단계로 <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
 
-                    {/* Q3. Budget */}
-                    <div className="space-y-4">
-                        <Label className="text-lg font-bold">3. 생각하시는 월 가용 예산 범위는?</Label>
-                        <p className="text-sm text-gray-500 mb-2">예산에 맞춰 Reset/Reborn/Restart 플랜을 조합해 드립니다.</p>
-                        <RadioGroup value={formData.budget} onValueChange={(v) => setFormData({ ...formData, budget: v })}>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="30" id="b1" />
-                                <Label htmlFor="b1">30만원 이하 (기본 영양/루틴 관리)</Label>
+                    {formStep === 3 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <Label className="text-lg font-bold">4. 월 가용 예산 범위를 알려주세요.</Label>
+                                    <RadioGroup value={formData.budget} onValueChange={(v) => setFormData({ ...formData, budget: v })}>
+                                        <div className="flex items-center space-x-2 border p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, budget: '30' })}>
+                                            <RadioGroupItem value="30" id="b1" />
+                                            <Label htmlFor="b1" className="cursor-pointer flex-1">30만원 이하 (기본 관리)</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, budget: '50' })}>
+                                            <RadioGroupItem value="50" id="b2" />
+                                            <Label htmlFor="b2" className="cursor-pointer flex-1">30~70만원 (적극적 회복)</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 border p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFormData({ ...formData, budget: '100+' })}>
+                                            <RadioGroupItem value="100+" id="b3" />
+                                            <Label htmlFor="b3" className="cursor-pointer flex-1">70만원 이상 (집중 케어)</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                                <div className="space-y-4">
+                                    <Label className="text-lg font-bold">5. 과거 치료나 관리 이력이 있나요? (필수 아님)</Label>
+                                    <Input
+                                        placeholder="예: 정형외과 도수치료 10회, 한약 복용 등"
+                                        className="h-12 rounded-xl"
+                                        value={formData.history}
+                                        onChange={(e) => setFormData({ ...formData, history: e.target.value })}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="50" id="b2" />
-                                <Label htmlFor="b2">30~70만원 (적극적 회복 + 보조제)</Label>
+                            <div className="flex gap-3">
+                                <Button variant="outline" className="h-14 flex-1 rounded-xl" onClick={() => setFormStep(2)}>
+                                    이전
+                                </Button>
+                                <Button className="h-14 flex-[2] rounded-xl bg-primary hover:bg-primary/90" onClick={handleSubmitForm}>
+                                    AI 설계 시작하기 <Sparkles className="ml-2 w-5 h-5" />
+                                </Button>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="100+" id="b3" />
-                                <Label htmlFor="b3">70만원 이상 (시술/1:1코칭 포함)</Label>
-                            </div>
-                        </RadioGroup>
-                    </div>
-
-                    <div className="pt-6 border-t">
-                        <Button className="w-full h-12 text-lg" onClick={handleSubmitForm}>
-                            AI 플랜 생성하기 <Sparkles className="ml-2 w-5 h-5" />
-                        </Button>
-                    </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
     );
 }
+

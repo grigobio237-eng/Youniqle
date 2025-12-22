@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, Search, User, Menu, X, LogOut, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Search, User, Menu, X, LogOut, ArrowRight, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -100,7 +100,8 @@ export default function Header() {
     { label: '👩‍⚕️ 김미정 원장 라운지', href: '/lounge' },
     { label: '🤖 AI 회복 네비게이터', href: '/ai-navigator' },
     { label: '🎁 회복 멤버십 & 리워드', href: '/membership' },
-    { label: '🧬 비밀 회복 오마카세', href: '/omakase' },
+    { label: '🧬 비밀회복 컨시어지', href: '/omakase' },
+    { label: '⚡ 실생활 유틸리티 허브', href: '/utils' },
   ];
 
   const handleSignOut = async () => {
@@ -155,8 +156,15 @@ export default function Header() {
                 We will hide mostly everything except maybe User icon if logged in?
                 Actually, let's hide everything to focus on the question. 
             */}
+            {/* Store Icon - Always visible or conditional based on preference */}
+            <Link href="/membership/shop">
+              <Button variant="ghost" size="icon">
+                <ShoppingBag className="h-5 w-5" />
+              </Button>
+            </Link>
+
             {!isGateMode && (
-              <Link href="/membership/shop">
+              <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (

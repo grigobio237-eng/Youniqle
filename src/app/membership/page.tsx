@@ -24,9 +24,9 @@ export default function MembershipPage() {
                 <Badge variant="outline" className="px-3 py-1 text-primary border-primary">
                     Private Concierge Membership
                 </Badge>
-                <h1 className="text-4xl font-bold">나의 회복 멤버십</h1>
+                <h1 className="text-4xl font-bold">회복 멤버십</h1>
                 <p className="text-xl text-gray-600">
-                    회복이 쌓일수록, 당신의 권한도 확장됩니다.
+                    회복을 기록할수록, 더 높은 <b>권한(Authority)</b>과 <b>접근(Access)</b>이 열립니다.
                 </p>
             </div>
 
@@ -43,7 +43,7 @@ export default function MembershipPage() {
                         icon={<RefreshCcw className="h-6 w-6" />}
                         isActive={userTier === 'RESET'}
                         description="멈추고 다시 세팅하는 시간"
-                        benefits={['Daily Recovery Gate 접근 권한', 'AI 네비게이터 기본 코칭', '회복 상점 멤버십 할인 (5%)']}
+                        benefits={['Daily Recovery Gate 접근 권한', 'AI 네비게이터 기본 코칭', '기초 회복 키트 구매 자격']}
                         progress={userTier === 'RESET' ? recoveryProgress : 100}
                     />
 
@@ -54,7 +54,7 @@ export default function MembershipPage() {
                         icon={<Zap className="h-6 w-6" />}
                         isActive={userTier === 'REBORN'}
                         description="에너지가 다시 차오르는 시기"
-                        benefits={['오마카세(1:1 설계) 신청 자격', '프리미엄 콘텐츠 열람', '상시 10% 할인']}
+                        benefits={['비밀회복 컨시어지(오마카세) 신청 권한', '프리미엄 심층 리포트 열람', '신제품 베타 테스터 우선권']}
                         progress={userTier === 'REBORN' ? recoveryProgress : (userTier === 'RESET' ? 0 : 100)}
                     />
 
@@ -65,7 +65,7 @@ export default function MembershipPage() {
                         icon={<Award className="h-6 w-6" />}
                         isActive={userTier === 'RESTART'}
                         description="새로운 삶으로의 확장"
-                        benefits={['VIP 전용 라운지 초대', '신제품 베타 테스터 권한', '상시 15% 할인 + 무료배송']}
+                        benefits={['SAPIENET 랩 투어 초대', '회복 큐레이터 자격 부여', '전용 프라이빗 라운지 입장']}
                         progress={userTier === 'RESTART' ? recoveryProgress : 0}
                     />
                 </div>
@@ -111,8 +111,8 @@ export default function MembershipPage() {
                     <SeedingCard
                         level="ECHO"
                         icon={<Share2 className="w-8 h-8 text-blue-500" />}
-                        title="울림 단계"
-                        desc="회복을 전파하는 리더"
+                        title="울림 단계 (Referral)"
+                        desc="친구와 7일 회복 챌린지 성공 시, 두 분 모두에게 '오마카세 우선권' 지급"
                         isUnlocked={false}
                     />
                 </div>

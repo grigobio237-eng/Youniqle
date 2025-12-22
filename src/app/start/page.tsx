@@ -67,7 +67,7 @@ export default function RecoveryStartPage() {
                         <StepRow
                             step="03"
                             title="전문가와 함께하는 심화 과정"
-                            desc="혼자서 어렵다면 '비밀 회복 오마카세'나 '닥터 라운지'를 통해 전문가의 도움을 받을 수 있습니다."
+                            desc="혼자서 어렵다면 '비밀회복 컨시어지'나 '닥터 라운지'를 통해 전문가의 도움을 받을 수 있습니다."
                         />
                     </div>
                 </div>

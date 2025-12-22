@@ -368,4 +368,84 @@ ${imagePrompt}
             throw new Error(`AI 생성 오류: ${error.message || '알 수 없는 오류'}`);
         }
     }
+
+    // Generate Recovery Case Simulation
+    static async generateRecoveryCase(input: { symptom: string; age?: string; gender?: string }): Promise<any> {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not set');
+        }
+
+        try {
+            const prompt = `당신은 회복 습관 전문가입니다.
+사용자가 입력한 고민을 바탕으로, **실제 사람이 실생활에서 습관을 바꿔 성공한 회복 스토리**를 시뮬레이션하여 작성해주세요.
+
+## 중요한 원칙
+1. **제품이 아닌 '습관'에 초점**: 이 사람이 구체적으로 어떤 습관을 바꿨는지 (예: "매일 밤 11시 이전 침대에 눕기", "점심 후 15분 산책")를 중심으로 써야 합니다.
+2. **구체적인 일상 디테일**: 막연한 "운동을 시작했다"가 아니라, "퇴근 후 계단으로 집까지 올라가기 시작했다" 같은 현실적이고 따라 할 수 있는 이야기여야 합니다.
+3. **시행착오 포함**: "처음엔 힘들었지만", "2주차에 포기하고 싶었지만" 같은 현실적인 어려움을 포함하세요.
+4. **제품은 선택사항**: 습관이 핵심이고, 제품(영양제/키트 등)은 "도움이 된 도구" 정도로 언급하세요. 제품이 전혀 없어도 괜찮습니다.
+
+## 사용자 고민
+- 증상/고민: ${input.symptom}
+${input.age ? `- 연령대: ${input.age}` : ''}
+${input.gender ? `- 성별: ${input.gender}` : ''}
+
+## 출력 형식 (JSON만 응답)
+{
+  "title": "공감 가는 제목 (예: 30대 직장인, 수면 루틴 3개월 바꿔보니)",
+  "category": "만성피로 | 통증/붓기 | MENTAL | 다이어트 중 택1",
+  "period": "소요 기간 (예: 3개월)",
+  "emotion": "감정 변화 (예: 짜증 많던 나 → 웃음 많아진 나)",
+  "summary": "**구체적인 습관 변화 중심**으로 1~2문장 (예: '저녁 9시 이후 핸드폰을 거실에 두고, 대신 책을 읽기 시작했어요. 3주 차부터 자연스럽게 잠이 오더라고요.')",
+  "habitChanges": [
+    "변화1 (예: 매일 점심 후 계단 5층 오르기)",
+    "변화2 (예: 저녁 8시 이후 카페인 끊기)",
+    "변화3 (예: 잠들기 전 감사일기 3줄 쓰기)"
+  ],
+  "graphData": [
+    { "name": "1주", "score": 25 },
+    { "name": "4주", "score": 50 },
+    { "name": "8주", "score": 72 },
+    { "name": "12주", "score": 88 }
+  ],
+  "tags": ["#해시태그1", "#해시태그2", "#해시태그3"],
+  "productRecommendation": {
+    "name": "보조 도구 이름 (선택, 없어도 OK. 예: 마그네슘 수면 키트 또는 '없음')",
+    "price": "가격 (예: 39,000원 또는 '-')",
+    "reason": "어떤 상황에서 도움이 됐는지 (예: '습관이 자리잡을 때까지 수면 보조로 사용')"
+  }
+}
+
+**중요**: summary와 habitChanges가 이 스토리의 핵심입니다. 진짜 사람이 쓴 것처럼 솔직하고 현실적으로 작성하세요.`;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse case data');
+
+        } catch (error: any) {
+            console.error('Gemini Case Gen Error:', error);
+            // Fallback Data
+            return {
+                title: "회복의 여정을 시작해보세요",
+                category: "일반",
+                period: "4주",
+                emotion: "불안 → 안정",
+                summary: "아직 데이터가 부족하지만, 작은 실천이 큰 변화를 만듭니다.",
+                graphData: [
+                    { name: 'Start', score: 30 },
+                    { name: 'Now', score: 45 }
+                ],
+                tags: ["#시작이반", "#회복"],
+                productRecommendation: {
+                    name: "기초 회복 스타터 팩",
+                    price: "29,000원",
+                    reason: "가장 기본이 되는 회복 루틴입니다."
+                }
+            };
+        }
+    }
 }

@@ -78,31 +78,31 @@ export default function Footer() {
   // 기본값 설정
   const defaultSettings: PublicSettings = {
     siteName: 'Youniqle',
-    siteDescription: '고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰입니다.',
+    siteDescription: '라이프스타일 큐레이션 & 회복 솔루션',
     companyInfo: {
-      companyName: '그리고바이오',
-      businessNumber: '000-00-00000',
-      ceoName: '',
-      businessType: '통신판매업',
+      companyName: 'SAPIENET',
+      businessNumber: '123-45-67890',
+      ceoName: '이승윤',
+      businessType: '통신판매업 / 바이오 헬스케어',
       businessStatus: '영업중'
     },
     businessRegistration: {
-      registrationNumber: '000-00-00000',
-      businessAddress: '',
+      registrationNumber: '123-45-67890',
+      businessAddress: '서울특별시 강남구 테헤란로 123, 그리고타워 10층',
       businessAddressDetail: '',
-      businessPhone: '',
-      businessEmail: 'admin@youniqle.com'
+      businessPhone: '02-1234-5678',
+      businessEmail: 'support@sapienet.com'
     },
     ecommerceRegistration: {
-      reportNumber: '제2024-서울강남-0000호',
+      reportNumber: '2024-서울강남-01234',
       reportAuthority: '서울특별시 강남구청'
     },
     contactInfo: {
-      customerServicePhone: '1588-0000',
-      customerServiceEmail: 'cs@youniqle.com',
+      customerServicePhone: '02-1234-5678',
+      customerServiceEmail: 'help@youniqle.com',
       address: '서울특별시 강남구 테헤란로 123',
-      addressDetail: '그리고바이오 빌딩 10층',
-      postalCode: '06292'
+      addressDetail: '그리고타워 10층',
+      postalCode: '06234'
     },
     legalInfo: {
       privacyPolicyUrl: '/privacy',
@@ -128,7 +128,7 @@ export default function Footer() {
                   sizes="40px"
                 />
               </div>
-              <span className="text-xl font-bold">{currentSettings.siteName}</span>
+              <span className="text-xl font-bold">Youniqle <span className="text-sm font-normal text-gray-400 ml-1">by SAPIENET</span></span>
             </div>
             <p className="text-gray-400 text-sm">
               {currentSettings.siteDescription}

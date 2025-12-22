@@ -7,14 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const categories = [
-  { name: '전체', value: '' },
-  { name: '신선식품', value: 'fresh-food' },
-  { name: '의류', value: 'clothing' },
-  { name: '신발', value: 'shoes' },
-  { name: '가방', value: 'bags' },
-  { name: '액세서리', value: 'accessories' },
-  { name: '생활용품', value: 'lifestyle' },
-  { name: '전자제품', value: 'electronics' },
+  { name: '전체 (All)', value: '' },
+  { name: '회복 키트', value: 'recovery-kit' },
+  { name: '수면/안정', value: 'sleep-relax' },
+  { name: '활력/에너지', value: 'energy' },
+  { name: '영양/보충', value: 'nutrition' },
+  { name: '측정/진단', value: 'diagnostic' },
+  { name: '오마카세 (Premium)', value: 'omakase' },
 ];
 
 const sortOptions = [
@@ -38,26 +37,26 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
 
   const createFilterUrl = (key: string, value: string) => {
     const params = new URLSearchParams();
-    
+
     // Preserve existing search params
     if (searchParams?.q) params.set('q', searchParams.q);
     if (searchParams?.category) params.set('category', searchParams.category);
     if (searchParams?.sort) params.set('sort', searchParams.sort);
-    
+
     // Update the specific filter
     if (value) {
       params.set(key, value);
     } else {
       params.delete(key);
     }
-    
+
     return `/products?${params.toString()}`;
   };
 
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">필터</h3>
-      
+
       {/* Categories */}
       <div>
         <Button
@@ -68,7 +67,7 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
           카테고리
           {showCategories ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
-        
+
         {showCategories && (
           <div className="mt-3 space-y-2">
             {categories.map((category) => (
@@ -99,7 +98,7 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
           정렬
           {showSort ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
-        
+
         {showSort && (
           <div className="mt-3 space-y-2">
             {sortOptions.map((option) => (

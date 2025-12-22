@@ -96,8 +96,8 @@ function OmakaseManagementContent() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">오마카세 신청 관리</h1>
-                    <p className="text-gray-500 mt-1">비밀 회복 오마카세 신청서를 검토하고 관리합니다.</p>
+                    <h1 className="text-3xl font-bold">컨시어지 신청 관리</h1>
+                    <p className="text-gray-500 mt-1">비밀회복 컨시어지 신청서를 검토하고 관리합니다.</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setFilter('all')}>전체</Button>

@@ -357,7 +357,7 @@ export default function AdminDashboard() {
             <Button variant="outline" asChild className="h-20 flex-col">
               <Link href="/admin/omakase">
                 <Activity className="h-6 w-6 mb-2" />
-                오마카세 신청 관리
+                컨시어지 신청 관리
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 flex-col">

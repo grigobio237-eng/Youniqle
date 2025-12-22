@@ -73,26 +73,15 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: process.env.NODE_ENV === 'production' 
-              ? "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data:; font-src *; connect-src *; frame-src *; frame-ancestors *; base-uri *; form-action *"
-              : "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data:; font-src *; connect-src *; frame-src *; frame-ancestors *; base-uri *; form-action *",
+            value: process.env.NODE_ENV === 'production'
+              ? "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;"
+              : "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;",
           },
           {
             key: 'X-Permitted-Cross-Domain-Policies',
             value: 'none',
           },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'credentialless',
-          },
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-          {
-            key: 'Cross-Origin-Resource-Policy',
-            value: 'same-origin',
-          },
+
         ],
       },
       {

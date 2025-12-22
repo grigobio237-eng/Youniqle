@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,9 +10,9 @@ import { Sun, Moon, Coffee, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AiNavigatorPage() {
-    const [scoreHistory, setScoreHistory] = useState<any[]>([]);
-    const [todayScore, setTodayScore] = useState(0);
-    const [activeTab, setActiveTab] = useState('MORNING');
+    const [scoreHistory, setScoreHistory] = React.useState<any[]>([]);
+    const [todayScore, setTodayScore] = React.useState(0);
+    const [activeTab, setActiveTab] = React.useState('MORNING');
 
     const [loading, setLoading] = useState(true);
     const [aiAdvice, setAiAdvice] = useState<string>('');
@@ -154,6 +154,38 @@ export default function AiNavigatorPage() {
                 </Tabs>
             </div>
 
+            {/* 2.5 Recommended Kit (Ad / Solution) */}
+            <div className="mb-12">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    🛍️ 오늘의 맞춤 회복 도구
+                </h2>
+                <Card className="overflow-hidden border-primary/20 shadow-md transition-all hover:shadow-lg">
+                    <div className="flex flex-col md:flex-row">
+                        <div className="bg-primary/5 p-8 flex items-center justify-center md:w-1/3">
+                            <div className="text-6xl">💊</div>
+                        </div>
+                        <div className="p-6 md:w-2/3 flex flex-col justify-center">
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900">만성 피로 삭제 팩</h3>
+                                    <p className="text-sm text-gray-500">지친 당신을 위한 에너지 부스터</p>
+                                </div>
+                                <span className="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">추천</span>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                                "오늘 회복 점수가 70점 미만입니다. <br />
+                                충분한 휴식과 함께 마그네슘이 포함된 이 팩을 섭취해보세요. 아침이 달라집니다."
+                            </p>
+                            <Button className="w-full md:w-auto" asChild>
+                                <Link href="/products/1">
+                                    최저가로 지금 구매하기 (35,000원)
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+
             {/* 3. AI Weekly Report Preview */}
             <div>
                 <h2 className="text-xl font-bold mb-4">주간 분석 리포트</h2>
@@ -173,7 +205,7 @@ export default function AiNavigatorPage() {
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </div >
     );
 }
 
