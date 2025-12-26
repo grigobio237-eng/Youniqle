@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles, Plus } from 'lucide-react';
+import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
 // Mock Data for Cases
 const CASES = [
@@ -142,9 +143,9 @@ export default function CasesPage() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-12">
+        <ChapterWrapper chapter="cases" className="container mx-auto px-4 py-12">
             <div className="text-center mb-12">
-                <h1 className="text-3xl font-bold mb-4">🔍 리얼 회복 케이스</h1>
+                <h1 className="text-3xl font-bold mb-4 text-text-primary">🔍 리얼 회복 케이스</h1>
                 <p className="text-xl text-text-secondary word-keep-all max-w-2xl mx-auto">
                     화려한 "Before/After 사진"은 없습니다.<br />
                     오직 <b>진짜 변화된 삶의 이야기</b>와 <b>회복 데이터</b>만 있습니다.<br />
@@ -153,9 +154,9 @@ export default function CasesPage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12">
-                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-gray-100 p-1 rounded-xl">
-                    <TabsTrigger value="OFFICIAL" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">공식 인증 사례</TabsTrigger>
-                    <TabsTrigger value="AI_SIMULATION" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">AI 시뮬레이션 사례 (Beta)</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-surface p-1 rounded-xl border border-line">
+                    <TabsTrigger value="OFFICIAL" className="rounded-lg data-[state=active]:bg-chapter-accent data-[state=active]:text-white">공식 인증 사례</TabsTrigger>
+                    <TabsTrigger value="AI_SIMULATION" className="rounded-lg data-[state=active]:bg-chapter-accent data-[state=active]:text-white">AI 시뮬레이션 사례 (Beta)</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="OFFICIAL">
@@ -203,10 +204,10 @@ export default function CasesPage() {
 
                 <TabsContent value="AI_SIMULATION">
                     {aiCases.length === 0 ? (
-                        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                        <div className="text-center py-20 bg-surface rounded-2xl border-2 border-dashed border-line">
                             <Sparkles className="w-12 h-12 text-primary mx-auto mb-4 opacity-50" />
-                            <h3 className="text-xl font-bold mb-2">아직 생성된 사례가 없습니다.</h3>
-                            <p className="text-gray-500 mb-6">"나와 같은 고민을 가진 사람은 어떻게 회복했을까?"<br />AI에게 물어보고 가상의 로드맵을 확인해보세요.</p>
+                            <h3 className="text-xl font-bold mb-2 text-text-primary">아직 생성된 사례가 없습니다.</h3>
+                            <p className="text-text-secondary mb-6">"나와 같은 고민을 가진 사람은 어떻게 회복했을까?"<br />AI에게 물어보고 가상의 로드맵을 확인해보세요.</p>
                             <Button onClick={() => setIsDialogOpen(true)} className="rounded-full">
                                 <Plus className="w-4 h-4 mr-2" /> 첫 번째 사례 만들기
                             </Button>
@@ -299,7 +300,7 @@ export default function CasesPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </ChapterWrapper>
     );
 }
 
@@ -312,40 +313,40 @@ function CaseCard({ item, isAi = false }: { item: any, isAi?: boolean }) {
             exit={{ opacity: 0, scale: 0.95 }}
             layout
         >
-            <Card className={`h-full hover:shadow-xl transition-all duration-300 overflow-hidden border-t-4 ${isAi ? 'border-t-purple-500 border-2 border-purple-100' : 'border-t-primary'}`}>
-                <CardHeader className={`pb-4 ${isAi ? 'bg-purple-50/50' : 'bg-gray-50/50'}`}>
+            <Card className={`h-full hover:shadow-xl transition-all duration-300 overflow-hidden border-t-4 border-line bg-surface ${isAi ? 'border-t-purple-500' : 'border-t-chapter-accent'}`}>
+                <CardHeader className={`pb-4 bg-surface`}>
                     <div className="flex justify-between items-start mb-2">
-                        <Badge variant={isAi ? "outline" : "secondary"} className={`mb-2 ${isAi ? 'border-purple-200 text-purple-600 bg-white' : ''}`}>
+                        <Badge variant={isAi ? "outline" : "secondary"} className={`mb-2 ${isAi ? 'border-purple-200 text-purple-600 bg-white' : 'badge-primary'}`}>
                             {isAi ? 'AI SIMULATION' : item.category}
                         </Badge>
-                        <span className="text-xs text-gray-400">{item.period} 소요</span>
+                        <span className="text-xs text-text-secondary">{item.period} 소요</span>
                     </div>
-                    <CardTitle className="text-lg font-bold">{item.title}</CardTitle>
+                    <CardTitle className="text-lg font-bold text-text-primary">{item.title}</CardTitle>
                     <CardDescription className="text-primary font-medium mt-1">
                         {item.emotion}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                     {/* Graph Simulation */}
-                    <div className="h-32 w-full mb-6 bg-white rounded-lg p-2 border border-dashed">
+                    <div className="h-32 w-full mb-6 bg-surface rounded-lg p-2 border border-dashed border-line">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={item.graphData}>
                                 <Tooltip
-                                    contentStyle={{ fontSize: '12px', borderRadius: '4px' }}
+                                    contentStyle={{ fontSize: '12px', borderRadius: '4px', backgroundColor: '#12161C', border: '1px solid rgba(255,255,255,0.1)' }}
                                 />
                                 <Line
                                     type="monotone"
                                     dataKey="score"
-                                    stroke={isAi ? "#9333ea" : "#2563eb"}
+                                    stroke="#0C3B2E" // Emerald (--ok)
                                     strokeWidth={3}
-                                    dot={{ r: 3 }}
+                                    dot={{ r: 3, fill: "#0C3B2E" }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
-                        <p className="text-center text-xs text-gray-400 mt-1">회복 점수 변화 추이</p>
+                        <p className="text-center text-xs text-text-secondary mt-1">회복 점수 변화 추이</p>
                     </div>
 
-                    <p className="mb-6 text-gray-700 leading-relaxed font-serif">
+                    <p className="mb-6 text-text-primary leading-relaxed font-serif">
                         "{item.summary}"
                     </p>
 
@@ -366,7 +367,7 @@ function CaseCard({ item, isAi = false }: { item: any, isAi?: boolean }) {
 
                     <div className="flex flex-wrap gap-2 mt-auto mb-4">
                         {item.tags.map((tag: string) => (
-                            <span key={tag} className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            <span key={tag} className="text-xs text-text-secondary bg-background px-2 py-1 rounded">
                                 {tag}
                             </span>
                         ))}
@@ -374,9 +375,9 @@ function CaseCard({ item, isAi = false }: { item: any, isAi?: boolean }) {
 
                     {/* Product CTA */}
                     {(item.product || item.productRecommendation) && (
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                            <p className="text-xs text-gray-400 mb-2">{isAi ? '이 증상에 추천하는 솔루션' : '이 분이 실제로 사용한 키트'}</p>
-                            <Button className={`w-full text-white hover:opacity-90 ${isAi ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-900'}`} asChild>
+                        <div className="mt-4 pt-4 border-t border-line">
+                            <p className="text-xs text-text-secondary mb-2">{isAi ? '이 증상에 추천하는 솔루션' : '이 분이 실제로 사용한 키트'}</p>
+                            <Button className={`w-full hover:opacity-90 ${isAi ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'btn-primary'}`} asChild>
                                 {isAi ? (
                                     <Link href="/products">
                                         {item.productRecommendation?.name} 보기

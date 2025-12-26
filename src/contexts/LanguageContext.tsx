@@ -48,7 +48,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // 번역 함수
   const t = (key: string, params?: Record<string, any>): string => {
     if (isLoading) {
-      return key; // 로딩 중일 때는 키 자체 반환
+      // 로딩 중일 때는 빈 문자열 또는 하위 키의 마지막 부분 반환 (예: customerCenter)
+      // 또는 공식 가이드라인에 따른 기본값 처리를 선호할 수도 있음
+      return '';
     }
 
     const keys = key.split('.');
@@ -58,12 +60,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (value && typeof value === 'object') {
         value = value[k];
       } else {
-        return key; // 키를 찾지 못하면 키 자체 반환
+        // 키를 찾지 못했을 때 가이드라인에 따라 빈 문자열 또는 기본값 반환
+        // 여기서는 가이드라인을 준수하여 빈 문자열 반환 (필요시 특정 키에 대한 하드코딩된 fallback 가능)
+        return '';
       }
     }
 
     if (typeof value !== 'string') {
-      return key;
+      return '';
     }
 
     // 파라미터 치환

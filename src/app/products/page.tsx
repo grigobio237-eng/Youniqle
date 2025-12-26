@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, TrendingUp, Star, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
 function ProductListSkeleton() {
   return (
@@ -60,10 +61,10 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <ChapterWrapper chapter="products" className="container mx-auto px-4 py-8">
       {/* AI Recommendation Banner */}
       {userScore && (
-        <div className="mb-12 bg-gradient-to-br from-primary/10 via-purple-50 to-blue-50 border border-primary/20 rounded-3xl p-6 md:p-10 relative overflow-hidden">
+        <div className="mb-12 bg-surface border border-primary/20 rounded-3xl p-6 md:p-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Sparkles className="w-32 h-32 text-primary" />
           </div>
@@ -76,7 +77,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
                 </span>
                 <span className="text-sm font-bold text-primary">당신의 회복 점수: {userScore}점</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 leading-tight">
+              <h2 className="text-2xl md:text-3xl font-black text-text-primary mb-4 leading-tight">
                 {recommendationLabel}
               </h2>
               <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-8 text-sm text-gray-600">
@@ -95,12 +96,12 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             </div>
 
             <div className="flex-shrink-0 grid grid-cols-2 gap-3 w-full md:w-auto">
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
-                <div className="w-20 h-20 bg-gray-100 rounded-xl mb-2 flex items-center justify-center text-2xl">💤</div>
+              <div className="bg-surface p-4 rounded-2xl shadow-sm border border-line flex flex-col items-center">
+                <div className="w-20 h-20 bg-background rounded-xl mb-2 flex items-center justify-center text-2xl">💤</div>
                 <p className="text-xs font-bold">딥 슬립</p>
               </div>
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
-                <div className="w-20 h-20 bg-gray-100 rounded-xl mb-2 flex items-center justify-center text-2xl">⚡</div>
+              <div className="bg-surface p-4 rounded-2xl shadow-sm border border-line flex flex-col items-center">
+                <div className="w-20 h-20 bg-background rounded-xl mb-2 flex items-center justify-center text-2xl">⚡</div>
                 <p className="text-xs font-bold">피로 삭제</p>
               </div>
             </div>
@@ -110,10 +111,10 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
 
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">
+          <h1 className="text-3xl font-black text-text-primary mb-2">
             전체 상품 <span className="text-primary text-lg font-bold ml-2">All Selection</span>
           </h1>
-          <p className="text-gray-500">당신의 회복 데이터를 완성하는 최고의 파트너들</p>
+          <p className="text-text-secondary">당신의 회복 데이터를 완성하는 최고의 파트너들</p>
         </div>
         {/* Simple Quiz-like Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
@@ -131,7 +132,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             <h3 className="font-bold flex items-center gap-2 mb-4">
               <Filter className="w-4 h-4" /> 세부 필터 (Filters)
             </h3>
-            <Card className="border-gray-100 shadow-sm overflow-hidden">
+            <Card className="border-line shadow-sm overflow-hidden bg-surface">
               <CardContent className="p-0">
                 <ProductFilters />
               </CardContent>
@@ -148,7 +149,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
           </ErrorBoundary>
         </main>
       </div>
-    </div>
+    </ChapterWrapper>
   );
 }
 

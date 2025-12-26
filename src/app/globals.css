@@ -3,31 +3,72 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Neutral Core */
+  --bg: #0B0D10;
+  --surface: #12161C;
+  --muted: #667085;
+  --mist: #F6F4F0;
+  --text: #F2F5F9;
+
+  /* Authority Accent */
+  --gold: #C7A76A;
+  --gold-weak: rgba(199, 167, 106, 0.1);
+
+  /* State Colors */
+  --ok: #0C3B2E;
+  --ok-weak: rgba(12, 59, 46, 0.1);
+  --warn: #7A5A12;
+  --warn-weak: rgba(122, 90, 18, 0.1);
+  --danger: #4A1020;
+  --danger-weak: rgba(74, 16, 32, 0.1);
+
+  /* Default Chapter Accent (Defaults to Deep Navy) */
+  --chapter-accent: #0E1B2C;
+  --accent-weak: rgba(14, 27, 44, 0.1);
+
+  /* Button Colors */
+  --btn-primary-bg: var(--chapter-accent);
+  --btn-primary-text: var(--text);
+  --btn-secondary-border: var(--chapter-accent);
+  --btn-secondary-text: var(--chapter-accent);
+
+  /* Utils */
+  --line: rgba(255, 255, 255, 0.1);
+}
+
+/* Chapter Overrides */
+[data-chapter="products"] { --chapter-accent: #0E1B2C; --accent-weak: rgba(14, 27, 44, 0.1); }
+[data-chapter="cases"] { --chapter-accent: #4A1C2D; --accent-weak: rgba(74, 28, 45, 0.1); }
+[data-chapter="lounge"] { --chapter-accent: #102A43; --accent-weak: rgba(16, 42, 67, 0.1); }
+[data-chapter="ai-navigator"] { --chapter-accent: #0E3A3A; --accent-weak: rgba(14, 58, 58, 0.1); }
+[data-chapter="membership"] { --chapter-accent: #0C3B2E; --accent-weak: rgba(12, 59, 46, 0.1); }
+[data-chapter="omakase"] { --chapter-accent: #2B1236; --accent-weak: rgba(43, 18, 54, 0.1); }
+[data-chapter="utils"] { --chapter-accent: #1F2A37; --accent-weak: rgba(31, 42, 55, 0.1); }
+
 @layer base {
   html {
     font-family: 'Pretendard', 'Inter', system-ui, sans-serif;
     overflow-x: hidden;
-    /* 가로 스크롤 방지 */
+    background-color: var(--bg);
+    color: var(--text);
   }
 
   body {
-    @apply bg-background text-text-primary;
+    background-color: var(--bg);
+    color: var(--text);
     letter-spacing: -0.01em;
     line-height: 1.5;
     overflow-x: hidden;
-    /* 가로 스크롤 방지 */
     width: 100%;
-    /* 전체 너비 사용 */
   }
 
   /* 모바일 최적화 */
   @media (max-width: 768px) {
     body {
       font-size: 14px;
-      /* 모바일에서 폰트 크기 조정 */
     }
 
-    /* 모든 요소가 화면 너비를 초과하지 않도록 */
     * {
       max-width: 100%;
       box-sizing: border-box;
@@ -37,43 +78,72 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    @apply font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-secondary hover:bg-secondary/90 text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    background-color: transparent;
+    color: var(--btn-secondary-text);
+    border: 1px solid var(--btn-secondary-border);
+    @apply font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:bg-primary/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-outline {
-    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply btn-secondary;
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    @apply rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  .card-accent {
+    @apply card;
+    border-left: 3px solid var(--chapter-accent);
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+    @apply w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200 outline-none;
   }
 
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border;
   }
 
   .badge-primary {
-    @apply bg-primary/10 text-primary;
+    background-color: var(--accent-weak);
+    color: var(--chapter-accent);
+    border-color: var(--chapter-accent);
   }
 
-  .badge-secondary {
-    @apply bg-secondary/10 text-secondary;
+  .badge-gold {
+    background-color: var(--gold-weak);
+    color: var(--gold);
+    border-color: var(--gold);
   }
 
   .badge-success {
-    @apply bg-accent/10 text-accent;
+    background-color: var(--ok-weak);
+    color: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .badge-warning {
+    background-color: var(--warn-weak);
+    color: var(--warn);
+    border-color: var(--warn);
   }
 
   .badge-danger {
-    @apply bg-danger/10 text-danger;
+    background-color: var(--danger-weak);
+    color: var(--danger);
+    border-color: var(--danger);
   }
 }
 

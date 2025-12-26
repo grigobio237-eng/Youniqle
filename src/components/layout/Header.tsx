@@ -11,6 +11,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import RealtimeNotificationCenter from '@/components/notifications/RealtimeNotificationCenter';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { motion } from 'framer-motion';
 
 export default function Header() {
   const { t } = useLanguage();
@@ -117,7 +118,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo - Always Visible */}
@@ -137,15 +138,26 @@ export default function Header() {
           {/* Desktop Navigation - Hidden if Gate Mode */}
           {!isGateMode && (
             <nav className="hidden md:flex items-center space-x-6">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm font-medium text-text-secondary hover:text-primary transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`text-sm font-medium transition-all duration-200 relative py-2 ${isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                      }`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-underline"
+                        className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
             </nav>
           )}
 
