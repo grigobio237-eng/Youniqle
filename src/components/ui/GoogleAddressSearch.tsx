@@ -50,7 +50,7 @@ export default function GoogleAddressSearch({ onAddressSelect, disabled = false 
       }
 
       const data = await response.json();
-      
+
       if (data.success && data.results && data.results.length > 0) {
         setSearchResults(data.results);
         setShowResults(true);
@@ -108,7 +108,7 @@ export default function GoogleAddressSearch({ onAddressSelect, disabled = false 
           )}
         </Button>
       </div>
-      
+
       {error && (
         <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-2 rounded">
           <AlertCircle className="h-4 w-4" />
@@ -126,7 +126,7 @@ export default function GoogleAddressSearch({ onAddressSelect, disabled = false 
               </h3>
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Globe className="h-3 w-3" />
-                <span>Google 주소 검색</span>
+                <span>정밀 주소 검색 시스템</span>
               </div>
             </div>
           </div>
@@ -168,12 +168,12 @@ export default function GoogleAddressSearch({ onAddressSelect, disabled = false 
           </div>
         </div>
       )}
-      
+
       <div className="text-xs text-gray-500 space-y-1">
         <div>💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.</div>
         <div className="flex items-center gap-1">
           <Globe className="h-3 w-3" />
-          <span>Google Geocoding API를 사용합니다. 전 세계 주소 검색 가능.</span>
+          <span>글로벌 정밀 검색 시스템을 가동합니다. 전 세계 어디든 식별이 가능합니다.</span>
         </div>
       </div>
     </div>

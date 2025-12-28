@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ChevronRight, ChevronLeft, RefreshCw, CheckCircle, ArrowRight } from 'lucide-react';
@@ -20,10 +21,10 @@ type Question = {
 };
 
 const getLevelInfo = (score: number) => {
-  if (score >= 90) return { level: 'Lv.4 만개 (Bloom)', char: '🌸', msg: '최상의 상태입니다. 이 눈부신 에너지를 마음껏 누리세요.', color: 'text-pink-500', bg: 'bg-pink-50' };
-  if (score >= 70) return { level: 'Lv.3 꽃봉오리 (Bud)', char: '🌷', msg: '당신의 에너지가 피어나기 시작했습니다. 거의 다 왔어요!', color: 'text-rose-400', bg: 'bg-rose-50' };
-  if (score >= 40) return { level: 'Lv.2 새싹 (Sprout)', char: '🌿', msg: '조금씩 생기가 돌고 있어요. 지금의 루틴을 유지하세요.', color: 'text-green-500', bg: 'bg-green-50' };
-  return { level: 'Lv.1 씨앗 (Seed)', char: '🌱', msg: '지금은 조용히 힘을 모을 때입니다. 곧 싹이 틀 거예요.', color: 'text-green-600', bg: 'bg-emerald-50' };
+  if (score >= 90) return { level: 'Lv.4 만개 (Bloom)', char: '🌸', msg: '최상의 상태입니다. 이 눈부신 에너지를 마음껏 누리세요.', color: 'text-status-good', bg: 'bg-status-good/10' };
+  if (score >= 70) return { level: 'Lv.3 꽃봉오리 (Bud)', char: '🌷', msg: '당신의 에너지가 피어나기 시작했습니다. 거의 다 왔어요!', color: 'text-status-normal', bg: 'bg-status-normal/10' };
+  if (score >= 40) return { level: 'Lv.2 새싹 (Sprout)', char: '🌿', msg: '조금씩 생기가 돌고 있어요. 지금의 루틴을 유지하세요.', color: 'text-status-amber', bg: 'bg-status-amber/10' };
+  return { level: 'Lv.1 씨앗 (Seed)', char: '🌱', msg: '지금은 조용히 힘을 모을 때입니다. 곧 싹이 틀 거예요.', color: 'text-status-danger', bg: 'bg-status-danger/10' };
 };
 
 // ---------------------------
@@ -54,40 +55,40 @@ function OnboardingDialog({ open, onOpenChange }: { open: boolean, onOpenChange:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md text-center p-8">
+      <DialogContent className="sm:max-w-md text-center p-12 rounded-[40px] border-none shadow-2xl bg-white">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-8"
           >
-            <div className="text-6xl mb-4">{currentStep.icon}</div>
+            <div className="text-7xl mb-4 grayscale-[0.2]">{currentStep.icon}</div>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center">{currentStep.title}</DialogTitle>
-              <DialogDescription className="text-lg whitespace-pre-line pt-2 text-center text-gray-600">
+              <DialogTitle className="text-3xl font-black text-center tracking-tight text-obsidian">{currentStep.title}</DialogTitle>
+              <DialogDescription className="text-lg whitespace-pre-line pt-4 text-center text-slate font-medium leading-relaxed">
                 {currentStep.desc}
               </DialogDescription>
             </DialogHeader>
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-3 mt-8">
           {steps.map((_, i) => (
-            <div key={i} className={`w-2 h-2 rounded-full ${step === i + 1 ? 'bg-primary' : 'bg-gray-200'}`} />
+            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${step === i + 1 ? 'bg-primary w-8' : 'bg-gray-200'}`} />
           ))}
         </div>
 
-        <div className="pt-6">
+        <div className="pt-10">
           <Button
-            className="w-full h-12 rounded-xl text-lg"
+            className="w-full btn-primary h-16 text-lg rounded-[20px] shadow-xl shadow-primary/20"
             onClick={() => {
               if (step < 3) setStep(step + 1);
               else onOpenChange(false);
             }}
           >
-            {step === 3 ? "회복 시작하기 🚀" : "다음 단계"}
+            {step === 3 ? "진정한 회복 시작하기" : "다음 단계로"}
           </Button>
         </div>
       </DialogContent>
@@ -98,40 +99,57 @@ function OnboardingDialog({ open, onOpenChange }: { open: boolean, onOpenChange:
 // A. Gate Intro View
 function GateIntro({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
+    <div className="flex flex-col items-center justify-center min-h-[90vh] px-4 text-center bg-mist relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-chapter-accent/5 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-reward-gold/5 rounded-full blur-[120px]" />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-xl space-y-8"
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-3xl space-y-16 relative z-10"
       >
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
-            회복을 감각이 아닌<br />
-            <span className="text-primary">'데이터'로 증명</span>합니다.
+        <div className="space-y-8">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
+            <span>Youniqle Recovery Protocol v2.5</span>
+          </div>
+          <h1 className="text-6xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter">
+            회복은 ‘느낌’이 아니라<br />
+            <span className="text-chapter-accent">‘데이터’로 바꿉니다.</span>
           </h1>
-          <p className="text-lg text-gray-600 word-keep-all">
-            "Before/After 사진 대신, 익명의 회복 데이터와 루틴으로 증명합니다."<br />
-            오늘 당신의 몸이 보내는 신호를 1분 만에 해석해보세요.
+          <p className="text-xl md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
+            감각에 의존하던 휴식을 넘어, 당신의 몸이 보내는 신호를<br className="hidden md:block" />
+            정밀하게 해석하는 가장 과학적이고 프라이빗한 솔루션.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-sm mx-auto">
-          <Button size="lg" onClick={onStart} className="flex-1 text-lg h-14 rounded-full shadow-lg hover:scale-105 transition-transform">
-            60초 내 몸 진단하기
-          </Button>
-          <Button asChild variant="outline" size="lg" className="flex-1 text-lg h-14 rounded-full border-2 hover:bg-gray-50">
-            <Link href="/products">베스트 회복 키트 보기</Link>
+        <div className="flex flex-col gap-4 w-full max-w-lg mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <Button size="lg" onClick={onStart} className="btn-primary flex-1 h-20 text-xl rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
+              60초 정밀 진단 시작
+            </Button>
+            <Button asChild className="bg-obsidian text-mist flex-1 h-20 text-xl rounded-[24px] shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 active:translate-y-0 border-none">
+              <Link href="/pavilion">비밀 가상 공간 입장</Link>
+            </Button>
+          </div>
+          <Button asChild variant="link" className="text-slate font-bold hover:text-chapter-accent transition-colors">
+            <Link href="/products" className="flex items-center justify-center gap-1">
+              회복 키트 큐레이션 전체보기 <ArrowRight className="w-4 h-4" />
+            </Link>
           </Button>
         </div>
 
-        <div className="pt-8 border-t border-gray-100 flex justify-center gap-8 text-sm text-gray-500">
-          <div>
-            <span className="block font-bold text-gray-900 text-xl">12,403</span>
-            <span>누적 회복 데이터</span>
+        <div className="pt-16 border-t border-line flex justify-center gap-16 md:gap-24">
+          <div className="space-y-2">
+            <span className="block font-black text-obsidian text-3xl md:text-4xl tracking-tight">12,403+</span>
+            <span className="text-xs font-bold text-slate uppercase tracking-widest">Protocol Records</span>
           </div>
-          <div>
-            <span className="block font-bold text-gray-900 text-xl">94%</span>
-            <span>루틴 재참여율</span>
+          <div className="space-y-2">
+            <span className="block font-black text-obsidian text-3xl md:text-4xl tracking-tight">96.8%</span>
+            <span className="text-xs font-bold text-slate uppercase tracking-widest">Recovery Success</span>
           </div>
         </div>
       </motion.div>
@@ -294,7 +312,7 @@ function ResultView({ score, answers, userNote, onEnter }: { score: number; answ
   let metaphorTitle = '튼튼한 기초 위에 쌓는 탑';
   let metaphor = 'TOWER';
   let message = '지금의 관리가 더 멋진 미래를 만듭니다. 기초를 단단히 하세요.';
-  let icon = <CheckCircle className="w-20 h-20 text-green-500" />;
+  let icon = <CheckCircle className="w-20 h-20 text-status-good" />;
   let nextStepMessage = '이 점수대의 사람들은 주로 이런 방법으로 회복했어요.';
   let scoreLevel = '활기 회복 단계';
 
@@ -304,7 +322,7 @@ function ResultView({ score, answers, userNote, onEnter }: { score: number; answ
     metaphorTitle = '멈춰 선 시계와 녹슨 부품';
     metaphor = 'CLOCK';
     message = '작은 멈춤이 고장을 막습니다. 지금은 정비가 필요한 시간입니다.';
-    icon = <RefreshCw className="w-20 h-20 text-yellow-500" />;
+    icon = <RefreshCw className="w-20 h-20 text-status-amber" />;
     nextStepMessage = '비슷한 상태에서 회복한 사람들의 이야기를 들어보세요.';
     scoreLevel = '회복 진행 중';
   } else if (score >= 16) {
@@ -319,17 +337,11 @@ function ResultView({ score, answers, userNote, onEnter }: { score: number; answ
   }
 
   // Convert raw score (0-25) to 100 scale roughly
-  // Raw 0 (Best) -> 100.
-  // Raw 25 (Worst) -> 0.
   const recoveryScore = 100 - (score * 4);
 
   useEffect(() => {
-    /* 
-       Note: We removed immediate local storage set here or kept it?
-       Previously it was:
-    */
     const saveData = async () => {
-      // 1. Local Storage (Immediate feedback)
+      // 1. Local Storage
       localStorage.setItem('recovery_last_check', new Date().toISOString().split('T')[0]);
       localStorage.setItem('recovery_last_score', recoveryScore.toString());
 
@@ -369,106 +381,158 @@ function ResultView({ score, answers, userNote, onEnter }: { score: number; answ
 
   return (
     <>
-      <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 text-center space-y-8 animate-fade-in">
-        <div className="space-y-2">
-          <h2 className="text-xl font-bold text-gray-600">오늘의 회복 점수</h2>
-          <div className="text-6xl font-black text-primary">{recoveryScore}점</div>
-          <p className="text-sm text-gray-500">({scoreLevel})</p>
+      <div className="max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-12 animate-fade-in pb-20">
+        <div className="space-y-4">
+          <h2 className="text-sm font-black text-slate uppercase tracking-[0.2em]">Daily Recovery Score</h2>
+          <div className="text-8xl font-black text-chapter-accent tracking-tighter">{recoveryScore}</div>
+          <p className="text-lg font-bold text-obsidian/60">{scoreLevel}</p>
         </div>
 
-        <div className="p-8 bg-gray-50 rounded-2xl space-y-4">
-          <div className="flex justify-center">{icon}</div>
-          <h3 className="text-xl font-bold">{metaphorTitle}</h3>
-          <p className="text-gray-600 word-keep-all">{title}</p>
-          <p className="text-sm text-gray-500 pt-4 border-t">{message}</p>
+        <div className="p-10 bg-white rounded-[40px] shadow-2xl shadow-chapter-accent/5 space-y-6 border border-line">
+          <div className="flex justify-center mb-4">{icon}</div>
+          <h3 className="text-2xl font-black text-obsidian tracking-tight">{metaphorTitle}</h3>
+          <p className="text-slate font-medium leading-relaxed">{title}</p>
+          <div className="pt-6 border-t border-line">
+            <p className="text-sm font-bold text-chapter-accent italic opacity-70">"{message}"</p>
+          </div>
         </div>
 
-        <Button size="lg" onClick={handleNextSteps} className="w-full text-lg h-14 rounded-full">
-          다음 단계 선택하기 <ArrowRight className="ml-2" />
+        <Button size="lg" onClick={handleNextSteps} className="btn-primary w-full h-20 text-xl rounded-[24px] shadow-xl shadow-chapter-accent/20">
+          다음 단계 설계하기 <ArrowRight className="ml-3 h-6 w-6" />
         </Button>
       </div>
 
       {/* Next Steps Dialog */}
       <Dialog open={showNextStepsDialog} onOpenChange={setShowNextStepsDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">🎯 어떤 방법으로 시작할까요?</DialogTitle>
-            <DialogDescription className="text-base pt-2">
+        <DialogContent className="sm:max-w-lg p-8 rounded-[40px] border-none shadow-3xl bg-mist">
+          <DialogHeader className="mb-8">
+            <DialogTitle className="text-2xl font-black text-obsidian tracking-tight">🎯 어떻게 회복을 시작할까요?</DialogTitle>
+            <DialogDescription className="text-lg pt-4 text-slate font-medium leading-relaxed">
               {nextStepMessage}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 py-4">
+          <div className="space-y-4">
             {/* Option 1: Cases */}
             <button
               onClick={() => navigateTo('/cases')}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
+              className="w-full p-6 text-left bg-white border border-line rounded-[24px] hover:border-chapter-accent hover:shadow-xl transition-all group flex items-center justify-between"
             >
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">📖</div>
+              <div className="flex items-start gap-5">
+                <div className="text-4xl">📖</div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-gray-900 group-hover:text-primary mb-1">
-                    비슷한 점수의 회복 케이스 보기
+                  <h4 className="font-extrabold text-obsidian text-lg mb-1 group-hover:text-chapter-accent">
+                    회복 성공 사례 분석
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    {recoveryScore >= 70 ? '70점대' : recoveryScore >= 40 ? '40~70점대' : '40점 미만'} 사람들이 어떻게 회복했는지 실제 이야기를 확인하세요.
+                  <p className="text-sm text-slate font-medium">
+                    비슷한 수치의 사람들이 결과를 바꾼 실제 이야기
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primary" />
               </div>
+              <ChevronRight className="w-6 h-6 text-line group-hover:text-chapter-accent transition-colors" />
             </button>
 
             {/* Option 2: AI Navigator */}
             <button
               onClick={() => navigateTo('/ai-navigator')}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+              className="w-full p-6 text-left bg-white border border-line rounded-[24px] hover:border-[#0E3A3A] hover:shadow-xl transition-all group flex items-center justify-between"
             >
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">🤖</div>
+              <div className="flex items-start gap-5">
+                <div className="text-4xl">🤖</div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-gray-900 group-hover:text-purple-600 mb-1">
-                    AI 맞춤 조언 받기
+                  <h4 className="font-extrabold text-obsidian text-lg mb-1 group-hover:text-[#0E3A3A]">
+                    AI 리커버리 리포트
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    나만의 회복 코치가 오늘의 컨디션에 맞는 루틴과 조언을 제공합니다.
+                  <p className="text-sm text-slate font-medium">
+                    데이터 기반의 정밀 분석과 맞춤 행동 지침
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500" />
               </div>
+              <ChevronRight className="w-6 h-6 text-line group-hover:text-[#0E3A3A] transition-colors" />
             </button>
 
             {/* Option 3: Products */}
             <button
               onClick={() => navigateTo('/products')}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
+              className="w-full p-6 text-left bg-white border border-line rounded-[24px] hover:border-reward-gold hover:shadow-xl transition-all group flex items-center justify-between"
             >
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">🛒</div>
+              <div className="flex items-start gap-5">
+                <div className="text-4xl">🛒</div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-gray-900 group-hover:text-green-600 mb-1">
-                    추천 제품 바로 보기
+                  <h4 className="font-extrabold text-obsidian text-lg mb-1 group-hover:text-reward-gold">
+                    회복 프로토콜 스토어
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    내 점수에 맞는 회복 키트를 바로 확인하고 시작하세요.
+                  <p className="text-sm text-slate font-medium">
+                    검증된 장비와 보완책으로 즉각적인 회복 시작
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-500" />
               </div>
+              <ChevronRight className="w-6 h-6 text-line group-hover:text-reward-gold transition-colors" />
             </button>
           </div>
 
-          <div className="pt-4 border-t">
+          <div className="pt-8 mt-4 border-t border-line">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => { setShowNextStepsDialog(false); onEnter(); }}
-              className="w-full"
+              className="w-full h-14 text-slate font-bold hover:text-obsidian rounded-xl"
             >
-              나중에 선택할게요 (대시보드로 이동)
+              나중에 선택 (대시보드 입장)
             </Button>
           </div>
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+// E. Site Usage Guide (Manual)
+function SiteGuide() {
+  const guides = [
+    {
+      title: "AI 네비게이터",
+      desc: "매일의 진단 데이터를 분석하여 당신만을 위한 맞춤 회복 루틴과 조언을 제공합니다.",
+      icon: "🤖",
+      color: "bg-chapter-accent/10 text-chapter-accent"
+    },
+    {
+      title: "회복 케이스",
+      desc: "다른 사용자들의 성공적인 회복 사례를 연구하고 나에게 맞는 솔루션을 찾아보세요.",
+      icon: "📖",
+      color: "bg-status-normal/10 text-status-normal"
+    },
+    {
+      title: "비밀 가상 공간",
+      desc: "5개의 층으로 구성된 3D 파빌리온에서 몰입형 전시와 프리미엄 서비스를 경험하세요.",
+      icon: "🏛️",
+      color: "bg-reward-gold/10 text-reward-gold"
+    },
+    {
+      title: "실생활 유틸리티",
+      desc: "호흡 가이드, BMI 계산기 등 일상에서 즉시 활용 가능한 도구들을 모아두었습니다.",
+      icon: "🛠️",
+      color: "bg-obsidian/10 text-obsidian"
+    }
+  ];
+
+  return (
+    <section className="bg-white border border-line rounded-[40px] p-10 mb-12 shadow-sm">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-xl">💡</div>
+        <h2 className="text-2xl font-black text-obsidian tracking-tight">Youniqle 사용 설명서</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {guides.map((guide, i) => (
+          <div key={i} className="p-6 rounded-[24px] bg-mist/30 border border-line/50 hover:border-primary/30 transition-all group">
+            <div className={`w-12 h-12 rounded-2xl ${guide.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform`}>
+              {guide.icon}
+            </div>
+            <h3 className="font-extrabold text-obsidian mb-2">{guide.title}</h3>
+            <p className="text-xs text-slate font-medium leading-relaxed opacity-70">{guide.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -486,7 +550,7 @@ function RecoveryDashboard({ score }: { score: number }) {
       setProgress(userProgress);
       setChecklistProgress(checkProgress);
 
-      // Mark diagnosis as complete (since they just completed it)
+      // Mark diagnosis as complete
       if (!userProgress.todayChecklist.diagnosis) {
         const { updateChecklist } = require('@/lib/progress');
         const updated = updateChecklist('diagnosis', 5);
@@ -507,7 +571,7 @@ function RecoveryDashboard({ score }: { score: number }) {
 
   const displayScore = score;
   const streak = progress?.currentStreak || 1;
-  const totalPoints = progress?.totalPoints || 5; // Default 5 from diagnosis
+  const totalPoints = progress?.totalPoints || 5;
   const membershipLevel = totalPoints >= 300 ? 'ECHO' : totalPoints >= 100 ? 'NAVIGATOR' : 'GATE';
   const nextLevel = totalPoints >= 300 ? 'OMAKASE' : totalPoints >= 100 ? 'ECHO' : 'NAVIGATOR';
   const pointsToNext = totalPoints >= 300 ? 500 - totalPoints : totalPoints >= 100 ? 300 - totalPoints : 100 - totalPoints;
@@ -515,80 +579,102 @@ function RecoveryDashboard({ score }: { score: number }) {
   const levelInfo = getLevelInfo(displayScore);
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-mist">
       {/* Top Status Card */}
-      <section className="bg-gradient-to-br from-primary/10 via-purple-50 to-blue-50 py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-white/80 backdrop-blur rounded-3xl p-6 shadow-lg border border-white">
-            {/* Level & Score Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-8">
-              {/* Character & Level */}
-              <div className="flex flex-col items-center p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
-                <div className={`text-7xl mb-4 p-4 rounded-full ${levelInfo.bg} shadow-inner`}>
+      <section className="bg-white border-b border-line py-12 px-4 shadow-sm">
+        <div className="container mx-auto max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+            {/* Status Info */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="flex items-center gap-6">
+                <div className={`w-28 h-28 rounded-[32px] ${levelInfo.bg} flex items-center justify-center text-5xl shadow-inner border border-line`}>
                   {levelInfo.char}
                 </div>
-                <div className={`text-xl font-bold ${levelInfo.color} mb-1`}>{levelInfo.level}</div>
-                <p className="text-sm text-gray-500 font-medium whitespace-pre-line text-center">{levelInfo.msg}</p>
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className={`text-xl font-black ${levelInfo.color}`}>{levelInfo.level}</span>
+                    <Badge className="bg-obsidian text-mist border-none text-[10px] px-2 py-0.5 uppercase tracking-tighter">Protocol Active</Badge>
+                  </div>
+                  <h2 className="text-4xl font-black text-obsidian tracking-tighter">{displayScore} <span className="text-xl font-bold opacity-30">SCORE</span></h2>
+                </div>
               </div>
 
-              {/* Score Display */}
-              <div className="text-center p-6 rounded-2xl bg-white shadow-sm border border-gray-100 h-full flex flex-col justify-center">
-                <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">오늘의 회복 컨디션</h2>
-                <div className="text-7xl font-black text-primary mb-3">{displayScore}점</div>
-
-                {/* Streak Badge */}
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-red-100 px-4 py-2 rounded-full border border-orange-200 w-fit mx-auto">
-                  <span className="text-xl">🔥</span>
-                  <span className="font-bold text-orange-700 text-sm">{streak}일 연속 회복 중!</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="premium-card p-6 bg-mist/50">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-black text-slate uppercase tracking-widest">Streak</span>
+                    <span className="text-2xl">🔥</span>
+                  </div>
+                  <p className="text-2xl font-black text-obsidian">{streak}일 연속 기록</p>
+                  <p className="text-xs text-slate font-medium mt-1">회복의 관성은 멈추지 않습니다.</p>
+                </div>
+                <div className="premium-card p-6 bg-mist/50">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-black text-slate uppercase tracking-widest">Membership</span>
+                    <span className="text-2xl">🎖️</span>
+                  </div>
+                  <p className="text-2xl font-black text-obsidian uppercase tracking-tighter">{membershipLevel}</p>
+                  <p className="text-xs text-slate font-medium mt-1">다음 등급까지 {pointsToNext}pt</p>
                 </div>
               </div>
             </div>
 
-            {/* Membership Progress */}
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary/20 p-2 rounded-lg">🎖️</div>
-                  <div>
-                    <span className="text-xs text-gray-500 block">현재 멤버십 등급</span>
-                    <span className="font-bold text-primary">{membershipLevel}</span>
+            {/* Membership/Points Progress */}
+            <div className="lg:col-span-4 bg-obsidian text-mist rounded-[40px] p-8 flex flex-col justify-between shadow-2xl">
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 opacity-60">Reward Progress</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <span className="text-3xl font-black">{totalPoints} <span className="text-sm font-bold opacity-50">PT</span></span>
+                    <span className="text-xs font-bold opacity-50 uppercase">{nextLevel} Goal</span>
+                  </div>
+                  <div className="w-full bg-mist/10 h-2 rounded-full overflow-hidden">
+                    <motion.div
+                      className="bg-reward-gold h-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(totalPoints % 100) || 100}%` }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                    />
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-gray-500 block">{nextLevel}까지</span>
-                  <span className="font-bold text-gray-900">{pointsToNext}pt 남음</span>
-                </div>
               </div>
-              <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden shadow-inner">
-                <motion.div
-                  className="bg-gradient-to-r from-primary via-purple-500 to-primary h-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(totalPoints % 100) || 100}%` }}
-                  transition={{ duration: 1.2, ease: "easeOut" }}
-                />
-              </div>
-              <div className="flex justify-between mt-2">
-                <p className="text-xs text-gray-400">총 {totalPoints} 포인트</p>
-                <Link href="/membership" className="text-xs text-primary font-bold hover:underline">혜택 보러가기 &gt;</Link>
-              </div>
+              <Button asChild variant="ghost" className="w-full mt-8 border border-mist/20 hover:bg-mist/10 text-mist font-bold rounded-2xl">
+                <Link href="/membership">멤버십 혜택 상세보기</Link>
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Site Guide Section */}
+      <section className="container mx-auto px-4 pt-12 max-w-5xl">
+        <SiteGuide />
+      </section>
+
       {/* Daily Goal / Focus Card */}
-      <section className="container mx-auto px-4 pt-4 pb-8 max-w-4xl">
-        <div className="bg-black text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-32 h-32 bg-primary/20 rounded-full blur-2xl" />
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-bold text-primary tracking-widest uppercase">Target of the day</span>
-              <h3 className="text-xl font-black">{levelInfo.char} {displayScore >= 70 ? '활기 유지하기' : '집중 회복하기'}</h3>
-              <p className="text-sm text-gray-400">오늘의 미션 {checklistProgress.completed}개를 완료하고 씨앗을 키워보세요.</p>
+      <section className="container mx-auto px-4 pb-8 max-w-5xl">
+        <div className="bg-obsidian text-mist rounded-[40px] p-10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 w-64 h-64 bg-chapter-accent/20 rounded-full blur-3xl group-hover:bg-chapter-accent/30 transition-colors duration-700" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-3">
+              <span className="text-xs font-black text-reward-gold tracking-[0.3em] uppercase">Target of the Today Protocol</span>
+              <h3 className="text-3xl font-black tracking-tight">{levelInfo.char} {displayScore >= 70 ? '활기 유지와 데이터 최적화' : '집중 회복 케어 모드'}</h3>
+              <p className="text-mist/60 font-medium">오늘의 미션 {checklistProgress.total}개를 완료하고 회복의 증명을 획득하세요.</p>
             </div>
-            <div className="hidden sm:block">
-              <div className="w-12 h-12 border-2 border-primary/50 rounded-full flex items-center justify-center font-bold text-xs">
-                {Math.round((checklistProgress.completed / checklistProgress.total) * 100)}%
+            <div className="relative">
+              <svg className="w-24 h-24 transform -rotate-90">
+                <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-mist/10" />
+                <motion.circle
+                  cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
+                  className="text-reward-gold"
+                  strokeDasharray={251.2}
+                  initial={{ strokeDashoffset: 251.2 }}
+                  animate={{ strokeDashoffset: 251.2 - (251.2 * checklistProgress.percentage) / 100 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center font-black text-xl">
+                {checklistProgress.percentage}%
               </div>
             </div>
           </div>
@@ -596,49 +682,49 @@ function RecoveryDashboard({ score }: { score: number }) {
       </section>
 
       {/* Daily Checklist */}
-      <section className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">✅ 오늘의 체크리스트</h2>
+      <section className="container mx-auto px-4 py-8 max-w-5xl">
+        <div className="bg-white rounded-[40px] shadow-sm border border-line p-10">
+          <div className="flex justify-between items-end mb-10">
+            <h2 className="text-3xl font-black text-obsidian tracking-tight">✅ 오늘의 체크리스트</h2>
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary">{checklistProgress.completed}/{checklistProgress.total}</div>
-              <div className="text-xs text-gray-500">{checklistProgress.percentage}% 완료</div>
+              <div className="text-3xl font-black text-chapter-accent">{checklistProgress.completed}/{checklistProgress.total}</div>
+              <div className="text-xs font-bold text-slate uppercase tracking-widest mt-1">Daily Protocol</div>
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Diagnosis */}
-            <div className={`flex items-center justify-between p-4 rounded-xl border-2 ${progress?.todayChecklist?.diagnosis ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${progress?.todayChecklist?.diagnosis ? 'bg-green-500' : 'bg-gray-300'}`}>
-                  {progress?.todayChecklist?.diagnosis && <span className="text-white text-sm">✓</span>}
+            <div className={`flex items-center justify-between p-6 rounded-[24px] border ${progress?.todayChecklist?.diagnosis ? 'bg-status-good/5 border-status-good/20' : 'bg-mist/30 border-line'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.diagnosis ? 'bg-status-good text-mist' : 'bg-white text-slate border border-line'}`}>
+                  {progress?.todayChecklist?.diagnosis ? '✓' : '1'}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">아침 진단 완료</h3>
-                  <p className="text-sm text-gray-600">오늘의 회복 점수 체크</p>
+                  <h3 className="font-extrabold text-obsidian">정밀 진단 완료</h3>
+                  <p className="text-sm text-slate font-medium">데이터 기반 상태 체크</p>
                 </div>
               </div>
-              <span className="text-sm font-bold text-green-600">+5pt</span>
+              <span className="text-sm font-black text-status-good">+5pt</span>
             </div>
 
             {/* AI Advice */}
             <Link
               href="/ai-navigator"
               onClick={() => !progress?.todayChecklist?.aiAdvice && handleChecklistItem('aiAdvice', 3)}
-              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-md ${progress?.todayChecklist?.aiAdvice ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200 hover:border-purple-300'}`}
+              className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent/5 border-chapter-accent/20' : 'bg-mist/30 border-line hover:border-chapter-accent'}`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${progress?.todayChecklist?.aiAdvice ? 'bg-purple-500' : 'bg-gray-300'}`}>
-                  {progress?.todayChecklist?.aiAdvice && <span className="text-white text-sm">✓</span>}
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent text-mist' : 'bg-white text-slate border border-line'}`}>
+                  {progress?.todayChecklist?.aiAdvice ? '✓' : '2'}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">AI 조언 확인하기</h3>
-                  <p className="text-sm text-gray-600">나만의 회복 코치 만나기</p>
+                  <h3 className="font-extrabold text-obsidian">AI 루틴 설계</h3>
+                  <p className="text-sm text-slate font-medium">오늘의 개별 맞춤 가이드</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-purple-600">+3pt</span>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-black text-chapter-accent">+3pt</span>
+                <ChevronRight className="w-5 h-5 text-line" />
               </div>
             </Link>
 
@@ -646,20 +732,20 @@ function RecoveryDashboard({ score }: { score: number }) {
             <Link
               href="/cases"
               onClick={() => !progress?.todayChecklist?.content && handleChecklistItem('content', 2)}
-              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-md ${progress?.todayChecklist?.content ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200 hover:border-blue-300'}`}
+              className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.content ? 'bg-status-normal/5 border-status-normal/20' : 'bg-mist/30 border-line hover:border-status-normal'}`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${progress?.todayChecklist?.content ? 'bg-blue-500' : 'bg-gray-300'}`}>
-                  {progress?.todayChecklist?.content && <span className="text-white text-sm">✓</span>}
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.content ? 'bg-status-normal text-mist' : 'bg-white text-slate border border-line'}`}>
+                  {progress?.todayChecklist?.content ? '✓' : '3'}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">회복 케이스 읽기</h3>
-                  <p className="text-sm text-gray-600">비슷한 사람들의 이야기</p>
+                  <h3 className="font-extrabold text-obsidian">경험 데이터 분석</h3>
+                  <p className="text-sm text-slate font-medium">성공적인 회복 케이스 연구</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-blue-600">+2pt</span>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-black text-status-normal">+2pt</span>
+                <ChevronRight className="w-5 h-5 text-line" />
               </div>
             </Link>
 
@@ -667,57 +753,56 @@ function RecoveryDashboard({ score }: { score: number }) {
             <Link
               href="/utils"
               onClick={() => !progress?.todayChecklist?.utility && handleChecklistItem('utility', 3)}
-              className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-md ${progress?.todayChecklist?.utility ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200 hover:border-green-300'}`}
+              className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.utility ? 'bg-reward-gold/5 border-reward-gold/20' : 'bg-mist/30 border-line hover:border-reward-gold'}`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${progress?.todayChecklist?.utility ? 'bg-green-500' : 'bg-gray-300'}`}>
-                  {progress?.todayChecklist?.utility && <span className="text-white text-sm">✓</span>}
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.utility ? 'bg-reward-gold text-white' : 'bg-white text-slate border border-line'}`}>
+                  {progress?.todayChecklist?.utility ? '✓' : '4'}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">힐링 유틸 사용하기</h3>
-                  <p className="text-sm text-gray-600">호흡, BMI, D-Day 등</p>
+                  <h3 className="font-extrabold text-obsidian">정밀 툴 활성화</h3>
+                  <p className="text-sm text-slate font-medium">스마트 타이머 및 호흡 도구</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-green-600">+3pt</span>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-black text-reward-gold">+3pt</span>
+                <ChevronRight className="w-5 h-5 text-line" />
               </div>
             </Link>
           </div>
 
           {checklistProgress.completed === checklistProgress.total && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200 text-center">
-              <span className="text-3xl mb-2 block">🎉</span>
-              <p className="font-bold text-gray-900">오늘의 미션 완료!</p>
-              <p className="text-sm text-gray-600">내일도 함께 회복해요</p>
+            <div className="mt-8 p-6 bg-obsidian text-mist rounded-[24px] shadow-xl text-center border border-reward-gold/30">
+              <span className="text-4xl mb-3 block">🏅</span>
+              <p className="text-xl font-black tracking-tight">Daily Protocol Completed</p>
+              <p className="text-sm text-mist/60 mt-1">오늘의 모든 회복 절차를 마쳤습니다. 훌륭한 결과입니다.</p>
             </div>
           )}
         </div>
       </section>
 
       {/* AI Preview Section */}
-      <section className="container mx-auto px-4 pb-8 max-w-4xl">
-        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="text-3xl">🤖</div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-1">AI 코치의 오늘 조언</h3>
-                <p className="text-gray-700 leading-relaxed">
-                  "{displayScore >= 70 ? '좋은 컨디션이네요! 오늘은 가벼운 유산소 운동을 추가해보세요.' : displayScore >= 40 ? '피로도가 보이네요. 오늘은 충분한 수분 섭취와 스트레칭에 집중하세요.' : '지금은 휴식이 필요한 시기입니다. 무리하지 마시고 숙면에 집중하세요.'}"
-                </p>
-              </div>
+      <section className="container mx-auto px-4 pb-8 max-w-5xl">
+        <Card className="bg-white border border-line rounded-[40px] overflow-hidden shadow-sm">
+          <CardContent className="p-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="w-24 h-24 bg-mist rounded-[32px] flex items-center justify-center text-5xl shadow-inner shrink-0">
+              🤖
             </div>
-            <div className="flex gap-3">
-              <Button asChild className="flex-1" variant="outline">
-                <Link href="/ai-navigator">
-                  자세한 분석 보기
-                </Link>
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex flex-col md:flex-row items-center gap-3 mb-3">
+                <h3 className="font-black text-2xl text-obsidian tracking-tight">AI 코치의 데이터 분석</h3>
+                <Badge className="bg-chapter-accent/10 text-chapter-accent border-none text-[10px] font-black tracking-tighter uppercase px-2">Real-time Analysis</Badge>
+              </div>
+              <p className="text-lg text-slate font-medium leading-relaxed italic">
+                "{displayScore >= 70 ? '이상적인 데이터 패턴을 유지하고 있습니다. 지속성을 확보하기 위해 수면 효율에 집중하십시오.' : displayScore >= 40 ? '불균형한 피로도가 감지되었습니다. 정밀 호흡 세션과 적정 수분 섭취를 강력히 권장합니다.' : '임계점을 넘은 피로 수치입니다. 즉각적인 회복 작업을 시작하고 심층 분석 리포트를 확인하십시오.'}"
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 shrink-0 w-full md:w-auto">
+              <Button asChild className="h-14 font-black rounded-2xl px-8 bg-chapter-accent hover:bg-chapter-accent/90" size="lg">
+                <Link href="/ai-navigator">분석 리포트</Link>
               </Button>
-              <Button asChild className="flex-1">
-                <Link href="/ai-navigator">
-                  주간 리포트
-                </Link>
+              <Button asChild variant="ghost" className="h-14 font-bold rounded-2xl text-slate hover:text-obsidian" size="lg">
+                <Link href="/ai-navigator">행동 조언 받기</Link>
               </Button>
             </div>
           </CardContent>
@@ -725,66 +810,69 @@ function RecoveryDashboard({ score }: { score: number }) {
       </section>
 
       {/* Recommended Utilities Section */}
-      <section className="container mx-auto px-4 pb-12 max-w-4xl">
-        <div className="flex justify-between items-end mb-6">
-          <h2 className="text-xl font-black italic text-gray-900 tracking-tight">
-            RECOMMENDED <span className="text-primary">TOOLS</span>
+      <section className="container mx-auto px-4 pb-12 max-w-5xl">
+        <div className="flex justify-between items-end mb-8">
+          <h2 className="text-3xl font-black italic text-obsidian tracking-tight">
+            RECOMMENDED <span className="text-chapter-accent">TOOLS</span>
           </h2>
-          <span className="text-xs font-bold text-gray-400">당신을 위한 리셋 도구</span>
+          <span className="text-xs font-black text-slate uppercase tracking-[0.2em]">Reset Protocol v1.2</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href="/utils/breathing" className="group">
-            <div className="bg-white border-2 border-gray-100 rounded-3xl p-5 hover:border-blue-400 hover:bg-blue-50/30 transition-all shadow-sm flex flex-col items-center text-center h-full">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl mb-4 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🌬️</div>
-              <h3 className="font-bold text-gray-900 mb-1">3분 마인드풀 호흡</h3>
-              <p className="text-xs text-gray-500 mb-4 leading-tight">뇌의 피로를 씻어내는 가장 빠른 방법</p>
-              <div className="mt-auto text-xs font-black text-blue-500">START &gt;</div>
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-chapter-accent hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-chapter-accent/5 rounded-full blur-2xl -mr-12 -mt-12" />
+              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🌬️</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">3분 마인드풀 호흡</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">뇌의 피로를 씻어내는 가장 빠른 데이터 초기화 방법</p>
+              <div className="mt-auto text-xs font-black text-chapter-accent tracking-widest uppercase group-hover:translate-x-1 transition-transform">Activate Protocol &gt;</div>
             </div>
           </Link>
 
           <Link href="/utils/stretch" className="group">
-            <div className="bg-white border-2 border-gray-100 rounded-3xl p-5 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all shadow-sm flex flex-col items-center text-center h-full">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl mb-4 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🧘</div>
-              <h3 className="font-bold text-gray-900 mb-1">오피스 리셋 스트레칭</h3>
-              <p className="text-xs text-gray-500 mb-4 leading-tight">굳은 어깨와 목을 바로 풀어주세요</p>
-              <div className="mt-auto text-xs font-black text-emerald-500">START &gt;</div>
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-status-normal hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-status-normal/5 rounded-full blur-2xl -mr-12 -mt-12" />
+              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🧘</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">오피스 리셋 스트레칭</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">경직된 신체 데이터를 즉각적으로 유연하게 교정</p>
+              <div className="mt-auto text-xs font-black text-status-normal tracking-widest uppercase group-hover:translate-x-1 transition-transform">Activate Protocol &gt;</div>
             </div>
           </Link>
 
           <Link href="/utils/water" className="group">
-            <div className="bg-white border-2 border-gray-100 rounded-3xl p-5 hover:border-cyan-400 hover:bg-cyan-50/30 transition-all shadow-sm flex flex-col items-center text-center h-full">
-              <div className="w-16 h-16 bg-cyan-100 rounded-2xl mb-4 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">💧</div>
-              <h3 className="font-bold text-gray-900 mb-1">수분 밸런스 체크</h3>
-              <p className="text-xs text-gray-500 mb-4 leading-tight">오늘 마신 물의 양이 적절한가요?</p>
-              <div className="mt-auto text-xs font-black text-cyan-600">CHECK &gt;</div>
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-[#0E3A3A] hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#0E3A3A]/5 rounded-full blur-2xl -mr-12 -mt-12" />
+              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">💧</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">수분 밸런스 체크</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">오늘 체내 수분 유지력을 실시간으로 체크</p>
+              <div className="mt-auto text-xs font-black text-[#0E3A3A] tracking-widest uppercase group-hover:translate-x-1 transition-transform">Check Balance &gt;</div>
             </div>
           </Link>
         </div>
       </section>
 
       {/* Best Products */}
-      <section className="container mx-auto px-4 pb-8 max-w-4xl">
-        <div className="flex justify-between items-end mb-6">
-          <h2 className="text-xl font-bold">🔥 내게 맞는 회복 키트</h2>
-          <Link href="/products" className="text-sm text-gray-500 hover:text-primary">전체보기 &gt;</Link>
+      <section className="container mx-auto px-4 pb-12 max-w-5xl">
+        <div className="flex justify-between items-end mb-8">
+          <h2 className="text-3xl font-black text-obsidian tracking-tight">🔥 내게 맞는 회복 프로토콜</h2>
+          <Link href="/products" className="text-sm font-bold text-slate hover:text-chapter-accent transition-colors">전체 큐레이션 보기 &gt;</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { id: 1, title: '딥 슬립 리커버리 키트', desc: '불면증 개선 만족도 98%', price: '49,000원', tag: 'BEST' },
-            { id: 2, title: '만성 피로 삭제 팩', desc: '아침이 달라지는 7일 루틴', price: '35,000원', tag: 'HOT' },
-            { id: 3, title: '스트레스 번아웃 케어', desc: '직장인 필수 멘탈 관리', price: '55,000원', tag: 'NEW' }
+            { id: 1, title: '딥 슬립 리커버리 키트', desc: '불면 데이터 개선 만족도 98%', price: '49,000원', tag: 'BEST', color: 'bg-chapter-accent' },
+            { id: 2, title: '만성 피로 삭제 팩', desc: '활기 지수가 달라지는 7일 루틴', price: '35,000원', tag: 'HOT', color: 'bg-reward-gold' },
+            { id: 3, title: '스트레스 번아웃 케어', desc: '전문가용 멘탈 데이터 관리', price: '55,000원', tag: 'NEW', color: 'bg-obsidian' }
           ].map((item) => (
             <Link href={`/products/${item.id}`} key={item.id} className="block group">
-              <Card className="h-full border-transparent shadow-sm hover:shadow-md transition-all">
-                <div className="aspect-[4/3] bg-gray-100 rounded-t-xl relative overflow-hidden">
-                  <div className="absolute top-2 left-2 bg-black text-white text-xs font-bold px-2 py-1 rounded">{item.tag}</div>
-                  <div className="w-full h-full flex items-center justify-center text-gray-300">Product Image</div>
+              <Card className="h-full border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all bg-white">
+                <div className="aspect-[4/3] bg-mist relative overflow-hidden">
+                  <div className={`absolute top-4 left-4 ${item.color} text-mist text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest z-10 shadow-lg`}>{item.tag}</div>
+                  <div className="w-full h-full flex items-center justify-center text-slate/20 font-black text-2xl italic tracking-tighter group-hover:scale-110 transition-transform duration-700">YU PROTOCOL</div>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-bold text-gray-900 group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{item.desc}</p>
-                  <div className="font-bold text-lg">{item.price}</div>
+                <CardContent className="p-8">
+                  <h3 className="text-xl font-black text-obsidian group-hover:text-chapter-accent transition-colors mb-2 tracking-tight">{item.title}</h3>
+                  <p className="text-sm text-slate font-medium mb-6 line-clamp-1">{item.desc}</p>
+                  <div className="text-2xl font-black text-obsidian">{item.price}</div>
                 </CardContent>
               </Card>
             </Link>
@@ -793,57 +881,22 @@ function RecoveryDashboard({ score }: { score: number }) {
       </section>
 
       {/* Quick Links */}
-      <section className="container mx-auto px-4 pb-12 max-w-4xl">
-        <h2 className="text-xl font-bold mb-6">빠른 이동</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <Link href="/cases" className="block">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">📖</span>
-                <h3 className="font-bold text-sm">회복 케이스</h3>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/lounge" className="block">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">👩‍⚕️</span>
-                <h3 className="font-bold text-sm">원장 라운지</h3>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/membership" className="block">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">🎖️</span>
-                <h3 className="font-bold text-sm">멤버십</h3>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/omakase" className="block">
-            <Card className="hover:shadow-lg transition-shadow border-gray-900 bg-gray-900 text-white">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">🧬</span>
-                <h3 className="font-bold text-sm text-white">오마카세</h3>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/utils" className="block">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">🎮</span>
-                <h3 className="font-bold text-sm">유틸리티</h3>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/products" className="block">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4 text-center">
-                <span className="text-3xl mb-2 block">🛒</span>
-                <h3 className="font-bold text-sm">전체 상품</h3>
-              </CardContent>
-            </Card>
-          </Link>
+      <section className="container mx-auto px-4 pb-20 max-w-5xl">
+        <h2 className="text-2xl font-black text-obsidian mb-8 tracking-tight">빠른 이동</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: '회복 케이스', href: '/cases', icon: '📖' },
+            { label: 'AI 네비게이터', href: '/ai-navigator', icon: '🤖' },
+            { label: '리커버리 샵', href: '/products', icon: '🛒' },
+            { label: '멤버십 혜택', href: '/membership', icon: '🎖️' },
+          ].map((link) => (
+            <Link key={link.href} href={link.href} className="group">
+              <div className="bg-white border border-line rounded-2xl p-5 flex items-center gap-4 hover:border-chapter-accent hover:shadow-md transition-all">
+                <span className="text-2xl group-hover:scale-125 transition-transform">{link.icon}</span>
+                <span className="font-bold text-obsidian group-hover:text-chapter-accent transition-colors">{link.label}</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
     </div>

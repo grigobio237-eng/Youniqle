@@ -7,7 +7,7 @@ export interface INotification extends Document {
   title: string;
   message: string;
   data?: any; // 추가 데이터 (주문번호, 링크 등)
-  
+
   // 알림 채널
   channels: {
     email: boolean;
@@ -15,13 +15,13 @@ export interface INotification extends Document {
     sms: boolean;
     inApp: boolean;
   };
-  
+
   // 전송 상태
   status: 'pending' | 'sent' | 'delivered' | 'failed' | 'read';
   sentAt?: Date;
   deliveredAt?: Date;
   readAt?: Date;
-  
+
   // 전송 결과
   deliveryResults?: {
     email?: {
@@ -44,13 +44,13 @@ export interface INotification extends Document {
       sentAt: Date;
     };
   };
-  
+
   // 우선순위 (1-10, 높을수록 우선)
   priority: number;
-  
+
   // 만료 시간
   expiresAt?: Date;
-  
+
   // 액션 버튼
   actions?: Array<{
     label: string;
@@ -58,7 +58,7 @@ export interface INotification extends Document {
     url?: string;
     style?: 'primary' | 'secondary' | 'danger';
   }>;
-  
+
   // 메타데이터
   tags: string[];
   source: string; // 알림을 생성한 시스템/사용자
@@ -70,20 +70,17 @@ const NotificationSchema = new Schema<INotification>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   type: {
     type: String,
     enum: ['order', 'payment', 'shipping', 'promotion', 'newsletter', 'system', 'marketing', 'partner', 'admin'],
-    required: true,
-    index: true
+    required: true
   },
   category: {
     type: String,
     enum: ['info', 'success', 'warning', 'error', 'urgent'],
-    default: 'info',
-    index: true
+    default: 'info'
   },
   title: {
     type: String,
@@ -98,7 +95,7 @@ const NotificationSchema = new Schema<INotification>({
   data: {
     type: Schema.Types.Mixed
   },
-  
+
   // 알림 채널
   channels: {
     email: {
@@ -118,13 +115,12 @@ const NotificationSchema = new Schema<INotification>({
       default: true
     }
   },
-  
+
   // 전송 상태
   status: {
     type: String,
     enum: ['pending', 'sent', 'delivered', 'failed', 'read'],
-    default: 'pending',
-    index: true
+    default: 'pending'
   },
   sentAt: {
     type: Date
@@ -135,7 +131,7 @@ const NotificationSchema = new Schema<INotification>({
   readAt: {
     type: Date
   },
-  
+
   // 전송 결과
   deliveryResults: {
     email: {
@@ -158,22 +154,20 @@ const NotificationSchema = new Schema<INotification>({
       sentAt: Date
     }
   },
-  
+
   // 우선순위
   priority: {
     type: Number,
     default: 5,
     min: 1,
-    max: 10,
-    index: true
+    max: 10
   },
-  
+
   // 만료 시간
   expiresAt: {
-    type: Date,
-    index: { expireAfterSeconds: 0 }
+    type: Date
   },
-  
+
   // 액션 버튼
   actions: [{
     label: {
@@ -191,7 +185,7 @@ const NotificationSchema = new Schema<INotification>({
       default: 'primary'
     }
   }],
-  
+
   // 메타데이터
   tags: [{
     type: String,
@@ -211,26 +205,20 @@ NotificationSchema.index({ userId: 1, status: 1 });
 NotificationSchema.index({ userId: 1, type: 1 });
 NotificationSchema.index({ userId: 1, createdAt: -1 });
 NotificationSchema.index({ status: 1, priority: -1 });
-NotificationSchema.index({ expiresAt: 1 });
+// TTL 인덱스: 만료된 알림 자동 삭제 (설정된 만료 시간에 즉시 삭제)
+NotificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // 가상 필드: 읽지 않은 알림 여부
-NotificationSchema.virtual('isUnread').get(function() {
+NotificationSchema.virtual('isUnread').get(function () {
   return this.status !== 'read' && !this.readAt;
 });
 
 // 가상 필드: 만료 여부
-NotificationSchema.virtual('isExpired').get(function() {
+NotificationSchema.virtual('isExpired').get(function () {
   return this.expiresAt && this.expiresAt < new Date();
 });
 
-// 만료된 알림 자동 삭제 (TTL 인덱스 사용)
-NotificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
 export default mongoose.models.Notification || mongoose.model<INotification>('Notification', NotificationSchema);
-
-
-
-
 
 
 

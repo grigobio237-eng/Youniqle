@@ -29,8 +29,7 @@ const NewsletterSchema = new Schema<INewsletter>({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true,
-    index: true
+    trim: true
   },
   name: {
     type: String,
@@ -97,13 +96,12 @@ const NewsletterSchema = new Schema<INewsletter>({
 });
 
 // 인덱스 설정
-NewsletterSchema.index({ email: 1 });
 NewsletterSchema.index({ status: 1 });
 NewsletterSchema.index({ subscribedAt: -1 });
 NewsletterSchema.index({ tags: 1 });
 
 // 이메일 중복 방지
-NewsletterSchema.pre('save', async function(next) {
+NewsletterSchema.pre('save', async function (next) {
   if (this.isNew) {
     const existing = await mongoose.model('Newsletter').findOne({ email: this.email });
     if (existing) {

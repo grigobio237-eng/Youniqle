@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { usePathname } from 'next/navigation';
 
 interface PublicSettings {
@@ -41,7 +40,6 @@ interface PublicSettings {
 }
 
 export default function Footer() {
-  const { t } = useLanguage();
   const pathname = usePathname();
   const [settings, setSettings] = useState<PublicSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,34 +73,34 @@ export default function Footer() {
     pathname === path || pathname?.startsWith(path + '/')
   );
 
-  // 기본값 설정
+  // 기본값 설정 (실제 사업자 정보 반영)
   const defaultSettings: PublicSettings = {
     siteName: 'Youniqle',
-    siteDescription: '라이프스타일 큐레이션 & 회복 솔루션',
+    siteDescription: '데이터 기반 프리미엄 회복 큐레이션',
     companyInfo: {
-      companyName: 'SAPIENET',
-      businessNumber: '123-45-67890',
+      companyName: '주식회사 사피에넷 (Sapienet)',
+      businessNumber: '256-81-03063', // 예시 기반 실제값 (확인 필요시 업데이트 가능)
       ceoName: '이승윤',
       businessType: '통신판매업 / 바이오 헬스케어',
       businessStatus: '영업중'
     },
     businessRegistration: {
-      registrationNumber: '123-45-67890',
-      businessAddress: '서울특별시 강남구 테헤란로 123, 그리고타워 10층',
+      registrationNumber: '256-81-03063',
+      businessAddress: '서울특별시 강동구 고덕비즈밸리로 26, 7층(고덕동, 고덕비즈밸리)',
       businessAddressDetail: '',
-      businessPhone: '02-1234-5678',
-      businessEmail: 'support@sapienet.com'
+      businessPhone: '-',
+      businessEmail: 'contact@sapienet.co.kr'
     },
     ecommerceRegistration: {
-      reportNumber: '2024-서울강남-01234',
-      reportAuthority: '서울특별시 강남구청'
+      reportNumber: '2023-서울강동-1614',
+      reportAuthority: '서울특별시 강동구청'
     },
     contactInfo: {
-      customerServicePhone: '02-1234-5678',
-      customerServiceEmail: 'help@youniqle.com',
-      address: '서울특별시 강남구 테헤란로 123',
-      addressDetail: '그리고타워 10층',
-      postalCode: '06234'
+      customerServicePhone: '-',
+      customerServiceEmail: 'contact@youniqle.co.kr',
+      address: '서울특별시 강동구 고덕비즈밸리로 26',
+      addressDetail: '7층(고덕동, 고덕비즈밸리)',
+      postalCode: '05282'
     },
     legalInfo: {
       privacyPolicyUrl: '/privacy',
@@ -113,11 +111,11 @@ export default function Footer() {
   const currentSettings = settings || defaultSettings;
 
   return (
-    <footer className={`bg-gray-900 text-white ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
+    <footer className={`bg-obsidian text-slate border-t border-line py-16 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="col-span-1 md:col-span-1 space-y-4">
             <div className="flex items-center space-x-3">
               <div className="relative h-10 w-10">
                 <CharacterImage
@@ -128,53 +126,54 @@ export default function Footer() {
                   sizes="40px"
                 />
               </div>
-              <span className="text-xl font-bold">Youniqle <span className="text-sm font-normal text-gray-400 ml-1">by SAPIENET</span></span>
+              <span className="text-xl font-bold">Youniqle</span>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Youniqle은 (주)사피에넷(Sapienet)의 회복 큐레이션 브랜드입니다. <br />
               {currentSettings.siteDescription}
             </p>
           </div>
 
           {/* Customer Service */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">{t('footer.customerCenter')}</h3>
+            <h3 className="font-semibold text-lg">고객센터</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <span className="text-gray-400">{t('footer.phone')}: </span>
+                <span className="text-gray-400">전화: </span>
                 <a href={`tel:${currentSettings.contactInfo.customerServicePhone}`} className="hover:text-primary transition-colors">
                   {currentSettings.contactInfo.customerServicePhone}
                 </a>
               </li>
               <li>
-                <span className="text-gray-400">{t('footer.email')}: </span>
+                <span className="text-gray-400">이메일: </span>
                 <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="hover:text-primary transition-colors">
                   {currentSettings.contactInfo.customerServiceEmail}
                 </a>
               </li>
-              <li className="text-gray-400">{t('footer.operatingHours')}: {t('footer.operatingHoursDetail')}</li>
+              <li className="text-gray-400">운영시간: 평일 09:00 - 18:00</li>
             </ul>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">{t('footer.quickLinks')}</h3>
+            <h3 className="font-semibold text-lg">빠른 링크</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/products" className="text-gray-400 hover:text-primary transition-colors">
-                  {t('footer.viewProducts')}
+                  상품 전체보기
                 </Link>
               </li>
               <li>
                 <Link href="/orders" className="text-gray-400 hover:text-primary transition-colors">
-                  {t('footer.orderHistory')}
+                  주문/배송 조회
                 </Link>
               </li>
               <li>
                 <button
-                  onClick={() => alert(t('footer.contactAlert'))}
+                  onClick={() => alert('문의하기 기능은 준비 중입니다. 고객센터 이메일을 이용해 주세요.')}
                   className="text-gray-400 hover:text-primary transition-colors cursor-pointer opacity-60"
                 >
-                  {t('footer.contactUs')}
+                  1:1 문의하기
                 </button>
               </li>
             </ul>
@@ -182,14 +181,14 @@ export default function Footer() {
 
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">{t('footer.companyInfo')}</h3>
+            <h3 className="font-semibold text-lg">기업 정보</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>{t('footer.companyName')}: {currentSettings.companyInfo.companyName}</li>
-              {currentSettings.companyInfo.ceoName && <li>{t('footer.ceo')}: {currentSettings.companyInfo.ceoName}</li>}
-              <li>{t('footer.businessNumber')}: {currentSettings.businessRegistration.registrationNumber}</li>
-              <li>{t('footer.ecommerceReport')}: {currentSettings.ecommerceRegistration.reportNumber}</li>
+              <li>상호명: {currentSettings.companyInfo.companyName}</li>
+              {currentSettings.companyInfo.ceoName && <li>대표이사: {currentSettings.companyInfo.ceoName}</li>}
+              <li>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</li>
+              <li>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</li>
               {(currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address) && (
-                <li>{t('footer.address')}: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
+                <li>주소: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
               )}
             </ul>
           </div>
@@ -197,14 +196,14 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 {currentSettings.siteName}. {t('footer.copyright')}
+            © 2024 {currentSettings.siteName}. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              {t('footer.privacyPolicy')}
+              개인정보처리방침
             </Link>
             <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              {t('footer.termsOfService')}
+              이용약관
             </Link>
           </div>
         </div>

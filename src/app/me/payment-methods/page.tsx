@@ -7,14 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import CharacterImage from '@/components/ui/CharacterImage';
-import { 
-  CreditCard, 
-  Plus, 
-  Trash2, 
-  CheckCircle, 
+import {
+  CreditCard,
+  Plus,
+  Trash2,
+  CheckCircle,
   ArrowLeft,
-  Lock
+  Lock,
+  ShieldCheck,
+  X,
+  CreditCard as CardIcon,
+  ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -64,60 +67,26 @@ export default function PaymentMethodsPage() {
     }
   };
 
-  const getCardType = (cardNumber: string): 'visa' | 'mastercard' | 'amex' | 'other' => {
-    const number = cardNumber.replace(/\s/g, '');
-    if (/^4/.test(number)) return 'visa';
-    if (/^5[1-5]/.test(number)) return 'mastercard';
-    if (/^3[47]/.test(number)) return 'amex';
-    return 'other';
-  };
-
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || '';
     const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
+    for (let i = 0, len = v.length; i < len; i += 4) {
+      parts.push(v.substring(i, i + 4));
     }
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return v;
-    }
+    return parts.join(' ').slice(0, 19);
   };
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCardNumber(e.target.value);
-    const cardType = getCardType(formatted);
     setFormData(prev => ({
       ...prev,
       cardNumber: formatted,
-      cardType,
     }));
   };
 
   const handleSave = async () => {
     if (!formData.cardNumber || !formData.cardHolder || !formData.expiryMonth || !formData.expiryYear) {
-      alert('필수 항목을 모두 입력해주세요.');
-      return;
-    }
-
-    // 카드번호 유효성 검사 (최소 16자리)
-    const cardNumberOnly = formData.cardNumber.replace(/\s/g, '');
-    if (cardNumberOnly.length < 16) {
-      alert('올바른 카드번호를 입력해주세요.');
-      return;
-    }
-
-    // 만료일 유효성 검사
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const expiryYearNum = parseInt(formData.expiryYear);
-    const expiryMonthNum = parseInt(formData.expiryMonth);
-
-    if (expiryYearNum < currentYear || (expiryYearNum === currentYear && expiryMonthNum < currentMonth)) {
-      alert('만료일이 유효하지 않습니다.');
+      alert('보안 프로토콜을 위해 모든 항목을 입력해주십시오.');
       return;
     }
 
@@ -125,41 +94,29 @@ export default function PaymentMethodsPage() {
       const cardNumberOnly = formData.cardNumber.replace(/\s/g, '');
       const last4 = cardNumberOnly.slice(-4);
 
-      const paymentData = {
-        cardNumber: cardNumberOnly, // 서버에 전송할 때는 마스킹된 값
-        cardHolder: formData.cardHolder,
-        expiryMonth: formData.expiryMonth,
-        expiryYear: formData.expiryYear,
-        cardType: formData.cardType,
-        isDefault: formData.isDefault,
-        last4,
-      };
-
       const response = await fetch('/api/payment-methods', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(paymentData),
+        body: JSON.stringify({
+          ...formData,
+          cardNumber: cardNumberOnly,
+          last4
+        }),
       });
 
       if (response.ok) {
-        alert('결제 수단이 추가되었습니다.');
+        alert('새로운 결제 터미널이 동기화되었습니다.');
         setIsAdding(false);
         resetForm();
         fetchPaymentMethods();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || '결제 수단 저장에 실패했습니다.');
       }
     } catch (error) {
       console.error('결제 수단 저장 오류:', error);
-      alert('결제 수단 저장 중 오류가 발생했습니다.');
     }
   };
 
   const handleDelete = async (paymentMethodId: string) => {
-    if (!confirm('이 결제 수단을 삭제하시겠습니까?')) {
-      return;
-    }
+    if (!confirm('이 결제 자산을 영구적으로 말소하시겠습니까?')) return;
 
     try {
       const response = await fetch(`/api/payment-methods`, {
@@ -169,15 +126,11 @@ export default function PaymentMethodsPage() {
       });
 
       if (response.ok) {
-        alert('결제 수단이 삭제되었습니다.');
+        alert('데이터 삭제 완료.');
         fetchPaymentMethods();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || '결제 수단 삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('결제 수단 삭제 오류:', error);
-      alert('결제 수단 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -190,15 +143,11 @@ export default function PaymentMethodsPage() {
       });
 
       if (response.ok) {
-        alert('기본 결제 수단이 설정되었습니다.');
+        alert('기본 결제 수단이 재설정되었습니다.');
         fetchPaymentMethods();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || '기본 결제 수단 설정에 실패했습니다.');
       }
     } catch (error) {
       console.error('기본 결제 수단 설정 오류:', error);
-      alert('기본 결제 수단 설정 중 오류가 발생했습니다.');
     }
   };
 
@@ -213,135 +162,95 @@ export default function PaymentMethodsPage() {
     });
   };
 
-  const getCardIcon = (cardType: string) => {
-    switch (cardType) {
-      case 'visa':
-        return '💳';
-      case 'mastercard':
-        return '💳';
-      case 'amex':
-        return '💳';
-      default:
-        return '💳';
-    }
-  };
-
-  const maskCardNumber = (cardNumber: string) => {
-    const last4 = cardNumber.slice(-4);
-    return `**** **** **** ${last4}`;
-  };
-
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chapter-accent"></div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
-              결제 수단을 관리하려면 로그인해주세요.
-            </p>
-            <Button asChild>
-              <Link href="/auth/signin">로그인하기</Link>
-            </Button>
-          </CardContent>
+      <div className="min-h-screen bg-mist flex items-center justify-center p-6">
+        <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
+          <p className="text-slate font-medium mb-8">결제 수단 관리를 위해 인증 프로토콜이 필요합니다.</p>
+          <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
+            <Link href="/auth/signin">인증 시작</Link>
+          </Button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Button variant="ghost" asChild className="mb-4">
-            <Link href="/me">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              마이페이지로 돌아가기
-            </Link>
-          </Button>
-          <h1 className="text-3xl font-bold mb-2">결제 수단 관리</h1>
-          <p className="text-gray-600">
-            등록된 결제 수단을 관리할 수 있습니다
-          </p>
+    <div className="min-h-screen bg-mist py-20 px-4">
+      <div className="container mx-auto max-w-5xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div className="text-center md:text-left">
+            <Button variant="ghost" asChild className="p-0 hover:bg-transparent text-slate hover:text-obsidian mb-4 transition-colors">
+              <Link href="/me" className="flex items-center gap-2 font-black text-xs uppercase tracking-widest">
+                <ArrowLeft className="h-4 w-4" />
+                Return to Dashboard
+              </Link>
+            </Button>
+            <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Financial Protocol</p>
+            <h1 className="text-5xl font-black text-obsidian tracking-tighter">결제 수단 관리</h1>
+            <p className="text-slate font-bold tracking-tight mt-1">{session?.user?.name} 요원의 승인된 결제 수단 목록입니다.</p>
+          </div>
+          {!isAdding && (
+            <Button onClick={() => setIsAdding(true)} className="h-14 px-8 rounded-2xl bg-obsidian text-mist font-black flex gap-2 shadow-xl shadow-obsidian/10">
+              <Plus className="h-5 w-5" /> 새 카드 등록
+            </Button>
+          )}
         </div>
 
-        {/* 보안 안내 */}
-        <Card className="mb-6 bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <Lock className="h-5 w-5 text-blue-600 mt-0.5" />
-              <div className="text-sm text-blue-800">
-                <p className="font-semibold mb-1">보안 안내</p>
-                <p>카드 정보는 암호화되어 안전하게 저장됩니다. 실제 카드번호는 표시되지 않으며, 마지막 4자리만 확인할 수 있습니다.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 결제 수단 목록 */}
-        <div className="space-y-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {paymentMethods.length === 0 && !isAdding ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-6">등록된 결제 수단이 없습니다.</p>
-                <Button onClick={() => setIsAdding(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  결제 수단 추가
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="md:col-span-2 py-24 bg-white/50 border-2 border-dashed border-line rounded-[40px] text-center">
+              <CreditCard className="h-12 w-12 mx-auto text-slate opacity-20 mb-4" />
+              <p className="text-slate font-bold">등록된 결제 데이터가 없습니다.</p>
+            </div>
           ) : (
             paymentMethods.map((method) => (
-              <Card key={method._id} className={method.isDefault ? 'border-blue-500 border-2' : ''}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-2xl">{getCardIcon(method.cardType)}</span>
-                        <h3 className="font-semibold text-lg capitalize">{method.cardType}</h3>
-                        {method.isDefault && (
-                          <Badge className="bg-blue-600">기본</Badge>
-                        )}
+              <Card key={method._id} className={`group relative border-none shadow-sm rounded-[42px] overflow-hidden transition-all duration-500 hover:shadow-2xl ${method.isDefault ? 'bg-obsidian text-mist' : 'bg-white text-obsidian'}`}>
+                <CardContent className="p-10 space-y-12">
+                  <div className="flex justify-between items-start">
+                    <div className="p-4 rounded-2xl bg-chapter-accent/20">
+                      <Lock className={`h-6 w-6 ${method.isDefault ? 'text-reward-gold' : 'text-chapter-accent'}`} />
+                    </div>
+                    {method.isDefault && (
+                      <Badge className="bg-reward-gold text-obsidian border-none font-black text-[9px] uppercase tracking-widest px-3">Primary Terminal</Badge>
+                    )}
+                  </div>
+
+                  <div className="space-y-6">
+                    <p className={`text-2xl font-black font-mono tracking-widest ${method.isDefault ? 'text-mist' : 'text-obsidian'}`}>
+                      **** **** **** <span className={method.isDefault ? 'text-reward-gold' : 'text-chapter-accent'}>{method.last4}</span>
+                    </p>
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-1">Card Holder</p>
+                        <p className="text-sm font-black uppercase tracking-tight">{method.cardHolder}</p>
                       </div>
-                      <div className="space-y-1 text-gray-600">
-                        <p className="font-medium text-xl font-mono">
-                          {method.cardNumber ? maskCardNumber(method.cardNumber) : `**** **** **** ${method.last4}`}
-                        </p>
-                        <p className="font-medium">{method.cardHolder}</p>
-                        <p className="text-sm">
-                          만료일: {method.expiryMonth}/{method.expiryYear}
-                        </p>
+                      <div className="text-right">
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-1">Expires</p>
+                        <p className="text-sm font-black">{method.expiryMonth}/{method.expiryYear}</p>
                       </div>
                     </div>
-                    <div className="flex flex-col space-y-2 ml-4">
-                      {!method.isDefault && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSetDefault(method._id || '')}
-                        >
-                          기본 설정
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(method._id || '')}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        삭제
+                  </div>
+
+                  <div className="flex gap-2 pt-4 border-t border-mist/10">
+                    {!method.isDefault && (
+                      <Button variant="ghost" className="flex-1 h-12 rounded-xl text-[10px] font-black hover:bg-mist/5" onClick={() => handleSetDefault(method._id || '')}>
+                        SET AS PRIMARY
                       </Button>
-                    </div>
+                    )}
+                    <Button variant="ghost" className="h-12 w-12 rounded-xl text-status-danger hover:bg-status-danger/5" onClick={() => handleDelete(method._id || '')}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -349,113 +258,65 @@ export default function PaymentMethodsPage() {
           )}
         </div>
 
-        {/* 결제 수단 추가 폼 */}
         {isAdding && (
-          <Card>
-            <CardHeader>
-              <CardTitle>결제 수단 추가</CardTitle>
+          <Card className="border-none shadow-2xl rounded-[48px] bg-white overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
+            <CardHeader className="p-10 pb-0 flex flex-row items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-obsidian tracking-tighter">보안 카드 등록</h2>
+                <p className="text-xs font-black text-slate uppercase tracking-widest mt-1">Financial Asset Synchronization</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => { setIsAdding(false); resetForm(); }} className="rounded-full hover:bg-mist h-12 w-12"><X className="h-6 w-6" /></Button>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="cardNumber">카드번호 *</Label>
-                <Input
-                  id="cardNumber"
-                  value={formData.cardNumber}
-                  onChange={handleCardNumberChange}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength={19}
-                  className="font-mono"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.cardType !== 'other' && (
-                    <span className="capitalize">{formData.cardType}</span>
-                  )}
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="cardHolder">카드 소유자 *</Label>
-                <Input
-                  id="cardHolder"
-                  value={formData.cardHolder}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cardHolder: e.target.value.toUpperCase() }))}
-                  placeholder="홍길동"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="expiryMonth">만료월 *</Label>
-                  <Input
-                    id="expiryMonth"
-                    value={formData.expiryMonth}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
-                      if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 12)) {
-                        setFormData(prev => ({ ...prev, expiryMonth: value }));
-                      }
-                    }}
-                    placeholder="MM"
-                    maxLength={2}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="expiryYear">만료년 *</Label>
-                  <Input
-                    id="expiryYear"
-                    value={formData.expiryYear}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-                      if (value === '' || parseInt(value) >= new Date().getFullYear()) {
-                        setFormData(prev => ({ ...prev, expiryYear: value }));
-                      }
-                    }}
-                    placeholder="YYYY"
-                    maxLength={4}
-                  />
+            <CardContent className="p-10 space-y-10">
+              <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-[32px] flex gap-4">
+                <ShieldCheck className="h-6 w-6 text-blue-600 shrink-0" />
+                <div className="text-xs font-medium text-blue-800 leading-relaxed">
+                  <p className="font-extrabold mb-1">엔드투엔드 암호화 적용</p>
+                  <p>모든 금융 데이터는 파편화되어 안전한 볼트에 저장됩니다. 원본 카드번호는 시스템 내부적으로만 처리되며 노출되지 않습니다.</p>
                 </div>
               </div>
 
-              {paymentMethods.length > 0 && (
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isDefault"
-                    checked={formData.isDefault}
-                    onChange={(e) => setFormData(prev => ({ ...prev, isDefault: e.target.checked }))}
-                    className="h-4 w-4"
-                  />
-                  <Label htmlFor="isDefault">기본 결제 수단으로 설정</Label>
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">카드 번호</Label>
+                  <div className="relative">
+                    <CreditCard className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate opacity-40" />
+                    <Input value={formData.cardNumber} onChange={handleCardNumberChange} placeholder="0000 0000 0000 0000" maxLength={19} className="h-16 pl-14 rounded-2xl bg-mist/50 border-line font-mono text-lg font-bold" />
+                  </div>
                 </div>
-              )}
 
-              <div className="flex space-x-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsAdding(false);
-                    resetForm();
-                  }}
-                  className="flex-1"
-                >
-                  취소
-                </Button>
-                <Button onClick={handleSave} className="flex-1">
-                  저장
-                </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">소유자 성함 (영문 권장)</Label>
+                    <Input value={formData.cardHolder} onChange={(e) => setFormData(prev => ({ ...prev, cardHolder: e.target.value.toUpperCase() }))} placeholder="HONG GILDONG" className="h-16 rounded-2xl bg-mist/50 border-line font-bold" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">만료 (월)</Label>
+                      <Input value={formData.expiryMonth} onChange={(e) => setFormData(prev => ({ ...prev, expiryMonth: e.target.value.slice(0, 2) }))} placeholder="MM" maxLength={2} className="h-16 rounded-2xl bg-mist/50 border-line text-center font-bold" />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">만료 (년)</Label>
+                      <Input value={formData.expiryYear} onChange={(e) => setFormData(prev => ({ ...prev, expiryYear: e.target.value.slice(0, 4) }))} placeholder="YYYY" maxLength={4} className="h-16 rounded-2xl bg-mist/50 border-line text-center font-bold" />
+                    </div>
+                  </div>
+                </div>
+
+                {paymentMethods.length > 0 && (
+                  <div className="flex items-center gap-3 bg-mist/30 p-4 rounded-2xl border border-line/30">
+                    <input type="checkbox" id="isDefault" checked={formData.isDefault} onChange={(e) => setFormData(prev => ({ ...prev, isDefault: e.target.checked }))} className="h-5 w-5 rounded border-line" />
+                    <label htmlFor="isDefault" className="text-sm font-bold text-obsidian cursor-pointer select-none">이 카드를 기본 결제 자산으로 설정합니다.</label>
+                  </div>
+                )}
               </div>
+
+              <Button onClick={handleSave} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black text-xl shadow-2xl hover:scale-[1.02] transition-all">
+                보안 자산 동기화 완료
+              </Button>
             </CardContent>
           </Card>
-        )}
-
-        {!isAdding && paymentMethods.length > 0 && (
-          <Button onClick={() => setIsAdding(true)} className="w-full">
-            <Plus className="h-4 w-4 mr-2" />
-            결제 수단 추가
-          </Button>
         )}
       </div>
     </div>
   );
 }
-

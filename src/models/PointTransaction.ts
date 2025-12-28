@@ -16,14 +16,12 @@ const PointTransactionSchema = new Schema<IPointTransaction>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   type: {
     type: String,
     enum: ['earned', 'used', 'expired', 'admin_grant', 'admin_deduct'],
-    required: true,
-    index: true
+    required: true
   },
   amount: {
     type: Number,

@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface INotificationSettings extends Document {
   userId: mongoose.Types.ObjectId;
-  
+
   // 채널별 설정
   channels: {
     email: {
@@ -40,7 +40,7 @@ export interface INotificationSettings extends Document {
       frequency: 'immediate' | 'daily' | 'weekly' | 'never';
     };
   };
-  
+
   // 알림 타입별 설정
   types: {
     order: {
@@ -98,14 +98,14 @@ export interface INotificationSettings extends Document {
       inApp: boolean;
     };
   };
-  
+
   // 긴급 알림 설정
   urgentNotifications: {
     enabled: boolean;
     channels: string[]; // ['email', 'push', 'sms']
     bypassQuietHours: boolean;
   };
-  
+
   // 알림 요약 설정
   digest: {
     enabled: boolean;
@@ -114,7 +114,7 @@ export interface INotificationSettings extends Document {
     timezone: string;
     types: string[]; // 요약에 포함할 알림 타입들
   };
-  
+
   // 메타데이터
   createdAt: Date;
   updatedAt: Date;
@@ -125,10 +125,9 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true,
-    index: true
+    unique: true
   },
-  
+
   // 채널별 설정
   channels: {
     email: {
@@ -230,7 +229,7 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>({
       }
     }
   },
-  
+
   // 알림 타입별 설정
   types: {
     order: {
@@ -288,7 +287,7 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>({
       inApp: { type: Boolean, default: true }
     }
   },
-  
+
   // 긴급 알림 설정
   urgentNotifications: {
     enabled: {
@@ -305,7 +304,7 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>({
       default: true
     }
   },
-  
+
   // 알림 요약 설정
   digest: {
     enabled: {
@@ -335,7 +334,7 @@ const NotificationSettingsSchema = new Schema<INotificationSettings>({
 });
 
 // 기본 설정 생성
-NotificationSettingsSchema.statics.createDefault = function(userId: string) {
+NotificationSettingsSchema.statics.createDefault = function (userId: string) {
   return new this({
     userId,
     // 기본 설정은 스키마 기본값 사용

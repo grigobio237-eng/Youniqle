@@ -38,8 +38,7 @@ const CouponSchema = new Schema<ICoupon>({
     required: true,
     unique: true,
     uppercase: true,
-    trim: true,
-    index: true
+    trim: true
   },
   name: {
     type: String,
@@ -94,21 +93,21 @@ const CouponSchema = new Schema<ICoupon>({
   },
   validFrom: {
     type: Date,
-    required: function() {
+    required: function () {
       return this.validityType === 'fixed';
     },
     default: Date.now
   },
   validUntil: {
     type: Date,
-    required: function() {
+    required: function () {
       return this.validityType === 'fixed';
     }
   },
   validityDurationDays: {
     type: Number,
     min: 1,
-    required: function() {
+    required: function () {
       return this.validityType === 'from_download';
     }
   },
@@ -161,14 +160,13 @@ const CouponSchema = new Schema<ICoupon>({
 });
 
 // 인덱스 설정
-CouponSchema.index({ code: 1 });
 CouponSchema.index({ status: 1 });
 CouponSchema.index({ validFrom: 1, validUntil: 1 });
 CouponSchema.index({ targetAudience: 1 });
 CouponSchema.index({ createdAt: -1 });
 
 // 쿠폰 코드 중복 방지
-CouponSchema.pre('save', async function(next) {
+CouponSchema.pre('save', async function (next) {
   if (this.isNew) {
     const existing = await mongoose.model('Coupon').findOne({ code: this.code });
     if (existing) {
@@ -180,7 +178,7 @@ CouponSchema.pre('save', async function(next) {
 });
 
 // 만료 상태 자동 업데이트
-CouponSchema.pre('save', function(next) {
+CouponSchema.pre('save', function (next) {
   if (this.validUntil < new Date() && this.status === 'active') {
     this.status = 'expired';
   }
@@ -188,16 +186,16 @@ CouponSchema.pre('save', function(next) {
 });
 
 // 가상 필드: 사용 가능 여부
-CouponSchema.virtual('isUsable').get(function() {
+CouponSchema.virtual('isUsable').get(function () {
   const now = new Date();
-  return this.status === 'active' && 
-         this.validFrom <= now && 
-         this.validUntil >= now &&
-         (!this.usageLimit || this.usageCount < this.usageLimit);
+  return this.status === 'active' &&
+    this.validFrom <= now &&
+    this.validUntil >= now &&
+    (!this.usageLimit || this.usageCount < this.usageLimit);
 });
 
 // 가상 필드: 남은 사용 횟수
-CouponSchema.virtual('remainingUsage').get(function() {
+CouponSchema.virtual('remainingUsage').get(function () {
   if (!this.usageLimit) return null;
   return Math.max(0, this.usageLimit - this.usageCount);
 });

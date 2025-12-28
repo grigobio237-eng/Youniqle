@@ -20,13 +20,11 @@ const RecoveryScoreSchema = new Schema<IRecoveryScore>({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true,
+        required: true
     },
     date: {
         type: Date,
-        required: true,
-        index: true, // For querying "today's score" quickly
+        required: true
     },
     rawScore: {
         type: Number,

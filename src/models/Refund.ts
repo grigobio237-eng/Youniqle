@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export type RefundType = 'refund' | 'exchange';
 
 // 환불/교환 사유
-export type RefundReason = 
+export type RefundReason =
   | 'change_of_mind'        // 단순 변심
   | 'defective_product'     // 상품 불량
   | 'wrong_product'         // 오배송
@@ -14,7 +14,7 @@ export type RefundReason =
   | 'other';                // 기타
 
 // 환불/교환 상태
-export type RefundStatus = 
+export type RefundStatus =
   | 'pending'       // 신청 대기
   | 'approved'      // 승인됨
   | 'rejected'      // 거부됨
@@ -37,25 +37,25 @@ export interface IRefund extends Document {
   // 기본 정보
   refundNumber: string;          // 환불/교환 번호
   type: RefundType;
-  
+
   // 메서드
   updateStatus(
     newStatus: RefundStatus,
     userId?: mongoose.Types.ObjectId,
     reason?: string
   ): Promise<IRefund>;
-  
+
   // 주문 정보
   orderId: mongoose.Types.ObjectId;
   orderNumber: string;
   userId: mongoose.Types.ObjectId;
   userName: string;
   userEmail: string;
-  
+
   // 파트너 정보
   partnerId?: mongoose.Types.ObjectId;
   partnerName?: string;
-  
+
   // 상품 정보
   items: {
     productId: mongoose.Types.ObjectId;
@@ -65,12 +65,12 @@ export interface IRefund extends Document {
     totalPrice: number;
     imageUrl?: string;
   }[];
-  
+
   // 환불/교환 사유
   reason: RefundReason;
   reasonDetail: string;          // 상세 사유
   images?: string[];             // 증빙 이미지
-  
+
   // 교환 정보 (교환인 경우)
   exchangeInfo?: {
     newProductId?: mongoose.Types.ObjectId;
@@ -79,7 +79,7 @@ export interface IRefund extends Document {
     newColor?: string;
     additionalPayment?: number;  // 추가 결제 금액
   };
-  
+
   // 금액 정보
   totalAmount: number;           // 총 금액
   refundAmount: number;          // 환불 금액
@@ -87,7 +87,7 @@ export interface IRefund extends Document {
   refundShippingFee: number;     // 반품 배송비
   deductionAmount: number;       // 차감 금액
   finalRefundAmount: number;     // 최종 환불 금액
-  
+
   // 환불 방법
   refundMethod: RefundMethod;
   bankAccount?: {                // 계좌 환불 시
@@ -95,7 +95,7 @@ export interface IRefund extends Document {
     accountNumber: string;
     accountHolder: string;
   };
-  
+
   // 수거 정보
   pickupAddress: {
     zipCode: string;
@@ -107,7 +107,7 @@ export interface IRefund extends Document {
   pickupCompletedAt?: Date;      // 수거 완료일
   courierCompany?: string;       // 택배사
   trackingNumber?: string;       // 송장번호
-  
+
   // 처리 정보
   status: RefundStatus;
   requestedAt: Date;             // 신청일
@@ -115,12 +115,12 @@ export interface IRefund extends Document {
   rejectedAt?: Date;             // 거부일
   completedAt?: Date;            // 완료일
   cancelledAt?: Date;            // 취소일
-  
+
   // 승인/거부 정보
   approvedBy?: mongoose.Types.ObjectId;  // 승인자
   rejectedBy?: mongoose.Types.ObjectId;  // 거부자
   rejectionReason?: string;      // 거부 사유
-  
+
   // 검수 정보
   inspectionResult?: {
     isPassed: boolean;           // 검수 통과 여부
@@ -128,14 +128,14 @@ export interface IRefund extends Document {
     inspector: mongoose.Types.ObjectId;
     inspectedAt: Date;
   };
-  
+
   // 메모
   adminNotes?: string;           // 관리자 메모
   partnerNotes?: string;         // 파트너 메모
-  
+
   // 알림
   notificationSent: boolean;     // 알림 전송 여부
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -146,7 +146,6 @@ const RefundSchema = new Schema<IRefund>(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     type: {
       type: String,
@@ -156,8 +155,7 @@ const RefundSchema = new Schema<IRefund>(
     orderId: {
       type: Schema.Types.ObjectId,
       ref: 'Order',
-      required: true,
-      index: true,
+      required: true
     },
     orderNumber: {
       type: String,
@@ -166,8 +164,7 @@ const RefundSchema = new Schema<IRefund>(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-      index: true,
+      required: true
     },
     userName: {
       type: String,
@@ -179,8 +176,7 @@ const RefundSchema = new Schema<IRefund>(
     },
     partnerId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      index: true,
+      ref: 'User'
     },
     partnerName: String,
     items: [
@@ -307,8 +303,7 @@ const RefundSchema = new Schema<IRefund>(
         'cancelled',
       ],
       default: 'pending',
-      required: true,
-      index: true,
+      required: true
     },
     requestedAt: {
       type: Date,
@@ -414,7 +409,7 @@ RefundSchema.methods.updateStatus = async function (
   return this.save();
 };
 
-const Refund = (mongoose.models.Refund as IRefundModel) || 
+const Refund = (mongoose.models.Refund as IRefundModel) ||
   mongoose.model<IRefund, IRefundModel>('Refund', RefundSchema);
 
 export default Refund;

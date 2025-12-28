@@ -3,170 +3,99 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Neutral Core */
-  --bg: #0B0D10;
-  --surface: #12161C;
-  --muted: #667085;
-  --mist: #F6F4F0;
-  --text: #F2F5F9;
-
-  /* Authority Accent */
-  --gold: #C7A76A;
-  --gold-weak: rgba(199, 167, 106, 0.1);
-
-  /* State Colors */
-  --ok: #0C3B2E;
-  --ok-weak: rgba(12, 59, 46, 0.1);
-  --warn: #7A5A12;
-  --warn-weak: rgba(122, 90, 18, 0.1);
-  --danger: #4A1020;
-  --danger-weak: rgba(74, 16, 32, 0.1);
-
-  /* Default Chapter Accent (Defaults to Deep Navy) */
-  --chapter-accent: #0E1B2C;
-  --accent-weak: rgba(14, 27, 44, 0.1);
-
-  /* Button Colors */
-  --btn-primary-bg: var(--chapter-accent);
-  --btn-primary-text: var(--text);
-  --btn-secondary-border: var(--chapter-accent);
-  --btn-secondary-text: var(--chapter-accent);
-
-  /* Utils */
-  --line: rgba(255, 255, 255, 0.1);
-}
-
-/* Chapter Overrides */
-[data-chapter="products"] { --chapter-accent: #0E1B2C; --accent-weak: rgba(14, 27, 44, 0.1); }
-[data-chapter="cases"] { --chapter-accent: #4A1C2D; --accent-weak: rgba(74, 28, 45, 0.1); }
-[data-chapter="lounge"] { --chapter-accent: #102A43; --accent-weak: rgba(16, 42, 67, 0.1); }
-[data-chapter="ai-navigator"] { --chapter-accent: #0E3A3A; --accent-weak: rgba(14, 58, 58, 0.1); }
-[data-chapter="membership"] { --chapter-accent: #0C3B2E; --accent-weak: rgba(12, 59, 46, 0.1); }
-[data-chapter="omakase"] { --chapter-accent: #2B1236; --accent-weak: rgba(43, 18, 54, 0.1); }
-[data-chapter="utils"] { --chapter-accent: #1F2A37; --accent-weak: rgba(31, 42, 55, 0.1); }
-
 @layer base {
+  :root {
+    /* 90% Premium Base (Mist & Ivory) */
+    --background: #F6F4F0; /* Mist - Warm Ivory Base */
+    --foreground: #0B0D10; /* Obsidian - Main Text */
+    
+    --surface: #FFFFFF; /* Pure White for Cards on Mist background */
+    --surface-dark: #12161C; /* Graphite - Dark Surface */
+    
+    --text-primary: #0B0D10; /* Obsidian */
+    --text-secondary: #667085; /* Slate */
+    
+    --line: rgba(11, 13, 16, 0.08); /* Subtle lines for light theme */
+    
+    /* 10% Chapter Signatures */
+    --chapter-accent: #0E1B2C; /* Default: Deep Navy */
+    
+    /* Status Feedback Colors */
+    --status-good: #064E3B; /* Emerald - Deep Green */
+    --status-normal: #667085; /* Slate */
+    --status-amber: #92400E; /* Deep Amber */
+    --status-danger: #4A1C2D; /* Case Burgundy */
+    
+    /* Authority & Reward */
+    --reward-gold: #C7A76A; /* Soft Gold */
+    
+    /* Chart Colors (Internal uses these or tailwind classes) */
+    --chart-1: #0E1B2C;
+    --chart-2: #4A1C2D;
+    --chart-3: #0F2A22;
+    --chart-4: #0E3A3A;
+    --chart-5: #C7A76A;
+  }
+
+  /* Chapter Overrides */
+  [data-chapter="products"] { --chapter-accent: #0E1B2C; } /* Deep Navy */
+  [data-chapter="cases"] { --chapter-accent: #4A1C2D; } /* Case Burgundy */
+  [data-chapter="lounge"] { --chapter-accent: #0F2A22; } /* Clinic Forest */
+  [data-chapter="ai-navigator"] { --chapter-accent: #0E3A3A; } /* Data Teal */
+  [data-chapter="membership"] { --chapter-accent: #C7A76A; } /* Member Gold */
+  [data-chapter="omakase"] { --chapter-accent: #2D1B4A; } /* Omakase Purple */
+  [data-chapter="utils"] { --chapter-accent: #334155; } /* Utils Slate */
+
   html {
     font-family: 'Pretendard', 'Inter', system-ui, sans-serif;
     overflow-x: hidden;
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased;
   }
 
   body {
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: var(--background);
+    color: var(--foreground);
     letter-spacing: -0.01em;
     line-height: 1.5;
     overflow-x: hidden;
     width: 100%;
   }
 
-  /* 모바일 최적화 */
+  /* Mobile Optimization */
   @media (max-width: 768px) {
     body {
       font-size: 14px;
-    }
-
-    * {
-      max-width: 100%;
-      box-sizing: border-box;
     }
   }
 }
 
 @layer components {
   .btn-primary {
-    background-color: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-    @apply font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-secondary {
-    background-color: transparent;
-    color: var(--btn-secondary-text);
-    border: 1px solid var(--btn-secondary-border);
-    @apply font-medium px-6 py-3 rounded-2xl transition-all duration-200 hover:bg-primary/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-chapter-accent text-white font-bold px-8 py-4 rounded-[12px] transition-all duration-300 hover:opacity-90 active:scale-95 disabled:opacity-50;
   }
 
   .btn-outline {
-    @apply btn-secondary;
+    @apply border border-chapter-accent text-chapter-accent bg-transparent font-bold px-8 py-4 rounded-[12px] transition-all duration-300 hover:bg-chapter-accent hover:text-white active:scale-95 disabled:opacity-50;
   }
 
-  .card {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    @apply rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  .premium-card {
+    @apply bg-surface border border-line rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-xl;
   }
 
-  .card-accent {
-    @apply card;
-    border-left: 3px solid var(--chapter-accent);
-  }
-
-  .input-field {
-    background-color: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--line);
-    @apply w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200 outline-none;
+  .premium-card-dark {
+    @apply bg-surface-dark border-none rounded-[32px] overflow-hidden transition-all duration-500;
+    color: white;
   }
 
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border;
   }
 
   .badge-primary {
-    background-color: var(--accent-weak);
+    background-color: rgba(var(--chapter-accent), 0.1);
     color: var(--chapter-accent);
     border-color: var(--chapter-accent);
-  }
-
-  .badge-gold {
-    background-color: var(--gold-weak);
-    color: var(--gold);
-    border-color: var(--gold);
-  }
-
-  .badge-success {
-    background-color: var(--ok-weak);
-    color: var(--ok);
-    border-color: var(--ok);
-  }
-
-  .badge-warning {
-    background-color: var(--warn-weak);
-    color: var(--warn);
-    border-color: var(--warn);
-  }
-
-  .badge-danger {
-    background-color: var(--danger-weak);
-    color: var(--danger);
-    border-color: var(--danger);
-  }
-}
-
-
-
-@layer components {
-  /* ... existing classes ... */
-
-  .file-upload-input {
-    @apply block w-full text-sm text-gray-500;
-  }
-
-
-  .file-upload-input::file-selector-button {
-    @apply mr-4 py-2 px-4 rounded-full border-0 text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200 cursor-pointer;
-  }
-
-  .shadcn-input::file-selector-button {
-    @apply border-0 bg-transparent text-sm font-medium;
-  }
-
-  .shadcn-input::placeholder,
-  .shadcn-textarea::placeholder {
-    @apply text-gray-500 opacity-100;
   }
 }

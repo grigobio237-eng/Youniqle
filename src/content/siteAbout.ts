@@ -1,10 +1,13 @@
-import { 
-  Sparkles, 
-  BadgeCheck, 
-  MessageSquare, 
-  Shield, 
+import {
+  Sparkles,
+  BadgeCheck,
+  MessageSquare,
+  Shield,
   Wallet,
-  LucideIcon 
+  LucideIcon,
+  Activity,
+  Zap,
+  Lock
 } from 'lucide-react';
 
 export interface ValueItem {
@@ -29,32 +32,32 @@ export interface AboutContent {
 export const ABOUT_CONTENT: AboutContent = {
   brand: "Youniqle",
   company: "주식회사 사피에넷",
-  payment: "Nicepay",
-  hero: "프리미엄을 더 공정하게.",
-  short: "Youniqle은 주식회사 사피에넷이 운영하는 프리미엄 큐레이션 몰입니다. 우리는 '정직한 정보·투명한 가격·빠른 사후지원'을 원칙으로, 파트너 네트워크에서 선별한 상품만 소개합니다. 안전결제(Nicepay)와 멤버십 포인트로 더 스마트한 쇼핑을 경험하세요.",
+  payment: "Safety Secured",
+  hero: "Recovery by Data, not Feeling.",
+  short: "Youniqle(유니크)은 주식회사 사피에넷이 운영하는 프리미엄 회복 큐레이션 브랜드입니다. 우리는 감각이 아닌 '데이터'에 기반하여 당신의 삶을 다시 세팅하는 가장 과학적이고 프라이빗한 솔루션을 제안합니다. 사피에넷의 기술력과 파트너 네트워크가 엄선한 회복 프로토콜을 만나보세요.",
   standard: [
-    "우리는 좋은 것을 바르게 전합니다.",
-    "Youniqle은 품질이 검증된 상품을 선별(큐레이션)하고, 파트너와의 직접 협업으로 합리적 가격과 안정적 재고를 유지합니다.",
-    "모든 정보는 투명하게 공개하고, 구매 전후 신속한 응대로 고객 시간을 아낍니다.",
-    "멤버십 포인트·등급 혜택으로 살수록 유리해지는 쇼핑을 제공하며, 결제는 Nicepay로 안전하게 처리됩니다."
+    "우리는 회복의 본질을 데이터로 증명합니다.",
+    "Youniqle은 단순한 상품 판매를 넘어, 사용자의 생체 데이터와 회복 점수를 기반으로 최적의 '회복 경로'를 설계(큐레이션)합니다.",
+    "사피에넷의 전문 연구진이 검증한 프로토콜만을 소개하며, 모든 회복 과정은 투명한 데이터로 기록됩니다.",
+    "멤버십 등급에 따른 프라이빗 컨시어지 서비스와 전용 상점을 통해 차별화된 회복 경험을 제공합니다."
   ],
   extended: [
-    "Youniqle은 프리미엄을 '생활 가능한 가격'으로 연결하는 큐레이션 커머스입니다. 우리는 파트너사와의 직접 협업, 데이터 기반 수요 예측, 표준화된 품질 검수를 통해 과장 없는 정보를 제공합니다.",
-    "고객의 시간과 신뢰를 가장 큰 자산으로 생각합니다. 가격·원산지·구성·A/S 범위를 투명하게 안내하고, 구매 이후에도 빠르게 돕는 것이 Youniqle의 기본입니다.",
-    "혜택은 단순하고, 결제는 안전하게. 멤버십 등급과 포인트로 합리성을 높이고, 결제는 Nicepay로 안전하게 처리합니다. 운영사: 주식회사 사피에넷."
+    "Youniqle은 '느낌'에 의존하던 회복 시장을 '데이터'의 영역으로 혁신하는 사피에넷의 핵심 브랜드입니다. 우리는 글로벌 파트너사와의 협업을 통해 검증된 장비와 보완책을 선별하고, 개별 사용자에게 최적화된 회복 루틴을 제공합니다.",
+    "당신의 시간과 에너지를 가장 소중한 자산으로 여깁니다. 불필요한 시행착오를 줄이고, 단 1분의 행동으로도 실질적인 회복 점수의 변화를 만들어내는 것이 우리의 목표입니다.",
+    "기술은 차갑지만 경험은 따뜻하게. 사피에넷의 정밀한 데이터 분석과 Youniqle의 섬세한 큐레이션이 만나 당신의 내일을 바꿉니다. 운영사: 주식회사 사피에넷."
   ],
   values: [
-    { title: "선별 큐레이션", desc: "파트너 검증·품질 표준화", icon: Sparkles },
-    { title: "투명 가격", desc: "합리적 마진, 숨김 없음", icon: BadgeCheck },
-    { title: "빠른 응대", desc: "구매 전후 1:1 지원", icon: MessageSquare },
-    { title: "안전 결제", desc: "Nicepay 기반 보안 결제", icon: Shield },
-    { title: "멤버십 혜택", desc: "등급·포인트로 더 합리하게", icon: Wallet }
+    { title: "데이터 기반", desc: "감각이 아닌 수치로 증명하는 회복", icon: Activity },
+    { title: "엄선 큐레이션", desc: "사피에넷 연구진의 엄격한 검증", icon: Sparkles },
+    { title: "전문가 코칭", desc: "AI와 원장님이 제안하는 개인 맞춤형 프로토콜", icon: Zap },
+    { title: "프라이빗 권한", desc: "등급별 차별화된 컨시어지 및 접근권", icon: Lock },
+    { title: "신뢰 프로세스", desc: "주식회사 사피에넷의 책임 운영", icon: Shield }
   ],
-  partnerOneLiner: "함께 성장할 파트너를 찾습니다. 브랜드 스토어·전문 유통사·크리에이터와의 공정한 협업을 약속합니다. (입점/제휴 문의: partner@youniqle.co.kr)",
+  partnerOneLiner: "회복의 가치를 함께 실현할 글로벌 파트너를 찾습니다. 브랜드, 연구소, 전문가 그룹과의 혁신적인 협업을 환영합니다. (제휴 문의: partner@youniqle.co.kr)",
   abTests: [
-    "좋은 것을 더 바르게, Youniqle.",
-    "프리미엄, 이제 합리의 영역으로.",
-    "선택은 가볍게, 신뢰는 단단하게."
+    "Recovery by Data, not Feeling.",
+    "내일의 에너지를 오늘 설계하다.",
+    "사피에넷의 프리미엄 회복 큐레이션, 유니크."
   ]
 } as const;
 

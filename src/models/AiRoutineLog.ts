@@ -19,13 +19,11 @@ const AiRoutineLogSchema = new Schema<IAiRoutineLog>({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true,
+        required: true
     },
     date: {
         type: Date,
-        required: true,
-        index: true,
+        required: true
     },
     routines: [{
         id: { type: String, required: true },

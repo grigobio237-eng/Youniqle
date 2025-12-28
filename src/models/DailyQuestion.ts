@@ -21,7 +21,6 @@ const DailyQuestionSchema = new Schema<IDailyQuestion>({
         type: String,
         required: true,
         unique: true, // Ensure only one set of questions per day
-        index: true,
     },
     dayOfWeek: {
         type: Number,

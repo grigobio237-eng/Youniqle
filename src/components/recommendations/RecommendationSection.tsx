@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Sparkles, 
-  TrendingUp, 
-  Users, 
-  Eye, 
-  Heart, 
-  ShoppingCart, 
+import {
+  Sparkles,
+  TrendingUp,
+  Users,
+  Eye,
+  Heart,
+  ShoppingCart,
   Star,
   Clock,
   Zap,
@@ -47,7 +47,6 @@ export default function RecommendationSection({
   showRefresh = true,
   className = ''
 }: RecommendationSectionProps) {
-  const { t } = useLanguage();
   const {
     recommendations,
     loading,
@@ -111,10 +110,10 @@ export default function RecommendationSection({
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.8) return 'bg-green-500 text-white';
-    if (score >= 0.6) return 'bg-blue-500 text-white';
-    if (score >= 0.4) return 'bg-yellow-500 text-white';
-    return 'bg-gray-500 text-white';
+    if (score >= 0.8) return 'bg-status-good text-white';
+    if (score >= 0.6) return 'bg-chapter-accent text-white';
+    if (score >= 0.4) return 'bg-status-amber text-white';
+    return 'bg-slate text-white';
   };
 
   const handleItemClick = async (itemId: string, itemData: any) => {
@@ -131,7 +130,7 @@ export default function RecommendationSection({
     try {
       // 행동 추적
       await trackBehavior(itemId, 'add_to_cart', itemData);
-      
+
       // 장바구니에 추가
       const response = await fetch('/api/cart', {
         method: 'POST',
@@ -203,17 +202,17 @@ export default function RecommendationSection({
       <div className={`space-y-4 ${className}`}>
         {showTitle && (
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <h2 className="text-2xl font-black text-obsidian tracking-tight">{title}</h2>
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: itemsPerPage }).map((_, index) => (
-            <Card key={index} className="animate-pulse">
+            <Card key={index} className="animate-pulse rounded-[24px]">
               <CardContent className="p-4">
-                <div className="w-full h-48 bg-gray-200 rounded mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="w-full h-48 bg-mist rounded-[20px] mb-4"></div>
+                <div className="h-4 bg-mist rounded mb-2"></div>
+                <div className="h-4 bg-mist rounded w-3/4"></div>
               </CardContent>
             </Card>
           ))}
@@ -227,26 +226,27 @@ export default function RecommendationSection({
       <div className={`space-y-4 ${className}`}>
         {showTitle && (
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <h2 className="text-2xl font-black text-obsidian tracking-tight">{title}</h2>
             <Button
               variant="outline"
               size="sm"
               onClick={refreshRecommendations}
+              className="rounded-full"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               다시 시도
             </Button>
           </div>
         )}
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="text-red-500 mb-4">
-              <Sparkles className="h-16 w-16 mx-auto mb-4" />
-              <p className="text-lg">추천을 불러올 수 없습니다</p>
-              <p className="text-sm text-gray-500 mt-2">{error}</p>
+        <Card className="rounded-[40px] border-status-danger/10">
+          <CardContent className="text-center py-16">
+            <div className="text-status-danger mb-4">
+              <Sparkles className="h-16 w-16 mx-auto mb-6 opacity-20" />
+              <p className="text-lg font-bold">추천을 불러올 수 없습니다</p>
+              <p className="text-sm text-slate mt-2">{error}</p>
             </div>
-            <Button onClick={refreshRecommendations} variant="outline">
-              다시 시도
+            <Button onClick={refreshRecommendations} variant="outline" className="rounded-full mt-6">
+              다시 시도하기
             </Button>
           </CardContent>
         </Card>
@@ -259,24 +259,25 @@ export default function RecommendationSection({
       <div className={`space-y-4 ${className}`}>
         {showTitle && (
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <h2 className="text-2xl font-black text-obsidian tracking-tight">{title}</h2>
             {showRefresh && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={refreshRecommendations}
+                className="rounded-full"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-{t('recommendations.refresh')}
+                새로고침
               </Button>
             )}
           </div>
         )}
-        <Card>
-          <CardContent className="text-center py-12">
-            <Sparkles className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('recommendations.noRecommendations')}</h3>
-            <p className="text-gray-500">{t('recommendations.noRecommendationsDesc')}</p>
+        <Card className="rounded-[40px] bg-mist/30 border-none shadow-inner">
+          <CardContent className="text-center py-16">
+            <Sparkles className="h-16 w-16 mx-auto mb-6 text-slate/20" />
+            <h3 className="text-xl font-black text-obsidian mb-2">아직 추천 드릴 상품이 없습니다</h3>
+            <p className="text-slate font-medium">더 많은 활동을 통해 당신의 취향을 학습시켜주세요</p>
           </CardContent>
         </Card>
       </div>
@@ -284,16 +285,16 @@ export default function RecommendationSection({
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* 헤더 */}
       {showTitle && (
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <h2 className="text-2xl font-black text-obsidian tracking-tight">{title}</h2>
             {showAlgorithm && (
-              <Badge variant="outline" className="flex items-center space-x-1">
-                {getAlgorithmIcon(algorithm)}
-                <span>{getAlgorithmName(algorithm)}</span>
+              <Badge variant="outline" className="flex items-center space-x-1 rounded-full px-3 py-1 bg-white">
+                <span className="text-chapter-accent">{getAlgorithmIcon(algorithm)}</span>
+                <span className="text-[10px] font-black uppercase tracking-tighter text-slate">{getAlgorithmName(algorithm)}</span>
               </Badge>
             )}
           </div>
@@ -303,9 +304,10 @@ export default function RecommendationSection({
                 variant="outline"
                 size="sm"
                 onClick={refreshRecommendations}
+                className="rounded-full"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-{t('recommendations.refresh')}
+                새로고침
               </Button>
             )}
             {totalPages > 1 && (
@@ -338,8 +340,8 @@ export default function RecommendationSection({
       {/* 추천 상품 그리드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {currentItems.map((item, index) => (
-          <Card 
-            key={item.itemId} 
+          <Card
+            key={item.itemId}
             className="cursor-pointer"
             data-item-id={item.itemId}
             data-item-data={JSON.stringify(item.metadata)}
@@ -349,8 +351,8 @@ export default function RecommendationSection({
               {/* 상품 이미지 */}
               <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg">
                 {item.product?.images?.[0]?.url ? (
-                  <Image 
-                    src={item.product.images[0].url} 
+                  <Image
+                    src={item.product.images[0].url}
                     alt={item.product.name}
                     width={400}
                     height={192}

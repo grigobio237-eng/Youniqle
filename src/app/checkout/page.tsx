@@ -14,19 +14,19 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CharacterImage from '@/components/ui/CharacterImage';
 import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  CreditCard, 
-  Truck, 
-  MapPin, 
-  User, 
-  Phone, 
-  Mail,
+import {
+  CreditCard,
+  Truck,
+  MapPin,
   ArrowLeft,
   ShoppingCart,
   CheckCircle,
   Tag,
-  AlertCircle
+  AlertCircle,
+  ChevronRight,
+  ShieldCheck,
+  Package,
+  Star
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -55,12 +55,11 @@ function CheckoutPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
-  
+
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
+
   // 배송지 정보
   const [shippingAddress, setShippingAddress] = useState({
     recipient: '',
@@ -72,7 +71,7 @@ function CheckoutPageContent() {
     shippingMethod: 'standard', // 배송 방법
     shippingRequest: '' // 배송 요청사항
   });
-  
+
   // 결제 정보
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [agreements, setAgreements] = useState({
@@ -150,7 +149,6 @@ function CheckoutPageContent() {
         });
         if (response.ok) {
           const data = await response.json();
-          // 현재 장바구니 금액에 적용 가능한 쿠폰만 필터링
           const usableCoupons = (data.coupons || []).filter((uc: any) => {
             const coupon = uc.couponId || uc;
             const minAmount = coupon.minOrderAmount || 0;
@@ -170,7 +168,7 @@ function CheckoutPageContent() {
     }
   }, [session, cart, status]);
 
-  // 예상 적립 포인트 계산 (등급별 적립률, 배송비/포인트/쿠폰 제외 금액 기준)
+  // 예상 적립 포인트 계산
   useEffect(() => {
     if (!cart) return;
     const earnRateMap: Record<string, number> = {
@@ -190,22 +188,17 @@ function CheckoutPageContent() {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        // URL 파라미터에서 바로 구매하기 상품 정보 확인
         const productId = searchParams?.get('product');
         const quantity = searchParams?.get('quantity');
-        
+
         if (productId && quantity) {
-          // 바로 구매하기: 상품 정보를 가져와서 임시 장바구니 생성
-          console.log('바로 구매하기 - 상품 ID:', productId, '수량:', quantity);
           const productResponse = await fetch(`/api/products/${productId}`, {
-            credentials: 'include', // NextAuth 세션 쿠키 포함
+            credentials: 'include',
           });
-          console.log('상품 API 응답 상태:', productResponse.status);
-          
+
           if (productResponse.ok) {
             const product = await productResponse.json();
-            console.log('상품 데이터:', product);
-            
+
             const tempCart: Cart = {
               _id: 'temp',
               items: [{
@@ -224,44 +217,33 @@ function CheckoutPageContent() {
               totalItems: parseInt(quantity),
               totalAmount: product.product.price * parseInt(quantity)
             };
-            console.log('생성된 임시 장바구니:', tempCart);
             setCart(tempCart);
-          } else {
-            const errorText = await productResponse.text();
-            console.error('상품 정보 로드 실패:', productResponse.status, errorText);
           }
         } else {
-          // 일반 장바구니에서 온 경우
           const response = await fetch('/api/cart', {
-            credentials: 'include', // NextAuth 세션 쿠키 포함
+            credentials: 'include',
           });
           if (response.ok) {
             const data = await response.json();
-            
-            // 선택된 상품 ID들 확인
             const selectedIds = searchParams?.get('selectedItems');
-            
+
             if (selectedIds) {
-              // 선택된 상품만 필터링
               const selectedIdArray = selectedIds.split(',');
-              const filteredItems = data.cart.items.filter((item: CartItem) => 
+              const filteredItems = data.cart.items.filter((item: CartItem) =>
                 selectedIdArray.includes(item._id)
               );
-              
+
               const filteredCart = {
                 ...data.cart,
                 items: filteredItems,
                 totalItems: filteredItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
                 totalAmount: filteredItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
               };
-              
+
               setCart(filteredCart);
             } else {
-              // 선택 정보가 없으면 전체 장바구니
               setCart(data.cart);
             }
-          } else {
-            console.error('장바구니 로드 실패');
           }
         }
       } catch (error) {
@@ -278,7 +260,6 @@ function CheckoutPageContent() {
     }
   }, [status, router, searchParams]);
 
-  // 배송지 정보 변경 핸들러
   const handleShippingChange = (field: string, value: string) => {
     setShippingAddress(prev => ({
       ...prev,
@@ -286,7 +267,6 @@ function CheckoutPageContent() {
     }));
   };
 
-  // 약관 동의 핸들러
   const handleAgreementChange = (field: string, checked: boolean) => {
     setAgreements(prev => ({
       ...prev,
@@ -294,25 +274,15 @@ function CheckoutPageContent() {
     }));
   };
 
-  // 쿠폰 적용 (코드로)
   const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) {
-      alert('쿠폰 코드를 입력해주세요.');
-      return;
-    }
-
-    if (!cart || cart.items.length === 0) {
-      alert('장바구니가 비어있습니다.');
-      return;
-    }
+    if (!couponCode.trim()) return;
+    if (!cart || cart.items.length === 0) return;
 
     try {
       setValidatingCoupon(true);
       const response = await fetch('/api/coupon/validate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: couponCode.trim(),
           cartItems: cart.items,
@@ -331,13 +301,11 @@ function CheckoutPageContent() {
       }
     } catch (error) {
       console.error('쿠폰 검증 오류:', error);
-      alert('쿠폰 검증 중 오류가 발생했습니다.');
     } finally {
       setValidatingCoupon(false);
     }
   };
 
-  // 쿠폰 선택 (드롭다운에서)
   const handleSelectCoupon = async (couponCode: string) => {
     if (couponCode === 'none') {
       handleRemoveCoupon();
@@ -349,9 +317,7 @@ function CheckoutPageContent() {
     try {
       const response = await fetch('/api/coupon/validate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: couponCode,
           cartItems: cart?.items || [],
@@ -371,35 +337,31 @@ function CheckoutPageContent() {
       }
     } catch (error) {
       console.error('쿠폰 검증 오류:', error);
-      alert('쿠폰 검증 중 오류가 발생했습니다.');
     } finally {
       setValidatingCoupon(false);
     }
   };
 
-  // 쿠폰 제거
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponDiscount(0);
     setCouponCode('');
   };
 
-  // 포인트 사용 핸들러
   const handleUsePoints = (value: number) => {
     setUsePoints(value);
     setPointsError('');
-    
+
     if (value > userPoints) {
       setPointsError('보유 포인트보다 많이 사용할 수 없습니다.');
       return;
     }
-    
+
     if (cart) {
-      const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
       const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
-      const maxUsable = Math.floor(subtotalAfterCoupon * 0.5); // 최대 50% 사용 가능
-      const MIN_UNIT = 10; // 최소 사용 단위
-      
+      const maxUsable = Math.floor(subtotalAfterCoupon * 0.5);
+      const MIN_UNIT = 10;
+
       if (value > maxUsable) {
         setPointsError(`포인트는 주문 금액의 50%까지만 사용 가능합니다. (최대 ${maxUsable}P)`);
         return;
@@ -412,38 +374,26 @@ function CheckoutPageContent() {
     }
   };
 
-  // 포인트 사용 제거
-  const handleRemovePoints = () => {
-    setUsePoints(0);
-    setPointsError('');
-  };
-
-  // 주문 처리 및 나이스페이 결제
   const handleOrder = async () => {
-    if (!cart || cart.items.length === 0) {
-      alert('장바구니가 비어있습니다.');
-      return;
-    }
+    if (!cart || cart.items.length === 0) return;
 
-    // 필수 정보 검증
     if (!shippingAddress.recipient || !shippingAddress.phone || !shippingAddress.address1) {
-      alert(t('checkout.fillAllFields'));
+      alert('모든 필수 정보를 입력해주세요.');
       return;
     }
 
     if (!agreements.terms || !agreements.privacy) {
-      alert(t('checkout.agreeRequired'));
+      alert('필수 약관에 동의하셔야 결제가 가능합니다.');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      // 1단계: 주문 생성
-      const deliveryFee = cart.totalAmount >= 50000 ? 0 : 3000;
+      const currentDeliveryFee = cart.totalAmount >= 50000 ? 0 : shippingAddress.shippingMethod === 'express' ? 5000 : 3000;
       const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
-      const totalAmount = subtotalAfterCoupon + deliveryFee - usePoints; // 포인트 사용 반영
-      
+      const totalAmountToPay = subtotalAfterCoupon + currentDeliveryFee - usePoints;
+
       const orderData = {
         items: cart.items.map(item => ({
           productId: item.productId._id,
@@ -463,24 +413,20 @@ function CheckoutPageContent() {
           shippingRequest: shippingAddress.shippingRequest
         },
         paymentMethod: paymentMethod,
-        totalAmount: totalAmount,
-        usedPoints: usePoints, // 사용한 포인트 추가
-        couponDiscount: couponDiscount // 쿠폰 할인 추가
+        totalAmount: totalAmountToPay,
+        usedPoints: usePoints,
+        couponDiscount: couponDiscount
       };
 
-      // NextAuth 세션 확인 (JWT 토큰 대신 세션 사용)
       if (!session?.user?.email) {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
         router.push('/auth/signin');
         return;
       }
 
       const orderResponse = await fetch('/api/orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // NextAuth 세션 쿠키 포함
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(orderData),
       });
 
@@ -494,26 +440,11 @@ function CheckoutPageContent() {
       const orderResult = await orderResponse.json();
       const order = orderResult.order;
 
-      console.log('주문 생성 결과:', order);
-
-      // 2단계: 나이스페이 결제 요청
-      const resolvedOrderUserId =
-        typeof order.userId === 'string'
-          ? order.userId
-          : order.userId && typeof (order.userId as any).toString === 'function'
-          ? (order.userId as any).toString()
-          : '';
-
-      const sessionUserId =
-        session?.user && typeof (session.user as any).id === 'string'
-          ? (session.user as any).id
-          : '';
-
       const paymentData = {
         orderId: order.orderNumber || order._id,
-        amount: totalAmount,
-        productName: cart.items.length === 1 
-          ? cart.items[0].productId.name 
+        amount: totalAmountToPay,
+        productName: cart.items.length === 1
+          ? cart.items[0].productId.name
           : `${cart.items[0].productId.name} 외 ${cart.items.length - 1}건`,
         buyerName: shippingAddress.recipient,
         buyerEmail: session?.user?.email || '',
@@ -523,31 +454,26 @@ function CheckoutPageContent() {
         transactionType: '0',
         reqReserved: JSON.stringify({
           orderId: order.orderNumber || order._id,
-          userId: resolvedOrderUserId || sessionUserId,
+          userId: (session.user as any).id || '',
           email: session?.user?.email || '',
         }),
       };
 
-      console.log('나이스페이 결제 요청 데이터:', paymentData);
-
       const paymentResponse = await fetch('/api/payment/request', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // NextAuth 세션 쿠키 포함
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(paymentData),
       });
 
       const paymentResult = await paymentResponse.json();
 
       if (paymentResult.success) {
-        // 3단계: 나이스페이 결제 페이지로 리다이렉트
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = paymentResult.authUrl;
         form.acceptCharset = 'euc-kr';
-        
+
         Object.entries(paymentResult.formData).forEach(([key, value]) => {
           const input = document.createElement('input');
           input.type = 'hidden';
@@ -555,7 +481,7 @@ function CheckoutPageContent() {
           input.value = value as string;
           form.appendChild(input);
         });
-        
+
         document.body.appendChild(form);
         form.submit();
       } else {
@@ -570,17 +496,10 @@ function CheckoutPageContent() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-mist flex items-center justify-center">
         <div className="text-center">
-          <CharacterImage
-            src="/character/youniqle-1.png"
-            alt="로딩 중"
-            width={64}
-            height={64}
-            className="w-16 h-16 mx-auto mb-4 animate-bounce"
-            sizes="64px"
-          />
-          <p className="text-gray-600">로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chapter-accent mx-auto mb-4"></div>
+          <p className="text-slate font-bold uppercase tracking-widest text-xs">Processing Security</p>
         </div>
       </div>
     );
@@ -588,573 +507,408 @@ function CheckoutPageContent() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <CharacterImage
-            src="/character/youniqle-1.png"
-            alt="장바구니가 비어있음"
-            width={64}
-            height={64}
-            className="w-16 h-16 mx-auto mb-4"
-            sizes="64px"
-          />
-          <h2 className="text-xl font-semibold mb-2">장바구니가 비어있습니다</h2>
-          <p className="text-gray-600 mb-4">상품을 장바구니에 담아주세요.</p>
-          <Button asChild>
-            <Link href="/products">쇼핑하러 가기</Link>
+      <div className="min-h-screen bg-mist flex items-center justify-center px-4">
+        <div className="text-center bg-white p-12 rounded-[40px] shadow-xl max-w-md w-full">
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🛒</div>
+          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">장바구니가 비어있습니다</h2>
+          <p className="text-slate font-medium mb-8">상품을 장바구니에 담아주세요.</p>
+          <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black shadow-lg">
+            <Link href="/products">회복 아이템 보러가기</Link>
           </Button>
         </div>
       </div>
     );
   }
 
-  // 배송비 계산 (배송 방법에 따라)
-  const getDeliveryFee = () => {
-    if (cart.totalAmount >= 50000) return 0; // 5만원 이상 무료배송
-    if (shippingAddress.shippingMethod === 'express') return 5000; // 당일배송
-    if (shippingAddress.shippingMethod === 'nextday') return 3000; // 익일배송
-    return 3000; // 기본 배송
-  };
-
-  const deliveryFee = getDeliveryFee();
+  const deliveryFee = cart.totalAmount >= 50000 ? 0 : shippingAddress.shippingMethod === 'express' ? 5000 : 3000;
   const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
   const totalAmount = Math.max(0, subtotalAfterCoupon + deliveryFee - usePoints);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <Button variant="ghost" asChild className="mr-4">
-              <Link href="/cart">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                장바구니로 돌아가기
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold">주문/결제</h1>
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            <span>장바구니</span>
-            <span className="mx-2">→</span>
-            <CheckCircle className="h-4 w-4 mr-2 text-blue-600" />
-            <span className="text-blue-600 font-medium">주문/결제</span>
+    <div className="min-h-screen bg-mist py-12 px-4">
+      <div className="container mx-auto max-w-6xl">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div>
+              <Button variant="ghost" asChild className="p-0 hover:bg-transparent text-slate hover:text-obsidian mb-4">
+                <Link href="/cart" className="flex items-center gap-2 font-bold">
+                  <ArrowLeft className="h-4 w-4" />
+                  장바구니로 돌아가기
+                </Link>
+              </Button>
+              <h1 className="text-4xl font-black text-obsidian tracking-tighter">CHECKOUT</h1>
+              <p className="text-slate font-bold uppercase tracking-widest text-xs mt-1">Order Execution Protocol</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 opacity-30">
+                <div className="w-3 h-3 rounded-full bg-slate" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Cart</span>
+              </div>
+              <div className="h-px w-8 bg-line" />
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-chapter-accent" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-chapter-accent">Payment</span>
+              </div>
+              <div className="h-px w-8 bg-line" />
+              <div className="flex items-center gap-2 opacity-30">
+                <div className="w-3 h-3 rounded-full bg-slate" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Done</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 주문 정보 */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* 배송지 정보 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-2" />
-                  배송지 정보
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-8">
+            {/* 배송 정보 */}
+            <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white hover:shadow-md transition-shadow">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="flex items-center text-xl font-black text-obsidian">
+                  <MapPin className="h-5 w-5 mr-3 text-chapter-accent" />
+                  배송 정보
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="recipient">받는 사람 *</Label>
+              <CardContent className="p-8 pt-4 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="recipient" className="font-bold text-slate">받는 사람 *</Label>
                     <Input
                       id="recipient"
                       value={shippingAddress.recipient}
                       onChange={(e) => handleShippingChange('recipient', e.target.value)}
+                      className="h-12 rounded-xl bg-mist/50 border-line focus:ring-chapter-accent"
                       placeholder="이름을 입력하세요"
-                      required
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="phone">연락처 *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="font-bold text-slate">연락처 *</Label>
                     <Input
                       id="phone"
                       value={shippingAddress.phone}
                       onChange={(e) => handleShippingChange('phone', e.target.value)}
+                      className="h-12 rounded-xl bg-mist/50 border-line"
                       placeholder="010-1234-5678"
-                      required
                     />
                   </div>
                 </div>
-                
-                <div>
-                  <Label>주소 *</Label>
-                  
-                  {/* Google 주소 검색 */}
-                  <div className="mb-3">
-                    <GoogleAddressSearch
-                      onAddressSelect={(address) => {
-                        setShippingAddress(prev => ({
-                          ...prev,
-                          zipCode: address.zonecode,
-                          address1: address.address
-                        }));
-                      }}
-                    />
-                  </div>
-                  
-                  {/* 주소 입력 필드들 */}
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        value={shippingAddress.zipCode}
-                        onChange={(e) => handleShippingChange('zipCode', e.target.value)}
-                        placeholder="우편번호 (직접 입력 가능)"
-                        className="w-32"
-                      />
-                      <Input
-                        value={shippingAddress.address1}
-                        onChange={(e) => handleShippingChange('address1', e.target.value)}
-                        placeholder="도로명주소"
-                        className="flex-1"
-                      />
-                    </div>
-                    <Input
-                      value={shippingAddress.address2}
-                      onChange={(e) => handleShippingChange('address2', e.target.value)}
-                      placeholder="상세주소를 입력하세요"
-                    />
-                    <div className="text-xs text-gray-500">
-                      💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
-                    </div>
-                  </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="shippingMethod">배송 방법</Label>
-                  <Select
-                    value={shippingAddress.shippingMethod}
-                    onValueChange={(value) => handleShippingChange('shippingMethod', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="배송 방법을 선택하세요" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">일반 배송 (1-2일) - 3,000원</SelectItem>
-                      <SelectItem value="nextday">익일 배송 - 3,000원</SelectItem>
-                      <SelectItem value="express">당일 배송 - 5,000원</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {cart.totalAmount >= 50000 && (
-                    <p className="text-sm text-green-600 mt-1">
-                      💡 5만원 이상 구매 시 배송비 무료!
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="shippingRequest">배송 요청사항</Label>
-                  <Select
-                    value={shippingAddress.shippingRequest}
-                    onValueChange={(value) => handleShippingChange('shippingRequest', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="배송 요청사항 선택 (선택사항)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">선택 안 함</SelectItem>
-                      <SelectItem value="door">문 앞에 놓아주세요</SelectItem>
-                      <SelectItem value="security">경비실에 맡겨주세요</SelectItem>
-                      <SelectItem value="delivery-box">택배함에 넣어주세요</SelectItem>
-                      <SelectItem value="call">배송 전 연락 부탁드립니다</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="memo">배송 메모 (선택사항)</Label>
-                  <Input
-                    id="memo"
-                    value={shippingAddress.memo}
-                    onChange={(e) => handleShippingChange('memo', e.target.value)}
-                    placeholder="기타 요청사항을 입력하세요"
+                <div className="space-y-4">
+                  <Label className="font-bold text-slate">주소 *</Label>
+                  <GoogleAddressSearch
+                    onAddressSelect={(address) => {
+                      setShippingAddress(prev => ({
+                        ...prev,
+                        zipCode: address.zonecode,
+                        address1: address.address
+                      }));
+                    }}
                   />
+                  <div className="flex gap-2">
+                    <Input
+                      value={shippingAddress.zipCode}
+                      onChange={(e) => handleShippingChange('zipCode', e.target.value)}
+                      placeholder="우편번호"
+                      className="w-32 h-12 rounded-xl bg-mist/50 border-line"
+                    />
+                    <Input
+                      value={shippingAddress.address1}
+                      onChange={(e) => handleShippingChange('address1', e.target.value)}
+                      placeholder="도로명주소"
+                      className="flex-1 h-12 rounded-xl bg-mist/50 border-line"
+                    />
+                  </div>
+                  <Input
+                    value={shippingAddress.address2}
+                    onChange={(e) => handleShippingChange('address2', e.target.value)}
+                    placeholder="상세주소를 입력하세요"
+                    className="h-12 rounded-xl bg-mist/50 border-line"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="shippingMethod" className="font-bold text-slate">배송 방법</Label>
+                    <Select
+                      value={shippingAddress.shippingMethod}
+                      onValueChange={(value) => handleShippingChange('shippingMethod', value)}
+                    >
+                      <SelectTrigger className="h-12 rounded-xl bg-mist/50 border-line">
+                        <SelectValue placeholder="배송 방법 선택" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-line">
+                        <SelectItem value="standard" className="rounded-lg">일반 배송 (1-2일) - 3,000원</SelectItem>
+                        <SelectItem value="nextday" className="rounded-lg">익일 배송 - 3,000원</SelectItem>
+                        <SelectItem value="express" className="rounded-lg">당일 배송 - 5,000원</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="shippingRequest" className="font-bold text-slate">배송 요청사항</Label>
+                    <Select
+                      value={shippingAddress.shippingRequest}
+                      onValueChange={(value) => handleShippingChange('shippingRequest', value)}
+                    >
+                      <SelectTrigger className="h-12 rounded-xl bg-mist/50 border-line">
+                        <SelectValue placeholder="요청사항 선택" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-line">
+                        <SelectItem value="" className="rounded-lg">선택 안 함</SelectItem>
+                        <SelectItem value="door" className="rounded-lg">문 앞에 놓아주세요</SelectItem>
+                        <SelectItem value="security" className="rounded-lg">경비실에 맡겨주세요</SelectItem>
+                        <SelectItem value="delivery-box" className="rounded-lg">택배함에 넣어주세요</SelectItem>
+                        <SelectItem value="call" className="rounded-lg">배송 전 연락 부탁드립니다</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* 결제 방법 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
+            <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="flex items-center text-xl font-black text-obsidian">
+                  <CreditCard className="h-5 w-5 mr-3 text-chapter-accent" />
                   결제 방법
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card">카드결제</Label>
+              <CardContent className="p-8 pt-4">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`flex items-center space-x-3 p-5 rounded-2xl border-2 transition-all cursor-pointer ${paymentMethod === 'card' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-mist bg-mist/30 hover:bg-mist/50'}`}>
+                    <RadioGroupItem value="card" id="card" className="border-slate data-[state=checked]:bg-chapter-accent data-[state=checked]:border-chapter-accent" />
+                    <Label htmlFor="card" className="flex items-center font-black text-obsidian cursor-pointer">
+                      신용/체크카드
+                    </Label>
                   </div>
                 </RadioGroup>
-              {!isMobileDevice && (
-                <Alert className="mt-4 border-yellow-300 bg-yellow-50 text-yellow-900">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>PC 결제 안내</AlertTitle>
-                  <AlertDescription>
-                    PC 환경에서는 신한 SOL페이 등 일부 간편결제가 지원되지 않을 수 있습니다. 일반 카드 결제를 이용해 주세요.
-                  </AlertDescription>
-                </Alert>
-              )}
-                <p className="text-sm text-gray-600 mt-2">
-                  안전한 나이스페이 결제 시스템을 사용합니다.
-                </p>
+                {!isMobileDevice && (
+                  <Alert className="mt-8 border-none bg-status-amber/5 rounded-2xl">
+                    <AlertCircle className="h-4 w-4 text-status-amber" />
+                    <AlertDescription className="text-xs font-medium text-status-amber leading-relaxed">
+                      PC 환경에서는 앱 카드 결제 시 일부 제한이 있을 수 있습니다. 수기 카드 정보 입력 혹은 간편결제를 권장합니다.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </CardContent>
             </Card>
 
-            {/* 쿠폰 적용 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Tag className="h-5 w-5 mr-2" />
-                  쿠폰 적용
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {appliedCoupon ? (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                        <span className="font-semibold text-green-800">
-                          쿠폰이 적용되었습니다
-                        </span>
+            {/* 쿠폰 & 포인트 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white">
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="flex items-center text-lg font-black text-obsidian">
+                    <Tag className="h-5 w-5 mr-3 text-chapter-accent" />
+                    쿠폰 할인
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-4 space-y-4">
+                  {appliedCoupon ? (
+                    <div className="p-5 rounded-2xl bg-status-good/5 border border-status-good/20 flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs font-black text-status-good uppercase tracking-widest">Active Coupon</span>
+                        <Button variant="ghost" size="sm" onClick={handleRemoveCoupon} className="h-6 px-2 text-[10px] font-bold text-status-danger hover:bg-status-danger/10">제거</Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleRemoveCoupon}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        제거
-                      </Button>
+                      <p className="font-bold text-obsidian leading-tight">{appliedCoupon.name}</p>
+                      <p className="text-xl font-black text-status-good">-{couponDiscount.toLocaleString()}원</p>
                     </div>
-                    <p className="text-sm text-gray-700 mb-1">{appliedCoupon.name}</p>
-                    <p className="text-lg font-bold text-green-600">
-                      -{couponDiscount.toLocaleString()}원 할인
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    {/* 쿠폰 선택 드롭다운 */}
-                    {availableCoupons.length > 0 && (
-                      <div className="space-y-2">
-                        <Label>사용 가능한 쿠폰 선택</Label>
-                        <Select
-                          value={appliedCoupon?.code || 'none'}
-                          onValueChange={handleSelectCoupon}
-                          disabled={loadingCoupons || validatingCoupon}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="쿠폰을 선택하세요" />
+                  ) : (
+                    <div className="space-y-4">
+                      {availableCoupons.length > 0 && (
+                        <Select value={appliedCoupon?.couponId?.code || ""} onValueChange={handleSelectCoupon}>
+                          <SelectTrigger className="h-12 rounded-xl bg-mist/50 border-line">
+                            <SelectValue placeholder="사용 가능한 쿠폰" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">쿠폰 사용 안 함</SelectItem>
-                            {availableCoupons.map((uc: any) => {
-                              const coupon = uc.couponId || uc;
-                              const discountText = coupon.type === 'percentage' 
-                                ? `${coupon.value}% 할인`
-                                : coupon.type === 'free_shipping'
-                                ? '무료배송'
-                                : `${coupon.value.toLocaleString()}원 할인`;
-                              const minAmountText = coupon.minOrderAmount 
-                                ? ` (${coupon.minOrderAmount.toLocaleString()}원 이상)`
-                                : '';
-                              return (
-                                <SelectItem key={uc._id} value={coupon.code}>
-                                  {coupon.name} - {discountText}{minAmountText}
-                                </SelectItem>
-                              );
-                            })}
+                          <SelectContent className="rounded-xl">
+                            {availableCoupons.map((uc: any) => (
+                              <SelectItem key={uc._id} value={uc.couponId.code || uc.code}>
+                                {uc.couponId.name || uc.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
-                        {loadingCoupons && (
-                          <p className="text-sm text-gray-500">쿠폰 목록을 불러오는 중...</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* 쿠폰 코드 직접 입력 */}
-                    <div className="space-y-2">
-                      <Label>또는 쿠폰 코드 직접 입력</Label>
-                      <div className="flex space-x-2">
+                      )}
+                      <div className="flex gap-2">
                         <Input
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                          placeholder="쿠폰 코드를 입력하세요"
-                          onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                          disabled={validatingCoupon}
+                          placeholder="쿠폰 코드 입력"
+                          className="h-12 rounded-xl bg-mist/50 border-line"
                         />
-                        <Button
-                          onClick={handleApplyCoupon}
-                          disabled={validatingCoupon || !couponCode.trim()}
-                          className="whitespace-nowrap"
-                        >
-                          {validatingCoupon ? '확인 중...' : '적용'}
-                        </Button>
+                        <Button onClick={handleApplyCoupon} disabled={validatingCoupon} className="h-12 px-6 rounded-xl bg-obsidian text-mist font-black">적용</Button>
                       </div>
                     </div>
+                  )}
+                </CardContent>
+              </Card>
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">
-                        {availableCoupons.length > 0 
-                          ? `사용 가능한 쿠폰 ${availableCoupons.length}개`
-                          : '사용 가능한 쿠폰이 없습니다'}
-                      </span>
-                      <Button variant="link" asChild className="p-0 h-auto">
-                        <Link href="/me/coupons">
-                          내 쿠폰함 보기
-                        </Link>
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* 포인트 사용 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <span className="text-yellow-600 mr-2">⭐</span>
-                  포인트 사용
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {usePoints > 0 ? (
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="h-5 w-5 text-yellow-600 mr-2" />
-                        <span className="font-semibold text-yellow-800">
-                          포인트가 적용되었습니다
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleRemovePoints}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        제거
-                      </Button>
-                    </div>
-                    <p className="text-lg font-bold text-yellow-600">
-                      -{usePoints.toLocaleString()}P 사용
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      남은 포인트: {(userPoints - usePoints).toLocaleString()}P
-                    </p>
+              <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white">
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="flex items-center text-lg font-black text-obsidian">
+                    <Star className="h-5 w-5 mr-3 text-reward-gold" />
+                    포인트 사용
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-4 space-y-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-bold text-slate">보유 포인트</span>
+                    <span className="font-black text-obsidian">{userPoints.toLocaleString()}P</span>
                   </div>
-                ) : (
-                  <>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="points">사용할 포인트</Label>
-                        <p className="text-sm text-gray-600 mb-2">
-                          보유 포인트: <span className="font-semibold text-yellow-600">{userPoints.toLocaleString()}P</span>
-                        </p>
-                        <div className="flex space-x-2">
-                          <Input
-                            id="points"
-                            type="number"
-                            value={usePoints || ''}
-                            onChange={(e) => handleUsePoints(Number(e.target.value))}
-                            placeholder="사용할 포인트를 입력하세요"
-                            max={userPoints}
-                            min="0"
-                            step="10"
-                          />
-                          {cart && (
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
-                                const maxUsable = Math.floor(subtotalAfterCoupon * 0.5);
-                                const actualMax = Math.min(maxUsable, userPoints);
-                                const roundedMax = Math.floor(actualMax / 10) * 10; // 10의 배수로
-                                handleUsePoints(roundedMax);
-                              }}
-                              disabled={!cart || userPoints === 0}
-                              className="whitespace-nowrap"
-                            >
-                              최대 사용
-                            </Button>
-                          )}
-                        </div>
-                        {pointsError && (
-                          <p className="text-sm text-red-600 mt-1">{pointsError}</p>
-                        )}
-                        {cart && !pointsError && usePoints === 0 && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            최대 사용 가능: {Math.min(
-                              Math.floor((cart.totalAmount - couponDiscount) * 0.5),
-                              userPoints
-                            ).toLocaleString()}P
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p>• 포인트는 주문 금액의 최대 50%까지만 사용 가능합니다</p>
-                        <p>• 포인트는 10P 단위로만 사용할 수 있습니다</p>
-                        <p>• 포인트 사용 시 적립은 사용한 금액을 제외한 금액에 대해 지급됩니다</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* 약관 동의 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>약관 동의</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={agreements.terms}
-                    onCheckedChange={(checked) => handleAgreementChange('terms', checked as boolean)}
-                  />
-                  <Label htmlFor="terms" className="text-sm">
-                    <Link href="/terms" className="text-blue-600 hover:underline">
-                      서비스 이용약관
-                    </Link>
-                    에 동의합니다. (필수)
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="privacy"
-                    checked={agreements.privacy}
-                    onCheckedChange={(checked) => handleAgreementChange('privacy', checked as boolean)}
-                  />
-                  <Label htmlFor="privacy" className="text-sm">
-                    <Link href="/privacy" className="text-blue-600 hover:underline">
-                      개인정보 처리방침
-                    </Link>
-                    에 동의합니다. (필수)
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="marketing"
-                    checked={agreements.marketing}
-                    onCheckedChange={(checked) => handleAgreementChange('marketing', checked as boolean)}
-                  />
-                  <Label htmlFor="marketing" className="text-sm">
-                    마케팅 정보 수신에 동의합니다. (선택)
-                  </Label>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      value={usePoints || ''}
+                      onChange={(e) => handleUsePoints(Number(e.target.value))}
+                      placeholder="얼마를 사용할까요?"
+                      className="h-12 rounded-xl bg-mist/50 border-line"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const maxUsable = Math.min(Math.floor((cart.totalAmount - couponDiscount) * 0.5), userPoints);
+                        handleUsePoints(Math.floor(maxUsable / 10) * 10);
+                      }}
+                      className="h-12 px-4 rounded-xl border-line font-black text-xs"
+                    >
+                      최대
+                    </Button>
+                  </div>
+                  {pointsError && <p className="text-[10px] font-bold text-status-danger mt-1">{pointsError}</p>}
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* 주문 요약 */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  주문 상품
+          <div className="lg:col-span-4 space-y-8 sticky top-24">
+            {/* 주문 요약 */}
+            <Card className="border-none shadow-2xl rounded-[40px] overflow-hidden bg-obsidian text-mist">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="flex items-center text-xl font-black">
+                  <Package className="h-5 w-5 mr-3 text-reward-gold" />
+                  최종 주문 확인
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {cart.items.map((item) => (
-                  <div key={item._id} className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                      {item.productId.images && item.productId.images.length > 0 ? (
-                        <div className="w-10 h-10 relative">
-                          <Image
-                            src={(item.productId.images[0] as any)?.url || item.productId.images[0]}
-                            alt={item.productId.name}
-                            fill
-                            className="object-cover rounded"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-10 h-10 bg-gray-200 rounded" />
-                      )}
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-4 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
+                  {cart.items.map((item) => (
+                    <div key={item._id} className="flex gap-4 items-center">
+                      <div className="w-12 h-12 rounded-lg bg-white/10 flex-shrink-0 relative overflow-hidden">
+                        <Image
+                          src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
+                          alt={item.productId.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold line-clamp-1">{item.productId.name}</p>
+                        <p className="text-[10px] opacity-50 font-medium">{item.quantity}개 / {(item.price * item.quantity).toLocaleString()}원</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.productId.name}</p>
-                      <p className="text-xs text-gray-500">수량: {item.quantity}개</p>
-                    </div>
-                    <p className="text-sm font-medium">
-                      {(item.price * item.quantity).toLocaleString()}원
-                    </p>
+                  ))}
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                <div className="space-y-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="opacity-60">상품 합계</span>
+                    <span className="font-bold">{cart.totalAmount.toLocaleString()}원</span>
                   </div>
-                ))}
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="opacity-60">쿠폰 할인</span>
+                      <span className="font-bold text-status-danger">-{couponDiscount.toLocaleString()}원</span>
+                    </div>
+                  )}
+                  {usePoints > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="opacity-60">포인트 사용</span>
+                      <span className="font-bold text-status-danger">-{usePoints.toLocaleString()}P</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="opacity-60">배송비</span>
+                    <span className="font-bold">{deliveryFee > 0 ? `${deliveryFee.toLocaleString()}원` : '무료'}</span>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                <div className="space-y-6">
+                  <div className="flex justify-between items-end">
+                    <span className="text-xs font-black uppercase tracking-widest opacity-40">Final Amount</span>
+                    <span className="text-3xl font-black text-reward-gold tracking-tighter">
+                      {totalAmount.toLocaleString()}원
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 transition-colors">
+                      <Checkbox
+                        id="terms"
+                        checked={agreements.terms}
+                        onCheckedChange={(c) => handleAgreementChange('terms', c as boolean)}
+                        className="mt-1 border-white/20 data-[state=checked]:bg-reward-gold data-[state=checked]:border-reward-gold"
+                      />
+                      <label htmlFor="terms" className="text-[10px] font-medium opacity-60 leading-relaxed cursor-pointer">
+                        (필수) 주문 상품 정보 및 결제 조건에 동의합니다.
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 transition-colors">
+                      <Checkbox
+                        id="privacy"
+                        checked={agreements.privacy}
+                        onCheckedChange={(c) => handleAgreementChange('privacy', c as boolean)}
+                        className="mt-1 border-white/20 data-[state=checked]:bg-reward-gold data-[state=checked]:border-reward-gold"
+                      />
+                      <label htmlFor="privacy" className="text-[10px] font-medium opacity-60 leading-relaxed cursor-pointer">
+                        (필수) 개인정보 제3자 제공 및 수집 이용에 동의합니다.
+                      </label>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleOrder}
+                    disabled={submitting}
+                    className="w-full h-18 rounded-2xl bg-reward-gold text-obsidian font-black text-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-reward-gold/10"
+                  >
+                    {submitting ? (
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-obsidian"></div>
+                    ) : (
+                      <>
+                        결제하기
+                        <ChevronRight className="w-6 h-6" />
+                      </>
+                    )}
+                  </Button>
+
+                  {expectedEarnPoints > 0 && (
+                    <p className="text-center text-[10px] font-bold text-reward-gold animate-pulse">
+                      결제 시 {expectedEarnPoints.toLocaleString()}P가 적립될 예정입니다.
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Truck className="h-5 w-5 mr-2" />
-                  주문 요약
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span>상품 금액</span>
-                  <span>{cart.totalAmount.toLocaleString()}원</span>
-                </div>
-                {couponDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>쿠폰 할인</span>
-                    <span>-{couponDiscount.toLocaleString()}원</span>
-                  </div>
-                )}
-                {usePoints > 0 && (
-                  <div className="flex justify-between text-yellow-600">
-                    <span>포인트 사용</span>
-                    <span>-{usePoints.toLocaleString()}P</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>배송비</span>
-                  <span>
-                    {deliveryFee === 0 ? '무료' : `${deliveryFee.toLocaleString()}원`}
-                  </span>
-                </div>
-                <hr />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>총 결제금액</span>
-                  <span className={couponDiscount > 0 || usePoints > 0 ? 'text-green-600' : ''}>
-                    {totalAmount.toLocaleString()}원
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-yellow-700">
-                  <span>예상 적립</span>
-                  <span>{expectedEarnPoints.toLocaleString()}P (등급: {userGrade})</span>
-                </div>
-                {(couponDiscount > 0 || usePoints > 0) && (
-                  <p className="text-sm text-green-600 text-center">
-                    {couponDiscount > 0 && usePoints > 0 
-                      ? `쿠폰과 포인트로 총 ${(couponDiscount + usePoints).toLocaleString()}원 절약했어요! 🎉`
-                      : couponDiscount > 0 
-                        ? `쿠폰으로 ${couponDiscount.toLocaleString()}원 절약했어요! 🎉`
-                        : `포인트로 ${usePoints.toLocaleString()}원 절약했어요! ⭐`
-                    }
-                  </p>
-                )}
-                <Button 
-                  className="w-full" 
-                  size="lg"
-                  onClick={handleOrder}
-                  disabled={submitting}
-                >
-                  {submitting ? '주문 처리 중...' : `${totalAmount.toLocaleString()}원 결제하기`}
-                </Button>
-              </CardContent>
+            <Card className="border-none bg-white rounded-[32px] overflow-hidden p-6 space-y-4">
+              <div className="flex items-center gap-2 text-status-good">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="text-[11px] font-black uppercase tracking-widest">Safe Protocol Active</span>
+              </div>
+              <p className="text-[10px] text-slate font-medium leading-relaxed">
+                나이스페이의 SSL 보안 결제 기술이 적용되어 귀하의 금융 정보를 안전하게 보호합니다.
+              </p>
             </Card>
           </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+      `}</style>
     </div>
   );
 }
@@ -1162,18 +916,8 @@ function CheckoutPageContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <CharacterImage
-            src="/character/youniqle-1.png"
-            alt="로딩 중"
-            width={64}
-            height={64}
-            className="w-16 h-16 mx-auto mb-4 animate-bounce"
-            sizes="64px"
-          />
-          <p className="text-gray-600">로딩 중...</p>
-        </div>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="text-center font-black text-obsidian tracking-tighter opacity-10">LOADING PROTOCOL</div>
       </div>
     }>
       <CheckoutPageContent />

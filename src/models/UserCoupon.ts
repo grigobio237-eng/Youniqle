@@ -17,14 +17,12 @@ const UserCouponSchema = new Schema<IUserCoupon>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   couponId: {
     type: Schema.Types.ObjectId,
     ref: 'Coupon',
-    required: true,
-    index: true
+    required: true
   },
   code: {
     type: String,
@@ -35,8 +33,7 @@ const UserCouponSchema = new Schema<IUserCoupon>({
   status: {
     type: String,
     enum: ['available', 'used', 'expired'],
-    default: 'available',
-    index: true
+    default: 'available'
   },
   downloadedAt: {
     type: Date,
@@ -59,7 +56,6 @@ const UserCouponSchema = new Schema<IUserCoupon>({
 });
 
 // 인덱스 설정
-UserCouponSchema.index({ userId: 1, couponId: 1 });
 UserCouponSchema.index({ userId: 1, status: 1 });
 UserCouponSchema.index({ code: 1, userId: 1 });
 

@@ -30,30 +30,30 @@ export interface ISettlement extends Document {
   partnerId: mongoose.Types.ObjectId;
   partnerName: string;
   partnerEmail: string;
-  
+
   // 메서드
   updateStatus(
     newStatus: SettlementStatus,
     adminId?: mongoose.Types.ObjectId,
     reason?: string
   ): Promise<ISettlement>;
-  
+
   // 정산 기본 정보
   settlementNumber: string;  // 정산 번호 (예: STL-202501-001)
   type: SettlementType;
   status: SettlementStatus;
-  
+
   // 정산 기간
   periodStart: Date;
   periodEnd: Date;
-  
+
   // 정산 금액 정보
   items: ISettlementItem[];
   totalOrders: number;           // 총 주문 건수
   totalOrderAmount: number;      // 총 주문 금액
   totalCommissionAmount: number; // 총 수수료 금액
   totalSettlementAmount: number; // 총 정산 금액 (실제 지급액)
-  
+
   // 추가 비용 및 조정
   additionalFees?: {
     name: string;
@@ -62,42 +62,42 @@ export interface ISettlement extends Document {
   }[];
   adjustmentAmount?: number;     // 조정 금액 (양수: 추가, 음수: 차감)
   adjustmentReason?: string;     // 조정 사유
-  
+
   // 정산 계좌 정보 (스냅샷)
   bankAccount: {
     bankName: string;
     accountNumber: string;
     accountHolder: string;
   };
-  
+
   // 세금 정보
   taxInfo?: {
     vatAmount?: number;           // 부가세
     incomeTaxAmount?: number;     // 소득세
     residentTaxAmount?: number;   // 주민세
   };
-  
+
   // 정산 처리 정보
   requestedAt?: Date;            // 정산 요청 일시
   approvedAt?: Date;             // 승인 일시
   approvedBy?: mongoose.Types.ObjectId; // 승인자 (관리자 ID)
   processedAt?: Date;            // 처리 완료 일시 (입금 완료)
   completedAt?: Date;            // 정산 완료 일시
-  
+
   // 취소/실패 정보
   cancelledAt?: Date;
   cancelReason?: string;
   failedAt?: Date;
   failReason?: string;
-  
+
   // 메모 및 첨부
   adminNotes?: string;           // 관리자 메모
   partnerNotes?: string;         // 파트너 메모
   attachments?: string[];        // 첨부 파일 (증빙 서류 등)
-  
+
   // 알림 상태
   notificationSent: boolean;     // 정산 완료 알림 전송 여부
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -107,8 +107,7 @@ const SettlementSchema = new Schema<ISettlement>(
     partnerId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-      index: true,
+      required: true
     },
     partnerName: {
       type: String,
@@ -122,7 +121,6 @@ const SettlementSchema = new Schema<ISettlement>(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     type: {
       type: String,
@@ -134,18 +132,15 @@ const SettlementSchema = new Schema<ISettlement>(
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed', 'cancelled'],
       default: 'pending',
-      required: true,
-      index: true,
+      required: true
     },
     periodStart: {
       type: Date,
-      required: true,
-      index: true,
+      required: true
     },
     periodEnd: {
       type: Date,
-      required: true,
-      index: true,
+      required: true
     },
     items: [
       {
@@ -237,7 +232,6 @@ const SettlementSchema = new Schema<ISettlement>(
 // 인덱스 설정
 SettlementSchema.index({ partnerId: 1, periodStart: -1 });
 SettlementSchema.index({ status: 1, createdAt: -1 });
-SettlementSchema.index({ settlementNumber: 1 });
 
 // 정산 번호 자동 생성 메서드
 SettlementSchema.statics.generateSettlementNumber = async function (
@@ -329,7 +323,7 @@ SettlementSchema.methods.updateStatus = async function (
 SettlementSchema.set('toJSON', { virtuals: true });
 SettlementSchema.set('toObject', { virtuals: true });
 
-const Settlement = (mongoose.models.Settlement as ISettlementModel) || 
+const Settlement = (mongoose.models.Settlement as ISettlementModel) ||
   mongoose.model<ISettlement, ISettlementModel>('Settlement', SettlementSchema);
 
 export default Settlement;

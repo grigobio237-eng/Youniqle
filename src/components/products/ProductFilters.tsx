@@ -37,92 +37,94 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
 
   const createFilterUrl = (key: string, value: string) => {
     const params = new URLSearchParams();
-
-    // Preserve existing search params
     if (searchParams?.q) params.set('q', searchParams.q);
     if (searchParams?.category) params.set('category', searchParams.category);
     if (searchParams?.sort) params.set('sort', searchParams.sort);
 
-    // Update the specific filter
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
+    if (value) params.set(key, value);
+    else params.delete(key);
 
     return `/products?${params.toString()}`;
   };
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">필터</h3>
-
+    <div className="space-y-8 p-6">
       {/* Categories */}
-      <div>
+      <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-between p-0 h-auto font-medium"
+          className="w-full justify-between p-0 h-auto font-black text-xs uppercase tracking-widest text-text-primary hover:bg-transparent"
           onClick={() => setShowCategories(!showCategories)}
         >
-          카테고리
-          {showCategories ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          카테고리 (Category)
+          {showCategories ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
         </Button>
 
         {showCategories && (
-          <div className="mt-3 space-y-2">
-            {categories.map((category) => (
-              <Link
-                key={category.value}
-                href={createFilterUrl('category', category.value)}
-                className="block"
-              >
-                <Badge
-                  variant={searchParams?.category === category.value ? 'default' : 'outline'}
-                  className="w-full justify-start cursor-pointer hover:bg-primary/10 transition-colors"
+          <div className="flex flex-col gap-1.5 pt-2">
+            {categories.map((category) => {
+              const isActive = (searchParams?.category || '') === category.value;
+              return (
+                <Link
+                  key={category.value}
+                  href={createFilterUrl('category', category.value)}
+                  className="block"
                 >
-                  {category.name}
-                </Badge>
-              </Link>
-            ))}
+                  <div
+                    className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${isActive
+                        ? 'bg-primary text-background border-primary'
+                        : 'bg-transparent text-text-secondary border-transparent hover:border-line hover:text-text-primary'
+                      }`}
+                  >
+                    {category.name}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
 
       {/* Sort Options */}
-      <div>
+      <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-between p-0 h-auto font-medium"
+          className="w-full justify-between p-0 h-auto font-black text-xs uppercase tracking-widest text-text-primary hover:bg-transparent"
           onClick={() => setShowSort(!showSort)}
         >
-          정렬
-          {showSort ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          정렬 (Sort)
+          {showSort ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
         </Button>
 
         {showSort && (
-          <div className="mt-3 space-y-2">
-            {sortOptions.map((option) => (
-              <Link
-                key={option.value}
-                href={createFilterUrl('sort', option.value)}
-                className="block"
-              >
-                <Badge
-                  variant={searchParams?.sort === option.value ? 'default' : 'outline'}
-                  className="w-full justify-start cursor-pointer hover:bg-primary/10 transition-colors"
+          <div className="flex flex-col gap-1.5 pt-2">
+            {sortOptions.map((option) => {
+              const isActive = (searchParams?.sort || 'newest') === option.value;
+              return (
+                <Link
+                  key={option.value}
+                  href={createFilterUrl('sort', option.value)}
+                  className="block"
                 >
-                  {option.name}
-                </Badge>
-              </Link>
-            ))}
+                  <div
+                    className={`px-4 py-2 text-sm font-medium transition-all ${isActive
+                        ? 'text-primary'
+                        : 'text-text-secondary hover:text-text-primary'
+                      }`}
+                  >
+                    {option.name}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
 
       {/* Clear Filters */}
       {(searchParams?.category || searchParams?.sort) && (
-        <div className="pt-4 border-t">
-          <Button variant="outline" size="sm" asChild>
+        <div className="pt-6 border-t border-line">
+          <Button variant="outline" size="sm" className="w-full rounded-xl border-line text-text-secondary hover:bg-white/5 font-bold" asChild>
             <Link href="/products">필터 초기화</Link>
           </Button>
         </div>

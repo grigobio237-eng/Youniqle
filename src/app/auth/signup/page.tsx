@@ -10,13 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon, KakaoIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, ChevronLeft } from 'lucide-react';
+
 import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
 import ReferralTracker from '@/components/auth/ReferralTracker';
 
 function SignupContent() {
-  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
@@ -36,14 +35,10 @@ function SignupContent() {
   }, []);
 
   const handleSocialLogin = async (provider: string) => {
-    // WebView 환경에서 Google 로그인 시도 시 경고
     if (provider === 'google') {
       const handled = await handleWebViewOAuth(provider, '/');
-      if (handled) {
-        return; // WebView 처리 완료 또는 사용자 취소
-      }
+      if (handled) return;
     }
-
     signIn(provider, { callbackUrl: '/' });
   };
 
@@ -51,24 +46,22 @@ function SignupContent() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert(t('auth.form.passwordMismatch'));
+      alert('비밀번호가 일치하지 않습니다.');
       return;
     }
 
-    const referralCode = searchParams?.get('ref') || ''; // Capture referral code
+    const referralCode = searchParams?.get('ref') || '';
 
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           password: formData.password,
           marketingConsent: formData.marketingConsent,
-          referralCode, // Send to API
+          referralCode,
         }),
       });
 
@@ -100,112 +93,87 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-      {/* 배경 캐릭터들 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 opacity-20">
-          <CharacterImage
-            src="/character/youniqle-2.png"
-            alt="배경 캐릭터"
-            fill
-            className="object-contain animate-bounce"
-            sizes="128px"
-          />
-        </div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 opacity-15">
-          <CharacterImage
-            src="/character/youniqle-3.png"
-            alt="배경 캐릭터"
-            fill
-            className="object-contain animate-pulse"
-            sizes="160px"
-          />
-        </div>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      {/* Back Button */}
+      <div className="absolute top-8 left-8">
+        <Button variant="ghost" asChild className="text-text-secondary hover:text-text-primary">
+          <Link href="/"><ChevronLeft className="mr-2 h-4 w-4" /> 홈으로</Link>
+        </Button>
       </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <Card className="shadow-2xl border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="text-center pb-8 pt-12">
-            <div className="flex justify-center mb-6">
-              <div className="relative w-16 h-16">
-                <CharacterImage
-                  src="/character/youniqle-1.png"
-                  alt="Youniqle 로고"
-                  fill
-                  className="object-contain"
-                  sizes="64px"
-                />
-              </div>
-            </div>
-            <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
-              회원가입
-            </CardTitle>
-            <p className="text-gray-600">
-              Youniqle에 오신 것을 환영합니다!
-            </p>
-          </CardHeader>
+      {/* Subtle Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[80px]"></div>
+      </div>
 
-          <CardContent className="px-8 pb-12">
-            {/* WebView 경고 메시지 */}
+      <div className="w-full max-w-md relative z-10 space-y-8 py-12">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="relative w-16 h-16">
+              <CharacterImage
+                src="/character/youniqle-1.png"
+                alt="Youniqle 로고"
+                fill
+                className="object-contain"
+                sizes="64px"
+              />
+            </div>
+          </div>
+          <h1 className="text-3xl font-black text-text-primary tracking-tighter">회원가입</h1>
+          <p className="text-text-secondary font-medium text-balance underline-offset-4">
+            Youniqle에 오신 것을 환영합니다!
+          </p>
+        </div>
+
+        <Card className="bg-surface border-line shadow-2xl rounded-[32px] overflow-hidden">
+          <CardContent className="p-8 space-y-8">
+            {/* WebView Warning */}
             {isInWebView && (
-              <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl">
                 <div className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-yellow-800">
-                    <p className="font-semibold mb-1">앱 내 브라우저 감지됨</p>
-                    <p className="text-xs">
-                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다.
-                      브라우저에서 직접 열어주세요.
-                    </p>
+                  <AlertCircle className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-text-primary font-bold">
+                    보안을 위해 시스템 브라우저 이용을 권장합니다.
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 소셜 로그인 버튼들 */}
-            <div className="space-y-4 mb-8">
+            {/* Social Logins */}
+            <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => handleSocialLogin('kakao')}
-                className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none font-medium transition-all duration-200"
+                className="h-14 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none rounded-2xl font-bold transition-all"
               >
                 <KakaoIcon className="w-5 h-5 mr-3" />
-                카카오로 계속하기
+                카카오
               </Button>
               <Button
                 onClick={() => handleSocialLogin('google')}
-                className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                className="h-14 bg-white border-none text-gray-900 hover:bg-gray-100 rounded-2xl font-bold transition-all"
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
-                구글로 계속하기
+                구글
               </Button>
             </div>
 
-            {/* 소셜 로그인 안내 문구 */}
-            <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-700 text-center">
-                <span className="font-medium">구글 계정으로 간편하게 시작하세요.</span><br />
-                또는 이메일로 직접 가입할 수도 있습니다.
-              </p>
-            </div>
-
-            {/* 구분선 */}
-            <div className="relative mb-8">
+            {/* Divider */}
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-line" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">또는</span>
+              <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+                <span className="px-4 bg-surface text-text-secondary">OR</span>
               </div>
             </div>
 
-            {/* 이메일 회원가입 폼 */}
+            {/* Email Signup Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700 mb-2 block">
-                  이름
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">이름</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary h-4 w-4" />
                   <Input
                     id="name"
                     name="name"
@@ -213,18 +181,16 @@ function SignupContent() {
                     required
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="이름을 입력하세요"
+                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
+                    placeholder="성함을 입력하세요"
                   />
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
-                  이메일
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">이메일</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary h-4 w-4" />
                   <Input
                     id="email"
                     name="email"
@@ -232,18 +198,16 @@ function SignupContent() {
                     required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="이메일을 입력하세요"
+                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
+                    placeholder="example@email.com"
                   />
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700 mb-2 block">
-                  비밀번호
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">비밀번호</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary h-4 w-4" />
                   <Input
                     id="password"
                     name="password"
@@ -251,25 +215,23 @@ function SignupContent() {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="비밀번호를 입력하세요"
+                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
+                    placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 mb-2 block">
-                  비밀번호 확인
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">비밀번호 확인</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary h-4 w-4" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -277,41 +239,40 @@ function SignupContent() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
                     placeholder="비밀번호를 다시 입력하세요"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 px-1">
                 <input
                   id="marketingConsent"
                   name="marketingConsent"
                   type="checkbox"
                   checked={formData.marketingConsent}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 bg-background border-line rounded text-primary focus:ring-primary"
                 />
-                <Label htmlFor="marketingConsent" className="text-sm text-gray-600">
+                <Label htmlFor="marketingConsent" className="text-sm text-text-secondary font-medium cursor-pointer">
                   마케팅 정보 수신에 동의합니다 (선택사항)
                 </Label>
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105"
+                className="w-full h-16 bg-primary hover:bg-primary/90 text-background font-black text-lg rounded-2xl shadow-xl transition-all hover:scale-[1.02]"
               >
-                회원가입
+                가입하기
               </Button>
             </form>
 
-            {/* 로그인 링크 */}
-            <div className="text-center mt-8">
-              <p className="text-gray-600">
+            <div className="text-center pt-4">
+              <p className="text-text-secondary font-medium">
                 이미 계정이 있으신가요?{' '}
                 <Link
                   href="/auth/signin"
-                  className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                  className="text-primary font-bold hover:underline"
                 >
                   로그인하기
                 </Link>
@@ -327,11 +288,8 @@ function SignupContent() {
 export default function SignupPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
       </div>
     }>
       <ReferralTracker />

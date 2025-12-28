@@ -30,8 +30,7 @@ const FAQSchema = new Schema<IFAQ>(
     category: {
       type: String,
       enum: ['order', 'payment', 'shipping', 'member', 'product', 'refund', 'other'],
-      required: true,
-      index: true,
+      required: true
     },
     order: {
       type: Number,
@@ -52,8 +51,7 @@ const FAQSchema = new Schema<IFAQ>(
     status: {
       type: String,
       enum: ['active', 'hidden'],
-      default: 'active',
-      index: true,
+      default: 'active'
     },
     tags: [{
       type: String,

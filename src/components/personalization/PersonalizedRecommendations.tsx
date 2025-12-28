@@ -31,13 +31,12 @@ export default function PersonalizedRecommendations({
   onItemClick,
   onItemPurchase
 }: PersonalizedRecommendationsProps) {
-  const { t } = useLanguage();
-  const { 
-    recommendations, 
-    loading, 
-    error, 
+  const {
+    recommendations,
+    loading,
+    error,
     generateRecommendations,
-    recordRecommendationFeedback 
+    recordRecommendationFeedback
   } = usePersonalization();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -65,7 +64,7 @@ export default function PersonalizedRecommendations({
     if (onItemClick) {
       onItemClick(item);
     }
-    
+
     // 클릭 피드백 기록
     await recordRecommendationFeedback(
       item.itemId,
@@ -73,7 +72,7 @@ export default function PersonalizedRecommendations({
       true,
       false
     );
-    
+
     // 상품 상세 페이지로 이동
     window.location.href = `/products/${item.itemId}`;
   };
@@ -82,7 +81,7 @@ export default function PersonalizedRecommendations({
     if (onItemPurchase) {
       onItemPurchase(item);
     }
-    
+
     try {
       // 장바구니에 추가
       const response = await fetch('/api/cart', {
@@ -108,7 +107,7 @@ export default function PersonalizedRecommendations({
       console.error('장바구니 추가 중 오류:', error);
       alert('장바구니 추가 중 오류가 발생했습니다.');
     }
-    
+
     // 구매 피드백 기록
     await recordRecommendationFeedback(
       item.itemId,
@@ -124,7 +123,7 @@ export default function PersonalizedRecommendations({
 
   if (loading && recommendations.length === 0) {
     return (
-      <Card>
+      <Card className="premium-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             {title}
@@ -133,17 +132,18 @@ export default function PersonalizedRecommendations({
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
+              className="rounded-full"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-{t('recommendations.refresh')}
+              새로고침
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-32">
+          <div className="flex items-center justify-center h-48">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">추천을 생성하는 중...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-text-secondary font-medium">취향을 분석하고 있습니다...</p>
             </div>
           </div>
         </CardContent>
@@ -153,15 +153,16 @@ export default function PersonalizedRecommendations({
 
   if (error) {
     return (
-      <Card>
+      <Card className="premium-card border-status-danger/20">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-status-danger">
             {title}
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
+              className="rounded-full"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               다시 시도
@@ -169,10 +170,10 @@ export default function PersonalizedRecommendations({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <p className="text-red-600 mb-4">{error}</p>
-            <Button onClick={handleRefresh} disabled={refreshing}>
-              다시 시도
+          <div className="text-center py-12">
+            <p className="text-status-danger mb-6 font-medium">{error}</p>
+            <Button onClick={handleRefresh} disabled={refreshing} className="btn-primary">
+              다시 시도하기
             </Button>
           </div>
         </CardContent>
@@ -183,7 +184,7 @@ export default function PersonalizedRecommendations({
   // 추천 상품이 없거나 로딩이 완료된 상태에서 빈 배열인 경우
   if (!loading && recommendations.length === 0) {
     return (
-      <Card>
+      <Card className="premium-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             {title}
@@ -192,23 +193,24 @@ export default function PersonalizedRecommendations({
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
+              className="rounded-full"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-{t('recommendations.refresh')}
+              새로고침
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <div className="text-gray-400 mb-4">
-              <Sparkles className="h-16 w-16 mx-auto mb-4" />
-              <p className="text-lg font-medium">{t('recommendations.noPersonalizedRecommendations')}</p>
-              <p className="text-sm text-gray-500 mt-2">
-                더 많은 상품을 둘러보시면 맞춤 추천을 받을 수 있습니다
+          <div className="text-center py-16">
+            <div className="text-text-secondary mb-6">
+              <Sparkles className="h-16 w-16 mx-auto mb-6 text-reward-gold" />
+              <p className="text-2xl font-black text-text-primary">아직 추천 드릴 상품이 없네요</p>
+              <p className="text-sm text-text-secondary mt-3">
+                다양한 회복 프로토콜을 경험하시면 더욱 정밀한 추천을 해드릴 수 있습니다.
               </p>
             </div>
-            <Button onClick={handleRefresh} disabled={refreshing}>
-              {t('recommendations.refresh')}
+            <Button onClick={handleRefresh} disabled={refreshing} className="btn-primary">
+              지금 둘러보기
             </Button>
           </div>
         </CardContent>
@@ -246,8 +248,8 @@ export default function PersonalizedRecommendations({
               {/* 상품 이미지 */}
               <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center relative">
                 {item.product?.images?.[0]?.url ? (
-                  <Image 
-                    src={item.product.images[0].url} 
+                  <Image
+                    src={item.product.images[0].url}
                     alt={item.product.name}
                     width={200}
                     height={200}
@@ -256,26 +258,28 @@ export default function PersonalizedRecommendations({
                     priority={index < 3}
                   />
                 ) : (
-                  <CharacterImage
-                    src="/character/youniqle-1.png"
-                    alt={`추천 상품 ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
+                  <div className="relative w-full h-full">
+                    <CharacterImage
+                      src="/character/youniqle-1.png"
+                      alt={`추천 상품 ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
                 )}
               </div>
 
               {/* 상품 정보 */}
               <div className="space-y-2">
                 <h4 className="font-medium text-sm line-clamp-2">
-                  {item.product?.name || 
-                   (item.itemType === 'product' ? `상품 ${item.itemId}` : 
-                    item.itemType === 'content' ? `콘텐츠 ${item.itemId}` :
-                    item.itemType === 'category' ? `카테고리 ${item.itemId}` :
-                    `브랜드 ${item.itemId}`)}
+                  {item.product?.name ||
+                    (item.itemType === 'product' ? `상품 ${item.itemId}` :
+                      item.itemType === 'content' ? `콘텐츠 ${item.itemId}` :
+                        item.itemType === 'category' ? `카테고리 ${item.itemId}` :
+                          `브랜드 ${item.itemId}`)}
                 </h4>
-                
+
                 {/* 가격 정보 */}
                 {item.product?.price && (
                   <div className="flex items-center space-x-2">
@@ -293,7 +297,7 @@ export default function PersonalizedRecommendations({
                 {/* 추천 점수 */}
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${item.score * 100}%` }}
                     />
@@ -341,7 +345,7 @@ export default function PersonalizedRecommendations({
                       <ThumbsDown className="w-3 h-3" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center space-x-1">
                     <Button
                       size="sm"

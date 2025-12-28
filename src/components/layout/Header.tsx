@@ -3,33 +3,24 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, Search, User, Menu, X, LogOut, ArrowRight, ShoppingBag } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
-import RealtimeNotificationCenter from '@/components/notifications/RealtimeNotificationCenter';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 
 export default function Header() {
-  const { t } = useLanguage();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [cartCount, setCartCount] = useState(0);
 
-  // Gate Logic: If strictly '/', default to hidden until 'gate-passed' event or storage check confirms.
-  // We'll use a state 'isGateMode' which is true only on '/' initially.
+  // Gate Logic
   const [isGateMode, setIsGateMode] = useState(false);
 
   useEffect(() => {
-    // Check if we are on the home page
     if (pathname === '/') {
-      // Check if gate is already passed today
       const today = new Date().toISOString().split('T')[0];
       const lastCheck = localStorage.getItem('recovery_last_check');
       if (lastCheck !== today) {
@@ -43,7 +34,6 @@ export default function Header() {
   }, [pathname]);
 
   useEffect(() => {
-    // Listen for Gate Completion Event from page.tsx
     const handleGatePass = () => setIsGateMode(false);
     window.addEventListener('recovery-gate-passed', handleGatePass);
     return () => window.removeEventListener('recovery-gate-passed', handleGatePass);
@@ -51,8 +41,6 @@ export default function Header() {
 
   useEffect(() => {
     let isMounted = true;
-
-    // 세션 상태 확인
     const checkSession = async () => {
       if (!isMounted) return;
       try {
@@ -96,18 +84,17 @@ export default function Header() {
   };
 
   const menuItems = [
-    { label: '🌱 회복 시작하기', href: '/', showInGate: false }, // Home links to itself, but hidden in gate
-    { label: '🔍 리얼 회복 케이스', href: '/cases' },
-    { label: '👩‍⚕️ 김미정 원장 라운지', href: '/lounge' },
-    { label: '🤖 AI 회복 네비게이터', href: '/ai-navigator' },
-    { label: '🎁 회복 멤버십 & 리워드', href: '/membership' },
-    { label: '🧬 비밀회복 컨시어지', href: '/omakase' },
-    { label: '⚡ 실생활 유틸리티 허브', href: '/utils' },
+    { label: 'AI 네비게이터', href: '/ai-navigator' },
+    { label: '회복 케이스', href: '/cases' },
+    { label: '회복 상점', href: '/products' },
+    { label: '라운지', href: '/lounge' },
+    { label: '실생활 유틸리티 허브', href: '/utils' },
+    { label: '비밀회복 컨시어지', href: '/omakase' },
+    { label: '비밀 가상 공간', href: '/pavilion' },
+    { label: '멤버십', href: '/membership' },
   ];
 
   const handleSignOut = async () => {
-    // (Simplified logout logic for brevity, reusing existing robust logic if needed but keeping it clean)
-    // For this refactor, I'll use the robust logic from previous version if possible, but to save tokens I'll use simple fetch
     try {
       await fetch('/api/auth/signout', { method: 'POST' });
       localStorage.clear();
@@ -121,8 +108,20 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo - Always Visible */}
-          <Link href="/" className="flex items-center space-x-2">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center space-x-2"
+            onClick={(e) => {
+              // If already checked in today, force refresh/navigation to clear gate state if necessary
+              if (typeof window !== 'undefined') {
+                const today = new Date().toISOString().split('T')[0];
+                if (localStorage.getItem('recovery_last_check') === today) {
+                  window.dispatchEvent(new Event('recovery-gate-passed'));
+                }
+              }
+            }}
+          >
             <div className="relative h-10 w-10">
               <CharacterImage
                 src="/character/youniqle-1.png"
@@ -135,16 +134,16 @@ export default function Header() {
             <span className="text-xl font-bold text-text-primary">Youniqle</span>
           </Link>
 
-          {/* Desktop Navigation - Hidden if Gate Mode */}
-          {!isGateMode && (
-            <nav className="hidden md:flex items-center space-x-6">
+          {/* Nav */}
+          {!isGateMode ? (
+            <nav className="hidden md:flex items-center space-x-8">
               {menuItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`text-sm font-medium transition-all duration-200 relative py-2 ${isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                    className={`text-sm font-semibold transition-all duration-200 relative py-2 ${isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
                       }`}
                   >
                     {item.label}
@@ -159,41 +158,31 @@ export default function Header() {
                 );
               })}
             </nav>
+          ) : (
+            <div className="hidden md:block">
+              <span className="text-xs font-black text-chapter-accent/40 uppercase tracking-[0.3em]">
+                Daily Recovery Checkpoint
+              </span>
+            </div>
           )}
 
-          {/* Right Side Actions */}
+          {/* Right Side */}
           <div className="flex items-center space-x-2">
-            {/* If Gate Mode, maybe show nothing or just Login? 
-                User guideline says: "Menu hidden". 
-                We will hide mostly everything except maybe User icon if logged in?
-                Actually, let's hide everything to focus on the question. 
-            */}
-            {/* Store Icon - Always visible or conditional based on preference */}
-            <Link href="/membership/shop">
-              <Button variant="ghost" size="icon">
-                <ShoppingBag className="h-5 w-5" />
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                    {cartCount}
+                  </Badge>
+                )}
               </Button>
             </Link>
 
-            {!isGateMode && (
-              <Link href="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
-                  {cartCount > 0 && (
-                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
-                      {cartCount}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-            )}
-
             {session ? (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href="/me"><User className="h-5 w-5" /></Link>
-                </Button>
-              </div>
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/me"><User className="h-5 w-5" /></Link>
+              </Button>
             ) : (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/auth/signin">로그인</Link>
@@ -210,11 +199,6 @@ export default function Header() {
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             )}
-
-            {/* If Gate Mode, we might want a 'Skip' or 'Login' for returning users? 
-                Plan implies strictly forcing the check daily. 
-                But let's keep it clean as requested.
-            */}
           </div>
         </div>
 
@@ -226,12 +210,17 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-sm font-medium text-text-secondary"
+                  className="text-sm font-bold text-text-secondary px-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
+              {!session && (
+                <Link href="/auth/signin" className="text-sm font-bold text-primary px-2" onClick={() => setIsMenuOpen(false)}>
+                  로그인
+                </Link>
+              )}
             </nav>
           </div>
         )}

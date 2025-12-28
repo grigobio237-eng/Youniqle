@@ -9,16 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import CharacterImage from '@/components/ui/CharacterImage';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  Trash2, 
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  Trash2,
   ArrowLeft,
   CreditCard,
-  Truck
+  Truck,
+  ChevronRight,
+  Package,
+  PackageCheck,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -48,7 +51,6 @@ interface Cart {
 export default function CartPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { t } = useLanguage();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -68,7 +70,6 @@ export default function CartPage() {
       if (response.ok) {
         const data = await response.json();
         setCart(data.cart);
-        // Select all items by default
         if (data.cart?.items) {
           const allItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
           setSelectedItems(allItemIds);
@@ -81,23 +82,17 @@ export default function CartPage() {
     }
   };
 
-  // Toggle item selection
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId);
-      } else {
-        newSet.add(itemId);
-      }
+      if (newSet.has(itemId)) newSet.delete(itemId);
+      else newSet.add(itemId);
       return newSet;
     });
   };
 
-  // Toggle all selection
   const toggleAllSelection = () => {
     if (!cart) return;
-    
     if (selectedItems.size === cart.items.length) {
       setSelectedItems(new Set());
     } else {
@@ -106,7 +101,6 @@ export default function CartPage() {
     }
   };
 
-  // Calculate total amount of selected items
   const getSelectedTotal = () => {
     if (!cart) return 0;
     return cart.items
@@ -116,126 +110,61 @@ export default function CartPage() {
 
   const updateQuantity = async (productId: string, newQuantity: number) => {
     if (newQuantity < 1 || newQuantity > 99) return;
-
     setUpdating(productId);
     try {
       const response = await fetch('/api/cart/update', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: newQuantity,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, quantity: newQuantity }),
       });
-
       if (response.ok) {
         const data = await response.json();
         setCart(data.cart);
-        
-        // 업데이트된 장바구니의 아이템 ID로 선택 상태 동기화
-        if (data.cart?.items) {
-          const updatedItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
-          setSelectedItems(prev => {
-            const newSet = new Set<string>();
-            prev.forEach(id => {
-              if (updatedItemIds.has(id)) {
-                newSet.add(id);
-              }
-            });
-            return newSet;
-          });
-        }
-        
-        // Update header cart count
         window.dispatchEvent(new Event('cartUpdated'));
-      } else {
-        const errorData = await response.json();
-        alert(t('cart.updateFailed'));
       }
     } catch (error) {
       console.error('Quantity update failed:', error);
-      alert(t('cart.updateFailed'));
     } finally {
       setUpdating(null);
     }
   };
 
   const removeItem = async (productId: string) => {
-    if (!confirm(t('cart.removeConfirm'))) return;
-
+    if (!confirm('이 아이템을 보관함에서 해제하시겠습니까?')) return;
     try {
       const response = await fetch('/api/cart', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId }),
       });
-
       if (response.ok) {
         const data = await response.json();
         setCart(data.cart);
-        
-        // 삭제된 상품의 선택 상태도 함께 제거
-        if (data.cart?.items) {
-          const remainingItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
-          setSelectedItems(prev => {
-            const newSet = new Set(prev);
-            // 남아있는 아이템만 유지
-            const filtered = new Set<string>();
-            newSet.forEach(id => {
-              if (remainingItemIds.has(id)) {
-                filtered.add(id);
-              }
-            });
-            return filtered;
-          });
-        }
-        
-        // Update header cart count
         window.dispatchEvent(new Event('cartUpdated'));
-      } else {
-        const errorData = await response.json();
-        alert(t('cart.deleteFailed'));
       }
     } catch (error) {
       console.error('Product removal failed:', error);
-      alert(t('cart.deleteFailed'));
     }
   };
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chapter-accent"></div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-4">
-              <CharacterImage
-                src="/character/youniqle-1.png"
-                alt="Youniqle Character"
-                fill
-                className="object-contain"
-                sizes="80px"
-              />
-            </div>
-            <h2 className="text-2xl font-bold mb-4">{t('cart.loginRequired')}</h2>
-            <p className="text-gray-600 mb-6">
-              {t('cart.loginRequiredDesc')}
-            </p>
-            <Button asChild>
-              <Link href="/auth/signin">{t('cart.goToLogin')}</Link>
-            </Button>
-          </CardContent>
+      <div className="min-h-screen bg-mist flex items-center justify-center p-6">
+        <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">로그인이 필요합니다</h2>
+          <p className="text-slate font-medium mb-8">보관함 접근을 위해 인증 프로토콜이 필요합니다.</p>
+          <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
+            <Link href="/auth/signin">인증 시작</Link>
+          </Button>
         </Card>
       </div>
     );
@@ -243,36 +172,20 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <div className="relative w-20 h-20">
-                <CharacterImage
-                  src="/character/youniqle-1.png"
-                  alt="Youniqle Character"
-                  fill
-                  className="object-contain"
-                  sizes="80px"
-                />
-              </div>
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('cart.title')}</h1>
-            <p className="text-xl text-gray-600">{t('cart.empty')}</p>
+      <div className="min-h-screen bg-mist py-20 px-4">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="mb-16">
+            <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 inline-block rounded-full border border-chapter-accent/10">Vault Control System</p>
+            <h1 className="text-5xl font-black text-obsidian tracking-tighter">보관함이 비어있습니다</h1>
           </div>
-
-          <Card className="shadow-lg">
-            <CardContent className="p-12 text-center">
-              <ShoppingCart className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-4">{t('cart.empty')}</h3>
-              <p className="text-gray-600 mb-6">
-                {t('cart.emptyDesc')}
-              </p>
-              <Button asChild size="lg">
-                <Link href="/products">{t('cart.shopNow')}</Link>
-              </Button>
-            </CardContent>
+          <Card className="border-none shadow-xl rounded-[48px] bg-white p-20">
+            <div className="w-24 h-24 mx-auto mb-10 bg-mist rounded-[32px] flex items-center justify-center text-slate/20">
+              <Package className="w-12 h-12" />
+            </div>
+            <p className="text-slate font-bold text-lg mb-12">당신의 회복을 위한 최적의 아이템들을 분석하고 할당하십시오.</p>
+            <Button asChild size="lg" className="h-16 px-12 rounded-2xl bg-chapter-accent text-mist font-black text-lg hover:scale-105 transition-all shadow-xl shadow-chapter-accent/20">
+              <Link href="/products" className="flex items-center gap-2">회복 아이템 스포팅 <ChevronRight className="w-5 h-5" /></Link>
+            </Button>
           </Card>
         </div>
       </div>
@@ -280,226 +193,195 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-12">
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* Header */}
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <div className="relative w-20 h-20">
-                <CharacterImage
-                  src="/character/youniqle-1.png"
-                  alt="Youniqle Character"
-                  fill
-                  className="object-contain"
-                  sizes="80px"
+    <div className="min-h-screen bg-mist py-20 px-4">
+      <div className="container mx-auto max-w-6xl">
+        <div className="flex flex-col items-center text-center mb-16">
+          <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 text-chapter-accent rounded-full border border-chapter-accent/10">Vault | My Selection</p>
+          <h1 className="text-5xl font-black text-obsidian tracking-tighter">보관 및 할당 센터</h1>
+          <Badge className="mt-4 bg-obsidian text-mist border-none px-6 py-2 rounded-full font-black text-xs">
+            현재 식별된 회복 프로토콜: {cart.totalItems}개
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-6">
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm border border-mist p-6 rounded-[28px] shadow-sm">
+              <div className="flex items-center space-x-4">
+                <Checkbox
+                  id="select-all"
+                  checked={selectedItems.size === cart.items.length && cart.items.length > 0}
+                  onCheckedChange={toggleAllSelection}
+                  className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent data-[state=checked]:border-chapter-accent"
                 />
+                <label htmlFor="select-all" className="text-sm font-black text-obsidian cursor-pointer select-none">
+                  전체 데이터 선택 <span className="text-slate/40 ml-1">({selectedItems.size}/{cart.items.length})</span>
+                </label>
               </div>
+              <Button variant="ghost" size="sm" className="text-xs font-black text-slate hover:text-status-danger hover:bg-status-danger/5 h-10 px-4 rounded-xl transition-all">
+                선택 항목 해제
+              </Button>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('cart.title')}</h1>
-            <p className="text-xl text-gray-600">
-              {t('cart.totalItems', { count: cart.totalItems })}
-            </p>
-          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart items list */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Select all checkbox */}
-            <Card className="shadow-lg">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="select-all"
-                    checked={selectedItems.size === cart.items.length && cart.items.length > 0}
-                    onCheckedChange={toggleAllSelection}
-                  />
-                  <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                    {t('cart.selectAllWithCount', { selected: selectedItems.size, total: cart.items.length })}
-                  </label>
-                </div>
-              </CardContent>
-            </Card>
-
-            {cart.items.map((item) => (
-              <Card key={item._id} className="shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    {/* Checkbox */}
-                    <Checkbox
-                      id={`item-${item._id}`}
-                      checked={selectedItems.has(item._id)}
-                      onCheckedChange={() => toggleItemSelection(item._id)}
-                    />
-
-                    {/* Product image */}
-                    <div className="w-20 h-20 flex-shrink-0 relative">
-                      <Image
-                        src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
-                        alt={item.productId.name}
-                        fill
-                        className="object-cover rounded-lg"
+            <div className="space-y-4">
+              {cart.items.map((item) => (
+                <Card key={item._id} className={`border-none shadow-sm rounded-[36px] overflow-hidden transition-all duration-500 hover:shadow-xl group ${selectedItems.has(item._id) ? 'bg-white' : 'bg-white/50 opacity-60'}`}>
+                  <CardContent className="p-8">
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                      <Checkbox
+                        checked={selectedItems.has(item._id)}
+                        onCheckedChange={() => toggleItemSelection(item._id)}
+                        className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent"
                       />
-                    </div>
 
-                    {/* Product info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg mb-2 truncate">
-                        {item.productId.name}
-                      </h3>
-                      <p className="text-gray-600 mb-2">
-                        {item.price.toLocaleString()}{t('common.currency')}
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="secondary">
-                          {item.quantity}{t('cart.items')}
-                        </Badge>
-                        <span className="text-sm text-gray-500">
-                          {(item.price * item.quantity).toLocaleString()}{t('common.currency')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Quantity control and delete */}
-                    <div className="flex flex-col items-end space-y-2">
-                      {/* Quantity control */}
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
-                          disabled={updating === item.productId._id || item.quantity <= 1}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const newQuantity = parseInt(e.target.value) || 1;
-                            updateQuantity(item.productId._id, newQuantity);
-                          }}
-                          className="w-16 text-center"
-                          min="1"
-                          max="99"
-                          disabled={updating === item.productId._id}
+                      <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner">
+                        <Image
+                          src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
+                          alt={item.productId.name}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
-                          disabled={updating === item.productId._id || item.quantity >= 99}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
+                        <div className="absolute inset-0 bg-obsidian/5 group-hover:bg-transparent transition-colors" />
                       </div>
 
-                      {/* Delete button */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeItem(item.productId._id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex-1 w-full text-center md:text-left">
+                        <Link href={`/products/${item.productId.slug}`} className="inline-block group/link">
+                          <h3 className="font-black text-2xl text-obsidian mb-2 tracking-tight group-hover/link:text-chapter-accent transition-colors">
+                            {item.productId.name}
+                          </h3>
+                        </Link>
+                        <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
+                          <span className="text-xl font-black text-chapter-accent">
+                            {item.price.toLocaleString()}원
+                          </span>
+                          <span className="text-[10px] font-black text-slate uppercase tracking-widest opacity-30 mt-1">Per Unit</span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center bg-mist/50 p-1.5 rounded-2xl border border-line">
+                            <button
+                              className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                              onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
+                              disabled={updating === item.productId._id || item.quantity <= 1}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-12 text-center font-black text-lg">{item.quantity}</span>
+                            <button
+                              className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                              onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
+                              disabled={updating === item.productId._id || item.quantity >= 99}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeItem(item.productId._id)}
+                            className="w-12 h-12 rounded-2xl text-slate hover:text-status-danger hover:bg-status-danger/5"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <Button asChild variant="ghost" className="h-14 px-8 text-slate font-black rounded-2xl hover:text-obsidian hover:bg-white transition-all">
+              <Link href="/products" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                추가 데이터 스캐닝 (쇼핑 계속하기)
+              </Link>
+            </Button>
           </div>
 
-          {/* Order summary */}
-          <div className="space-y-6">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  {t('checkout.orderSummary')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>{t('cart.selected')}</span>
-                  <span>{selectedItems.size}{t('cart.items')}</span>
+          <div className="lg:col-span-4 space-y-8 sticky top-24">
+            <Card className="border-none shadow-2xl rounded-[48px] overflow-hidden bg-obsidian text-mist p-10 relative">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-reward-gold/10 blur-[80px] rounded-full -translate-y-24 translate-x-24" />
+              <div className="relative z-10 space-y-10">
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-reward-gold">Order Summary</p>
+                  <h3 className="text-2xl font-black tracking-tight">할당 정보 요약</h3>
                 </div>
-                <div className="flex justify-between">
-                  <span>{t('cart.productPrice')}</span>
-                  <span>{getSelectedTotal().toLocaleString()}{t('common.currency')}</span>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-sm font-bold opacity-60">
+                    <span>선택된 프로토콜</span>
+                    <span>{selectedItems.size}개</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm font-bold opacity-60">
+                    <span>아이템 가치</span>
+                    <span>{getSelectedTotal().toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm font-bold opacity-60">
+                    <span>물류 배송비</span>
+                    <span>{getSelectedTotal() >= 50000 ? '데이터 면제 (Free)' : '3,000원'}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>{t('cart.shippingFee')}</span>
-                  <span>
-                    {getSelectedTotal() >= 50000 ? t('cart.free') : `3,000${t('common.currency')}`}
-                  </span>
+
+                <div className="h-px bg-mist/10" />
+
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Estimated Total Value</p>
+                  <p className="text-4xl font-black text-reward-gold tracking-tighter">
+                    {(getSelectedTotal() + (getSelectedTotal() >= 50000 || getSelectedTotal() === 0 ? 0 : 3000)).toLocaleString()} <span className="text-lg">원</span>
+                  </p>
                 </div>
-                <hr />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>{t('cart.totalAmount')}</span>
-                  <span>
-                    {(getSelectedTotal() + (getSelectedTotal() >= 50000 ? 0 : 3000)).toLocaleString()}{t('common.currency')}
-                  </span>
-                </div>
-                <Button 
-                  className="w-full" 
-                  size="lg"
+
+                <Button
+                  className="w-full h-20 rounded-[32px] bg-reward-gold text-obsidian font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-reward-gold/20 flex items-center justify-center gap-2 disabled:opacity-20"
                   onClick={() => {
                     if (selectedItems.size === 0) {
-                      alert(t('cart.selectProducts'));
+                      alert('할당할 아이템을 선택해주십시오.');
                       return;
                     }
-                    // 선택된 상품 ID들을 쿼리 파라미터로 전달
                     const selectedIds = Array.from(selectedItems).join(',');
                     router.push(`/checkout?selectedItems=${selectedIds}`);
                   }}
                   disabled={selectedItems.size === 0}
                 >
-                  {t('cart.checkoutWithCount', { count: selectedItems.size })}
+                  최종 할당 실행 <ChevronRight className="w-6 h-6" />
                 </Button>
-              </CardContent>
+
+                {getSelectedTotal() < 50000 && getSelectedTotal() > 0 && (
+                  <div className="flex gap-3 bg-white/5 p-4 rounded-2xl items-center border border-white/10">
+                    <AlertCircle className="w-4 h-4 text-reward-gold shrink-0" />
+                    <p className="text-[10px] font-medium leading-relaxed opacity-60">
+                      50,000원 이상 누적 시 <span className="text-reward-gold font-black">물류비 면제</span> 프로토콜이 가동됩니다.
+                    </p>
+                  </div>
+                )}
+              </div>
             </Card>
 
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Truck className="h-5 w-5 mr-2" />
-                  {t('products.shippingInfo')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>{t('cart.shippingFee')}</span>
-                  <span>3,000{t('common.currency')}</span>
+            <Card className="border-none bg-white p-8 rounded-[36px] shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-mist rounded-xl text-obsidian">
+                  <Truck className="h-5 w-5" />
+                </div>
+                <h4 className="font-black text-sm tracking-tight text-obsidian uppercase">Logistics info</h4>
+              </div>
+              <div className="space-y-4 text-xs font-bold text-slate">
+                <div className="flex justify-between pb-3 border-b border-line/30">
+                  <span className="opacity-40 uppercase tracking-widest">Base Fee</span>
+                  <span className="text-obsidian">3,000 KRW</span>
+                </div>
+                <div className="flex justify-between pb-3 border-b border-line/30">
+                  <span className="opacity-40 uppercase tracking-widest">Exemption</span>
+                  <span className="text-obsidian">Over 50,000 KRW</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{t('products.freeShipping')}</span>
-                  <span>50,000{t('common.currency')} {t('products.freeShippingCondition')}</span>
+                  <span className="opacity-40 uppercase tracking-widest">Est. Lead Time</span>
+                  <span className="text-obsidian">2-3 Business Days</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>{t('products.shippingInfo')}</span>
-                  <span>2-3{t('common.days')}</span>
-                </div>
-              </CardContent>
+              </div>
             </Card>
-
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/products">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('cart.continueShopping')}
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

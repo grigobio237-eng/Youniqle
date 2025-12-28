@@ -84,7 +84,6 @@ const getFundingStatus = (product: Product) => {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session } = useSession();
-  const { t } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -199,16 +198,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       });
 
       if (response.ok) {
-        alert(t('cart.addSuccess', { name: product?.name, count: quantity }));
+        alert(`${product?.name} 상품 ${quantity}개가 장바구니에 담겼습니다.`);
         // 헤더 장바구니 개수 업데이트
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const errorData = await response.json();
-        alert(t('cart.addFailed', { error: errorData.error }));
+        alert(`장바구니 추가 실패: ${errorData.error}`);
       }
     } catch (error) {
       console.error('장바구니 추가 중 오류:', error);
-      alert(t('cart.addError'));
+      alert('장바구니 추가 중 오류가 발생했습니다.');
     } finally {
       setAddingToCart(false);
     }
@@ -216,7 +215,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleToggleWishlist = async () => {
     if (!session?.user) {
-      alert(t('auth.loginRequired'));
+      alert('로그인이 필요한 서비스입니다.');
       return;
     }
 
@@ -235,14 +234,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
       if (response.ok) {
         setIsInWishlist(!isInWishlist);
-        alert(isInWishlist ? t('cart.wishlistRemoveSuccess') : t('cart.wishlistAddSuccess'));
+        alert(isInWishlist ? '위시리스트에서 제거되었습니다.' : '위시리스트에 추가되었습니다.');
       } else {
         const errorData = await response.json();
-        alert(t('cart.wishlistFailed', { error: errorData.error }));
+        alert(`위시리스트 처리 실패: ${errorData.error}`);
       }
     } catch (error) {
       console.error('위시리스트 처리 중 오류:', error);
-      alert(t('cart.wishlistError'));
+      alert('위시리스트 처리 중 오류가 발생했습니다.');
     } finally {
       setAddingToWishlist(false);
     }
@@ -328,8 +327,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('productDetail.loading')}</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">상품 정보를 불러오는 중입니다...</p>
         </div>
       </div>
     );
@@ -340,12 +339,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">{t('productDetail.notFound')}</h2>
+            <h2 className="text-2xl font-bold mb-4">상품을 찾을 수 없습니다</h2>
             <p className="text-gray-600 mb-6">
               요청하신 상품이 존재하지 않거나 삭제되었습니다.
             </p>
             <Button asChild>
-              <Link href="/products">{t('productDetail.backToList')}</Link>
+              <Link href="/products">상품 목록으로 돌아가기</Link>
             </Button>
           </CardContent>
         </Card>
@@ -357,26 +356,26 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const fundingStatus = product && product.isFunding ? getFundingStatus(product) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* 브레드크럼 */}
-        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-blue-600">홈</Link>
+        <div className="flex items-center space-x-2 text-sm text-text-secondary mb-6">
+          <Link href="/" className="hover:text-primary">홈</Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-blue-600">상품</Link>
+          <Link href="/products" className="hover:text-primary">상품</Link>
           <span>/</span>
-          <Link href={`/products?category=${product.category}`} className="hover:text-blue-600">
+          <Link href={`/products?category=${product.category}`} className="hover:text-primary">
             {product.category}
           </Link>
           <span>/</span>
-          <span className="text-gray-900">{product.name}</span>
+          <span className="text-text-primary">{product.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* 이미지 갤러리 */}
           <div className="space-y-4">
             {/* 메인 이미지 */}
-            <div className="relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="relative aspect-square bg-white rounded-3xl shadow-sm overflow-hidden border border-line">
               {product.images && product.images.length > 0 && product.images[0]?.url ? (
                 <>
                   <Image
@@ -392,7 +391,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full"
                         onClick={() => handleImageNavigation('prev')}
                       >
                         <ChevronLeft className="h-4 w-4" />
@@ -400,7 +399,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full"
                         onClick={() => handleImageNavigation('next')}
                       >
                         <ChevronRight className="h-4 w-4" />
@@ -416,7 +415,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     width={200}
                     height={200}
                     className="object-contain opacity-50"
-                    sizes="200px"
                   />
                 </div>
               )}
@@ -424,14 +422,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 썸네일 이미지들 */}
             {product.images && product.images.length > 1 && product.images.every(img => img?.url) && (
-              <div className="flex space-x-2 overflow-x-auto">
+              <div className="flex space-x-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index
-                      ? 'border-blue-500'
-                      : 'border-gray-200 hover:border-gray-300'
+                    className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index
+                      ? 'border-primary'
+                      : 'border-transparent hover:border-gray-300'
                       }`}
                   >
                     <Image
@@ -440,7 +438,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       width={80}
                       height={80}
                       className="w-full h-full object-cover"
-                      sizes="80px"
                     />
                   </button>
                 ))}
@@ -453,92 +450,91 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* 상품 기본 정보 */}
             <div>
               <div className="flex items-center space-x-2 mb-2">
-                <Badge variant="secondary">{product.category}</Badge>
+                <Badge variant="outline" className="text-primary border-primary">{product.category}</Badge>
                 {product.featured && (
-                  <Badge className="bg-yellow-100 text-yellow-800">{t('products.popular')}</Badge>
+                  <Badge className="bg-reward-gold text-white border-none">인기 상품</Badge>
                 )}
                 {product.isFunding && (
-                  <Badge className="bg-orange-500 text-white">펀딩 진행중</Badge>
+                  <Badge className="bg-status-amber text-white border-none">펀딩 진행중</Badge>
                 )}
                 {!product.isFunding && discountRate > 0 && (
-                  <Badge className="bg-red-100 text-red-800">{t('productDetail.discount', { percent: discountRate })}</Badge>
+                  <Badge className="bg-status-danger text-white border-none">{discountRate}% 특별 할인</Badge>
                 )}
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              <p className="text-gray-600 text-lg mb-4">{product.summary}</p>
+              <h1 className="text-3xl font-bold text-text-primary mb-4 leading-tight">{product.name}</h1>
+              <p className="text-text-secondary text-lg mb-6 leading-relaxed">{product.summary}</p>
 
               {product.isFunding && fundingStatus ? (
-                <div className="space-y-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                <div className="space-y-4 p-6 bg-white rounded-3xl border border-line shadow-sm">
                   <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">모인 금액</p>
-                      <span className="text-3xl font-bold text-orange-600">
+                      <p className="text-sm text-text-secondary mb-1">모인 금액</p>
+                      <span className="text-3xl font-bold text-status-amber">
                         {formatPrice(fundingStatus.currentAmount)}원
                       </span>
-                      <span className="text-sm text-gray-500 ml-2">
+                      <span className="text-sm text-text-secondary ml-2 font-medium">
                         {fundingStatus.displayPercent}% 달성
                       </span>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-500 mb-1">남은 시간</p>
-                      <span className="text-2xl font-bold text-gray-800">
+                      <p className="text-sm text-text-secondary mb-1">남은 시간</p>
+                      <span className="text-2xl font-bold text-text-primary">
                         {fundingStatus.daysLeft > 0 ? `${fundingStatus.daysLeft}일` : '마감임박'}
                       </span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <Progress value={fundingStatus.percent} className="h-3 bg-orange-100" indicatorClassName="bg-orange-500" />
-                    <div className="flex justify-between text-xs text-gray-500">
+                    <Progress value={fundingStatus.percent} className="h-2 bg-gray-100" indicatorClassName="bg-status-amber" />
+                    <div className="flex justify-between text-xs text-text-secondary pt-1">
                       <span>목표 금액 {formatPrice(fundingStatus.goal)}원</span>
                       <span>{product.participantCount || 0}명 참여</span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4 mb-4">
+                <div className="flex items-baseline space-x-3 mb-6">
                   {product.originalPrice && product.originalPrice > product.price && (
-                    <span className="text-lg text-gray-500 line-through">
+                    <span className="text-xl text-text-secondary line-through">
                       {formatPrice(product.originalPrice)}원
                     </span>
                   )}
-                  <span className="text-3xl font-bold text-blue-600">
+                  <span className="text-4xl font-bold text-primary">
                     {formatPrice(product.price)}원
                   </span>
                 </div>
               )}
             </div>
 
-            {/* 재고 상태 (펀딩일 때는 숨기거나 다르게 표시) */}
+            {/* 재고 상태 */}
             {!product.isFunding && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-4 border-y border-line">
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">{t('productDetail.stock')}:</span>
-                  <span className={`font-medium ${product.stock > 10 ? 'text-green-600' :
-                    product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
+                  <span className="text-sm text-text-secondary">재고 상태:</span>
+                  <span className={`font-bold ${product.stock > 10 ? 'text-status-good' :
+                    product.stock > 0 ? 'text-status-amber' : 'text-status-danger'
                     }`}>
-                    {product.stock > 0 ? t('productDetail.stockRemaining', { count: product.stock }) : t('productDetail.outOfStock')}
+                    {product.stock > 0 ? `${product.stock}개 남음` : '품절'}
                   </span>
                 </div>
-                {/* 재입고 알림 버튼 (품절 시) */}
+                {/* 재입고 알림 버튼 */}
                 {product.stock === 0 && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleStockAlert}
                     disabled={registeringStockAlert || stockAlertRegistered}
-                    className={`flex items-center space-x-2 ${stockAlertRegistered ? 'bg-green-50 border-green-200 text-green-700' : ''
-                      }`}
+                    className={`rounded-full ${stockAlertRegistered ? 'bg-status-good/10 border-status-good text-status-good' : ''}`}
                   >
                     {stockAlertRegistered ? (
                       <>
-                        <CheckCircle className="h-4 w-4" />
+                        <CheckCircle className="h-4 w-4 mr-2" />
                         <span>알림 등록됨</span>
                       </>
                     ) : (
                       <>
-                        <Bell className="h-4 w-4" />
+                        <Bell className="h-4 w-4 mr-2" />
                         <span>{registeringStockAlert ? '등록 중...' : '재입고 알림 받기'}</span>
                       </>
                     )}
@@ -549,25 +545,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 수량 선택 */}
             {product.stock > 0 && (
-              <div className="flex items-center space-x-4 mt-4">
-                <span className="text-sm font-medium text-gray-700">{product.isFunding ? '참여 구좌 수' : t('productDetail.quantity')}:</span>
-                <div className="flex items-center border border-gray-300 rounded-lg">
+              <div className="flex items-center space-x-6">
+                <span className="text-sm font-bold text-text-primary">{product.isFunding ? '참여 구좌 수' : '구매 수량'}</span>
+                <div className="flex items-center bg-gray-100 rounded-xl p-1">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleQuantityChange(-1)}
                     disabled={quantity <= 1}
-                    className="h-8 w-8 p-0"
+                    className="h-10 w-10 p-0 hover:bg-white hover:shadow-sm rounded-lg"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="px-4 py-1 text-center min-w-[3rem]">{quantity}</span>
+                  <span className="px-6 py-1 text-center min-w-[3rem] font-bold">{quantity}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleQuantityChange(1)}
                     disabled={quantity >= product.stock}
-                    className="h-8 w-8 p-0"
+                    className="h-10 w-10 p-0 hover:bg-white hover:shadow-sm rounded-lg"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -576,78 +572,48 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {/* 총 가격 */}
-            <div className="bg-gray-50 p-4 rounded-lg mt-4">
+            <div className="bg-mist p-6 rounded-3xl">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">{product.isFunding ? '총 펀딩 참여 금액' : t('productDetail.totalPrice')}</span>
-                <span className={`text-2xl font-bold ${product.isFunding ? 'text-orange-600' : 'text-blue-600'}`}>
+                <span className="text-lg font-bold text-text-primary">{product.isFunding ? '총 펀딩 금액' : '주문 금액'}</span>
+                <span className={`text-3xl font-black ${product.isFunding ? 'text-status-amber' : 'text-primary'}`}>
                   {formatPrice(product.price * quantity)}원
                 </span>
               </div>
             </div>
 
-            {/* 쿠폰 안내 (펀딩 제외) */}
-            {!product.isFunding && (
-              <Card className="mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 mt-4">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Gift className="h-5 w-5 text-orange-600" />
-                    <span className="font-semibold text-orange-800">쿠폰 혜택</span>
-                  </div>
-                  <p className="text-sm text-orange-700 mb-3">
-                    구매 시 쿠폰을 사용하여 추가 할인을 받을 수 있습니다!
-                  </p>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
-                      <Link href="/coupons">
-                        <Tag className="h-4 w-4 mr-1" />
-                        쿠폰 다운로드
-                      </Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild className="text-orange-700 border-orange-300">
-                      <Link href="/me/coupons">
-                        <Gift className="h-4 w-4 mr-1" />
-                        내 쿠폰함
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* 액션 버튼들 */}
-            <div className="space-y-3 mt-6">
-              {/* 메인 구매 버튼 */}
+            <div className="space-y-3 pt-4">
               <Button
                 onClick={() => window.location.href = `/checkout?product=${product._id}&quantity=${quantity}`}
                 disabled={product.stock === 0}
-                className={`w-full text-lg py-6 font-bold ${product.isFunding
-                  ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-200 shadow-lg'
-                  : 'bg-blue-600 hover:bg-blue-700'
+                className={`w-full text-xl py-8 rounded-[16px] font-black shadow-lg transition-all active:scale-[0.98] ${product.isFunding
+                  ? 'bg-status-amber hover:bg-amber-700 shadow-amber-200'
+                  : 'btn-primary shadow-blue-100'
                   }`}
               >
-                {product.stock === 0 ? t('productDetail.outOfStock') : (product.isFunding ? '펀딩 참여하기' : t('productDetail.buyNow'))}
+                {product.stock === 0 ? '품절되었습니다' : (product.isFunding ? '지금 펀딩하기' : '지금 구매하기')}
               </Button>
 
-              {/* 보조 버튼들 */}
               <div className="flex space-x-3">
                 <Button
                   variant={isInWishlist ? "default" : "outline"}
                   onClick={handleToggleWishlist}
                   disabled={addingToWishlist}
-                  className="flex-1"
+                  className={`flex-1 py-7 rounded-[16px] font-bold ${isInWishlist ? 'bg-status-danger text-white border-none' : 'btn-outline'}`}
                 >
-                  <Heart className={`h-4 w-4 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
-                  {isInWishlist ? (product.isFunding ? '찜 취소' : t('productDetail.removeFromWishlist')) : (product.isFunding ? '찜하기' : t('productDetail.addToWishlist'))}
+                  <Heart className={`h-5 w-5 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
+                  {isInWishlist ? '관심 상품 해제' : '관심 상품 등록'}
                 </Button>
 
                 {!product.isFunding && (
                   <Button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0 || addingToCart}
-                    className="flex-1"
+                    variant="outline"
+                    className="flex-1 py-7 rounded-[16px] font-bold btn-outline hover:bg-white"
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {product.stock === 0 ? t('productDetail.outOfStock') : t('productDetail.addToCart')}
+                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    장바구니 담기
                   </Button>
                 )}
               </div>

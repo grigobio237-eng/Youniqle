@@ -67,15 +67,15 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
       <body className={`${inter.className} min-h-screen flex flex-col`} suppressHydrationWarning>
-        <LanguageProvider>
-          <SessionProvider>
+        <SessionProvider>
+          <LanguageProvider>
             <ConditionalHeader />
             <main className="flex-1">
               {children}
             </main>
             <Footer />
-          </SessionProvider>
-        </LanguageProvider>
+          </LanguageProvider>
+        </SessionProvider>
       </body>
     </html>
   );

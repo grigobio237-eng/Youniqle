@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,9 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Sparkles, Plus } from 'lucide-react';
+import { Loader2, Sparkles, Plus, Quote, ArrowRight } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
 // Mock Data for Cases
@@ -23,8 +23,7 @@ const CASES = [
         category: '만성피로',
         budget: '50~100만원',
         period: '3개월',
-        emotion: '무기력함 → 활기참',
-        summary: '아침에 눈을 뜨는 게 고통이었지만, 이제는 알람 없이 일어납니다.',
+        oneLiner: '아침에 눈을 뜨는 게 고통이었지만, 이제는 알람 없이 일어납니다.',
         graphData: [
             { name: '1주', score: 20 },
             { name: '4주', score: 45 },
@@ -40,8 +39,7 @@ const CASES = [
         category: '통증/붓기',
         budget: '100만원 이상',
         period: '6개월',
-        emotion: '무거움 → 가벼움',
-        summary: '다리가 코끼리 같았는데, 이제는 좋아하는 구두를 다시 신습니다.',
+        oneLiner: '다리가 코끼리 같았는데, 이제는 좋아하는 구두를 다시 신습니다.',
         graphData: [
             { name: '1주', score: 30 },
             { name: '8주', score: 50 },
@@ -57,8 +55,7 @@ const CASES = [
         category: 'MENTAL',
         budget: '30만원 이하',
         period: '2개월',
-        emotion: '불안 → 평온',
-        summary: '작은 일에도 예민했는데, 마음의 중심이 잡힌 기분이에요.',
+        oneLiner: '작은 일에도 예민했는데, 마음의 중심이 잡힌 기분이에요.',
         graphData: [
             { name: '1주', score: 40 },
             { name: '3주', score: 55 },
@@ -72,23 +69,19 @@ const CASES = [
 
 export default function CasesPage() {
     const [filter, setFilter] = React.useState('ALL');
-    const [activeTab, setActiveTab] = React.useState('OFFICIAL'); // 'OFFICIAL' | 'AI_SIMULATION'
+    const [activeTab, setActiveTab] = React.useState('OFFICIAL');
 
-    // AI Generation State
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [isGenerating, setIsGenerating] = React.useState(false);
     const [aiCases, setAiCases] = React.useState<any[]>([]);
     const [userSymptom, setUserSymptom] = React.useState('');
     const [userAge, setUserAge] = React.useState('');
 
-    // Load AI cases from localStorage on mount
     React.useEffect(() => {
         const savedCases = localStorage.getItem('youniqle_ai_cases');
         if (savedCases) {
             try {
-                const parsed = JSON.parse(savedCases);
-                console.log('✅ Loaded AI cases from storage:', parsed.length);
-                setAiCases(parsed);
+                setAiCases(JSON.parse(savedCases));
             } catch (e) {
                 console.error('Failed to parse saved AI cases:', e);
             }
@@ -101,34 +94,20 @@ export default function CasesPage() {
 
     const handleGenerateCase = async () => {
         if (!userSymptom) return;
-
         setIsGenerating(true);
         try {
             const response = await fetch('/api/ai/generate-case', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    symptom: userSymptom,
-                    age: userAge
-                })
+                body: JSON.stringify({ symptom: userSymptom, age: userAge })
             });
 
             if (response.ok) {
                 const newCase = await response.json();
-                // Add ID and enhance data for UI compatibility
-                const enhancedCase = {
-                    ...newCase,
-                    id: Date.now(),
-                    isAiGenerated: true,
-                    budget: '맞춤형', // AI response doesn't strictly follow budget, fallback
-                };
-
-                setAiCases([enhancedCase, ...aiCases]);
-
-                // Save to localStorage for persistence
-                localStorage.setItem('youniqle_ai_cases', JSON.stringify([enhancedCase, ...aiCases]));
-                console.log('✅ Saved AI case to localStorage');
-
+                const enhancedCase = { ...newCase, id: Date.now(), isAiGenerated: true, budget: '맞춤형' };
+                const updated = [enhancedCase, ...aiCases];
+                setAiCases(updated);
+                localStorage.setItem('youniqle_ai_cases', JSON.stringify(updated));
                 setActiveTab('AI_SIMULATION');
                 setIsDialogOpen(false);
                 setUserSymptom('');
@@ -143,58 +122,40 @@ export default function CasesPage() {
     };
 
     return (
-        <ChapterWrapper chapter="cases" className="container mx-auto px-4 py-12">
-            <div className="text-center mb-12">
-                <h1 className="text-3xl font-bold mb-4 text-text-primary">🔍 리얼 회복 케이스</h1>
-                <p className="text-xl text-text-secondary word-keep-all max-w-2xl mx-auto">
-                    화려한 "Before/After 사진"은 없습니다.<br />
-                    오직 <b>진짜 변화된 삶의 이야기</b>와 <b>회복 데이터</b>만 있습니다.<br />
-                    당신과 비슷한 고민을 가진 분들의 여정을 확인해보세요.
+        <ChapterWrapper chapter="cases" className="container mx-auto px-4 py-20 min-h-screen">
+            <div className="max-w-4xl mx-auto text-center mb-24 space-y-6">
+                <div className="inline-flex items-center px-4 py-1.5 bg-chapter-accent/5 text-chapter-accent rounded-full text-[10px] font-black tracking-widest uppercase border border-chapter-accent/20">
+                    Real Recovery Insights
+                </div>
+                <h1 className="text-4xl md:text-6xl font-black text-text-primary tracking-tighter">회복이 데이터가 되는 순간</h1>
+                <p className="text-xl text-text-secondary leading-relaxed font-medium">
+                    Youniqle에는 과장된 전후 사진이 존재하지 않습니다.<br />
+                    오직 <b className="text-text-primary">진실된 변화의 기록</b>과 <b className="text-text-primary">검증된 수치</b>만이 당신의 회복을 증명합니다.
                 </p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12">
-                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-surface p-1 rounded-xl border border-line">
-                    <TabsTrigger value="OFFICIAL" className="rounded-lg data-[state=active]:bg-chapter-accent data-[state=active]:text-white">공식 인증 사례</TabsTrigger>
-                    <TabsTrigger value="AI_SIMULATION" className="rounded-lg data-[state=active]:bg-chapter-accent data-[state=active]:text-white">AI 시뮬레이션 사례 (Beta)</TabsTrigger>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-20">
+                <TabsList className="flex justify-center bg-transparent gap-4 mb-16">
+                    <TabsTrigger value="OFFICIAL" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">공식 인증 사례</TabsTrigger>
+                    <TabsTrigger value="AI_SIMULATION" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">AI 가상 사례 (Beta)</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="OFFICIAL">
-                    {/* Filter Section */}
-                    <div className="flex justify-center mb-8 flex-wrap gap-2">
-                        <Button
-                            variant={filter === 'ALL' ? 'default' : 'outline'}
-                            onClick={() => setFilter('ALL')}
-                            className="rounded-full"
-                        >
-                            전체 보기
-                        </Button>
-                        <Button
-                            variant={filter === '만성피로' ? 'default' : 'outline'}
-                            onClick={() => setFilter('만성피로')}
-                            className="rounded-full"
-                        >
-                            #만성피로
-                        </Button>
-                        <Button
-                            variant={filter === '통증/붓기' ? 'default' : 'outline'}
-                            onClick={() => setFilter('통증/붓기')}
-                            className="rounded-full"
-                        >
-                            #통증/붓기
-                        </Button>
-                        <Button
-                            variant={filter === 'MENTAL' ? 'default' : 'outline'}
-                            onClick={() => setFilter('MENTAL')}
-                            className="rounded-full"
-                        >
-                            #멘탈케어
-                        </Button>
+                <TabsContent value="OFFICIAL" className="space-y-12">
+                    <div className="flex justify-center flex-wrap gap-2">
+                        {['ALL', '만성피로', '통증/붓기', 'MENTAL'].map((f) => (
+                            <Button
+                                key={f}
+                                variant="outline"
+                                onClick={() => setFilter(f)}
+                                className={`rounded-full px-6 font-bold transition-all ${filter === f ? 'bg-text-primary text-background border-text-primary' : 'bg-transparent text-text-secondary border-line'}`}
+                            >
+                                {f === 'ALL' ? '전체' : `#${f}`}
+                            </Button>
+                        ))}
                     </div>
 
-                    {/* Official Cases Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <AnimatePresence>
+                        <AnimatePresence mode="popLayout">
                             {filteredCases.map((item) => (
                                 <CaseCard key={item.id} item={item} />
                             ))}
@@ -204,12 +165,12 @@ export default function CasesPage() {
 
                 <TabsContent value="AI_SIMULATION">
                     {aiCases.length === 0 ? (
-                        <div className="text-center py-20 bg-surface rounded-2xl border-2 border-dashed border-line">
-                            <Sparkles className="w-12 h-12 text-primary mx-auto mb-4 opacity-50" />
-                            <h3 className="text-xl font-bold mb-2 text-text-primary">아직 생성된 사례가 없습니다.</h3>
-                            <p className="text-text-secondary mb-6">"나와 같은 고민을 가진 사람은 어떻게 회복했을까?"<br />AI에게 물어보고 가상의 로드맵을 확인해보세요.</p>
-                            <Button onClick={() => setIsDialogOpen(true)} className="rounded-full">
-                                <Plus className="w-4 h-4 mr-2" /> 첫 번째 사례 만들기
+                        <div className="text-center py-24 bg-surface/50 rounded-[40px] border-2 border-dashed border-line">
+                            <Sparkles className="w-16 h-16 text-chapter-accent mx-auto mb-6 opacity-40" />
+                            <h3 className="text-2xl font-black mb-4">시뮬레이션 데이터가 없습니다.</h3>
+                            <p className="text-text-secondary mb-10 text-lg font-medium opacity-70">"내 조건에서 어떤 변화가 가능할까?"<br />AI에게 당신의 증상을 물려주세요.</p>
+                            <Button onClick={() => setIsDialogOpen(true)} className="bg-chapter-accent hover:bg-chapter-accent/90 text-background font-black rounded-2xl h-14 px-10 shadow-xl">
+                                <Plus className="w-5 h-5 mr-3" /> 첫 번째 사례 생성
                             </Button>
                         </div>
                     ) : (
@@ -224,78 +185,66 @@ export default function CasesPage() {
                 </TabsContent>
             </Tabs>
 
-            {/* CTA Box (Footer) */}
-            <div className="mt-16 text-center bg-primary/5 rounded-2xl p-8 sm:p-12">
-                <h3 className="text-2xl font-bold mb-4">내 고민도 해결될 수 있을까요?</h3>
-                <p className="text-gray-600 mb-8">
-                    망설이지 말고 AI에게 물어보세요. <br />
-                    당신의 회복 가능성을 미리 시뮬레이션해드립니다.
+            <div className="mt-20 py-16 px-8 rounded-[48px] bg-surface border border-line flex flex-col items-center text-center space-y-8 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-chapter-accent/30"></div>
+                <h3 className="text-3xl font-black tracking-tighter">당신도 '회복 데이터'의 주인공이 될 수 있습니다.</h3>
+                <p className="text-text-secondary text-lg font-medium max-w-xl opacity-80 leading-relaxed">
+                    수천 명의 데이터가 증명하는 최적의 회복 경로를 안내해드립니다. <br />
+                    지금 바로 AI 전문가와 무료 진단을 시작해보세요.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" variant="default" className="rounded-full px-8" asChild>
-                        <Link href="/">
-                            내 회복 점수 다시 확인하기
-                        </Link>
+                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                    <Button size="lg" className="bg-chapter-accent hover:bg-chapter-accent/90 text-background font-black rounded-2xl h-16 px-10" asChild>
+                        <Link href="/">내 회복 점수 진단하기</Link>
                     </Button>
                     <Button
                         size="lg"
                         variant="outline"
-                        className="rounded-full px-8"
+                        className="border-line font-black rounded-2xl h-16 px-10 hover:bg-white/5"
                         onClick={() => setIsDialogOpen(true)}
                     >
-                        <Sparkles className="w-4 h-4 mr-2 text-primary" />
-                        AI로 내 회복 사례 찾아보기
+                        <Sparkles className="w-5 h-5 mr-3 text-chapter-accent" />
+                        AI 시뮬레이션 돌려보기
                     </Button>
                 </div>
             </div>
 
-            {/* AI Generation Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-purple-500" />
-                            AI 회복 사례 시뮬레이터
+                <DialogContent className="bg-surface border-line sm:max-w-lg rounded-[32px] overflow-hidden p-8 shadow-2xl">
+                    <DialogHeader className="space-y-4">
+                        <DialogTitle className="flex items-center gap-3 text-2xl font-black">
+                            <Sparkles className="w-6 h-6 text-chapter-accent" />
+                            AI 시뮬레이터
                         </DialogTitle>
-                        <DialogDescription>
-                            현재 겪고 있는 증상이나 고민을 입력하시면,<br />AI가 가장 유사한 <b>회복 성공 로드맵</b>을 보여드립니다.
+                        <DialogDescription className="text-text-secondary font-medium leading-relaxed">
+                            현재 겪고 있는 증상을 상세하게 입력해주세요. <br />AI가 가장 유사한 성공적인 <b>회복 로드맵</b>을 설계해드립니다.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="symptom">가장 큰 고민거리가 무엇인가요?</Label>
+                    <div className="space-y-6 py-8">
+                        <div className="space-y-3">
+                            <Label htmlFor="symptom" className="text-xs font-black uppercase tracking-widest text-text-secondary ml-1">상태 기술</Label>
                             <Textarea
                                 id="symptom"
-                                placeholder="예: 30대 남자인데, 매일 야근으로 아침에 일어나기가 너무 힘들어요. 주말에는 잠만 자는데도 피로가 안 풀려요."
+                                placeholder="예: 30대 후반, 극심한 야근 후 아침에 몸이 붓고 기력이 없습니다."
                                 value={userSymptom}
                                 onChange={(e) => setUserSymptom(e.target.value)}
-                                className="min-h-[100px]"
+                                className="bg-background border-line min-h-[140px] rounded-2xl focus:border-chapter-accent transition-all p-5"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="age">연령대 (선택)</Label>
+                        <div className="space-y-3">
+                            <Label htmlFor="age" className="text-xs font-black uppercase tracking-widest text-text-secondary ml-1">연령 및 성별</Label>
                             <Input
                                 id="age"
-                                placeholder="예: 30대 후반"
+                                placeholder="예: 40대 초반 남성"
                                 value={userAge}
                                 onChange={(e) => setUserAge(e.target.value)}
+                                className="bg-background border-line h-14 rounded-2xl focus:border-chapter-accent transition-all px-5"
                             />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>취소</Button>
-                        <Button onClick={handleGenerateCase} disabled={!userSymptom || isGenerating} className="bg-purple-600 hover:bg-purple-700">
-                            {isGenerating ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    분석 중...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles className="mr-2 h-4 w-4" />
-                                    시뮬레이션 시작
-                                </>
-                            )}
+                    <DialogFooter className="gap-3">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-14 font-bold text-text-secondary">취소</Button>
+                        <Button onClick={handleGenerateCase} disabled={!userSymptom || isGenerating} className="bg-chapter-accent hover:bg-chapter-accent/90 text-background font-black h-14 px-8 rounded-2xl shadow-lg">
+                            {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : '로드맵 설계 시작'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -304,92 +253,91 @@ export default function CasesPage() {
     );
 }
 
-// Sub-component for clean rendering
 function CaseCard({ item, isAi = false }: { item: any, isAi?: boolean }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             layout
         >
-            <Card className={`h-full hover:shadow-xl transition-all duration-300 overflow-hidden border-t-4 border-line bg-surface ${isAi ? 'border-t-purple-500' : 'border-t-chapter-accent'}`}>
-                <CardHeader className={`pb-4 bg-surface`}>
-                    <div className="flex justify-between items-start mb-2">
-                        <Badge variant={isAi ? "outline" : "secondary"} className={`mb-2 ${isAi ? 'border-purple-200 text-purple-600 bg-white' : 'badge-primary'}`}>
-                            {isAi ? 'AI SIMULATION' : item.category}
+            <Card className="bg-surface border-line rounded-[32px] overflow-hidden group hover:border-chapter-accent transition-all duration-500 shadow-xl flex flex-col h-full">
+                <CardHeader className="p-8 pb-4 space-y-4">
+                    <div className="flex justify-between items-start">
+                        <Badge className={`bg-chapter-accent/10 text-chapter-accent border-none font-black text-[10px] tracking-widest rounded-md ${isAi ? 'bg-primary/10 text-primary' : ''}`}>
+                            {isAi ? 'AI ANALYSIS' : item.category.toUpperCase()}
                         </Badge>
-                        <span className="text-xs text-text-secondary">{item.period} 소요</span>
+                        <span className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest">{item.period} Journey</span>
                     </div>
-                    <CardTitle className="text-lg font-bold text-text-primary">{item.title}</CardTitle>
-                    <CardDescription className="text-primary font-medium mt-1">
-                        {item.emotion}
-                    </CardDescription>
+                    <h3 className="text-xl font-black text-text-primary leading-tight">{item.title}</h3>
                 </CardHeader>
-                <CardContent className="p-6">
-                    {/* Graph Simulation */}
-                    <div className="h-32 w-full mb-6 bg-surface rounded-lg p-2 border border-dashed border-line">
+
+                <CardContent className="p-8 pt-0 space-y-8 flex-1 flex flex-col">
+                    {/* Score Graph */}
+                    <div className="h-40 w-full relative">
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-chapter-accent/5 to-transparent pointer-events-none rounded-b-2xl"></div>
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={item.graphData}>
                                 <Tooltip
-                                    contentStyle={{ fontSize: '12px', borderRadius: '4px', backgroundColor: '#12161C', border: '1px solid rgba(255,255,255,0.1)' }}
+                                    contentStyle={{
+                                        backgroundColor: '#1A1D21',
+                                        borderRadius: '16px',
+                                        border: '1px solid rgba(233,226,214,0.1)',
+                                        color: '#E9E2D6',
+                                        fontSize: '12px'
+                                    }}
                                 />
                                 <Line
                                     type="monotone"
                                     dataKey="score"
-                                    stroke="#0C3B2E" // Emerald (--ok)
-                                    strokeWidth={3}
-                                    dot={{ r: 3, fill: "#0C3B2E" }}
+                                    stroke="var(--chapter-accent)"
+                                    strokeWidth={4}
+                                    dot={{ r: 4, fill: 'var(--chapter-accent)', strokeWidth: 0 }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
-                        <p className="text-center text-xs text-text-secondary mt-1">회복 점수 변화 추이</p>
+                        <p className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-chapter-accent uppercase tracking-widest opacity-60">Recovery index trend</p>
                     </div>
 
-                    <p className="mb-6 text-text-primary leading-relaxed font-serif">
-                        "{item.summary}"
-                    </p>
-
-                    {/* Habit Changes (AI only) */}
-                    {isAi && item.habitChanges && (
-                        <div className="mb-6 bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
-                            <h4 className="text-sm font-bold text-purple-900 mb-2">🔄 실천한 습관 변화</h4>
-                            <ul className="space-y-1">
-                                {item.habitChanges.map((habit: string, idx: number) => (
-                                    <li key={idx} className="text-sm text-purple-800 flex items-start">
-                                        <span className="mr-2 text-purple-400">•</span>
-                                        <span>{habit}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                    <div className="space-y-6 flex-1">
+                        <div className="relative pl-8">
+                            <Quote className="absolute left-0 top-0 w-6 h-6 text-chapter-accent opacity-20 rotate-180" />
+                            <p className="text-lg font-bold text-text-primary leading-relaxed italic tracking-tight">
+                                {isAi ? item.oneLiner || item.summary : item.oneLiner}
+                            </p>
                         </div>
-                    )}
 
-                    <div className="flex flex-wrap gap-2 mt-auto mb-4">
-                        {item.tags.map((tag: string) => (
-                            <span key={tag} className="text-xs text-text-secondary bg-background px-2 py-1 rounded">
-                                {tag}
-                            </span>
-                        ))}
+                        {isAi && item.habitChanges && (
+                            <div className="p-5 rounded-2xl bg-background border border-line space-y-3">
+                                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Key Habit Shifts</h4>
+                                <ul className="space-y-2">
+                                    {item.habitChanges.slice(0, 3).map((h: string, i: number) => (
+                                        <li key={i} className="text-sm font-medium text-text-secondary flex items-start gap-2">
+                                            <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+                                            {h}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Product CTA */}
-                    {(item.product || item.productRecommendation) && (
-                        <div className="mt-4 pt-4 border-t border-line">
-                            <p className="text-xs text-text-secondary mb-2">{isAi ? '이 증상에 추천하는 솔루션' : '이 분이 실제로 사용한 키트'}</p>
-                            <Button className={`w-full hover:opacity-90 ${isAi ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'btn-primary'}`} asChild>
-                                {isAi ? (
-                                    <Link href="/products">
-                                        {item.productRecommendation?.name} 보기
-                                    </Link>
-                                ) : (
-                                    <Link href={`/products/${item.product.id}`}>
-                                        {item.product.name} 구매하기 <span className="ml-2 text-xs opacity-70">({item.product.price})</span>
-                                    </Link>
-                                )}
-                            </Button>
+                    <div className="pt-6 border-t border-line space-y-4">
+                        <div className="flex flex-wrap gap-2">
+                            {item.tags.map((tag: string) => (
+                                <span key={tag} className="text-[10px] font-bold text-text-secondary opacity-50">
+                                    {tag}
+                                </span>
+                            ))}
                         </div>
-                    )}
+
+                        <Button className="w-full bg-background border border-line hover:border-chapter-accent hover:bg-chapter-accent/5 text-text-primary font-black h-12 rounded-xl group transition-all" asChild>
+                            <Link href={isAi ? "/products" : `/products/${item.product?.id || '1'}`}>
+                                {isAi ? '추천 제품 보기' : `${item.product?.name} 확인`}
+                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </motion.div>

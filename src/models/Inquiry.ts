@@ -10,19 +10,19 @@ export interface IInquiry extends Document {
   content: string;
   status: 'pending' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  
+
   // AI 관련 필드
   aiAnswer?: string;
   aiGeneratedAt?: Date;
   aiModel?: string;
   aiConfidence?: number;
   aiNeedsReview?: boolean;
-  
+
   // 관리자 응답
   adminAnswer?: string;
   adminId?: mongoose.Types.ObjectId;
   answeredAt?: Date;
-  
+
   // 메타데이터
   source: 'website' | 'email' | 'phone' | 'api' | 'admin' | 'webhook';
   tags: string[];
@@ -32,12 +32,12 @@ export interface IInquiry extends Document {
     size: number;
     type: string;
   }>;
-  
+
   // 처리 정보
   assignedTo?: mongoose.Types.ObjectId;
   category?: string;
   subcategory?: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,8 +46,7 @@ const InquirySchema = new Schema<IInquiry>({
   inquiryId: {
     type: String,
     required: true,
-    unique: true,
-    index: true
+    unique: true
   },
   userId: {
     type: Schema.Types.ObjectId,
@@ -56,8 +55,7 @@ const InquirySchema = new Schema<IInquiry>({
   },
   userEmail: {
     type: String,
-    required: true,
-    index: true
+    required: true
   },
   userName: {
     type: String,
@@ -66,8 +64,7 @@ const InquirySchema = new Schema<IInquiry>({
   type: {
     type: String,
     enum: ['general', 'delivery', 'payment', 'product', 'technical', 'refund', 'partnership'],
-    required: true,
-    index: true
+    required: true
   },
   subject: {
     type: String,
@@ -80,16 +77,14 @@ const InquirySchema = new Schema<IInquiry>({
   status: {
     type: String,
     enum: ['pending', 'in_progress', 'resolved', 'closed'],
-    default: 'pending',
-    index: true
+    default: 'pending'
   },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high', 'urgent'],
-    default: 'medium',
-    index: true
+    default: 'medium'
   },
-  
+
   // AI 관련 필드
   aiAnswer: {
     type: String
@@ -109,7 +104,7 @@ const InquirySchema = new Schema<IInquiry>({
     type: Boolean,
     default: false
   },
-  
+
   // 관리자 응답
   adminAnswer: {
     type: String
@@ -121,13 +116,12 @@ const InquirySchema = new Schema<IInquiry>({
   answeredAt: {
     type: Date
   },
-  
+
   // 메타데이터
   source: {
     type: String,
     enum: ['website', 'email', 'phone', 'api', 'admin', 'webhook'],
-    default: 'website',
-    index: true
+    default: 'website'
   },
   tags: [{
     type: String
@@ -138,7 +132,7 @@ const InquirySchema = new Schema<IInquiry>({
     size: { type: Number, required: true },
     type: { type: String, required: true }
   }],
-  
+
   // 처리 정보
   assignedTo: {
     type: Schema.Types.ObjectId,
@@ -159,20 +153,21 @@ InquirySchema.index({ inquiryId: 1 });
 InquirySchema.index({ userEmail: 1 });
 InquirySchema.index({ status: 1 });
 InquirySchema.index({ type: 1 });
+InquirySchema.index({ source: 1 });
 InquirySchema.index({ priority: 1 });
 InquirySchema.index({ createdAt: -1 });
 InquirySchema.index({ aiNeedsReview: 1 });
 
 // 가상 필드
-InquirySchema.virtual('hasAiAnswer').get(function() {
+InquirySchema.virtual('hasAiAnswer').get(function () {
   return !!this.aiAnswer;
 });
 
-InquirySchema.virtual('hasAdminAnswer').get(function() {
+InquirySchema.virtual('hasAdminAnswer').get(function () {
   return !!this.adminAnswer;
 });
 
-InquirySchema.virtual('isResolved').get(function() {
+InquirySchema.virtual('isResolved').get(function () {
   return this.status === 'resolved' || this.status === 'closed';
 });
 

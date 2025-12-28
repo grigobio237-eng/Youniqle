@@ -6,7 +6,6 @@ import ProductFilters from '@/components/products/ProductFilters';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, TrendingUp, Star, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -16,14 +15,14 @@ function ProductListSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
-        <Card key={i}>
-          <Skeleton className="aspect-square w-full rounded-t-2xl" />
+        <Card key={i} className="bg-surface border-line">
+          <Skeleton className="aspect-square w-full rounded-t-2xl bg-background" />
           <CardContent className="p-6">
-            <Skeleton className="h-4 w-3/4 mb-2" />
-            <Skeleton className="h-3 w-full mb-4" />
+            <Skeleton className="h-4 w-3/4 mb-2 bg-background" />
+            <Skeleton className="h-3 w-full mb-4 bg-background" />
             <div className="flex justify-between items-center">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-6 w-20 bg-background" />
+              <Skeleton className="h-8 w-16 bg-background" />
             </div>
           </CardContent>
         </Card>
@@ -42,7 +41,6 @@ interface ProductsPageProps {
 }
 
 export default function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { t } = useLanguage();
   const [userScore, setUserScore] = useState<number | null>(null);
   const [recommendationLabel, setRecommendationLabel] = useState('');
 
@@ -61,78 +59,78 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   }, []);
 
   return (
-    <ChapterWrapper chapter="products" className="container mx-auto px-4 py-8">
+    <ChapterWrapper chapter="products" className="container mx-auto px-4 py-12">
       {/* AI Recommendation Banner */}
       {userScore && (
-        <div className="mb-12 bg-surface border border-primary/20 rounded-3xl p-6 md:p-10 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Sparkles className="w-32 h-32 text-primary" />
+        <div className="mb-20 bg-surface border border-line rounded-[40px] p-8 md:p-14 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <Sparkles className="w-64 h-64 text-primary" />
           </div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> AI 맞춤 추천
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1 text-center md:text-left space-y-6">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <span className="bg-primary text-background text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest">
+                  <Sparkles className="w-3 h-3" /> AI Tailored
                 </span>
-                <span className="text-sm font-bold text-primary">당신의 회복 점수: {userScore}점</span>
+                <span className="text-sm font-bold text-primary">나의 회복 점수: {userScore}점</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-text-primary mb-4 leading-tight">
+              <h2 className="text-3xl md:text-5xl font-black text-text-primary leading-tight tracking-tighter">
                 {recommendationLabel}
               </h2>
-              <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-8 text-sm text-gray-600">
+              <div className="flex flex-wrap justify-center md:justify-start gap-8 text-sm text-text-secondary font-medium">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span>동일 점수대 <b>92%가 만족</b></span>
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span>동일 점수대 <b className="text-text-primary">92%가 만족</b></span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span>3주 내 <b>회복 점수 향상</b> 사례 다수</span>
+                  <Star className="w-4 h-4 text-primary fill-primary" />
+                  <span>3주 내 <b className="text-text-primary">회복 지수 개선</b> 사례 다수</span>
                 </div>
               </div>
-              <Button asChild size="lg" className="rounded-full px-8 h-12 shadow-lg hover:scale-105 transition-transform">
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-background font-black rounded-2xl px-10 h-14 shadow-xl transition-all hover:scale-105">
                 <Link href="#recommended-products">추천 제품 보기</Link>
               </Button>
             </div>
 
-            <div className="flex-shrink-0 grid grid-cols-2 gap-3 w-full md:w-auto">
-              <div className="bg-surface p-4 rounded-2xl shadow-sm border border-line flex flex-col items-center">
-                <div className="w-20 h-20 bg-background rounded-xl mb-2 flex items-center justify-center text-2xl">💤</div>
-                <p className="text-xs font-bold">딥 슬립</p>
+            <div className="flex-shrink-0 grid grid-cols-2 gap-4 w-full md:w-auto">
+              <div className="bg-background/40 backdrop-blur-md p-6 rounded-3xl border border-line flex flex-col items-center group transition-all hover:border-primary">
+                <div className="w-24 h-24 bg-surface rounded-2xl mb-3 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">💤</div>
+                <p className="text-xs font-black text-text-secondary group-hover:text-primary">DEEP SLEEP</p>
               </div>
-              <div className="bg-surface p-4 rounded-2xl shadow-sm border border-line flex flex-col items-center">
-                <div className="w-20 h-20 bg-background rounded-xl mb-2 flex items-center justify-center text-2xl">⚡</div>
-                <p className="text-xs font-bold">피로 삭제</p>
+              <div className="bg-background/40 backdrop-blur-md p-6 rounded-3xl border border-line flex flex-col items-center group transition-all hover:border-primary">
+                <div className="w-24 h-24 bg-surface rounded-2xl mb-3 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">⚡</div>
+                <p className="text-xs font-black text-text-secondary group-hover:text-primary">VITALITY</p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-text-primary mb-2">
-            전체 상품 <span className="text-primary text-lg font-bold ml-2">All Selection</span>
+      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 pb-8 border-b border-line">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-black text-text-primary tracking-tighter">
+            전체 상품 <span className="text-primary text-xl font-bold ml-2">All Selection</span>
           </h1>
-          <p className="text-text-secondary">당신의 회복 데이터를 완성하는 최고의 파트너들</p>
+          <p className="text-text-secondary text-lg font-medium opacity-60">당신의 회복 데이터를 완성하는 최고의 파트너들</p>
         </div>
         {/* Simple Quiz-like Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
-          <Button variant="outline" size="sm" className="rounded-full border-gray-200 shrink-0">😴 수면부족</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-gray-200 shrink-0">😩 만성피로</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-gray-200 shrink-0">🤰 붓기관리</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-gray-200 shrink-0">🧘 멘탈케어</Button>
+        <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
+          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😴 수면부족</Button>
+          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😩 만성피로</Button>
+          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">🤰 붓기관리</Button>
+          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">🧘 멘탈케어</Button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-12">
         {/* Filters Sidebar - Desktop Only */}
-        <aside className="lg:w-64 flex-shrink-0 hidden lg:block">
-          <div className="sticky top-24">
-            <h3 className="font-bold flex items-center gap-2 mb-4">
-              <Filter className="w-4 h-4" /> 세부 필터 (Filters)
+        <aside className="lg:w-72 flex-shrink-0 hidden lg:block">
+          <div className="sticky top-28 space-y-6">
+            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-text-secondary flex items-center gap-2 ml-1">
+              <Filter className="w-3 h-3" /> Filters
             </h3>
-            <Card className="border-line shadow-sm overflow-hidden bg-surface">
+            <Card className="border-line shadow-2xl overflow-hidden bg-surface rounded-[32px]">
               <CardContent className="p-0">
                 <ProductFilters />
               </CardContent>

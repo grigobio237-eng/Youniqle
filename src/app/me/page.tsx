@@ -7,12 +7,38 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import CharacterImage from '@/components/ui/CharacterImage';
 import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
-import { User, Mail, Phone, MapPin, Settings, Save, Store, CheckCircle, Clock, XCircle, AlertCircle, X, Upload, FileImage } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Settings,
+  Save,
+  Store,
+  CheckCircle,
+  Clock,
+  XCircle,
+  AlertCircle,
+  X,
+  Upload,
+  FileImage,
+  ChevronRight,
+  ClipboardList,
+  ShieldCheck,
+  CreditCard,
+  Ticket,
+  Bell,
+  LogOut,
+  UserX,
+  ShoppingBag,
+  Heart
+} from 'lucide-react';
 import Link from 'next/link';
 import ReferralSection from '@/components/ui/ReferralSection';
+import Image from 'next/image';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -58,7 +84,6 @@ export default function MyPage() {
       });
       fetchUserData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const fetchUserData = async () => {
@@ -69,15 +94,15 @@ export default function MyPage() {
       const response = await fetch('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
-        setUserData(data.user);
+        const u = data.user || data;
+        setUserData(u);
 
-        // 사용자 데이터로 폼 초기화
-        if (data.user.addresses && data.user.addresses.length > 0) {
-          const defaultAddress = data.user.addresses[0];
+        if (u.addresses && u.addresses.length > 0) {
+          const defaultAddress = u.addresses[0];
           setFormData(prev => ({
             ...prev,
-            phone: data.user.phone || '',
-            marketingConsent: data.user.marketingConsent || false,
+            phone: u.phone || '',
+            marketingConsent: u.marketingConsent || false,
             zipCode: defaultAddress.zip || '',
             address1: defaultAddress.addr1 || '',
             address2: defaultAddress.addr2 || '',
@@ -85,13 +110,13 @@ export default function MyPage() {
         } else {
           setFormData(prev => ({
             ...prev,
-            phone: data.user.phone || '',
-            marketingConsent: data.user.marketingConsent || false,
+            phone: u.phone || '',
+            marketingConsent: u.marketingConsent || false,
           }));
         }
       }
     } catch (error) {
-      console.error('사용자 데이터 가져오기 실패:', error);
+      console.error('사용자 데이터 로드 오류:', error);
     } finally {
       setLoading(false);
     }
@@ -105,14 +130,7 @@ export default function MyPage() {
     }));
   };
 
-  const handleAddressSelect = (data: {
-    zonecode: string;
-    address: string;
-    addressEnglish: string;
-    addressType: string;
-    bname: string;
-    buildingName: string;
-  }) => {
+  const handleAddressSelect = (data: any) => {
     setFormData(prev => ({
       ...prev,
       zipCode: data.zonecode,
@@ -123,13 +141,11 @@ export default function MyPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // 주소 정보가 있을 때만 전송
       const updateData: any = {
         phone: formData.phone,
         marketingConsent: formData.marketingConsent,
       };
 
-      // 주소 정보가 완전한 경우에만 추가
       if (formData.zipCode && formData.address1) {
         updateData.zipCode = formData.zipCode;
         updateData.address1 = formData.address1;
@@ -138,24 +154,21 @@ export default function MyPage() {
 
       const response = await fetch('/api/auth/me', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setUserData(data.user);
+        setUserData(data.user || data);
         setIsEditing(false);
-        alert('프로필이 성공적으로 업데이트되었습니다.');
+        alert('프로필이 업데이트되었습니다.');
       } else {
         const errorData = await response.json();
-        console.error('Save error details:', errorData);
         alert(`저장 실패: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('저장 오류:', error);
       alert('저장 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -173,28 +186,20 @@ export default function MyPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 파일 크기 검증 (10MB)
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       alert('파일 크기는 10MB를 초과할 수 없습니다.');
       return;
     }
 
-    // 파일 형식 검증
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      alert('이미지 파일만 업로드 가능합니다. (JPEG, PNG, GIF, WebP)');
-      return;
-    }
-
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'partner-documents');
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', 'partner-documents');
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        body: fd,
       });
 
       if (response.ok) {
@@ -202,18 +207,16 @@ export default function MyPage() {
         handlePartnerApplicationChange(field, result.url);
       } else {
         const errorData = await response.json();
-        alert(`파일 업로드 실패: ${errorData.error}`);
+        alert(`업로드 실패: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('파일 업로드 오류:', error);
-      alert('파일 업로드 중 오류가 발생했습니다.');
+      console.error('업로드 오류:', error);
     }
   };
 
   const handlePartnerApplicationSubmit = async () => {
     setPartnerApplicationLoading(true);
     try {
-      // 전체 주소를 결합 (우편번호 + 기본 주소 + 상세주소)
       let fullBusinessAddress = partnerApplicationData.businessAddress;
       if (partnerApplicationData.businessZipCode) {
         fullBusinessAddress = `[${partnerApplicationData.businessZipCode}] ${fullBusinessAddress}`;
@@ -224,9 +227,7 @@ export default function MyPage() {
 
       const response = await fetch('/api/partner/auth/apply', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: session?.user?.email,
           name: session?.user?.name,
@@ -237,17 +238,15 @@ export default function MyPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        alert('파트너 신청이 완료되었습니다. 관리자 검토 후 결과를 안내드립니다.');
+        alert('파트너 신청이 접수되었습니다. 검토 후 연락드리겠습니다.');
         setShowPartnerApplication(false);
-        fetchUserData(); // 사용자 데이터 새로고침
+        fetchUserData();
       } else {
         const errorData = await response.json();
         alert(`신청 실패: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Partner application error:', error);
-      alert('신청 중 오류가 발생했습니다.');
+      console.error('신청 오류:', error);
     } finally {
       setPartnerApplicationLoading(false);
     }
@@ -257,11 +256,11 @@ export default function MyPage() {
     if (!userData?.partnerStatus || userData.partnerStatus === 'none') {
       return {
         status: 'none',
-        title: '파트너 신청하기',
-        description: '나만의 온라인 상점을 열어보세요!',
+        title: '파트너 프로토콜 시작',
+        description: '회복의 전문가로서 본인만의 상점을 운영하십시오.',
         icon: Store,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50',
+        color: 'text-chapter-accent',
+        bgColor: 'bg-chapter-accent/5',
         action: () => setShowPartnerApplication(true)
       };
     }
@@ -270,42 +269,32 @@ export default function MyPage() {
       case 'pending':
         return {
           status: 'pending',
-          title: '승인 대기 중',
-          description: '파트너 신청이 검토 중입니다. 3-5 영업일 내에 결과를 안내드립니다.',
+          title: '검토 진행 중',
+          description: '보안 심사가 진행 중입니다. 3-5영업일이 소요됩니다.',
           icon: Clock,
-          color: 'text-yellow-600',
-          bgColor: 'bg-yellow-50',
+          color: 'text-status-amber',
+          bgColor: 'bg-status-amber/5',
           action: null
         };
       case 'approved':
         return {
           status: 'approved',
-          title: '파트너 승인됨',
-          description: `파트너로 승인되었습니다! 파트너 대시보드에서 상점을 관리하세요.`,
+          title: '파트너 인증 완료',
+          description: '인증된 파트너입니다. 관리 대시보드에 접근 가능합니다.',
           icon: CheckCircle,
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
+          color: 'text-status-good',
+          bgColor: 'bg-status-good/5',
           action: () => window.open('/partner/login', '_blank')
         };
       case 'rejected':
         return {
           status: 'rejected',
-          title: '신청이 거부되었습니다',
-          description: userData.partnerApplication?.rejectedReason || '승인 기준에 맞지 않습니다.',
+          title: '인증 승인 거절',
+          description: userData.partnerApplication?.rejectedReason || '보안 정책에 부합하지 않습니다.',
           icon: XCircle,
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
+          color: 'text-status-danger',
+          bgColor: 'bg-status-danger/5',
           action: () => setShowPartnerApplication(true)
-        };
-      case 'suspended':
-        return {
-          status: 'suspended',
-          title: '파트너 정지됨',
-          description: '파트너 활동이 정지되었습니다. 문의사항이 있으시면 고객센터로 연락해주세요.',
-          icon: AlertCircle,
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-50',
-          action: null
         };
       default:
         return null;
@@ -314,604 +303,298 @@ export default function MyPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chapter-accent"></div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
-              마이페이지를 이용하려면 로그인해주세요.
-            </p>
-            <Button asChild>
-              <a href="/auth/signin">로그인하기</a>
-            </Button>
-          </CardContent>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
+          <p className="text-slate font-medium mb-8">대시보드 접근을 위해 인증 프로토콜이 필요합니다.</p>
+          <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
+            <Link href="/auth/signin">인증 시작</Link>
+          </Button>
         </Card>
       </div>
     );
   }
 
+  const partnerInfo = getPartnerStatusInfo();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* 헤더 */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="relative w-20 h-20">
-              <CharacterImage
-                src="/character/youniqle-1.png"
-                alt="Youniqle 캐릭터"
-                fill
-                className="object-contain"
-                sizes="80px"
-              />
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">마이페이지</h1>
-          <p className="text-xl text-gray-600">
-            {session.user?.name}님, 안녕하세요!
-          </p>
+    <div className="min-h-screen bg-mist py-20 px-4">
+      <div className="container mx-auto max-w-6xl">
+        <div className="flex flex-col items-center text-center mb-16">
+          <p className="text-slate font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 text-chapter-accent rounded-full border border-chapter-accent/10">Personal Control Center</p>
+          <h1 className="text-5xl font-black text-obsidian tracking-tighter">나의 프로필</h1>
+          <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원의 개인 설정 및 활동 현황입니다.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 프로필 정보 */}
-          <div className="lg:col-span-2">
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  프로필 정보
-                </CardTitle>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="flex items-center"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  {isEditing ? '취소' : '편집'}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-8">
+            {/* 프로필 정보 */}
+            <Card className="border-none shadow-sm rounded-[40px] bg-white overflow-hidden">
+              <CardHeader className="p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-mist rounded-2xl text-obsidian">
+                    <User className="h-6 w-6" />
+                  </div>
+                  <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로필 설정</CardTitle>
+                </div>
+                <Button variant="ghost" onClick={() => setIsEditing(!isEditing)} className="font-black text-xs text-slate hover:bg-mist h-10 px-4 rounded-xl">
+                  {isEditing ? <><X className="h-4 w-4 mr-2" /> 취소</> : <><Settings className="h-4 w-4 mr-2" /> 편집</>}
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* 기본 정보 (소셜에서 가져온 정보) */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2 text-gray-700">기본 정보</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {(session.user as any)?.provider ?
-                      `${(session.user as any).provider}에서 가져온 정보입니다.` :
-                      '이메일로 가입한 계정입니다.'
-                    }
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">이메일: {session.user?.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">이름: {session.user?.name}</span>
-                    </div>
-                    {session.user?.image && (
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-600">프로필 이미지: </span>
-                        <img
-                          src={session.user.image}
-                          alt="프로필"
-                          className="w-8 h-8 rounded-full ml-2"
-                        />
-                      </div>
-                    )}
+              <CardContent className="p-10 space-y-10">
+                <div className="bg-mist/30 p-8 rounded-[32px] border border-line/30 flex items-center gap-6">
+                  <div className="relative w-24 h-24 rounded-[32px] overflow-hidden bg-white shadow-md border-4 border-white">
+                    <Image src={session.user?.image || '/placeholder-user.jpg'} alt="" fill className="object-cover" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-obsidian">{session.user?.name}</h3>
+                    <p className="text-sm font-bold text-slate flex items-center gap-2 opacity-60">
+                      <Mail className="h-3 w-3" /> {session.user?.email}
+                    </p>
+                    <Badge className="mt-2 bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-3">
+                      {(session.user as any)?.provider || 'Email Member'}
+                    </Badge>
                   </div>
                 </div>
 
-                {/* 추가 정보 (쇼핑 시 필요) */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-700">쇼핑을 위한 추가 정보</h3>
-
-                  <div>
-                    <Label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-2 block">
-                      휴대폰 번호
-                    </Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">연락처</Label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate h-4 w-4 opacity-40" />
                       <Input
-                        id="phone"
                         name="phone"
-                        type="tel"
                         value={formData.phone}
                         onChange={handleInputChange}
                         disabled={!isEditing}
-                        className="pl-10"
-                        placeholder="010-1234-5678"
+                        placeholder="010-XXXX-XXXX"
+                        className="h-14 pl-12 rounded-2xl bg-mist/50 border-line focus:ring-chapter-accent"
                       />
                     </div>
                   </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      기본 배송지
-                    </Label>
-                    <div className="space-y-3">
-                      <GoogleAddressSearch
-                        onAddressSelect={handleAddressSelect}
+                  <div className="space-y-3">
+                    <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">마케팅 활용 동의</Label>
+                    <div className={`h-14 flex items-center px-5 rounded-2xl border transition-all ${formData.marketingConsent ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                      <Checkbox
+                        id="marketing"
+                        checked={formData.marketingConsent}
+                        onCheckedChange={(c) => setFormData(prev => ({ ...prev, marketingConsent: c as boolean }))}
                         disabled={!isEditing}
+                        className="rounded-md"
                       />
-                      <div className="flex space-x-2">
-                        <div className="relative flex-1">
-                          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                          <Input
-                            value={formData.zipCode}
-                            disabled={!isEditing}
-                            className="pl-10"
-                            placeholder="우편번호"
-                            readOnly
-                          />
-                        </div>
-                        <Input
-                          value={formData.address1}
-                          onChange={handleInputChange}
-                          name="address1"
-                          disabled={!isEditing}
-                          placeholder="기본 주소"
-                          readOnly
-                          className="flex-1"
-                        />
-                      </div>
-                      <Input
-                        value={formData.address2}
-                        onChange={handleInputChange}
-                        name="address2"
-                        disabled={!isEditing}
-                        placeholder="상세 주소 (동/호수, 건물명 등)"
-                      />
+                      <label htmlFor="marketing" className="ml-3 text-sm font-bold text-slate cursor-pointer select-none">이벤트 등 마케팅 수신동의 (선택)</label>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="marketingConsent"
-                      name="marketingConsent"
-                      checked={formData.marketingConsent}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, marketingConsent: checked as boolean }))}
-                      disabled={!isEditing}
-                    />
-                    <Label htmlFor="marketingConsent" className="text-sm text-gray-600">
-                      마케팅 정보 수신에 동의합니다 (선택사항)
-                    </Label>
+                <div className="space-y-4">
+                  <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
+                  <div className="space-y-3">
+                    <GoogleAddressSearch onAddressSelect={handleAddressSelect} disabled={!isEditing} />
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                      <Input value={formData.address1} readOnly placeholder="주소" className="h-14 md:col-span-3 rounded-2xl bg-mist/50 border-line" />
+                    </div>
+                    <Input name="address2" value={formData.address2} onChange={handleInputChange} disabled={!isEditing} placeholder="상세 주소를 입력하세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
                   </div>
                 </div>
 
                 {isEditing && (
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      취소
-                    </Button>
-                    <Button
-                      onClick={handleSave}
-                      className="flex items-center"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      저장
-                    </Button>
-                  </div>
+                  <Button onClick={handleSave} className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+                    <Save className="h-5 w-5" /> 프로필 저장하기
+                  </Button>
                 )}
               </CardContent>
             </Card>
+
+            {/* 친구 초대 섹션 */}
+            <ReferralSection referralCode={userData?.referralCode} />
           </div>
 
-          {/* 사이드바 */}
-          <div className="space-y-6">
-            {/* 멤버십 정보 */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg">멤버십</CardTitle>
+          <div className="lg:col-span-4 space-y-8">
+            {/* 멤버십 위젯 */}
+            <Card className="border-none shadow-2xl rounded-[40px] bg-obsidian text-mist overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-reward-gold/10 blur-[60px] rounded-full -translate-y-12 translate-x-12" />
+              <CardHeader className="p-8 pb-4 relative z-10">
+                <div className="flex justify-between items-center">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-reward-gold">Authority Level</p>
+                  <Link href="/membership" className="text-[9px] font-black text-mist/40 hover:text-reward-gold transition-colors">BENEFITS GUIDE</Link>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${userData?.grade === 'ecosoul' ? 'bg-purple-100' :
-                    userData?.grade === 'glower' ? 'bg-pink-100' :
-                      userData?.grade === 'bloomer' ? 'bg-green-100' :
-                        userData?.grade === 'rooter' ? 'bg-blue-100' : 'bg-amber-100'
-                    }`}>
-                    <span className="text-2xl">
-                      {userData?.grade === 'ecosoul' ? '🌿' :
-                        userData?.grade === 'glower' ? '🌸' :
-                          userData?.grade === 'bloomer' ? '🌺' :
-                            userData?.grade === 'rooter' ? '🌱' : '🌲'}
-                    </span>
+              <CardContent className="p-8 pt-2 text-center relative z-10">
+                <MembershipInfo currentGrade={userData?.grade || 'cedar'} currentPoints={userData?.points || 0} />
+                <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-end">
+                  <div className="text-left">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Total Points</p>
+                    <p className="text-3xl font-black text-reward-gold tracking-tighter">{userData?.points?.toLocaleString() || 0}<span className="text-sm ml-1 opacity-60">P</span></p>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 uppercase">
-                    {userData?.grade === 'cedar' ? 'CEDAR' :
-                      userData?.grade === 'rooter' ? 'ROOTER' :
-                        userData?.grade === 'bloomer' ? 'BLOOMER' :
-                          userData?.grade === 'glower' ? 'GLOWER' :
-                            userData?.grade === 'ecosoul' ? 'ECOSOUL' : 'CEDAR'}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    현재 포인트: {userData?.points || 0}P
-                    <Button variant="link" asChild className="p-0 h-auto ml-2 text-blue-600">
-                      <Link href="/me/points">
-                        내역보기
-                      </Link>
-                    </Button>
-                  </p>
-                  <MembershipInfo
-                    currentGrade={userData?.grade || 'cedar'}
-                    currentPoints={userData?.points || 0}
-                  />
+                  <Button asChild variant="ghost" className="h-10 px-4 rounded-xl text-xs font-black text-mist hover:bg-white/5 flex gap-2">
+                    <Link href="/me/points">내역 관측</Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 파트너 섹션 */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Store className="h-5 w-5 mr-2" />
-                  파트너
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(() => {
-                  const partnerInfo = getPartnerStatusInfo();
-                  if (!partnerInfo) return null;
-
-                  const Icon = partnerInfo.icon;
-
-                  return (
-                    <div className={`p-4 rounded-lg ${partnerInfo.bgColor} border`}>
-                      <div className="flex items-start space-x-3">
-                        <div className={`p-2 rounded-full ${partnerInfo.bgColor}`}>
-                          <Icon className={`h-5 w-5 ${partnerInfo.color}`} />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className={`font-semibold ${partnerInfo.color} mb-2`}>
-                            {partnerInfo.title}
-                          </h4>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {partnerInfo.description}
-                          </p>
-                          {partnerInfo.action && (
-                            <Button
-                              onClick={partnerInfo.action}
-                              size="sm"
-                              className="w-full"
-                            >
-                              {partnerInfo.status === 'approved' ? '파트너 대시보드' :
-                                partnerInfo.status === 'rejected' ? '재신청하기' :
-                                  '파트너 신청하기'}
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+            {/* 파트너 상태 */}
+            {partnerInfo && (
+              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-mist transition-all hover:shadow-md">
+                <div className="flex flex-col gap-6">
+                  <div className="flex justify-between items-start">
+                    <div className={`p-4 rounded-2xl ${partnerInfo.bgColor} ${partnerInfo.color}`}>
+                      <partnerInfo.icon className="h-6 w-6" />
                     </div>
-                  );
-                })()}
-              </CardContent>
-            </Card>
+                    {partnerInfo.status === 'approved' && (
+                      <Badge className="bg-status-good text-mist font-black text-[9px] uppercase tracking-widest px-3 border-none shadow-sm shadow-status-good/20">ACTIVE</Badge>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className={`text-xl font-black ${partnerInfo.color} tracking-tight`}>{partnerInfo.title}</h3>
+                    <p className="text-xs font-medium text-slate mt-1 leading-relaxed">{partnerInfo.description}</p>
+                  </div>
+                  {partnerInfo.action && (
+                    <Button onClick={partnerInfo.action} className={`w-full h-12 rounded-xl font-black text-xs shadow-lg transition-all ${partnerInfo.status === 'approved' ? 'bg-status-good text-mist' : 'bg-obsidian text-mist'}`}>
+                      {partnerInfo.status === 'approved' ? '파트너 대시보드' : partnerInfo.status === 'rejected' ? '다시 신청하기' : '시작 프로토콜'}
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            )}
 
-            {/* [NEW] 친구 초대 (추천인) 섹션 */}
-            <ReferralSection referralCode={userData?.referralCode} />
+            {/* 바로가기 그리드 */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { href: '/orders', label: '주문 내역', icon: ClipboardList },
+                { href: '/me/coupons', label: '내 쿠폰함', icon: Ticket },
+                { href: '/cart', label: '장바구니', icon: ShoppingBag },
+                { href: '/wishlist', label: '관심 목록', icon: Heart },
+                { href: '/me/addresses', label: '주소 관리', icon: MapPin },
+                { href: '/me/payment-methods', label: '결제 수단', icon: CreditCard },
+              ].map((link, i) => (
+                <Link key={i} href={link.href} className="group relative bg-white p-6 rounded-[28px] border border-mist shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center active:scale-95">
+                  <div className="p-3 bg-mist rounded-2xl text-slate group-hover:bg-chapter-accent group-hover:text-mist transition-colors">
+                    <link.icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-[11px] font-black text-obsidian tracking-tight">{link.label}</span>
+                </Link>
+              ))}
+            </div>
 
-
-            {/* 빠른 링크 */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg">빠른 링크</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/orders">주문 내역</a>
+            {/* 위기 관리 (하단 메뉴) */}
+            <Card className="border-none bg-mist/50 rounded-[32px] p-8 space-y-4">
+              <Button asChild variant="ghost" className="w-full justify-between h-12 px-2 text-slate hover:bg-white rounded-xl transition-all">
+                <Link href="/me/notifications" className="flex items-center gap-3">
+                  <Bell className="h-4 w-4" />
+                  <span className="text-xs font-black">알림 프로토콜 설정</span>
+                  <ChevronRight className="h-3 w-3 ml-auto opacity-30" />
+                </Link>
+              </Button>
+              <div className="h-px bg-line/20 w-full" />
+              <div className="flex gap-2">
+                <Button variant="ghost" className="flex-1 justify-center h-10 text-slate hover:text-obsidian text-[10px] font-bold">
+                  로그아웃
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/me/coupons">내 쿠폰함</a>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/cart">장바구니</a>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/wishlist">위시리스트</a>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <a href="/contact">문의하기</a>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/me/addresses">배송지 관리</Link>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/me/refunds">환불 내역</Link>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/me/points">포인트 내역</Link>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/me/notifications">알림 설정</Link>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/me/payment-methods">결제 수단 관리</Link>
-                </Button>
-                <hr className="my-2" />
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-red-600 hover:text-red-700"
-                  asChild
-                >
+                <div className="w-px bg-line/20 h-4 self-center" />
+                <Button asChild variant="ghost" className="flex-1 justify-center h-10 text-slate hover:text-status-danger text-[10px] font-bold">
                   <Link href="/me/delete-account">회원 탈퇴</Link>
                 </Button>
-              </CardContent>
+              </div>
             </Card>
           </div>
         </div>
+      </div>
 
-        {/* 파트너 신청 모달 */}
-        {
-          showPartnerApplication && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-text-primary">파트너 신청</h2>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowPartnerApplication(false)}
-                    >
-                      <X className="h-5 w-5" />
-                    </Button>
+      {/* 파트너 신청 모달 리뉴얼 (스타일만 업그레이드) */}
+      {showPartnerApplication && (
+        <div className="fixed inset-0 bg-obsidian/90 backdrop-blur-md flex items-center justify-center z-[100] p-6 overflow-y-auto">
+          <Card className="max-w-3xl w-full border-none shadow-2xl rounded-[48px] bg-white overflow-hidden my-auto">
+            <div className="p-10 md:p-16">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <h2 className="text-3xl font-black text-obsidian tracking-tighter">파트너 권한 신청</h2>
+                  <p className="text-xs font-black text-slate uppercase tracking-widest mt-1">Specialist Authority Protocol</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setShowPartnerApplication(false)} className="rounded-full hover:bg-mist h-12 w-12"><X className="h-6 w-6" /></Button>
+              </div>
+
+              <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">상호명 / 성함</Label>
+                      <Input value={partnerApplicationData.businessName} onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)} required placeholder="정식 명칭을 입력하십시오" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업자 번호 (개인은 생년월일)</Label>
+                      <Input value={partnerApplicationData.businessNumber} onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)} required placeholder="000-00-00000" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업장/비상 연락처</Label>
+                      <Input value={partnerApplicationData.businessPhone} onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)} required placeholder="02-XXXX-XXXX" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                    </div>
                   </div>
 
-                  <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-6">
-                    {/* 기본 정보 */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 text-text-primary">기본 정보</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="businessName">상호명 *</Label>
-                          <Input
-                            id="businessName"
-                            value={partnerApplicationData.businessName}
-                            onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)}
-                            required
-                            placeholder="상호명을 입력하세요"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="businessNumber">사업자등록번호 *</Label>
-                          <Input
-                            id="businessNumber"
-                            value={partnerApplicationData.businessNumber}
-                            onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)}
-                            required
-                            placeholder="123-45-67890"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="businessPhone">사업장 전화번호 *</Label>
-                          <Input
-                            id="businessPhone"
-                            value={partnerApplicationData.businessPhone}
-                            onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)}
-                            required
-                            placeholder="02-1234-5678"
-                          />
-                        </div>
-                      </div>
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업장 주소</Label>
+                      <GoogleAddressSearch onAddressSelect={(a) => { handlePartnerApplicationChange('businessZipCode', a.zonecode); handlePartnerApplicationChange('businessAddress', a.address); }} />
+                      <Input value={partnerApplicationData.businessAddress} placeholder="기본 주소" className="h-14 rounded-2xl bg-mist/50 border-line text-xs font-bold" readOnly />
+                      <Input value={partnerApplicationData.businessDetailAddress} onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)} placeholder="상세 주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
                     </div>
-
-                    {/* 사업장 정보 */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 text-text-primary">사업장 정보</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="businessAddress">사업장 주소 *</Label>
-
-                          {/* Google 주소 검색 */}
-                          <div className="mb-3">
-                            <GoogleAddressSearch
-                              onAddressSelect={(address) => {
-                                handlePartnerApplicationChange('businessZipCode', address.zonecode);
-                                handlePartnerApplicationChange('businessAddress', address.address);
-                              }}
-                            />
-                          </div>
-
-                          {/* 주소 입력 필드들 */}
-                          <div className="space-y-2">
-                            <div className="flex gap-2">
-                              <Input
-                                value={partnerApplicationData.businessZipCode}
-                                onChange={(e) => handlePartnerApplicationChange('businessZipCode', e.target.value)}
-                                placeholder="우편번호 (직접 입력 가능)"
-                                className="w-32"
-                              />
-                              <Input
-                                value={partnerApplicationData.businessAddress}
-                                onChange={(e) => handlePartnerApplicationChange('businessAddress', e.target.value)}
-                                placeholder="도로명주소"
-                                className="flex-1"
-                              />
-                            </div>
-                            <Input
-                              value={partnerApplicationData.businessDetailAddress}
-                              onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)}
-                              placeholder="상세주소를 입력하세요 (예: 101호, 2층)"
-                            />
-                            <div className="text-xs text-gray-500">
-                              💡 주소 검색이 안 되면 우편번호와 주소를 직접 입력해주세요.
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="businessDescription">사업 설명 *</Label>
-                          <textarea
-                            id="businessDescription"
-                            value={partnerApplicationData.businessDescription}
-                            onChange={(e) => handlePartnerApplicationChange('businessDescription', e.target.value)}
-                            required
-                            rows={4}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="사업 내용을 자세히 설명해주세요 (판매 상품, 경험, 특장점 등)"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 정산 정보 */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 text-text-primary">정산 정보</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bankName">은행명 *</Label>
-                          <Input
-                            id="bankName"
-                            value={partnerApplicationData.bankName}
-                            onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)}
-                            required
-                            placeholder="국민은행"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="accountHolder">예금주 *</Label>
-                          <Input
-                            id="accountHolder"
-                            value={partnerApplicationData.accountHolder}
-                            onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)}
-                            required
-                            placeholder="홍길동"
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <Label htmlFor="bankAccount">계좌번호 *</Label>
-                          <Input
-                            id="bankAccount"
-                            value={partnerApplicationData.bankAccount}
-                            onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)}
-                            required
-                            placeholder="123456-78-901234"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 서류 업로드 */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 text-text-primary">서류 업로드</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* 사업자등록증 */}
-                        <div>
-                          <Label htmlFor="businessRegistration">사업자등록증 *</Label>
-                          <div className="space-y-2">
-                            <input
-                              type="file"
-                              id="businessRegistration"
-                              accept="image/*"
-                              onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
-                              className="file-upload-input"
-                            />
-                            {partnerApplicationData.businessRegistrationImage && (
-                              <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                                <FileImage className="h-4 w-4 text-green-600" />
-                                <span className="text-sm text-green-700">사업자등록증 업로드 완료</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 통장사본 */}
-                        <div>
-                          <Label htmlFor="bankStatement">통장사본 *</Label>
-                          <div className="space-y-2">
-                            <input
-                              type="file"
-                              id="bankStatement"
-                              accept="image/*"
-                              onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
-                              className="file-upload-input"
-                            />
-                            {partnerApplicationData.bankStatementImage && (
-                              <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                                <FileImage className="h-4 w-4 text-green-600" />
-                                <span className="text-sm text-green-700">통장사본 업로드 완료</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        * 사업자등록증과 통장사본을 업로드해주세요. 이미지 파일만 업로드 가능합니다.
-                      </p>
-
-                      {/* 업로드 완료 안내 */}
-                      {partnerApplicationData.businessRegistrationImage && partnerApplicationData.bankStatementImage ? (
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm font-medium text-blue-800">
-                              모든 서류 업로드가 완료되었습니다!
-                            </span>
-                          </div>
-                          <p className="text-xs text-blue-600 mt-1">
-                            아래 &quot;파트너 신청하기&quot; 버튼을 클릭하여 신청을 완료해주세요.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <AlertCircle className="h-5 w-5 text-yellow-600" />
-                            <span className="text-sm font-medium text-yellow-800">
-                              서류 업로드 필요
-                            </span>
-                          </div>
-                          <p className="text-xs text-yellow-600 mt-1">
-                            사업자등록증과 통장사본을 모두 업로드한 후 &quot;파트너 신청하기&quot; 버튼을 클릭해주세요.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 제출 버튼 */}
-                    <div className="flex justify-end space-x-3 pt-6 border-t">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowPartnerApplication(false)}
-                      >
-                        취소
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={partnerApplicationLoading}
-                        className="flex items-center"
-                      >
-                        {partnerApplicationLoading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            신청 중...
-                          </>
-                        ) : (
-                          <>
-                            <Store className="h-4 w-4 mr-2" />
-                            파트너 신청하기
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </form>
+                  </div>
                 </div>
-              </div>
+
+                <div className="space-y-6">
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">정산 계좌 정보</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Input value={partnerApplicationData.bankName} onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)} required placeholder="은행명" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                    <Input value={partnerApplicationData.accountHolder} onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)} required placeholder="예금주" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                    <Input value={partnerApplicationData.bankAccount} onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)} required placeholder="계좌번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">증빙 서류 전송</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className={`p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all ${partnerApplicationData.businessRegistrationImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
+                      <div className={`w-14 h-14 rounded-[18px] flex items-center justify-center ${partnerApplicationData.businessRegistrationImage ? 'bg-status-good text-white' : 'bg-mist text-slate'}`}>
+                        <FileImage className="h-6 w-6" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs font-black text-obsidian">사업자등록증</p>
+                        <p className="text-[10px] font-bold text-slate mt-1">{partnerApplicationData.businessRegistrationImage ? '전송 완료' : '이미지 업로드'}</p>
+                      </div>
+                      <input type="file" onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')} className="absolute inset-x-8 h-32 opacity-0 cursor-pointer" />
+                    </div>
+                    <div className={`p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all ${partnerApplicationData.bankStatementImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
+                      <div className={`w-14 h-14 rounded-[18px] flex items-center justify-center ${partnerApplicationData.bankStatementImage ? 'bg-status-good text-white' : 'bg-mist text-slate'}`}>
+                        <FileImage className="h-6 w-6" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs font-black text-obsidian">통장 사본</p>
+                        <p className="text-[10px] font-bold text-slate mt-1">{partnerApplicationData.bankStatementImage ? '전송 완료' : '이미지 업로드'}</p>
+                      </div>
+                      <input type="file" onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')} className="absolute inset-x-8 h-32 opacity-0 cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+
+                <Button type="submit" disabled={partnerApplicationLoading} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black text-xl shadow-2xl hover:scale-[1.02] transition-all">
+                  {partnerApplicationLoading ? '신청 프로토콜 가동 중...' : '파트너 신청 프로토콜 제출'}
+                </Button>
+              </form>
             </div>
-          )
-        }
-      </div >
-    </div >
+          </Card>
+        </div>
+      )}
+    </div>
   );
 }

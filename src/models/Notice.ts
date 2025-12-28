@@ -15,23 +15,23 @@ export interface INotice extends Document {
   title: string;
   content: string;
   summary?: string;              // 요약 (목록용)
-  
+
   // 분류
   type: NoticeType;
   category?: string;             // 카테고리 (선택적)
   tags: string[];
-  
+
   // 상태
   status: NoticeStatus;
-  
+
   // 중요도
   isPinned: boolean;             // 상단 고정
   isImportant: boolean;          // 중요 공지
   isPopup: boolean;              // 팝업 노출
-  
+
   // 노출 대상
   targetAudience: NoticeTarget;  // 노출 대상 (전체, 신규회원, 기존회원, 파트너, 관리자)
-  
+
   // 팝업 설정 (팝업인 경우)
   popupSettings?: {
     width: number;               // 팝업 너비
@@ -39,11 +39,11 @@ export interface INotice extends Document {
     displayDays: number;         // 며칠간 표시 (하루 동안 보지 않기)
     backgroundColor?: string;    // 배경색
   };
-  
+
   // 작성자
   authorId: mongoose.Types.ObjectId;
   authorName: string;
-  
+
   // 첨부 파일
   attachments?: {
     fileName: string;
@@ -51,22 +51,22 @@ export interface INotice extends Document {
     fileSize: number;
     fileType: string;
   }[];
-  
+
   // 이미지
   thumbnailImage?: string;       // 썸네일 이미지
   images?: string[];             // 본문 이미지
-  
+
   // 노출 기간
   startDate?: Date;              // 노출 시작일
   endDate?: Date;                // 노출 종료일
-  
+
   // 통계
   viewCount: number;             // 조회수
-  
+
   // 게시 정보
   publishedAt?: Date;            // 게시일
   archivedAt?: Date;             // 보관일
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -92,8 +92,7 @@ const NoticeSchema = new Schema<INotice>(
       type: String,
       enum: ['general', 'important', 'event', 'maintenance', 'update'],
       default: 'general',
-      required: true,
-      index: true,
+      required: true
     },
     category: {
       type: String,
@@ -107,13 +106,11 @@ const NoticeSchema = new Schema<INotice>(
       type: String,
       enum: ['draft', 'published', 'archived'],
       default: 'draft',
-      required: true,
-      index: true,
+      required: true
     },
     isPinned: {
       type: Boolean,
-      default: false,
-      index: true,
+      default: false
     },
     isImportant: {
       type: Boolean,
@@ -127,8 +124,7 @@ const NoticeSchema = new Schema<INotice>(
       type: String,
       enum: ['all', 'new', 'existing', 'partner', 'admin'],
       default: 'all',
-      required: true,
-      index: true,
+      required: true
     },
     popupSettings: {
       width: {
@@ -148,8 +144,7 @@ const NoticeSchema = new Schema<INotice>(
     authorId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-      index: true,
+      required: true
     },
     authorName: {
       type: String,
@@ -166,12 +161,10 @@ const NoticeSchema = new Schema<INotice>(
     thumbnailImage: String,
     images: [String],
     startDate: {
-      type: Date,
-      index: true,
+      type: Date
     },
     endDate: {
-      type: Date,
-      index: true,
+      type: Date
     },
     viewCount: {
       type: Number,
@@ -213,12 +206,12 @@ NoticeSchema.methods.archive = async function (this: INotice): Promise<INotice> 
 // 가상 필드: 현재 노출 여부
 NoticeSchema.virtual('isActive').get(function (this: INotice) {
   if (this.status !== 'published') return false;
-  
+
   const now = new Date();
-  
+
   if (this.startDate && now < this.startDate) return false;
   if (this.endDate && now > this.endDate) return false;
-  
+
   return true;
 });
 

@@ -7,18 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CharacterImage from '@/components/ui/CharacterImage';
 import {
   Tag,
   Calendar,
   Percent,
-  DollarSign,
+  Banknote,
   Truck,
   Clock,
   CheckCircle,
   XCircle,
   ArrowLeft,
-  RefreshCw
+  RefreshCw,
+  Ticket,
+  ChevronRight,
+  Download
 } from 'lucide-react';
 
 interface Coupon {
@@ -75,11 +77,9 @@ export default function MyCouponsPage() {
         const data = await response.json();
         setCoupons(data.coupons || []);
         setStats(data.stats || { available: 0, used: 0, expired: 0 });
-      } else {
-        console.error('쿠폰 목록 조회 실패');
       }
     } catch (error) {
-      console.error('쿠폰 목록 조회 오류:', error);
+      console.error('쿠폰 로드 오류:', error);
     } finally {
       setLoading(false);
     }
@@ -95,287 +95,170 @@ export default function MyCouponsPage() {
 
   const getCouponIcon = (type: string) => {
     switch (type) {
-      case 'percentage':
-        return <Percent className="h-5 w-5" />;
-      case 'fixed':
-        return <DollarSign className="h-5 w-5" />;
-      case 'free_shipping':
-        return <Truck className="h-5 w-5" />;
-      default:
-        return <Tag className="h-5 w-5" />;
-    }
-  };
-
-  const getCouponValue = (coupon: Coupon) => {
-    const { type, value, maxDiscountAmount } = coupon.couponId;
-    switch (type) {
-      case 'percentage':
-        return `${value}% 할인${maxDiscountAmount ? ` (최대 ${maxDiscountAmount.toLocaleString()}원)` : ''}`;
-      case 'fixed':
-        return `${value.toLocaleString()}원 할인`;
-      case 'free_shipping':
-        return '무료 배송';
-      default:
-        return '';
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'available':
-        return <Badge className="bg-green-100 text-green-800">사용 가능</Badge>;
-      case 'used':
-        return <Badge className="bg-gray-100 text-gray-800">사용 완료</Badge>;
-      case 'expired':
-        return <Badge className="bg-red-100 text-red-800">만료됨</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'available':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'used':
-        return <Clock className="h-5 w-5 text-gray-600" />;
-      case 'expired':
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      default:
-        return null;
+      case 'percentage': return <Percent className="h-5 w-5" />;
+      case 'fixed': return <Banknote className="h-5 w-5" />;
+      case 'free_shipping': return <Truck className="h-5 w-5" />;
+      default: return <Tag className="h-5 w-5" />;
     }
   };
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <CharacterImage
-            src="/character/youniqle-1.png"
-            alt="로딩 중"
-            width={64}
-            height={64}
-            className="w-16 h-16 mx-auto mb-4 animate-bounce"
-            sizes="64px"
-          />
-          <p className="text-gray-600">로딩 중...</p>
-        </div>
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chapter-accent"></div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
-              쿠폰함을 확인하려면 로그인해주세요.
-            </p>
-            <Button asChild>
-              <Link href="/auth/signin">로그인하기</Link>
-            </Button>
-          </CardContent>
+      <div className="min-h-screen bg-mist flex items-center justify-center p-6">
+        <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
+          <p className="text-slate font-medium mb-8">인벤토리 확인을 위해 인증 프로토콜이 필요합니다.</p>
+          <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
+            <Link href="/auth/signin">인증 시작</Link>
+          </Button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-12">
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <Button variant="ghost" asChild>
-              <Link href="/me">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                마이페이지로 돌아가기
+    <div className="min-h-screen bg-mist py-20 px-4">
+      <div className="container mx-auto max-w-5xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div className="text-center md:text-left">
+            <Button variant="ghost" asChild className="p-0 hover:bg-transparent text-slate hover:text-obsidian mb-4 transition-colors">
+              <Link href="/me" className="flex items-center gap-2 font-black text-xs uppercase tracking-widest">
+                <ArrowLeft className="h-4 w-4" />
+                Return to Dashboard
               </Link>
             </Button>
-            <Button variant="outline" onClick={fetchCoupons}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              새로고침
-            </Button>
+            <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Inventory Analysis</p>
+            <h1 className="text-5xl font-black text-obsidian tracking-tighter">쿠폰 인벤토리</h1>
+            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원이 보유한 활성 혜택입니다.</p>
           </div>
-          
-          <div className="flex items-center mb-2">
-            <Tag className="h-8 w-8 text-blue-600 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">내 쿠폰함</h1>
-          </div>
-          <p className="text-xl text-gray-600">보유한 쿠폰을 확인하고 사용하세요</p>
+          <Button variant="outline" onClick={fetchCoupons} className="h-12 px-6 rounded-xl border-line text-slate font-black flex gap-2 hover:bg-white transition-all">
+            <RefreshCw className="h-4 w-4" />
+            데이터 최신화
+          </Button>
         </div>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {[
+            { label: '사용가능', count: stats.available, icon: CheckCircle, color: 'text-status-good', bg: 'bg-status-good/5' },
+            { label: '사용완료', count: stats.used, icon: Clock, color: 'text-slate', bg: 'bg-mist' },
+            { label: '기간만료', count: stats.expired, icon: XCircle, color: 'text-status-danger', bg: 'bg-status-danger/5' },
+          ].map((stat, i) => (
+            <Card key={i} className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden group hover:shadow-md transition-all">
+              <CardContent className="p-8 flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">사용 가능</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.available}</p>
+                  <p className="text-[10px] font-black text-slate uppercase tracking-widest mb-1 opacity-60">{stat.label}</p>
+                  <p className={`text-4xl font-black ${stat.color} tracking-tighter`}>{stat.count}</p>
                 </div>
-                <CheckCircle className="h-12 w-12 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">사용 완료</p>
-                  <p className="text-3xl font-bold text-gray-600">{stats.used}</p>
+                <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color}`}>
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                <Clock className="h-12 w-12 text-gray-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">만료됨</p>
-                  <p className="text-3xl font-bold text-red-600">{stats.expired}</p>
-                </div>
-                <XCircle className="h-12 w-12 text-red-200" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* 쿠폰 다운로드 센터 링크 */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-500 to-purple-500">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <h3 className="text-xl font-bold mb-2">쿠폰 다운로드 센터</h3>
-                <p className="text-blue-100">다양한 쿠폰을 다운로드하고 혜택을 누려보세요!</p>
-              </div>
-              <Button asChild variant="secondary" size="lg">
-                <Link href="/coupons">
-                  쿠폰 받기
-                  <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
-                </Link>
-              </Button>
+        <Card className="border-none shadow-2xl rounded-[40px] bg-obsidian text-mist overflow-hidden mb-12 relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-reward-gold/10 blur-[100px] rounded-full -translate-y-32 translate-x-32" />
+          <CardContent className="p-10 md:p-14 relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+            <div>
+              <h3 className="text-2xl font-black tracking-tight mb-2">새로운 혜택이 기다리고 있습니다</h3>
+              <p className="text-sm font-medium opacity-60">추가적인 회복 프로토콜을 인벤토리에 할당하십시오.</p>
             </div>
+            <Button asChild className="h-16 px-10 rounded-2xl bg-reward-gold text-obsidian font-black text-lg hover:scale-105 transition-all shadow-xl shadow-reward-gold/10">
+              <Link href="/coupons" className="flex items-center gap-2">
+                <Download className="h-5 w-5" /> 쿠폰 다운로드 센터
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 
-        {/* 쿠폰 목록 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>쿠폰 목록</CardTitle>
+        <Card className="border-none shadow-sm rounded-[40px] bg-white overflow-hidden">
+          <CardHeader className="p-10 pb-4 border-b border-mist">
+            <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로토콜 리스트</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-10 pt-8">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="all">전체 ({stats.available + stats.used + stats.expired})</TabsTrigger>
-                <TabsTrigger value="available">사용 가능 ({stats.available})</TabsTrigger>
-                <TabsTrigger value="used">사용 완료 ({stats.used})</TabsTrigger>
-                <TabsTrigger value="expired">만료됨 ({stats.expired})</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-4 h-14 bg-mist p-1 rounded-2xl mb-10">
+                {[
+                  { id: 'all', label: 'ALL', total: stats.available + stats.used + stats.expired },
+                  { id: 'available', label: 'AVAILABLE', total: stats.available },
+                  { id: 'used', label: 'USED', total: stats.used },
+                  { id: 'expired', label: 'EXPIRED', total: stats.expired },
+                ].map(tab => (
+                  <TabsTrigger key={tab.id} value={tab.id} className="rounded-xl font-black text-[10px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-obsidian data-[state=active]:shadow-sm transition-all uppercase">
+                    {tab.label} <span className="ml-1 opacity-40">({tab.total})</span>
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
-              <TabsContent value={activeTab} className="space-y-4">
+              <TabsContent value={activeTab} className="space-y-6 focus-visible:outline-none">
                 {coupons.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Tag className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                      {activeTab === 'all' ? '보유한 쿠폰이 없습니다' :
-                       activeTab === 'available' ? '사용 가능한 쿠폰이 없습니다' :
-                       activeTab === 'used' ? '사용한 쿠폰이 없습니다' :
-                       '만료된 쿠폰이 없습니다'}
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                      쿠폰 다운로드 센터에서 다양한 쿠폰을 받아보세요!
-                    </p>
-                    <Button asChild>
-                      <Link href="/coupons">쿠폰 다운로드</Link>
+                  <div className="text-center py-24 bg-mist/30 rounded-[32px] border-2 border-dashed border-line/50">
+                    <Ticket className="h-12 w-12 mx-auto text-slate opacity-20 mb-4" />
+                    <h3 className="text-xl font-black text-obsidian tracking-tight mb-2">기록된 데이터가 없습니다</h3>
+                    <p className="text-slate font-medium text-sm mb-8 opacity-60 italic">선택하신 카테고리에 해당하는 쿠폰이 존재하지 않습니다.</p>
+                    <Button asChild variant="outline" className="rounded-xl border-line font-black text-xs hover:bg-white px-8">
+                      <Link href="/coupons">쿠폰함 채우기</Link>
                     </Button>
                   </div>
                 ) : (
-                  coupons.map((coupon) => (
-                    <Card key={coupon._id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start space-x-4 flex-1">
-                            {/* 쿠폰 아이콘 */}
-                            <div className={`p-4 rounded-lg ${
-                              coupon.status === 'available' ? 'bg-green-100 text-green-600' :
-                              coupon.status === 'used' ? 'bg-gray-100 text-gray-600' :
-                              'bg-red-100 text-red-600'
-                            }`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {coupons.map((coupon) => (
+                      <Card key={coupon._id} className={`border-none shadow-sm rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-xl group ${coupon.status !== 'available' ? 'opacity-50 grayscale' : 'bg-white'}`}>
+                        <div className="p-8 space-y-6">
+                          <div className="flex justify-between items-start">
+                            <div className={`p-4 rounded-2xl ${coupon.status === 'available' ? 'bg-mist text-chapter-accent group-hover:bg-chapter-accent group-hover:text-mist' : 'bg-mist text-slate'
+                              } transition-colors`}>
                               {getCouponIcon(coupon.couponId.type)}
                             </div>
+                            <Badge className={`border-none font-black text-[9px] uppercase tracking-widest px-3 ${coupon.status === 'available' ? 'bg-status-good/10 text-status-good' :
+                                coupon.status === 'used' ? 'bg-slate/10 text-slate' : 'bg-status-danger/10 text-status-danger'
+                              }`}>
+                              {coupon.status === 'available' ? 'Active' : coupon.status === 'used' ? 'Used' : 'Expired'}
+                            </Badge>
+                          </div>
 
-                            {/* 쿠폰 정보 */}
-                            <div className="flex-1">
-                              <div className="flex items-center mb-2">
-                                <h3 className="text-lg font-bold text-gray-900 mr-3">
-                                  {coupon.couponId.name}
-                                </h3>
-                                {getStatusBadge(coupon.status)}
-                              </div>
-                              
-                              <p className="text-2xl font-bold text-blue-600 mb-2">
-                                {getCouponValue(coupon)}
-                              </p>
+                          <div>
+                            <h3 className="text-xl font-black text-obsidian tracking-tight line-clamp-1">{coupon.couponId.name}</h3>
+                            <p className="text-3xl font-black text-chapter-accent tracking-tighter mt-1">
+                              {coupon.couponId.type === 'percentage' ? `${coupon.couponId.value}%` : coupon.couponId.type === 'fixed' ? `${coupon.couponId.value.toLocaleString()}원` : 'FREE'}
+                              <span className="text-xs font-bold text-slate ml-2 opacity-60">DISCOUNT</span>
+                            </p>
+                          </div>
 
-                              {coupon.couponId.description && (
-                                <p className="text-sm text-gray-600 mb-3">
-                                  {coupon.couponId.description}
-                                </p>
-                              )}
-
-                              {/* 쿠폰 코드 */}
-                              <div className="inline-flex items-center px-3 py-1 bg-gray-100 rounded-lg mb-3">
-                                <Tag className="h-4 w-4 mr-2 text-gray-600" />
-                                <code className="font-mono font-bold text-gray-900">
-                                  {coupon.code}
-                                </code>
-                              </div>
-
-                              {/* 쿠폰 조건 */}
-                              <div className="space-y-1 text-sm text-gray-600">
-                                {coupon.couponId.minOrderAmount && (
-                                  <p>• 최소 주문 금액: {coupon.couponId.minOrderAmount.toLocaleString()}원</p>
-                                )}
-                                <div className="flex items-center space-x-4">
-                                  <div className="flex items-center">
-                                    <Calendar className="h-4 w-4 mr-1" />
-                                    <span>유효기간: {formatDate(coupon.downloadedAt)} ~ {formatDate(coupon.validUntil)}</span>
-                                  </div>
-                                </div>
-                                {coupon.usedAt && (
-                                  <p className="text-gray-500">
-                                    사용일: {formatDate(coupon.usedAt)}
-                                  </p>
-                                )}
-                              </div>
+                          <div className="bg-mist/50 p-4 rounded-xl space-y-2">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate">
+                              <Tag className="w-3 h-3" />
+                              <span className="opacity-50">CODE:</span>
+                              <span className="text-obsidian select-all">{coupon.code}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate">
+                              <Calendar className="w-3 h-3" />
+                              <span className="opacity-50">PERIOD:</span>
+                              <span className="text-obsidian">{formatDate(coupon.validUntil)} 까지</span>
                             </div>
                           </div>
 
-                          {/* 상태 아이콘 */}
-                          <div className="ml-4">
-                            {getStatusIcon(coupon.status)}
-                          </div>
-                        </div>
-
-                        {/* 사용하기 버튼 */}
-                        {coupon.status === 'available' && (
-                          <div className="mt-4 pt-4 border-t">
-                            <Button asChild className="w-full" size="lg">
-                              <Link href="/products">
-                                쿠폰 사용하러 가기
+                          {coupon.status === 'available' && (
+                            <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black text-sm shadow-lg shadow-obsidian/10 transition-all hover:-translate-y-1">
+                              <Link href="/products" className="flex items-center justify-center gap-2">
+                                쿠폰 사용하기 <ChevronRight className="h-4 w-4" />
                               </Link>
                             </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
             </Tabs>
@@ -385,4 +268,3 @@ export default function MyCouponsPage() {
     </div>
   );
 }
-

@@ -18,10 +18,10 @@ jest.mock('@/models/Product', () => ({
     ...data,
     validateSync: jest.fn(() => {
       const errors = {};
-      if (!data.name) errors.name = { message: 'Name is required' };
-      if (!data.price) errors.price = { message: 'Price is required' };
-      if ((data as any).price < 0) errors.price = { message: 'Price must be positive' };
-      if ((data as any).stock < 0) errors.stock = { message: 'Stock must be positive' };
+      if (!(data as any).name) (errors as any).name = { message: 'Name is required' };
+      if (!(data as any).price) (errors as any).price = { message: 'Price is required' };
+      if ((data as any).price < 0) (errors as any).price = { message: 'Price must be positive' };
+      if ((data as any).stock < 0) (errors as any).stock = { message: 'Stock must be positive' };
       return Object.keys(errors).length > 0 ? { errors } : null;
     }),
   })),
