@@ -7,7 +7,7 @@ import Footer from '@/components/layout/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Youniqle - 프리미엄 온라인 쇼핑몰',
+  title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
   description: '고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰 Youniqle에서 특별한 쇼핑 경험을 만나보세요.',
   keywords: ['쇼핑몰', '온라인쇼핑', '유니클', 'youniqle'],
   authors: [{ name: 'Youniqle Team' }],
@@ -28,13 +28,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     url: 'http://localhost:3000',
-    title: 'Youniqle - 프리미엄 온라인 쇼핑몰',
+    title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
     description: '고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰',
     siteName: 'Youniqle',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Youniqle - 프리미엄 온라인 쇼핑몰',
+    title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
     description: '고품질 상품을 합리적인 가격으로 제공하는 온라인 쇼핑몰',
   },
   verification: {
