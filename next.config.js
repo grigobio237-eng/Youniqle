@@ -42,6 +42,30 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'youniqle-eea2f.firebasestorage.app', // 특정 프로젝트 버킷 직접 허용
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
@@ -81,6 +105,14 @@ const nextConfig = {
             key: 'X-Permitted-Cross-Domain-Policies',
             value: 'none',
           },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'credentialless', // require-corp에서 완화: 외부 이미지(CORS) 로드 허용
+          },
 
         ],
       },
@@ -105,5 +137,5 @@ const nextConfig = {
   },
 }
 
+// [Force Restart] Firebase 초기화 로직 반영을 위한 강제 리로드 트리거 (한글)
 module.exports = nextConfig
-

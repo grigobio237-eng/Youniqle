@@ -459,6 +459,8 @@ export default function AdminProductsPage() {
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                      // @ts-ignore - Next.js Image component might not have crossOrigin in types but it reflects to img
+                      crossOrigin="anonymous"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">

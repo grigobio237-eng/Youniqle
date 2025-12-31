@@ -11,10 +11,10 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    
+
     // JWT 토큰으로 인증 확인
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -36,10 +36,10 @@ export async function POST(
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const user = await User.findById(decoded.id);
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -54,7 +54,7 @@ export async function POST(
     }
 
     const product = await Product.findById(id);
-    
+
     if (!product) {
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -64,8 +64,13 @@ export async function POST(
       product.approvalStatus = 'approved';
       product.rejectionReason = undefined;
       await product.save();
-      
-      return NextResponse.json({ 
+
+      // 캐시 무효화 (승인 시 즉시 사용자 페이지 반영)
+      const { cache } = await import('@/lib/cache');
+      await cache.delPattern('products:*');
+      console.log(`🗑️ 상품 승인으로 인한 캐시 무효화 완료: ${id}`);
+
+      return NextResponse.json({
         message: '상품이 승인되었습니다.',
         product: {
           id: product._id.toString(),
@@ -80,12 +85,17 @@ export async function POST(
           { status: 400 }
         );
       }
-      
+
       product.approvalStatus = 'rejected';
       product.rejectionReason = rejectionReason;
       await product.save();
-      
-      return NextResponse.json({ 
+
+      // 캐시 무효화
+      const { cache } = await import('@/lib/cache');
+      await cache.delPattern('products:*');
+      console.log(`🗑️ 상품 거부로 인한 캐시 무효화 완료: ${id}`);
+
+      return NextResponse.json({
         message: '상품이 거부되었습니다.',
         product: {
           id: product._id.toString(),

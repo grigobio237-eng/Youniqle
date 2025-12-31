@@ -84,20 +84,22 @@ export default function LoungePage() {
                             <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-bold mb-4">김미정 원장 프로필</DialogTitle>
-                                    <DialogDescription className="text-base text-gray-700 space-y-2">
-                                        <ul className="list-disc pl-5 space-y-2">
-                                            <li>고려대학교 외래교수 역임</li>
-                                            <li>대한 발란스의학회 부회장</li>
-                                            <li>세계얼굴 총회 상임회장</li>
-                                            <li>춘사 영화제 운영위원</li>
-                                            <li>국제 항노화 협회장 역임</li>
-                                            <li>미스코리아 심사위원</li>
-                                            <li>미래경희 병원장 역임</li>
-                                            <li>일본 중입자 크리닉 대표원장 역임</li>
-                                            <li>사랑의 크리닉 대원장 역임</li>
-                                            <li>독일 프리덴바일 병원 연수</li>
-                                            <li>독일 웨셀브 면역병원 연수</li>
-                                        </ul>
+                                    <DialogDescription asChild className="text-base text-gray-700">
+                                        <div className="space-y-4">
+                                            <ul className="list-disc pl-5 space-y-2 mt-4">
+                                                <li>고려대학교 외래교수 역임</li>
+                                                <li>대한 발란스의학회 부회장</li>
+                                                <li>세계얼굴 총회 상임회장</li>
+                                                <li>춘사 영화제 운영위원</li>
+                                                <li>국제 항노화 협회장 역임</li>
+                                                <li>미스코리아 심사위원</li>
+                                                <li>미래경희 병원장 역임</li>
+                                                <li>일본 중입자 크리닉 대표원장 역임</li>
+                                                <li>사랑의 크리닉 대원장 역임</li>
+                                                <li>독일 프리덴바일 병원 연수</li>
+                                                <li>독일 웨셀브 면역병원 연수</li>
+                                            </ul>
+                                        </div>
                                     </DialogDescription>
                                 </DialogHeader>
                             </DialogContent>

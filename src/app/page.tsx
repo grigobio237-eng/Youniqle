@@ -116,7 +116,7 @@ function GateIntro({ onStart }: { onStart: () => void }) {
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
             <span>Youniqle Recovery Protocol v2.5</span>
           </div>
-          <h1 className="text-6xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter">
+          <h1 className="text-4xl sm:text-5xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter">
             회복은 ‘느낌’이 아니라<br />
             <span className="text-chapter-accent">‘데이터’로 바꿉니다.</span>
           </h1>
@@ -132,14 +132,9 @@ function GateIntro({ onStart }: { onStart: () => void }) {
               60초 정밀 진단 시작
             </Button>
             <Button asChild className="bg-obsidian text-mist flex-1 h-20 text-xl rounded-[24px] shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 active:translate-y-0 border-none">
-              <Link href="/pavilion">비밀 가상 공간 입장</Link>
+              <Link href="/products">회복 키트 큐레이션 바로가기</Link>
             </Button>
           </div>
-          <Button asChild variant="link" className="text-slate font-bold hover:text-chapter-accent transition-colors">
-            <Link href="/products" className="flex items-center justify-center gap-1">
-              회복 키트 큐레이션 전체보기 <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
         </div>
 
         <div className="pt-16 border-t border-line flex justify-center gap-16 md:gap-24">
@@ -709,7 +704,7 @@ function RecoveryDashboard({ score }: { score: number }) {
 
             {/* AI Advice */}
             <Link
-              href="/ai-navigator"
+              href="/ai-advice"
               onClick={() => !progress?.todayChecklist?.aiAdvice && handleChecklistItem('aiAdvice', 3)}
               className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent/5 border-chapter-accent/20' : 'bg-mist/30 border-line hover:border-chapter-accent'}`}
             >
@@ -802,7 +797,7 @@ function RecoveryDashboard({ score }: { score: number }) {
                 <Link href="/ai-navigator">분석 리포트</Link>
               </Button>
               <Button asChild variant="ghost" className="h-14 font-bold rounded-2xl text-slate hover:text-obsidian" size="lg">
-                <Link href="/ai-navigator">행동 조언 받기</Link>
+                <Link href="/ai-advice">행동 조언 받기</Link>
               </Button>
             </div>
           </CardContent>
@@ -829,7 +824,7 @@ function RecoveryDashboard({ score }: { score: number }) {
             </div>
           </Link>
 
-          <Link href="/utils/stretch" className="group">
+          <Link href="/utils?tool=stretch" className="group">
             <div className="bg-white border border-line rounded-[32px] p-8 hover:border-status-normal hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-status-normal/5 rounded-full blur-2xl -mr-12 -mt-12" />
               <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🧘</div>
@@ -839,7 +834,7 @@ function RecoveryDashboard({ score }: { score: number }) {
             </div>
           </Link>
 
-          <Link href="/utils/water" className="group">
+          <Link href="/utils?tool=water" className="group">
             <div className="bg-white border border-line rounded-[32px] p-8 hover:border-[#0E3A3A] hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#0E3A3A]/5 rounded-full blur-2xl -mr-12 -mt-12" />
               <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">💧</div>

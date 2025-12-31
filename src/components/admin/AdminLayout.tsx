@@ -6,16 +6,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getAdminApiUrl, logEnvironmentInfo } from '@/lib/apiUtils';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Package, 
-  FileText, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X, 
+import {
+  LayoutDashboard,
+  Users,
+  Package,
+  FileText,
+  BarChart3,
+  Settings,
+  LogOut,
+  Menu,
+  X,
   Shield,
   Bell,
   CheckCircle,
@@ -33,7 +33,8 @@ import {
   Target,
   Clock,
   DollarSign,
-  MessageCircle
+  MessageCircle,
+  Sparkles
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -135,6 +136,12 @@ const navigationItems = [
         href: '/admin/products/new',
         icon: Plus,
         description: '관리자 직접 상품 등록'
+      },
+      {
+        name: 'AI 상세페이지 빌더',
+        href: '/admin/ai-builder',
+        icon: Sparkles,
+        description: 'AI싱크클럽 전용 AI 빌더'
       }
     ]
   },
@@ -266,7 +273,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     try {
       // 유틸리티 함수를 사용하여 API URL 생성
       const apiUrl = getAdminApiUrl('/notifications');
-      
+
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -274,7 +281,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         },
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
@@ -290,12 +297,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     try {
       // 환경 정보 로깅
       logEnvironmentInfo();
-      
+
       // 유틸리티 함수를 사용하여 API URL 생성
       const apiUrl = getAdminApiUrl('/auth/verify');
-      
+
       console.log('Admin auth check URL:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -305,9 +312,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         // 10초 타임아웃
         signal: AbortSignal.timeout(10000),
       });
-      
+
       console.log('Admin auth response status:', response.status);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('Admin auth success:', data.user?.email);
@@ -331,15 +338,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     try {
       // 유틸리티 함수를 사용하여 API URL 생성
       const apiUrl = getAdminApiUrl('/auth/logout');
-      
-      const response = await fetch(apiUrl, { 
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         setAdmin(null);
         router.push('/admin/login');
@@ -392,16 +399,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b">
@@ -435,9 +441,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                 {admin.avatar ? (
-                  <img 
-                    src={admin.avatar} 
+                  <img
+                    src={admin.avatar}
                     alt={admin.name}
+                    crossOrigin="anonymous"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
@@ -459,53 +466,73 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navigationItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const safePathname = pathname || '';
+              const isActive = safePathname === item.href || (item.subItems && item.subItems.some(sub => safePathname === sub.href));
               const isPartnersMenu = item.href === '/admin/partners';
               const showNotification = isPartnersMenu && notifications.pendingPartners > 0;
-              
+              const hasSubItems = item.subItems && item.subItems.length > 0;
+
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
+                <div key={item.name} className="space-y-1">
+                  <Link
+                    href={item.href}
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
                       ? 'bg-primary text-white'
                       : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <div className="relative">
-                    <Icon className="h-5 w-5" />
-                    {showNotification && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs p-0 min-w-[20px]"
-                      >
-                        {notifications.pendingPartners}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span>{item.name}</span>
+                      }`}
+                    onClick={() => !hasSubItems && setSidebarOpen(false)}
+                  >
+                    <div className="relative">
+                      <Icon className="h-5 w-5" />
                       {showNotification && (
-                        <Badge 
-                          variant="destructive" 
-                          className={`text-xs ${
-                            isActive ? 'bg-red-500 text-white' : 'bg-red-500 text-white'
-                          }`}
+                        <Badge
+                          variant="destructive"
+                          className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs p-0 min-w-[20px]"
                         >
                           {notifications.pendingPartners}
                         </Badge>
                       )}
                     </div>
-                    <div className={`text-xs ${
-                      isActive ? 'text-white/80' : 'text-text-secondary'
-                    }`}>
-                      {item.description}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span>{item.name}</span>
+                        {showNotification && (
+                          <Badge
+                            variant="destructive"
+                            className={`text-xs ${isActive ? 'bg-red-500 text-white' : 'bg-red-500 text-white'
+                              }`}
+                          >
+                            {notifications.pendingPartners}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+
+                  {/* Sub Items */}
+                  {hasSubItems && (isActive || (pathname && pathname.startsWith(item.href))) && item.subItems && (
+                    <div className="ml-9 space-y-1 mt-1">
+                      {item.subItems.map((subItem) => {
+                        const SubIcon = subItem.icon;
+                        const isSubActive = pathname === subItem.href;
+                        return (
+                          <Link
+                            key={subItem.href}
+                            href={subItem.href}
+                            className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isSubActive
+                              ? 'text-primary bg-primary/5'
+                              : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
+                              }`}
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            <SubIcon className="h-4 w-4" />
+                            <span>{subItem.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -524,7 +551,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <option value="zh">中文</option>
               </select>
             </div>
-            
+
             {/* Logout */}
             <Button
               variant="ghost"

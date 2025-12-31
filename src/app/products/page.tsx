@@ -116,6 +116,9 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         </div>
         {/* Simple Quiz-like Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
+          <Button variant="outline" size="sm" asChild className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">
+            <Link href="/products?isFunding=true">🚀 회복 펀딩</Link>
+          </Button>
           <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😴 수면부족</Button>
           <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😩 만성피로</Button>
           <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">🤰 붓기관리</Button>
@@ -132,7 +135,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             </h3>
             <Card className="border-line shadow-2xl overflow-hidden bg-surface rounded-[32px]">
               <CardContent className="p-0">
-                <ProductFilters />
+                <ProductFilters searchParams={React.use(searchParams)} />
               </CardContent>
             </Card>
           </div>
@@ -142,7 +145,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         <main className="flex-1" id="recommended-products">
           <ErrorBoundary>
             <Suspense fallback={<ProductListSkeleton />}>
-              <ProductList searchParams={{}} />
+              <ProductList searchParams={React.use(searchParams)} />
             </Suspense>
           </ErrorBoundary>
         </main>

@@ -74,7 +74,12 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 아래 JSON 형식으로만 응답해주세요. 다른 텍스트는 추가하지 마세요.
 {
   "comment": "오늘의 상태에 대한 따뜻한 한줄 코멘트 (30자 이내)",
-  "actionItem": "오늘 딱 하나만 실천할 수 있는 회복 행동 추천 (50자 이내)"
+  "actionItem": "오늘 딱 하나만 실천할 수 있는 회복 행동 추천 (50자 이내)",
+  "tomorrowForecast": {
+    "status": "내일의 상태 요약 (예: 회복 가속, 휴식 주의보, 리듬 안정)",
+    "description": "오늘의 점수를 바탕으로 분석한 내일의 컨디션 예측 (100자 이내)",
+    "energyLevel": 0에서 100 사이의 숫자 (기대 에너지 레벨)
+  }
 }`;
 
             const text = await this.generateWithFallback(prompt);
@@ -86,7 +91,12 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
                 return {
                     comment: parsed.comment || '오늘도 회복하는 하루 되세요!',
                     actionItem: parsed.actionItem || '자기 전 10분 스트레칭을 해보세요.',
-                    recoveryScore: totalScore
+                    recoveryScore: totalScore,
+                    tomorrowForecast: parsed.tomorrowForecast || {
+                        status: '분석 중',
+                        description: '충분한 수면 후 내일 아침에 더 정확한 예측이 가능합니다.',
+                        energyLevel: totalScore > 80 ? 90 : 70
+                    }
                 };
             }
 
@@ -446,6 +456,281 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
                     reason: "가장 기본이 되는 회복 루틴입니다."
                 }
             };
+        }
+    }
+
+    static async planDetailPage(input: {
+        name: string;
+        category: string;
+        price: number;
+        promotion?: string;
+        keywords: string;
+        targetGender?: string[];
+        targetAge?: string[];
+        length: 5 | 7 | 9 | 'auto';
+        isFunding?: boolean;
+        referenceImage?: string; // Base64
+    }): Promise<any> {
+        const lengthCount = input.length === 'auto' ? '7' : String(input.length);
+        const targetInfo = `타겟 고객: ${input.targetGender?.join(', ')} / 연령대: ${input.targetAge?.join(', ')}`;
+
+        const prompt = `
+당신은 대한민국 최고의 이커머스 상세페이지 기획 전문가입니다. 
+당신의 임무는 소비자의 구매 욕구를 자극하는 완벽한 상세페이지 기획안을 작성하는 것입니다.
+
+**CRITICAL: 모든 결과물은 반드시 '한글'로만 작성하세요. 영어는 단 한 단어도 포함해서는 안 됩니다.**
+
+[상품 정보]
+- 상품명: ${input.name}
+- 카테고리: ${input.category}
+- 가격/이벤트: ${input.price} / ${input.promotion || '없음'}
+- 핵심 강점(USP): ${input.keywords}
+- ${targetInfo}
+- ${input.isFunding ? '특이사항: 와디즈/텀블벅 스타일의 펀딩 프로젝트' : '특이사항: 일반 판매 상품'}
+
+[기획 지침]
+1. 유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 모든 섹션의 카피와 비주얼에 자연스럽게 녹아들어야 합니다. 
+   - 제품을 사용하는 행위가 단순히 소비가 아닌, 사용자의 삶을 '회복'시키는 과정임을 강조하세요.
+2. '판매 논리(Seller Winning Logic)'에 따라 총 ${lengthCount}개의 섹션을 구성하세요.
+   (Hook -> Solution -> Clarity -> Social Proof -> Detail -> Risk Reversal)
+3. **비주얼 프롬프트(visualPrompt)** 작성 시 주의사항:
+   - 반드시 '한글'로 작성할 것.
+   - 풍경 사진이 아닌, **'제품'이 강조된 프리미엄 연출샷**이어야 합니다.
+   - '회복'의 무드(편안함, 치유, 생동감, 정돈됨)가 시각적으로 느껴지도록 하세요.
+   - 예: "고급스러운 대리석 선반 위에 제품이 정갈하게 놓여 있고, 주변에 수분이 맺힌 신선한 잎사귀가 배치된 클로즈업 샷. 부드러운 아침 햇살 조명이 비쳐 '회복'의 느낌을 전달함."
+4. **키 메시지(keyMessage)**: 이미지 위에 들어갈 폰트용 문구로, 20자 이내의 강력한 한글 헤드라인을 작성하세요.
+
+## 출력 형식 (JSON Array) - 설명 없이 JSON만 출력하세요.
+[
+  {
+    "id": "section-1",
+    "title": "섹션 제목 (한글)",
+    "logicalSections": ["Hook"],
+    "keyMessage": "가슴을 울리는 한글 카피",
+    "visualPrompt": "제품이 돋보이는 구체적인 배경과 소품 묘사 (한글)",
+    "productPosition": "center",
+    "productSize": "medium"
+  }
+]`;
+
+        const text = await this.generateWithFallback(prompt, "대한민국 상세페이지 전략가 모드 (한글 100% 필수)", 0.7);
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+
+        if (jsonMatch) {
+            try {
+                return JSON.parse(jsonMatch[0]);
+            } catch (e) {
+                console.error("Failed to parse JSON response", e);
+                return [];
+            }
+        }
+        throw new Error('상세페이지 기획안 생성에 실패했습니다.');
+    }
+
+    /**
+     * Regenerate a single segment of the detail page
+     */
+    static async regenerateDetailSegment(input: {
+        name: string;
+        category: string;
+        keywords: string;
+        sectionId: string;
+        logicalSection: string;
+    }): Promise<any> {
+        const prompt = `당신은 대한민국 최고의 이커머스 상세페이지 기획자입니다. 모든 응답은 반드시 '한글'로만 작성하세요.
+상품명: "${input.name}"
+카테고리: "${input.category}"
+기존 특징: "${input.keywords}"
+현재 기획하려는 섹션 성격: [${input.logicalSection}]
+
+위 정보를 바탕으로 해당 섹션에 최적화된 새로운 기획을 만들어주세요.
+
+## 지침
+- 유니클의 핵심 가치인 **'회복(Recovery)'**이 해당 섹션에 반드시 반영되어야 합니다.
+- 비주얼 프롬프트(visualPrompt): 풍경이 아닌, **제품 스테이징(대리석 테이블, 스토디오 소품 등)**이 강조되면서도 '치유와 회복'의 분위기가 느껴지는 한글 묘사.
+- 키 메시지(keyMessage): '회복'의 가치를 담은 강력하고 직관적인 한글 카피.
+
+## 출력 형식 (JSON Object)
+{
+  "id": "${input.sectionId}",
+  "title": "${input.logicalSection} 섹션 (한글)",
+  "logicalSections": ["${input.logicalSection}"],
+  "keyMessage": "한글 카피",
+  "visualPrompt": "제품 중심의 한글 묘사",
+  "productPosition": "center",
+  "productSize": "medium"
+}`;
+
+        const text = await this.generateWithFallback(prompt, "섹션 재생성 모드", 0.8);
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+        try {
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('No valid JSON found in response');
+        } catch (e) {
+            console.error('Segment regeneration parse error:', e);
+            throw e;
+        }
+    }
+
+    // AI Action Advice: Generate 3 specific actionable items
+    static async generateActionAdvice(input: any): Promise<any> {
+        try {
+            const prompt = `당신은 회복(Recovery) 전문 코치입니다. 사용자의 회복 점수를 분석하고, 오늘 즉시 실천할 수 있는 **3가지 구체적인 행동 조언**을 제공해주세요.
+
+## 사용자 회복 상태
+- 회복 점수: ${input.todayScore}점
+- 상세 지표: 피로도(${input.scores.q1}), 수면(${input.scores.q2}), 붓기(${input.scores.q3}), 감정(${input.scores.q4}), 집중력(${input.scores.q5})
+
+## 요청
+사용자의 가장 취약한 지표를 개선할 수 있는 행동 위주로 추천해주세요. 
+아래 JSON 형식으로만 응답해주세요.
+
+{
+  "aiComment": "오늘의 상태에 대한 분석과 격려 (50자 이내)",
+  "adviceItems": [
+    {
+      "id": "advice-1",
+      "category": "PHYSICAL | MENTAL | LIFESTYLE | SLEEP | NUTRITION 중 택1",
+      "content": "구체적인 실천 행동 (예: 미온수 200ml 마시기)"
+    },
+    ... (총 3개)
+  ]
+}`;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('JSON parsing failed');
+        } catch (error) {
+            console.error('Gemini Action Advice Error:', error);
+            return {
+                aiComment: "오늘도 당신의 회복을 응원합니다. 간단한 행동부터 시작해 보세요.",
+                adviceItems: [
+                    { id: 'def-1', category: 'PHYSICAL', content: '잠시 눈을 감고 크게 심호흡 5번 하기' },
+                    { id: 'def-2', category: 'LIFESTYLE', content: '가벼운 스트레칭으로 몸의 긴장 풀기' },
+                    { id: 'def-3', category: 'NUTRITION', content: '미온수 한 잔 천천히 들이키기' }
+                ]
+            };
+        }
+    }
+
+    // AI Section Image Generation: Multimodal generation (Text + Reference Image)
+    static async generateDetailImage(input: {
+        prompt: string;
+        keyMessage: string;
+        referenceImage?: string; // Base64
+        aspectRatio?: "9:16" | "1:1";
+    }): Promise<string> {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.');
+        }
+
+        const models = [
+            'gemini-3-pro-image-preview', // User's preferred model from AI Studio
+            'gemini-2.0-flash-exp',
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-flash'
+        ];
+        let lastError: any;
+
+        for (const modelName of models) {
+            try {
+                const model = genAI.getGenerativeModel({
+                    model: modelName,
+                    safetySettings: [
+                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    ]
+                });
+
+                const promptParts: any[] = [
+                    {
+                        text: `High quality e-commerce product photography. ${input.prompt}. 
+CRITICAL: Please overlay the following Korean text clearly on the image in a stylish typography: "${input.keyMessage}".
+The overall style should be premium, clean, and reflect a "Recovery" theme.
+Aspect Ratio: ${input.aspectRatio || "9:16"}`
+                    }
+                ];
+
+                if (input.referenceImage) {
+                    const base64Content = input.referenceImage.split(',')[1] || input.referenceImage;
+                    promptParts.push({
+                        inlineData: {
+                            data: base64Content,
+                            mimeType: "image/png"
+                        }
+                    });
+                }
+
+                const result = await model.generateContent({
+                    contents: [{ role: 'user', parts: promptParts }],
+                    generationConfig: {
+                        // Include image config for models that support it
+                        ...(modelName.includes('image') ? {
+                            //@ts-ignore
+                            imageConfig: {
+                                aspectRatio: input.aspectRatio || "9:16",
+                                imageSize: "1K"
+                            }
+                        } : {})
+                    } as any
+                });
+
+                const response = await result.response;
+                const parts = response.candidates?.[0]?.content?.parts;
+
+                if (parts) {
+                    for (const part of parts) {
+                        if ((part as any).inlineData) {
+                            return `data:image/png;base64,${(part as any).inlineData.data}`;
+                        }
+                    }
+                }
+                break;
+            } catch (error: any) {
+                console.warn(`[Gemini] Model ${modelName} failed:`, error.message);
+                lastError = error;
+                continue;
+            }
+        }
+
+        console.log('[Gemini] All generation models failed or returned no data. Using simulation fallback.');
+        const seed = Math.random().toString(36).substring(7);
+        const w = input.aspectRatio === "1:1" ? 1000 : 900;
+        const h = input.aspectRatio === "1:1" ? 1000 : 1600;
+        return `https://picsum.photos/seed/${seed}/${w}/${h}`;
+    }
+
+    // AI Section Image Generation (Old prompt logic, kept for compatibility)
+    static async generateSectionImageContent(section: any, referenceImage?: string): Promise<any> {
+        return {
+            prompt: section.visualPrompt,
+            message: section.keyMessage,
+            referenceImage: referenceImage ? 'provided' : 'none'
+        };
+    }
+
+    // AI Feature Suggestion: Suggest 3 USPs for a product
+    static async suggestProductFeatures(productName: string, category: string): Promise<string> {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.');
+        }
+
+        const prompt = `상품명 "${productName}" (카테고리: ${category})에 대해 판매를 촉진할 수 있는 핵심 특징(USP) 3가지를 한국어로 추천해줘.
+회복(Recovery)과 건강이라는 테마를 살려서, 소비자에게 신뢰를 줄 수 있는 강력한 문구로 작성해줘.`;
+
+        try {
+            return await this.generateWithFallback(prompt, "이커머스 마케팅 전문가 모드", 0.7);
+        } catch (error: any) {
+            console.error('Gemini Feature Suggestion Error:', error);
+            return "1. 프리미엄 회복 포뮬러\n2. 사용자 맞춤형 케어 솔루션\n3. 검증된 원료와 안전성";
         }
     }
 }

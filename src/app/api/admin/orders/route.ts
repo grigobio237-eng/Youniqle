@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // 주문 데이터 변환
     const transformedOrders = orders.map(order => ({
       _id: order._id,
-      orderNumber: order.orderNumber,
+      orderNumber: order.orderNumber || order._id.toString().slice(-8).toUpperCase(),
       customer: {
         name: order.userId?.name || 'Unknown',
         email: order.userId?.email || '',

@@ -12,10 +12,13 @@ import {
   Eye,
   MessageCircle,
   DollarSign,
-  Activity,
   ArrowUpRight,
   ArrowDownRight,
-  Calendar
+  Activity,
+  Calendar,
+  Layers,
+  HeartPulse,
+  BrainCircuit
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -44,10 +47,19 @@ interface DashboardStats {
     createdAt: string;
   }>;
   topProducts: Array<{
-    id: string;
-    name: string;
     sales: number;
     revenue: number;
+  }>;
+  activityMetrics?: {
+    totalDiagnoses: number;
+    totalAiAdvices: number;
+    totalScoreLogs: number;
+    totalAttempts: number;
+  };
+  recentActivities?: Array<{
+    type: 'DIAGNOSIS' | 'AI_ADVICE';
+    user: { name: string; email: string };
+    createdAt: string;
   }>;
 }
 
@@ -110,12 +122,15 @@ export default function AdminDashboard() {
       color: 'text-green-600'
     },
     {
-      title: '총 주문 수',
+      title: '총 주문 수 (결제)',
       value: stats?.totalOrders || 0,
       icon: ShoppingCart,
-      change: 0,
+      change: stats?.activityMetrics?.totalAttempts
+        ? Math.round(((stats?.totalOrders || 0) / (stats?.activityMetrics?.totalAttempts + (stats?.totalOrders || 0))) * 100)
+        : 0,
       href: '/admin/orders',
-      color: 'text-orange-600'
+      color: 'text-orange-600',
+      isConversion: true
     },
     {
       title: '총 매출',
@@ -163,14 +178,14 @@ export default function AdminDashboard() {
                       {stat.value}
                     </p>
                     {stat.change !== 0 && (
-                      <div className={`flex items-center text-sm ${isPositive ? 'text-green-600' : 'text-red-600'
+                      <div className={`flex items-center text-sm ${stat.isConversion ? 'text-blue-600' : (isPositive ? 'text-green-600' : 'text-red-600')
                         }`}>
-                        {isPositive ? (
-                          <ArrowUpRight className="h-4 w-4 mr-1" />
+                        {stat.isConversion ? (
+                          <Activity className="h-4 w-4 mr-1" />
                         ) : (
-                          <ArrowDownRight className="h-4 w-4 mr-1" />
+                          isPositive ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />
                         )}
-                        {Math.abs(stat.change)}%
+                        {stat.isConversion ? `전환율 ${stat.change}%` : `${Math.abs(stat.change)}%`}
                       </div>
                     )}
                   </div>
@@ -191,57 +206,41 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Additional Stats */}
+      {/* Recovery Hub Monitoring */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Eye className="h-5 w-5" />
-              <span>오늘 방문자</span>
+        <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
+              <HeartPulse className="w-4 h-4" /> 정밀 회복 진단
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-primary">
-              {stats?.todayVisitors || 0}
-            </div>
-            <p className="text-sm text-text-secondary mt-2">
-              실시간 방문자 수
-            </p>
+            <div className="text-4xl font-black">{stats?.activityMetrics?.totalDiagnoses || 0}</div>
+            <p className="text-xs opacity-60 mt-1">총 누적 진단 완료 건수</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <MessageCircle className="h-5 w-5" />
-              <span>총 리뷰 수</span>
+        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-none shadow-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
+              <BrainCircuit className="w-4 h-4" /> AI 행동 조언
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-secondary">
-              {stats?.totalReviews || 0}
-            </div>
-            <p className="text-sm text-text-secondary mt-2">
-              사용자 작성 리뷰
-            </p>
+            <div className="text-4xl font-black">{stats?.activityMetrics?.totalAiAdvices || 0}</div>
+            <p className="text-xs opacity-60 mt-1">총 상담 로그 생성 건수</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Activity className="h-5 w-5" />
-              <span>시스템 상태</span>
+        <Card className="bg-gradient-to-br from-amber-400 to-orange-500 text-white border-none shadow-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
+              <Layers className="w-4 h-4" /> 파빌리온 아이템
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="font-medium text-green-600">정상 운영</span>
-            </div>
-            <p className="text-sm text-text-secondary mt-2">
-              모든 시스템이 정상 작동 중
-            </p>
+            <div className="text-4xl font-black">28</div>
+            <p className="text-xs opacity-60 mt-1">1F-5F 전체 등록 아이템</p>
           </CardContent>
         </Card>
       </div>
@@ -347,35 +346,41 @@ export default function AdminDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" asChild className="h-20 flex-col">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <Link href="/admin/products/new">
-                <Package className="h-6 w-6 mb-2" />
-                새 상품 등록
+                <Package className="h-6 w-6 text-indigo-500" />
+                <span className="font-bold">새 상품 등록</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 flex-col">
+            <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+              <Link href="/admin/pavilion">
+                <Layers className="h-6 w-6 text-emerald-500" />
+                <span className="font-bold">파빌리온 관리</span>
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all">
               <Link href="/admin/omakase">
-                <Activity className="h-6 w-6 mb-2" />
-                컨시어지 신청 관리
+                <Activity className="h-6 w-6 text-purple-500" />
+                <span className="font-bold">신청 관리</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 flex-col">
+            <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
               <Link href="/admin/users">
-                <Users className="h-6 w-6 mb-2" />
-                회원 관리
+                <Users className="h-6 w-6 text-blue-500" />
+                <span className="font-bold">회원 관리</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 flex-col">
+            <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-all">
               <Link href="/admin/recovery">
-                <TrendingUp className="h-6 w-6 mb-2" />
-                회복 현황 분석
+                <TrendingUp className="h-6 w-6 text-orange-500" />
+                <span className="font-bold">현황 분석</span>
               </Link>
             </Button>
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }
 

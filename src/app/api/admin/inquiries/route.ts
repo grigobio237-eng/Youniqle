@@ -7,12 +7,16 @@ import { authOptions } from '@/lib/auth';
 // 문의 목록 조회 (관리자)
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user || (session.user as any).role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
+
+    await connectDB();
+
+    // Mongoose 모델 등록 보장
+    await import('@/models/User');
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
@@ -23,13 +27,13 @@ export async function GET(request: NextRequest) {
 
     const query: any = {};
 
-    if (status) {
+    if (status && status !== 'all') {
       query.status = status;
     }
-    if (type) {
+    if (type && type !== 'all') {
       query.type = type;
     }
-    if (priority) {
+    if (priority && priority !== 'all') {
       query.priority = priority;
     }
 
@@ -60,11 +64,13 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('문의 조회 오류:', error);
+    console.error('문의 조회 오류 (Admin API):', error);
     return NextResponse.json(
-      { error: error.message || '문의 조회에 실패했습니다.' },
+      {
+        error: error.message || '문의 조회에 실패했습니다.',
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
 }
-

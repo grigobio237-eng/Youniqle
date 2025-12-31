@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Upload, 
-  X, 
-  Image as ImageIcon, 
+import {
+  Upload,
+  X,
+  Image as ImageIcon,
   GripVertical,
   Plus,
   Trash2
@@ -28,10 +28,10 @@ interface ImageManagerProps {
   maxImages?: number;
 }
 
-export default function ImageManager({ 
-  images, 
-  onImagesChange, 
-  maxImages = 10 
+export default function ImageManager({
+  images,
+  onImagesChange,
+  maxImages = 10
 }: ImageManagerProps) {
   const [uploading, setUploading] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -49,7 +49,7 @@ export default function ImageManager({
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
+
         // 파일 크기 검증 (5MB 제한)
         if (file.size > 5 * 1024 * 1024) {
           toast.error(`${file.name}은(는) 5MB를 초과합니다.`);
@@ -96,7 +96,7 @@ export default function ImageManager({
   // 이미지 삭제
   const handleImageDelete = async (index: number) => {
     const imageToDelete = images[index];
-    
+
     try {
       // Vercel Blob에서 이미지 삭제
       const response = await fetch('/api/upload/delete', {
@@ -213,6 +213,7 @@ export default function ImageManager({
                     src={image.url}
                     alt={`상품 이미지 ${index + 1}`}
                     className="w-full h-24 object-cover"
+                    crossOrigin="anonymous" // 교차 출처 리소스 허용 (COEP 대응)
                   />
 
                   {/* 삭제 버튼 */}

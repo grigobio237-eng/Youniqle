@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IOrder extends Document {
+  orderNumber: string;
   userId: mongoose.Types.ObjectId;
   items: Array<{
     productId: mongoose.Types.ObjectId;
@@ -62,6 +63,11 @@ export interface IOrder extends Document {
 }
 
 const OrderSchema = new Schema<IOrder>({
+  orderNumber: {
+    type: String,
+    required: true,
+    unique: true
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -141,8 +147,8 @@ const OrderSchema = new Schema<IOrder>({
     }],
     subtotal: { type: Number, required: true },
     commission: { type: Number, required: true },
-    status: { 
-      type: String, 
+    status: {
+      type: String,
       enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
       default: 'pending'
     },

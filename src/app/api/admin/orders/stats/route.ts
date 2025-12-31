@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -25,20 +25,36 @@ export async function GET(request: NextRequest) {
     // 통계 데이터 조회
     const [
       totalOrders,
+      totalAttempts,
       totalRevenue,
       pendingOrders,
       completedOrders
     ] = await Promise.all([
-      Order.countDocuments(),
+      Order.countDocuments({
+        $or: [
+          { paymentStatus: 'completed' },
+          { status: { $in: ['confirmed', 'preparing', 'shipped', 'delivered'] } }
+        ]
+      }),
+      Order.countDocuments({ status: 'pending', paymentStatus: 'pending' }),
       Order.aggregate([
+        {
+          $match: {
+            $or: [
+              { paymentStatus: 'completed' },
+              { status: { $in: ['confirmed', 'preparing', 'shipped', 'delivered'] } }
+            ]
+          }
+        },
         { $group: { _id: null, total: { $sum: '$totalAmount' } } }
       ]),
-      Order.countDocuments({ status: { $in: ['pending', 'confirmed', 'preparing', 'shipped'] } }),
+      Order.countDocuments({ status: { $in: ['confirmed', 'preparing', 'shipped'] } }),
       Order.countDocuments({ status: 'delivered' })
     ]);
 
     return NextResponse.json({
       totalOrders,
+      totalAttempts,
       totalRevenue: totalRevenue[0]?.total || 0,
       pendingOrders,
       completedOrders

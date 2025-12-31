@@ -194,6 +194,11 @@ export async function POST(request: NextRequest) {
 
     await product.save();
 
+    // 캐시 무효화 (상품 목록)
+    const { cache } = await import('@/lib/cache');
+    await cache.delPattern('products:*');
+    console.log('🗑️ 새 상품 등록으로 인한 상품 목록 캐시 무효화 완료');
+
     return NextResponse.json({
       message: '상품이 성공적으로 생성되었습니다.',
       product: {

@@ -194,7 +194,7 @@ export default function CasesPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                     <Button size="lg" className="bg-chapter-accent hover:bg-chapter-accent/90 text-background font-black rounded-2xl h-16 px-10" asChild>
-                        <Link href="/">내 회복 점수 진단하기</Link>
+                        <Link href="/diagnosis">내 회복 점수 진단하기</Link>
                     </Button>
                     <Button
                         size="lg"

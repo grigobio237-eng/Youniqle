@@ -48,7 +48,8 @@ const GAMES = [
         description: '짧은 시간 집중력을 요하는 클래식 게임',
         icon: <Gamepad2 className="w-8 h-8 text-white" />,
         color: 'from-violet-400 to-purple-400',
-        active: false
+        active: true,
+        href: '/utils/minigames/memory'
     },
     {
         id: '2048',
@@ -56,7 +57,8 @@ const GAMES = [
         description: '숫자 대신 사원→대리→사장으로 승진하는 퍼즐',
         icon: <Trophy className="w-8 h-8 text-white" />,
         color: 'from-cyan-400 to-sky-400',
-        active: false
+        active: true,
+        href: '/utils/minigames/2048'
     },
     {
         id: 'bingo',
@@ -64,7 +66,8 @@ const GAMES = [
         description: '"회의 중 졸아본 적 있음" 등 직장인 공감 빙고',
         icon: <Users className="w-8 h-8 text-white" />,
         color: 'from-lime-400 to-green-500',
-        active: false
+        active: true,
+        href: '/utils/minigames/bingo'
     },
     {
         id: 'difference',
@@ -72,7 +75,8 @@ const GAMES = [
         description: '두 개의 비슷한 사무실 풍경에서 차이점 찾기',
         icon: <Search className="w-8 h-8 text-white" />,
         color: 'from-red-400 to-pink-500',
-        active: false
+        active: true,
+        href: '/utils/minigames/difference'
     }
 ];
 

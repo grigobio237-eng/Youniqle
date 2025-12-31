@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
     }
 
     await connectDB();
-    
+
     // 관리자 권한 확인
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // 기간별 날짜 계산
     const now = new Date();
     let startDate = new Date();
-    
+
     switch (period) {
       case '7d':
         startDate.setDate(now.getDate() - 7);
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         startDate.setDate(now.getDate() - 7);
     }
 
-    // 기본 쿼리 조건
+    // 기본 조회 쿼리 구성
     const baseQuery: any = {
       createdAt: { $gte: startDate }
     };
@@ -56,9 +56,19 @@ export async function GET(request: NextRequest) {
       baseQuery['items.partnerId'] = partnerId;
     }
 
+    // 기본 유효 주문 쿼리 조건 (실제 매출로 인정되는 상태)
+    const validOrderQuery: any = {
+      ...baseQuery,
+      $or: [
+        { paymentStatus: 'completed' },
+        { status: { $in: ['confirmed', 'preparing', 'shipped', 'delivered'] } }
+      ]
+    };
+
     // 1. 전체 통계
     const [
       totalOrders,
+      totalAttempts,
       totalRevenue,
       ordersByStatus,
       ordersByPaymentStatus,
@@ -67,33 +77,41 @@ export async function GET(request: NextRequest) {
       topProducts,
       recentOrders
     ] = await Promise.all([
-      // 전체 주문 수
-      Order.countDocuments(baseQuery),
-      
-      // 전체 매출
+      // 유효 주문 수
+      Order.countDocuments(validOrderQuery),
+
+      // 주문 시도 수 (Pending)
+      Order.countDocuments({
+        ...baseQuery,
+        status: 'pending',
+        paymentStatus: 'pending'
+      }),
+
+      // 전체 매출 (유효 주문 기준)
       Order.aggregate([
-        { $match: baseQuery },
+        { $match: validOrderQuery },
         { $group: { _id: null, total: { $sum: '$totalAmount' } } }
       ]),
-      
-      // 상태별 주문 수
+
+      // 상태별 주문 수 (전체 시도 포함 분포)
       Order.aggregate([
         { $match: baseQuery },
         { $group: { _id: '$status', count: { $sum: 1 } } }
       ]),
-      
-      // 결제 상태별 주문 수
+
+      // 결제 상태별 주문 수 (전체 시도 포함 분포)
       Order.aggregate([
         { $match: baseQuery },
         { $group: { _id: '$paymentStatus', count: { $sum: 1 } } }
       ]),
-      
-      // 일별 통계 (최근 30일)
+
+      // 일별 통계 (유효 주문 기준)
       Order.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
+            ...validOrderQuery,
             createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) }
-          } 
+          }
         },
         {
           $group: {
@@ -109,10 +127,10 @@ export async function GET(request: NextRequest) {
         { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
         { $limit: 30 }
       ]),
-      
-      // 파트너별 통계
+
+      // 파트너별 통계 (유효 주문 기준)
       Order.aggregate([
-        { $match: baseQuery },
+        { $match: validOrderQuery },
         { $unwind: '$items' },
         {
           $group: {
@@ -126,10 +144,10 @@ export async function GET(request: NextRequest) {
         { $sort: { revenue: -1 } },
         { $limit: 10 }
       ]),
-      
-      // 인기 상품 (주문 수 기준)
+
+      // 인기 상품 (유효 주문 기준)
       Order.aggregate([
-        { $match: baseQuery },
+        { $match: validOrderQuery },
         { $unwind: '$items' },
         {
           $group: {
@@ -143,9 +161,9 @@ export async function GET(request: NextRequest) {
         { $sort: { totalQuantity: -1 } },
         { $limit: 10 }
       ]),
-      
-      // 최근 주문 (최근 10개)
-      Order.find(baseQuery)
+
+      // 최근 주문 (유효 주문 기준)
+      Order.find(validOrderQuery)
         .populate('items.productId', 'name images partnerName')
         .populate('userId', 'name email')
         .sort({ createdAt: -1 })
@@ -175,6 +193,7 @@ export async function GET(request: NextRequest) {
       period,
       summary: {
         totalOrders,
+        totalAttempts,
         totalRevenue: totalRevenue[0]?.total || 0,
         urgentOrders,
         failedPayments,

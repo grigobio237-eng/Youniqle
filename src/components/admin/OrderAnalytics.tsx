@@ -5,24 +5,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  DollarSign, 
-  Package, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  DollarSign,
+  Package,
   AlertTriangle,
   Clock,
   CheckCircle,
   XCircle,
   BarChart3,
-  PieChart
+  PieChart,
+  ShoppingCart
 } from 'lucide-react';
 
 interface AnalyticsData {
-  period: string;
   summary: {
+    period: string;
     totalOrders: number;
+    totalAttempts: number;
     totalRevenue: number;
     urgentOrders: number;
     failedPayments: number;
@@ -117,7 +119,7 @@ export default function OrderAnalytics() {
       const response = await fetch(`/api/admin/orders/analytics?period=${period}`, {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         const analyticsData = await response.json();
         setData(analyticsData);
@@ -200,11 +202,10 @@ export default function OrderAnalytics() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === tab.id
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
@@ -262,6 +263,21 @@ export default function OrderAnalytics() {
                     <p className="text-2xl font-bold text-red-600">{data.summary.failedPayments}</p>
                   </div>
                   <XCircle className="h-8 w-8 text-red-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">주문 시도</p>
+                    <p className="text-2xl font-bold text-orange-400">{data.summary.totalAttempts.toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      결제 단계 전환율: {data.summary.totalAttempts ? Math.round((data.summary.totalOrders / (data.summary.totalAttempts + data.summary.totalOrders)) * 100) : 0}%
+                    </p>
+                  </div>
+                  <ShoppingCart className="h-8 w-8 text-orange-400 opacity-50" />
                 </div>
               </CardContent>
             </Card>

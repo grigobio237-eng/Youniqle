@@ -7,7 +7,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, ContactShadows, MeshReflectorMaterial, Html, PerspectiveCamera, Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { User } from 'lucide-react';
-import { PAVILION_DATA, FloorOwner } from '@/app/pavilion/page';
+import { FloorOwner } from '@/app/pavilion/page';
 
 // --- Components ---
 
@@ -190,7 +190,7 @@ function MasterpieceFrame({ id, title, position, onClick }: { id: string, title:
 }
 
 // Custom First-Person Camera controller
-function FPController({ isInsideRoom, activeFloor, selectedOwnerId }: { isInsideRoom: boolean, activeFloor: number, selectedOwnerId: string | null }) {
+function FPController({ isInsideRoom, activeFloor, selectedOwnerId, floorData }: { isInsideRoom: boolean, activeFloor: number, selectedOwnerId: string | null, floorData: FloorOwner[] }) {
     const { camera } = useThree();
     const targetPos = useRef(new THREE.Vector3(0, 5, 12));
     const targetLookAt = useRef(new THREE.Vector3(0, 3, 0));
@@ -202,7 +202,7 @@ function FPController({ isInsideRoom, activeFloor, selectedOwnerId }: { isInside
             targetLookAt.current.set(0, 3.5, -15);
         } else if (selectedOwnerId) {
             // Zoom into the magic door area (All floors)
-            const owners = PAVILION_DATA[activeFloor] || [];
+            const owners = floorData || [];
             const index = owners.findIndex(o => o.id === selectedOwnerId);
             const total = owners.length;
             const spacing = 8;
@@ -284,7 +284,8 @@ export default function ConventionCenter({
     onReady,
     onArtistClick,
     onArtworkClick,
-    onEnterRoom
+    onEnterRoom,
+    floorData
 }: {
     activeFloor: number;
     selectedArtistId: string | null;
@@ -294,6 +295,7 @@ export default function ConventionCenter({
     onArtistClick: (id: string) => void;
     onArtworkClick: (id: string) => void;
     onEnterRoom: () => void;
+    floorData: FloorOwner[]; // PAVILION_DATA 대신 부모(page.tsx)로부터 데이터를 전달받음
 }) {
 
     useEffect(() => {
@@ -317,7 +319,7 @@ export default function ConventionCenter({
         <div style={{ width: '100%', height: '100%', background: activeFloor === 5 ? '#030303' : activeColor }}>
             <Canvas shadows={false}>
                 <PerspectiveCamera makeDefault fov={45} />
-                <FPController isInsideRoom={isInsideRoom} activeFloor={activeFloor} selectedOwnerId={selectedArtistId} />
+                <FPController isInsideRoom={isInsideRoom} activeFloor={activeFloor} selectedOwnerId={selectedArtistId} floorData={floorData} />
 
                 <color attach="background" args={[activeFloor === 5 ? '#030303' : activeColor]} />
                 <fog attach="fog" args={[activeFloor === 5 ? '#000000' : activeColor, 15, 80]} />
@@ -345,8 +347,8 @@ export default function ConventionCenter({
                             </mesh>
 
                             {/* Specialist Cards based on floor */}
-                            {PAVILION_DATA[activeFloor]?.map((owner, index) => {
-                                const total = PAVILION_DATA[activeFloor].length;
+                            {floorData?.map((owner, index) => {
+                                const total = floorData.length;
                                 const spacing = 8;
                                 const xPos = (index - (total - 1) / 2) * spacing;
                                 return (
@@ -367,7 +369,7 @@ export default function ConventionCenter({
                             {selectedArtistId && (
                                 <MagicDoor
                                     position={[
-                                        (PAVILION_DATA[activeFloor]?.findIndex(o => o.id === selectedArtistId) - (PAVILION_DATA[activeFloor]?.length - 1) / 2) * 8,
+                                        (floorData?.findIndex(o => o.id === selectedArtistId) - (floorData?.length - 1) / 2) * 8,
                                         4,
                                         -19.2
                                     ]}

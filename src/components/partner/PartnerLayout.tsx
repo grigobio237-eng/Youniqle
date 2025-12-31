@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   LayoutDashboard,
   Package,
   ShoppingCart,
@@ -24,7 +24,8 @@ import {
   DollarSign,
   Megaphone,
   Globe,
-  RotateCcw
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -118,6 +119,12 @@ const navigationItems = [
     description: '상세 매출 분석'
   },
   {
+    name: 'AI 상세페이지 빌더',
+    href: '/partner/ai-builder',
+    icon: Sparkles,
+    description: 'AI싱크클럽 전용 AI 빌더'
+  },
+  {
     name: '설정',
     href: '/partner/settings',
     icon: Settings,
@@ -148,28 +155,28 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
   const checkPartnerAuth = async () => {
     try {
       const response = await fetch('/api/partner/auth/verify');
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('파트너 정보:', data.partner); // 디버깅용
         setPartner(data.partner);
       } else if (response.status === 401) {
         console.log('파트너 토큰 없음, 소셜 로그인 사용자 확인 중...');
-        
+
         // 소셜 로그인 사용자인지 확인
         const sessionResponse = await fetch('/api/auth/session');
         if (sessionResponse.ok) {
           const sessionData = await sessionResponse.json();
           if (sessionData.user) {
             console.log('소셜 로그인 사용자 발견:', sessionData.user);
-            
+
             // 파트너 권한 확인
             const checkResponse = await fetch('/api/partner/auth/check-partner-status');
             const checkData = await checkResponse.json();
-            
+
             if (checkResponse.ok && checkData.isPartner) {
               console.log('파트너 권한 확인됨, 토큰 발급 시작');
-              
+
               // 파트너 토큰 발급
               const tokenResponse = await fetch('/api/partner/auth/social-login', {
                 method: 'POST',
@@ -178,7 +185,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 },
                 body: JSON.stringify({ provider: sessionData.user.provider || 'google' }),
               });
-              
+
               if (tokenResponse.ok) {
                 console.log('파트너 토큰 발급 성공, 재인증 시도');
                 // 토큰 발급 후 다시 인증 확인
@@ -198,7 +205,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
         } else {
           console.log('세션 확인 실패:', sessionResponse.status);
         }
-        
+
         console.log('파트너 권한 확인 실패:', response.status);
         // 파트너 권한이 없으면 로그인 페이지로 리다이렉트
         router.push('/partner/login');
@@ -315,16 +322,15 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b">
@@ -358,9 +364,10 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
                 {partner.avatar ? (
-                  <img 
-                    src={partner.avatar} 
+                  <img
+                    src={partner.avatar}
                     alt={partner.name}
+                    crossOrigin="anonymous"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
@@ -391,24 +398,22 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-secondary text-white'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                    ? 'bg-secondary text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
+                    }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon className="h-5 w-5" />
                   <div className="flex-1">
                     <div>{item.name}</div>
-                    <div className={`text-xs ${
-                      isActive ? 'text-white/80' : 'text-text-secondary'
-                    }`}>
+                    <div className={`text-xs ${isActive ? 'text-white/80' : 'text-text-secondary'
+                      }`}>
                       {item.description}
                     </div>
                   </div>
@@ -431,7 +436,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 <option value="zh">中文</option>
               </select>
             </div>
-            
+
             {/* Logout */}
             <Button
               variant="ghost"

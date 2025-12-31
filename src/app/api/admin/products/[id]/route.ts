@@ -209,6 +209,12 @@ export async function PUT(
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
 
+    // 캐시 무효화 (상품 목록 및 개별 상품)
+    const { cache } = await import('@/lib/cache');
+    await cache.delPattern('products:*');
+    await cache.del(`product:${id}`);
+    console.log(`🗑️ 상품 수정으로 인한 캐시 무효화 완료: ${id}`);
+
     return NextResponse.json({
       message: '상품이 성공적으로 수정되었습니다.',
       product: updatedProduct
@@ -268,45 +274,43 @@ export async function DELETE(
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 이미지 파일들 삭제 (Vercel Blob)
+    // 이미지 파일들 삭제 (Firebase Storage 및 Vercel Blob)
     if (product.images && product.images.length > 0) {
       try {
-        const blobImages = product.images.filter((img: any) =>
-          img.url && img.url.includes('blob.vercel-storage.com')
-        );
+        const { StorageService } = await import('@/lib/storage');
 
-        if (blobImages.length > 0) {
-          const deletePromises = blobImages.map(async (img: any) => {
-            try {
-              // Vercel Blob에서 직접 삭제
-              const { del } = await import('@vercel/blob');
+        // 1. 이미지 배열 내 파일 삭제
+        const deletePromises = product.images.map(async (img: any) => {
+          if (img.url) {
+            await StorageService.deleteFile(img.url);
+          }
+        });
 
-              if (!process.env.BLOB_READ_WRITE_TOKEN) {
-                console.error('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다.');
-                return;
-              }
-
-              await del(img.url, {
-                token: process.env.BLOB_READ_WRITE_TOKEN,
-              });
-
-              console.log(`이미지 삭제 성공: ${img.url}`);
-            } catch (error) {
-              console.error(`이미지 삭제 중 오류: ${img.url}`, error);
-            }
-          });
-
-          await Promise.all(deletePromises);
-          console.log(`관리자 상품 삭제: ${blobImages.length}개 이미지 파일 삭제 완료`);
+        // 2. 상세 설명 HTML 내 이미지 태그 URL 추출 및 삭제
+        if (product.description && product.description.includes('<img')) {
+          const imgRegex = /<img[^>]+src="([^">]+)"/g;
+          let match;
+          while ((match = imgRegex.exec(product.description)) !== null) {
+            const imgSrc = match[1];
+            deletePromises.push(StorageService.deleteFile(imgSrc));
+          }
         }
+
+        await Promise.all(deletePromises);
+        console.log(`✅ 관리자 상품 삭제: 관련 이미지 파일들 정리 완료`);
       } catch (error) {
-        console.error('이미지 삭제 오류:', error);
-        // 이미지 삭제 실패해도 상품은 삭제 진행
+        console.error('이미지 삭제 중 오류 발생:', error);
       }
     }
 
     // 상품 삭제
     await Product.findByIdAndDelete(id);
+
+    // 캐시 무효화
+    const { cache } = await import('@/lib/cache');
+    await cache.delPattern('products:*');
+    await cache.del(`product:${id}`);
+    console.log(`🗑️ 상품 삭제로 인한 캐시 무효화 완료: ${id}`);
 
     return NextResponse.json({
       message: '상품이 성공적으로 삭제되었습니다.'

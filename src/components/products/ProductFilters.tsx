@@ -13,6 +13,7 @@ const categories = [
   { name: '활력/에너지', value: 'energy' },
   { name: '영양/보충', value: 'nutrition' },
   { name: '측정/진단', value: 'diagnostic' },
+  { name: '회복 펀딩', value: 'funding' },
   { name: '오마카세 (Premium)', value: 'omakase' },
 ];
 
@@ -28,6 +29,7 @@ interface ProductFiltersProps {
     q?: string;
     category?: string;
     sort?: string;
+    isFunding?: string;
   };
 }
 
@@ -40,9 +42,18 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
     if (searchParams?.q) params.set('q', searchParams.q);
     if (searchParams?.category) params.set('category', searchParams.category);
     if (searchParams?.sort) params.set('sort', searchParams.sort);
+    if (searchParams?.isFunding) params.set('isFunding', searchParams.isFunding);
 
-    if (value) params.set(key, value);
-    else params.delete(key);
+    if (key === 'category' && value === 'funding') {
+      params.delete('category');
+      params.set('isFunding', 'true');
+    } else if (key === 'category') {
+      params.set('category', value);
+      params.delete('isFunding');
+    } else {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    }
 
     return `/products?${params.toString()}`;
   };
@@ -63,7 +74,12 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
         {showCategories && (
           <div className="flex flex-col gap-1.5 pt-2">
             {categories.map((category) => {
-              const isActive = (searchParams?.category || '') === category.value;
+              let isActive = false;
+              if (category.value === 'funding') {
+                isActive = searchParams?.isFunding === 'true';
+              } else {
+                isActive = (searchParams?.category || '') === category.value && searchParams?.isFunding !== 'true';
+              }
               return (
                 <Link
                   key={category.value}
@@ -72,8 +88,8 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
                 >
                   <div
                     className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${isActive
-                        ? 'bg-primary text-background border-primary'
-                        : 'bg-transparent text-text-secondary border-transparent hover:border-line hover:text-text-primary'
+                      ? 'bg-primary text-background border-primary'
+                      : 'bg-transparent text-text-secondary border-transparent hover:border-line hover:text-text-primary'
                       }`}
                   >
                     {category.name}
@@ -108,8 +124,8 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
                 >
                   <div
                     className={`px-4 py-2 text-sm font-medium transition-all ${isActive
-                        ? 'text-primary'
-                        : 'text-text-secondary hover:text-text-primary'
+                      ? 'text-primary'
+                      : 'text-text-secondary hover:text-text-primary'
                       }`}
                   >
                     {option.name}
@@ -122,7 +138,7 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
       </div>
 
       {/* Clear Filters */}
-      {(searchParams?.category || searchParams?.sort) && (
+      {(searchParams?.category || searchParams?.sort || searchParams?.isFunding) && (
         <div className="pt-6 border-t border-line">
           <Button variant="outline" size="sm" className="w-full rounded-xl border-line text-text-secondary hover:bg-white/5 font-bold" asChild>
             <Link href="/products">필터 초기화</Link>

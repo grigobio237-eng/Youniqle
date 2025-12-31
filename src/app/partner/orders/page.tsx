@@ -7,14 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Search, 
-  Filter, 
-  Eye, 
-  Package, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
+import {
+  Search,
+  Filter,
+  Eye,
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
   XCircle,
   Download
 } from 'lucide-react';
@@ -126,7 +126,7 @@ export default function PartnerOrdersPage() {
       const response = await fetch('/api/partner/orders', {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setOrders(data.orders || []);
@@ -285,14 +285,14 @@ export default function PartnerOrdersPage() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.customer.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     const matchesPaymentStatus = paymentStatusFilter === 'all' || order.paymentStatus === paymentStatusFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPaymentStatus;
   });
 
@@ -407,7 +407,7 @@ export default function PartnerOrdersPage() {
                           {paymentStatusLabels[order.paymentStatus]}
                         </Badge>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
@@ -434,6 +434,7 @@ export default function PartnerOrdersPage() {
                               <img
                                 src={item.image}
                                 alt={item.productName}
+                                crossOrigin="anonymous"
                                 className="w-12 h-12 object-cover rounded"
                               />
                               <div className="flex-1">
@@ -480,7 +481,7 @@ export default function PartnerOrdersPage() {
                         <Eye className="h-4 w-4 mr-2" />
                         상세보기
                       </Button>
-                      
+
                       {/* 동적으로 상태 변경 버튼 생성 (파트너 권한) */}
                       {['confirmed', 'preparing', 'shipped', 'delivered'].map((status) => {
                         if (canTransitionTo(order.status, status, 'partner')) {
@@ -578,6 +579,7 @@ export default function PartnerOrdersPage() {
                       <img
                         src={item.image}
                         alt={item.productName}
+                        crossOrigin="anonymous"
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div className="flex-1">

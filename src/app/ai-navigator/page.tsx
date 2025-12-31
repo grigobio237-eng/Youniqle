@@ -8,12 +8,16 @@ import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 export default function AiNavigatorPage() {
     const [scoreHistory, setScoreHistory] = React.useState<any[]>([]);
     const [todayScore, setTodayScore] = React.useState(0);
     const [loading, setLoading] = useState(true);
     const [aiAdvice, setAiAdvice] = useState<string>('');
+    const [tomorrowForecast, setTomorrowForecast] = useState<any>(null);
+    const [isForecastOpen, setIsForecastOpen] = useState(false);
 
     useEffect(() => {
         const mockData = [
@@ -44,6 +48,7 @@ export default function AiNavigatorPage() {
                 if (response.ok) {
                     const data = await response.json();
                     setAiAdvice(data.comment);
+                    setTomorrowForecast(data.tomorrowForecast);
                 }
             } catch (e) {
                 console.error("AI Fetch Error", e);
@@ -118,26 +123,25 @@ export default function AiNavigatorPage() {
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Zap className="w-5 h-5 fill-current" />
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight">오늘의 1분 처방</h2>
+                                    <h2 className="text-2xl font-black tracking-tight">AI 회복 전략 가이드</h2>
                                 </div>
 
                                 <Card className="bg-surface border-line border-l-4 border-l-primary overflow-hidden group">
                                     <CardContent className="p-10 space-y-6">
                                         <div className="space-y-2">
-                                            <div className="text-xs font-bold text-primary tracking-widest uppercase">Immediate Action</div>
+                                            <div className="text-xs font-bold text-primary tracking-widest uppercase">Analysis Report</div>
                                             <h3 className="text-3xl font-black text-text-primary">
-                                                기상 직후, 온수 <span className="text-primary">200ml</span>를 천천히 음미하며 마시세요.
+                                                {aiAdvice || '데이터를 분석 중입니다...'}
                                             </h3>
                                         </div>
                                         <p className="text-text-secondary text-lg font-medium leading-relaxed opacity-80">
-                                            오늘 당신의 체내 수분 밀도가 낮게 감지되었습니다.
-                                            급격한 각성보다는 부드러운 순환을 통해 신진대사를 깨우는 것이 오늘의 핵심 회복 전략입니다.
+                                            오늘의 분석 결과, 당신의 회복 패턴은 안정적이지만 특정 영역에서의 보충이 필요해 보입니다.
+                                            자세한 실천 방법은 '행동 조언' 탭에서 확인하실 수 있습니다.
                                         </p>
                                         <div className="pt-4">
-                                            <div className="flex items-center gap-4 p-4 rounded-3xl bg-background/50 border border-line">
-                                                <Checkbox id="action-1" className="w-6 h-6 border-2 border-primary data-[state=checked]:bg-primary" />
-                                                <label htmlFor="action-1" className="text-lg font-bold text-text-primary cursor-pointer select-none">지금 수행 완료</label>
-                                            </div>
+                                            <Button asChild className="h-14 bg-primary text-background font-black rounded-2xl px-10">
+                                                <Link href="/ai-advice">실전 행동 조언 받기 <ArrowRight className="w-5 h-5 ml-2" /></Link>
+                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -191,14 +195,17 @@ export default function AiNavigatorPage() {
                                     <h2 className="text-2xl font-black tracking-tight">내일의 예보</h2>
                                 </div>
 
-                                <Card className="bg-surface/30 border-dashed border-2 border-line rounded-[32px]">
+                                <Card className="bg-surface/30 border-dashed border-2 border-line rounded-[32px] hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => setIsForecastOpen(true)}>
                                     <CardContent className="p-10 flex items-center justify-between">
                                         <div className="space-y-2">
                                             <div className="text-xs font-bold text-text-secondary opacity-50 uppercase tracking-widest">Next Schedule</div>
-                                            <h4 className="text-xl font-black text-text-primary/70">내일 오전 08:30 분석 업데이트</h4>
+                                            <h4 className="text-xl font-black text-text-primary/70 group-hover:text-primary transition-colors">내일 오전 08:30 분석 업데이트</h4>
                                             <p className="text-sm text-text-secondary font-medium">숙면 데이터를 바탕으로 내일의 회복 전략이 수립됩니다.</p>
+                                            <Link href="/utils?tool=sleep" className="inline-block pt-2 text-xs font-black text-primary hover:underline underline-offset-4">
+                                                지금 숙면 데이터 입력하기 →
+                                            </Link>
                                         </div>
-                                        <Button size="icon" variant="outline" className="rounded-full w-12 h-12 border-line text-text-secondary opacity-40">
+                                        <Button size="icon" variant="outline" className="rounded-full w-12 h-12 border-line text-text-secondary opacity-40 group-hover:opacity-100 group-hover:bg-primary group-hover:text-background transition-all">
                                             <ChevronRight />
                                         </Button>
                                     </CardContent>
@@ -207,7 +214,87 @@ export default function AiNavigatorPage() {
                         </div>
                     </div>
                 </section>
+
+                <ForecastModal
+                    open={isForecastOpen}
+                    onOpenChange={setIsForecastOpen}
+                    forecast={tomorrowForecast}
+                />
             </div>
         </ChapterWrapper>
+    );
+}
+
+function ForecastModal({ open, onOpenChange, forecast }: { open: boolean, onOpenChange: (open: boolean) => void, forecast: any }) {
+    if (!forecast) return null;
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+                <div className="relative">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>내일의 회복 예보</DialogTitle>
+                        <DialogDescription>AI가 분석한 당신의 내일 컨디션입니다.</DialogDescription>
+                    </DialogHeader>
+
+                    <div className="h-48 bg-gradient-to-br from-obsidian to-primary/20 flex flex-col items-center justify-center relative overflow-hidden p-8">
+                        <div className="absolute inset-0 opacity-10">
+                            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <circle cx="50" cy="50" r="40" fill="white" />
+                            </svg>
+                        </div>
+                        <div className="relative z-10 flex flex-col items-center text-center">
+                            <div className="text-4xl mb-2">🔭</div>
+                            <h2 className="text-2xl font-black text-primary tracking-tighter uppercase">{forecast.status}</h2>
+                        </div>
+                    </div>
+
+                    <div className="p-10 space-y-8">
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black tracking-widest uppercase px-2">Prediction</Badge>
+                                <div className="text-xs font-bold text-text-secondary opacity-40 uppercase tracking-widest">Energy Level</div>
+                            </div>
+
+                            <div className="flex items-end gap-3">
+                                <span className="text-5xl font-black text-text-primary tracking-tighter">{forecast.energyLevel}</span>
+                                <span className="text-xl font-bold text-text-secondary opacity-40 mb-1.5">%</span>
+                            </div>
+
+                            <div className="h-2 bg-line rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-primary transition-all duration-1000 ease-out"
+                                    style={{ width: `${forecast.energyLevel}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="bg-background/50 border border-line p-6 rounded-[24px]">
+                            <p className="text-text-primary font-medium leading-relaxed opacity-80 italic">
+                                "{forecast.description}"
+                            </p>
+                        </div>
+
+                        <div className="space-y-4 pt-2">
+                            <div className="flex items-center gap-3 text-xs font-bold text-text-secondary uppercase tracking-widest opacity-40">
+                                <Calendar className="w-4 h-4" />
+                                Analysis Methodology
+                            </div>
+                            <p className="text-[11px] text-text-secondary leading-relaxed">
+                                오늘 측정된 5가지 핵심 지표와 최근 7일간의 누적 데이터를 상관관계 분석 모델에 대입하여 도출되었습니다.
+                                내일 아침의 수면 데이터가 통합되면 실시간으로 예측치가 보정됩니다.
+                            </p>
+                        </div>
+
+                        <Button
+                            className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black shadow-xl"
+                            onClick={() => onOpenChange(false)}
+                        >
+                            확인 완료
+                        </Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }

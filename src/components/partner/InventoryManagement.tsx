@@ -6,11 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Package, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Package,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   TrendingUp,
   TrendingDown,
   Edit,
@@ -85,7 +85,7 @@ export default function InventoryManagement() {
       const response = await fetch('/api/partner/inventory', {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setInventory(data.inventory || []);
@@ -293,6 +293,7 @@ export default function InventoryManagement() {
                   <img
                     src={item.image}
                     alt={item.productName}
+                    crossOrigin="anonymous"
                     className="w-16 h-16 object-cover rounded-lg"
                   />
                   <div>

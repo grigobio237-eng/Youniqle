@@ -37,6 +37,13 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "ai싱크클럽-상세페이지-&-썸네일-빌더",
+    "나이스페이 샘플",
+    "n8n-data",
+    "n8n-data-backup",
+    "playwright-report",
+    "test-results",
+    "coverage"
   ]
 }

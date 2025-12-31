@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import PartnerLayout from '@/components/partner/PartnerLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,8 +20,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus, Edit, Trash2, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Sparkles } from 'lucide-react';
 import ImageManager from '@/components/products/ImageManager';
+import ProductDescriptionEditor from '@/components/admin/ProductDescriptionEditor';
 import { toast } from 'sonner';
 import { PRODUCT_CATEGORIES } from '@/constants/categories';
 
@@ -90,6 +92,7 @@ function PartnerProductsContent() {
     category: '',
     summary: '',
     description: '',
+    descriptionIsHtml: false,
     images: [] as Array<{
       url: string;
       w?: number;
@@ -448,6 +451,7 @@ function PartnerProductsContent() {
       category: '',
       summary: '',
       description: '',
+      descriptionIsHtml: false,
       images: [],
       featured: false,
       isFunding: false,
@@ -491,6 +495,7 @@ function PartnerProductsContent() {
       category: product.category,
       summary: product.summary,
       description: product.description,
+      descriptionIsHtml: (product as any).descriptionIsHtml || false,
       images: product.images || [],
       featured: product.featured,
       isFunding: product.isFunding || false,
@@ -721,14 +726,28 @@ function PartnerProductsContent() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="description">상품 설명 *</Label>
-                <Textarea
-                  id="description"
+              <div className="space-y-2">
+                <Label htmlFor="description">상세 설명 *</Label>
+                <div className="flex items-center space-x-2 mb-2">
+                  <Link href="/partner/ai-builder">
+                    <Button type="button" variant="outline" size="sm" className="text-blue-600 border-blue-200 bg-blue-50">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      AI로 상세페이지 만들기
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-gray-500">이미지가 준비되었다면 AI 빌더를 추천합니다!</p>
+                </div>
+                <ProductDescriptionEditor
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  rows={4}
-                  required
+                  onChange={(val) => setFormData(prev => ({ ...prev, description: val }))}
+                  isHtml={formData.descriptionIsHtml}
+                  onIsHtmlChange={(isHtml) => setFormData(prev => ({ ...prev, descriptionIsHtml: isHtml }))}
+                  productContext={{
+                    name: formData.name,
+                    category: formData.category,
+                    price: formData.price,
+                    images: formData.images
+                  }}
                 />
               </div>
 
@@ -774,6 +793,7 @@ function PartnerProductsContent() {
                   <img
                     src={product.images[0].url}
                     alt={product.name}
+                    crossOrigin="anonymous"
                     className="w-full h-full object-cover"
                   />
                 ) : (

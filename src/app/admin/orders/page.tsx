@@ -6,14 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Search, 
-  Filter, 
-  Eye, 
-  Package, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
+import {
+  Search,
+  Filter,
+  Eye,
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
   XCircle,
   Download,
   Users,
@@ -115,6 +115,7 @@ export default function AdminOrdersPage() {
   const [activeView, setActiveView] = useState<'list' | 'analytics'>('list');
   const [stats, setStats] = useState({
     totalOrders: 0,
+    totalAttempts: 0,
     totalRevenue: 0,
     pendingOrders: 0,
     completedOrders: 0
@@ -153,7 +154,7 @@ export default function AdminOrdersPage() {
       const response = await fetch('/api/admin/orders', {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setOrders(data.orders || []);
@@ -173,7 +174,7 @@ export default function AdminOrdersPage() {
       const response = await fetch('/api/admin/orders/stats', {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -394,14 +395,14 @@ export default function AdminOrdersPage() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch =
+      (order.orderNumber?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (order.customer?.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (order.customer?.email?.toLowerCase() || '').includes(searchQuery.toLowerCase());
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     const matchesPaymentStatus = paymentStatusFilter === 'all' || order.paymentStatus === paymentStatusFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPaymentStatus;
   });
 
@@ -427,130 +428,143 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">주문 관리</h1>
-            <p className="text-gray-600 mt-1">전체 주문을 관리하고 처리하세요</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant={activeView === 'list' ? 'default' : 'outline'}
-              onClick={() => setActiveView('list')}
-            >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              주문 목록
-            </Button>
-            <Button
-              variant={activeView === 'analytics' ? 'default' : 'outline'}
-              onClick={() => setActiveView('analytics')}
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              분석 대시보드
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => setIsDownloadDialogOpen(true)}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              주문 내역 다운로드
-            </Button>
-            {selectedOrders.size > 0 && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setBulkActionType('status');
-                    setIsBulkActionDialogOpen(true);
-                  }}
-                >
-                  일괄 상태 변경 ({selectedOrders.size})
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setBulkActionType('tracking');
-                    setIsBulkActionDialogOpen(true);
-                  }}
-                >
-                  일괄 송장 입력 ({selectedOrders.size})
-                </Button>
-              </>
-            )}
-          </div>
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">주문 관리</h1>
+          <p className="text-gray-600 mt-1">전체 주문을 관리하고 처리하세요</p>
         </div>
-
-        {/* 분석 대시보드 */}
-        {activeView === 'analytics' && <OrderAnalytics />}
-
-        {/* 주문 목록 */}
-        {activeView === 'list' && (
-          <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <ShoppingCart className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">총 주문</p>
-                  <p className="text-2xl font-bold">{stats.totalOrders}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">총 매출</p>
-                  <p className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Clock className="h-6 w-6 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">처리 대기</p>
-                  <p className="text-2xl font-bold">{stats.pendingOrders}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <CheckCircle className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">완료된 주문</p>
-                  <p className="text-2xl font-bold">{stats.completedOrders}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex gap-2">
+          <Button
+            variant={activeView === 'list' ? 'default' : 'outline'}
+            onClick={() => setActiveView('list')}
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            주문 목록
+          </Button>
+          <Button
+            variant={activeView === 'analytics' ? 'default' : 'outline'}
+            onClick={() => setActiveView('analytics')}
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            분석 대시보드
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsDownloadDialogOpen(true)}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            주문 내역 다운로드
+          </Button>
+          {selectedOrders.size > 0 && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setBulkActionType('status');
+                  setIsBulkActionDialogOpen(true);
+                }}
+              >
+                일괄 상태 변경 ({selectedOrders.size})
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setBulkActionType('tracking');
+                  setIsBulkActionDialogOpen(true);
+                }}
+              >
+                일괄 송장 입력 ({selectedOrders.size})
+              </Button>
+            </>
+          )}
         </div>
+      </div>
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
+      {/* 분석 대시보드 */}
+      {activeView === 'analytics' && <OrderAnalytics />}
+
+      {/* 주문 목록 */}
+      {activeView === 'list' && (
+        <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <ShoppingCart className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-xs font-medium text-gray-500">총 주문 (결제)</p>
+                    <p className="text-xl font-bold">{stats.totalOrders}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-xs font-medium text-gray-500">주문 시도</p>
+                    <p className="text-xl font-bold">{stats.totalAttempts || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-xs font-medium text-gray-500">총 매출</p>
+                    <p className="text-xl font-bold">₩{stats.totalRevenue.toLocaleString()}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-xs font-medium text-gray-500">처리 대기</p>
+                    <p className="text-xl font-bold">{stats.pendingOrders}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-xs font-medium text-gray-500">완료된 주문</p>
+                    <p className="text-xl font-bold">{stats.completedOrders}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     placeholder="주문번호, 고객명, 이메일로 검색..."
@@ -559,226 +573,230 @@ export default function AdminOrdersPage() {
                     className="pl-10"
                   />
                 </div>
-              </div>
-              <div className="flex gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="주문 상태" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">전체 상태</SelectItem>
-                    <SelectItem value="pending">주문 대기</SelectItem>
-                    <SelectItem value="confirmed">주문 확인</SelectItem>
-                    <SelectItem value="preparing">상품 준비중</SelectItem>
-                    <SelectItem value="shipped">배송중</SelectItem>
-                    <SelectItem value="delivered">배송완료</SelectItem>
-                    <SelectItem value="cancelled">주문 취소</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="결제 상태" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">전체 결제</SelectItem>
-                    <SelectItem value="pending">결제 대기</SelectItem>
-                    <SelectItem value="paid">결제완료</SelectItem>
-                    <SelectItem value="failed">결제실패</SelectItem>
-                    <SelectItem value="refunded">환불완료</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Orders List */}
-        <div className="space-y-4">
-          {filteredOrders.length > 0 && (
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSelectAll}
-                    >
-                      {selectedOrders.size === filteredOrders.length ? (
-                        <CheckSquare className="h-4 w-4 mr-2" />
-                      ) : (
-                        <Square className="h-4 w-4 mr-2" />
-                      )}
-                      전체 선택
-                    </Button>
-                    <span className="text-sm text-gray-600">
-                      {selectedOrders.size}개 선택됨
-                    </span>
-                  </div>
-                  {selectedOrders.size > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedOrders(new Set())}
-                    >
-                      선택 해제
-                    </Button>
-                  )}
+                <div className="flex gap-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="주문 상태" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">전체 상태</SelectItem>
+                      <SelectItem value="pending">주문 대기</SelectItem>
+                      <SelectItem value="confirmed">주문 확인</SelectItem>
+                      <SelectItem value="preparing">상품 준비중</SelectItem>
+                      <SelectItem value="shipped">배송중</SelectItem>
+                      <SelectItem value="delivered">배송완료</SelectItem>
+                      <SelectItem value="cancelled">주문 취소</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="결제 상태" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">전체 결제</SelectItem>
+                      <SelectItem value="pending">결제 대기</SelectItem>
+                      <SelectItem value="paid">결제완료</SelectItem>
+                      <SelectItem value="failed">결제실패</SelectItem>
+                      <SelectItem value="refunded">환불완료</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-          {filteredOrders.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12">
-                <ShoppingCart className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">주문이 없습니다</h3>
-                <p className="text-gray-600">아직 주문된 상품이 없습니다.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            filteredOrders.map((order) => (
-              <Card key={order._id}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* 체크박스 */}
-                    <div className="flex items-start">
-                      <Checkbox
-                        checked={selectedOrders.has(order._id)}
-                        onCheckedChange={() => handleSelectOrder(order._id)}
-                        className="mt-1"
-                      />
-                    </div>
-                    {/* Order Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <h3 className="text-lg font-semibold">{order.orderNumber}</h3>
-                        <Badge className={statusColors[order.status]}>
-                          {getStatusIcon(order.status)}
-                          <span className="ml-1">{statusLabels[order.status]}</span>
-                        </Badge>
-                        <Badge className={paymentStatusColors[order.paymentStatus]}>
-                          {paymentStatusLabels[order.paymentStatus]}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
-                          <p className="text-sm text-gray-600">{order.customer.name}</p>
-                          <p className="text-sm text-gray-600">{order.customer.email}</p>
-                          <p className="text-sm text-gray-600">{order.customer.phone}</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
-                          <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
-                          <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
-                          <p className="text-sm text-gray-600">
-                            {order.shippingAddress.address} {order.shippingAddress.detail}
-                          </p>
-                        </div>
-                      </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                      {/* Order Items */}
-                      <div className="mb-4">
-                        <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
-                        <div className="space-y-2">
-                          {order.items.map((item, index) => (
-                            <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                              <img
-                                src={item.image}
-                                alt={item.productName}
-                                className="w-12 h-12 object-cover rounded"
-                              />
-                              <div className="flex-1">
-                                <p className="font-medium">{item.productName}</p>
-                                <p className="text-sm text-gray-600">
-                                  {item.quantity}개 × ₩{item.price.toLocaleString()}
-                                </p>
-                                {item.partnerName && (
-                                  <p className="text-xs text-blue-600">파트너: {item.partnerName}</p>
-                                )}
-                              </div>
-                              <p className="font-semibold">
-                                ₩{(item.quantity * item.price).toLocaleString()}
+          {/* Orders List */}
+          < div className="space-y-4" >
+            {
+              filteredOrders.length > 0 && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSelectAll}
+                        >
+                          {selectedOrders.size === filteredOrders.length ? (
+                            <CheckSquare className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Square className="h-4 w-4 mr-2" />
+                          )}
+                          전체 선택
+                        </Button>
+                        <span className="text-sm text-gray-600">
+                          {selectedOrders.size}개 선택됨
+                        </span>
+                      </div>
+                      {selectedOrders.size > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedOrders(new Set())}
+                        >
+                          선택 해제
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            }
+            {
+              filteredOrders.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <ShoppingCart className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">주문이 없습니다</h3>
+                    <p className="text-gray-600">아직 주문된 상품이 없습니다.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredOrders.map((order) => (
+                  <Card key={order._id}>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        {/* 체크박스 */}
+                        <div className="flex items-start">
+                          <Checkbox
+                            checked={selectedOrders.has(order._id)}
+                            onCheckedChange={() => handleSelectOrder(order._id)}
+                            className="mt-1"
+                          />
+                        </div>
+                        {/* Order Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4 mb-3">
+                            <h3 className="text-lg font-semibold">{order.orderNumber}</h3>
+                            <Badge className={statusColors[order.status]}>
+                              {getStatusIcon(order.status)}
+                              <span className="ml-1">{statusLabels[order.status]}</span>
+                            </Badge>
+                            <Badge className={paymentStatusColors[order.paymentStatus]}>
+                              {paymentStatusLabels[order.paymentStatus]}
+                            </Badge>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
+                              <p className="text-sm text-gray-600">{order.customer.name}</p>
+                              <p className="text-sm text-gray-600">{order.customer.email}</p>
+                              <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
+                              <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
+                              <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
+                              <p className="text-sm text-gray-600">
+                                {order.shippingAddress.address} {order.shippingAddress.detail}
                               </p>
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
-                          주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}
-                        </div>
-                        <div className="text-lg font-bold text-primary">
-                          총 ₩{order.totalAmount.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
+                          {/* Order Items */}
+                          <div className="mb-4">
+                            <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
+                            <div className="space-y-2">
+                              {order.items.map((item, index) => (
+                                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                  <img
+                                    src={item.image}
+                                    alt={item.productName}
+                                    className="w-12 h-12 object-cover rounded"
+                                  />
+                                  <div className="flex-1">
+                                    <p className="font-medium">{item.productName}</p>
+                                    <p className="text-sm text-gray-600">
+                                      {item.quantity}개 × ₩{item.price.toLocaleString()}
+                                    </p>
+                                    {item.partnerName && (
+                                      <p className="text-xs text-blue-600">파트너: {item.partnerName}</p>
+                                    )}
+                                  </div>
+                                  <p className="font-semibold">
+                                    ₩{(item.quantity * item.price).toLocaleString()}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
 
-                    {/* 송장 정보 표시 */}
-                    {(order.status === 'shipped' || order.status === 'delivered') && (
-                      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Truck className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-semibold text-blue-900">배송 정보</span>
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-600">
+                              주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}
+                            </div>
+                            <div className="text-lg font-bold text-primary">
+                              총 ₩{order.totalAmount.toLocaleString()}
+                            </div>
+                          </div>
                         </div>
-                        {order.trackingNumber ? (
-                          <div className="text-sm text-blue-800">
-                            <p>택배사: {order.courierCompany || '미입력'}</p>
-                            <p>송장번호: {order.trackingNumber}</p>
-                            {order.shippedAt && (
-                              <p className="text-xs text-gray-600">
-                                배송일: {new Date(order.shippedAt).toLocaleDateString('ko-KR')}
-                              </p>
+
+                        {/* 송장 정보 표시 */}
+                        {(order.status === 'shipped' || order.status === 'delivered') && (
+                          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Truck className="h-4 w-4 text-blue-600" />
+                              <span className="text-sm font-semibold text-blue-900">배송 정보</span>
+                            </div>
+                            {order.trackingNumber ? (
+                              <div className="text-sm text-blue-800">
+                                <p>택배사: {order.courierCompany || '미입력'}</p>
+                                <p>송장번호: {order.trackingNumber}</p>
+                                {order.shippedAt && (
+                                  <p className="text-xs text-gray-600">
+                                    배송일: {new Date(order.shippedAt).toLocaleDateString('ko-KR')}
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-blue-700">송장 정보가 등록되지 않았습니다.</p>
                             )}
                           </div>
-                        ) : (
-                          <p className="text-sm text-blue-700">송장 정보가 등록되지 않았습니다.</p>
                         )}
-                      </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="flex flex-col gap-2 lg:w-48">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => handleViewDetail(order)}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        상세보기
-                      </Button>
-                      
-                      {/* 동적으로 상태 변경 버튼 생성 */}
-                      {['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'].map((status) => {
-                        if (canTransitionTo(order.status, status, 'admin')) {
-                          const statusInfo = STATUS_INFO[status as keyof typeof STATUS_INFO];
-                          return (
-                            <Button
-                              key={status}
-                              size="sm"
-                              variant={status === 'cancelled' ? 'destructive' : 'default'}
-                              onClick={() => handleStatusUpdate(order._id, status)}
-                              className="w-full"
-                            >
-                              {statusInfo.label}
-                            </Button>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-          </>
-        )}
+                        {/* Actions */}
+                        <div className="flex flex-col gap-2 lg:w-48">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => handleViewDetail(order)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            상세보기
+                          </Button>
+
+                          {/* 동적으로 상태 변경 버튼 생성 */}
+                          {['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'].map((status) => {
+                            if (canTransitionTo(order.status, status, 'admin')) {
+                              const statusInfo = STATUS_INFO[status as keyof typeof STATUS_INFO];
+                              return (
+                                <Button
+                                  key={status}
+                                  size="sm"
+                                  variant={status === 'cancelled' ? 'destructive' : 'default'}
+                                  onClick={() => handleStatusUpdate(order._id, status)}
+                                  className="w-full"
+                                >
+                                  {statusInfo.label}
+                                </Button>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )
+            }
+          </div >
+        </>
+      )
+      }
 
       {/* 주문 상세 다이얼로그 */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
@@ -799,14 +817,14 @@ export default function AdminOrdersPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">주문 상태</h4>
-                  <Badge className={statusColors[selectedOrder.status]}>
-                    {statusLabels[selectedOrder.status]}
+                  <Badge className={statusColors[selectedOrder.status as keyof typeof statusColors]}>
+                    {statusLabels[selectedOrder.status as keyof typeof statusLabels]}
                   </Badge>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">결제 상태</h4>
-                  <Badge className={paymentStatusColors[selectedOrder.paymentStatus]}>
-                    {paymentStatusLabels[selectedOrder.paymentStatus]}
+                  <Badge className={paymentStatusColors[selectedOrder.paymentStatus as keyof typeof paymentStatusColors]}>
+                    {paymentStatusLabels[selectedOrder.paymentStatus as keyof typeof paymentStatusLabels]}
                   </Badge>
                 </div>
                 <div>
@@ -1118,6 +1136,6 @@ export default function AdminOrdersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 }

@@ -170,11 +170,13 @@ export default function ProductDetailPage() {
                     <Card className="overflow-hidden">
                         <div className="aspect-square relative bg-gray-100">
                             {product.images?.[0] ? (
+                                // 이미지 URL에 ?v=1을 추가하고 속성을 crossorigin(소문자)으로 통일
                                 <Image
-                                    src={product.images[0].url}
+                                    src={`${product.images[0].url}?v=1`}
                                     alt={product.name}
                                     fill
                                     className="object-cover"
+                                    crossOrigin="anonymous"
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center text-gray-400">
@@ -286,9 +288,10 @@ export default function ProductDetailPage() {
 
                             <div>
                                 <h4 className="font-medium text-gray-900 mb-2">상세 설명</h4>
-                                <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border min-h-[150px] whitespace-pre-wrap text-sm text-gray-700">
-                                    {product.description}
-                                </div>
+                                <div
+                                    className="prose max-w-none bg-white p-6 rounded-lg border min-h-[150px] text-sm text-gray-700"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                />
                             </div>
                         </CardContent>
                     </Card>
