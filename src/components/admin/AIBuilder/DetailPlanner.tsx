@@ -313,7 +313,11 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
             // 썸네일을 제외한 나머지(상세 이미지)들을 설명 HTML에 포함
             const detailedImageUrls = imageUrls.slice(1);
             const descriptionHtml = detailedImageUrls
-                .map((url, idx) => `<img src="${url}?v=1" alt="${info.name}_detail_${idx + 1}" crossorigin="anonymous" style="max-width: 100%; display: block; margin: 0 auto;" />`)
+                .map((url, idx) => {
+                    // Firebase Storage URL(이미 ?token= 포함)과 v=1 파라미터 안전하게 결합
+                    const separator = url.includes('?') ? '&' : '?';
+                    return `<img src="${url}${separator}v=1" alt="${info.name}_detail_${idx + 1}" crossorigin="anonymous" style="max-width: 100%; display: block; margin: 0 auto;" />`;
+                })
                 .join('');
 
             const slug = info.name

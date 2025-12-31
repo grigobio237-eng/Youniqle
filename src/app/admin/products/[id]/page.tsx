@@ -172,7 +172,7 @@ export default function ProductDetailPage() {
                             {product.images?.[0] ? (
                                 // 이미지 URL에 ?v=1을 추가하고 속성을 crossorigin(소문자)으로 통일
                                 <Image
-                                    src={`${product.images[0].url}?v=1`}
+                                    src={product.images[0].url.includes('?') ? `${product.images[0].url}&v=1` : `${product.images[0].url}?v=1`}
                                     alt={product.name}
                                     fill
                                     className="object-cover"
