@@ -66,6 +66,30 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'k.kakaocdn.net', // 카카오 프로필 이미지
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'th-p.kakaocdn.net', // 카카오 프로필 썸네일
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.kakaocdn.net', // 카카오 모든 이미지 서브도메인 (HTTPS)
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: '*.kakaocdn.net', // 카카오 모든 이미지 서브도메인 (HTTP)
+        port: '',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
