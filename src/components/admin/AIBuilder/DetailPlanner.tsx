@@ -7,6 +7,8 @@ import ImageUploader from './ImageUploader';
 import { removeBackground } from '@imgly/background-removal';
 import { Download, RefreshCw } from 'lucide-react';
 
+import html2canvas from 'html2canvas';
+
 // Types (Synchronized with AI Studio)
 enum PageLength {
     AUTO = 'auto',
@@ -409,6 +411,44 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
         }
     };
 
+    const handleDownloadAsImage = async () => {
+        const element = document.getElementById('detail-page-container');
+        if (!element) return;
+
+        const tid = toast.loading('이미지로 변환 중 (대용량 이미지는 시간이 걸릴 수 있습니다)...');
+        try {
+            // 모든 이미지의 로딩을 보장하기 위해 잠시 대기
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const canvas = await html2canvas(element, {
+                useCORS: true,
+                allowTaint: false,
+                scale: 2, // 고해상도 품질
+                logging: true, // 디버깅을 위해 일시적 활성화
+                backgroundColor: '#ffffff',
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById('detail-page-container');
+                    if (clonedElement) {
+                        clonedElement.style.height = 'auto';
+                        clonedElement.style.overflow = 'visible';
+                    }
+                }
+            });
+
+            const image = canvas.toDataURL('image/png', 1.0);
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = `${info.name}_상세페이지_전체_${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success('다운로드 완료!', { id: tid });
+        } catch (error: any) {
+            console.error('Download failed:', error);
+            toast.error(`이미지 변환 실패: ${error.message || '알 수 없는 오류'}`, { id: tid });
+        }
+    };
+
     const handleDownloadAll = () => {
         segments.forEach((seg, index) => {
             if (seg.imageUrl) {
@@ -689,27 +729,21 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 기획 수정
                             </button>
                             <button
-                                className="px-5 py-2 bg-slate-800 text-white text-sm font-bold rounded-lg hover:bg-black transition-all flex items-center gap-2"
-                                onClick={handleDownloadAll}
-                            >
-                                <Download size={16} /> 전체 이미지 다운로드
-                            </button>
-                            <button
                                 className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
-                                onClick={() => window.print()}
+                                onClick={handleDownloadAsImage}
                             >
-                                📄 PDF로 저장
+                                <Download size={16} /> 상세 이미지 다운로드
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 print-image-container">
+                    <div id="detail-page-container" className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 print-image-container">
                         {segments.map((seg) => (
                             <div key={seg.id} className="relative w-full aspect-[9/16] bg-slate-100 group">
                                 {seg.imageUrl ? (
                                     <>
                                         <img
-                                            src={seg.imageUrl}
+                                            src={seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`}
                                             alt={seg.title}
                                             className="w-full h-full object-cover block"
                                             crossOrigin="anonymous"

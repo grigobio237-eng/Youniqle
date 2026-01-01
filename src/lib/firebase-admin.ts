@@ -7,67 +7,38 @@ import * as admin from 'firebase-admin';
 const getApp = () => {
     if (admin.apps.length) return admin.app();
 
-    const projectId = (process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)?.trim();
+    const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-    const b64Input = process.env.FIREBASE_PRIVATE_KEY_B64?.trim();
-    const rawInput = process.env.FIREBASE_PRIVATE_KEY?.trim();
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (!projectId || !clientEmail || !privateKey) {
+        console.error('[Firebase Admin] 필수 정보(ProjectID, ClientEmail, PrivateKey)가 누락되었습니다.');
+        return null;
+    }
 
     try {
-        let sourceKey = "";
+        // 환경 변수에서 개행 문자(\n)가 문자열 그대로 들어오는 경우 대응
+        privateKey = privateKey.replace(/\\n/g, '\n');
 
-        if (b64Input) {
-            console.log('[Firebase Admin] Base64 데이터를 처리 중입니다.');
-
-            // [Ultimate Repair] 
-            // 1. URL-Safe Base64 대응 ( - -> + , _ -> / )
-            // 2. 공백 파손 대응 ( ' ' -> + )
-            const sanitizedB64 = b64Input
-                .replace(/-/g, '+')
-                .replace(/_/g, '/')
-                .replace(/ /g, '+');
-
-            sourceKey = Buffer.from(sanitizedB64, 'base64').toString('utf8');
-        } else if (rawInput) {
-            console.log('[Firebase Admin] 일반 텍스트 데이터를 처리 중입니다.');
-            sourceKey = rawInput;
+        // 이미 따옴표가 포함되어 있는 경우 제거
+        if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+            privateKey = privateKey.substring(1, privateKey.length - 1);
         }
 
-        if (!projectId || !clientEmail || !sourceKey) {
-            console.error('[Firebase Admin] 필수 정보가 누락되었습니다.');
-            return null;
-        }
-
-        // [Strict Standard PEM Wrapping]
-        const pureBody = sourceKey
-            .replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----/g, '')
-            .replace(/\\n/g, '')
-            .replace(/\s+/g, '')
-            .trim();
-
-        // 64자 줄바꿈 표준 준수 (Google Auth Library 엄격 대응)
-        let pemBody = "";
-        for (let i = 0; i < pureBody.length; i += 64) {
-            pemBody += pureBody.substring(i, i + 64) + "\n";
-        }
-
-        const finalPem = `-----BEGIN PRIVATE KEY-----\n${pemBody}-----END PRIVATE KEY-----\n`;
-
-        console.log('[Firebase Admin] 인증 시도 상세 (URL-Safe 모드):');
+        console.log('[Firebase Admin] 표준 환경 변수 모드로 초기화를 시도합니다.');
         console.log(` - Project ID: ${projectId}`);
         console.log(` - Client Email: ${clientEmail}`);
-        console.log(` - Safe Body Length: ${pureBody.length}`);
-        console.log(` - Body Checksum: ${pureBody.substring(0, 10)}...${pureBody.substring(pureBody.length - 10)}`);
 
         return admin.initializeApp({
             credential: admin.credential.cert({
                 projectId,
                 clientEmail,
-                privateKey: finalPem,
+                privateKey,
             }),
             storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim() || `${projectId}.firebasestorage.app`
         });
     } catch (error: any) {
-        console.error('[Firebase Admin] 초기화 치명적 에러:', error.message);
+        console.error('[Firebase Admin] 초기화 에러:', error.message);
         return null;
     }
 };
