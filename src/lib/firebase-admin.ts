@@ -2,56 +2,61 @@ import * as admin from 'firebase-admin';
 
 /**
  * Firebase Admin SDK 초기화 및 반환
- * Version: 1.1.2 (Strict PEM Formatting - 64 chars break)
+ * Version: 1.1.3 (Ultimate URL-Safe & Space Repair)
  */
 const getApp = () => {
     if (admin.apps.length) return admin.app();
 
     const projectId = (process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)?.trim();
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-    const privateKeyB64 = process.env.FIREBASE_PRIVATE_KEY_B64?.trim();
-    const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY?.trim();
+    const b64Input = process.env.FIREBASE_PRIVATE_KEY_B64?.trim();
+    const rawInput = process.env.FIREBASE_PRIVATE_KEY?.trim();
 
     try {
         let sourceKey = "";
 
-        if (privateKeyB64) {
-            console.log('[Firebase Admin] Base64 인코딩된 키를 사용합니다.');
-            sourceKey = Buffer.from(privateKeyB64, 'base64').toString('utf8');
-        } else if (privateKeyRaw) {
-            console.log('[Firebase Admin] 일반 텍스트 키를 사용합니다.');
-            sourceKey = privateKeyRaw;
+        if (b64Input) {
+            console.log('[Firebase Admin] Base64 데이터를 처리 중입니다.');
+
+            // [Ultimate Repair] 
+            // 1. URL-Safe Base64 대응 ( - -> + , _ -> / )
+            // 2. 공백 파손 대응 ( ' ' -> + )
+            const sanitizedB64 = b64Input
+                .replace(/-/g, '+')
+                .replace(/_/g, '/')
+                .replace(/ /g, '+');
+
+            sourceKey = Buffer.from(sanitizedB64, 'base64').toString('utf8');
+        } else if (rawInput) {
+            console.log('[Firebase Admin] 일반 텍스트 데이터를 처리 중입니다.');
+            sourceKey = rawInput;
         }
 
         if (!projectId || !clientEmail || !sourceKey) {
-            console.error('[Firebase Admin] 필수 변수 누락');
+            console.error('[Firebase Admin] 필수 정보가 누락되었습니다.');
             return null;
         }
 
-        // [Strict PEM Body Formatting]
-        // 1. 순수 데이터만 추출 (헤더, 푸터, 모든 공백/개행 제거)
+        // [Strict Standard PEM Wrapping]
         const pureBody = sourceKey
             .replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----/g, '')
             .replace(/\\n/g, '')
             .replace(/\s+/g, '')
             .trim();
 
-        // 2. 64자마다 줄바꿈 삽입 (RFC 7468 표준 준수)
-        let formattedBody = "";
+        // 64자 줄바꿈 표준 준수 (Google Auth Library 엄격 대응)
+        let pemBody = "";
         for (let i = 0; i < pureBody.length; i += 64) {
-            formattedBody += pureBody.substring(i, i + 64) + "\n";
+            pemBody += pureBody.substring(i, i + 64) + "\n";
         }
 
-        // 3. 최종 PEM 조립
-        const finalPem = `-----BEGIN PRIVATE KEY-----\n${formattedBody}-----END PRIVATE KEY-----\n`;
+        const finalPem = `-----BEGIN PRIVATE KEY-----\n${pemBody}-----END PRIVATE KEY-----\n`;
 
-        console.log('[Firebase Admin] 인증 시도 상세 (Strict Mode):');
+        console.log('[Firebase Admin] 인증 시도 상세 (URL-Safe 모드):');
         console.log(` - Project ID: ${projectId}`);
         console.log(` - Client Email: ${clientEmail}`);
-        console.log(` - Cleaned Body Length: ${pureBody.length}`);
-
-        // 데이터 무결성 최종 대조 로그
-        console.log(` - Body Checksum (First/Last 10): ${pureBody.substring(0, 10)}...${pureBody.substring(pureBody.length - 10)}`);
+        console.log(` - Safe Body Length: ${pureBody.length}`);
+        console.log(` - Body Checksum: ${pureBody.substring(0, 10)}...${pureBody.substring(pureBody.length - 10)}`);
 
         return admin.initializeApp({
             credential: admin.credential.cert({
@@ -62,7 +67,7 @@ const getApp = () => {
             storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim() || `${projectId}.firebasestorage.app`
         });
     } catch (error: any) {
-        console.error('[Firebase Admin] 초기화 에러:', error.message);
+        console.error('[Firebase Admin] 초기화 치명적 에러:', error.message);
         return null;
     }
 };
