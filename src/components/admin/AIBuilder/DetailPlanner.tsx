@@ -325,21 +325,31 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
 
             const thumbRes = await fetch('/api/upload', { method: 'POST', body: thumbFormData });
             const thumbData = await thumbRes.json();
-            if (!thumbData.success) throw new Error('대표 썸네일 업로드 실패');
+            if (!thumbRes.ok || !thumbData.success) {
+                throw new Error(thumbData.error || '대표 썸네일 업로드 실패');
+            }
             imageUrls.push(thumbData.url); // 첫 번째 이미지가 대표 이미지가 됨
 
             // 상세 이미지 업로드
             for (let i = 0; i < segments.length; i++) {
                 const seg = segments[i];
                 if (seg.imageUrl) {
-                    const file = await base64ToFile(seg.imageUrl, `${safeBaseName}_detail_${i + 1}.png`);
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('folder', 'products/details');
+                    try {
+                        const file = await base64ToFile(seg.imageUrl, `${safeBaseName}_detail_${i + 1}.png`);
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('folder', 'products/details');
 
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                    const data = await res.json();
-                    if (data.success) imageUrls.push(data.url);
+                        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                            imageUrls.push(data.url);
+                        } else {
+                            console.warn(`상세 이미지 ${i + 1} 업로드 실패:`, data.error);
+                        }
+                    } catch (uploadError) {
+                        console.error(`상세 이미지 ${i + 1} 처리 중 오류:`, uploadError);
+                    }
                 }
             }
 

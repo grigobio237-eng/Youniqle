@@ -36,9 +36,18 @@ export class StorageService {
         } = options;
 
         // 1. Sharp를 이용한 WebP 변환 및 최적화
-        const optimizedBuffer = await sharp(buffer)
-            .webp({ quality: 85, effort: 6 })
-            .toBuffer();
+        let optimizedBuffer: Buffer;
+        try {
+            if (!buffer || buffer.length === 0) throw new Error('업로드할 이미지 데이터가 비어 있습니다.');
+
+            optimizedBuffer = await sharp(buffer)
+                .webp({ quality: 85, effort: 6 })
+                .toBuffer();
+        } catch (sharpError: any) {
+            console.error('[StorageService] Sharp 최적화 실패:', sharpError.message);
+            // Sharp 실패 시 원본 버퍼 사용 시도
+            optimizedBuffer = buffer;
+        }
 
         const finalFilename = filename.endsWith('.webp') ? filename : `${filename.split('.')[0]}.webp`;
         const filePath = `${folder}/${finalFilename}`;
@@ -59,8 +68,12 @@ export class StorageService {
                 }
             });
 
-            // 파일을 공개 상태로 전환
-            await file.makePublic();
+            // 파일을 공개 상태로 전환 시도 (Uniform Access 정책에 따라 실패할 수 있음)
+            try {
+                await file.makePublic();
+            } catch (publicError) {
+                console.warn('[StorageService] makePublic 실패 (무시하고 진행):', (publicError as any).message);
+            }
 
             // Firebase Storage 정식 URL 반환 (토큰 포함하여 CORS 에러 방지)
             const url = `https://firebasestorage.googleapis.com/v0/b/${this.bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
