@@ -46,31 +46,24 @@ export class StorageService {
         if (useFirebase) {
             // 2. Firebase Storage 업로드
             const file = this.bucket.file(filePath);
-            const downloadToken = uuidv4(); // 고유 토큰 생성
+            const downloadToken = uuidv4(); // 고유 다운로드 토큰 생성 (uuidv4로 통일)
 
+            // 파일 저장 시 메타데이터(다운로드 토큰)를 한 번에 설정
             await file.save(optimizedBuffer, {
                 metadata: {
                     contentType: 'image/webp',
                     cacheControl: 'public, max-age=31536000',
                     metadata: {
-                        firebaseStorageDownloadTokens: downloadToken // 하위 호환성 유지
+                        firebaseStorageDownloadTokens: downloadToken
                     }
                 }
             });
 
-            // 영구 다운로드 토큰 생성 (uuid)
-            const tokenForUpload = crypto.randomUUID();
-
-            // 파일을 공개 상태로 전환하고 다운로드 토큰 메타데이터 설정
+            // 파일을 공개 상태로 전환
             await file.makePublic();
-            await file.setMetadata({
-                metadata: {
-                    firebaseStorageDownloadTokens: tokenForUpload
-                }
-            });
 
-            // Firebase Storage 정식 URL 반환 (토큰 포함하여 CORS 에러 100% 방지)
-            const url = `https://firebasestorage.googleapis.com/v0/b/${this.bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${tokenForUpload}`;
+            // Firebase Storage 정식 URL 반환 (토큰 포함하여 CORS 에러 방지)
+            const url = `https://firebasestorage.googleapis.com/v0/b/${this.bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
 
             return {
                 url,
