@@ -116,7 +116,7 @@ function GateIntro({ onStart }: { onStart: () => void }) {
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
             <span>Youniqle Recovery Protocol v2.5</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter">
+          <h1 className="text-4xl sm:text-5xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter break-keep">
             회복은 ‘느낌’이 아니라<br />
             <span className="text-chapter-accent">‘데이터’로 바꿉니다.</span>
           </h1>
