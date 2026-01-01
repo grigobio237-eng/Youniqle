@@ -52,20 +52,23 @@ const getApp = () => {
 
             // 데이터 무결성 보완 (이중 이스케이프 개행 문자 완벽 처리)
             if (serviceAccount.private_key) {
-                // 가장 확실하고 검증된 방식: \n 리터럴을 실제 개행문자로 치환
-                // 및 주변부 불필요한 따옴표/공백 제거
+                // [CRITICAL FIX] Invalid JWT Signature 오류 해결을 위한 표준 처리
+                // 1. 이미 줄바꿈된 키라면 그대로 사용
+                // 2. \n 문자열 리터럴로 되어 있다면 실제 줄바꿈으로 변경
+                // 3. 앞뒤 불필요한 따옴표나 공백 완벽 제거
                 serviceAccount.private_key = serviceAccount.private_key
                     .replace(/\\n/g, '\n')
                     .replace(/\\\\n/g, '\n')
                     .replace(/\r/g, '')
                     .replace(/^"/, '')
                     .replace(/"$/, '')
+                    .replace(/^'/, '')
+                    .replace(/'$/, '')
                     .trim();
 
-                // PEM 형식 헤더 보정 (비정상적인 공백 제거)
-                if (serviceAccount.private_key.includes('BEGIN PRIVATE KEY')) {
-                    // 키 내용 사이에 발생할 수 있는 잘못된 공백 문자들 제거 시도
-                    // 주의: 서명에 영향을 줄 수 있으므로 최소한으로 진행
+                // PEM 형식 확인 및 보완
+                if (!serviceAccount.private_key.includes('-----BEGIN PRIVATE KEY-----')) {
+                    console.warn('[Firebase Admin] Private Key에 헤더가 없습니다.');
                 }
             }
             if (serviceAccount.client_email) {
