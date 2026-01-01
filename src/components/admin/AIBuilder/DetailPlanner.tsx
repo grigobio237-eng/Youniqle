@@ -43,6 +43,35 @@ interface DetailPlannerProps {
 }
 
 const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
+    // Utility: Canvas를 이용한 이미지 리사이징 (Base64 최적화)
+    const resizeImage = (base64: string, maxWidth: number = 1024): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new window.Image();
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8)); // JPEG 80% 품질로 압축
+                } else {
+                    resolve(base64);
+                }
+            };
+            img.onerror = () => resolve(base64);
+            img.src = base64;
+        });
+    };
+
     const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
     const [loading, setLoading] = useState(false);
     const [isRemovingBackground, setIsRemovingBackground] = useState(false);
@@ -73,7 +102,9 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
 
     // Handle Image Selection with Background Removal
     const handleImageSelected = async (base64: string) => {
-        setInfo({ ...info, referenceImage: base64 });
+        // 전송 전 리사이징 적용
+        const resized = await resizeImage(base64);
+        setInfo({ ...info, referenceImage: resized });
 
         // Try background removal
         setIsRemovingBackground(true);
@@ -84,16 +115,19 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                 publicPath: `${window.location.origin}/imgly-assets/`
             });
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onloadend = async () => {
                 const cutout = reader.result as string;
-                setCutoutImage(cutout);
+                // 배경 제거된 이미지도 리사이징하여 메모리/전송 효율 최적화
+                const resizedCutout = await resizeImage(cutout);
+                setCutoutImage(resizedCutout);
                 toast.success('제품 추출 완료!', { id: tid });
             };
             reader.readAsDataURL(blob);
         } catch (error) {
             console.error('Background removal failed:', error);
-            // Fallback: use original image as cutout
-            setCutoutImage(base64);
+            // Fallback: use resized original image as cutout
+            const resizedOriginal = await resizeImage(base64);
+            setCutoutImage(resizedOriginal);
             toast.error('배경 제거 실패. 원본 이미지를 사용합니다.', { id: tid });
         } finally {
             setIsRemovingBackground(false);
