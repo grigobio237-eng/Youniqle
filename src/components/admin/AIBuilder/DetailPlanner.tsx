@@ -743,7 +743,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 {seg.imageUrl ? (
                                     <>
                                         <img
-                                            src={seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`}
+                                            src={seg.imageUrl.startsWith('data:') ? seg.imageUrl : (seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`)}
                                             alt={seg.title}
                                             className="w-full h-full object-cover block"
                                             crossOrigin="anonymous"
