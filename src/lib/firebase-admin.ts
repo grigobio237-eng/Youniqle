@@ -52,11 +52,32 @@ const getApp = () => {
 
             // 데이터 무결성 보완 (이중 이스케이프 개행 문자 완벽 처리)
             if (serviceAccount.private_key) {
+                // 이중/삼중 이스케이프된 개행 문자 정규화
                 serviceAccount.private_key = serviceAccount.private_key
-                    .replace(/\\\\n/g, '\n') // 삼중/사중 이스케이프 대응
-                    .replace(/\\n/g, '\n')   // 이중 이스케이프 대응
-                    .replace(/\r/g, '')      // 윈도우 스타일 개행 제거
+                    .replace(/\\\\n/g, '\n')
+                    .replace(/\\n/g, '\n')
+                    .replace(/\r/g, '')
                     .trim();
+
+                // 만약 큰따옴표로 감싸져 있다면 제거
+                if (serviceAccount.private_key.startsWith('"') && serviceAccount.private_key.endsWith('"')) {
+                    serviceAccount.private_key = serviceAccount.private_key.substring(1, serviceAccount.private_key.length - 1);
+                }
+
+                // PEM 형식 보장 (헤더/푸터 사이의 공백 제거 및 올바른 개행 적용)
+                if (serviceAccount.private_key.includes('-----BEGIN PRIVATE KEY-----')) {
+                    const parts = serviceAccount.private_key.split('-----');
+                    if (parts.length >= 5) {
+                        // 헤더(-----BEGIN...-----) + 본문(공백제거) + 푸터(-----END...-----)
+                        const header = `-----${parts[1]}-----`;
+                        const footer = `-----${parts[3]}-----`;
+                        const body = parts[2].replace(/\s/g, ''); // 본문 모든 공백 제거
+
+                        // 64자씩 줄바꿈하는 표준 PEM 형식으로 재구성 (더욱 견고함)
+                        const formattedBody = body.match(/.{1,64}/g)?.join('\n') || body;
+                        serviceAccount.private_key = `${header}\n${formattedBody}\n${footer}`;
+                    }
+                }
             }
             if (serviceAccount.client_email) {
                 serviceAccount.client_email = serviceAccount.client_email.trim();

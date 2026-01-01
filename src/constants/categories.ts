@@ -1,6 +1,7 @@
 // 전체 프로젝트에서 사용되는 카테고리 목록
 export const PRODUCT_CATEGORIES = [
   { value: 'fresh-food', label: '신선식품', labelEn: 'Fresh Food' },
+  { value: 'food', label: '식품', labelEn: 'Food' },
   { value: 'clothing', label: '의류', labelEn: 'Clothing' },
   { value: 'shoes', label: '신발', labelEn: 'Shoes' },
   { value: 'bags', label: '가방', labelEn: 'Bags' },
