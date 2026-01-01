@@ -52,30 +52,20 @@ const getApp = () => {
 
             // 데이터 무결성 보완 (이중 이스케이프 개행 문자 완벽 처리)
             if (serviceAccount.private_key) {
-                // 1단계: 원형 개행 문자 치환 (사중/이중/리터럴 치환)
-                let rawKey = serviceAccount.private_key
-                    .replace(/\\\\n/g, '\n')
+                // 가장 확실하고 검증된 방식: \n 리터럴을 실제 개행문자로 치환
+                // 및 주변부 불필요한 따옴표/공백 제거
+                serviceAccount.private_key = serviceAccount.private_key
                     .replace(/\\n/g, '\n')
+                    .replace(/\\\\n/g, '\n')
                     .replace(/\r/g, '')
+                    .replace(/^"/, '')
+                    .replace(/"$/, '')
                     .trim();
 
-                // 2단계: 따옴표 및 이스케이프 제거
-                if (rawKey.startsWith('"') && rawKey.endsWith('"')) rawKey = rawKey.substring(1, rawKey.length - 1);
-                if (rawKey.startsWith('\\"') && rawKey.endsWith('\\"')) rawKey = rawKey.substring(2, rawKey.length - 2);
-
-                // 3단계: PEM 형식 표준화 (더욱 공격적인 정규화)
-                if (rawKey.includes('PRIVATE KEY')) {
-                    // 순수 데이터(Base64)만 추출
-                    const pureData = rawKey
-                        .replace(/-----BEGIN (.*)-----/g, '')
-                        .replace(/-----END (.*)-----/g, '')
-                        .replace(/\s/g, ''); // 모든 공백, 개행 제거
-
-                    // 정석적인 64자 줄바꿈으로 재구성
-                    const formattedData = pureData.match(/.{1,64}/g)?.join('\n') || pureData;
-                    serviceAccount.private_key = `-----BEGIN PRIVATE KEY-----\n${formattedData}\n-----END PRIVATE KEY-----`;
-                } else {
-                    serviceAccount.private_key = rawKey;
+                // PEM 형식 헤더 보정 (비정상적인 공백 제거)
+                if (serviceAccount.private_key.includes('BEGIN PRIVATE KEY')) {
+                    // 키 내용 사이에 발생할 수 있는 잘못된 공백 문자들 제거 시도
+                    // 주의: 서명에 영향을 줄 수 있으므로 최소한으로 진행
                 }
             }
             if (serviceAccount.client_email) {

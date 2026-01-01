@@ -43,6 +43,9 @@ interface DetailPlannerProps {
 }
 
 const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
+    // [Debug] 카테고리 목록 로드 확인용
+    console.log('[DetailPlanner] Current categories:', PRODUCT_CATEGORIES.map(c => c.label));
+
     // Utility: Canvas를 이용한 이미지 리사이징 (Base64 최적화)
     const resizeImage = (base64: string, maxWidth: number = 1024): Promise<string> => {
         return new Promise((resolve) => {
