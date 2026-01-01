@@ -27,4 +27,3 @@ export function getCategoryValue(label: string): string | undefined {
   const category = PRODUCT_CATEGORIES.find(cat => cat.label === label);
   return category?.value;
 }
-

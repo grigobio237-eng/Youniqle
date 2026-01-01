@@ -52,31 +52,30 @@ const getApp = () => {
 
             // 데이터 무결성 보완 (이중 이스케이프 개행 문자 완벽 처리)
             if (serviceAccount.private_key) {
-                // 이중/삼중 이스케이프된 개행 문자 정규화
-                serviceAccount.private_key = serviceAccount.private_key
+                // 1단계: 원형 개행 문자 치환 (사중/이중/리터럴 치환)
+                let rawKey = serviceAccount.private_key
                     .replace(/\\\\n/g, '\n')
                     .replace(/\\n/g, '\n')
                     .replace(/\r/g, '')
                     .trim();
 
-                // 만약 큰따옴표로 감싸져 있다면 제거
-                if (serviceAccount.private_key.startsWith('"') && serviceAccount.private_key.endsWith('"')) {
-                    serviceAccount.private_key = serviceAccount.private_key.substring(1, serviceAccount.private_key.length - 1);
-                }
+                // 2단계: 따옴표 및 이스케이프 제거
+                if (rawKey.startsWith('"') && rawKey.endsWith('"')) rawKey = rawKey.substring(1, rawKey.length - 1);
+                if (rawKey.startsWith('\\"') && rawKey.endsWith('\\"')) rawKey = rawKey.substring(2, rawKey.length - 2);
 
-                // PEM 형식 보장 (헤더/푸터 사이의 공백 제거 및 올바른 개행 적용)
-                if (serviceAccount.private_key.includes('-----BEGIN PRIVATE KEY-----')) {
-                    const parts = serviceAccount.private_key.split('-----');
-                    if (parts.length >= 5) {
-                        // 헤더(-----BEGIN...-----) + 본문(공백제거) + 푸터(-----END...-----)
-                        const header = `-----${parts[1]}-----`;
-                        const footer = `-----${parts[3]}-----`;
-                        const body = parts[2].replace(/\s/g, ''); // 본문 모든 공백 제거
+                // 3단계: PEM 형식 표준화 (더욱 공격적인 정규화)
+                if (rawKey.includes('PRIVATE KEY')) {
+                    // 순수 데이터(Base64)만 추출
+                    const pureData = rawKey
+                        .replace(/-----BEGIN (.*)-----/g, '')
+                        .replace(/-----END (.*)-----/g, '')
+                        .replace(/\s/g, ''); // 모든 공백, 개행 제거
 
-                        // 64자씩 줄바꿈하는 표준 PEM 형식으로 재구성 (더욱 견고함)
-                        const formattedBody = body.match(/.{1,64}/g)?.join('\n') || body;
-                        serviceAccount.private_key = `${header}\n${formattedBody}\n${footer}`;
-                    }
+                    // 정석적인 64자 줄바꿈으로 재구성
+                    const formattedData = pureData.match(/.{1,64}/g)?.join('\n') || pureData;
+                    serviceAccount.private_key = `-----BEGIN PRIVATE KEY-----\n${formattedData}\n-----END PRIVATE KEY-----`;
+                } else {
+                    serviceAccount.private_key = rawKey;
                 }
             }
             if (serviceAccount.client_email) {
