@@ -2,42 +2,51 @@ import * as admin from 'firebase-admin';
 
 /**
  * Firebase Admin SDK 초기화 및 반환
- * Version: 1.1.0 (Base64 Fallback & Integrity Logging)
+ * Version: 1.1.1 (Aggressive PEM Repair & Literal \n Fix)
  */
 const getApp = () => {
     if (admin.apps.length) return admin.app();
 
     const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKeyB64 = process.env.FIREBASE_PRIVATE_KEY_B64; // 새로운 Base64 전용 변수
+    const privateKeyB64 = process.env.FIREBASE_PRIVATE_KEY_B64;
     const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY;
 
     try {
-        let finalKey = "";
+        let sourceKey = "";
 
         if (privateKeyB64) {
             console.log('[Firebase Admin] Base64 인코딩된 키를 사용합니다.');
-            finalKey = Buffer.from(privateKeyB64.trim(), 'base64').toString('utf8');
+            sourceKey = Buffer.from(privateKeyB64.trim(), 'base64').toString('utf8');
         } else if (privateKeyRaw) {
             console.log('[Firebase Admin] 일반 텍스트 키를 사용합니다.');
-            finalKey = privateKeyRaw.replace(/\\n/g, '\n').trim();
+            sourceKey = privateKeyRaw;
         }
 
-        if (!projectId || !clientEmail || !finalKey) {
-            console.error('[Firebase Admin] 필수 변수 누락:', { projectId: !!projectId, clientEmail: !!clientEmail, key: !!finalKey });
+        if (!projectId || !clientEmail || !sourceKey) {
+            console.error('[Firebase Admin] 필수 변수 누락:', { projectId: !!projectId, clientEmail: !!clientEmail, key: !!sourceKey });
             return null;
         }
 
-        // 키 무결성 로그 (앞뒤 10자만 노출하여 보안 유지)
-        const keyDataOnly = finalKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s+/g, '');
-        console.log(`[Firebase Admin] 키 로드 완료 (Body Length: ${keyDataOnly.length})`);
-        console.log(`[Firebase Admin] 데이터 대조용: ${keyDataOnly.substring(0, 10)}...${keyDataOnly.substring(keyDataOnly.length - 10)}`);
+        // [Aggressive PEM Repair]
+        // 어떤 경로로 왔든 상관없이 모든 노이즈를 제거하고 순수 키 데이터만 추출합니다.
+        const body = sourceKey
+            .replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----/g, '') // 헤더/푸터 제거
+            .replace(/\\n/g, '') // 글자 형태의 '\n' 제거 (매우 중요)
+            .replace(/\s+/g, '')  // 실제 줄바꿈, 공백 제거
+            .trim();
+
+        // 표준 PEM 형식으로 완벽하게 재조립
+        const repairedKey = `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----\n`;
+
+        console.log(`[Firebase Admin] 키 복구 완료 (Body Length: ${body.length})`);
+        console.log(`[Firebase Admin] 데이터 확인: ${body.substring(0, 15)}...${body.substring(body.length - 15)}`);
 
         return admin.initializeApp({
             credential: admin.credential.cert({
                 projectId,
                 clientEmail: clientEmail.trim(),
-                privateKey: finalKey,
+                privateKey: repairedKey,
             }),
             storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim() || `${projectId}.firebasestorage.app`
         });
