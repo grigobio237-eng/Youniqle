@@ -520,7 +520,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <label className="block text-sm font-semibold text-slate-700">핵심 특징 (USP)</label>
+                                        <label className="block text-sm font-semibold text-slate-700">핵심 회복 키워드</label>
                                         <button
                                             onClick={handleSuggestFeatures}
                                             className="text-xs text-blue-600 font-bold hover:underline"
@@ -532,7 +532,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                         value={info.features}
                                         onChange={(e) => setInfo({ ...info, features: e.target.value })}
                                         rows={3}
-                                        placeholder="상품의 특장점을 입력하세요."
+                                        placeholder="상품이 돕는 회복 키워드와 핵심 가치를 입력하세요."
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                     />
                                 </div>

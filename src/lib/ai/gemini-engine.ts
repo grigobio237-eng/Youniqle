@@ -471,43 +471,59 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
         isFunding?: boolean;
         referenceImage?: string; // Base64
     }): Promise<any> {
-        const lengthCount = input.length === 'auto' ? '7' : String(input.length);
+        const lengthCount = input.length === 'auto' ? '6' : String(input.length);
         const targetInfo = `타겟 고객: ${input.targetGender?.join(', ')} / 연령대: ${input.targetAge?.join(', ')}`;
 
         const prompt = `
-당신은 대한민국 최고의 이커머스 상세페이지 기획 전문가입니다. 
-당신의 임무는 소비자의 구매 욕구를 자극하는 완벽한 상세페이지 기획안을 작성하는 것입니다.
+당신은 대한민국 최고의 이커머스 상세페이지 기획 전문가이며, 유니클(Youniqle)의 브랜드 디렉터입니다.
+당실의 임무는 유니클의 고유한 '회복(Recovery) 설계' 철학을 담은 상세페이지 기획안을 작성하는 것입니다.
 
-**CRITICAL: 모든 결과물은 반드시 '한글'로만 작성하세요. 영어는 단 한 단어도 포함해서는 안 됩니다.**
+**CRITICAL: 모든 결과물은 반드시 '한글'로만 작성하세요.**
+**CRITICAL: 기존의 장점 나열 방식이 아닌, 아래의 [유니클 5단계 구조]를 엄격히 따르세요.**
 
 [상품 정보]
 - 상품명: ${input.name}
 - 카테고리: ${input.category}
-- 가격/이벤트: ${input.price} / ${input.promotion || '없음'}
-- 핵심 강점(USP): ${input.keywords}
+- 핵심 강조사항: ${input.keywords}
 - ${targetInfo}
-- ${input.isFunding ? '특이사항: 와디즈/텀블벅 스타일의 펀딩 프로젝트' : '특이사항: 일반 판매 상품'}
+
+[유니클 5단계 구조 및 가이드]
+
+1. **상단: 회복 키워드 선언 (Recovery_Keyword)**
+   - 상품명은 노출하지 않습니다.
+   - 예: "이 솔루션은 '세포 회복'을 돕기 위해 설계되었습니다."
+   - 이미지 위 핵심 문구는 '회복 키워드' 형여야 합니다.
+
+2. **회복 메커니즘 요약 (Mechanism)**
+   - 제품이 어떻게 회복 환경을 만드는지 쉽게 설명합니다.
+   - "얼마나 강한가"가 아닌 "얼마나 빨리 다시 살아나는가"의 관점을 유지하세요.
+   - 예: "세포 회복은 자극이 아니라, 다시 살아날 조건을 만드는 일입니다."
+
+3. **대표 솔루션 강조 (Main_Solution)**
+   - UNIQLE 브랜드명을 붙인 고유 솔루션 명칭을 사용하세요 (예: UNIQLE ${input.name} Core™).
+   - "단기 각성이 아닌 누적 회복"을 목표로 함을 강조합니다.
+
+4. **보조 솔루션 제안 (Support_Solution)**
+   - 함께 사용할 때의 시너지를 제안합니다. (최대 2개 섹션 가능)
+   - "필수"라는 단어는 절대 사용하지 마세요. "환경 보완", "지속성 강화" 등의 표현을 씁니다.
+
+5. **회복 루틴 가이드 (Routine_Guide)**
+   - 유니클의 신뢰 장치입니다.
+   - 사용 타이밍, 피해야 할 습관, 최소 체감 기간 가이드를 포함합니다.
+   - **엔딩 문구**: 반드시 "유니클은 효과를 약속하지 않습니다. 회복을 설계합니다." 문구를 이 섹션의 마지막 키 메시지로 포함하세요.
 
 [기획 지침]
-1. 유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 모든 섹션의 카피와 비주얼에 자연스럽게 녹아들어야 합니다. 
-   - 제품을 사용하는 행위가 단순히 소비가 아닌, 사용자의 삶을 '회복'시키는 과정임을 강조하세요.
-2. '판매 논리(Seller Winning Logic)'에 따라 총 ${lengthCount}개의 섹션을 구성하세요.
-   (Hook -> Solution -> Clarity -> Social Proof -> Detail -> Risk Reversal)
-3. **비주얼 프롬프트(visualPrompt)** 작성 시 주의사항:
-   - 반드시 '한글'로 작성할 것.
-   - 풍경 사진이 아닌, **'제품'이 강조된 프리미엄 연출샷**이어야 합니다.
-   - '회복'의 무드(편안함, 치유, 생동감, 정돈됨)가 시각적으로 느껴지도록 하세요.
-   - 예: "고급스러운 대리석 선반 위에 제품이 정갈하게 놓여 있고, 주변에 수분이 맺힌 신선한 잎사귀가 배치된 클로즈업 샷. 부드러운 아침 햇살 조명이 비쳐 '회복'의 느낌을 전달함."
-4. **키 메시지(keyMessage)**: 이미지 위에 들어갈 폰트용 문구로, 20자 이내의 강력한 한글 헤드라인을 작성하세요.
+- 비주얼 프롬프트: 제품 스테이징(대리석, 신선한 식물, 깨끗한 빛)이 강조된 한글 묘사.
+- 모든 섹션의 분위기는 '치유, 정돈됨, 프리미엄'이어야 함.
 
 ## 출력 형식 (JSON Array) - 설명 없이 JSON만 출력하세요.
 [
   {
     "id": "section-1",
-    "title": "섹션 제목 (한글)",
-    "logicalSections": ["Hook"],
-    "keyMessage": "가슴을 울리는 한글 카피",
-    "visualPrompt": "제품이 돋보이는 구체적인 배경과 소품 묘사 (한글)",
+    "title": "회복 키워드 선언 (한글)",
+    "logicalSections": ["Recovery_Keyword"],
+    "keyMessage": "핵심 한글 카피",
+    "visualPrompt": "제품이 돋보이는 한글 비주얼 설명",
     "productPosition": "center",
     "productSize": "medium"
   }
@@ -540,14 +556,15 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
         const prompt = `당신은 대한민국 최고의 이커머스 상세페이지 기획자입니다. 모든 응답은 반드시 '한글'로만 작성하세요.
 상품명: "${input.name}"
 카테고리: "${input.category}"
-기존 특징: "${input.keywords}"
+핵심 강조사항: "${input.keywords}"
 현재 기획하려는 섹션 성격: [${input.logicalSection}]
 
-위 정보를 바탕으로 해당 섹션에 최적화된 새로운 기획을 만들어주세요.
+위 정보를 바탕으로 해당 섹션에 최적화된 새로운 회복 설계 기획을 만들어주세요.
 
 ## 지침
 - 유니클의 핵심 가치인 **'회복(Recovery)'**이 해당 섹션에 반드시 반영되어야 합니다.
-- 비주얼 프롬프트(visualPrompt): 풍경이 아닌, **제품 스테이징(대리석 테이블, 스토디오 소품 등)**이 강조되면서도 '치유와 회복'의 분위기가 느껴지는 한글 묘사.
+- **성분 강조보다는 '회복 환경'과 '루틴'의 관점**에서 카피를 작성하세요.
+- 비주얼 프롬프트(visualPrompt): 제품 스테이징이 강조되면서도 '치유와 회복'의 분위기가 느껴지는 한글 묘사.
 - 키 메시지(keyMessage): '회복'의 가치를 담은 강력하고 직관적인 한글 카피.
 
 ## 출력 형식 (JSON Object)
@@ -723,14 +740,14 @@ Aspect Ratio: ${input.aspectRatio || "9:16"}`
             throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.');
         }
 
-        const prompt = `상품명 "${productName}" (카테고리: ${category})에 대해 판매를 촉진할 수 있는 핵심 특징(USP) 3가지를 한국어로 추천해줘.
-회복(Recovery)과 건강이라는 테마를 살려서, 소비자에게 신뢰를 줄 수 있는 강력한 문구로 작성해줘.`;
+        const prompt = `상품명 "${productName}" (카테고리: ${category})에 대해 유니클(Youniqle)의 브랜드 철학인 '회복(Recovery)' 관점에서 제안할 수 있는 핵심 회복 키워드와 가치 3가지를 한국어로 추천해줘.
+단순한 성분 나열이 아니라, 이 제품이 사용자의 어떤 회복 리듬을 돕는지(예: 세포 재생, 깊은 휴식, 에너지 순환 등)를 중심으로 작성해줘.`;
 
         try {
-            return await this.generateWithFallback(prompt, "이커머스 마케팅 전문가 모드", 0.7);
+            return await this.generateWithFallback(prompt, "유니클 브랜드 전략가 모드", 0.7);
         } catch (error: any) {
             console.error('Gemini Feature Suggestion Error:', error);
-            return "1. 프리미엄 회복 포뮬러\n2. 사용자 맞춤형 케어 솔루션\n3. 검증된 원료와 안전성";
+            return "1. 세포 단위의 깊은 회복\n2. 무너진 신체 리듬의 정상화\n3. 지속 가능한 에너지 순환 설계";
         }
     }
 }
