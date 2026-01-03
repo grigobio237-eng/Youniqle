@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,26 +11,43 @@ import {
     Trash2,
     Save,
     Layers,
-    Info,
     User,
     Package,
-    CheckCircle2,
     Loader2,
     ChevronRight,
     ChevronDown,
     RefreshCw,
-    LayoutDashboard
+    LayoutDashboard,
+    Upload,
+    Globe,
+    Image as ImageIcon,
+    Info,
+    CheckCircle2,
+    Search,
+    ArrowRight,
+    ExternalLink
 } from 'lucide-react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { motion, AnimatePresence } from 'framer-motion';
 
+// --- Types ---
 interface PavilionItem {
     id: string;
     type: string;
     title: string;
     description: string;
     price: string;
-    specs: Record<string, string>;
+    rental?: string;
     image?: string;
+    canvasSize?: string;
+    specs: Record<string, string>;
 }
 
 interface FloorOwner {
@@ -38,6 +55,7 @@ interface FloorOwner {
     name: string;
     role: string;
     bio: string;
+    image?: string;
     items: PavilionItem[];
 }
 
@@ -46,25 +64,130 @@ interface PavilionFloor {
     owners: FloorOwner[];
 }
 
+// --- Local Components ---
+
+function ImageUploader({
+    label,
+    value,
+    onChange,
+    folder = 'pavilion'
+}: {
+    label: string,
+    value?: string,
+    onChange: (url: string) => void,
+    folder?: string
+}) {
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', folder);
+
+            const res = await fetch('/api/admin/pavilion/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+            const data = await res.json();
+            onChange(data.url);
+        } catch (error) {
+            console.error('Upload Error:', error);
+            alert('이미지 업로드에 실패했습니다.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{label}</label>
+            <div className="space-y-3">
+                {/* 큰 미리보기 영역 */}
+                <div
+                    className="w-full aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer group hover:border-indigo-400 transition-all relative"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    {value ? (
+                        <>
+                            <img src={value} alt="Preview" className="w-full h-full object-contain" />
+                            <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-[10px] font-black uppercase">
+                                Uploaded
+                            </div>
+                        </>
+                    ) : (
+                        <div className="text-center">
+                            <ImageIcon className="w-12 h-12 text-slate-300 group-hover:text-indigo-400 mx-auto mb-2" />
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Click to upload</p>
+                        </div>
+                    )}
+                    {uploading && (
+                        <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center">
+                            <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-2" />
+                            <p className="text-[10px] font-black uppercase text-indigo-600">Uploading...</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* URL 입력 및 버튼 */}
+                <div className="space-y-2">
+                    <Input
+                        value={value || ''}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder="이미지 URL (직접 입력하거나 업로드)"
+                        className="text-xs h-8"
+                    />
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full h-8 text-[10px] uppercase font-black"
+                        onClick={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}
+                        disabled={uploading}
+                    >
+                        {uploading ? '업로드 중...' : value ? '이미지 교체' : '파일 선택 (WebP 자동 변환)'}
+                    </Button>
+                </div>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleUpload}
+                />
+            </div>
+        </div>
+    );
+}
+
 export default function PavilionAdminPage() {
     const [data, setData] = useState<PavilionFloor[]>([]);
     const [activeFloor, setActiveFloor] = useState<number>(1);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [expandedOwner, setExpandedOwner] = useState<string | null>(null);
+    const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchPavilionData();
     }, []);
 
+    // 층이 바뀌면 선택된 작가 초기화 및 검색어 초기화
+    useEffect(() => {
+        setSelectedOwnerId(null);
+        setSearchTerm('');
+    }, [activeFloor]);
+
     const fetchPavilionData = async () => {
         try {
             setLoading(true);
-            const res = await fetch('/api/admin/pavilion', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                }
-            });
+            const res = await fetch('/api/admin/pavilion');
             if (res.ok) {
                 const floors = await res.json();
                 setData(floors);
@@ -76,45 +199,24 @@ export default function PavilionAdminPage() {
         }
     };
 
-    const handleInitData = async () => {
-        if (!confirm('현재 모든 파빌리온 데이터가 초기화되고 기본 데이터로 재설정됩니다. 계속하시겠습니까?')) return;
-
-        try {
-            setLoading(true);
-            const res = await fetch('/api/admin/pavilion/init', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                }
-            });
-            if (res.ok) {
-                alert('데이터 초기화 완료');
-                fetchPavilionData();
-            }
-        } catch (error) {
-            alert('초기화 실패');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleSaveFloor = async (floorNum: number) => {
         const floorData = data.find(f => f.floor === floorNum);
         if (!floorData) return;
+
+        // 디버깅: 전송하는 데이터 확인
+        console.log('[Frontend] Saving Floor Data:', floorNum);
+        floorData.owners.forEach(owner => {
+            console.log(`  - ${owner.name}: image = ${owner.image || 'EMPTY'}`);
+        });
 
         try {
             setSaving(true);
             const res = await fetch('/api/admin/pavilion', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(floorData)
             });
-            if (res.ok) {
-                alert(`${floorNum}층 데이터 저장 완료`);
-            }
+            if (res.ok) alert(`${floorNum}층 데이터 저장 완료`);
         } catch (error) {
             alert('저장 실패');
         } finally {
@@ -122,245 +224,405 @@ export default function PavilionAdminPage() {
         }
     };
 
-    // --- Edit Handlers ---
+    const handleInitData = async () => {
+        if (!confirm('현재 모든 파빌리온 데이터가 초기화되고 기본 데이터로 재설정됩니다. 계속하시겠습니까?')) return;
+        try {
+            setLoading(true);
+            const res = await fetch('/api/admin/pavilion/init', { method: 'POST' });
+            if (res.ok) {
+                alert('데이터 초기화 완료');
+                fetchPavilionData();
+            }
+        } catch (error) { alert('초기화 실패'); } finally { setLoading(false); }
+    };
 
-    const updateOwnerField = (floorIdx: number, ownerIdx: number, field: keyof FloorOwner, value: string) => {
+    // --- Data Update Handlers ---
+    const updateOwner = (fIdx: number, oIdx: number, updates: Partial<FloorOwner>) => {
         const newData = [...data];
-        newData[floorIdx].owners[ownerIdx][field] = value as any;
+        newData[fIdx].owners[oIdx] = { ...newData[fIdx].owners[oIdx], ...updates };
         setData(newData);
     };
 
-    const updateItemField = (floorIdx: number, ownerIdx: number, itemIdx: number, field: keyof PavilionItem, value: string) => {
+    const updateItem = (fIdx: number, oIdx: number, iIdx: number, updates: Partial<PavilionItem>) => {
         const newData = [...data];
-        newData[floorIdx].owners[ownerIdx].items[itemIdx][field] = value as any;
+        newData[fIdx].owners[oIdx].items[iIdx] = { ...newData[fIdx].owners[oIdx].items[iIdx], ...updates };
         setData(newData);
     };
 
-    const addItem = (floorIdx: number, ownerIdx: number) => {
+    const addOwner = (fIdx: number) => {
         const newData = [...data];
-        const newItem: PavilionItem = {
-            id: `item-${Date.now()}`,
-            type: 'PRODUCT',
-            title: '새로운 상품',
-            description: '설명을 입력하세요',
-            price: '₩0',
-            specs: { 'Origin': 'Unknown' }
-        };
-        newData[floorIdx].owners[ownerIdx].items.push(newItem);
-        setData(newData);
-    };
-
-    const removeItem = (floorIdx: number, ownerIdx: number, itemIdx: number) => {
-        if (!confirm('정말 삭제하시겠습니까?')) return;
-        const newData = [...data];
-        newData[floorIdx].owners[ownerIdx].items.splice(itemIdx, 1);
-        setData(newData);
-    };
-
-    const addOwner = (floorIdx: number) => {
-        const newData = [...data];
-        const newOwner: FloorOwner = {
-            id: `owner-${Date.now()}`,
+        const newOwnerId = `owner-${Date.now()}`;
+        newData[fIdx].owners.push({
+            id: newOwnerId,
             name: '새로운 전문가',
-            role: '역할 입력',
+            role: activeFloor === 1 ? '아티스트' : '마스터',
             bio: '소개를 입력하세요',
             items: []
-        };
-        newData[floorIdx].owners.push(newOwner);
+        });
         setData(newData);
+        // 추가 후 즉시 상세 페이지로 이동
+        setSelectedOwnerId(newOwnerId);
     };
 
-    const removeOwner = (floorIdx: number, ownerIdx: number) => {
-        if (!confirm('소유자와 포함된 모든 아이템이 삭제됩니다. 계속하시겠습니까?')) return;
+    const addItem = (fIdx: number, oIdx: number) => {
         const newData = [...data];
-        newData[floorIdx].owners.splice(ownerIdx, 1);
+        newData[fIdx].owners[oIdx].items.push({
+            id: `item-${Date.now()}`,
+            type: activeFloor === 1 ? 'ARTWORK' : 'PRODUCT',
+            title: '새로운 항목',
+            description: '항목에 대한 설명을 입력하세요',
+            price: '₩0',
+            rental: activeFloor === 1 ? '₩0' : undefined,
+            canvasSize: '0 x 0 cm',
+            specs: { 'Origin': 'Korea' }
+        });
         setData(newData);
     };
 
     const currentFloorIdx = data.findIndex(f => f.floor === activeFloor);
     const currentFloor = data[currentFloorIdx];
+    const selectedOwner = currentFloor?.owners.find(o => o.id === selectedOwnerId);
+    const selectedOwnerIdx = currentFloor?.owners.findIndex(o => o.id === selectedOwnerId);
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-slate-400" />
-                <p className="text-slate-500 font-medium">파빌리온 데이터를 불러오고 있습니다...</p>
+                <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Synchronizing Pavilion Core...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 pb-20">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <LayoutDashboard className="w-8 h-8 text-indigo-500" />
-                        비밀 가상공간(Pavilion) 관리
+        <div className="space-y-8 pb-32 max-w-7xl mx-auto">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-1">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic flex items-center gap-3">
+                        <Globe className="w-10 h-10 text-indigo-600" />
+                        PAVILION <span className="text-indigo-600">MANAGEMENT</span>
                     </h1>
-                    <p className="text-slate-500 mt-1">1층부터 5층까지의 가상 공간 콘텐츠를 실시간으로 제어합니다.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Digital Twin Space Control Center</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" onClick={handleInitData} className="border-slate-200 text-slate-500 hover:text-rose-500">
-                        <RefreshCw className="w-4 h-4 mr-2" /> 초기화
+                    <Button variant="outline" onClick={handleInitData} className="border-slate-200 text-slate-400 hover:text-rose-500 font-black text-[10px] uppercase">
+                        <RefreshCw className="w-3 h-3 mr-2" /> Reset All
                     </Button>
-                    <Button onClick={() => handleSaveFloor(activeFloor)} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100">
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                        현재 층 정보 저장
+                    <Button onClick={() => handleSaveFloor(activeFloor)} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-100 font-black text-[10px] uppercase px-8">
+                        {saving ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Save className="w-3 h-3 mr-2" />}
+                        Save {activeFloor}F Changes
                     </Button>
                 </div>
-            </div>
+            </header>
 
-            {/* Floor Selector */}
-            <div className="flex gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+            {/* Floor Navigation */}
+            <nav className="flex gap-2 p-2 bg-slate-100 rounded-3xl w-fit">
                 {[1, 2, 3, 4, 5].map((f) => (
                     <button
                         key={f}
                         onClick={() => setActiveFloor(f)}
-                        className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeFloor === f ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`px-10 py-4 rounded-2xl font-black text-xs transition-all uppercase tracking-tighter ${activeFloor === f ? 'bg-white text-indigo-600 shadow-md scale-105' : 'text-slate-400 hover:text-slate-600'}`}
                     >
-                        {f}F {f === 1 ? 'Gallery' : f === 2 ? 'Shop' : f === 3 ? 'Coaching' : f === 4 ? 'Medical' : 'Omakase'}
+                        {f}F {f === 1 ? 'Art Gallery' : f === 2 ? 'Shop' : f === 3 ? 'Coaching' : f === 4 ? 'Medical' : 'Omakase'}
                     </button>
                 ))}
-            </div>
+            </nav>
 
             {!currentFloor ? (
-                <Card className="p-12 text-center border-dashed">
-                    <p className="text-slate-400 italic">현재 층에 대한 데이터가 없습니다. 초기화를 진행해주세요.</p>
+                <Card className="p-20 text-center border-4 border-dashed border-slate-100 rounded-[40px]">
+                    <Info className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                    <p className="text-slate-400 font-bold italic tracking-tight">No synchronized data for this floor. Initialize the system to start.</p>
                 </Card>
             ) : (
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <Layers className="w-5 h-5 text-indigo-400" />
-                            전문가 영역 현황 <Badge variant="secondary" className="ml-2">{currentFloor.owners.length}</Badge>
-                        </h3>
-                        <Button onClick={() => addOwner(currentFloorIdx)} size="sm" variant="ghost" className="text-indigo-600 hover:bg-indigo-50 font-bold">
-                            <Plus className="w-4 h-4 mr-1" /> 전문가 추가
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        {currentFloor.owners.map((owner, oIdx) => (
-                            <Card key={owner.id} className="overflow-hidden border-none shadow-sm ring-1 ring-slate-200">
-                                <div
-                                    className={`p-6 flex items-center justify-between cursor-pointer transition-colors ${expandedOwner === owner.id ? 'bg-indigo-50/30' : 'hover:bg-slate-50/50'}`}
-                                    onClick={() => setExpandedOwner(expandedOwner === owner.id ? null : owner.id)}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-500">
-                                            <User className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900">{owner.name || '이름 없음'}</h4>
-                                            <p className="text-xs text-slate-500">{owner.role || '역할 미정'}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-200">
-                                            Items: {owner.items.length}
-                                        </Badge>
-                                        {expandedOwner === owner.id ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
-                                    </div>
+                    {/* List/Detail Layout */}
+                    {!selectedOwner ? (
+                        /* --- TABLE VIEW (Excel Style) --- */
+                        <div className="space-y-6 bg-white p-8 rounded-[32px] shadow-sm border border-slate-100">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                                <div className="space-y-1">
+                                    <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                        <Layers className="w-5 h-5 text-indigo-500" />
+                                        Specialist Directory
+                                        <Badge variant="secondary" className="ml-2 bg-slate-100 text-slate-500 font-bold px-2 py-0 h-5 text-[10px]">{currentFloor.owners.length}</Badge>
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400 font-medium">Manage and monitor floor specialists in a data-centric view.</p>
                                 </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Find by name or role..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold focus:ring-2 focus:ring-indigo-500 transition-all w-64 outline-none"
+                                        />
+                                    </div>
+                                    <Button onClick={() => addOwner(currentFloorIdx)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-widest px-6 rounded-lg h-10">
+                                        <Plus className="w-4 h-4 mr-2" /> Add New
+                                    </Button>
+                                </div>
+                            </div>
 
-                                <AnimatePresence>
-                                    {expandedOwner === owner.id && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="border-t border-slate-100"
-                                        >
-                                            <div className="p-8 space-y-8 bg-white">
-                                                {/* Owner Info Edit */}
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Name</label>
-                                                        <Input value={owner.name} onChange={(e) => updateOwnerField(currentFloorIdx, oIdx, 'name', e.target.value)} placeholder="전문가 이름" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Role</label>
-                                                        <Input value={owner.role} onChange={(e) => updateOwnerField(currentFloorIdx, oIdx, 'role', e.target.value)} placeholder="직함 / 역할" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Action</label>
-                                                        <Button variant="destructive" className="w-full" onClick={() => removeOwner(currentFloorIdx, oIdx)}>
-                                                            <Trash2 className="w-4 h-4 mr-2" /> 전문가 권한 삭제
-                                                        </Button>
-                                                    </div>
-                                                    <div className="md:col-span-3 space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Bio</label>
-                                                        <Textarea value={owner.bio} onChange={(e) => updateOwnerField(currentFloorIdx, oIdx, 'bio', e.target.value)} placeholder="전문가 소개글" className="min-h-[100px]" />
-                                                    </div>
-                                                </div>
-
-                                                {/* Items Manager */}
-                                                <div className="space-y-4 pt-6 border-t border-slate-50">
-                                                    <div className="flex items-center justify-between">
-                                                        <h5 className="text-sm font-black text-slate-700 flex items-center gap-2">
-                                                            <Package className="w-4 h-4 text-slate-400" /> 관리 아이템 리스트
-                                                        </h5>
-                                                        <Button onClick={() => addItem(currentFloorIdx, oIdx)} size="sm" variant="outline" className="h-8 border-indigo-100 text-indigo-500 hover:bg-indigo-50">
-                                                            <Plus className="w-3 h-3 mr-1" /> 아이템 추가
-                                                        </Button>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        {owner.items.map((item, iIdx) => (
-                                                            <Card key={item.id} className="p-6 bg-slate-50/50 border-none ring-1 ring-slate-100 relative group">
-                                                                <button
-                                                                    onClick={() => removeItem(currentFloorIdx, oIdx, iIdx)}
-                                                                    className="absolute top-2 right-2 p-2 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-
-                                                                <div className="space-y-4">
-                                                                    <div className="flex gap-4">
-                                                                        <div className="w-16 h-16 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-xs">
-                                                                            IMG
-                                                                        </div>
-                                                                        <div className="flex-1 space-y-3">
-                                                                            <Input
-                                                                                value={item.title}
-                                                                                onChange={(e) => updateItemField(currentFloorIdx, oIdx, iIdx, 'title', e.target.value)}
-                                                                                placeholder="아이템 명칭"
-                                                                                className="font-bold h-8 text-sm"
-                                                                            />
-                                                                            <div className="flex gap-2">
-                                                                                <Badge className="h-5 text-[9px] uppercase">{item.type}</Badge>
-                                                                                <Input
-                                                                                    value={item.price}
-                                                                                    onChange={(e) => updateItemField(currentFloorIdx, oIdx, iIdx, 'price', e.target.value)}
-                                                                                    placeholder="가격 (예: ₩10,000)"
-                                                                                    className="h-6 text-[10px] tabular-nums"
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <Textarea
-                                                                        value={item.description}
-                                                                        onChange={(e) => updateItemField(currentFloorIdx, oIdx, iIdx, 'description', e.target.value)}
-                                                                        placeholder="상세 설명"
-                                                                        className="text-xs min-h-[60px] bg-white"
-                                                                    />
+                            <div className="overflow-hidden rounded-xl border border-slate-100">
+                                <Table>
+                                    <TableHeader className="bg-slate-50/50">
+                                        <TableRow className="hover:bg-transparent border-slate-100">
+                                            <TableHead className="w-[80px] text-[11px] font-black uppercase text-slate-400 py-4">Profile</TableHead>
+                                            <TableHead className="text-[11px] font-black uppercase text-slate-400 py-4">Full Name</TableHead>
+                                            <TableHead className="text-[11px] font-black uppercase text-slate-400 py-4">Designated Role</TableHead>
+                                            <TableHead className="text-[11px] font-black uppercase text-slate-400 py-4 text-center">Asset Count</TableHead>
+                                            <TableHead className="text-right text-[11px] font-black uppercase text-slate-400 py-4">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {currentFloor.owners
+                                            .filter(owner =>
+                                                owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                owner.role.toLowerCase().includes(searchTerm.toLowerCase())
+                                            )
+                                            .map((owner) => (
+                                                <TableRow
+                                                    key={owner.id}
+                                                    className="group cursor-pointer hover:bg-slate-50/80 transition-colors border-slate-50"
+                                                    onClick={() => setSelectedOwnerId(owner.id)}
+                                                >
+                                                    <TableCell className="py-3">
+                                                        <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
+                                                            {owner.image ? (
+                                                                <img src={owner.image} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <User className="w-4 h-4 text-slate-300" />
                                                                 </div>
-                                                            </Card>
-                                                        ))}
-                                                        {owner.items.length === 0 && (
-                                                            <div className="col-span-2 p-12 text-center bg-slate-50/30 border-2 border-dashed border-slate-100 rounded-3xl">
-                                                                <p className="text-slate-400 text-xs font-medium">등록된 아이템이 없습니다. 새로운 가치를 추가해보세요.</p>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="py-3">
+                                                        <span className="text-sm font-black text-slate-700 group-hover:text-indigo-600 transition-colors">{owner.name || 'Anonymous'}</span>
+                                                    </TableCell>
+                                                    <TableCell className="py-3">
+                                                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest border-slate-200 text-slate-500 group-hover:border-indigo-200 group-hover:text-indigo-500 transition-all">
+                                                            {owner.role}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="py-3 text-center">
+                                                        <span className="text-xs font-bold text-slate-500">{owner.items.length} Assets</span>
+                                                    </TableCell>
+                                                    <TableCell className="py-3 text-right">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+
+                                        {currentFloor.owners.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="py-20 text-center">
+                                                    <User className="w-10 h-10 text-slate-100 mx-auto mb-4" />
+                                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Floor registry is empty</p>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+
+                                        {currentFloor.owners.length > 0 && currentFloor.owners.filter(owner =>
+                                            owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            owner.role.toLowerCase().includes(searchTerm.toLowerCase())
+                                        ).length === 0 && (
+                                                <TableRow>
+                                                    <TableCell colSpan={5} className="py-12 text-center">
+                                                        <Search className="w-8 h-8 text-slate-100 mx-auto mb-3" />
+                                                        <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest italic">No matches found for "{searchTerm}"</p>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    ) : (
+                        /* --- DETAIL VIEW --- */
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center justify-between border-b-4 border-slate-50 pb-6">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setSelectedOwnerId(null)}
+                                    className="text-slate-400 hover:text-slate-900 font-black text-[11px] uppercase p-0 h-auto"
+                                >
+                                    <Loader2 className="w-4 h-4 mr-2 rotate-90" />
+                                    Back to Specialist List
+                                </Button>
+                                <div className="flex items-center gap-4">
+                                    <Badge className="bg-indigo-50 text-indigo-600 border-none font-black px-4 py-1">
+                                        Editing: {selectedOwner.name}
+                                    </Badge>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-rose-500 hover:bg-rose-50 font-black text-[10px] uppercase"
+                                        onClick={() => {
+                                            if (confirm('Delete specialist and all data?')) {
+                                                const newData = [...data];
+                                                newData[currentFloorIdx].owners.splice(selectedOwnerIdx!, 1);
+                                                setData(newData);
+                                                setSelectedOwnerId(null);
+                                            }
+                                        }}
+                                    >
+                                        <Trash2 className="w-3 h-3 mr-2" /> Delete Specialist
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <Card className="border-none shadow-2xl shadow-indigo-100/50 rounded-[40px] overflow-hidden">
+                                <div className="p-10 space-y-12">
+                                    {/* Profile Edit Section */}
+                                    <section className="space-y-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-8 bg-indigo-600 rounded-full" />
+                                            <h5 className="text-sm font-black uppercase tracking-widest text-slate-800">Master Identity</h5>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                                            <div className="lg:col-span-1">
+                                                <ImageUploader
+                                                    label="Profile / Bio Image"
+                                                    folder={`pavilion/floor${activeFloor}/owners`}
+                                                    value={selectedOwner.image}
+                                                    onChange={(url) => updateOwner(currentFloorIdx, selectedOwnerIdx!, { image: url })}
+                                                />
+                                            </div>
+                                            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                                                    <Input className="h-12 font-bold" value={selectedOwner.name} onChange={(e) => updateOwner(currentFloorIdx, selectedOwnerIdx!, { name: e.target.value })} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Designated Role</label>
+                                                    <Input className="h-12 font-bold" value={selectedOwner.role} onChange={(e) => updateOwner(currentFloorIdx, selectedOwnerIdx!, { role: e.target.value })} />
+                                                </div>
+                                                <div className="md:col-span-2 space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Curriculum Vitae / Narrative Bio</label>
+                                                    <Textarea className="min-h-[150px] font-medium leading-relaxed" value={selectedOwner.bio} onChange={(e) => updateOwner(currentFloorIdx, selectedOwnerIdx!, { bio: e.target.value })} />
                                                 </div>
                                             </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
+                                        </div>
+                                    </section>
+
+                                    {/* Items / Gallery Management */}
+                                    <section className="space-y-8 border-t-4 border-slate-50 pt-12">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2 h-8 bg-indigo-400 rounded-full" />
+                                                <h5 className="text-sm font-black uppercase tracking-widest text-slate-800">{activeFloor === 1 ? 'Curated Masterpieces' : 'Assigned Product Assets'}</h5>
+                                            </div>
+                                            <Button onClick={() => addItem(currentFloorIdx, selectedOwnerIdx!)} variant="outline" size="sm" className="font-black text-[10px] uppercase border-2 h-10 px-6 hover:bg-slate-50 rounded-xl">
+                                                <Plus className="w-3 h-3 mr-2" /> Add New Asset
+                                            </Button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                            {selectedOwner.items.map((item, iIdx) => (
+                                                <Card key={item.id} className="p-6 bg-slate-50/50 border-none rounded-[32px] relative group transition-all hover:bg-slate-100/50 ring-1 ring-slate-100">
+                                                    {/* 우측 상단 액션 버튼들 */}
+                                                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    setSaving(true);
+                                                                    const floorData = data.find(f => f.floor === activeFloor);
+                                                                    if (!floorData) return;
+
+                                                                    const res = await fetch('/api/admin/pavilion', {
+                                                                        method: 'POST',
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        body: JSON.stringify(floorData)
+                                                                    });
+
+                                                                    if (res.ok) {
+                                                                        alert('작품 정보가 저장되었습니다!');
+                                                                    }
+                                                                } catch (error) {
+                                                                    alert('저장 실패');
+                                                                } finally {
+                                                                    setSaving(false);
+                                                                }
+                                                            }}
+                                                            className="p-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-full shadow-lg transition-all"
+                                                            title="Save this asset"
+                                                        >
+                                                            <Save className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (confirm('Delete this asset?')) {
+                                                                    const newData = [...data];
+                                                                    newData[currentFloorIdx].owners[selectedOwnerIdx!].items.splice(iIdx, 1);
+                                                                    setData(newData);
+                                                                }
+                                                            }}
+                                                            className="p-2 bg-white text-slate-300 hover:text-rose-500 rounded-full shadow-lg transition-all"
+                                                            title="Delete this asset"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+                                                        <div className="md:col-span-2 space-y-4">
+                                                            <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                                                <ImageUploader
+                                                                    label="Asset Visual"
+                                                                    folder={`pavilion/floor${activeFloor}/items`}
+                                                                    value={item.image}
+                                                                    onChange={(url) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { image: url })}
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Title</label>
+                                                                <Input className="font-black italic bg-white" placeholder="작품명을 입력하세요" value={item.title} onChange={(e) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { title: e.target.value })} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="md:col-span-3 space-y-4">
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-1 text-indigo-600">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest opacity-60 ml-1">Sale Value (KRW)</label>
+                                                                    <Input className="font-black bg-white/50 border-indigo-100" placeholder="₩0" value={item.price} onChange={(e) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { price: e.target.value })} />
+                                                                </div>
+                                                                <div className="space-y-1 text-indigo-400">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest opacity-60 ml-1">Monthly Rental (KRW)</label>
+                                                                    <Input className="font-black bg-white/50 border-indigo-50" placeholder="₩0" value={item.rental || ''} onChange={(e) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { rental: e.target.value })} />
+                                                                </div>
+                                                                <div className="col-span-2 space-y-1">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Canvas Size (캔버스 크기)</label>
+                                                                    <Input className="font-bold bg-white" placeholder="예: 50.0 x 60.0 cm (15호)" value={item.canvasSize || ''} onChange={(e) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { canvasSize: e.target.value })} />
+                                                                </div>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Curated Description</label>
+                                                                <Textarea className="min-h-[100px] text-xs font-medium bg-white" placeholder="작품의 의도와 상세 정보를 입력하세요" value={item.description} onChange={(e) => updateItem(currentFloorIdx, selectedOwnerIdx!, iIdx, { description: e.target.value })} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Card>
+                                            ))}
+                                            {selectedOwner.items.length === 0 && (
+                                                <div className="xl:col-span-2 p-12 text-center border-2 border-dashed border-slate-100 rounded-[32px]">
+                                                    <Package className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No assets added yet</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </section>
+                                </div>
                             </Card>
-                        ))}
-                    </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

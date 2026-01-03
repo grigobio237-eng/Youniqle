@@ -27,27 +27,42 @@ export async function authenticateToken(request: NextRequest): Promise<{ user: a
   try {
     await connectDB();
 
+    let token = '';
     const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else {
+      // 쿠키에서 토큰 확인 (admin-token 또는 token)
+      token = request.cookies.get('admin-token')?.value || request.cookies.get('token')?.value || '';
+    }
+
+    if (!token) {
       return { user: null, error: '인증 토큰이 필요합니다.' };
     }
 
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
+    const decoded = verifyToken(token) as any;
 
     if (!decoded) {
       return { user: null, error: '유효하지 않은 토큰입니다.' };
     }
 
+    // 유저 ID 필드 정규화 (id 또는 userId)
+    const userId = decoded.userId || decoded.id;
+
+    if (!userId) {
+      return { user: null, error: '토큰에 사용자 정보가 없습니다.' };
+    }
+
     // 사용자 정보 조회
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(userId);
     if (!user) {
+      console.log('❌ User not found in DB for ID:', userId);
       return { user: null, error: '사용자를 찾을 수 없습니다.' };
     }
 
-    if (!user.isActive) {
-      return { user: null, error: '비활성화된 계정입니다.' };
+    if (user.isDeleted) {
+      return { user: null, error: '삭제된 계정입니다.' };
     }
 
     return { user };
@@ -60,7 +75,7 @@ export async function authenticateToken(request: NextRequest): Promise<{ user: a
 // 관리자 권한 검증 미들웨어
 export async function authenticateAdmin(request: NextRequest): Promise<{ user: any; error?: string }> {
   const authResult = await authenticateToken(request);
-  
+
   if (authResult.error) {
     return authResult;
   }
@@ -75,7 +90,7 @@ export async function authenticateAdmin(request: NextRequest): Promise<{ user: a
 // 파트너 권한 검증 미들웨어
 export async function authenticatePartner(request: NextRequest): Promise<{ user: any; error?: string }> {
   const authResult = await authenticateToken(request);
-  
+
   if (authResult.error) {
     return authResult;
   }
@@ -91,7 +106,7 @@ export async function authenticatePartner(request: NextRequest): Promise<{ user:
 export function withAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const authResult = await authenticateToken(request);
-    
+
     if (authResult.error) {
       return NextResponse.json(
         { error: authResult.error },
@@ -107,7 +122,7 @@ export function withAuth(handler: (request: NextRequest, user: any) => Promise<N
 export function withAdminAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const authResult = await authenticateAdmin(request);
-    
+
     if (authResult.error) {
       return NextResponse.json(
         { error: authResult.error },
@@ -123,7 +138,7 @@ export function withAdminAuth(handler: (request: NextRequest, user: any) => Prom
 export function withPartnerAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const authResult = await authenticatePartner(request);
-    
+
     if (authResult.error) {
       return NextResponse.json(
         { error: authResult.error },

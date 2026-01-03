@@ -21,6 +21,11 @@ async function updatePavilionHandler(request: NextRequest) {
         const body = await request.json();
         const { floor, owners } = body;
 
+        console.log(`[API] Updating Floor ${floor} with ${owners?.length} owners`);
+        owners?.forEach((o: any) => {
+            console.log(` - Owner: ${o.name}, Image Path: ${o.image || 'EMPTY'}`);
+        });
+
         if (!floor || !owners) {
             return NextResponse.json({ error: 'Floor and owners data are required' }, { status: 400 });
         }

@@ -10,6 +10,7 @@ export interface IPavilionItem {
     price: string;
     rental?: string;
     image?: string;
+    canvasSize?: string;
 }
 
 export interface IFloorOwner {
@@ -17,6 +18,7 @@ export interface IFloorOwner {
     name: string;
     role: string;
     bio: string;
+    image?: string; // Specialist profile / Representative work
     items: IPavilionItem[];
 }
 
@@ -40,7 +42,8 @@ const PavilionItemSchema = new Schema<IPavilionItem>({
     specs: { type: Schema.Types.Mixed, default: {} },
     price: { type: String, required: true },
     rental: { type: String },
-    image: { type: String }
+    image: { type: String },
+    canvasSize: { type: String }
 });
 
 const FloorOwnerSchema = new Schema<IFloorOwner>({
@@ -48,6 +51,7 @@ const FloorOwnerSchema = new Schema<IFloorOwner>({
     name: { type: String, required: true },
     role: { type: String, required: true },
     bio: { type: String, required: true },
+    image: { type: String },
     items: [PavilionItemSchema]
 });
 
