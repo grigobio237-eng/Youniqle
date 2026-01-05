@@ -328,6 +328,9 @@ export default function PavilionPage() {
                                         <img
                                             src={selectedItem.image}
                                             alt={selectedItem.title}
+                                            onContextMenu={(e) => e.preventDefault()}
+                                            draggable={false}
+                                            style={{ userSelect: 'none', WebkitUserDrag: 'none' } as any}
                                             className="w-full h-full object-contain object-top bg-white transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
@@ -417,6 +420,9 @@ export default function PavilionPage() {
                                 <img
                                     src={selectedItem.image}
                                     alt={selectedItem.title}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    draggable={false}
+                                    style={{ userSelect: 'none', WebkitUserDrag: 'none' } as any}
                                     className="max-w-full max-h-full object-contain shadow-2xl pointer-events-auto"
                                     onClick={(e) => {
                                         e.stopPropagation();

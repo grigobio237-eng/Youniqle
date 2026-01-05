@@ -37,10 +37,13 @@ interface ProductsPageProps {
     category?: string;
     sort?: string;
     page?: string;
+    isFunding?: string;
   }>;
 }
 
 export default function ProductsPage({ searchParams }: ProductsPageProps) {
+  const params = React.use(searchParams);
+  const isFunding = params.isFunding === 'true';
   const [userScore, setUserScore] = useState<number | null>(null);
   const [recommendationLabel, setRecommendationLabel] = useState('');
 
@@ -107,12 +110,37 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         </div>
       )}
 
+      {/* Tabs Menu */}
+      <div className="flex items-center gap-1 mb-12 bg-surface/50 p-1.5 rounded-3xl w-fit border border-line backdrop-blur-md">
+        <Button
+          variant={!isFunding ? "default" : "ghost"}
+          asChild
+          className={`rounded-2xl px-10 h-12 font-black uppercase tracking-widest text-[11px] transition-all ${!isFunding ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
+        >
+          <Link href="/products">일반 상품</Link>
+        </Button>
+        <Button
+          variant={isFunding ? "default" : "ghost"}
+          asChild
+          className={`rounded-2xl px-10 h-12 font-black uppercase tracking-widest text-[11px] transition-all ${isFunding ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
+        >
+          <Link href="/products?isFunding=true">회복 펀딩</Link>
+        </Button>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 pb-8 border-b border-line">
         <div className="space-y-2">
           <h1 className="text-4xl font-black text-text-primary tracking-tighter">
-            전체 상품 <span className="text-primary text-xl font-bold ml-2">All Selection</span>
+            {isFunding ? '회복 펀딩' : '전체 상품'}
+            <span className="text-primary text-xl font-bold ml-2">
+              {isFunding ? 'Recovery Funding' : 'All Selection'}
+            </span>
           </h1>
-          <p className="text-text-secondary text-lg font-medium opacity-60">당신의 회복 데이터를 완성하는 최고의 파트너들</p>
+          <p className="text-text-secondary text-lg font-medium opacity-60">
+            {isFunding
+              ? '더 나은 회복을 위한 새로운 프로젝트에 동참하세요'
+              : '당신의 회복 데이터를 완성하는 최고의 파트너들'}
+          </p>
         </div>
         {/* Simple Quiz-like Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
@@ -135,7 +163,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             </h3>
             <Card className="border-line shadow-2xl overflow-hidden bg-surface rounded-[32px]">
               <CardContent className="p-0">
-                <ProductFilters searchParams={React.use(searchParams)} />
+                <ProductFilters searchParams={params} />
               </CardContent>
             </Card>
           </div>
@@ -145,7 +173,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         <main className="flex-1" id="recommended-products">
           <ErrorBoundary>
             <Suspense fallback={<ProductListSkeleton />}>
-              <ProductList searchParams={React.use(searchParams)} />
+              <ProductList searchParams={params} />
             </Suspense>
           </ErrorBoundary>
         </main>

@@ -33,13 +33,13 @@ export default function PartnerLoginPage() {
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    
+
     if (error) {
       console.log('소셜 로그인 오류:', error);
       let errorMessage = '소셜 로그인 중 오류가 발생했습니다.';
-      
+
       const status = urlParams.get('status');
-      
+
       switch (error) {
         case 'no-session':
           errorMessage = '세션을 찾을 수 없습니다. 다시 로그인해주세요.';
@@ -66,9 +66,9 @@ export default function PartnerLoginPage() {
         default:
           errorMessage = `소셜 로그인 오류: ${error}`;
       }
-      
+
       setError(errorMessage);
-      
+
       // URL에서 오류 파라미터 제거
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -121,17 +121,17 @@ export default function PartnerLoginPage() {
     try {
       // 기존 파트너 토큰 삭제
       document.cookie = 'partner-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      
+
       // 파트너 로그인 상태를 sessionStorage에 저장 (페이지 새로고침 시에도 유지)
       sessionStorage.setItem('partner-login-attempt', 'true');
       sessionStorage.setItem('partner-login-provider', provider);
-      
+
       // NextAuth.js의 signIn 함수를 redirect: true로 사용하여 직접 리다이렉트
-      await signIn(provider, { 
+      await signIn(provider, {
         redirect: true,
         callbackUrl: '/api/partner/auth/callback'
       });
-      
+
     } catch (error) {
       console.error('Social login error:', error);
       setError('소셜 로그인 중 오류가 발생했습니다.');
@@ -162,8 +162,8 @@ export default function PartnerLoginPage() {
 
       <div className="w-full max-w-md relative">
         {/* Back to Home */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="absolute -top-16 left-0 flex items-center text-text-secondary hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -184,7 +184,7 @@ export default function PartnerLoginPage() {
               </CardDescription>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             {error && (
               <Alert variant="destructive" className="mb-6">
@@ -277,7 +277,7 @@ export default function PartnerLoginPage() {
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800 text-center">
                 <strong>소셜 로그인 사용법:</strong><br />
-                구글로 가입한 후 파트너 신청을 완료하신 분들만 이용 가능합니다.<br />
+                소셜 계정(구글, 카카오)으로 가입한 후 파트너 신청을 완료하신 분들만 이용 가능합니다.<br />
                 <span className="text-xs text-blue-600">※ 소셜 로그인 시 자동으로 파트너 토큰이 발급됩니다.</span>
               </p>
             </div>
@@ -290,7 +290,7 @@ export default function PartnerLoginPage() {
                   <div className="text-sm text-yellow-800">
                     <p className="font-semibold mb-1">앱 내 브라우저 감지됨</p>
                     <p className="text-xs">
-                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다. 
+                      Google 로그인은 보안상의 이유로 시스템 브라우저(Chrome, Safari 등)에서만 가능합니다.
                       브라우저에서 직접 열어주세요.
                     </p>
                   </div>
@@ -301,8 +301,8 @@ export default function PartnerLoginPage() {
             {/* 소셜 로그인 안내 문구 */}
             <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
               <p className="text-sm text-orange-700 text-center">
-                <span className="font-medium">카카오톡과 네이버 로그인은 준비 중입니다.</span><br />
-                현재는 구글 로그인과 이메일 로그인만 이용 가능합니다.
+                <span className="font-medium">네이버 로그인은 준비 중입니다.</span><br />
+                현재는 구글과 카카오 로그인, 이메일 로그인만 이용 가능합니다.
               </p>
             </div>
 
@@ -319,11 +319,11 @@ export default function PartnerLoginPage() {
 
               <Button
                 onClick={() => handleSocialLogin('kakao')}
-                disabled
-                className="w-full h-12 bg-yellow-400/50 text-black/50 border-0 transition-all duration-200 font-medium cursor-not-allowed"
+                className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none transition-all duration-200 font-medium"
+                disabled={loading}
               >
                 <KakaoIcon className="w-5 h-5 mr-3" />
-                카카오로 파트너 로그인 (준비중)
+                {loading ? (loadingStep || '카카오 로그인 중...') : '카카오로 파트너 로그인'}
               </Button>
 
               <Button
@@ -388,8 +388,8 @@ export default function PartnerLoginPage() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full h-12 text-lg font-semibold"
                 disabled={loading}
               >
@@ -408,7 +408,7 @@ export default function PartnerLoginPage() {
                   </Link>
                 </Button>
               </div>
-              
+
               <div className="border-t pt-4">
                 <p className="text-xs text-text-secondary text-center">
                   파트너 승인이 필요한 서비스입니다.

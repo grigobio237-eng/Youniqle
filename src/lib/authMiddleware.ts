@@ -33,8 +33,10 @@ export async function authenticateToken(request: NextRequest): Promise<{ user: a
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7);
     } else {
-      // 쿠키에서 토큰 확인 (admin-token 또는 token)
-      token = request.cookies.get('admin-token')?.value || request.cookies.get('token')?.value || '';
+      // 쿠키에서 토큰 확인 (admin-token, partner-token 또는 token)
+      token = request.cookies.get('admin-token')?.value ||
+        request.cookies.get('partner-token')?.value ||
+        request.cookies.get('token')?.value || '';
     }
 
     if (!token) {

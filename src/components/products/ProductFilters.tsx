@@ -13,7 +13,6 @@ const categories = [
   { name: '활력/에너지', value: 'energy' },
   { name: '영양/보충', value: 'nutrition' },
   { name: '측정/진단', value: 'diagnostic' },
-  { name: '회복 펀딩', value: 'funding' },
   { name: '오마카세 (Premium)', value: 'omakase' },
 ];
 

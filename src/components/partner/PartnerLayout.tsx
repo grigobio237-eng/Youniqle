@@ -25,7 +25,8 @@ import {
   Megaphone,
   Globe,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  Palette
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -48,6 +49,7 @@ interface Partner {
   name: string;
   role: string;
   partnerStatus: string;
+  partnerType?: string;
   businessName?: string;
   commissionRate: number;
   partnerStats?: {
@@ -301,6 +303,20 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
     return notificationDate.toLocaleDateString('ko-KR');
   };
 
+  // 파빌리온 권한이 있는 파트너 타입 확인
+  const pavilionPartnerTypes = ['artist', 'business', 'shopper', 'coach'];
+  const hasPavilionAccess = partner?.partnerType && pavilionPartnerTypes.includes(partner.partnerType);
+
+  const getPavilionMenuInfo = () => {
+    const type = partner?.partnerType;
+    if (type === 'artist') return { name: '전시 관리', badge: 'ARTIST', description: '가상공간 1층 작품 관리' };
+    if (['business', 'shopper'].includes(type || '')) return { name: '상점 관리', badge: 'SHOP', description: '가상공간 2층 상점 관리' };
+    if (type === 'coach') return { name: '코칭 관리', badge: 'COACH', description: '가상공간 3층 코칭 관리' };
+    return { name: '전시 관리', badge: 'PARTNER', description: '가상공간 전시 관리' };
+  };
+
+  const pavilionInfo = getPavilionMenuInfo();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -388,7 +404,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 수수료 {partner.commissionRate}%
               </Badge>
               <Badge variant="default" className="text-xs">
-                파트너
+                {partner.partnerType ? partner.partnerType.toUpperCase() : '파트너'}
               </Badge>
             </div>
           </div>
@@ -420,6 +436,30 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 </Link>
               );
             })}
+
+            {/* 파빌리온 전용 메뉴 (권한이 있는 경우만) */}
+            {hasPavilionAccess && (
+              <Link
+                href="/partner/pavilion"
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/partner/pavilion'
+                  ? 'bg-secondary text-white'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
+                  }`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <Palette className="h-5 w-5" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {pavilionInfo.name}
+                    <Badge variant="outline" className="text-[9px] h-4 px-1 bg-indigo-50 text-indigo-600 border-indigo-200">{pavilionInfo.badge}</Badge>
+                  </div>
+                  <div className={`text-xs ${pathname === '/partner/pavilion' ? 'text-white/80' : 'text-text-secondary'
+                    }`}>
+                    {pavilionInfo.description}
+                  </div>
+                </div>
+              </Link>
+            )}
           </nav>
 
           {/* Language Selection */}
@@ -471,6 +511,3 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
     </div>
   );
 }
-
-
-

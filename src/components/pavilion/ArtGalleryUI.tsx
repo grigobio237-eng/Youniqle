@@ -73,6 +73,9 @@ export default function ArtGalleryUI({
                                         <img
                                             src={artist.image}
                                             alt={artist.name}
+                                            onContextMenu={(e) => e.preventDefault()}
+                                            draggable={false}
+                                            style={{ userSelect: 'none', WebkitUserDrag: 'none' } as any}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                     ) : (
@@ -105,6 +108,9 @@ export default function ArtGalleryUI({
                                 <motion.img
                                     src={selectedArtist.image}
                                     alt={selectedArtist.name}
+                                    onContextMenu={(e: any) => e.preventDefault()}
+                                    draggable={false}
+                                    style={{ userSelect: 'none', WebkitUserDrag: 'none' } as any}
                                     className="w-full h-full object-cover"
                                     initial={{ opacity: 0, scale: 1.1 }}
                                     animate={{ opacity: 1, scale: 1 }}

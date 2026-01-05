@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // 파트너 정보 확인 (role은 user여도 partnerStatus가 approved면 파트너)
     const partner = await User.findById(decoded.id)
       .select('-passwordHash');
-    
+
     console.log('파트너 인증 확인:', {
       tokenId: decoded.id,
       partnerFound: !!partner,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       partnerEmail: partner?.email,
       partnerStatus: partner?.partnerStatus
     });
-    
+
     if (!partner || partner.partnerStatus !== 'approved') {
       return NextResponse.json(
         { error: '승인된 파트너가 아닙니다.' },
@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         name: partner.name,
         role: partner.role,
         partnerStatus: partner.partnerStatus,
+        partnerType: partner.partnerApplication?.partnerType,
         businessName: partner.partnerApplication?.businessName,
         commissionRate: partner.partnerSettings?.commissionRate || 10,
         partnerStats: partner.partnerStats,
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Partner verify error:', error);
-    
+
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json(
         { error: '유효하지 않은 토큰입니다.' },
