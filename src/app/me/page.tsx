@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,7 @@ export default function MyPage() {
   const [loading, setLoading] = useState(false);
   const [showPartnerApplication, setShowPartnerApplication] = useState(false);
   const [partnerApplicationData, setPartnerApplicationData] = useState({
+    partnerType: '',
     businessName: '',
     businessNumber: '',
     businessZipCode: '',
@@ -69,7 +70,46 @@ export default function MyPage() {
     businessRegistrationImage: '',
     bankStatementImage: ''
   });
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File | null }>({
+    businessRegistrationImage: null,
+    bankStatementImage: null
+  });
+  const [previewUrls, setPreviewUrls] = useState<{ [key: string]: string | null }>({
+    businessRegistrationImage: null,
+    bankStatementImage: null
+  });
   const [partnerApplicationLoading, setPartnerApplicationLoading] = useState(false);
+
+  // WebP 변환 유틸리티
+  const convertToWebP = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new globalThis.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+              type: 'image/webp',
+              lastModified: Date.now(),
+            });
+            resolve(newFile);
+          } else {
+            reject(new Error('WebP conversion failed'));
+          }
+        }, 'image/webp', 0.8); // 퀄리티 0.8
+      };
+      img.onerror = (e) => reject(e);
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
   useEffect(() => {
     if (session?.user) {
@@ -182,41 +222,71 @@ export default function MyPage() {
     }));
   };
 
-  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'businessRegistrationImage' | 'bankStatementImage') => {
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      // 1. 파일 상태 저장
+      setSelectedFiles(prev => ({
+        ...prev,
+        [fieldName]: file
+      }));
 
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('파일 크기는 10MB를 초과할 수 없습니다.');
-      return;
-    }
-
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', 'partner-documents');
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: fd,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        handlePartnerApplicationChange(field, result.url);
-      } else {
-        const errorData = await response.json();
-        alert(`업로드 실패: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error('업로드 오류:', error);
+      // 2. 미리보기 URL 생성 및 저장
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewUrls(prev => ({
+        ...prev,
+        [fieldName]: previewUrl
+      }));
     }
   };
 
   const handlePartnerApplicationSubmit = async () => {
     setPartnerApplicationLoading(true);
     try {
+      // 1. 이미지 업로드 처리 (WebP 변환 후)
+      let businessRegistrationImageUrl = partnerApplicationData.businessRegistrationImage;
+      let bankStatementImageUrl = partnerApplicationData.bankStatementImage;
+
+      // 사업자등록증 / 자격증 업로드
+      if (selectedFiles.businessRegistrationImage) {
+        try {
+          const webpFile = await convertToWebP(selectedFiles.businessRegistrationImage);
+          const formData = new FormData();
+          formData.append('file', webpFile);
+          formData.append('folder', 'partner-documents');
+
+          const res = await fetch('/api/upload', { method: 'POST', body: formData });
+          if (!res.ok) throw new Error('Business Registration Upload Failed');
+          const data = await res.json();
+          businessRegistrationImageUrl = data.url;
+        } catch (e) {
+          console.error(e);
+          alert('증빙서류 업로드 중 오류가 발생했습니다.');
+          setPartnerApplicationLoading(false);
+          return;
+        }
+      }
+
+      // 통장사본 업로드
+      if (selectedFiles.bankStatementImage) {
+        try {
+          const webpFile = await convertToWebP(selectedFiles.bankStatementImage);
+          const formData = new FormData();
+          formData.append('file', webpFile);
+          formData.append('folder', 'partner-documents');
+
+          const res = await fetch('/api/upload', { method: 'POST', body: formData });
+          if (!res.ok) throw new Error('Bank Statement Upload Failed');
+          const data = await res.json();
+          bankStatementImageUrl = data.url;
+        } catch (e) {
+          console.error(e);
+          alert('통장사본 업로드 중 오류가 발생했습니다.');
+          setPartnerApplicationLoading(false);
+          return;
+        }
+      }
+
       let fullBusinessAddress = partnerApplicationData.businessAddress;
       if (partnerApplicationData.businessZipCode) {
         fullBusinessAddress = `[${partnerApplicationData.businessZipCode}] ${fullBusinessAddress}`;
@@ -227,13 +297,17 @@ export default function MyPage() {
 
       const response = await fetch('/api/partner/auth/apply', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          email: session?.user?.email,
-          name: session?.user?.name,
-          phone: formData.phone,
+          email: session?.user?.email || userData?.email || '',
+          name: session?.user?.name || userData?.name || '',
+          phone: partnerApplicationData.businessPhone,
           ...partnerApplicationData,
-          businessAddress: fullBusinessAddress
+          businessAddress: fullBusinessAddress,
+          businessRegistrationImage: businessRegistrationImageUrl,
+          bankStatementImage: bankStatementImageUrl
         }),
       });
 
@@ -247,6 +321,7 @@ export default function MyPage() {
       }
     } catch (error) {
       console.error('신청 오류:', error);
+      alert('신청 중 오류가 발생했습니다.');
     } finally {
       setPartnerApplicationLoading(false);
     }
@@ -499,7 +574,7 @@ export default function MyPage() {
               </Button>
               <div className="h-px bg-line/20 w-full" />
               <div className="flex gap-2">
-                <Button variant="ghost" className="flex-1 justify-center h-10 text-slate hover:text-obsidian text-[10px] font-bold">
+                <Button variant="ghost" onClick={() => signOut({ callbackUrl: '/' })} className="flex-1 justify-center h-10 text-slate hover:text-obsidian text-[10px] font-bold">
                   로그아웃
                 </Button>
                 <div className="w-px bg-line/20 h-4 self-center" />
@@ -526,66 +601,182 @@ export default function MyPage() {
               </div>
 
               <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">상호명 / 성함</Label>
-                      <Input value={partnerApplicationData.businessName} onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)} required placeholder="정식 명칭을 입력하십시오" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업자 번호 (개인은 생년월일)</Label>
-                      <Input value={partnerApplicationData.businessNumber} onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)} required placeholder="000-00-00000" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업장/비상 연락처</Label>
-                      <Input value={partnerApplicationData.businessPhone} onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)} required placeholder="02-XXXX-XXXX" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    </div>
-                  </div>
 
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">사업장 주소</Label>
-                      <GoogleAddressSearch onAddressSelect={(a) => { handlePartnerApplicationChange('businessZipCode', a.zonecode); handlePartnerApplicationChange('businessAddress', a.address); }} />
-                      <Input value={partnerApplicationData.businessAddress} placeholder="기본 주소" className="h-14 rounded-2xl bg-mist/50 border-line text-xs font-bold" readOnly />
-                      <Input value={partnerApplicationData.businessDetailAddress} onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)} placeholder="상세 주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    </div>
+                {/* 1. 카테고리 선택 섹션 */}
+                <div className="mb-12">
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1 mb-4 block">파트너 유형 선택</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { id: 'shopper', title: '쇼퍼 (Shopper)', desc: '사업자등록증 없이 일반 상품 판매', icon: ShoppingBag },
+                      { id: 'business', title: '사업장회원 (Business)', desc: '파빌리언 2층 상점 입점 및 운영', icon: Store },
+                      { id: 'coach', title: '코치 회원 (Coach)', desc: '파빌리언 3층 샵 운영 (운동/건강)', icon: User },
+                      { id: 'artist', title: '작가 회원 (Artist)', desc: '1층 갤러리 운영 및 작품 게시', icon: FileImage },
+                    ].map((type) => (
+                      <div
+                        key={type.id}
+                        onClick={() => handlePartnerApplicationChange('partnerType', type.id)}
+                        className={`p-6 rounded-[28px] border-2 cursor-pointer transition-all flex items-start gap-4 ${partnerApplicationData.partnerType === type.id ? 'border-obsidian bg-obsidian/5' : 'border-line hover:border-obsidian/30 hover:bg-mist/30'}`}
+                      >
+                        <div className={`p-3 rounded-2xl ${partnerApplicationData.partnerType === type.id ? 'bg-obsidian text-mist' : 'bg-mist text-slate'}`}>
+                          <type.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-black text-obsidian text-sm">{type.title}</h4>
+                          <p className="text-[11px] font-medium text-slate mt-1">{type.desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">정산 계좌 정보</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input value={partnerApplicationData.bankName} onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)} required placeholder="은행명" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    <Input value={partnerApplicationData.accountHolder} onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)} required placeholder="예금주" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    <Input value={partnerApplicationData.bankAccount} onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)} required placeholder="계좌번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                  </div>
-                </div>
+                {/* 2. 입력 폼 섹션 (유형 선택 시 노출) */}
+                {partnerApplicationData.partnerType && (
+                  <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                            {partnerApplicationData.partnerType === 'shopper' ? '활동명 (닉네임)' :
+                              partnerApplicationData.partnerType === 'coach' ? '샵 이름 (상호명)' :
+                                partnerApplicationData.partnerType === 'artist' ? '갤러리 이름' : '상호명 / 성함'}
+                            <span className="text-red-500 ml-1">*</span>
+                          </Label>
+                          <Input value={partnerApplicationData.businessName} onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)} required placeholder={partnerApplicationData.partnerType === 'shopper' ? "활동명을 입력하세요" : "정식 명칭을 입력하십시오"} className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        </div>
 
-                <div className="space-y-6">
-                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">증빙 서류 전송</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className={`p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all ${partnerApplicationData.businessRegistrationImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
-                      <div className={`w-14 h-14 rounded-[18px] flex items-center justify-center ${partnerApplicationData.businessRegistrationImage ? 'bg-status-good text-white' : 'bg-mist text-slate'}`}>
-                        <FileImage className="h-6 w-6" />
+                        {/* 사업자 번호: 쇼퍼는 숨김, 그 외는 노출 (코치/작가는 선택 사항일 수 있으나 입력 권장) */}
+                        {partnerApplicationData.partnerType !== 'shopper' && (
+                          <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                              {partnerApplicationData.partnerType === 'business' ? '사업자 번호 (필수)' : '사업자 번호 (선택)'}
+                              {partnerApplicationData.partnerType === 'business' && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            <Input value={partnerApplicationData.businessNumber} onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)} required={partnerApplicationData.partnerType === 'business'} placeholder="000-00-00000" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                          </div>
+                        )}
+
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                            연락처 <span className="text-red-500 ml-1">*</span>
+                          </Label>
+                          <Input value={partnerApplicationData.businessPhone} onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)} required placeholder="010-XXXX-XXXX" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        </div>
+
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                            소개글 <span className="text-red-500 ml-1">*</span>
+                          </Label>
+                          <Input value={partnerApplicationData.businessDescription} onChange={(e) => handlePartnerApplicationChange('businessDescription', e.target.value)} required placeholder="간단한 소개를 입력해주세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-xs font-black text-obsidian">사업자등록증</p>
-                        <p className="text-[10px] font-bold text-slate mt-1">{partnerApplicationData.businessRegistrationImage ? '전송 완료' : '이미지 업로드'}</p>
+
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                            {partnerApplicationData.partnerType === 'shopper' ? '활동 지역 (선택)' : '사업장/활동 주소'}
+                            {partnerApplicationData.partnerType !== 'shopper' && <span className="text-red-500 ml-1">*</span>}
+                          </Label>
+                          <GoogleAddressSearch onAddressSelect={(a) => { handlePartnerApplicationChange('businessZipCode', a.zonecode); handlePartnerApplicationChange('businessAddress', a.address); }} />
+                          <Input value={partnerApplicationData.businessAddress} placeholder="기본 주소" className="h-14 rounded-2xl bg-mist/50 border-line text-xs font-bold" readOnly />
+                          <Input value={partnerApplicationData.businessDetailAddress} onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)} placeholder="상세 주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        </div>
                       </div>
-                      <input type="file" onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')} className="absolute inset-x-8 h-32 opacity-0 cursor-pointer" />
                     </div>
-                    <div className={`p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all ${partnerApplicationData.bankStatementImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
-                      <div className={`w-14 h-14 rounded-[18px] flex items-center justify-center ${partnerApplicationData.bankStatementImage ? 'bg-status-good text-white' : 'bg-mist text-slate'}`}>
-                        <FileImage className="h-6 w-6" />
+
+                    <div className="space-y-6">
+                      <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                        정산 계좌 정보 (수익금 정산용) <span className="text-red-500 ml-1">*</span>
+                      </Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Input value={partnerApplicationData.bankName} onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)} required placeholder="은행명" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        <Input value={partnerApplicationData.accountHolder} onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)} required placeholder="예금주" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        <Input value={partnerApplicationData.bankAccount} onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)} required placeholder="계좌번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
                       </div>
-                      <div className="text-center">
-                        <p className="text-xs font-black text-obsidian">통장 사본</p>
-                        <p className="text-[10px] font-bold text-slate mt-1">{partnerApplicationData.bankStatementImage ? '전송 완료' : '이미지 업로드'}</p>
-                      </div>
-                      <input type="file" onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')} className="absolute inset-x-8 h-32 opacity-0 cursor-pointer" />
                     </div>
+
+                    {/* 증빙 서류: 쇼퍼는 숨김 */}
+                    {partnerApplicationData.partnerType !== 'shopper' && (
+                      <div className="space-y-6">
+                        <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
+                          증빙 서류 전송 {partnerApplicationData.partnerType === 'business' && <span className="text-red-500 ml-1">*</span>}
+                        </Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className={`relative p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all overflow-hidden ${previewUrls.businessRegistrationImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
+                            {previewUrls.businessRegistrationImage ? (
+                              <>
+                                <div className="absolute inset-0 z-0">
+                                  <Image src={previewUrls.businessRegistrationImage} alt="Preview" fill className="object-cover opacity-50" />
+                                </div>
+                                <div className="relative z-10 w-14 h-14 rounded-[18px] flex items-center justify-center bg-status-good text-white shadow-lg">
+                                  <CheckCircle className="h-6 w-6" />
+                                </div>
+                                <div className="relative z-10 text-center">
+                                  <p className="text-xs font-black text-obsidian shadow-sm">
+                                    {partnerApplicationData.partnerType === 'business' ? '사업자등록증' :
+                                      partnerApplicationData.partnerType === 'coach' ? '자격증 사본' : '포트폴리오/작품증빙'}
+                                  </p>
+                                  <p className="text-[10px] font-bold text-status-good mt-1 font-black bg-white/50 px-2 py-0.5 rounded-full inline-block backdrop-blur-sm">선택 완료</p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-14 h-14 rounded-[18px] flex items-center justify-center bg-mist text-slate">
+                                  <FileImage className="h-6 w-6" />
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-xs font-black text-obsidian">
+                                    {partnerApplicationData.partnerType === 'business' ? '사업자등록증' :
+                                      partnerApplicationData.partnerType === 'coach' ? '자격증 사본' : '포트폴리오/작품증빙'}
+                                  </p>
+                                  <p className="text-[10px] font-bold text-slate mt-1">이미지 업로드</p>
+                                </div>
+                              </>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                            />
+                          </div>
+
+                          <div className={`relative p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all overflow-hidden ${previewUrls.bankStatementImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
+                            {previewUrls.bankStatementImage ? (
+                              <>
+                                <div className="absolute inset-0 z-0">
+                                  <Image src={previewUrls.bankStatementImage} alt="Preview" fill className="object-cover opacity-50" />
+                                </div>
+                                <div className="relative z-10 w-14 h-14 rounded-[18px] flex items-center justify-center bg-status-good text-white shadow-lg">
+                                  <CheckCircle className="h-6 w-6" />
+                                </div>
+                                <div className="relative z-10 text-center">
+                                  <p className="text-xs font-black text-obsidian shadow-sm">통장 사본</p>
+                                  <p className="text-[10px] font-bold text-status-good mt-1 font-black bg-white/50 px-2 py-0.5 rounded-full inline-block backdrop-blur-sm">선택 완료</p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-14 h-14 rounded-[18px] flex items-center justify-center bg-mist text-slate">
+                                  <FileImage className="h-6 w-6" />
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-xs font-black text-obsidian">통장 사본</p>
+                                  <p className="text-[10px] font-bold text-slate mt-1">이미지 업로드</p>
+                                </div>
+                              </>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
 
                 <Button type="submit" disabled={partnerApplicationLoading} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black text-xl shadow-2xl hover:scale-[1.02] transition-all">
                   {partnerApplicationLoading ? '신청 프로토콜 가동 중...' : '파트너 신청 프로토콜 제출'}

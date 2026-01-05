@@ -24,25 +24,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        grade: user.grade,
-        points: user.points,
-        referralCode: user.referralCode,
-        referredBy: user.referredBy,
-        marketingConsent: user.marketingConsent,
-        addresses: user.addresses,
-        createdAt: user.createdAt,
-      },
-    });
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      role: user.role,
+      grade: user.grade,
+      points: user.points,
+      referralCode: user.referralCode,
+      referredBy: user.referredBy,
+      marketingConsent: user.marketingConsent,
+      addresses: user.addresses,
+      partnerStatus: user.partnerStatus,
+      partnerApplication: user.partnerApplication,
+      createdAt: user.createdAt,
+    };
+
+    return NextResponse.json({ user: userResponse });
   } catch (error) {
     console.error('Get user error:', error);
-    
+
     return NextResponse.json(
       { error: '서버 오류가 발생했습니다.' },
       { status: 500 }
@@ -105,26 +107,30 @@ export async function PUT(request: NextRequest) {
 
     await user.save();
 
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      role: user.role,
+      grade: user.grade,
+      points: user.points,
+      referralCode: user.referralCode,
+      referredBy: user.referredBy,
+      marketingConsent: user.marketingConsent,
+      addresses: user.addresses,
+      partnerStatus: user.partnerStatus,
+      partnerApplication: user.partnerApplication,
+      createdAt: user.createdAt,
+    };
+
     return NextResponse.json({
       message: '프로필이 성공적으로 업데이트되었습니다.',
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        grade: user.grade,
-        points: user.points,
-        referralCode: user.referralCode,
-        referredBy: user.referredBy,
-        marketingConsent: user.marketingConsent,
-        addresses: user.addresses,
-        createdAt: user.createdAt,
-      },
+      user: userResponse,
     });
   } catch (error) {
     console.error('Update user error:', error);
-    
+
     return NextResponse.json(
       { error: '서버 오류가 발생했습니다.' },
       { status: 500 }

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Fingerprint, ChevronRight, ShoppingCart, User as UserIcon, Menu, ArrowRight, X, Heart, Sparkles, LayoutGrid, Info, CheckCircle2, ArrowLeft, Image as LucideImage, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Direct imports
 import ConventionCenter from '@/components/convention/ConventionCenter';
@@ -34,6 +35,7 @@ export interface FloorOwner {
 }
 
 export default function PavilionPage() {
+    const router = useRouter();
     const [activeFloor, setActiveFloor] = useState(1);
     const [mounted, setMounted] = useState(false);
     const [showIntro, setShowIntro] = useState(true);
@@ -53,8 +55,10 @@ export default function PavilionPage() {
     const [selectedOwner, setSelectedOwner] = useState<FloorOwner | null>(null);
     const [isInsideRoom, setIsInsideRoom] = useState(false);
     const [selectedItem, setSelectedItem] = useState<PavilionItem | null>(null);
+    const [isImageZoomed, setIsImageZoomed] = useState(false);
     const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'STANDARD' | 'ART_GRID' | 'ART_BIO'>('STANDARD');
+    const [galleryOffset, setGalleryOffset] = useState(0); // 1층 갤러리 좌우 이동 오프셋
 
     // Omakase Suite State (5F)
     const [omakaseSelection, setOmakaseSelection] = useState<PavilionItem[]>([]);
@@ -72,6 +76,22 @@ export default function PavilionPage() {
             const res = await fetch('/api/pavilion');
             if (res.ok) {
                 const data = await res.json();
+
+                // Floor 2 (상점)는 별도 API에서 상품 데이터 로드
+                const floor2Res = await fetch('/api/pavilion/products?floorId=floor-2');
+                if (floor2Res.ok) {
+                    const productsData = await floor2Res.json(); // 중복 호출 제거
+                    // Floor 2 데이터 구조 생성
+                    data[2] = [{
+                        id: 'shop-products',
+                        name: 'Recovery Shop',
+                        role: '상품 전시',
+                        bio: '회복을 위한 다양한 상품을 만나보세요',
+                        image: '/artist_master_a.png', // 기본 이미지
+                        items: productsData.items || []
+                    }];
+                }
+
                 setPavilionData(data);
             }
         } catch (error) {
@@ -84,7 +104,7 @@ export default function PavilionPage() {
     // Handle Specialist Click
     const handleArtistClick = useCallback((id: string) => {
         setSelectedArtistId(id);
-        if (activeFloor === 1) {
+        if (activeFloor === 1 || activeFloor === 2) {
             setViewMode('ART_BIO');
         }
         const owner = (pavilionData[activeFloor] || []).find(o => o.id === id);
@@ -96,9 +116,17 @@ export default function PavilionPage() {
     const handleArtworkClick = useCallback((itemId: string) => {
         if (selectedOwner) {
             const item = selectedOwner.items.find(i => i.id === itemId);
-            if (item) setSelectedItem(item);
+            if (item) {
+                // Floor 2 (상점)인 경우 상품 상세 페이지로 라우팅
+                if (activeFloor === 2 && (item as any).productId) {
+                    router.push(`/products/${(item as any).productId}`);
+                } else {
+                    // 1층 갤러리는 기존 모달 표시
+                    setSelectedItem(item);
+                }
+            }
         }
-    }, [selectedOwner]);
+    }, [selectedOwner, activeFloor, router]);
 
     // Handle Floor change
     const handleFloorChange = useCallback((floor: number) => {
@@ -108,16 +136,20 @@ export default function PavilionPage() {
         setSelectedItem(null);
         setSelectedArtistId(null);
 
-        if (floor === 1) {
+        if (floor === 1 || floor === 2) {
             setViewMode('ART_GRID');
         } else {
             setViewMode('STANDARD');
         }
     }, []);
 
+    const handleEngineReady = useCallback(() => {
+        setEngineStatus('READY');
+    }, []);
+
     // Set initial view mode for Floor 1 when data loads
     useEffect(() => {
-        if (mounted && !isLoading && activeFloor === 1 && Object.keys(pavilionData).length > 0) {
+        if (mounted && !isLoading && (activeFloor === 1 || activeFloor === 2) && Object.keys(pavilionData).length > 0) {
             setViewMode('ART_GRID');
         }
     }, [mounted, isLoading, activeFloor, pavilionData]);
@@ -136,19 +168,47 @@ export default function PavilionPage() {
                     selectedOwner={selectedOwner}
                     selectedItemId={selectedItem?.id || null}
                     isInsideRoom={isInsideRoom}
-                    onReady={() => setEngineStatus('READY')}
+                    onReady={handleEngineReady}
                     onArtistClick={handleArtistClick}
                     onArtworkClick={handleArtworkClick}
                     onEnterRoom={() => {
                         setIsInsideRoom(true);
                         setViewMode('STANDARD');
                     }}
-                    floorData={activeFloor === 1 && !isInsideRoom ? [] : currentFloorOwners}
+                    floorData={(activeFloor === 1 || activeFloor === 2) && !isInsideRoom ? [] : currentFloorOwners}
+                    panOffset={galleryOffset}
                 />
             </div>
 
+            {/* Gallery Navigation Arrows (Only inside 1st floor gallery) */}
+            {activeFloor === 1 && isInsideRoom && !selectedItem && (
+                <>
+                    <button
+                        onClick={() => setGalleryOffset(prev => prev - 20)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-40 p-6 md:p-10 text-obsidian/10 hover:text-obsidian/30 transition-all pointer-events-auto group"
+                    >
+                        <LucideImage className="w-12 h-12 md:w-20 md:h-20 rotate-180 opacity-20 group-hover:opacity-100 transition-opacity" />
+                        <span className="sr-only">이전 작품</span>
+                        {/* 화살표 아이콘 대신 사용자가 투명한 화살표를 원하므로 Chevron 사용 */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <ChevronRight className="w-full h-full rotate-180 opacity-10 group-hover:opacity-40" />
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => setGalleryOffset(prev => prev + 20)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-40 p-6 md:p-10 text-obsidian/10 hover:text-obsidian/30 transition-all pointer-events-auto group"
+                    >
+                        <LucideImage className="w-12 h-12 md:w-20 md:h-20 opacity-20 group-hover:opacity-100 transition-opacity" />
+                        <span className="sr-only">다음 작품</span>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <ChevronRight className="w-full h-full opacity-10 group-hover:opacity-40" />
+                        </div>
+                    </button>
+                </>
+            )}
+
             {/* Art Gallery 2D Overlays */}
-            {activeFloor === 1 && viewMode !== 'STANDARD' && (
+            {(activeFloor === 1 || activeFloor === 2) && viewMode !== 'STANDARD' && (
                 <ArtGalleryUI
                     viewMode={viewMode === 'ART_GRID' ? 'GRID' : 'BIO'}
                     artists={currentFloorOwners.map((o: FloorOwner) => ({
@@ -156,7 +216,7 @@ export default function PavilionPage() {
                         name: o.name,
                         role: o.role,
                         bio: o.bio,
-                        image: o.image || ARTIST_PORTRAITS[o.id] || ARTIST_PORTRAITS['artist-a']
+                        image: (o.image && o.image.trim() !== '') ? o.image : (ARTIST_PORTRAITS[o.id] || ARTIST_PORTRAITS['artist-a'])
                     }))}
                     selectedArtistId={selectedArtistId}
                     onArtistSelect={handleArtistClick}
@@ -165,6 +225,9 @@ export default function PavilionPage() {
                         setViewMode('STANDARD');
                     }}
                     onBack={() => setViewMode('ART_GRID')}
+                    title={activeFloor === 2 ? "Prestige Shop" : "Art Gallery"}
+                    subtitle={activeFloor === 2 ? "Curated for Recovery" : "Visionaries of Recovery"}
+                    enterButtonText={activeFloor === 2 ? "상점 입장하기" : "갤러리 입장하기"}
                 />
             )}
 
@@ -204,7 +267,7 @@ export default function PavilionPage() {
 
                 {/* --- Owner Mini Bio --- */}
                 <AnimatePresence>
-                    {selectedOwner && !isInsideRoom && !selectedItem && activeFloor !== 1 && (
+                    {selectedOwner && !isInsideRoom && !selectedItem && activeFloor !== 1 && activeFloor !== 2 && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -239,11 +302,14 @@ export default function PavilionPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 z-[200] bg-white/95 backdrop-blur-3xl flex flex-col items-center justify-center p-6 md:p-12 pointer-events-auto overflow-y-auto"
+                            className="absolute inset-0 z-[9999] bg-white/95 backdrop-blur-3xl flex flex-col items-center justify-start p-6 md:p-12 pt-28 md:pt-32 pointer-events-auto overflow-y-auto"
                         >
                             <button
-                                onClick={() => setSelectedItem(null)}
-                                className="absolute top-6 right-6 md:top-12 md:right-12 flex items-center gap-4 text-obsidian/40 hover:text-obsidian group z-50"
+                                onClick={() => {
+                                    setSelectedItem(null);
+                                    setIsImageZoomed(false);
+                                }}
+                                className="fixed top-8 right-8 md:top-12 md:right-12 flex items-center gap-4 text-obsidian/40 hover:text-obsidian group z-[210]"
                             >
                                 <span className="font-black uppercase tracking-widest text-[8px] md:text-[10px] hidden md:block">상세 정보 닫기</span>
                                 <div className="p-3 md:p-4 bg-obsidian/5 rounded-full group-hover:bg-obsidian transition-all group-hover:scale-110">
@@ -251,17 +317,18 @@ export default function PavilionPage() {
                                 </div>
                             </button>
 
-                            <div className="max-w-[1400px] w-full grid grid-cols-1 xl:grid-cols-5 gap-8 md:gap-16 items-center my-auto">
+                            <div className="max-w-[1400px] w-full grid grid-cols-1 xl:grid-cols-5 gap-8 md:gap-16 items-center pb-12">
                                 <motion.div
                                     initial={{ x: -100, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
-                                    className="xl:col-span-3 aspect-[4/5] md:aspect-auto md:h-[70vh] bg-obsidian rounded-[32px] md:rounded-[60px] relative overflow-hidden shadow-2xl border-[8px] md:border-[20px] border-white group"
+                                    className="xl:col-span-3 aspect-[4/5] md:aspect-auto md:h-[70vh] bg-obsidian rounded-[32px] md:rounded-[60px] relative overflow-hidden shadow-2xl border-[8px] md:border-[20px] border-white group cursor-zoom-in"
+                                    onClick={() => setIsImageZoomed(true)}
                                 >
                                     {selectedItem.image ? (
                                         <img
                                             src={selectedItem.image}
                                             alt={selectedItem.title}
-                                            className="w-full h-full object-contain bg-white"
+                                            className="w-full h-full object-contain object-top bg-white transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
                                         <div className="absolute inset-0 bg-gradient-to-tr from-[#D4AF37]/20 via-obsidian to-transparent flex items-center justify-center">
@@ -271,59 +338,92 @@ export default function PavilionPage() {
                                 </motion.div>
 
                                 <div className="xl:col-span-2 space-y-6 md:space-y-12 text-left">
-                                    <div className="space-y-4 md:space-y-6">
+                                    <div className="space-y-3 md:space-y-6">
                                         <div className="flex items-center gap-4">
-                                            <span className="px-3 py-1 bg-[#D4AF37] text-white font-black text-[7px] md:text-[9px] uppercase tracking-widest rounded">{selectedItem.type}</span>
+                                            <span className="px-2 py-0.5 bg-[#D4AF37] text-white font-black text-[6px] md:text-[9px] uppercase tracking-widest rounded">{selectedItem.type}</span>
                                         </div>
-                                        <h3 className="text-3xl md:text-7xl font-black text-obsidian tracking-tighter uppercase italic leading-none">
+                                        <h3 className="text-2xl md:text-7xl font-black text-obsidian tracking-tighter uppercase italic leading-tight md:leading-none">
                                             {selectedItem.title}
                                         </h3>
-                                        <p className="text-sm md:text-2xl font-serif text-obsidian/50 leading-relaxed italic border-l-4 border-[#D4AF37] pl-4 md:pl-8">
+                                        <p className="text-xs md:text-2xl font-serif text-obsidian/50 leading-relaxed italic border-l-2 md:border-l-4 border-[#D4AF37] pl-3 md:pl-8">
                                             "{selectedItem.description}"
                                         </p>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-px bg-obsidian/5 rounded-2xl overflow-hidden border border-obsidian/5">
+                                    <div className="grid grid-cols-2 gap-px bg-obsidian/5 rounded-xl md:rounded-2xl overflow-hidden border border-obsidian/5">
                                         {selectedItem.canvasSize && (
-                                            <div className="p-4 md:p-8 bg-white/40 space-y-2">
-                                                <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">CANVAS SIZE</span>
-                                                <p className="font-black text-obsidian text-sm md:text-lg">{selectedItem.canvasSize}</p>
+                                            <div className="p-3 md:p-8 bg-white/40 space-y-1 md:space-y-2">
+                                                <span className="text-[6px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">CANVAS SIZE</span>
+                                                <p className="font-black text-obsidian text-xs md:text-lg">{selectedItem.canvasSize}</p>
                                             </div>
                                         )}
                                         {Object.entries(selectedItem.specs).map(([key, value]) => (
-                                            <div key={key} className="p-4 md:p-8 bg-white/40 space-y-2">
-                                                <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">{key}</span>
-                                                <p className="font-black text-obsidian text-sm md:text-lg">{value}</p>
+                                            <div key={key} className="p-3 md:p-8 bg-white/40 space-y-1 md:space-y-2">
+                                                <span className="text-[6px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">{key}</span>
+                                                <p className="font-black text-obsidian text-xs md:text-lg">{value}</p>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <div className="space-y-4 md:space-y-6 pt-2">
-                                        <div className="flex flex-col gap-4 pb-4 border-b border-obsidian/5">
+                                    <div className="space-y-3 md:space-y-6 pt-2">
+                                        <div className="flex flex-col gap-2 md:gap-4 pb-3 md:pb-4 border-b border-obsidian/5">
                                             {selectedItem.rental && (
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest italic">렌탈 (월)</span>
-                                                    <span className="text-xl md:text-2xl font-black text-obsidian tracking-tighter">₩{parseInt(selectedItem.rental.replace(/[^0-9]/g, '') || '0').toLocaleString()}</span>
+                                                    <span className="text-[8px] md:text-[10px] font-black text-[#D4AF37] uppercase tracking-widest italic">렌탈 (월)</span>
+                                                    <span className="text-lg md:text-2xl font-black text-obsidian tracking-tighter">₩{parseInt(selectedItem.rental.replace(/[^0-9]/g, '') || '0').toLocaleString()}</span>
                                                 </div>
                                             )}
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[10px] font-black text-obsidian/30 uppercase tracking-widest italic">가치 산정액 (판매가)</span>
-                                                <span className="text-2xl md:text-4xl font-black text-obsidian tracking-tighter">₩{parseInt(selectedItem.price.replace(/[^0-9]/g, '') || '0').toLocaleString()}</span>
+                                                <span className="text-[8px] md:text-[10px] font-black text-obsidian/30 uppercase tracking-widest italic">가치 산정액</span>
+                                                <span className="text-xl md:text-4xl font-black text-obsidian tracking-tighter">₩{parseInt(selectedItem.price.replace(/[^0-9]/g, '') || '0').toLocaleString()}</span>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <button className="h-14 md:h-20 bg-obsidian text-white rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
-                                                <ShoppingCart size={18} />
+                                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                                            <button className="h-12 md:h-20 bg-obsidian text-white rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-4">
+                                                <ShoppingCart size={14} className="md:w-[18px] md:h-[18px]" />
                                                 담기
                                             </button>
-                                            <button className="h-14 md:h-20 border-2 border-obsidian/10 text-obsidian rounded-2xl font-black uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all">
+                                            <button className="h-12 md:h-20 border-2 border-obsidian/10 text-obsidian rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all">
                                                 문의하기
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* --- Image Zoom Modal --- */}
+                <AnimatePresence>
+                    {isImageZoomed && selectedItem && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[10000] bg-black/95 flex items-center justify-center p-4 backdrop-blur-xl cursor-zoom-out"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsImageZoomed(false);
+                            }}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="relative w-full h-full flex items-center justify-center pointer-events-none"
+                            >
+                                <img
+                                    src={selectedItem.image}
+                                    alt={selectedItem.title}
+                                    className="max-w-full max-h-full object-contain shadow-2xl pointer-events-auto"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsImageZoomed(false);
+                                    }}
+                                />
+                            </motion.div>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -417,7 +517,7 @@ export default function PavilionPage() {
                         <button
                             onClick={() => {
                                 setIsInsideRoom(false);
-                                if (activeFloor === 1) setViewMode('ART_GRID');
+                                if (activeFloor === 1 || activeFloor === 2) setViewMode('ART_GRID');
                             }}
                             className="w-full md:w-auto px-6 py-4 md:px-10 md:py-5 bg-obsidian text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-[0.2em] md:tracking-[0.4em] shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4"
                         >

@@ -32,6 +32,7 @@ export interface IUser extends Document {
   // 파트너 관련 필드
   partnerStatus: 'none' | 'pending' | 'approved' | 'rejected' | 'suspended';
   partnerApplication?: {
+    partnerType?: 'shopper' | 'business' | 'coach' | 'artist';
     businessName: string;
     businessNumber: string;
     businessAddress: string;
@@ -204,6 +205,11 @@ const UserSchema = new Schema<IUser>({
     default: 'none'
   },
   partnerApplication: {
+    partnerType: {
+      type: String,
+      enum: ['shopper', 'business', 'coach', 'artist'],
+      default: 'business'
+    },
     businessName: { type: String, trim: true },
     businessNumber: { type: String, trim: true },
     businessAddress: { type: String, trim: true },

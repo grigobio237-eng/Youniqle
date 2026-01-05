@@ -5,19 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
+import {
+  Users,
+  Search,
+  Filter,
+  Eye,
+  CheckCircle,
   XCircle,
   MoreVertical,
   Mail,
@@ -41,6 +41,7 @@ interface Partner {
   phone?: string;
   partnerStatus: 'pending' | 'approved' | 'rejected' | 'suspended';
   partnerApplication?: {
+    partnerType: string;
     businessName: string;
     businessNumber: string;
     businessAddress: string;
@@ -49,6 +50,8 @@ interface Partner {
     bankAccount: string;
     bankName: string;
     accountHolder: string;
+    businessRegistrationImage?: string;
+    bankStatementImage?: string;
     appliedAt: string;
     approvedAt?: string;
     rejectedAt?: string;
@@ -81,11 +84,28 @@ const statusLabels = {
   suspended: '정지됨'
 };
 
+const partnerTypeLabels: { [key: string]: string } = {
+  shopper: '쇼퍼',
+  business: '사업장',
+  coach: '코치',
+  artist: '작가'
+};
+
+const partnerTypeColors: { [key: string]: string } = {
+  shopper: 'bg-blue-50 text-blue-700 border-blue-200',
+  business: 'bg-purple-50 text-purple-700 border-purple-200',
+  coach: 'bg-orange-50 text-orange-700 border-orange-200',
+  artist: 'bg-pink-50 text-pink-700 border-pink-200'
+};
+
 export default function AdminPartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     fetchPartners();
@@ -128,13 +148,13 @@ export default function AdminPartnersPage() {
   };
 
   const filteredPartners = partners.filter(partner => {
-    const matchesSearch = 
+    const matchesSearch =
       partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       partner.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       partner.partnerApplication?.businessName?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || partner.partnerStatus === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -287,6 +307,11 @@ export default function AdminPartnersPage() {
                       {partner.partnerStatus === 'rejected' && <XCircle className="h-3 w-3" />}
                       <span>{statusLabels[partner.partnerStatus]}</span>
                     </Badge>
+                    {partner.partnerApplication?.partnerType && (
+                      <Badge variant="outline" className={`${partnerTypeColors[partner.partnerApplication.partnerType]}`}>
+                        {partnerTypeLabels[partner.partnerApplication.partnerType] || partner.partnerApplication.partnerType}
+                      </Badge>
+                    )}
                     {partner.partnerApplication?.businessName && (
                       <Badge variant="outline">
                         {partner.partnerApplication.businessName}
@@ -356,7 +381,14 @@ export default function AdminPartnersPage() {
 
                 {/* Actions */}
                 <div className="flex items-center space-x-2 ml-4">
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedPartner(partner);
+                      setShowDetailModal(true);
+                    }}
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
@@ -368,14 +400,14 @@ export default function AdminPartnersPage() {
                     <DropdownMenuContent align="end">
                       {partner.partnerStatus === 'pending' && (
                         <>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handlePartnerAction(partner.id, 'approve')}
                             className="text-green-600"
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
                             승인
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => {
                               const reason = prompt('거부 사유를 입력하세요:');
                               if (reason) {
@@ -390,7 +422,7 @@ export default function AdminPartnersPage() {
                         </>
                       )}
                       {partner.partnerStatus === 'approved' && (
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handlePartnerAction(partner.id, 'suspend')}
                           className="text-orange-600"
                         >
@@ -398,7 +430,7 @@ export default function AdminPartnersPage() {
                         </DropdownMenuItem>
                       )}
                       {partner.partnerStatus === 'suspended' && (
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handlePartnerAction(partner.id, 'approve')}
                           className="text-green-600"
                         >
@@ -426,6 +458,176 @@ export default function AdminPartnersPage() {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Partner Detail Modal */}
+      {showDetailModal && selectedPartner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <CardHeader className="flex flex-row items-center justify-between border-b p-6">
+              <div>
+                <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                  {selectedPartner.name} 상세 정보
+                  <Badge className={partnerTypeColors[selectedPartner.partnerApplication?.partnerType || '']}>
+                    {partnerTypeLabels[selectedPartner.partnerApplication?.partnerType || ''] || '미지정'}
+                  </Badge>
+                </CardTitle>
+                <CardDescription>{selectedPartner.email}</CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setShowDetailModal(false)}>
+                <XCircle className="h-6 w-6" />
+              </Button>
+            </CardHeader>
+            <CardContent className="p-8 space-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* 기본 정보 */}
+                <div className="space-y-6">
+                  <h4 className="text-lg font-bold border-b pb-2">기본 및 활동 정보</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-slate font-bold">상호명/활동명:</span>
+                      <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.businessName}</span>
+                    </div>
+                    {selectedPartner.partnerApplication?.businessNumber && (
+                      <div className="flex justify-between">
+                        <span className="text-slate font-bold">사업자 번호:</span>
+                        <span className="font-medium text-obsidian">{selectedPartner.partnerApplication.businessNumber}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-slate font-bold">연락처:</span>
+                      <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.businessPhone || selectedPartner.phone}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-slate font-bold block">주소:</span>
+                      <span className="text-sm text-obsidian leading-relaxed">{selectedPartner.partnerApplication?.businessAddress}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-slate font-bold block">소개글:</span>
+                      <p className="text-sm text-obsidian bg-mist/30 p-4 rounded-xl leading-relaxed whitespace-pre-wrap">
+                        {selectedPartner.partnerApplication?.businessDescription}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 정산 정보 */}
+                <div className="space-y-6">
+                  <h4 className="text-lg font-bold border-b pb-2">정산 계좌 정보</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-slate font-bold">은행명:</span>
+                      <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.bankName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate font-bold">예금주:</span>
+                      <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.accountHolder}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate font-bold">계좌번호:</span>
+                      <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.bankAccount}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 증빙 서류 */}
+              {selectedPartner.partnerApplication?.partnerType !== 'shopper' && (
+                <div className="space-y-6">
+                  <h4 className="text-lg font-bold border-b pb-2">제출 증빙 서류</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <p className="text-sm font-bold text-slate">
+                        {selectedPartner.partnerApplication?.partnerType === 'business' ? '사업자등록증' :
+                          selectedPartner.partnerApplication?.partnerType === 'coach' ? '자격증 사본' : '포트폴리오/작품증빙'}
+                      </p>
+                      {selectedPartner.partnerApplication?.businessRegistrationImage ? (
+                        <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-line bg-mist group">
+                          <img
+                            src={selectedPartner.partnerApplication.businessRegistrationImage}
+                            alt="증빙서류"
+                            className="w-full h-full object-contain"
+                          />
+                          <a
+                            href={selectedPartner.partnerApplication.businessRegistrationImage}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold transition-opacity"
+                          >
+                            크게 보기
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                          제출된 서류 없음
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-bold text-slate">통장 사본</p>
+                      {selectedPartner.partnerApplication?.bankStatementImage ? (
+                        <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-line bg-mist group">
+                          <img
+                            src={selectedPartner.partnerApplication.bankStatementImage}
+                            alt="통장사본"
+                            className="w-full h-full object-contain"
+                          />
+                          <a
+                            href={selectedPartner.partnerApplication.bankStatementImage}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold transition-opacity"
+                          >
+                            크게 보기
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                          제출된 서류 없음
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 하단 작업 버튼 */}
+              <div className="flex justify-end gap-3 pt-6 border-t">
+                {selectedPartner.partnerStatus === 'pending' && (
+                  <>
+                    <Button
+                      onClick={() => {
+                        const reason = prompt('거부 사유를 입력하세요:');
+                        if (reason) {
+                          handlePartnerAction(selectedPartner.id, 'reject', { reason });
+                          setShowDetailModal(false);
+                        }
+                      }}
+                      className="bg-red-50 text-red-600 border-red-200 hover:bg-red-100 h-12 px-8 font-black rounded-xl"
+                    >
+                      승인 거부
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (confirm('이 파트너 신청을 승인하시겠습니까?')) {
+                          handlePartnerAction(selectedPartner.id, 'approve');
+                          setShowDetailModal(false);
+                        }
+                      }}
+                      className="bg-green-600 text-white hover:bg-green-700 h-12 px-10 font-black rounded-xl"
+                    >
+                      최종 승인
+                    </Button>
+                  </>
+                )}
+                <Button variant="outline" onClick={() => setShowDetailModal(false)} className="h-12 px-8 rounded-xl font-bold">
+                  닫기
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

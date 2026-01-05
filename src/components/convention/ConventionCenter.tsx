@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, ContactShadows, MeshReflectorMaterial, Html, PerspectiveCamera, Float, Stars, useTexture } from '@react-three/drei';
+import { OrbitControls, ContactShadows, MeshReflectorMaterial, Html, Text, PerspectiveCamera, Float, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { User } from 'lucide-react';
 import { FloorOwner } from '@/app/pavilion/page';
@@ -186,6 +186,15 @@ function MasterpieceFrame({ id, title, image, highResImage, position, onClick, i
             onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
         >
+            {/* Clickable Hitbox Mesh - Covers the entire frame area */}
+            <mesh
+                position={[0, 0, 0.5]} // Slightly in front of everything
+                onClick={(e) => { e.stopPropagation(); onClick(id); }}
+            >
+                <planeGeometry args={[isSelected ? 4.5 : 3.5, isSelected ? 5.5 : 4.5]} />
+                <meshBasicMaterial transparent opacity={0} />
+            </mesh>
+
             {/* Compact Premium Frame */}
             <mesh
                 castShadow
@@ -207,24 +216,6 @@ function MasterpieceFrame({ id, title, image, highResImage, position, onClick, i
                 )}
             </mesh>
 
-            <Html position={[0, -2.6, 0.3]} center distanceFactor={8}>
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isSelected ? 1 : 0.8 }}
-                    className={`text-center group pointer-events-none transition-opacity duration-500`}
-                >
-                    <div className="bg-obsidian/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-[#D4AF37]/30 shadow-2xl transition-all group-hover:bg-white group-hover:scale-105">
-                        <h6 className="text-xs font-black text-[#D4AF37] uppercase tracking-tight mb-1 italic">{title}</h6>
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-[7px] font-black text-white/40 uppercase tracking-wider">Pricing Plan</span>
-                            <div className="flex items-center justify-center gap-2">
-                                <span className="text-[8px] font-black text-white group-hover:text-obsidian uppercase">Sale: {price}</span>
-                                {rental && <span className="text-[8px] font-black text-[#D4AF37] uppercase">Rent: {rental}/mo</span>}
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-            </Html>
 
             {/* Spotlight from top */}
             <spotLight position={[0, 10, 5]} angle={0.3} penumbra={1} intensity={100} target={new THREE.Object3D().translateZ(position[2])} />
@@ -238,19 +229,26 @@ function FPController({
     activeFloor,
     selectedOwnerId,
     selectedItemId,
-    floorData
+    floorData,
+    panOffset
 }: {
     isInsideRoom: boolean,
     activeFloor: number,
     selectedOwnerId: string | null,
     selectedItemId: string | null,
-    floorData: FloorOwner[]
+    floorData: FloorOwner[],
+    panOffset?: number
 }) {
     const { camera } = useThree();
     const targetPos = useRef(new THREE.Vector3(0, 5, 12));
     const targetLookAt = useRef(new THREE.Vector3(0, 3, 0));
+    const currentPan = useRef(0);
 
     useFrame((state) => {
+        // Handle Horizontal Panning based on external prop or pointer
+        const targetPan = panOffset !== undefined ? panOffset : state.pointer.x * 20;
+        currentPan.current = THREE.MathUtils.lerp(currentPan.current, targetPan, 0.05);
+
         if (selectedItemId) {
             // "Frontal View" focusing on the artwork
             const owners = floorData || [];
@@ -269,8 +267,8 @@ function FPController({
             }
         } else if (isInsideRoom) {
             // Intimate 1st person exhibition view - Camera higher and closer to wall
-            targetPos.current.set(0, 5, 6); // Raised from 3.5 to 5, moved closer from 8 to 6
-            targetLookAt.current.set(0, 4.5, -15); // Look slightly higher
+            targetPos.current.set(currentPan.current, 5, 6);
+            targetLookAt.current.set(currentPan.current * 1.2, 4.5, -15);
         } else if (selectedOwnerId) {
             // Zoom into the magic door area (All floors)
             const owners = floorData || [];
@@ -279,19 +277,20 @@ function FPController({
             const spacing = 8;
             const areaPos = index !== -1 ? (index - (total - 1) / 2) * spacing : 0;
 
-            targetPos.current.set(areaPos, 4, 6);
-            targetLookAt.current.set(areaPos, 3, -10);
+            targetPos.current.set(areaPos + currentPan.current * 0.5, 4, 6);
+            targetLookAt.current.set(areaPos + currentPan.current, 3, -10);
         } else {
             // Standard floor-specific lobby views
+            const basePos = new THREE.Vector3(0, 4.5, 18);
             switch (activeFloor) {
-                case 1: targetPos.current.set(0, 4.5, 18); break;
-                case 2: targetPos.current.set(0, 6, 22); break;
-                case 3: targetPos.current.set(0, 5, 20); break;
-                case 4: targetPos.current.set(0, 4.5, 18); break;
-                case 5: targetPos.current.set(0, 4, 15); break;
-                default: targetPos.current.set(0, 4.5, 18);
+                case 1: basePos.set(0, 4.5, 18); break;
+                case 2: basePos.set(0, 6, 22); break;
+                case 3: basePos.set(0, 5, 20); break;
+                case 4: basePos.set(0, 4.5, 18); break;
+                case 5: basePos.set(0, 4, 15); break;
             }
-            targetLookAt.current.set(0, 3, 0);
+            targetPos.current.set(basePos.x + currentPan.current * 0.5, basePos.y, basePos.z);
+            targetLookAt.current.set(currentPan.current, 3, 0);
         }
 
         state.camera.position.lerp(targetPos.current, 0.04);
@@ -357,7 +356,8 @@ export default function ConventionCenter({
     onArtistClick,
     onArtworkClick,
     onEnterRoom,
-    floorData
+    floorData,
+    panOffset
 }: {
     activeFloor: number;
     selectedArtistId: string | null;
@@ -369,6 +369,7 @@ export default function ConventionCenter({
     onArtworkClick: (id: string) => void;
     onEnterRoom: () => void;
     floorData: FloorOwner[];
+    panOffset?: number;
 }) {
 
     useEffect(() => {
@@ -391,13 +392,17 @@ export default function ConventionCenter({
     return (
         <div style={{ width: '100%', height: '100%', background: activeFloor === 5 ? '#030303' : activeColor }}>
             <Canvas shadows={false}>
-                <PerspectiveCamera makeDefault fov={45} />
+                <PerspectiveCamera
+                    makeDefault
+                    fov={typeof window !== 'undefined' && window.innerWidth < 768 ? 65 : 45}
+                />
                 <FPController
                     isInsideRoom={isInsideRoom}
                     activeFloor={activeFloor}
                     selectedOwnerId={selectedArtistId}
                     selectedItemId={selectedItemId}
                     floorData={floorData}
+                    panOffset={panOffset}
                 />
 
                 <color attach="background" args={[activeFloor === 5 ? '#030303' : activeColor]} />
@@ -408,7 +413,7 @@ export default function ConventionCenter({
                 <pointLight position={[10, 20, 10]} intensity={activeFloor === 5 ? 30 : 200} />
                 <spotLight position={[0, 40, 20]} angle={0.6} penumbra={1} intensity={activeFloor === 5 ? 50 : 500} castShadow />
 
-                <LobbyDecor activeFloor={activeFloor} />
+                {activeFloor > 2 && <LobbyDecor activeFloor={activeFloor} />}
 
                 {/* FP Navigation Guide */}
                 <Html fullscreen portal={undefined} className="pointer-events-none">
@@ -418,64 +423,66 @@ export default function ConventionCenter({
                 {/* --- Dynamic Floor Rendering --- */}
                 <group>
                     {!isInsideRoom ? (
-                        <group>
-                            {/* Luxury Showroom Walls */}
-                            <mesh position={[0, 10, -20]}>
-                                <boxGeometry args={[100, 20, 1]} />
-                                <meshStandardMaterial color={wallColor} roughness={0.1} />
-                            </mesh>
+                        (activeFloor === 1 || activeFloor === 2) ? null : (
+                            <group>
+                                {/* Luxury Showroom Walls */}
+                                <mesh position={[0, 10, -20]}>
+                                    <boxGeometry args={[100, 20, 1]} />
+                                    <meshStandardMaterial color={wallColor} roughness={0.1} />
+                                </mesh>
 
-                            {/* Specialist Cards based on floor */}
-                            {floorData?.map((owner, index) => {
-                                const total = floorData.length;
-                                const spacing = 8;
-                                const xPos = (index - (total - 1) / 2) * spacing;
-                                return (
-                                    <SpecialistCard
-                                        key={owner.id}
-                                        id={owner.id}
-                                        name={owner.name}
-                                        role={owner.role}
-                                        position={[xPos, 4, -19.4]}
-                                        onClick={onArtistClick}
-                                        isActive={selectedArtistId === owner.id}
-                                        activeFloor={activeFloor}
+                                {/* Specialist Cards based on floor */}
+                                {floorData?.map((owner, index) => {
+                                    const total = floorData.length;
+                                    const spacing = 8;
+                                    const xPos = (index - (total - 1) / 2) * spacing;
+                                    return (
+                                        <SpecialistCard
+                                            key={owner.id}
+                                            id={owner.id}
+                                            name={owner.name}
+                                            role={owner.role}
+                                            position={[xPos, 4, -19.4]}
+                                            onClick={onArtistClick}
+                                            isActive={selectedArtistId === owner.id}
+                                            activeFloor={activeFloor}
+                                        />
+                                    );
+                                })}
+
+                                {/* Magic Door Appearance - Only for non-gallery floors with 3D lobbies */}
+                                {selectedArtistId && activeFloor !== 1 && (
+                                    <MagicDoor
+                                        position={[
+                                            (floorData?.findIndex(o => o.id === selectedArtistId) - (floorData?.length - 1) / 2) * 8,
+                                            4,
+                                            -19.2
+                                        ]}
+                                        isActive={true}
+                                        onEnter={onEnterRoom}
                                     />
-                                );
-                            })}
+                                )}
 
-                            {/* Magic Door Appearance - Only for non-gallery floors with 3D lobbies */}
-                            {selectedArtistId && activeFloor !== 1 && (
-                                <MagicDoor
-                                    position={[
-                                        (floorData?.findIndex(o => o.id === selectedArtistId) - (floorData?.length - 1) / 2) * 8,
-                                        4,
-                                        -19.2
-                                    ]}
-                                    isActive={true}
-                                    onEnter={onEnterRoom}
-                                />
-                            )}
-
-                            {/* Floor Material */}
-                            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
-                                <planeGeometry args={[100, 100]} />
-                                <MeshReflectorMaterial
-                                    blur={[0, 0]}
-                                    resolution={1024}
-                                    mixBlur={0}
-                                    mixStrength={activeFloor === 5 ? 5 : 20}
-                                    roughness={1}
-                                    depthScale={0}
-                                    minDepthThreshold={1}
-                                    maxDepthThreshold={1}
-                                    color={activeFloor === 5 ? "#111111" : "#fcfcfc"}
-                                    metalness={activeFloor === 5 ? 1 : 0.1}
-                                    mirror={0.6}
-                                    distortion={0}
-                                />
-                            </mesh>
-                        </group>
+                                {/* Floor Material */}
+                                <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
+                                    <planeGeometry args={[100, 100]} />
+                                    <MeshReflectorMaterial
+                                        blur={[0, 0]}
+                                        resolution={1024}
+                                        mixBlur={0}
+                                        mixStrength={activeFloor === 5 ? 5 : 20}
+                                        roughness={1}
+                                        depthScale={0}
+                                        minDepthThreshold={1}
+                                        maxDepthThreshold={1}
+                                        color={activeFloor === 5 ? "#111111" : "#fcfcfc"}
+                                        metalness={activeFloor === 5 ? 1 : 0.1}
+                                        mirror={0.6}
+                                        distortion={0}
+                                    />
+                                </mesh>
+                            </group>
+                        )
                     ) : (
                         /* --- Inside Room View (Dynamic Gallery) --- */
                         <group position={[0, 0, -20]}>
@@ -542,13 +549,18 @@ export default function ConventionCenter({
                                 );
                             })}
 
-                            <Html position={[0, 10, -14]} center>
-                                <div className="text-center">
-                                    <h2 className="text-6xl font-black text-[#D4AF37]/20 uppercase tracking-[1.5em] whitespace-nowrap select-none italic">
-                                        {activeFloor === 5 ? 'ULTIMATE SUITE' : `${selectedOwner?.name?.toUpperCase()} ARCHIVE`}
-                                    </h2>
-                                </div>
-                            </Html>
+                            <Text
+                                position={[0, 10, -14.9]}
+                                fontSize={4}
+                                color="#D4AF37"
+                                fillOpacity={0.05}
+                                fontStyle="italic"
+                                letterSpacing={1.5}
+                                anchorX="center"
+                                anchorY="middle"
+                            >
+                                {activeFloor === 5 ? 'ULTIMATE SUITE' : `${selectedOwner?.name?.toUpperCase()} ARCHIVE`}
+                            </Text>
 
                             {/* Inner Room Floor */}
                             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>

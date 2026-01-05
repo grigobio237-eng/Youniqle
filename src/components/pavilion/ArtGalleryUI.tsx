@@ -19,6 +19,9 @@ interface ArtGalleryUIProps {
     onArtistSelect: (id: string) => void;
     onEnterGallery: () => void;
     onBack?: () => void;
+    title?: string;
+    subtitle?: string;
+    enterButtonText?: string;
 }
 
 export default function ArtGalleryUI({
@@ -27,12 +30,15 @@ export default function ArtGalleryUI({
     selectedArtistId,
     onArtistSelect,
     onEnterGallery,
-    onBack
+    onBack,
+    title = "Art Gallery",
+    subtitle = "Visionaries of Recovery",
+    enterButtonText = "갤러리 입장하기"
 }: ArtGalleryUIProps) {
     const selectedArtist = artists.find(a => a.id === selectedArtistId);
 
     return (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/95 backdrop-blur-sm pointer-events-auto">
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-start md:justify-center bg-white/95 backdrop-blur-sm pointer-events-auto overflow-y-auto py-20 pb-32">
             <AnimatePresence mode="wait">
                 {viewMode === 'GRID' && (
                     <motion.div
@@ -48,10 +54,10 @@ export default function ArtGalleryUI({
                                 animate={{ opacity: 1, letterSpacing: '1em' }}
                                 className="text-sm font-black text-obsidian uppercase tracking-[1em] mb-4"
                             >
-                                Art Gallery
+                                {title}
                             </motion.h2>
                             <h3 className="text-4xl md:text-5xl font-black tracking-tighter text-obsidian uppercase italic">
-                                Visionaries of Recovery
+                                {subtitle}
                             </h3>
                         </div>
 
@@ -91,16 +97,18 @@ export default function ArtGalleryUI({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="w-full h-full flex flex-col md:flex-row items-center justify-center bg-white"
+                        className="w-full h-full flex flex-col md:flex-row items-stretch md:items-center justify-start md:justify-center bg-white overflow-y-auto"
                     >
                         {/* Background Spline/Graphic or Artist Image */}
-                        <div className="relative w-full md:w-1/2 h-1/2 md:h-full overflow-hidden">
+                        <div className="relative w-full md:w-1/2 min-h-[50vh] md:h-full overflow-hidden flex-shrink-0 bg-mist">
                             {selectedArtist.image ? (
                                 <motion.img
-                                    layoutId={`artist-image-${selectedArtist.id}`}
                                     src={selectedArtist.image}
                                     alt={selectedArtist.name}
                                     className="w-full h-full object-cover"
+                                    initial={{ opacity: 0, scale: 1.1 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.8 }}
                                 />
                             ) : (
                                 <div className="w-full h-full bg-mist flex items-center justify-center">
@@ -109,13 +117,13 @@ export default function ArtGalleryUI({
                             )}
                             <button
                                 onClick={onBack}
-                                className="absolute top-8 left-8 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white text-obsidian transition-colors z-30"
+                                className="absolute top-8 left-8 w-12 h-12 rounded-full bg-white/40 backdrop-blur-md flex items-center justify-center hover:bg-white text-obsidian transition-colors z-30"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <div className="w-full md:w-1/2 p-12 md:p-24 flex flex-col justify-center">
+                        <div className="w-full md:w-1/2 p-8 md:p-24 flex flex-col justify-center overflow-y-visible">
                             <motion.div
                                 initial={{ opacity: 0, x: 50 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -136,7 +144,7 @@ export default function ArtGalleryUI({
                                     onClick={onEnterGallery}
                                     className="group flex items-center gap-6 px-10 py-5 bg-obsidian text-white rounded-full overflow-hidden relative"
                                 >
-                                    <span className="relative z-10 text-sm font-black uppercase tracking-widest">갤러리 입장하기</span>
+                                    <span className="relative z-10 text-sm font-black uppercase tracking-widest">{enterButtonText}</span>
                                     <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={20} />
                                     <motion.div
                                         className="absolute inset-0 bg-[#D4AF37]"

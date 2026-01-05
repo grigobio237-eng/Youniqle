@@ -14,7 +14,9 @@ export async function GET(request: NextRequest) {
     const filter: any = {
       partnerStatus: { $in: ['pending', 'approved', 'rejected', 'suspended'] }
     };
-    
+    const totalUserCount = await User.countDocuments();
+    console.log(`[DEBUG] Total User Count in DB: ${totalUserCount}`);
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -22,13 +24,13 @@ export async function GET(request: NextRequest) {
         { 'partnerApplication.businessName': { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (status !== 'all') {
       filter.partnerStatus = status;
     }
 
-    console.log('🔍 파트너 관리 API 필터:', filter);
-    
+    console.log('🔍 파트너 관리 API 필터:', JSON.stringify(filter, null, 2));
+
     // 파트너 목록 조회
     const partners = await User.find(filter)
       .select('-passwordHash -emailVerificationToken')
@@ -36,17 +38,24 @@ export async function GET(request: NextRequest) {
       .limit(100);
 
     console.log(`📊 파트너 조회 결과: ${partners.length}명`);
-    partners.forEach((partner, index) => {
-      console.log(`${index + 1}. ${partner.email} - ${partner.partnerStatus}`);
+    partners.forEach((partner: any, index: number) => {
+      console.log(`${index + 1}. ${partner.email} - status: ${partner.partnerStatus}, name: ${partner.name}`);
     });
 
-    const partnersData = partners.map(partner => ({
+    // 만약 pending인 유저가 하나도 없다면, 전체 유저 중 pending인 유저가 있는지 별도로 확인 (디버깅용)
+    if (partners.filter((p: any) => p.partnerStatus === 'pending').length === 0) {
+      const allPendingCount = await User.countDocuments({ partnerStatus: 'pending' });
+      console.log(`❗ [DEBUG] 필터링 제외 DB 전체의 pending 유저 수: ${allPendingCount}`);
+    }
+
+    const partnersData = partners.map((partner: any) => ({
       id: partner._id.toString(),
       name: partner.name,
       email: partner.email,
       phone: partner.phone,
       partnerStatus: partner.partnerStatus,
       partnerApplication: partner.partnerApplication ? {
+        partnerType: partner.partnerApplication.partnerType,
         businessName: partner.partnerApplication.businessName,
         businessNumber: partner.partnerApplication.businessNumber,
         businessAddress: partner.partnerApplication.businessAddress,
@@ -55,6 +64,8 @@ export async function GET(request: NextRequest) {
         bankAccount: partner.partnerApplication.bankAccount,
         bankName: partner.partnerApplication.bankName,
         accountHolder: partner.partnerApplication.accountHolder,
+        businessRegistrationImage: partner.partnerApplication.businessRegistrationImage,
+        bankStatementImage: partner.partnerApplication.bankStatementImage,
         appliedAt: partner.partnerApplication.appliedAt,
         approvedAt: partner.partnerApplication.approvedAt,
         rejectedAt: partner.partnerApplication.rejectedAt,

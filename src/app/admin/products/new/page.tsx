@@ -44,6 +44,9 @@ export default function NewProductPage() {
     isFunding: false,
     fundingGoal: '',
     fundingEndDate: '',
+    isPavilion: false, // 파빌리온 전시 여부
+    pavilionFloorId: 'floor-2', // 기본값 2층
+    pavilionPosition: '', // 전시 순서
     images: [] as Array<{
       url: string;
       w?: number;
@@ -341,6 +344,9 @@ export default function NewProductPage() {
         clothingInfo: formData.clothingInfo && Object.values(formData.clothingInfo).some(v => v) ? formData.clothingInfo : undefined,
         electronicsInfo: formData.electronicsInfo && Object.values(formData.electronicsInfo).some(v => v) ? formData.electronicsInfo : undefined,
         descriptionIsHtml: formData.descriptionIsHtml,
+        // 파빌리온 전시 정보
+        pavilionFloorId: formData.isPavilion ? formData.pavilionFloorId : undefined,
+        pavilionPosition: formData.isPavilion && formData.pavilionPosition ? parseInt(formData.pavilionPosition) : undefined,
       };
 
       const response = await fetch('/api/admin/products', {
@@ -502,6 +508,54 @@ export default function NewProductPage() {
                   value={formData.fundingEndDate}
                   onChange={(e) => setFormData(prev => ({ ...prev, fundingEndDate: e.target.value }))}
                 />
+              </div>
+            </div>
+          )
+        }
+
+        {/* Pavilion Exhibition Fields */}
+        <div className="flex items-center space-x-2 border p-4 rounded-lg bg-blue-50">
+          <Checkbox
+            id="isPavilion"
+            checked={formData.isPavilion}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPavilion: checked as boolean }))}
+          />
+          <div className="space-y-1">
+            <Label htmlFor="isPavilion" className="font-semibold">파빌리온 전시</Label>
+            <p className="text-sm text-gray-500">
+              이 상품을 파빌리온 2층 상점에 전시합니다. 회복 상점에도 동시에 게시됩니다.
+            </p>
+          </div>
+        </div>
+
+        {
+          formData.isPavilion && (
+            <div className="grid grid-cols-2 gap-4 border-l-2 border-blue-500 pl-4 ml-2">
+              <div>
+                <Label htmlFor="pavilionFloorId">전시 층</Label>
+                <Input
+                  id="pavilionFloorId"
+                  value="2층 - 상점"
+                  disabled
+                  className="bg-gray-100"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  현재는 2층만 지원됩니다.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="pavilionPosition">전시 순서</Label>
+                <Input
+                  id="pavilionPosition"
+                  type="number"
+                  value={formData.pavilionPosition}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pavilionPosition: e.target.value }))}
+                  placeholder="예: 1"
+                  min="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  숫자가 작을수록 먼저 전시됩니다.
+                </p>
               </div>
             </div>
           )
