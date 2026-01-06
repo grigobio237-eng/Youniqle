@@ -16,13 +16,13 @@ function ProductListSkeleton() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className="bg-surface border-line">
-          <Skeleton className="aspect-square w-full rounded-t-2xl bg-background" />
+          <Skeleton className="aspect-square w-full rounded-t-2xl bg-background animate-shimmer" />
           <CardContent className="p-6">
-            <Skeleton className="h-4 w-3/4 mb-2 bg-background" />
-            <Skeleton className="h-3 w-full mb-4 bg-background" />
+            <Skeleton className="h-4 w-3/4 mb-2 bg-background animate-shimmer" />
+            <Skeleton className="h-3 w-full mb-4 bg-background animate-shimmer" />
             <div className="flex justify-between items-center">
-              <Skeleton className="h-6 w-20 bg-background" />
-              <Skeleton className="h-8 w-16 bg-background" />
+              <Skeleton className="h-6 w-20 bg-background animate-shimmer" />
+              <Skeleton className="h-8 w-16 bg-background animate-shimmer" />
             </div>
           </CardContent>
         </Card>

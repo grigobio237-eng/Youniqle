@@ -84,14 +84,14 @@ export default function Header() {
   };
 
   const menuItems = [
-    { label: 'AI 네비게이터', href: '/ai-navigator' },
-    { label: '회복 케이스', href: '/cases' },
-    { label: '회복 상점', href: '/products' },
-    { label: '라운지', href: '/lounge' },
-    { label: '실생활 유틸리티 허브', href: '/utils' },
-    { label: '비밀회복 컨시어지', href: '/omakase' },
-    { label: '비밀 가상 공간', href: '/pavilion' },
-    { label: '멤버십', href: '/membership' },
+    { label: 'AI 네비게이터', href: '/ai-navigator', desc: '매일의 진단 데이터를 분석한 맞춤 회복 가이드' },
+    { label: '실제 회복 스토리', href: '/cases', desc: '다른 사용자들의 성공적인 회복 사례 연구' },
+    { label: '회복 상점', href: '/products', desc: '과학적으로 검증된 회복 제품' },
+    { label: '라운지', href: '/lounge', desc: '브랜드 철학과 커뮤니티 소통 공간' },
+    { label: '회복 도구함', href: '/utils', desc: '일상에서 즉시 활용 가능한 실용 도구' },
+    { label: '비밀회복 컨시어지', href: '/omakase', desc: '프리미엄 맞춤형 회복 서비스' },
+    { label: '회복 체험관', href: '/pavilion', desc: '5층 구조의 인터랙티브 가상 공간' },
+    { label: '멤버십', href: '/membership', desc: '등급별 혜택 및 리워드 프로그램' },
   ];
 
   const handleSignOut = async () => {

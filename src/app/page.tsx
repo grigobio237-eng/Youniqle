@@ -116,9 +116,9 @@ function GateIntro({ onStart }: { onStart: () => void }) {
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
             <span>Youniqle Recovery Protocol v2.5</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-8xl font-black text-obsidian leading-[0.9] tracking-tighter break-keep">
-            회복은 ‘느낌’이 아니라<br />
-            <span className="text-chapter-accent">‘데이터’로 바꿉니다.</span>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-obsidian leading-[1.1] tracking-tighter break-keep">
+            번아웃에서 벗어나<br />
+            <span className="text-chapter-accent">진짜 '나'로 돌아가는 시간</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
             감각에 의존하던 휴식을 넘어, 당신의 몸이 보내는 신호를<br className="hidden md:block" />

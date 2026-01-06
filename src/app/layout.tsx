@@ -20,9 +20,9 @@ if (typeof window === 'undefined' && process.env.ENABLE_MONITORING === 'true') {
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
-  description: '당신의 회복을 설계하는 라이프 네비게이터, Youniqle에서 데이터 기반의 맞춤형 회복 솔루션을 경험해보세요.',
-  keywords: ['쇼핑몰', '온라인쇼핑', '유니클', 'youniqle'],
+  title: 'Youniqle - 번아웃 극복을 위한 AI 맞춤 회복 솔루션',
+  description: '60초 진단으로 나만의 회복 점수를 확인하고, 1만+ 사용자가 검증한 데이터 기반 맞춤형 회복 프로토콜을 경험하세요.',
+  keywords: ['번아웃', '회복', 'AI 진단', '웰니스', '맞춤 솔루션', 'youniqle', '리커버리', '스트레스 관리', '수면 개선', '피로 해소'],
   authors: [{ name: 'Youniqle Team' }],
   creator: 'Youniqle',
   publisher: 'Youniqle',
@@ -41,14 +41,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     url: 'https://grigobio.co.kr',
-    title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
-    description: '당신의 회복을 설계하는 라이프 네비게이터, Youniqle',
+    title: 'Youniqle - 번아웃 극복을 위한 AI 맞춤 회복 솔루션',
+    description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
     siteName: 'Youniqle',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Youniqle - 당신의 회복을 설계하는 라이프 네비게이터',
-    description: '당신의 회복을 설계하는 라이프 네비게이터, Youniqle',
+    title: 'Youniqle - 번아웃 극복을 위한 AI 맞춤 회복 솔루션',
+    description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
   },
   verification: {
     google: 'your-google-verification-code',
