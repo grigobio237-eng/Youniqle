@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Sparkles, Plus, Quote, ArrowRight } from 'lucide-react';
+import { Loader2, Sparkles, Plus, Quote, ArrowRight, Trash2, EyeOff } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
 // Mock Data for Cases
@@ -68,6 +69,7 @@ const CASES = [
 ];
 
 export default function CasesPage() {
+    const { data: session } = useSession();
     const [filter, setFilter] = React.useState('ALL');
     const [activeTab, setActiveTab] = React.useState('OFFICIAL');
 
@@ -76,6 +78,70 @@ export default function CasesPage() {
     const [aiCases, setAiCases] = React.useState<any[]>([]);
     const [userSymptom, setUserSymptom] = React.useState('');
     const [userAge, setUserAge] = React.useState('');
+
+    // 웹툰 스토리 상태
+    const [webtoons, setWebtoons] = React.useState<any[]>([]);
+    const [isLoadingWebtoons, setIsLoadingWebtoons] = React.useState(false);
+    const [selectedWebtoon, setSelectedWebtoon] = React.useState<any>(null);
+    const [isManaging, setIsManaging] = React.useState(false);
+
+    // 내 웹툰 상태
+    const [myWebtoons, setMyWebtoons] = React.useState<any[]>([]);
+    const [isLoadingMyWebtoons, setIsLoadingMyWebtoons] = React.useState(false);
+
+    // 본인 웹툰인지 확인 (email 또는 myWebtoons에 포함 여부로 판단)
+    const isOwner = selectedWebtoon && session?.user && (
+        selectedWebtoon.userId?.email === session.user.email ||
+        myWebtoons.some(w => w._id === selectedWebtoon._id)
+    );
+
+    // 웹툰 삭제
+    const handleDeleteWebtoon = async () => {
+        if (!selectedWebtoon || !confirm('정말 이 웹툰을 삭제하시겠습니까? Firebase에 저장된 이미지도 함께 삭제됩니다.')) return;
+        setIsManaging(true);
+        try {
+            const res = await fetch(`/api/webtoon?id=${selectedWebtoon._id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setWebtoons(prev => prev.filter(w => w._id !== selectedWebtoon._id));
+                setMyWebtoons(prev => prev.filter(w => w._id !== selectedWebtoon._id));
+                setSelectedWebtoon(null);
+                alert('웹툰과 관련 이미지가 모두 삭제되었습니다.');
+            } else {
+                const err = await res.json();
+                alert(err.error || '삭제에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        } finally {
+            setIsManaging(false);
+        }
+    };
+
+    // 웹툰 비공개 전환
+    const handleUnpublishWebtoon = async () => {
+        if (!selectedWebtoon || !confirm('이 웹툰을 게시판에서 내리시겠습니까? (비공개로 전환)')) return;
+        setIsManaging(true);
+        try {
+            const res = await fetch('/api/webtoon', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedWebtoon._id, isPublic: false })
+            });
+            if (res.ok) {
+                setWebtoons(prev => prev.filter(w => w._id !== selectedWebtoon._id));
+                setSelectedWebtoon(null);
+                alert('웹툰이 비공개로 전환되었습니다.');
+            } else {
+                alert('비공개 전환에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Unpublish error:', error);
+            alert('비공개 전환 중 오류가 발생했습니다.');
+        } finally {
+            setIsManaging(false);
+        }
+    };
 
     React.useEffect(() => {
         const savedCases = localStorage.getItem('youniqle_ai_cases');
@@ -87,6 +153,46 @@ export default function CasesPage() {
             }
         }
     }, []);
+
+    // 웹툰 불러오기 (공개된 것만)
+    React.useEffect(() => {
+        const loadWebtoons = async () => {
+            setIsLoadingWebtoons(true);
+            try {
+                const res = await fetch('/api/webtoon?public=true');
+                if (res.ok) {
+                    const data = await res.json();
+                    setWebtoons(data.webtoons || []);
+                }
+            } catch (error) {
+                console.error('Failed to load webtoons:', error);
+            } finally {
+                setIsLoadingWebtoons(false);
+            }
+        };
+        loadWebtoons();
+    }, []);
+
+
+    // 내 웹툰 불러오기 (로그인 시에만)
+    React.useEffect(() => {
+        if (!session?.user) return;
+        const loadMyWebtoons = async () => {
+            setIsLoadingMyWebtoons(true);
+            try {
+                const res = await fetch('/api/webtoon?mine=true');
+                if (res.ok) {
+                    const data = await res.json();
+                    setMyWebtoons(data.webtoons || []);
+                }
+            } catch (error) {
+                console.error('Failed to load my webtoons:', error);
+            } finally {
+                setIsLoadingMyWebtoons(false);
+            }
+        };
+        loadMyWebtoons();
+    }, [session?.user]);
 
     const filteredCases = filter === 'ALL'
         ? CASES
@@ -135,9 +241,13 @@ export default function CasesPage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-20">
-                <TabsList className="flex justify-center bg-transparent gap-4 mb-16">
+                <TabsList className="flex justify-center bg-transparent gap-4 mb-16 flex-wrap">
                     <TabsTrigger value="OFFICIAL" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">공식 인증 사례</TabsTrigger>
                     <TabsTrigger value="AI_SIMULATION" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">AI 가상 사례 (Beta)</TabsTrigger>
+                    <TabsTrigger value="WEBTOON" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:border-primary font-black transition-all">📖 웹툰 스토리</TabsTrigger>
+                    {session?.user && (
+                        <TabsTrigger value="MY_WEBTOON" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-obsidian data-[state=active]:text-white data-[state=active]:border-obsidian font-black transition-all">📁 내 웹툰</TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent value="OFFICIAL" className="space-y-12">
@@ -183,6 +293,83 @@ export default function CasesPage() {
                         </div>
                     )}
                 </TabsContent>
+
+                {/* 웹툰 스토리 탭 */}
+                <TabsContent value="WEBTOON">
+                    {isLoadingWebtoons ? (
+                        <div className="text-center py-24">
+                            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+                            <p className="text-text-secondary font-medium">웹툰을 불러오는 중...</p>
+                        </div>
+                    ) : webtoons.length === 0 ? (
+                        <div className="text-center py-24 bg-surface/50 rounded-[40px] border-2 border-dashed border-line">
+                            <div className="text-6xl mb-6">📖</div>
+                            <h3 className="text-2xl font-black mb-4">아직 게시된 웹툰이 없습니다.</h3>
+                            <p className="text-text-secondary mb-10 text-lg font-medium opacity-70">
+                                "일일 웹툰 챌린지"에서 웹툰을 만들고<br />전체 공개로 게시해보세요!
+                            </p>
+                            <Button asChild className="bg-primary hover:bg-primary/90 text-white font-black rounded-2xl h-14 px-10 shadow-xl">
+                                <Link href="/">웹툰 만들러 가기</Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <AnimatePresence>
+                                {webtoons.map((webtoon) => (
+                                    <WebtoonCard key={webtoon._id} webtoon={webtoon} onClick={() => setSelectedWebtoon(webtoon)} />
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    )}
+                </TabsContent>
+
+                {/* 내 웹툰 탭 */}
+                {session?.user && (
+                    <TabsContent value="MY_WEBTOON">
+                        {isLoadingMyWebtoons ? (
+                            <div className="text-center py-24">
+                                <Loader2 className="w-12 h-12 animate-spin text-obsidian mx-auto mb-4" />
+                                <p className="text-text-secondary font-medium">내 웹툰을 불러오는 중...</p>
+                            </div>
+                        ) : myWebtoons.length === 0 ? (
+                            <div className="text-center py-24 bg-surface/50 rounded-[40px] border-2 border-dashed border-line">
+                                <div className="text-6xl mb-6">📁</div>
+                                <h3 className="text-2xl font-black mb-4">아직 만든 웹툰이 없습니다.</h3>
+                                <p className="text-text-secondary mb-10 text-lg font-medium opacity-70">
+                                    "일일 웹툰 챌린지"에서 첫 웹툰을 만들어보세요!
+                                </p>
+                                <Button asChild className="bg-obsidian hover:bg-obsidian/90 text-white font-black rounded-2xl h-14 px-10 shadow-xl">
+                                    <Link href="/">웹툰 만들러 가기</Link>
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 text-sm text-text-secondary">
+                                    <span className="font-bold">총 {myWebtoons.length}개</span>
+                                    <span className="text-primary font-bold">
+                                        🔓 공개 {myWebtoons.filter(w => w.isPublic).length}개
+                                    </span>
+                                    <span className="text-amber-600 font-bold">
+                                        🔒 비공개 {myWebtoons.filter(w => !w.isPublic).length}개
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    <AnimatePresence>
+                                        {myWebtoons.map((webtoon) => (
+                                            <div key={webtoon._id} className="relative">
+                                                {/* 공개/비공개 배지 */}
+                                                <div className={`absolute top-4 right-4 z-10 px-3 py-1 rounded-full text-[10px] font-black ${webtoon.isPublic ? 'bg-primary text-white' : 'bg-amber-500 text-white'}`}>
+                                                    {webtoon.isPublic ? '🔓 공개' : '🔒 비공개'}
+                                                </div>
+                                                <WebtoonCard webtoon={webtoon} onClick={() => setSelectedWebtoon(webtoon)} />
+                                            </div>
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            </div>
+                        )}
+                    </TabsContent>
+                )}
             </Tabs>
 
             <div className="mt-20 py-16 px-8 rounded-[48px] bg-surface border border-line flex flex-col items-center text-center space-y-8 shadow-2xl relative overflow-hidden">
@@ -247,6 +434,76 @@ export default function CasesPage() {
                             {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : '로드맵 설계 시작'}
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* 웹툰 상세 보기 모달 */}
+            <Dialog open={!!selectedWebtoon} onOpenChange={(open) => !open && setSelectedWebtoon(null)}>
+                <DialogContent className="bg-surface border-line sm:max-w-3xl rounded-[32px] overflow-hidden p-0 shadow-2xl max-h-[90vh] flex flex-col">
+                    <DialogHeader className="p-6 pb-0">
+                        <DialogTitle className="flex items-center gap-3 text-xl font-black">
+                            📖 {selectedWebtoon?.summary || '회복 웹툰'}
+                        </DialogTitle>
+                        <DialogDescription className="text-text-secondary font-medium">
+                            {new Date(selectedWebtoon?.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} · {selectedWebtoon?.genre} · {selectedWebtoon?.panels?.length || 4}컷
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                        {selectedWebtoon?.panels?.map((panel: any, idx: number) => (
+                            <div key={idx} className="rounded-2xl overflow-hidden border border-line shadow-lg">
+                                <img
+                                    src={panel.imageUrl}
+                                    alt={`Panel ${panel.panelNumber}`}
+                                    className="w-full h-auto"
+                                />
+                                <div className="bg-background p-4">
+                                    <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Panel {panel.panelNumber}</span>
+                                    <p className="text-sm font-medium text-text-primary mt-1">{panel.script}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="p-6 pt-0 border-t border-line space-y-4">
+                        {/* 본인 웹툰일 경우 관리 버튼 */}
+                        {isOwner && (
+                            <div className="flex flex-col sm:flex-row gap-2 p-4 bg-red-50 rounded-xl border border-red-100">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleUnpublishWebtoon}
+                                    disabled={isManaging}
+                                    className="flex-1 border-amber-300 text-amber-700 hover:bg-amber-50 h-12"
+                                >
+                                    {isManaging ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
+                                    게시판에서 내리기
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={handleDeleteWebtoon}
+                                    disabled={isManaging}
+                                    className="flex-1 h-12"
+                                >
+                                    {isManaging ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                                    완전 삭제
+                                </Button>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="text-lg">👤</span>
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm font-bold text-text-primary">
+                                    {selectedWebtoon?.userId?.name || '익명 작가'}
+                                </p>
+                                <p className="text-xs text-text-secondary opacity-60">
+                                    {selectedWebtoon?.visualStyle} 스타일
+                                </p>
+                            </div>
+                            <Button variant="ghost" onClick={() => setSelectedWebtoon(null)} className="font-bold">
+                                닫기
+                            </Button>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </ChapterWrapper>
@@ -337,6 +594,83 @@ function CaseCard({ item, isAi = false }: { item: any, isAi?: boolean }) {
                                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
+    );
+}
+
+// 웹툰 카드 컴포넌트
+function WebtoonCard({ webtoon, onClick }: { webtoon: any; onClick?: () => void }) {
+    const formattedDate = new Date(webtoon.date).toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            layout
+        >
+            <Card
+                className="bg-surface border-line rounded-[32px] overflow-hidden group hover:border-primary transition-all duration-500 shadow-xl flex flex-col h-full cursor-pointer"
+                onClick={onClick}
+            >
+                {/* 대표 이미지 */}
+                <div className="relative aspect-square overflow-hidden">
+                    {webtoon.imageUrl ? (
+                        <img
+                            src={webtoon.imageUrl}
+                            alt={webtoon.script || '웹툰'}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                    ) : webtoon.panels?.[0]?.imageUrl ? (
+                        <img
+                            src={webtoon.panels[0].imageUrl}
+                            alt={webtoon.script || '웹툰'}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-mist/20 flex items-center justify-center">
+                            <span className="text-6xl">📖</span>
+                        </div>
+                    )}
+                    <div className="absolute top-4 left-4">
+                        <Badge className="bg-primary/90 text-white font-black text-[10px] tracking-wide">
+                            {webtoon.panels?.length || 4}컷 웹툰
+                        </Badge>
+                    </div>
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <p className="text-white text-xs font-bold opacity-80">{formattedDate}</p>
+                    </div>
+                </div>
+
+                <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
+                    <div className="space-y-2 flex-1">
+                        <h3 className="text-lg font-black text-text-primary leading-tight line-clamp-2">
+                            {webtoon.summary || '오늘의 회복 웹툰'}
+                        </h3>
+                        <p className="text-sm text-text-secondary line-clamp-2 opacity-70">
+                            {webtoon.script || webtoon.panels?.[0]?.script}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-4 border-t border-line">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-sm">👤</span>
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-xs font-bold text-text-primary">
+                                {webtoon.userId?.name || '익명 작가'}
+                            </p>
+                            <p className="text-[10px] text-text-secondary opacity-60">
+                                {webtoon.genre} · {webtoon.visualStyle}
+                            </p>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

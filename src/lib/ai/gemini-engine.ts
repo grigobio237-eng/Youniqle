@@ -753,4 +753,238 @@ Aspect Ratio: ${input.aspectRatio || "9:16"}`
             return "1. 세포 단위의 깊은 회복\n2. 무너진 신체 리듬의 정상화\n3. 지속 가능한 에너지 순환 설계";
         }
     }
+
+    // --- Webtoon Challenge Methods ---
+
+    /**
+     * 웹툰 주제 추천
+     */
+    static async suggestWebtoonTopics(input: { genre: string; userContext?: string }): Promise<string[]> {
+        const { genre, userContext } = input;
+        const prompt = `장르: ${genre}
+${userContext ? `상황/맥락: ${userContext}` : ''}
+이 장르에 어울리는 일상/회복 관련 4컷 웹툰 주제 5가지를 추천해주세요.
+사용자의 공감을 얻을 수 있고 위트 있는 주제면 좋습니다.
+
+JSON 형식으로 응답:
+{ "ideas": ["주제1", "주제2", "주제3", "주제4", "주제5"] }`;
+
+        try {
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]).ideas || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('Suggest topics error:', error);
+            return [];
+        }
+    }
+
+    /**
+     * 웹툰 대본 생성
+     */
+    static async generateWebtoonScript(input: {
+        recoveryData: any;
+        prevSummary?: string;
+        episodeNumber: number;
+        genre: string;
+        userName: string;
+        panelCount: number; // 새로 추가
+    }): Promise<any> {
+        const { recoveryData, prevSummary, episodeNumber, genre, userName, panelCount } = input;
+
+        const prompt = `
+당신은 인기 웹툰 작가이자 회복 코치입니다.
+사용자(${userName})의 오늘 회복 데이터를 바탕으로 공감을 자극하는 ${panelCount}컷 웹툰 대본을 작성해주세요.
+
+## 데이터
+- 회복 점수: ${recoveryData.totalScore}
+- 장르: ${genre}
+- 에피소드: ${episodeNumber}화
+- 목표 분량: **정확히 ${panelCount}개**의 컷(Panel)
+${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
+
+## 요청
+1. **정확히 ${panelCount}개**의 컷(Panel)에 들어갈 대본과 이미지 생성용 프롬프트를 작성하세요.
+2. 주인공 캐릭터의 외형 묘사(characterPrompt)를 상세하게 작성하세요. (영어 권장)
+3. 전체 줄거리 요약(summary)을 포함하세요.
+
+## 응답 형식 (JSON)
+{
+  "characterPrompt": "Detailed physical description of the main character (English)",
+  "summary": "전체 에피소드 요약",
+  "panels": [
+    {
+      "panelNumber": 1,
+      "script": "캐릭터의 대사나 나레이션 (한글)",
+      "prompt": "Detailed image generation prompt for this scene including background (English)"
+    },
+    ... (총 ${panelCount}개)
+  ]
+}
+`;
+
+        const text = await this.generateWithFallback(prompt);
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+        throw new Error('Webtoon script generation failed');
+    }
+
+    /**
+     * 비주얼 스타일에 따른 상세 프롬프트 반환
+     */
+    private static getStylePrompt(style: string): string {
+        const styleMap: Record<string, string> = {
+            'premium': 'Korean Webtoon Style, Semi-realistic, Digital Cel-Shading, High Gloss, professional digital drawing',
+            'romance': 'Shojo Manga Style, Sparkle Effect, Ornate Details, Pastel & Vivid Colors, Dreamy Lighting, romantic aesthetic',
+            'noir': 'Film Noir, Chiaroscuro, High Contrast, Muted Colors, Gritty Texture, dramatic shadows',
+            'anime': 'Anime Style, Cel-Shaded, Vibrant Colors, Clean Lineart, Japanese animation aesthetic',
+            'retro-90s': '90s Anime Aesthetic, Retro City Pop Style, Lo-fi, Grainy Texture, VHS Effect, vintage nostalgic feel',
+            'manga-bw': 'Manga Style, Black and White, Screen Tones, Halftone Pattern, Ink Wash, classic comic ink style',
+            'watercolor': 'Watercolor Illustration, Wet-on-Wet, Soft Edges, Bleeding Effect, Paper Texture, emotional hand-painted feel',
+            'oil': 'Oil Painting, Impasto, Thick Brushstrokes, Textured Canvas, Expressive, heavy paint texture',
+            'fairytale': 'Children\'s Book Illustration, Flat Design, Warm Color Palette, Soft Shapes, storybook aesthetic',
+            'american': 'American Comic Book Style, Thick Outlines, Bold Colors, Ben-Day Dots, Dynamic Action, Marvel/DC comic aesthetic',
+            '3d': '3D Render Style, Pixar Style, Soft Lighting, Cute Character Design, Voxel, high-end 3D animation'
+        };
+        return styleMap[style] || `${style} style`;
+    }
+
+    /**
+     * 웹툰 캐릭터 기준 시트 생성
+     */
+    static async generateCharacterSheet(input: {
+        characterPrompt: string;
+        visualStyle: string;
+        referenceDescription?: string;
+    }): Promise<string> {
+        const stylePrompt = this.getStylePrompt(input.visualStyle);
+        const refSubject = input.referenceDescription ? `based on these features: ${input.referenceDescription}` : '';
+        const prompt = `Generate a character reference sheet.
+1. Subject: A full body reference sheet of a character, ${input.characterPrompt}. ${refSubject}
+2. Art Style: ${stylePrompt}
+3. Requirements: Front view, neutral pose, white background, consistent character design
+4. Quality Boosters: Masterpiece, High Quality, Highly Detailed, 8k resolution`;
+
+        try {
+            const result = await this.generateDetailImage({
+                prompt,
+                keyMessage: "Character Reference",
+                aspectRatio: "1:1"
+            });
+
+            // 결과가 URL인 경우 (폴백) Base64 접두사 없이 반환
+            if (result.startsWith('http')) {
+                // URL을 그대로 반환하되, route.ts에서 처리
+                return result;
+            }
+            // data: 접두사가 이미 있으면 Base64 부분만 추출
+            if (result.startsWith('data:')) {
+                return result.split(',')[1];
+            }
+            return result;
+        } catch (error: any) {
+            console.error('[GeminiAIEngine] Character sheet generation failed:', error);
+            throw new Error(`캐릭터 시트 생성 실패: ${error.message}`);
+        }
+    }
+
+    /**
+     * 웹툰 패널 이미지 생성
+     */
+    static async generateWebtoonPanelImage(input: {
+        panelPrompt: string;
+        characterPrompt: string;
+        visualStyle: string;
+        genre: string;
+    }): Promise<string> {
+        const stylePrompt = this.getStylePrompt(input.visualStyle);
+        const prompt = `Generate a scene for a webtoon.
+1. Subject: ${input.panelPrompt}, ${input.characterPrompt}
+2. Art Style: ${stylePrompt}
+3. Atmosphere/Genre: ${input.genre} genre
+4. Quality Boosters: Masterpiece, High Quality, Highly Detailed, 8k resolution
+5. Constraints: NO TEXT on the image, Clean background where applicable`;
+
+        const imageUrl = await this.generateDetailImage({
+            prompt,
+            keyMessage: "", // 텍스트 없이 생성 유도
+            aspectRatio: "1:1"
+        });
+
+        // 만약 https://picsum.photos 등의 URL이면 base64로 변환이 필요할 수 있지만, 
+        // generateDetailImage가 base64를 반환한다고 가정(시뮬레이션 제외)
+        if (imageUrl.startsWith('data:')) {
+            return imageUrl.split(',')[1];
+        }
+
+        // 시뮬레이션 URL인 경우 (개발 중) - 실제로는 base64 데이터여야 함
+        return Buffer.from(imageUrl).toString('base64');
+    }
+
+    /**
+     * 캐릭터 이미지 분석 (Vision)
+     */
+    static async analyzeCharacterImage(imageBase64: string): Promise<string> {
+        const prompt = "Analyze this character image and describe its key visual features (species, colors, accessories, clothing, personality felt) in a concise English prompt format for an AI image generator. Focus on descriptors that help maintain consistency. Return the description only.";
+
+        try {
+            if (!process.env.GEMINI_API_KEY) {
+                console.error('GEMINI_API_KEY is missing');
+                throw new Error('API key is not configured');
+            }
+
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await model.generateContent([
+                prompt,
+                {
+                    inlineData: {
+                        data: imageBase64,
+                        mimeType: "image/png"
+                    }
+                }
+            ]);
+            const response = await result.response;
+            const text = response.text();
+
+            if (!text) throw new Error('Empty response from AI');
+            return text;
+        } catch (error: any) {
+            console.error('Gemini Image analysis detail error:', error);
+            throw new Error(`AI 분석 중 오류: ${error.message}`);
+        }
+    }
+
+    /**
+     * 인스타그램 캡션 및 해시태그 생성
+     */
+    static async generateInstagramCaption(input: {
+        topic: string;
+        panels: { panelNumber: number; script: string }[];
+    }): Promise<any> {
+        const prompt = `주제: ${input.topic}
+위 주제로 만든 4컷 웹툰을 인스타그램에 올리려고 합니다.
+MZ세대의 감성을 담은 위트 있고 공감 가는 캡션과 해시태그를 만들어주세요.
+
+JSON 형식:
+{
+  "description": "인스타그램 캡션 내용 (이모지 포함)",
+  "hashtags": "#해시태그1 #해시태그2 ..."
+}`;
+
+        try {
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            return { description: "오늘의 회복 기록!", hashtags: "#유니클 #회복챌린지" };
+        } catch (error) {
+            return { description: "오늘의 회복 기록!", hashtags: "#유니클 #회복챌린지" };
+        }
+    }
 }
