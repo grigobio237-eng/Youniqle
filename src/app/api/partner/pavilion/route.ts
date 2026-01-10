@@ -69,7 +69,7 @@ async function updatePartnerPavilionHandler(request: NextRequest, user: any) {
     try {
         await connectDB();
         const body = await request.json();
-        const { bio, role, image, items, name } = body;
+        const { bio, role, image, items, name, schedule } = body;
 
         const partnerType = user.partnerApplication?.partnerType;
         const floorNum = getFloorByType(partnerType);
@@ -95,7 +95,8 @@ async function updatePartnerPavilionHandler(request: NextRequest, user: any) {
             role: role || (partnerType === 'artist' ? '아티스트' : '전문가'),
             bio: bio || '',
             image: image || '',
-            items: items || []
+            items: items || [],
+            schedule: schedule || []
         };
 
         if (ownerIndex > -1) {

@@ -13,6 +13,19 @@ export interface IPavilionItem {
     canvasSize?: string;
 }
 
+export interface IScheduleSlot {
+    time: string;
+    isBooked: boolean;
+    bookedBy?: string;
+}
+
+export interface IScheduleDay {
+    date: string; // YYYY-MM-DD
+    type: 'FULL_DAY' | 'HOURLY';
+    slots?: IScheduleSlot[];
+    isAvailable: boolean;
+}
+
 export interface IFloorOwner {
     id: string; // e.g., 'artist-a'
     name: string;
@@ -20,6 +33,7 @@ export interface IFloorOwner {
     bio: string;
     image?: string; // Specialist profile / Representative work
     items: IPavilionItem[];
+    schedule?: IScheduleDay[];
 }
 
 export interface IPavilionFloor extends Document {
@@ -46,13 +60,25 @@ const PavilionItemSchema = new Schema<IPavilionItem>({
     canvasSize: { type: String }
 });
 
+const ScheduleDaySchema = new Schema<IScheduleDay>({
+    date: { type: String, required: true },
+    type: { type: String, enum: ['FULL_DAY', 'HOURLY'], required: true },
+    slots: [{
+        time: String,
+        isBooked: { type: Boolean, default: false },
+        bookedBy: String
+    }],
+    isAvailable: { type: Boolean, default: true }
+});
+
 const FloorOwnerSchema = new Schema<IFloorOwner>({
     id: { type: String, required: true },
     name: { type: String, required: true },
     role: { type: String, required: true },
     bio: { type: String, required: true },
     image: { type: String },
-    items: [PavilionItemSchema]
+    items: [PavilionItemSchema],
+    schedule: [ScheduleDaySchema]
 });
 
 const PavilionFloorSchema = new Schema<IPavilionFloor>({

@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. 승인 요청 (서버 -> 나이스페이)
-        const ediDate = new Date().toISOString().replace(new RegExp('[-:T' + '.]', 'g'), '').substring(0, 14);
+        const ediDate = new Date().toISOString()
+            .replace(new RegExp('[-:T' + '.]', 'g'), '')
+            .substring(0, 14);
         const signData = crypto.createHash('sha256')
             .update(authToken + mid + amt + ediDate + merchantKey)
             .digest('hex');

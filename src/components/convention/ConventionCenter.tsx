@@ -423,7 +423,7 @@ export default function ConventionCenter({
                 {/* --- Dynamic Floor Rendering --- */}
                 <group>
                     {!isInsideRoom ? (
-                        (activeFloor === 1 || activeFloor === 2) ? null : (
+                        activeFloor <= 3 ? null : (
                             <group>
                                 {/* Luxury Showroom Walls */}
                                 <mesh position={[0, 10, -20]}>
@@ -451,7 +451,7 @@ export default function ConventionCenter({
                                 })}
 
                                 {/* Magic Door Appearance - Only for non-gallery floors with 3D lobbies */}
-                                {selectedArtistId && activeFloor !== 1 && (
+                                {selectedArtistId && activeFloor > 3 && (
                                     <MagicDoor
                                         position={[
                                             (floorData?.findIndex(o => o.id === selectedArtistId) - (floorData?.length - 1) / 2) * 8,

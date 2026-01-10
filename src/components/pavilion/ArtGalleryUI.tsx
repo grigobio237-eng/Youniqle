@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, User } from 'lucide-react';
+import { X, ArrowRight, User, Calendar } from 'lucide-react';
 
 interface Artist {
     id: string;
@@ -22,6 +22,7 @@ interface ArtGalleryUIProps {
     title?: string;
     subtitle?: string;
     enterButtonText?: string;
+    onViewSchedule?: () => void;
 }
 
 export default function ArtGalleryUI({
@@ -33,7 +34,8 @@ export default function ArtGalleryUI({
     onBack,
     title = "Art Gallery",
     subtitle = "Visionaries of Recovery",
-    enterButtonText = "갤러리 입장하기"
+    enterButtonText = "갤러리 입장하기",
+    onViewSchedule
 }: ArtGalleryUIProps) {
     const selectedArtist = artists.find(a => a.id === selectedArtistId);
 
@@ -146,19 +148,31 @@ export default function ArtGalleryUI({
                                     {selectedArtist.bio}
                                 </p>
 
-                                <button
-                                    onClick={onEnterGallery}
-                                    className="group flex items-center gap-6 px-10 py-5 bg-obsidian text-white rounded-full overflow-hidden relative"
-                                >
-                                    <span className="relative z-10 text-sm font-black uppercase tracking-widest">{enterButtonText}</span>
-                                    <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={20} />
-                                    <motion.div
-                                        className="absolute inset-0 bg-[#D4AF37]"
-                                        initial={{ x: '-100%' }}
-                                        whileHover={{ x: 0 }}
-                                        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-                                    />
-                                </button>
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <button
+                                        onClick={onEnterGallery}
+                                        className="group flex-1 flex items-center justify-center gap-6 px-10 py-5 bg-obsidian text-white rounded-full overflow-hidden relative"
+                                    >
+                                        <span className="relative z-10 text-sm font-black uppercase tracking-widest">{enterButtonText}</span>
+                                        <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={20} />
+                                        <motion.div
+                                            className="absolute inset-0 bg-[#D4AF37]"
+                                            initial={{ x: '-100%' }}
+                                            whileHover={{ x: 0 }}
+                                            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+                                        />
+                                    </button>
+
+                                    {onViewSchedule && (
+                                        <button
+                                            onClick={onViewSchedule}
+                                            className="flex-1 flex items-center justify-center gap-4 px-10 py-5 border-2 border-obsidian rounded-full text-obsidian font-black uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all"
+                                        >
+                                            <Calendar size={20} />
+                                            <span>스케줄 확인 및 예약</span>
+                                        </button>
+                                    )}
+                                </div>
                             </motion.div>
                         </div>
                     </motion.div>

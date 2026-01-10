@@ -24,12 +24,28 @@ import {
     ArrowLeft,
     Check,
     Search,
-    X
+    X,
+    Calendar,
+    Clock,
+    Minus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 // --- Types ---
+interface IScheduleSlot {
+    time: string;
+    isBooked: boolean;
+    bookedBy?: string;
+}
+
+interface IScheduleDay {
+    date: string;
+    type: 'FULL_DAY' | 'HOURLY';
+    slots?: IScheduleSlot[];
+    isAvailable: boolean;
+}
+
 interface PavilionItem {
     id: string;
     type: string;
@@ -43,13 +59,14 @@ interface PavilionItem {
     productId?: string; // 참조용 상품 ID
 }
 
-interface FloorOwner {
-    id: string;
+interface IFloorOwner {
+    id: string; // e.g., 'artist-a'
     name: string;
     role: string;
     bio: string;
-    image?: string;
+    image?: string; // Specialist profile / Representative work
     items: PavilionItem[];
+    schedule?: IScheduleDay[];
 }
 
 interface Product {
@@ -161,10 +178,11 @@ function ImageUploader({
 
 export default function PartnerPavilionPage() {
     const router = useRouter();
-    const [owner, setOwner] = useState<FloorOwner | null>(null);
+    const [owner, setOwner] = useState<IFloorOwner | null>(null);
     const [floor, setFloor] = useState<number>(1);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [schedule, setSchedule] = useState<IScheduleDay[]>([]);
 
     // Product Selection State
     const [showProductSelector, setShowProductSelector] = useState(false);
@@ -184,6 +202,7 @@ export default function PartnerPavilionPage() {
                 const data = await res.json();
                 setOwner(data.owner);
                 setFloor(data.floor);
+                setSchedule(data.owner.schedule || []);
             }
         } catch (error) {
             console.error('Failed to fetch exhibition data:', error);
@@ -214,7 +233,7 @@ export default function PartnerPavilionPage() {
             const res = await fetch('/api/partner/pavilion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(owner)
+                body: JSON.stringify({ ...owner, schedule })
             });
             if (res.ok) {
                 alert('전시 정보가 성공적으로 저장되었습니다.');
@@ -230,7 +249,7 @@ export default function PartnerPavilionPage() {
     };
 
     const handleAddClick = () => {
-        if (floor === 1) {
+        if (floor === 1 || floor === 3) {
             addItem();
         } else {
             fetchProducts();
@@ -241,25 +260,44 @@ export default function PartnerPavilionPage() {
     const addItem = (product?: Product) => {
         if (!owner) return;
 
-        const newItem: PavilionItem = product ? {
-            id: `item-${Date.now()}`,
-            type: floor === 2 ? 'PRODUCT' : 'COACHING',
-            title: product.name,
-            description: product.summary,
-            price: `₩${product.price.toLocaleString()}`,
-            image: product.images[0]?.url || '',
-            specs: { 'Category': product.category },
-            productId: product._id
-        } : {
-            id: `item-${Date.now()}`,
-            type: 'ARTWORK',
-            title: '새로운 작품',
-            description: '작품에 대한 설명을 입력하세요',
-            price: '₩0',
-            rental: '₩0',
-            canvasSize: '0 x 0 cm',
-            specs: { 'Origin': 'Korea' }
-        };
+        let newItem: PavilionItem;
+
+        if (product) {
+            newItem = {
+                id: `item-${Date.now()}`,
+                type: floor === 2 ? 'PRODUCT' : 'COACHING',
+                title: product.name,
+                description: product.summary,
+                price: product.price.toString(),
+                image: product.images[0]?.url || '',
+                specs: { 'Category': product.category },
+                productId: product._id
+            };
+        } else {
+            if (floor === 1) {
+                newItem = {
+                    id: `item-${Date.now()}`,
+                    type: 'ARTWORK',
+                    title: '새로운 작품',
+                    description: '작품에 대한 설명을 입력하세요',
+                    price: '0',
+                    rental: '0',
+                    canvasSize: '0 x 0 cm',
+                    specs: { 'Origin': 'Korea' }
+                };
+            } else {
+                // floor 3 (Coaching)
+                newItem = {
+                    id: `item-${Date.now()}`,
+                    type: 'COACHING',
+                    title: '새로운 코칭 프로그램',
+                    description: '프로그램에 대한 상세 설명을 입력하세요.',
+                    price: '0',
+                    image: '',
+                    specs: { 'Type': 'Coaching' }
+                };
+            }
+        }
 
         setOwner({
             ...owner,
@@ -390,7 +428,7 @@ export default function PartnerPavilionPage() {
 
                     <div className="grid grid-cols-1 gap-6">
                         <AnimatePresence>
-                            {owner.items.map((item, index) => (
+                            {owner.items.map((item: PavilionItem, index: number) => (
                                 <motion.div
                                     key={item.id}
                                     initial={{ opacity: 0, y: 20 }}
@@ -425,8 +463,17 @@ export default function PartnerPavilionPage() {
                                             <div className="md:col-span-3 space-y-4">
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-1">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-600 ml-1">가격 / 가치</label>
-                                                        <Input className="font-black text-indigo-600" value={item.price} onChange={(e) => updateItem(index, { price: e.target.value })} />
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-600 ml-1">가격 (KRW)</label>
+                                                        <Input
+                                                            type="text"
+                                                            className="font-black text-indigo-600"
+                                                            value={item.price}
+                                                            placeholder="0"
+                                                            onChange={(e) => {
+                                                                const val = e.target.value.replace(/[^0-9]/g, '');
+                                                                updateItem(index, { price: val });
+                                                            }}
+                                                        />
                                                     </div>
                                                     {floor === 1 && (
                                                         <div className="space-y-1">
@@ -440,7 +487,7 @@ export default function PartnerPavilionPage() {
                                                             <Input className="font-bold" value={item.canvasSize || ''} onChange={(e) => updateItem(index, { canvasSize: e.target.value })} />
                                                         </div>
                                                     )}
-                                                    {floor !== 1 && (
+                                                    {floor === 2 && (
                                                         <div className="col-span-2 space-y-1">
                                                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">참조 상품 ID</label>
                                                             <Input className="font-mono text-[10px] text-slate-400 bg-slate-50" readOnly value={item.productId || 'N/A'} />
@@ -470,6 +517,175 @@ export default function PartnerPavilionPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Schedule Management Section - Only for Coaches (Floor 3) */}
+            {floor === 3 && (
+                <div className="lg:col-span-3 space-y-6 mt-12 pb-20">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-8 bg-indigo-600 rounded-full" />
+                        <h3 className="text-xl font-black uppercase tracking-tight text-slate-800">코치 스케줄 정밀 관리</h3>
+                        <Badge className="bg-indigo-600 text-white border-none font-bold">PRECISION SCHEDULING</Badge>
+                    </div>
+
+                    <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
+                                    <Calendar className="w-5 h-5 text-indigo-500" />
+                                    활동 가능 스케줄 설정
+                                </CardTitle>
+                                <CardDescription className="text-[10px] font-bold uppercase tracking-widest mt-1">
+                                    일일 단위 또는 시간 단위로 코칭 가능 시간을 설정하세요.
+                                </CardDescription>
+                            </div>
+                            <Button
+                                onClick={() => {
+                                    const today = new Date().toISOString().split('T')[0];
+                                    if (!schedule.find(s => s.date === today)) {
+                                        setSchedule([...schedule, { date: today, type: 'FULL_DAY', isAvailable: true, slots: [] }]);
+                                    } else {
+                                        alert('이미 해당 날짜의 스케줄이 존재합니다.');
+                                    }
+                                }}
+                                className="bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-black text-[10px] uppercase h-10 px-6 rounded-xl"
+                            >
+                                <Plus className="w-4 h-4 mr-2" /> 새 날짜 추가
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="p-8">
+                            <div className="space-y-6">
+                                {schedule.length > 0 ? (
+                                    schedule.map((day, idx) => (
+                                        <div key={idx} className="p-6 bg-slate-50 rounded-[24px] border border-slate-100 space-y-4">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
+                                                        <Calendar className="w-5 h-5 text-indigo-500" />
+                                                    </div>
+                                                    <div>
+                                                        <Input
+                                                            type="date"
+                                                            value={day.date}
+                                                            onChange={(e) => {
+                                                                const newSchedule = [...schedule];
+                                                                newSchedule[idx].date = e.target.value;
+                                                                setSchedule(newSchedule);
+                                                            }}
+                                                            className="font-black border-none bg-transparent p-0 h-auto text-lg focus-visible:ring-0"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-100 shadow-sm">
+                                                    <button
+                                                        onClick={() => {
+                                                            const newSchedule = [...schedule];
+                                                            newSchedule[idx].type = 'FULL_DAY';
+                                                            setSchedule(newSchedule);
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${day.type === 'FULL_DAY' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+                                                    >
+                                                        1일 단위
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            const newSchedule = [...schedule];
+                                                            newSchedule[idx].type = 'HOURLY';
+                                                            if (!newSchedule[idx].slots) newSchedule[idx].slots = [];
+                                                            setSchedule(newSchedule);
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${day.type === 'HOURLY' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+                                                    >
+                                                        시간 단위
+                                                    </button>
+                                                </div>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => {
+                                                        const newSchedule = [...schedule];
+                                                        newSchedule.splice(idx, 1);
+                                                        setSchedule(newSchedule);
+                                                    }}
+                                                    className="text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </Button>
+                                            </div>
+
+                                            <div className="pt-2">
+                                                {day.type === 'FULL_DAY' ? (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">상태:</span>
+                                                        <button
+                                                            onClick={() => {
+                                                                const newSchedule = [...schedule];
+                                                                newSchedule[idx].isAvailable = !newSchedule[idx].isAvailable;
+                                                                setSchedule(newSchedule);
+                                                            }}
+                                                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${day.isAvailable ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-red-100 text-red-600 border border-red-200'}`}
+                                                        >
+                                                            {day.isAvailable ? '코칭 가능' : '휴무 / 예약불가'}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-4">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {day.slots?.map((slot, sIdx) => (
+                                                                <div key={sIdx} className="flex items-center bg-white border border-slate-100 rounded-xl px-3 py-2 gap-2 shadow-sm group/slot">
+                                                                    <Clock className="w-3 h-3 text-indigo-400" />
+                                                                    <input
+                                                                        type="time"
+                                                                        value={slot.time}
+                                                                        onChange={(e) => {
+                                                                            const newSchedule = [...schedule];
+                                                                            newSchedule[idx].slots![sIdx].time = e.target.value;
+                                                                            setSchedule(newSchedule);
+                                                                        }}
+                                                                        className="text-xs font-bold border-none p-0 w-16 focus:ring-0 bg-transparent"
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const newSchedule = [...schedule];
+                                                                            newSchedule[idx].slots!.splice(sIdx, 1);
+                                                                            setSchedule(newSchedule);
+                                                                        }}
+                                                                        className="text-slate-300 hover:text-red-500 transition-colors"
+                                                                    >
+                                                                        <Minus className="w-3 h-3" />
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                onClick={() => {
+                                                                    const newSchedule = [...schedule];
+                                                                    newSchedule[idx].slots!.push({ time: "10:00", isBooked: false });
+                                                                    setSchedule(newSchedule);
+                                                                }}
+                                                                className="rounded-xl border-dashed border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50 h-9"
+                                                            >
+                                                                <Plus className="w-3 h-3 mr-1" /> 슬롯 추가
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="py-24 text-center border-4 border-dashed border-slate-100 rounded-[40px] bg-white/50">
+                                        <Calendar className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] italic">설정된 활동 가능 스케줄이 없습니다.<br />새 날짜 추가를 통해 코칭 가능 시간을 등록하세요.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
             {/* Product Selector Modal */}
             <AnimatePresence>

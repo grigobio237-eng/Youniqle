@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
 
     // 나이스페이 공식 문서 기준 파라미터 생성
     const ediDate = new Date().toISOString()
-      .replace(new RegExp('[-:T' + '.]', 'g'), '').substring(0, 14);
+      .replace(new RegExp('[-:T' + '.]', 'g'), '')
+      .substring(0, 14);
 
     // 결제수단 매핑 (기본값: CARD)
     const requestedMethod = (payMethod || paymentMethod || 'CARD') as string;

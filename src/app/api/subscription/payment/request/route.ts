@@ -24,7 +24,9 @@ export async function POST(request: NextRequest) {
         const productName = '김미정 원장 라운지 1개월 구독';
 
         // 나이스페이 공식 문서 기준 파라미터 생성
-        const ediDate = new Date().toISOString().replace(new RegExp('[-:T' + '.]', 'g'), '').substring(0, 14);
+        const ediDate = new Date().toISOString()
+            .replace(new RegExp('[-:T' + '.]', 'g'), '')
+            .substring(0, 14);
 
         // 서명 생성 (EdiDate + MID + Amt + MerchantKey)
         const signatureData = `${ediDate}${merchantId}${amount}${merchantKey}`;
