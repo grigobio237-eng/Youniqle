@@ -654,9 +654,6 @@ function WebtoonCard({ webtoon, onClick }: { webtoon: any; onClick?: () => void 
                         <h3 className="text-lg font-black text-text-primary leading-tight line-clamp-2">
                             {webtoon.summary || '오늘의 회복 웹툰'}
                         </h3>
-                        <p className="text-sm text-text-secondary line-clamp-2 opacity-70">
-                            {webtoon.script || webtoon.panels?.[0]?.script}
-                        </p>
                     </div>
 
                     <div className="flex items-center gap-3 pt-4 border-t border-line">
