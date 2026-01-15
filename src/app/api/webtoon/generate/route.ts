@@ -354,16 +354,9 @@ export async function POST(req: NextRequest) {
                         genre: genre || 'slice-of-life'
                     });
 
-                    // 5-2. Canvas로 텍스트 렌더링
-                    const finalImageBase64 = await drawTextOnImage(
-                        cleanImageBase64,
-                        panel.script
-                    );
-
                     return {
                         ...panel,
-                        cleanImageUrl: `data:image/png;base64,${cleanImageBase64}`, // 원본 저장
-                        imageUrl: `data:image/png;base64,${finalImageBase64}` // 최종 이미지
+                        imageUrl: `data:image/png;base64,${cleanImageBase64}` // 원본 이미지 반환 (텍스트 합성은 클라이언트에서 수행)
                     };
                 } catch (error) {
                     console.error(`[Webtoon Generate] Panel ${panel.panelNumber} failed:`, error);
@@ -378,6 +371,7 @@ export async function POST(req: NextRequest) {
             success: true,
             episodeNumber,
             panels: panelsWithImages,
+            title: scriptData.title,
             summary: scriptData.summary,
             characterPrompt: scriptData.characterPrompt,
             characterSheetImage: `data:image/png;base64,${characterSheetBase64}`,

@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
         const {
             date,
             episodeNumber,
+            title,
             panels,
             script,
             summary,
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
                 userId: user._id,
                 date: targetDate,
                 episodeNumber,
+                title: title || summary || '오늘의 회복 웹툰',
                 panels: uploadedPanels,
                 script: script || (uploadedPanels && uploadedPanels.length > 0 ? uploadedPanels[0].script : ""),
                 summary,

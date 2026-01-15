@@ -442,7 +442,7 @@ export default function CasesPage() {
                 <DialogContent className="bg-surface border-line sm:max-w-3xl rounded-[32px] overflow-hidden p-0 shadow-2xl max-h-[90vh] flex flex-col">
                     <DialogHeader className="p-6 pb-0">
                         <DialogTitle className="flex items-center gap-3 text-xl font-black">
-                            📖 {selectedWebtoon?.summary || '회복 웹툰'}
+                            📖 {selectedWebtoon?.title || (selectedWebtoon?.summary?.length < 30 ? selectedWebtoon.summary : '오늘의 회복 웹툰')}
                         </DialogTitle>
                         <DialogDescription className="text-text-secondary font-medium">
                             {new Date(selectedWebtoon?.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} · {selectedWebtoon?.genre} · {selectedWebtoon?.panels?.length || 4}컷
@@ -652,7 +652,7 @@ function WebtoonCard({ webtoon, onClick }: { webtoon: any; onClick?: () => void 
                 <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
                     <div className="space-y-2 flex-1">
                         <h3 className="text-lg font-black text-text-primary leading-tight line-clamp-2">
-                            {webtoon.summary || '오늘의 회복 웹툰'}
+                            {webtoon.title || (webtoon.summary?.length < 30 ? webtoon.summary : '오늘의 회복 웹툰')}
                         </h3>
                     </div>
 

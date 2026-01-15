@@ -809,17 +809,19 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
 ## 요청
 1. **정확히 ${panelCount}개**의 컷(Panel)에 들어갈 대본과 이미지 생성용 프롬프트를 작성하세요.
 2. 주인공 캐릭터의 외형 묘사(characterPrompt)를 상세하게 작성하세요. (영어 권장)
-3. 전체 줄거리 요약(summary)을 포함하세요.
+3. 전체 줄거리를 나타내는 **한국어 제목(title)**과 **한국어 요약(summary)**을 반드시 포함하세요. (절대 영어를 섞지 마세요)
+4. 각 컷의 script는 반드시 **한국어**로 작성하세요.
 
 ## 응답 형식 (JSON)
 {
+  "title": "에피소드 전체의 한국어 제목",
+  "summary": "에피소드 전체의 한국어 요약 (한글만 사용)",
   "characterPrompt": "Detailed physical description of the main character (English)",
-  "summary": "전체 에피소드 요약",
   "panels": [
     {
       "panelNumber": 1,
-      "script": "캐릭터의 대사나 나레이션 (한글)",
-      "prompt": "Detailed image generation prompt for this scene including background (English)"
+      "script": "해당 컷의 한국어 대사나 나레이션",
+      "prompt": "Detailed image generation prompt (English)"
     },
     ... (총 ${panelCount}개)
   ]

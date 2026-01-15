@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ChevronLeft, ChevronRight, MessageSquare, ArrowRight, Loader2, Sparkles, PenTool, Image as ImageIcon, RefreshCcw, Download, Copy, Check, Camera, UserCircle2, CheckCircle, Trash2, Globe, Lock, Share2, RefreshCw, Palette, Quote } from 'lucide-react';
-import { compressImage } from '@/lib/utils/image-client';
+import { compressImage, drawTextOnImageClient } from '@/lib/utils/image-client';
 import { downloadWebtoon } from '@/lib/utils/download';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -594,7 +594,21 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
       });
       if (res.ok) {
         const data = await res.json();
-        setGeneratedData({ ...generatedData, panels: data.panels, characterSheetImage });
+
+        // [최적화 5차] 클라이언트 사이드에서 한글 대사 합성 (서버 폰트 문제 해결)
+        const synthesizedPanels = await Promise.all(
+          data.panels.map(async (panel: any) => {
+            const synthesizedUrl = await drawTextOnImageClient(panel.imageUrl, panel.script);
+            return { ...panel, imageUrl: synthesizedUrl };
+          })
+        );
+
+        setGeneratedData({
+          ...generatedData,
+          panels: synthesizedPanels,
+          summary: data.title || data.summary || generatedData.summary, // 한글 제목 우선 사용
+          characterSheetImage
+        });
         setStep('IMAGE');
         // 인스타그램 캡션 자동 생성
         if (!instagramCaption) generateInstagramCaption();
@@ -630,6 +644,7 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
       const payload = {
         date: new Date().toISOString(),
         episodeNumber: generatedData.episodeNumber || 1,
+        title: generatedData.summary || '오늘의 회복 웹툰', // handleFinalGenerateWebtoon에서 한글 제목이 summary에 할당됨
         panels: compressedPanels,
         script: generatedData.summary || editedPanels[0]?.script || '',
         summary: generatedData.summary || '오늘의 회복 웹툰',

@@ -4,6 +4,7 @@ export interface IWebtoon extends Document {
     userId: mongoose.Types.ObjectId;
     date: Date;
     episodeNumber: number; // 연제 회차 (1~30)
+    title: string; // 한글 제목
     panels: Array<{
         panelNumber: number;
         script: string;
@@ -35,6 +36,11 @@ const WebtoonSchema = new Schema<IWebtoon>({
     episodeNumber: {
         type: Number,
         required: true
+    },
+    title: {
+        type: String,
+        required: true,
+        default: '오늘의 회복 웹툰'
     },
     panels: [{
         panelNumber: { type: Number, required: true },
