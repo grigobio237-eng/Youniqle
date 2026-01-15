@@ -531,16 +531,27 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
     if (!characterSheetImage) return;
     setIsSavingCharacter(true);
     try {
+      if (!characterSheetImage) return;
+
+      // [최적화 3차] 캐릭터 시트 이미지도 압축하여 전송 (413 에러 방지)
+      const compressedCharImage = await compressImage(characterSheetImage, 800, 0.7);
+
+      const payload = {
+        imageUrl: compressedCharImage,
+        prompt: characterPrompt,
+        genre,
+        visualStyle
+      };
+
+      // 전송 크기 모니터링
+      const payloadString = JSON.stringify(payload);
+      const sizeInMB = (payloadString.length / (1024 * 1024)).toFixed(2);
+      console.log(`[Character Save] Total Payload Size: ${sizeInMB}MB`);
+
       const res = await fetch('/api/character', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `내 캐릭터 ${new Date().toLocaleDateString()}`,
-          imageData: characterSheetImage,
-          prompt: characterPrompt,
-          visualStyle,
-          setAsDefault: true
-        })
+        body: payloadString
       });
       if (res.ok) {
         const data = await res.json();
@@ -603,11 +614,11 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
 
     setIsGenerating(true);
     try {
-      // [최적화 2차] 서버로 보내는 이미지 데이터를 JPEG로 압축하여 페이로드 크기 획기적 축소
+      // [최적화 3차] 서버 전송 제한(413 에러)을 완벽히 피하기 위해 압축 강도 상향 (800px, 0.6)
       const compressedPanels = await Promise.all(
         generatedData.panels.map(async (p: any) => {
           const { cleanImageUrl, ...rest } = p;
-          const compressedUrl = await compressImage(p.imageUrl, 1024, 0.8);
+          const compressedUrl = await compressImage(p.imageUrl, 800, 0.6);
           return {
             ...rest,
             imageUrl: compressedUrl
@@ -615,21 +626,28 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
         })
       );
 
+      const payload = {
+        date: new Date().toISOString(),
+        episodeNumber: generatedData.episodeNumber || 1,
+        panels: compressedPanels,
+        script: generatedData.summary || editedPanels[0]?.script || '',
+        summary: generatedData.summary || '오늘의 회복 웹툰',
+        imageUrl: compressedPanels[0]?.imageUrl || '',
+        characterPrompt,
+        visualStyle,
+        genre,
+        isPublic
+      };
+
+      // 전송 크기 모니터링
+      const payloadString = JSON.stringify(payload);
+      const sizeInMB = (payloadString.length / (1024 * 1024)).toFixed(2);
+      console.log(`[Webtoon Post] Total Payload Size: ${sizeInMB}MB`);
+
       const res = await fetch('/api/webtoon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: new Date().toISOString(),
-          episodeNumber: generatedData.episodeNumber || 1,
-          panels: compressedPanels,
-          script: generatedData.summary || editedPanels[0]?.script || '',
-          summary: generatedData.summary || '오늘의 회복 웹툰',
-          imageUrl: compressedPanels[0]?.imageUrl || '',
-          characterPrompt,
-          visualStyle,
-          genre,
-          isPublic
-        })
+        body: payloadString
       });
 
       if (res.ok) {
@@ -639,8 +657,20 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
           handleSaveCharacter();
         }
       } else {
-        const err = await res.json();
-        alert(err.error || '게시에 실패했습니다.');
+        // 서버 응답이 JSON이 아닐 경우(413 등)를 대비한 안전한 에러 처리
+        let errorMsg = '게시에 실패했습니다.';
+        try {
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const err = await res.json();
+            errorMsg = err.error || errorMsg;
+          } else if (res.status === 413) {
+            errorMsg = '전송용량이 너무 큽니다. 내용을 조금 줄이거나 다시 시도해주세요. (413)';
+          }
+        } catch (e) {
+          console.error('Error parsing response:', e);
+        }
+        alert(errorMsg);
       }
     } catch (error) {
       console.error('Webtoon post failed:', error);
