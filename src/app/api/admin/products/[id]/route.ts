@@ -177,6 +177,19 @@ export async function PUT(
       );
     }
 
+    // 기존 이미지 정보 보관 (파일 정리를 위해)
+    const oldProduct = await Product.findById(id).lean() as any;
+    const oldImages = oldProduct?.images?.map((img: any) => img.url) || [];
+    const oldDescImages: string[] = [];
+    if (oldProduct?.description?.includes('<img')) {
+      const imgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+      let match;
+      while ((match = imgRegex.exec(oldProduct.description)) !== null) {
+        oldDescImages.push(match[1]);
+      }
+    }
+    const allOldImages = [...new Set([...oldImages, ...oldDescImages])];
+
     // 상품 업데이트
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -207,6 +220,30 @@ export async function PUT(
 
     if (!updatedProduct) {
       return NextResponse.json({ error: '상품을 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    // 바뀐 이미지 파일들 정리 (기존에 있었으나 새 정보에는 없는 파일 삭제)
+    const newImages = images?.map((img: any) => img.url) || [];
+    const newDescImages: string[] = [];
+    if (description && description.includes('<img')) {
+      const imgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+      let match;
+      while ((match = imgRegex.exec(description)) !== null) {
+        newDescImages.push(match[1]);
+      }
+    }
+    const allNewImages = [...new Set([...newImages, ...newDescImages])];
+
+    const imagesToRemove = allOldImages.filter(url => !allNewImages.includes(url));
+
+    if (imagesToRemove.length > 0) {
+      try {
+        const { StorageService } = await import('@/lib/storage');
+        await Promise.all(imagesToRemove.map(url => StorageService.deleteFile(url)));
+        console.log(`✅ 관리자 상품 수정: 유실된 이미지 파일 ${imagesToRemove.length}개 정리 완료`);
+      } catch (error) {
+        console.error('수정 중 이미지 삭제 오류:', error);
+      }
     }
 
     // 캐시 무효화 (상품 목록 및 개별 상품)
@@ -275,29 +312,34 @@ export async function DELETE(
     }
 
     // 이미지 파일들 삭제 (Firebase Storage 및 Vercel Blob)
+    const imagesToDelete: string[] = [];
+
+    // 1. 메인 이미지 배열 내 파일들 추출
     if (product.images && product.images.length > 0) {
+      product.images.forEach((img: any) => {
+        if (img.url) imagesToDelete.push(img.url);
+      });
+    }
+
+    // 2. 상세 설명 HTML 내 이미지 태그 URL 추출
+    if (product.description && product.description.includes('<img')) {
+      const imgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+      let match;
+      while ((match = imgRegex.exec(product.description)) !== null) {
+        imagesToDelete.push(match[1]);
+      }
+    }
+
+    // 파일 삭제 실행
+    if (imagesToDelete.length > 0) {
       try {
         const { StorageService } = await import('@/lib/storage');
-
-        // 1. 이미지 배열 내 파일 삭제
-        const deletePromises = product.images.map(async (img: any) => {
-          if (img.url) {
-            await StorageService.deleteFile(img.url);
-          }
-        });
-
-        // 2. 상세 설명 HTML 내 이미지 태그 URL 추출 및 삭제
-        if (product.description && product.description.includes('<img')) {
-          const imgRegex = /<img[^>]+src="([^">]+)"/g;
-          let match;
-          while ((match = imgRegex.exec(product.description)) !== null) {
-            const imgSrc = match[1];
-            deletePromises.push(StorageService.deleteFile(imgSrc));
-          }
-        }
-
-        await Promise.all(deletePromises);
-        console.log(`✅ 관리자 상품 삭제: 관련 이미지 파일들 정리 완료`);
+        // 중복 제거 후 삭제
+        const uniqueImages = [...new Set(imagesToDelete)];
+        await Promise.all(
+          uniqueImages.map(url => StorageService.deleteFile(url))
+        );
+        console.log(`✅ 관리자 상품 삭제: 관련 이미지 파일 ${uniqueImages.length}개 정리 완료`);
       } catch (error) {
         console.error('이미지 삭제 중 오류 발생:', error);
       }

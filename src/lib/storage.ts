@@ -1,5 +1,5 @@
 import { getFirebaseStorageInstance } from './firebase-admin';
-import { put } from '@vercel/blob';
+import { put, del } from '@vercel/blob';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -110,8 +110,10 @@ export class StorageService {
                 );
                 await this.bucket.file(decodedPath).delete();
             } else if (urlOrPath.includes('public.blob.vercel-storage.com')) {
-                // Vercel Blob (추후 지원 중단 가능)
-                // del(urlOrPath)
+                // Vercel Blob 삭제
+                await del(urlOrPath, {
+                    token: process.env.BLOB_READ_WRITE_TOKEN,
+                });
             }
         } catch (error) {
             console.error('File deletion error:', error);

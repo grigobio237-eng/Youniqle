@@ -40,36 +40,42 @@ export async function POST(req: NextRequest) {
         const timestamp = Date.now();
 
         // 패널 이미지들을 Firebase Storage에 WebP로 업로드
-        let uploadedPanels = panels;
+        let uploadedPanels = [];
         if (panels && panels.length > 0) {
-            console.log('[Webtoon Save] Uploading panel images to Firebase...');
-            uploadedPanels = await Promise.all(
-                panels.map(async (panel: any, idx: number) => {
-                    // 이미 Firebase URL이면 스킵
-                    if (panel.imageUrl && panel.imageUrl.includes('storage.googleapis.com')) {
-                        return panel;
-                    }
+            console.log(`[Webtoon Save] Processing ${panels.length} panel images...`);
 
-                    // Base64 이미지인 경우 Firebase에 업로드
-                    if (panel.imageUrl && panel.imageUrl.startsWith('data:image/')) {
-                        try {
-                            const path = `webtoons/${user._id}/${timestamp}_panel_${panel.panelNumber || idx + 1}.webp`;
-                            const firebaseUrl = await uploadImageToFirebase(panel.imageUrl, path);
-                            console.log(`[Webtoon Save] Panel ${panel.panelNumber || idx + 1} uploaded: ${firebaseUrl}`);
-                            return {
-                                ...panel,
-                                imageUrl: firebaseUrl,
-                                cleanImageUrl: panel.cleanImageUrl // 원본도 유지 (필요시 별도 업로드 가능)
-                            };
-                        } catch (uploadError: any) {
-                            console.error(`[Webtoon Save] Panel ${idx + 1} upload failed:`, uploadError.message);
-                            return panel; // 업로드 실패 시 원본 유지
-                        }
+            for (let i = 0; i < panels.length; i++) {
+                const panel = panels[i];
+                const panelNum = panel.panelNumber || i + 1;
+
+                // 이미 Firebase URL이면 스킵
+                if (panel.imageUrl && panel.imageUrl.includes('storage.googleapis.com')) {
+                    uploadedPanels.push(panel);
+                    continue;
+                }
+
+                // Base64 이미지인 경우 Firebase에 업로드
+                if (panel.imageUrl && panel.imageUrl.startsWith('data:image/')) {
+                    try {
+                        console.log(`[Webtoon Save] Uploading panel ${panelNum}/${panels.length}...`);
+                        const path = `webtoons/${user._id}/${timestamp}_panel_${panelNum}.webp`;
+                        const firebaseUrl = await uploadImageToFirebase(panel.imageUrl, path);
+
+                        uploadedPanels.push({
+                            ...panel,
+                            imageUrl: firebaseUrl,
+                            // cleanImageUrl은 프론트에서 제외하고 보냈으므로 여기서도 제외되거나 명시적으로 null 처리
+                        });
+                        console.log(`[Webtoon Save] Panel ${panelNum} upload success.`);
+                    } catch (uploadError: any) {
+                        console.error(`[Webtoon Save] Panel ${panelNum} upload failed:`, uploadError.message);
+                        uploadedPanels.push(panel); // 실패 시 원본 유지
                     }
-                    return panel;
-                })
-            );
-            console.log('[Webtoon Save] All panel images uploaded successfully!');
+                } else {
+                    uploadedPanels.push(panel);
+                }
+            }
+            console.log('[Webtoon Save] All panel images processed.');
         }
 
         // 대표 이미지도 Firebase URL로 업데이트

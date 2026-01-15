@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { ChevronRight, ChevronLeft, RefreshCw, RefreshCcw, CheckCircle, ArrowRight, Sparkles, Palette, PenTool, Image as ImageIcon, Check, Loader2, Quote, Download, Copy, UserCircle2, Camera } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageSquare, ArrowRight, Loader2, Sparkles, PenTool, Image as ImageIcon, RefreshCcw, Download, Copy, Check, Camera, UserCircle2, CheckCircle, Trash2, Globe, Lock, Share2, RefreshCw, Palette, Quote } from 'lucide-react';
+import { compressImage } from '@/lib/utils/image-client';
 import { downloadWebtoon } from '@/lib/utils/download';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -602,16 +603,28 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
 
     setIsGenerating(true);
     try {
+      // [최적화 2차] 서버로 보내는 이미지 데이터를 JPEG로 압축하여 페이로드 크기 획기적 축소
+      const compressedPanels = await Promise.all(
+        generatedData.panels.map(async (p: any) => {
+          const { cleanImageUrl, ...rest } = p;
+          const compressedUrl = await compressImage(p.imageUrl, 1024, 0.8);
+          return {
+            ...rest,
+            imageUrl: compressedUrl
+          };
+        })
+      );
+
       const res = await fetch('/api/webtoon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           date: new Date().toISOString(),
           episodeNumber: generatedData.episodeNumber || 1,
-          panels: generatedData.panels,
+          panels: compressedPanels,
           script: generatedData.summary || editedPanels[0]?.script || '',
           summary: generatedData.summary || '오늘의 회복 웹툰',
-          imageUrl: generatedData.panels[0]?.imageUrl || '',
+          imageUrl: compressedPanels[0]?.imageUrl || '',
           characterPrompt,
           visualStyle,
           genre,
