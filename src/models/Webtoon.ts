@@ -84,8 +84,6 @@ const WebtoonSchema = new Schema<IWebtoon>({
     timestamps: true
 });
 
-// 동일 사용자가 같은 날짜에 중복 생성하는 것 방지 (또는 덮어쓰기)
-WebtoonSchema.index({ userId: 1, date: 1 }, { unique: true });
 // 월별 조회를 위한 인덱스
 WebtoonSchema.index({ month: 1, isPublic: 1 });
 

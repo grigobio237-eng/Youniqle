@@ -84,26 +84,22 @@ export async function POST(req: NextRequest) {
             ? uploadedPanels[0].imageUrl
             : imageUrl;
 
-        // Upsert daily webtoon
-        const webtoon = await Webtoon.findOneAndUpdate(
-            { userId: user._id, date: targetDate },
-            {
-                userId: user._id,
-                date: targetDate,
-                episodeNumber,
-                title: title || summary || '오늘의 회복 웹툰',
-                panels: uploadedPanels,
-                script: script || (uploadedPanels && uploadedPanels.length > 0 ? uploadedPanels[0].script : ""),
-                summary,
-                imageUrl: finalImageUrl,
-                characterPrompt,
-                visualStyle,
-                genre,
-                isPublic,
-                month
-            },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
+        // Create new webtoon (allow multiple per day)
+        const webtoon = await Webtoon.create({
+            userId: user._id,
+            date: targetDate,
+            episodeNumber,
+            title: title || summary || '오늘의 회복 웹툰',
+            panels: uploadedPanels,
+            script: script || (uploadedPanels && uploadedPanels.length > 0 ? uploadedPanels[0].script : ""),
+            summary,
+            imageUrl: finalImageUrl,
+            characterPrompt,
+            visualStyle,
+            genre,
+            isPublic,
+            month
+        });
 
         return NextResponse.json({ success: true, webtoon });
 
