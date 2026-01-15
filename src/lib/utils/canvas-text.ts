@@ -36,11 +36,11 @@ export async function drawTextOnImage(
         const boxHeight = lines.length * lineHeight + padding;
         const boxY = height - boxHeight - padding;
 
-        // SVG 생성
+        // SVG 생성 (한글 폰트 지원을 위해 폰트 패밀리 보완)
         const svgOverlay = `
       <svg width="${width}" height="${height}">
         <rect x="${padding}" y="${boxY}" width="${maxWidth}" height="${boxHeight}" fill="rgba(255, 255, 255, 0.9)" rx="10" />
-        <text x="${padding + padding / 2}" y="${boxY + padding / 2 + fontSize}" font-family="sans-serif" font-size="${fontSize}" font-weight="bold" fill="black">
+        <text x="${padding + padding / 2}" y="${boxY + padding / 2 + fontSize}" font-family="'Noto Sans KR', 'Nanum Gothic', 'Malgun Gothic', sans-serif" font-size="${fontSize}" font-weight="bold" fill="black">
           ${lines.map((line, i) => `<tspan x="${padding + padding / 2}" dy="${i === 0 ? 0 : lineHeight}">${escapeHtml(line)}</tspan>`).join('')}
         </text>
       </svg>

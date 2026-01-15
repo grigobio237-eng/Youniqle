@@ -537,10 +537,11 @@ function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: bo
       const compressedCharImage = await compressImage(characterSheetImage, 800, 0.7);
 
       const payload = {
-        imageUrl: compressedCharImage,
+        name: `내 캐릭터 ${new Date().toLocaleDateString()}`,
+        imageData: compressedCharImage,
         prompt: characterPrompt,
-        genre,
-        visualStyle
+        visualStyle,
+        setAsDefault: true
       };
 
       // 전송 크기 모니터링
