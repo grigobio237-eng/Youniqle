@@ -12,6 +12,8 @@ import { downloadWebtoon } from '@/lib/utils/download';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
+import DiagnosisBasedRecommendations from '@/components/personalization/DiagnosisBasedRecommendations';
+import RealtimeActivityBanner from '@/components/social/RealtimeActivityBanner';
 import {
   Select,
   SelectContent,
@@ -1662,8 +1664,13 @@ function RecoveryDashboard({ score, onOpenWebtoon }: { score: number; onOpenWebt
         </div>
       </section>
 
-      {/* Site Guide Section */}
+      {/* Realtime Activity Banner */}
       <section className="container mx-auto px-4 pt-12 max-w-5xl">
+        <RealtimeActivityBanner className="mb-8" />
+      </section>
+
+      {/* Site Guide Section */}
+      <section className="container mx-auto px-4 max-w-5xl">
         <SiteGuide />
       </section>
 
@@ -1867,33 +1874,15 @@ function RecoveryDashboard({ score, onOpenWebtoon }: { score: number; onOpenWebt
         </div>
       </section>
 
-      {/* Best Products */}
+      {/* Best Products - 진단 기반 추천 */}
       <section className="container mx-auto px-4 pb-12 max-w-5xl">
-        <div className="flex justify-between items-end mb-8">
-          <h2 className="text-3xl font-black text-obsidian tracking-tight">🔥 내게 맞는 회복 프로토콜</h2>
-          <Link href="/products" className="text-sm font-bold text-slate hover:text-chapter-accent transition-colors">전체 큐레이션 보기 &gt;</Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { id: 1, title: '딥 슬립 리커버리 키트', desc: '불면 데이터 개선 만족도 98%', price: '49,000원', tag: 'BEST', color: 'bg-chapter-accent' },
-            { id: 2, title: '만성 피로 삭제 팩', desc: '활기 지수가 달라지는 7일 루틴', price: '35,000원', tag: 'HOT', color: 'bg-reward-gold' },
-            { id: 3, title: '스트레스 번아웃 케어', desc: '전문가용 멘탈 데이터 관리', price: '55,000원', tag: 'NEW', color: 'bg-obsidian' }
-          ].map((item) => (
-            <Link href={`/products/${item.id}`} key={item.id} className="block group">
-              <Card className="h-full border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all bg-white">
-                <div className="aspect-[4/3] bg-mist relative overflow-hidden">
-                  <div className={`absolute top-4 left-4 ${item.color} text-mist text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest z-10 shadow-lg`}>{item.tag}</div>
-                  <div className="w-full h-full flex items-center justify-center text-slate/20 font-black text-2xl italic tracking-tighter group-hover:scale-110 transition-transform duration-700">YU PROTOCOL</div>
-                </div>
-                <CardContent className="p-8">
-                  <h3 className="text-xl font-black text-obsidian group-hover:text-chapter-accent transition-colors mb-2 tracking-tight">{item.title}</h3>
-                  <p className="text-sm text-slate font-medium mb-6 line-clamp-1">{item.desc}</p>
-                  <div className="text-2xl font-black text-obsidian">{item.price}</div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <DiagnosisBasedRecommendations
+          limit={6}
+          showProducts={true}
+          showProtocols={true}
+          showContent={true}
+          showCategoryStatus={false}
+        />
       </section>
 
       {/* Quick Links */}

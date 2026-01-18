@@ -48,8 +48,8 @@ const CoachingBookingSchema = new Schema<ICoachingBooking>({
     timestamps: true
 });
 
+// 인덱스 설정 (unique: true 필드는 자동으로 인덱스가 생성되므로 제외)
 CoachingBookingSchema.index({ coachId: 1, date: 1 });
 CoachingBookingSchema.index({ userId: 1 });
-CoachingBookingSchema.index({ orderNumber: 1 });
 
 export default mongoose.models.CoachingBooking || mongoose.model<ICoachingBooking>('CoachingBooking', CoachingBookingSchema);

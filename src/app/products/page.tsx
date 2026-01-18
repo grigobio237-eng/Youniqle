@@ -10,6 +10,7 @@ import { Sparkles, TrendingUp, Star, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import ExternalProductCuration from '@/components/products/ExternalProductCuration';
 
 function ProductListSkeleton() {
   return (
@@ -45,6 +46,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = React.use(searchParams);
   const isFunding = params.isFunding === 'true';
   const [userScore, setUserScore] = useState<number | null>(null);
+  const [userTags, setUserTags] = useState<string[]>([]);
   const [recommendationLabel, setRecommendationLabel] = useState('');
 
   useEffect(() => {
@@ -54,9 +56,16 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         const numScore = parseInt(score);
         setUserScore(numScore);
 
-        if (numScore >= 70) setRecommendationLabel('활기 회복을 위한 고농축 키트');
-        else if (numScore >= 40) setRecommendationLabel('지친 몸을 위한 집중 리셋 키트');
-        else setRecommendationLabel('최우선 휴식을 위한 딥 슬립 키트');
+        if (numScore >= 70) {
+          setRecommendationLabel('활기 회복을 위한 고농축 키트');
+          setUserTags(['concentration', 'mental_care']);
+        } else if (numScore >= 40) {
+          setRecommendationLabel('지친 몸을 위한 집중 리셋 키트');
+          setUserTags(['chronic_fatigue', 'stress']);
+        } else {
+          setRecommendationLabel('최우선 휴식을 위한 딥 슬립 키트');
+          setUserTags(['sleep_lack', 'chronic_fatigue']);
+        }
       }
     }
   }, []);
@@ -176,6 +185,17 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
               <ProductList searchParams={params} />
             </Suspense>
           </ErrorBoundary>
+
+          {/* AI 추천 외부 큐레이션 */}
+          {!isFunding && (
+            <div className="mt-16 pt-12 border-t border-line">
+              <ExternalProductCuration
+                recoveryScore={userScore || undefined}
+                tags={userTags}
+                maxItems={8}
+              />
+            </div>
+          )}
         </main>
       </div>
     </ChapterWrapper>

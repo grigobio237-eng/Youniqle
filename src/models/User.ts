@@ -114,6 +114,13 @@ export interface IUser extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  diagnosisResults?: Array<{
+    type: 'free' | 'deep';
+    scores: Record<string, number>;
+    totalScore: number;
+    metadata?: any;
+    createdAt: Date;
+  }>;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -288,7 +295,14 @@ const UserSchema = new Schema<IUser>({
     status: { type: String, enum: ['active', 'inactive'], default: 'inactive' },
     plan: { type: String, enum: ['lounge_chat'] },
     expiresAt: { type: Date }
-  }
+  },
+  diagnosisResults: [{
+    type: { type: String, enum: ['free', 'deep'], required: true },
+    scores: { type: Map, of: Number },
+    totalScore: { type: Number },
+    metadata: { type: Schema.Types.Mixed },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, {
   timestamps: true,
 });

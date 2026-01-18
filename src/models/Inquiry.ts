@@ -148,8 +148,7 @@ const InquirySchema = new Schema<IInquiry>({
   timestamps: true
 });
 
-// 인덱스 설정
-InquirySchema.index({ inquiryId: 1 });
+// 인덱스 설정 (unique: true 필드는 자동으로 인덱스가 생성되므로 제외)
 InquirySchema.index({ userEmail: 1 });
 InquirySchema.index({ status: 1 });
 InquirySchema.index({ type: 1 });

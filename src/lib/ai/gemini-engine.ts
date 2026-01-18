@@ -223,6 +223,73 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             }
         };
     }
+    // Daily Check-in Question Generator (Interactive)
+    static async generateDailyCheckInQuestion(input: {
+        userName: string;
+        dayOfWeek: string;
+        timeOfDay: string;
+        recentContext?: string; // e.g., "yesterday sleep was bad"
+    }): Promise<any> {
+        if (!process.env.GEMINI_API_KEY) {
+            return {
+                greeting: `안녕하세요, ${input.userName}님!`,
+                question: '오늘 컨디션은 어떠신가요?',
+                options: [
+                    { label: '아주 좋아요', value: 'good' },
+                    { label: '보통이에요', value: 'normal' },
+                    { label: '조금 피곤해요', value: 'tired' }
+                ]
+            };
+        }
+
+        try {
+            const prompt = `
+당신은 '유니클(Youniqle)'의 친근하고 세심한 **퍼스널 회복 코치**입니다.
+사용자(${input.userName})에게 하루를 시작하는(또는 하루 중) 인사를 건네고, 컨디션을 체크하는 질문을 하나 던져주세요.
+
+## 상황 정보
+- 요일/시간: ${input.dayOfWeek} ${input.timeOfDay}
+- 최근 컨텍스트: ${input.recentContext || '특이사항 없음'}
+
+## 코칭 원칙
+1. **따뜻하고 개인화된 인사**: 요일이나 시간대, 최근 컨텍스트를 반영해 자연스럽게 인사를 건네세요. (예: "월요일 아침이네요!", "어제 늦게 주무셨는데...")
+2. **핵심 질문 1개**: 사용자가 부담 없이 답할 수 있는 컨디션 체크 질문을 1개만 하세요.
+3. **간단한 선택지**: 답변하기 쉽게 3개의 선택지를 함께 제공하세요.
+
+## 응답 형식 (JSON Only)
+{
+  "greeting": "따뜻한 인사말 (나-전달법, 1~2문장)",
+  "question": "핵심 질문 (1문장)",
+  "options": [
+    { "label": "긍정 답변 (예: 상쾌해요!)", "value": "good", "emoji": "😊" },
+    { "label": "중립 답변 (예: 평범해요)", "value": "normal", "emoji": "😐" },
+    { "label": "부정 답변 (예: 몸이 무거워요)", "value": "bad", "emoji": "🫠" }
+  ]
+}`;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse daily check-in');
+
+        } catch (error) {
+            console.error('Gemini Check-in Error:', error);
+            // Fallback
+            return {
+                greeting: `${input.userName}님, 안녕하세요!`,
+                question: '오늘 몸 상태는 좀 어떠신가요?',
+                options: [
+                    { label: '가볍고 좋아요', value: 'good', emoji: '💪' },
+                    { label: '그저 그래요', value: 'normal', emoji: '😐' },
+                    { label: '많이 피곤하네요', value: 'bad', emoji: '💤' }
+                ]
+            };
+        }
+    }
+
     // Daily Question Generator
     static async generateDailyQuestions(theme: string, keywords: string): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {

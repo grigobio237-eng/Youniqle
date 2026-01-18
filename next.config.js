@@ -90,6 +90,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'shopping-phinf.pstatic.net', // 네이버 쇼핑 상품 이미지
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pstatic.net', // 네이버 이미지 CDN 전체
+        port: '',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },

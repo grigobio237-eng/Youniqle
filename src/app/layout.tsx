@@ -5,6 +5,7 @@ import ConditionalHeader from '@/components/layout/ConditionalHeader';
 import Footer from '@/components/layout/Footer';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import NudgeFeaturesProvider from '@/components/providers/NudgeFeaturesProvider';
 // 모니터링 시스템 초기화는 서버 사이드에서만 실행
 // Vercel 환경에서는 필요시에만 활성화
 if (typeof window === 'undefined' && process.env.ENABLE_MONITORING === 'true') {
@@ -69,15 +70,16 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen flex flex-col`} suppressHydrationWarning>
         <SessionProvider>
           <LanguageProvider>
-            <ConditionalHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
+            <NudgeFeaturesProvider>
+              <ConditionalHeader />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </NudgeFeaturesProvider>
           </LanguageProvider>
         </SessionProvider>
       </body>
     </html>
   );
 }
-

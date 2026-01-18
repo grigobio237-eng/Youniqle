@@ -399,81 +399,223 @@ function UtilsContent() {
 
 // Sub-modals and component definitions
 function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
-    const [hours, setHours] = useState(7.5);
+    const [bedtimeHour, setBedtimeHour] = useState(23);
+    const [bedtimeMin, setBedtimeMin] = useState(0);
+    const [wakeHour, setWakeHour] = useState(7);
+    const [wakeMin, setWakeMin] = useState(0);
     const [quality, setQuality] = useState('good');
+    const [disturbances, setDisturbances] = useState<string[]>([]);
+    const [isSaved, setIsSaved] = useState(false);
+
+    const disturbanceOptions = [
+        { id: 'woke_up', icon: '🌙', label: '중간에 깸' },
+        { id: 'dreams', icon: '💭', label: '꿈' },
+        { id: 'noise', icon: '🔊', label: '소음' },
+        { id: 'temp', icon: '🌡️', label: '온도' },
+        { id: 'stress', icon: '😰', label: '스트레스' },
+        { id: 'phone', icon: '📱', label: '스마트폰' },
+    ];
+
+    const qualityOptions = [
+        { id: 'poor', icon: '😫', label: '나쁨', color: 'border-red-400 bg-red-50' },
+        { id: 'fair', icon: '😑', label: '보통', color: 'border-yellow-400 bg-yellow-50' },
+        { id: 'good', icon: '🙂', label: '좋음', color: 'border-green-400 bg-green-50' },
+        { id: 'great', icon: '🤩', label: '완벽', color: 'border-blue-400 bg-blue-50' }
+    ];
+
+    // 수면 시간 계산
+    const calculateSleepDuration = () => {
+        let bedtime = bedtimeHour * 60 + bedtimeMin;
+        let waketime = wakeHour * 60 + wakeMin;
+
+        if (waketime < bedtime) {
+            waketime += 24 * 60; // 다음날로 넘어간 경우
+        }
+
+        const duration = waketime - bedtime;
+        const hours = Math.floor(duration / 60);
+        const mins = duration % 60;
+        return { hours, mins, total: duration };
+    };
+
+    const sleepDuration = calculateSleepDuration();
+
+    const toggleDisturbance = (id: string) => {
+        setDisturbances(prev =>
+            prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
+        );
+    };
 
     const handleSave = () => {
-        // AI 엔진에 데이터를 전송하는 시뮬레이션
-        onOpenChange(false);
+        // localStorage에 저장
+        const data = {
+            bedtime: `${bedtimeHour.toString().padStart(2, '0')}:${bedtimeMin.toString().padStart(2, '0')}`,
+            waketime: `${wakeHour.toString().padStart(2, '0')}:${wakeMin.toString().padStart(2, '0')}`,
+            duration: sleepDuration.total,
+            quality,
+            disturbances,
+            date: new Date().toISOString().split('T')[0]
+        };
+        localStorage.setItem('recovery_sleep_data', JSON.stringify(data));
+        localStorage.setItem('recovery_last_score', String(Math.round(sleepDuration.hours * 10)));
+
+        setIsSaved(true);
+        setTimeout(() => {
+            setIsSaved(false);
+            onOpenChange(false);
+        }, 1500);
     };
+
+    const getSleepAdvice = () => {
+        if (sleepDuration.hours >= 8) return { text: "충분한 수면 시간이에요! 👍", color: "text-green-600" };
+        if (sleepDuration.hours >= 7) return { text: "적정 수면 시간이에요.", color: "text-blue-600" };
+        if (sleepDuration.hours >= 6) return { text: "조금 더 자면 좋겠어요.", color: "text-yellow-600" };
+        return { text: "수면이 많이 부족해요! 😴", color: "text-red-600" };
+    };
+
+    const advice = getSleepAdvice();
+
+    // 저장 완료 화면
+    if (isSaved) {
+        return (
+            <Dialog open={open} onOpenChange={onOpenChange}>
+                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+                    <div className="h-80 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                        <div className="text-8xl mb-4 animate-bounce">✅</div>
+                        <h2 className="text-2xl font-black">저장 완료!</h2>
+                        <p className="text-white/70 mt-2">수면 데이터가 기록되었습니다</p>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface max-h-[90vh] overflow-y-auto">
                 <div className="relative">
                     <DialogHeader className="sr-only">
                         <DialogTitle>수면 리커버리 기록</DialogTitle>
                         <DialogDescription>어젯밤의 수면 데이터를 입력하세요.</DialogDescription>
                     </DialogHeader>
 
-                    <div className="h-48 bg-gradient-to-br from-[#1A1D21] to-[#2D333B] flex flex-col items-center justify-center relative overflow-hidden p-8">
-                        <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30"></div>
+                    <div className="h-40 bg-gradient-to-br from-indigo-600 to-purple-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+')]"></div>
                         <div className="relative z-10 flex flex-col items-center text-white">
-                            <div className="text-4xl mb-2 animate-pulse">🌙</div>
-                            <h2 className="text-2xl font-black tracking-tighter uppercase">Sleep Analysis</h2>
+                            <div className="text-4xl mb-2">🌙</div>
+                            <h2 className="text-xl font-black tracking-tight">수면 기록</h2>
+                            <p className="text-sm text-white/70">어젯밤 수면을 기록해주세요</p>
                         </div>
                     </div>
 
-                    <div className="p-10 space-y-10">
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-end">
-                                <label className="text-xs font-black text-slate uppercase tracking-widest opacity-40">Sleep Duration</label>
-                                <div className="text-3xl font-black text-obsidian">{hours} <span className="text-sm">Hours</span></div>
+                    <div className="p-6 space-y-6">
+                        {/* 시간 선택 */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate uppercase tracking-widest">취침 시간</label>
+                                <div className="flex items-center gap-1 bg-mist rounded-xl p-3">
+                                    <select
+                                        value={bedtimeHour}
+                                        onChange={(e) => setBedtimeHour(parseInt(e.target.value))}
+                                        className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                    >
+                                        {Array.from({ length: 24 }, (_, i) => (
+                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}</option>
+                                        ))}
+                                    </select>
+                                    <span className="text-2xl font-black text-obsidian">:</span>
+                                    <select
+                                        value={bedtimeMin}
+                                        onChange={(e) => setBedtimeMin(parseInt(e.target.value))}
+                                        className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                    >
+                                        {[0, 15, 30, 45].map(m => (
+                                            <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <input
-                                type="range"
-                                min="3" max="12" step="0.5"
-                                value={hours}
-                                onChange={(e) => setHours(parseFloat(e.target.value))}
-                                className="w-full h-2 bg-mist rounded-full appearance-none cursor-pointer accent-obsidian"
-                            />
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate uppercase tracking-widest">기상 시간</label>
+                                <div className="flex items-center gap-1 bg-mist rounded-xl p-3">
+                                    <select
+                                        value={wakeHour}
+                                        onChange={(e) => setWakeHour(parseInt(e.target.value))}
+                                        className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                    >
+                                        {Array.from({ length: 24 }, (_, i) => (
+                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}</option>
+                                        ))}
+                                    </select>
+                                    <span className="text-2xl font-black text-obsidian">:</span>
+                                    <select
+                                        value={wakeMin}
+                                        onChange={(e) => setWakeMin(parseInt(e.target.value))}
+                                        className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                    >
+                                        {[0, 15, 30, 45].map(m => (
+                                            <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="space-y-6">
-                            <label className="text-xs font-black text-slate uppercase tracking-widest opacity-40">Sleep Quality</label>
+                        {/* 총 수면 시간 */}
+                        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-indigo-600 font-bold uppercase tracking-widest mb-1">총 수면 시간</p>
+                            <p className="text-3xl font-black text-indigo-700">
+                                {sleepDuration.hours}시간 {sleepDuration.mins > 0 && `${sleepDuration.mins}분`}
+                            </p>
+                            <p className={`text-sm font-medium mt-1 ${advice.color}`}>{advice.text}</p>
+                        </div>
+
+                        {/* 수면 품질 */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-black text-slate uppercase tracking-widest">수면 품질</label>
                             <div className="grid grid-cols-4 gap-2">
-                                {[
-                                    { id: 'poor', icon: '😫', label: '나쁨' },
-                                    { id: 'fair', icon: '😑', label: '보통' },
-                                    { id: 'good', icon: '🙂', label: '좋음' },
-                                    { id: 'great', icon: '🤩', label: '완벽' }
-                                ].map((q) => (
+                                {qualityOptions.map((q) => (
                                     <button
                                         key={q.id}
                                         onClick={() => setQuality(q.id)}
-                                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${quality === q.id
-                                            ? 'border-obsidian bg-obsidian text-mist shadow-lg transform -translate-y-1'
-                                            : 'border-line bg-white text-slate hover:border-line-heavy'
+                                        className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${quality === q.id
+                                            ? `${q.color} border-2 shadow-md transform -translate-y-0.5`
+                                            : 'border-line bg-white hover:border-line-heavy'
                                             }`}
                                     >
-                                        <span className="text-xl">{q.icon}</span>
-                                        <span className="text-[10px] font-black">{q.label}</span>
+                                        <span className="text-2xl">{q.icon}</span>
+                                        <span className="text-[10px] font-bold text-slate">{q.label}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="bg-mist/30 p-6 rounded-3xl border border-line border-dashed">
-                            <p className="text-[11px] text-slate font-medium leading-relaxed italic text-center">
-                                "이 데이터는 내일 네비게이터의 '회복 예보'에 직접적인 영향을 미쳐 분석 정밀도를 42% 향상시킵니다."
-                            </p>
+                        {/* 방해 요소 */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-black text-slate uppercase tracking-widest">방해 요소 (선택)</label>
+                            <div className="flex flex-wrap gap-2">
+                                {disturbanceOptions.map((d) => (
+                                    <button
+                                        key={d.id}
+                                        onClick={() => toggleDisturbance(d.id)}
+                                        className={`px-3 py-2 rounded-full border-2 transition-all flex items-center gap-1.5 text-sm ${disturbances.includes(d.id)
+                                            ? 'border-obsidian bg-obsidian text-mist'
+                                            : 'border-line bg-white text-slate hover:border-line-heavy'
+                                            }`}
+                                    >
+                                        <span>{d.icon}</span>
+                                        <span className="font-medium">{d.label}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
+                        {/* 저장 버튼 */}
                         <Button
-                            className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black shadow-xl"
+                            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl"
                             onClick={handleSave}
                         >
-                            데이터 동기화 완료
+                            🌙 수면 기록 저장하기
                         </Button>
                     </div>
 
@@ -490,23 +632,55 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 }
 
 function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
-    const [intake, setIntake] = useState(1250);
-    const goal = 2000;
-    const progress = (intake / goal) * 100;
+    const [intake, setIntake] = useState(0);
+    const [goal, setGoal] = useState(2000);
+    const [customAmount, setCustomAmount] = useState('');
+    const [records, setRecords] = useState<{ time: string, amount: number, type: string }[]>([]);
+    const [showGoalEdit, setShowGoalEdit] = useState(false);
+    const progress = Math.min((intake / goal) * 100, 100);
 
-    const handleAdd = (amount: number) => {
-        setIntake(prev => Math.min(prev + amount, 4000));
+    const drinkOptions = [
+        { id: 'water', icon: '💧', label: '물', amount: 250 },
+        { id: 'bigwater', icon: '🥤', label: '큰 잔', amount: 500 },
+        { id: 'coffee', icon: '☕', label: '커피', amount: 200 },
+        { id: 'tea', icon: '🍵', label: '차', amount: 150 },
+    ];
+
+    const handleAdd = (amount: number, type: string = '물') => {
+        const newIntake = Math.min(intake + amount, 5000);
+        setIntake(newIntake);
+
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        setRecords(prev => [...prev, { time: timeStr, amount, type }]);
+    };
+
+    const handleCustomAdd = () => {
+        const amount = parseInt(customAmount);
+        if (amount > 0 && amount <= 2000) {
+            handleAdd(amount, '직접입력');
+            setCustomAmount('');
+        }
+    };
+
+    const handleReset = () => {
+        setIntake(0);
+        setRecords([]);
     };
 
     const getStatusMessage = () => {
-        if (progress >= 100) return "오늘의 목표를 달성했습니다! 완벽한 밸런스예요.";
-        if (progress >= 70) return "거의 다 왔어요! 조금만 더 보충해볼까요?";
-        return "신진대사를 위해 수분이 조금 더 필요해 보입니다.";
+        if (progress >= 100) return { text: "목표 달성! 🎉 오늘도 완벽한 수분 밸런스예요!", color: "text-green-600" };
+        if (progress >= 80) return { text: "거의 다 왔어요! 조금만 더 마시면 목표 달성!", color: "text-chapter-accent" };
+        if (progress >= 50) return { text: "절반 왔어요! 물 한 잔 더 마셔볼까요?", color: "text-blue-600" };
+        if (progress >= 25) return { text: "좋은 시작이에요! 꾸준히 마셔주세요 💪", color: "text-slate" };
+        return { text: "수분 섭취를 시작해볼까요? 건강의 첫걸음이에요!", color: "text-slate" };
     };
+
+    const status = getStatusMessage();
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface max-h-[90vh] overflow-y-auto">
                 <div className="relative">
                     <DialogHeader className="sr-only">
                         <DialogTitle>수분 밸런스 체크</DialogTitle>
@@ -514,59 +688,134 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                     </DialogHeader>
 
                     {/* Visual Progress Header */}
-                    <div className="h-64 bg-gradient-to-br from-blue-500 to-indigo-600 flex flex-col items-center justify-center relative overflow-hidden p-8">
-                        {/* Dynamic Wave Background (Simplified) */}
+                    <div className="h-56 bg-gradient-to-br from-blue-400 to-indigo-600 flex flex-col items-center justify-center relative overflow-hidden">
+                        {/* Wave Background */}
                         <div
                             className="absolute bottom-0 left-0 w-full bg-white/20 transition-all duration-1000 ease-out"
                             style={{ height: `${progress}%` }}
                         />
 
+                        {/* Bubbles animation */}
+                        {progress < 100 && (
+                            <div className="absolute inset-0 overflow-hidden">
+                                <div className="absolute bottom-0 left-1/4 w-3 h-3 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+                                <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-white/20 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
+                                <div className="absolute bottom-0 left-3/4 w-4 h-4 bg-white/25 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+                            </div>
+                        )}
+
                         <div className="relative z-10 flex flex-col items-center text-white">
-                            <div className="text-6xl mb-4 animate-bounce">💧</div>
-                            <div className="text-5xl font-black tracking-tighter mb-1">{intake} <span className="text-xl opacity-60">ml</span></div>
-                            <div className="text-sm font-bold opacity-60 uppercase tracking-widest">Daily Progress {Math.round(progress)}%</div>
+                            <div className="text-5xl mb-3">{progress >= 100 ? '🎊' : '💧'}</div>
+                            <div className="text-5xl font-black tracking-tighter">
+                                {intake.toLocaleString()}
+                                <span className="text-xl opacity-70 ml-1">ml</span>
+                            </div>
+                            <div className="text-sm font-bold opacity-70 mt-1 uppercase tracking-widest">
+                                {Math.round(progress)}% 달성
+                            </div>
                         </div>
                     </div>
 
-                    <div className="p-10 space-y-8">
-                        <div className="text-center space-y-2">
-                            <p className="text-obsidian font-bold text-lg leading-tight">
-                                {getStatusMessage()}
-                            </p>
-                            <p className="text-sm text-slate font-medium opacity-60">일일 목표: {goal}ml</p>
+                    <div className="p-6 space-y-5">
+                        {/* 상태 메시지 */}
+                        <div className="text-center">
+                            <p className={`font-bold text-lg ${status.color}`}>{status.text}</p>
+                            <div className="flex items-center justify-center gap-2 mt-2">
+                                <span className="text-sm text-slate">목표:</span>
+                                {showGoalEdit ? (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="number"
+                                            value={goal}
+                                            onChange={(e) => setGoal(Math.max(500, Math.min(5000, parseInt(e.target.value) || 2000)))}
+                                            className="w-20 text-center border border-line rounded-lg px-2 py-1 text-sm font-bold"
+                                        />
+                                        <span className="text-sm text-slate">ml</span>
+                                        <button onClick={() => setShowGoalEdit(false)} className="text-xs text-blue-500 font-bold">확인</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setShowGoalEdit(true)} className="text-sm font-bold text-blue-600 hover:underline">
+                                        {goal.toLocaleString()}ml 변경
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Progress Bar */}
-                        <div className="h-4 bg-mist rounded-full overflow-hidden border border-line">
+                        <div className="h-3 bg-mist rounded-full overflow-hidden border border-line">
                             <div
-                                className="h-full bg-blue-500 transition-all duration-1000 ease-out"
+                                className={`h-full transition-all duration-500 ease-out rounded-full ${progress >= 100 ? 'bg-green-500' : 'bg-blue-500'}`}
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
 
-                        {/* Controls */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <button
-                                onClick={() => handleAdd(250)}
-                                className="h-20 rounded-2xl border-2 border-line hover:border-blue-500 bg-white transition-all flex flex-col items-center justify-center gap-1 group"
-                            >
-                                <span className="text-xl group-hover:scale-120 transition-transform">🥛</span>
-                                <span className="text-[10px] font-black uppercase text-slate tracking-widest">Add 250ml</span>
-                            </button>
-                            <button
-                                onClick={() => handleAdd(500)}
-                                className="h-20 rounded-2xl border-2 border-line hover:border-blue-500 bg-white transition-all flex flex-col items-center justify-center gap-1 group"
-                            >
-                                <span className="text-xl group-hover:scale-120 transition-transform">🥤</span>
-                                <span className="text-[10px] font-black uppercase text-slate tracking-widest">Add 500ml</span>
-                            </button>
+                        {/* 빠른 추가 버튼 */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-black text-slate uppercase tracking-widest">빠른 추가</h4>
+                            <div className="grid grid-cols-4 gap-2">
+                                {drinkOptions.map((drink) => (
+                                    <button
+                                        key={drink.id}
+                                        onClick={() => handleAdd(drink.amount, drink.label)}
+                                        className="p-3 rounded-2xl border-2 border-line hover:border-blue-400 bg-white transition-all flex flex-col items-center gap-1 group active:scale-95"
+                                    >
+                                        <span className="text-2xl group-hover:scale-110 transition-transform">{drink.icon}</span>
+                                        <span className="text-[10px] font-bold text-slate">{drink.label}</span>
+                                        <span className="text-[9px] text-slate/60">{drink.amount}ml</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
+                        {/* 직접 입력 */}
+                        <div className="flex gap-2">
+                            <input
+                                type="number"
+                                placeholder="직접 입력 (ml)"
+                                value={customAmount}
+                                onChange={(e) => setCustomAmount(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCustomAdd()}
+                                className="flex-1 border-2 border-line rounded-xl px-4 py-3 text-sm font-medium focus:border-blue-400 focus:outline-none"
+                            />
+                            <Button
+                                onClick={handleCustomAdd}
+                                disabled={!customAmount || parseInt(customAmount) <= 0}
+                                className="px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                            >
+                                추가
+                            </Button>
+                        </div>
+
+                        {/* 오늘 기록 */}
+                        {records.length > 0 && (
+                            <div className="bg-mist/50 rounded-2xl p-4 space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <h4 className="text-xs font-black text-slate uppercase tracking-widest">오늘 기록</h4>
+                                    <button onClick={handleReset} className="text-xs text-status-danger font-bold hover:underline">
+                                        초기화
+                                    </button>
+                                </div>
+                                <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                                    {records.slice(-6).map((record, idx) => (
+                                        <span key={idx} className="bg-white px-3 py-1 rounded-full text-xs font-medium text-slate border border-line">
+                                            {record.time} {record.type} {record.amount}ml
+                                        </span>
+                                    ))}
+                                    {records.length > 6 && (
+                                        <span className="bg-blue-100 px-3 py-1 rounded-full text-xs font-bold text-blue-600">
+                                            +{records.length - 6}개 더
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 저장 버튼 */}
                         <Button
                             className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black shadow-xl"
                             onClick={() => onOpenChange(false)}
                         >
-                            오늘의 리포트 저장
+                            {progress >= 100 ? '🎉 목표 달성! 저장하기' : '오늘의 기록 저장'}
                         </Button>
                     </div>
 
@@ -586,12 +835,56 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
     const [step, setStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [timeLeft, setTimeLeft] = useState(15);
+    const [isCompleted, setIsCompleted] = useState(false);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const steps = [
-        { title: 'Neck Reset', icon: '🧘', desc: '목과 승모근의 긴장 데이터를 수평으로 정렬합니다.', time: 15 },
-        { title: 'Shoulder Unlock', icon: '🙆', desc: '견갑골 주변의 경직도를 45도 각도로 완화합니다.', time: 20 },
-        { title: 'Spine Decompress', icon: '🤸', desc: '척추 사이의 공간을 확보하여 신경 전도율을 최적화합니다.', time: 30 }
+        {
+            title: '목 스트레칭',
+            titleEn: 'Neck Reset',
+            icon: '🧘',
+            time: 15,
+            shortDesc: '뻣뻣한 목 근육을 부드럽게 풀어줍니다',
+            instructions: [
+                '👉 편하게 의자에 앉아서 등을 꼿꼿이 펴주세요',
+                '👉 어깨에 힘을 빼고, 양손은 무릎 위에 올려놓으세요',
+                '👉 머리를 천천히 왼쪽으로 기울여 5초간 유지하세요',
+                '👉 이번엔 오른쪽으로 기울여 5초간 유지하세요',
+                '👉 마지막으로 천천히 고개를 아래로 숙여 5초간 유지!'
+            ],
+            tip: '💡 목을 돌릴 때 어깨가 따라 올라가지 않도록 주의하세요!'
+        },
+        {
+            title: '어깨 풀기',
+            titleEn: 'Shoulder Unlock',
+            icon: '🙆',
+            time: 20,
+            shortDesc: '굳어있는 어깨를 시원하게 풀어줍니다',
+            instructions: [
+                '👉 양쪽 어깨를 귀에 닿을 만큼 으쓱~ 올려보세요',
+                '👉 3초 동안 힘껏 올린 상태로 유지하세요',
+                '👉 "후~" 숨을 내쉬면서 어깨를 툭 떨어뜨리세요',
+                '👉 이 동작을 3번 반복해주세요',
+                '👉 마지막으로 어깨를 뒤로 크게 5번 돌려주세요'
+            ],
+            tip: '💡 어깨를 돌릴 때 원을 크게 그린다고 상상하면 더 시원해요!'
+        },
+        {
+            title: '허리 펴기',
+            titleEn: 'Spine Decompress',
+            icon: '🤸',
+            time: 30,
+            shortDesc: '오래 앉아서 굳은 허리를 시원하게 펴줍니다',
+            instructions: [
+                '👉 의자 끝에 앉아서 발을 바닥에 평평하게 놓으세요',
+                '👉 양손을 머리 뒤에 깍지 끼고 하늘을 바라보세요',
+                '👉 숨을 크게 들이마시면서 가슴을 활짝 펴주세요',
+                '👉 5초간 유지한 후, 천천히 숨을 내쉬며 돌아오세요',
+                '👉 이번엔 상체를 앞으로 숙여 발끝을 터치해보세요',
+                '👉 마지막으로 허리를 좌우로 천천히 트위스트!'
+            ],
+            tip: '💡 허리가 아프면 무리하지 말고 할 수 있는 만큼만 하세요!'
+        }
     ];
 
     useEffect(() => {
@@ -599,10 +892,16 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => prev - 1);
             }, 1000);
-        } else if (timeLeft === 0) {
+        } else if (timeLeft === 0 && isPlaying) {
             setIsPlaying(false);
+            // 자동으로 다음 단계 알림
             if (step < steps.length - 1) {
-                // Next step logic could go here
+                setTimeout(() => {
+                    setStep(prev => prev + 1);
+                    setTimeLeft(steps[step + 1].time);
+                }, 500);
+            } else {
+                setIsCompleted(true);
             }
         }
         return () => {
@@ -620,73 +919,219 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
             setTimeLeft(steps[step + 1].time);
             setIsPlaying(false);
         } else {
-            onOpenChange(false);
+            setIsCompleted(true);
         }
     };
 
+    const handlePrev = () => {
+        if (step > 0) {
+            setStep(prev => prev - 1);
+            setTimeLeft(steps[step - 1].time);
+            setIsPlaying(false);
+        }
+    };
+
+    const handleReset = () => {
+        setStep(0);
+        setTimeLeft(steps[0].time);
+        setIsPlaying(false);
+        setIsCompleted(false);
+    };
+
+    const handleClose = () => {
+        handleReset();
+        onOpenChange(false);
+    };
+
+    // 완료 화면
+    if (isCompleted) {
+        return (
+            <Dialog open={open} onOpenChange={handleClose}>
+                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+                    <div className="relative">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>스트레칭 완료</DialogTitle>
+                            <DialogDescription>축하합니다! 오늘의 스트레칭을 완료했습니다.</DialogDescription>
+                        </DialogHeader>
+
+                        <div className="h-64 bg-gradient-to-br from-green-400 to-emerald-600 flex flex-col items-center justify-center relative overflow-hidden p-8">
+                            <div className="absolute inset-0 opacity-20">
+                                <div className="absolute top-10 left-10 text-6xl animate-bounce">🎉</div>
+                                <div className="absolute bottom-10 right-10 text-6xl animate-bounce delay-150">✨</div>
+                            </div>
+                            <div className="relative z-10 flex flex-col items-center text-white text-center">
+                                <div className="text-8xl mb-4">🏆</div>
+                                <h2 className="text-3xl font-black tracking-tight">완료!</h2>
+                                <p className="text-lg opacity-80 mt-2">오늘도 건강해졌어요</p>
+                            </div>
+                        </div>
+
+                        <div className="p-10 space-y-6 text-center">
+                            <div className="space-y-2">
+                                <p className="text-2xl font-black text-obsidian">스트레칭 미션 성공! 🎊</p>
+                                <p className="text-slate font-medium">
+                                    3가지 스트레칭을 모두 완료했어요.<br />
+                                    뻣뻣했던 몸이 한결 가벼워졌을 거예요!
+                                </p>
+                            </div>
+
+                            <div className="bg-mist/50 rounded-2xl p-6 space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate">완료한 스트레칭</span>
+                                    <span className="font-bold text-obsidian">3가지</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate">소요 시간</span>
+                                    <span className="font-bold text-obsidian">약 1분 5초</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate">오늘의 스트레칭</span>
+                                    <span className="font-bold text-green-600">✓ 달성</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <Button variant="outline" className="flex-1 h-14 rounded-2xl font-bold" onClick={handleReset}>
+                                    다시 하기
+                                </Button>
+                                <Button className="flex-1 h-14 rounded-2xl bg-obsidian text-mist font-black shadow-xl" onClick={handleClose}>
+                                    완료 🎉
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+
+    const currentStep = steps[step];
+    const progress = ((currentStep.time - timeLeft) / currentStep.time) * 100;
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+        <Dialog open={open} onOpenChange={handleClose}>
+            <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface max-h-[90vh] overflow-y-auto">
                 <div className="relative">
                     <DialogHeader className="sr-only">
                         <DialogTitle>오피스 리셋 스트레칭</DialogTitle>
                         <DialogDescription>1분 만에 신체 밸런스를 회복하세요.</DialogDescription>
                     </DialogHeader>
 
-                    <div className="h-64 bg-[#F8F9FA] flex flex-col items-center justify-center relative overflow-hidden p-8 border-b border-line">
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-mist/20"></div>
-
-                        <div className="relative z-10 flex flex-col items-center text-obsidian">
-                            <div className="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center text-6xl mb-4 relative">
-                                {steps[step].icon}
-                                {isPlaying && (
-                                    <div className="absolute inset-0 rounded-full border-4 border-obsidian animate-ping opacity-20"></div>
-                                )}
-                            </div>
-                            <h2 className="text-2xl font-black italic tracking-tighter uppercase">{steps[step].title}</h2>
+                    {/* 헤더 */}
+                    <div className="h-48 bg-gradient-to-br from-chapter-accent/90 to-chapter-accent flex flex-col items-center justify-center relative overflow-hidden p-6">
+                        <div className="absolute top-3 left-4 text-xs font-black text-white/60 uppercase tracking-widest">
+                            Step {step + 1} of {steps.length}
                         </div>
+
+                        {/* 원형 타이머 */}
+                        <div className="relative w-28 h-28">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle
+                                    cx="56" cy="56" r="50"
+                                    stroke="rgba(255,255,255,0.2)"
+                                    strokeWidth="8"
+                                    fill="none"
+                                />
+                                <circle
+                                    cx="56" cy="56" r="50"
+                                    stroke="white"
+                                    strokeWidth="8"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeDasharray={`${2 * Math.PI * 50}`}
+                                    strokeDashoffset={`${2 * Math.PI * 50 * (1 - progress / 100)}`}
+                                    className="transition-all duration-1000 ease-linear"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                                <span className="text-3xl">{currentStep.icon}</span>
+                            </div>
+                        </div>
+
+                        <h2 className="text-xl font-black text-white mt-3 tracking-tight">{currentStep.title}</h2>
+                        <p className="text-sm text-white/70 font-medium">{currentStep.shortDesc}</p>
                     </div>
 
-                    <div className="p-10 space-y-10">
-                        <div className="text-center space-y-4">
-                            <p className="text-slate font-medium leading-relaxed opacity-60 px-4">
-                                {steps[step].desc}
-                            </p>
-                            <div className="text-6xl font-black italic tracking-tighter text-obsidian ordinal">
-                                00:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}
+                    <div className="p-6 space-y-6">
+                        {/* 타이머 */}
+                        <div className="text-center">
+                            <div className="text-5xl font-black text-obsidian tabular-nums">
+                                {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                            </div>
+                            <p className="text-xs text-slate mt-1 uppercase tracking-widest">남은 시간</p>
+                        </div>
+
+                        {/* 상세 가이드 */}
+                        <div className="bg-mist/50 rounded-2xl p-5 space-y-3">
+                            <h4 className="font-black text-obsidian text-sm flex items-center gap-2">
+                                📋 따라해 보세요!
+                            </h4>
+                            <div className="space-y-2">
+                                {currentStep.instructions.map((instruction, idx) => (
+                                    <p key={idx} className="text-sm text-obsidian/80 leading-relaxed pl-1">
+                                        {instruction}
+                                    </p>
+                                ))}
                             </div>
                         </div>
 
-                        <div className="flex gap-4">
+                        {/* 팁 */}
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                            <p className="text-sm text-yellow-800 font-medium">
+                                {currentStep.tip}
+                            </p>
+                        </div>
+
+                        {/* 컨트롤 */}
+                        <div className="flex gap-3">
                             <Button
                                 variant="outline"
-                                className="w-20 h-20 rounded-2xl border-2 border-line text-obsidian hover:bg-mist"
-                                onClick={togglePlay}
+                                className="w-14 h-14 rounded-xl border-2 border-line"
+                                onClick={handlePrev}
+                                disabled={step === 0}
                             >
-                                {isPlaying ? <Pause className="w-8 h-8 font-black" /> : <Play className="w-8 h-8 font-black fill-current" />}
+                                <ChevronLeft className="w-6 h-6" />
                             </Button>
                             <Button
-                                className="flex-1 h-20 rounded-2xl bg-obsidian text-mist font-black text-xl shadow-xl flex items-center justify-between px-8 group"
+                                variant="outline"
+                                className={`w-16 h-16 rounded-2xl border-2 ${isPlaying ? 'border-chapter-accent bg-chapter-accent/10' : 'border-obsidian text-obsidian hover:bg-obsidian hover:text-white'}`}
+                                onClick={togglePlay}
+                            >
+                                {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
+                            </Button>
+                            <Button
+                                className="flex-1 h-14 rounded-xl bg-obsidian text-mist font-black shadow-lg group"
                                 onClick={handleNext}
                             >
-                                <span>{step === steps.length - 1 ? 'RECOVERY COMPLETED' : 'NEXT PROTOCOL'}</span>
-                                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                                {step === steps.length - 1 ? '완료하기 🎉' : '다음 동작'}
+                                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </div>
 
-                        <div className="flex justify-center gap-2">
-                            {steps.map((_, i) => (
-                                <div
+                        {/* 단계 표시 */}
+                        <div className="flex justify-center gap-2 pt-2">
+                            {steps.map((s, i) => (
+                                <button
                                     key={i}
-                                    className={`h-1.5 rounded-full transition-all duration-500 ${i === step ? 'w-12 bg-obsidian' : 'w-2 bg-line'}`}
+                                    onClick={() => {
+                                        setStep(i);
+                                        setTimeLeft(steps[i].time);
+                                        setIsPlaying(false);
+                                    }}
+                                    className={`h-2 rounded-full transition-all duration-300 ${i === step
+                                        ? 'w-8 bg-chapter-accent'
+                                        : i < step
+                                            ? 'w-2 bg-green-500'
+                                            : 'w-2 bg-line'
+                                        }`}
                                 />
                             ))}
                         </div>
                     </div>
 
                     <button
-                        onClick={() => onOpenChange(false)}
-                        className="absolute top-4 right-4 w-10 h-10 bg-obsidian/10 backdrop-blur rounded-full flex items-center justify-center text-obsidian hover:bg-obsidian/20 transition-colors z-20"
+                        onClick={handleClose}
+                        className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors z-20"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -695,3 +1140,4 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
         </Dialog>
     );
 }
+
