@@ -1056,4 +1056,98 @@ JSON 형식:
             return { description: "오늘의 회복 기록!", hashtags: "#유니클 #회복챌린지" };
         }
     }
+
+    // AI Diagnosis Solution: Generate personalized advice based on Big 5 & Facets
+    static async generateDiagnosisSolution(input: {
+        scores: { physical: number; mental: number; lifestyle: number; sleep: number };
+        tScores?: { domains: any; facets: any };
+        userInfo?: { name: string; age?: string; gender?: string };
+    }): Promise<any> {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not set');
+        }
+
+        try {
+            const domainScores = input.tScores?.domains || {};
+            const facetScores = input.tScores?.facets || {};
+
+            // Format scores for prompt
+            const scoreSummary = `
+            [기본 4대 지표 (0-100점)]
+            - 신체 활력: ${input.scores.physical}
+            - 멘탈 안정: ${input.scores.mental}
+            - 생활 규칙성: ${input.scores.lifestyle}
+            - 수면 품질: ${input.scores.sleep}
+            
+            [Big 5 성격 요인 (T점수, 평균 50)]
+            - 신경성(N): ${domainScores.N || '-'} (불안, 우울, 자의식 등)
+            - 외향성(E): ${domainScores.E || '-'} (활동성, 사교성 등)
+            - 개방성(O): ${domainScores.O || '-'} (상상력, 감수성 등)
+            - 우호성(A): ${domainScores.A || '-'} (이타성, 협조성 등)
+            - 성실성(C): ${domainScores.C || '-'} (자기도능감, 신중함 등)
+            `;
+
+            const prompt = `당신은 대한민국 최고의 통합 의학 전문가이자 심리 상담가(Wellness Coach)입니다.
+            사용자의 심층 심리 진단 결과를 바탕으로 **가장 시급하고 효과적인 4대 영역 맞춤 처방**을 내려주세요.
+
+            ## 사용자 정보
+            ${input.userInfo?.name ? `- 이름: ${input.userInfo.name}` : ''}
+            ${scoreSummary}
+
+            ## 처방 원칙
+            1. **전문적이지만 따뜻하게**: 의학적 근거를 바탕으로 하되, 말투는 따뜻하고 격려하는 어조를 사용하세요.
+            2. **구체적인 행동 지침**: "운동하세요" 대신 "하루 15분, 점심 식사 후 햇볕을 쬐며 산책하세요"처럼 구체적으로 제안하세요.
+            3. **연결성**: 성격 요인이 건강에 미치는 영향을 설명해주세요. (예: "높은 신경성으로 인해 수면 질이 낮습니다. 이를 보완하기 위해...")
+            4. **통일된 톤**: 모든 제안은 '회복(Recovery)'이라는 하나의 목표를 향해야 합니다.
+
+            ## 제안할 제품 컨셉 (Product Concept)
+            이 사용자에게 가장 필요한 단 하나의 **"가상의 맞춤형 제품"**을 기획해주세요.
+            - 기존에 있는 제품이어도 좋고, 세상에 없던 새로운 조합이어도 좋습니다.
+            - 예: "스트레스로 긴장된 승모근을 이완시키는 마그네슘 아로마 롤온", "불안한 밤을 위한 테아닌 & 캐모마일 블렌딩 티"
+
+            ## 출력 형식 (JSON Only)
+            {
+              "analysis": "사용자의 현재 상태에 대한 1-2문장 총평 (예: 신경성이 높아 전반적인 긴장도가 높지만, 성실성이 높아 루틴을 통한 회복 가능성이 매우 큽니다.)",
+              "exercise": "운동 처방 (제목 + 1-2문장 설명)",
+              "nutrition": "영양/식습관 처방 (제목 + 1-2문장 설명)",
+              "mindset": "마인드셋/심리 처방 (제목 + 1-2문장 설명)",
+                "sleep": "수면 조언 (100자 이내)",
+                "productConcept": {
+                    "name": "제안 제품명 (예: 딥 슬립 리커버리 키트)",
+                    "reason": "추천 이유 (1문장)",
+                    "ingredients": ["핵심성분/요소1", "핵심성분/요소2"]
+                },
+                "audioScript": "당신은 유니클 회복 센터의 원장(Healing Director)으로서, 사용자의 이름을 다정하게 부르며 진단 결과를 위로와 공감의 언어로 풀어주는 프리미엄 오디오 가이드 대본을 작성하세요. 
+                - 말투: 아주 부드럽고, 천천히 말하는 듯한 느낌, 전문적이지만 따뜻한 위로가 중심.
+                - 내용: '진단 점수가 낮아서 걱정되시죠?' 보다는 '그동안 많이 애쓰셨다는 게 결과에서 느껴져요'라는 공감적 접근. 특히 Big 5 점수 중 가장 특징적인 부분(예: 높은 신경성, 낮은 외향성 등)을 회복의 관점에서 긍정적으로 재해석하여 언급할 것.
+                - 분량: 공백 포함 250-300자 내외. 구어체(~요, ~죠). 바로 녹음해서 읽어줄 수 있는 완성된 대본 형태로 작성."
+            }
+            `;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse diagnosis solution');
+
+        } catch (error) {
+            console.error('Gemini Diagnosis Solution Error:', error);
+            // Fallback Data
+            return {
+                analysis: "데이터 분석 중 일시적인 오류가 발생했습니다. 전반적인 밸런스 유지를 권장합니다.",
+                exercise: "가벼운 산책으로 신체 리듬 깨우기",
+                nutrition: "수분 섭취를 늘리고 자극적인 음식 줄이기",
+                mindset: "하루 5분, 나만을 위한 명상 시간 갖기",
+                sleep: "취침 1시간 전 스마트폰 사용 줄이기",
+                productConcept: {
+                    name: "베이직 밸런스 케어",
+                    reason: "기초적인 회복 루틴 형성을 돕습니다.",
+                    ingredients: ["종합비타민", "스트레칭 밴드"]
+                },
+                audioScript: "안녕하세요. 오늘 하루 많이 힘드셨죠? 잠시 깊은 숨을 들이마시고, 천천히 내뱉어보세요. 당신의 몸과 마음이 편안해지는 것을 느껴봅니다. 오늘 하루도 정말 수고 많으셨어요."
+            };
+        }
+    }
 }

@@ -61,12 +61,24 @@
     line-height: 1.5;
     overflow-x: hidden;
     width: 100%;
+    position: relative;
+    -webkit-text-size-adjust: 100%;
   }
 
   /* Mobile Optimization */
   @media (max-width: 768px) {
     body {
       font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      font-size: 13px;
+    }
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 }

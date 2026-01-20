@@ -9,7 +9,9 @@ export type ChapterType =
     | 'ai-navigator'
     | 'membership'
     | 'omakase'
-    | 'utils';
+    | 'utils'
+    | 'my-page'
+    | 'diagnosis-report';
 
 interface ChapterWrapperProps {
     chapter: ChapterType;

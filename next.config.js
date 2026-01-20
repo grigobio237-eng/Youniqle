@@ -134,8 +134,8 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value: process.env.NODE_ENV === 'production'
-              ? "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;"
-              : "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;",
+              ? "default-src *; media-src 'self' data:; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;"
+              : "default-src *; media-src 'self' data:; script-src * 'unsafe-inline' 'unsafe-eval' blob: data: https://unpkg.com https://cdn.jsdelivr.net; style-src * 'unsafe-inline'; img-src * data: blob:; font-src *; connect-src * blob: data: https://unpkg.com https://cdn.jsdelivr.net; frame-src *; frame-ancestors *; base-uri *; form-action *; worker-src 'self' blob: data:;",
           },
           {
             key: 'X-Permitted-Cross-Domain-Policies',

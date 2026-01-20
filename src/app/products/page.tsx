@@ -74,12 +74,12 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
     <ChapterWrapper chapter="products" className="container mx-auto px-4 py-12">
       {/* AI Recommendation Banner */}
       {userScore && (
-        <div className="mb-20 bg-surface border border-line rounded-[40px] p-8 md:p-14 relative overflow-hidden shadow-2xl">
+        <div className="mb-12 md:mb-20 bg-surface border border-line rounded-[32px] md:rounded-[40px] p-6 md:p-14 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 p-8 opacity-5">
             <Sparkles className="w-64 h-64 text-primary" />
           </div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-12">
             <div className="flex-1 text-center md:text-left space-y-6">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                 <span className="bg-primary text-background text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest">
@@ -87,7 +87,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
                 </span>
                 <span className="text-sm font-bold text-primary">나의 회복 점수: {userScore}점</span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-black text-text-primary leading-tight tracking-tighter">
+              <h2 className="text-2xl md:text-5xl font-black text-text-primary leading-tight tracking-tighter">
                 {recommendationLabel}
               </h2>
               <div className="flex flex-wrap justify-center md:justify-start gap-8 text-sm text-text-secondary font-medium">
@@ -137,7 +137,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         </Button>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 pb-8 border-b border-line">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6 pb-8 border-b border-line">
         <div className="space-y-2">
           <h1 className="text-4xl font-black text-text-primary tracking-tighter">
             {isFunding ? '회복 펀딩' : '전체 상품'}

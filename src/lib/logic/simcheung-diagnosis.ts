@@ -4,19 +4,16 @@
  * Based on IPIP-NEO-60 Commercial Edition Design
  */
 
+import { FullDiagnosisQuestion, FULL_DIAGNOSIS_QUESTIONS } from '../data/full-diagnosis-questions';
+
 export interface StartDiagnosisRequest {
     answers: Record<number, number>; // { questionId: score (1-5) }
-    questions: DiagnosisQuestion[];
-    gender?: 'M' | 'F'; // T-Score 규준 적용 시 필요할 수 있음
+    questions: FullDiagnosisQuestion[]; // Updated to use the new type
+    gender?: 'M' | 'F';
     age?: number;
 }
 
-export interface DiagnosisQuestion {
-    id: number;
-    domain: 'N' | 'E' | 'O' | 'A' | 'C';
-    facet: number; // 1-6
-    isReverseKey: boolean; // true if score needs to be reversed (1->5, 5->1)
-}
+// Removing local DiagnosisQuestion interface in favor of imported one
 
 export interface DiagnosisResult {
     rawScores: {
@@ -43,8 +40,7 @@ const FACETS_PER_DOMAIN = 6;
 const MAX_SCORE = 5;
 const MIN_SCORE = 1;
 
-// 규준 (Norms) - 임시: IPIP 미국 성인 평균/표준편차 (추후 한국 데이터로 교체 필요)
-// 값은 예시 (실제 IPIP 데이터 참고 필요, 현재는 근사치 사용)
+// 규준 (Norms) - 임시: IPIP 미국 성인 평균/표준편차
 const DEFAULT_NORMS: Record<string, { mean: number; sd: number }> = {
     // Domains (Sum of 6 facets * 2 items = 12 items -> range 12-60)
     N: { mean: 30, sd: 8 },
@@ -66,7 +62,6 @@ export class SimcheungDiagnosisEngine {
         const validity = this.checkValidity(Object.values(answers));
 
         // 1. 전처리 & 결측치 보정 (Imputation)
-        // 90% 이상 응답시에만 보정 수행
         const totalQuestions = questions.length;
         const answeredCount = Object.keys(answers).length;
         const missingCount = totalQuestions - answeredCount;
@@ -85,13 +80,12 @@ export class SimcheungDiagnosisEngine {
         }
 
         // 결측치 보정 로직 (Person-Mean Imputation)
-        // 각 Domain별 사용자의 평균 점수로 결측치 대체
         const processedAnswers = { ...answers };
         let imputedCount = 0;
 
         if (missingCount > 0) {
             DOMAINS.forEach(domain => {
-                const domainQIds = questions.filter(q => q.domain === domain).map(q => q.id);
+                const domainQIds = questions.filter(q => q.domainChar === domain).map(q => q.id);
                 const userDomainScores = domainQIds
                     .map(id => processedAnswers[id])
                     .filter(val => val !== undefined && val !== null);
@@ -123,14 +117,14 @@ export class SimcheungDiagnosisEngine {
 
         questions.forEach(q => {
             const rawVal = processedAnswers[q.id];
-            // Reverse Scoring: (Max + Min) - Val => 6 - Val
-            const finalVal = q.isReverseKey ? (6 - rawVal) : rawVal;
+            // Reverse Scoring: Key '-' means reverse (1->5, 5->1)
+            const finalVal = (q.key === '-') ? (6 - rawVal) : rawVal;
 
-            const facetKey = `${q.domain}${q.facet}`;
+            const facetKey = `${q.domainChar}${q.facetIndex}`;
 
             // Accumulate
             facetRawScores[facetKey] = (facetRawScores[facetKey] || 0) + finalVal;
-            domainRawScores[q.domain] = (domainRawScores[q.domain] || 0) + finalVal;
+            domainRawScores[q.domainChar] = (domainRawScores[q.domainChar] || 0) + finalVal;
         });
 
         // 3. T-Score 변환
@@ -275,6 +269,31 @@ export class SimcheungDiagnosisEngine {
             convertedScores,
             lowestCategory,
             totalScore: Math.round(Object.values(convertedScores).reduce((a, b) => a + b, 0) / 4)
+        };
+    }
+
+    /**
+     * Standardize Scores for Diamond Graph (Physical, Mental, Sleep, Lifestyle)
+     */
+    static mapFreeToStandard(freeResult: FreeDiagnosisResult): { physical: number; mental: number; sleep: number; lifestyle: number } {
+        const s = freeResult.convertedScores;
+        // Logic must match /api/diagnosis/save/route.ts
+        return {
+            physical: s.Physical || 0,
+            mental: Math.round(((s.Mindset || 0) + (s.Emotional || 0)) / 2),
+            lifestyle: s.Social || 0,
+            sleep: s.Physical || 0 // Fallback if no specific sleep score in Free
+        };
+    }
+
+    static mapPaidToStandard(tScores: { domains: Record<string, number> }): { physical: number; mental: number; sleep: number; lifestyle: number } {
+        const t = tScores.domains;
+        // Logic must match /api/diagnosis/save/route.ts
+        return {
+            physical: t.E || 50, // Extraversion -> Activity
+            mental: t.N ? (100 - t.N) : 50, // Low Neuroticism -> High Mental Stability
+            lifestyle: t.C || 50, // Conscientiousness -> Regular Lifestyle
+            sleep: t.N ? (100 - t.N) : 50 // Anxiety affects sleep
         };
     }
 }

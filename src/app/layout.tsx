@@ -6,17 +6,7 @@ import Footer from '@/components/layout/Footer';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import NudgeFeaturesProvider from '@/components/providers/NudgeFeaturesProvider';
-// 모니터링 시스템 초기화는 서버 사이드에서만 실행
-// Vercel 환경에서는 필요시에만 활성화
-if (typeof window === 'undefined' && process.env.ENABLE_MONITORING === 'true') {
-  try {
-    const { initializeMonitoring } = require('@/lib/initializeMonitoring');
-    initializeMonitoring();
-  } catch (error) {
-    // 모니터링 초기화 실패해도 앱은 계속 실행
-    console.warn('모니터링 시스템 초기화 실패:', error);
-  }
-}
+import { ToastProvider } from '@/components/ui/toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -71,11 +61,13 @@ export default function RootLayout({
         <SessionProvider>
           <LanguageProvider>
             <NudgeFeaturesProvider>
-              <ConditionalHeader />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
+              <ToastProvider>
+                <ConditionalHeader />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </ToastProvider>
             </NudgeFeaturesProvider>
           </LanguageProvider>
         </SessionProvider>

@@ -20,6 +20,19 @@ export interface IDiagnosis extends Document {
     resultTitle: string;
     resultDescription: string;
     recommendations: string[];
+    aiSolution?: {
+        analysis: string;
+        exercise: string;
+        nutrition: string;
+        mindset: string;
+        sleep: string;
+        productConcept: {
+            name: string;
+            reason: string;
+            ingredients: string[];
+        };
+        audioScript?: string;
+    };
     createdAt: Date;
     updatedAt: Date;
 }
@@ -61,7 +74,20 @@ const DiagnosisSchema = new Schema<IDiagnosis>({
     },
     recommendations: [{
         type: String
-    }]
+    }],
+    aiSolution: {
+        analysis: String,
+        exercise: String,
+        nutrition: String,
+        mindset: String,
+        sleep: String,
+        productConcept: {
+            name: String,
+            reason: String,
+            ingredients: [String]
+        },
+        audioScript: String
+    }
 }, {
     timestamps: true
 });

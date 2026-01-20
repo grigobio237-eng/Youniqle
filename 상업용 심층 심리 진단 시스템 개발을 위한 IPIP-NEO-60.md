@@ -63,6 +63,196 @@ IPIP 데이터베이스에는 수천 개의 문항이 존재하며, 이 중 IPIP
 3.2. 문항 상세 리스트 및 심층 분석 의도
 다음은 선정된 60문항의 목록이다. 각 문항은 국면 코드, 영문 원문, 국문 번안(안), 채점 키(+/-), 그리고 해당 문항이 측정하고자 하는 심층적 의도를 포함한다.4
 (참고: 국문 번안은 한국의 문화적 맥락을 고려하여 의역되었으며, 실제 상용화 시에는 전문 번역 및 역번역(Back-translation) 과정을 거칠 것을 권장한다.)
+3.2.1. 신경증 (Neuroticism) 문항 [1-12번]
+No.	국면 (Facet)	문항 (영문 / 국문)	Key	심층 분석 의도 및 메커니즘
+1	N1 불안	Worry about things.
+
+(나는 평소에 걱정이 많은 편이다.)	+	일반화된 불안(Generalized Anxiety) 측정. 특정 대상이 아닌 삶 전반에 대한 막연한 예기 불안 수준을 평가함. 이는 위험 감지 시스템의 민감도를 반영함.
+2	N1 불안	Am relaxed most of the time.
+
+(나는 대체로 느긋하고 편안한 편이다.)	-	이완 능력(Relaxation Capacity) 측정. 스트레스 상황이 없을 때의 기저 긴장 수준(Baseline Tension)을 평가. 역채점 문항으로, 점수가 낮을수록 만성적 긴장 상태를 의미함.
+3	N2 분노	Get angry easily.
+
+(나는 쉽게 화를 내는 편이다.)	+	정서적 반응성(Reactivity) 측정. 좌절이나 방해물에 직면했을 때 즉각적으로 발생하는 적대감의 역치(Threshold)를 평가함.
+4	N2 분노	Rarely get irritated.
+
+(나는 좀처럼 짜증을 내지 않는다.)	-	분노 조절(Anger Control) 및 평정심 유지 능력. 역채점 문항. 이 점수가 높다면(즉, 짜증을 안 냄) 대인관계 갈등 상황에서의 인내심을 예측할 수 있음.
+5	N3 우울	Often feel blue.
+
+(종종 기분이 우울하거나 처진다.)	+	기분 저하(Dysphoria) 빈도 측정. 임상적 우울증과는 다르며, 일상생활에서의 활력 저하와 슬픔의 경험 빈도를 나타냄.
+6	N3 우울	Feel comfortable with myself.
+
+(나는 내 자신에 대해 편안함과 만족감을 느낀다.)	-	자기 수용(Self-Acceptance) 측정. 역채점 문항. 낮은 점수는 자기 비하적 사고와 낮은 자존감을 시사함.
+7	N4 자의식	Am afraid that I will do the wrong thing.
+
+(혹시 실수하지 않을까, 잘못된 행동을 할까 봐 두려워한다.)	+	사회적 수행 불안(Social Performance Anxiety). 타인의 평가에 대한 과도한 예민성과 실수에 대한 공포를 측정함.
+8	N4 자의식	Am not easily embarrassed.
+
+(나는 남들 앞에서 쉽게 당황하지 않는다.)	-	사회적 대담성(Social Boldness). 역채점 문항. 이 점수가 높다면(당황하지 않음) 낯선 환경이나 발표 상황에서의 적응력을 예측함.
+9	N5 충동성	Often eat too much.
+
+(종종 과식하거나 폭식하는 경향이 있다.)	+	**충동 조절 실패(Impulse Control Failure)**의 대표적 지표. 음식에 대한 통제력은 다른 보상(쇼핑, 게임 등)에 대한 통제력과 높은 상관을 보임.
+10	N5 충동성	Am able to control my cravings.
+
+(나는 강한 욕구가 생겨도 잘 참을 수 있다.)	-	지연 만족 능력(Delay of Gratification). 역채점 문항. 장기적 목표를 위해 즉각적 쾌락을 억제하는 의지력을 측정.
+11	N6 취약성	Panic easily.
+
+(나는 당황하면 쉽게 패닉 상태에 빠진다.)	+	스트레스 붕괴점(Breaking Point) 측정. 압박 상황에서 인지적, 정서적 기능이 얼마나 쉽게 마비되는지를 평가함.
+12	N6 취약성	Remain calm under pressure.
+
+(압박감이 심한 상황에서도 침착함을 유지한다.)	-	**회복탄력성(Resilience)**의 핵심 지표. 역채점 문항. 위기 상황에서의 대처 능력을 가장 잘 보여주는 문항 중 하나임.
+3.2.2. 외향성 (Extraversion) 문항 [13-24번]
+No.	국면 (Facet)	문항 (영문 / 국문)	Key	심층 분석 의도 및 메커니즘
+13	E1 친밀감	Make friends easily.
+
+(나는 처음 보는 사람과도 금방 친구가 된다.)	+	사회적 접근성(Social Accessibility). 타인에 대한 경계심 없이 관계를 시작하는 능력을 평가.
+14	E1 친밀감	Keep others at a distance.
+
+(나는 사람들과 적당한 거리를 두는 편이다.)	-	정서적 거리두기(Emotional Distancing). 역채점 문항. 깊은 관계 맺기를 회피하거나 사적인 영역을 중시하는 성향.
+15	E2 사교성	Love large parties.
+
+(나는 많은 사람이 모이는 파티나 시끌벅적한 모임을 좋아한다.)	+	군중 선호도(Preference for Crowds). 다수와의 상호작용에서 에너지를 얻는지(외향) 소모하는지(내향)를 판별하는 핵심 문항.
+16	E2 사교성	Prefer to be alone.
+
+(나는 혼자 있는 시간을 더 좋아한다.)	-	고독에 대한 욕구(Need for Solitude). 역채점 문항. 내향성을 측정하는 가장 직접적인 지표.
+17	E3 주장성	Take charge.
+
+(나는 모임이나 프로젝트를 주도적으로 이끄는 편이다.)	+	사회적 지배성(Social Dominance). 리더십 역할에 대한 자연스러운 선호도와 타인에게 영향력을 행사하려는 욕구.
+18	E3 주장성	Wait for others to lead the way.
+
+(다른 사람이 나서서 이끌어 주기를 기다리는 편이다.)	-	수동성 및 추종성(Passivity/Followership). 역채점 문항. 리스크를 회피하고 책임을 분산시키려는 성향.
+19	E4 활동성	Am always busy.
+
+(나는 항상 무언가를 하며 바쁘게 지낸다.)	+	행동 템포(Behavioral Tempo). 신체적 에너지 수준과 삶의 속도를 측정. 높은 점수는 '워커홀릭' 성향과 관련될 수 있음.
+20	E4 활동성	Like to take it easy.
+
+(나는 여유롭고 느긋하게 지내는 것을 좋아한다.)	-	여유 추구(Leisure Orientation). 역채점 문항. 삶의 질과 휴식을 중시하는 태도.
+21	E5 흥미추구	Love excitement.
+
+(나는 자극적이고 흥미진진한 일을 좋아한다.)	+	감각 추구(Sensation Seeking). 도파민 보상 회로의 반응성을 반영하며, 위험 감수 행동과 관련이 높음.
+22	E5 흥미추구	Dislike loud music.
+
+(나는 시끄러운 음악이나 소란스러운 환경을 싫어한다.)	-	감각 과부하 회피(Avoidance of Sensory Overload). 역채점 문항. 강한 외부 자극에 대한 생리적 민감성을 측정.
+23	E6 명랑함	Radiate joy.
+
+(나는 주변 사람들에게 즐거움을 전파한다.)	+	긍정 정서 표현(Positive Affectivity). 내적인 행복감을 넘어 이를 외부로 표출하는 정도를 측정.
+24	E6 명랑함	Seldom joke around.
+
+(나는 좀처럼 농담을 하거나 장난치지 않는다.)	-	진지함(Seriousness). 역채점 문항. 감정 표현의 억제 또는 엄숙한 태도를 반영함.
+3.2.3. 개방성 (Openness to Experience) 문항 [25-36번]
+No.	국면 (Facet)	문항 (영문 / 국문)	Key	심층 분석 의도 및 메커니즘
+25	O1 상상력	Have a vivid imagination.
+
+(나는 상상력이 매우 풍부하다.)	+	판타지 경향성(Fantasy Proneness). 현실 너머의 세계를 구축하고 즐기는 인지적 능력을 평가.
+26	O1 상상력	Seldom daydream.
+
+(나는 공상에 잠기는 일이 거의 없다.)	-	현실 지향성(Reality Orientation). 역채점 문항. '지금-여기'의 구체적인 사실에 집중하는 실용적 사고방식.
+27	O2 예술	See beauty in things that others might not notice.
+
+(나는 남들이 무심코 지나치는 것에서 아름다움을 발견하곤 한다.)	+	미적 몰입(Aesthetic Absorption). 예술적, 자연적 대상에 깊이 감동하고 몰입하는 감수성의 깊이.
+28	O2 예술	Do not like art.
+
+(나는 미술관이나 예술 작품에는 별 관심이 없다.)	-	예술적 무관심(Aesthetic Insensitivity). 역채점 문항. 미적 가치보다 기능적 가치를 중시하는 성향.
+29	O3 감수성	Experience my emotions intensely.
+
+(나는 기쁨이나 슬픔 같은 감정을 깊고 강렬하게 느낀다.)	+	정서적 깊이(Affect Intensity). 자신의 내면 상태를 섬세하게 지각하고 증폭시키는 경향.
+30	O3 감수성	Seldom get emotional.
+
+(나는 좀처럼 감정적이 되지 않는다.)	-	정서적 둔감화(Emotional Blunting) 또는 억제. 역채점 문항. 감정을 배제하고 이성적으로 판단하려는 성향.
+31	O4 모험심	Prefer variety to routine.
+
+(나는 반복적인 일상보다는 변화와 다양함을 선호한다.)	+	새로움 추구(Novelty Seeking). 익숙한 것에서 벗어나려는 욕구. 마케팅적으로 얼리어답터 성향과 관련됨.
+32	O4 모험심	Dislike changes.
+
+(나는 환경이나 방식이 바뀌는 것을 싫어한다.)	-	습관 고수(Habitual Rigidity). 역채점 문항. 예측 가능성과 안정성을 최우선 가치로 두는 보수적 성향.
+33	O5 지성	Like to solve complex problems.
+
+(나는 복잡한 문제를 깊이 생각해서 해결하는 것을 좋아한다.)	+	인지적 욕구(Need for Cognition). 지능지수(IQ)가 아닌, 지적인 활동 자체를 즐기는 성격적 태도를 측정.
+34	O5 지성	Avoid philosophical discussions.
+
+(나는 추상적이거나 철학적인 토론은 피하는 편이다.)	-	반지성적 태도(Anti-Intellectualism) 또는 실용주의. 역채점 문항. 당장의 쓸모가 없는 사변적 논의를 기피함.
+35	O6 진보성	Tend to vote for liberal political candidates.
+
+(나는 사회적으로 진보적인 가치를 지지하는 편이다.)	+	권위에 대한 도전(Challenging Authority). 기존의 관습, 도덕, 전통을 재검토하려는 개방적 태도. (정치적 성향보다는 가치관의 유연성을 측정)
+36	O6 진보성	Believe in one true religion.
+
+(오직 하나의 진정한 종교나 신념만이 옳다고 믿는다.)	-	독단주의(Dogmatism). 역채점 문항. 절대적 진리를 상정하고 다양성을 배척하는 닫힌 사고방식.
+3.2.4. 우호성 (Agreeableness) 문항 [37-48번]
+No.	국면 (Facet)	문항 (영문 / 국문)	Key	심층 분석 의도 및 메커니즘
+37	A1 신뢰	Trust others.
+
+(나는 기본적으로 사람들을 믿는 편이다.)	+	인간 본성 긍정(Faith in Human Nature). 타인이 선한 의도를 가졌다고 가정하는 기본값(Default) 설정.
+38	A1 신뢰	Distrust people.
+
+(나는 사람들의 의도를 의심하고 경계하는 편이다.)	-	냉소주의(Cynicism). 역채점 문항. 타인이 이기적이고 기회주의적일 것이라고 가정하는 방어적 태도.
+39	A2 도덕성	Would never cheat on my taxes.
+
+(나는 아무리 사소한 것이라도 규칙을 어기거나 속이지 않는다.)	+	원칙 준수(Principledness). 이득을 위해 양심을 타협하지 않는 강직함.
+40	A2 도덕성	Use flattery to get ahead.
+
+(성공을 위해서라면 윗사람에게 아부도 할 수 있다.)	-	**마키아벨리즘(Machiavellianism)**적 조작. 역채점 문항. 목적 달성을 위해 대인관계를 수단으로 활용하는 성향.
+41	A3 이타성	Love to help others.
+
+(나는 남을 돕는 것에서 기쁨을 느낀다.)	+	능동적 자선(Active Benevolence). 타인의 안녕을 위해 자신의 자원을 자발적으로 투입하는 성향.
+42	A3 이타성	Turn my back on others.
+
+(나는 타인의 곤란한 사정에 별로 개입하고 싶지 않다.)	-	이기심(Self-Centeredness). 역채점 문항. 자신의 이익과 편의를 타인의 필요보다 우선시함.
+43	A4 협조성	Dislike direct conflict.
+
+(나는 얼굴 붉히는 갈등 상황을 극도로 싫어한다.)	+	갈등 회피(Conflict Avoidance). 관계의 조화를 유지하기 위해 자신의 주장을 굽히는 성향.
+44	A4 협조성	Love a good fight.
+
+(나는 논쟁이나 싸움을 피하지 않고 오히려 즐긴다.)	-	공격적 대립(Aggressive Confrontation). 역채점 문항. 자신의 정당성을 증명하기 위해 타인을 압도하려는 성향.
+45	A5 겸손	Dislike being the center of attention.
+
+(나는 사람들로부터 주목받는 것을 부담스러워한다.)	+	자기 낮춤(Self-Effacement). 자신의 성취를 드러내지 않고 공을 타인에게 돌리는 태도.
+46	A5 겸손	Think highly of myself.
+
+(나는 내가 남들보다 꽤 괜찮은 사람이라고 생각한다.)	-	**나르시시즘(Narcissism)**적 우월감. 역채점 문항. 자신을 과대평가하고 특권 의식을 가짐.
+47	A6 공감	Sympathize with the homeless.
+
+(나는 어려운 처지에 있는 사람들을 보면 마음이 아프다.)	+	정서적 공명(Emotional Resonance). 타인의 고통을 자신의 고통처럼 느끼는 거울 뉴런의 활성도 반영.
+48	A6 공감	Feel little concern for others.
+
+(나는 타인의 문제에 대해 별로 신경 쓰지 않는다.)	-	무정함(Callousness). 역채점 문항. 타인의 감정에 둔감하거나 의도적으로 무시하는 '차가운 마음(Tough-mindedness)'.
+3.2.5. 성실성 (Conscientiousness) 문항 [49-60번]
+No.	국면 (Facet)	문항 (영문 / 국문)	Key	심층 분석 의도 및 메커니즘
+49	C1 자기도능감	Complete tasks successfully.
+
+(나는 맡은 일을 훌륭하게 완수해낼 자신이 있다.)	+	유능감(Competence). 자신의 능력에 대한 믿음. 이는 실제 능력과는 별개로 과제 착수 의지에 영향을 미침.
+50	C1 자기도능감	Misjudge situations.
+
+(나는 종종 상황 판단을 잘못하거나 실수를 한다.)	-	**무능감(Ineptitude)**에 대한 인식. 역채점 문항. 자신감이 부족하고 실패를 예상하는 태도.
+51	C2 질서정연	Like order.
+
+(나는 주변이 항상 정리정돈되어 있어야 마음이 편하다.)	+	조직화 욕구(Need for Organization). 물리적 환경의 질서와 체계를 중시하는 성향.
+52	C2 질서정연	Leave my belongings around.
+
+(나는 물건을 쓰고 나서 아무 데나 두는 편이다.)	-	무질서(Disorderliness). 역채점 문항. 환경의 혼란스러움을 개의치 않는 태도.
+53	C3 의무감	Keep my promises.
+
+(나는 한 번 한 약속은 무슨 일이 있어도 지키려 노력한다.)	+	도덕적 책무성(Ethical Reliability). 원칙과 규범을 내면화하여 타인의 감시 없이도 준수함.
+54	C3 의무감	Break my promises.
+
+(나는 상황에 따라 약속을 어길 때도 있다.)	-	기회주의적 태도(Casualness regarding obligations). 역채점 문항. 의무를 가볍게 여기는 성향.
+55	C4 성취노력	Work hard.
+
+(나는 목표를 달성하기 위해 정말 열심히 일한다.)	+	투지(Grit) 및 야망. 높은 목표를 설정하고 이를 달성하기 위해 자원을 집중하는 추진력.
+56	C4 성취노력	Do just enough work to get by.
+
+(나는 딱 혼나지 않을 만큼만, 필요한 만큼만 일한다.)	-	최소 노력의 법칙(Minimalism in Effort). 역채점 문항. 성취 자체보다 편안함이나 다른 가치를 우선시함.
+57	C5 자기절제	Get chores done right away.
+
+(나는 해야 할 일이 생기면 미루지 않고 즉시 처리한다.)	+	실행력(Execution). 하기 싫은 일도 의지력으로 착수하게 만드는 자기 통제 기능.
+58	C5 자기절제	Waste my time.
+
+(나는 딴짓을 하느라 시간을 낭비할 때가 많다.)	-	지연 행동(Procrastination). 역채점 문항. 주의가 산만하고 유혹에 쉽게 굴복하여 과제 수행을 미루는 성향.
+59	C6 신중함	Think before I act.
+
+(나는 말이나 행동을 하기 전에 결과를 미리 생각한다.)	+	반추적 사고(Reflective deliberation). 행동의 파급 효과를 시뮬레이션하는 인지적 브레이크 기능.
+60	C6 신중함	Rush into things.
+
+(나는 깊게 생각하기보다 일단 저지르고 보는 편이다.)	-	충동성(Impulsivity). 역채점 문항. 사고보다 행동이 앞서는 성향. (N5 충동성과 유사하나, C6는 의사결정의 속도와 관련됨)
 ________________________________________4. 심리측정 공학 및 채점 알고리즘 설계
 성공적인 상업용 진단 시스템은 단순히 점수를 합산하는 것을 넘어, 응답의 품질을 검증하고, 규준(Norms)에 비추어 의미 있는 지표로 변환하는 정교한 알고리즘을 필요로 한다. 본 장에서는 개발자가 즉시 코드로 구현 가능한 수준의 수리적 모델을 제시한다.
 4.1. 데이터 전처리 및 무결성 검증 (Data Integrity Algorithms)

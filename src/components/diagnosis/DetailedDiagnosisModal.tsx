@@ -11,27 +11,63 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, RefreshCw, X } from 'lucide-react';
 import Link from 'next/link';
+import { MockPaymentModal } from '../payment/MockPaymentModal';
+import { DiagnosisRadarChart } from '../charts/DiagnosisRadarChart';
 
 interface DetailedDiagnosisModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onUnlockPaid?: () => void;
+    initialStep?: 'intro' | 'test' | 'analyzing' | 'result';
 }
 
-export function DetailedDiagnosisModal({ open, onOpenChange }: DetailedDiagnosisModalProps) {
+export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initialStep = 'intro' }: DetailedDiagnosisModalProps) {
     const [step, setStep] = useState<'intro' | 'test' | 'analyzing' | 'result'>('intro');
     const [currentQIndex, setCurrentQIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [result, setResult] = useState<FreeDiagnosisResult | null>(null);
     const [questions, setQuestions] = useState<DiagnosisQuestionData[]>([]);
 
-    // Reset when opened
+    // Reset or Initialize when opened
     useEffect(() => {
-        if (open && step === 'result') {
-            // Keep result if already done? Or reset? Let's keep it for now unless explicitly reset.
-            // Actually, if re-opening, maybe start fresh or show result?
-            // Let's reset if it was closed.
+        if (open) {
+            setStep(initialStep);
+            if (initialStep === 'result') {
+                fetchLatestResult();
+            }
         }
-    }, [open]);
+    }, [open, initialStep]);
+
+    const fetchLatestResult = async () => {
+        try {
+            const response = await fetch('/api/user/profile');
+            if (response.ok) {
+                const userData = await response.json();
+                const diagnosisHistory = userData.diagnosisResults || [];
+                const latest = diagnosisHistory.length > 0 ? diagnosisHistory[diagnosisHistory.length - 1] : null;
+
+                if (latest) {
+                    console.log('Latest fetched:', latest);
+                    // DB schema uses 'scores', component expects 'convertedScores'
+                    if (latest.scores && !latest.convertedScores) {
+                        setResult({
+                            convertedScores: latest.scores,
+                            rawScores: latest.metadata?.rawScores || {},
+                            lowestCategory: latest.metadata?.lowestCategory || '',
+                            totalScore: latest.totalScore
+                        });
+                    } else if (latest.result) {
+                        setResult(latest.result);
+                    } else {
+                        // Fallback if structure matches directly
+                        setResult(latest);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch diagnosis result:', error);
+        }
+    };
 
     const handleStart = () => {
         // Load questions based on session count
@@ -115,6 +151,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange }: DetailedDiagnosis
                             index={currentQIndex}
                             total={questions.length}
                             onAnswer={handleAnswer}
+                            onPrevious={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
                             onClose={handleClose}
                         />
                     )}
@@ -122,7 +159,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange }: DetailedDiagnosis
                         <AnalyzingView key="analyzing" />
                     )}
                     {step === 'result' && result && (
-                        <ResultView key="result" result={result} onClose={handleClose} />
+                        <ResultView key="result" result={result} onClose={handleClose} onUnlockPaid={onUnlockPaid} />
                     )}
                 </AnimatePresence>
             </DialogContent>
@@ -169,7 +206,7 @@ function IntroView({ onStart, onClose }: { onStart: () => void, onClose: () => v
     );
 }
 
-function TestView({ question, index, total, onAnswer, onClose }: any) {
+function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any) {
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
@@ -183,7 +220,19 @@ function TestView({ question, index, total, onAnswer, onClose }: any) {
                 <Progress value={(index / total) * 100} className="h-2 bg-mist" indicatorClassName="bg-primary" />
             </div>
 
-            <div className="flex-1 flex flex-col justify-center px-8 pb-8">
+            <div className="flex-1 flex flex-col justify-center px-8 pb-8 relative">
+                {/* Previous Button (Absolute Position or Flex) */}
+                {index > 0 && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0 left-8 text-slate-400 hover:text-primary -mt-2 pl-0 hover:bg-transparent"
+                        onClick={onPrevious}
+                    >
+                        &lt; 이전 질문
+                    </Button>
+                )}
+
                 <h3 className="text-xl md:text-2xl font-bold text-obsidian leading-snug mb-12 text-center text-balance">
                     {question.text}
                 </h3>
@@ -231,12 +280,25 @@ function AnalyzingView() {
     );
 }
 
-function ResultView({ result, onClose }: { result: FreeDiagnosisResult, onClose: () => void }) {
+function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisResult, onClose: () => void, onUnlockPaid?: () => void }) {
+    const [paymentOpen, setPaymentOpen] = useState(false);
+
+    const handleUnlockClick = () => {
+        setPaymentOpen(true);
+    };
+
+    const handlePaymentSuccess = () => {
+        setPaymentOpen(false);
+        if (onUnlockPaid) onUnlockPaid();
+    };
+
+    // Use standardized scores for the graph
+    const standardScores = SimcheungDiagnosisEngine.mapFreeToStandard(result);
     const chartData = [
-        { subject: '마인드', A: result.convertedScores.Mindset, fullMark: 100 },
-        { subject: '감정', A: result.convertedScores.Emotional, fullMark: 100 },
-        { subject: '관계', A: result.convertedScores.Social, fullMark: 100 },
-        { subject: '신체', A: result.convertedScores.Physical, fullMark: 100 },
+        { subject: '신체', score: standardScores.physical, fullMark: 100 },
+        { subject: '멘탈', score: standardScores.mental, fullMark: 100 },
+        { subject: '수면', score: standardScores.sleep, fullMark: 100 },
+        { subject: '생활', score: standardScores.lifestyle, fullMark: 100 },
     ];
 
     const lowestCatName =
@@ -257,38 +319,76 @@ function ResultView({ result, onClose }: { result: FreeDiagnosisResult, onClose:
                         <div className="text-xs font-bold opacity-60 uppercase tracking-widest mb-1">Total Score</div>
                         <div className="text-4xl font-black tracking-tighter">{result.totalScore}<span className="text-lg opacity-50">/100</span></div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-white/80 hover:bg-white/10" onClick={onClose}><X /></Button>
                 </div>
 
                 <div className="bg-white rounded-[24px] shadow-xl border border-line p-6 mb-6 flex-shrink-0">
                     <div className="h-48 w-full -ml-2">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                                <PolarGrid stroke="#e2e8f0" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 'bold' }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                <Radar name="My Score" dataKey="A" stroke="#2563eb" fill="#2563eb" fillOpacity={0.3} />
-                            </RadarChart>
-                        </ResponsiveContainer>
+                        <DiagnosisRadarChart
+                            data={chartData}
+                            color="#2563eb"
+                        />
                     </div>
                 </div>
 
                 <div className="space-y-6">
+                    {/* AI Whisper Nudge */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                        className="bg-primary/5 border border-primary/20 rounded-2xl p-5 relative"
+                    >
+                        <div className="absolute -top-3 left-4 bg-white px-2 py-0.5 rounded-full border border-primary/20 text-[10px] font-bold text-primary uppercase flex items-center gap-1 shadow-sm">
+                            <span className="text-sm">🤖</span> AI Coach Whisper
+                        </div>
+                        <p className="text-sm font-medium text-obsidian leading-relaxed mt-2">
+                            "회원님, 전반적으로 훌륭하시지만 <span className="text-primary font-black underline decoration-2 underline-offset-2">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
+                            이 부분만 해결하면 회복 탄력성이 <span className="bg-primary/10 px-1 rounded font-bold">2배</span>는 좋아질 것 같아요. 제가 원인을 찾아드릴까요?"
+                        </p>
+                    </motion.div>
+
                     <div className="bg-status-amber/10 border border-status-amber/20 rounded-2xl p-5">
-                        <div className="text-xs font-black text-status-amber uppercase tracking-widest mb-2">Weakeness Analysis</div>
+                        <div className="text-xs font-black text-status-amber uppercase tracking-widest mb-2">Weakness Analysis</div>
                         <h3 className="text-lg font-bold text-obsidian mb-2">
                             '{lowestCatName}' 케어가 시급합니다
                         </h3>
                         <p className="text-sm text-slate leading-relaxed">
-                            4가지 영역 중 가장 에너지가 낮은 상태입니다.
-                            이 부분을 방치하면 전체적인 회복 탄력성이 저하될 수 있습니다.
+                            현재 4가지 영역 중 가장 에너지가 소진된 상태입니다.
                         </p>
                     </div>
 
-                    {/* Recommendation Logic Placeholders */}
+                    {/* Blur Report (Gap Nudge) */}
+                    <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-line shadow-lg bg-white" onClick={handleUnlockClick}>
+                        <div className="p-5 filter blur-[6px] select-none pointer-events-none opacity-60">
+                            <div className="text-xs font-black text-obsidian uppercase tracking-widest mb-3">Deep Analysis Report</div>
+                            <h3 className="text-lg font-bold text-obsidian mb-2">당신의 {lowestCatName} 점수가 낮은 결정적 원인 3가지</h3>
+                            <ul className="space-y-2 mt-4 text-sm text-slate">
+                                <li className="flex gap-2"><span>1.</span> <span>무의식적인 스트레스 반응 패턴이...</span></li>
+                                <li className="flex gap-2"><span>2.</span> <span>수면의 질과 연관된 호르몬 불균형이...</span></li>
+                                <li className="flex gap-2"><span>3.</span> <span>과거의 특정 경험으로 인한 방어 기제가...</span></li>
+                            </ul>
+                        </div>
+
+                        {/* Lock Overlay */}
+                        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[2px] p-6 text-center transition-colors hover:bg-white/30">
+                            <div className="w-12 h-12 bg-obsidian text-white rounded-full flex items-center justify-center mb-3 shadow-xl">
+                                <span className="text-xl">🔒</span>
+                            </div>
+                            <h4 className="text-sm font-black text-obsidian mb-1">심층 분석 리포트 잠김</h4>
+                            <p className="text-xs text-slate font-medium mb-4">나의 진짜 원인을 파악하고 싶다면?</p>
+                            <Button className="h-10 px-6 rounded-full bg-obsidian text-white font-bold text-xs shadow-lg hover:scale-105 transition-transform" onClick={(e) => { e.stopPropagation(); handleUnlockClick(); }}>
+                                지금 잠금 해제하기
+                            </Button>
+                            {/* Temporary Dev Button for Report Page Check */}
+                            <div className="mt-2">
+                                <Link href="/diagnosis/report" className="text-[10px] text-slate-400 underline">
+                                    (개발용) 리포트 페이지 미리보기
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-white rounded-2xl p-5 border border-line">
-                        <div className="text-xs font-black text-primary uppercase tracking-widest mb-3">Recommended Solution</div>
-                        <Button asChild onClick={onClose} className="w-full h-12 bg-primary text-background font-bold rounded-xl shadow-lg shadow-primary/20 cursor-pointer">
+                        <div className="text-xs font-black text-primary uppercase tracking-widest mb-3">Next Step</div>
+                        <Button asChild onClick={onClose} className="w-full h-12 bg-primary text-background font-bold rounded-xl shadow-lg shadow-primary/20 cursor-pointer hover:opacity-90">
                             <Link href="/ai-advice">
                                 맞춤형 회복 플랜 보기 <ChevronRight className="w-4 h-4 ml-1" />
                             </Link>
@@ -296,6 +396,14 @@ function ResultView({ result, onClose }: { result: FreeDiagnosisResult, onClose:
                     </div>
                 </div>
             </div>
+            {/* Mock Payment Modal */}
+            <MockPaymentModal
+                open={paymentOpen}
+                onOpenChange={setPaymentOpen}
+                price={3900}
+                productName="심층 심리 분석 리포트 + AI 솔루션"
+                onSuccess={handlePaymentSuccess}
+            />
         </motion.div>
     );
 }

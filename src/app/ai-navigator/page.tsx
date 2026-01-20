@@ -8,9 +8,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
+import { PaidDiagnosisModal } from '@/components/diagnosis/PaidDiagnosisModal';
+import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 
 // 카테고리별 상태 메시지
 const CATEGORY_STATUS_MESSAGES: Record<string, Record<string, { message: string; action: string; actionLink: string }>> = {
@@ -58,6 +61,7 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
 };
 
 export default function AiNavigatorPage() {
+    const router = useRouter();
     const [scoreHistory, setScoreHistory] = useState<any[]>([]);
     const [todayScore, setTodayScore] = useState(0);
     const [categoryScores, setCategoryScores] = useState<any>(null);
@@ -73,6 +77,8 @@ export default function AiNavigatorPage() {
     const [bridgeDialogOpen, setBridgeDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [diagnosisModalOpen, setDiagnosisModalOpen] = useState(false);
+    const [diagnosisModalStep, setDiagnosisModalStep] = useState<'intro' | 'result'>('intro');
+    const [paidDiagnosisModalOpen, setPaidDiagnosisModalOpen] = useState(false);
 
     // 프로토콜 관련 상태
     const [protocols, setProtocols] = useState<any[]>([]);
@@ -249,24 +255,16 @@ export default function AiNavigatorPage() {
                                 {/* 오른쪽: 레이더 차트 */}
                                 {radarData.length > 0 && (
                                     <div className="w-full md:w-80 h-64 bg-surface/30 rounded-[32px] border border-line p-4">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart data={radarData}>
-                                                <PolarGrid stroke="var(--color-line)" />
-                                                <PolarAngleAxis
-                                                    dataKey="category"
-                                                    tick={{ fill: 'var(--color-text-secondary)', fontSize: 10, fontWeight: 700 }}
-                                                />
-                                                <PolarRadiusAxis angle={30} domain={[0, 40]} tick={false} axisLine={false} />
-                                                <Radar
-                                                    name="점수"
-                                                    dataKey="score"
-                                                    stroke="var(--chapter-accent)"
-                                                    fill="var(--chapter-accent)"
-                                                    fillOpacity={0.3}
-                                                    strokeWidth={2}
-                                                />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
+                                        <DiagnosisRadarChart
+                                            data={radarData.map(d => ({
+                                                subject: d.category === 'PHYSICAL' ? '신체' :
+                                                    d.category === 'MENTAL' ? '멘탈' :
+                                                        d.category === 'SLEEP' ? '수면' : '생활',
+                                                score: Math.round((d.score / d.fullMark) * 100), // Normalize to 100
+                                                fullMark: 100
+                                            }))}
+                                            color="#0F172A" // Obsidian or use CSS var if supported, let's use a specific dark color for Navigator
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -330,7 +328,7 @@ export default function AiNavigatorPage() {
 
                                             <div className="flex gap-3 pt-2">
                                                 {weakestInfo.statusInfo.actionLink === '/utils' ? (
-                                                    <Button onClick={() => setDiagnosisModalOpen(true)} className="h-12 bg-primary text-background font-black rounded-xl px-6">
+                                                    <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 bg-primary text-background font-black rounded-xl px-6">
                                                         {weakestInfo.statusInfo.action} <ArrowRight className="w-4 h-4 ml-2" />
                                                     </Button>
                                                 ) : (
@@ -343,6 +341,9 @@ export default function AiNavigatorPage() {
                                                 <Button asChild variant="outline" className="h-12 rounded-xl px-6 font-bold">
                                                     <Link href="/ai-advice">AI 상세 조언</Link>
                                                 </Button>
+                                                <Button variant="outline" className="h-12 rounded-xl px-6 font-bold text-slate-500 border-slate-300" onClick={() => { setDiagnosisModalStep('result'); setDiagnosisModalOpen(true); }}>
+                                                    진단 결과 다시보기
+                                                </Button>
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -351,56 +352,52 @@ export default function AiNavigatorPage() {
                                         <CardContent className="p-8 space-y-6">
                                             <div className="text-xs font-bold text-primary tracking-widest uppercase">Analysis Report</div>
                                             <h3 className="text-2xl font-black text-text-primary">
-                                                {aiAdvice || '데이터를 분석 중입니다...'}
+                                                아직 심층 진단을<br />완료하지 않았습니다.
                                             </h3>
-                                            <Button asChild className="h-12 bg-primary text-background font-black rounded-xl px-6">
-                                                <Link href="/ai-advice">실전 행동 조언 받기 <ArrowRight className="w-4 h-4 ml-2" /></Link>
+                                            <p className="text-sm font-medium text-slate opacity-80">
+                                                60초 만에 끝나는 AI 진단으로<br />나의 회복 유형을 알아보세요.
+                                            </p>
+                                            <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 bg-primary text-background font-black rounded-xl px-6">
+                                                지금 진단 시작하기 <ArrowRight className="w-4 h-4 ml-2" />
                                             </Button>
                                         </CardContent>
                                     </Card>
                                 )}
                             </div>
 
-                            {/* Step 2: 맞춤 프로토콜 */}
+                            {/* Step 2: 심층 분석 리포트 (Protocols Replaced) */}
                             <div className="space-y-8 relative">
                                 <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">02</div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                            <Sparkles className="w-5 h-5" />
-                                        </div>
-                                        <h2 className="text-2xl font-black tracking-tight">맞춤 회복 프로토콜</h2>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                        <Package className="w-5 h-5" />
                                     </div>
-                                    <Link href="/products" className="text-sm font-bold text-slate hover:text-primary transition-colors">
-                                        전체 보기 →
-                                    </Link>
+                                    <h2 className="text-2xl font-black tracking-tight">심층 분석 리포트</h2>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {protocols.slice(0, 4).map((item: any) => (
-                                        <Link key={item.id} href={item.link} className="block group">
-                                            <Card className="h-full border-line rounded-[24px] overflow-hidden shadow-sm hover:shadow-lg transition-all bg-white hover:border-primary">
-                                                <CardContent className="p-6 flex items-center gap-4">
-                                                    <div className="w-16 h-16 bg-mist rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                                                        {item.icon || '✨'}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            {item.tag && (
-                                                                <Badge className="bg-chapter-accent text-mist text-[9px] font-black">{item.tag}</Badge>
-                                                            )}
-                                                        </div>
-                                                        <h3 className="font-bold text-obsidian group-hover:text-primary transition-colors truncate">
-                                                            {item.title}
-                                                        </h3>
-                                                        <p className="text-xs text-slate truncate">{item.description}</p>
-                                                    </div>
-                                                    <ChevronRight className="w-5 h-5 text-line group-hover:text-primary transition-colors flex-shrink-0" />
-                                                </CardContent>
-                                            </Card>
-                                        </Link>
-                                    ))}
-                                </div>
+                                <Card className="bg-white border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer group" onClick={() => router.push('/diagnosis/report')}>
+                                    <CardContent className="p-8 flex items-center justify-between gap-6">
+                                        <div className="flex-1 space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <Badge className="bg-chapter-accent text-mist text-[10px] font-black uppercase tracking-widest">Premium Report</Badge>
+                                                <span className="text-xs font-bold text-slate-400">최근 업데이트: {new Date().toLocaleDateString()}</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-obsidian leading-tight group-hover:text-primary transition-colors">
+                                                당신의 심리 상태를<br />
+                                                <span className="text-primary">가장 정밀하게</span> 분석했습니다.
+                                            </h3>
+                                            <p className="text-sm font-medium text-slate opacity-80 line-clamp-2">
+                                                5가지 성격 요인과 30가지 세부 국면을 통해<br />
+                                                나조차 몰랐던 내면의 데이터를 확인하세요.
+                                            </p>
+                                        </div>
+                                        <div className="hidden md:flex flex-col items-center justify-center w-24 h-24 bg-mist rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                            <div className="text-3xl mb-1">📊</div>
+                                            <div className="text-[10px] font-bold text-slate-400 group-hover:text-primary">View Report</div>
+                                        </div>
+                                    </CardContent>
+                                    <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+                                </Card>
                             </div>
 
                             {/* Step 3: AI 추천 파트너 상품 */}
@@ -558,7 +555,20 @@ export default function AiNavigatorPage() {
                 </Dialog>
 
                 {/* 진단 모달 */}
-                <DetailedDiagnosisModal open={diagnosisModalOpen} onOpenChange={setDiagnosisModalOpen} />
+                <DetailedDiagnosisModal
+                    open={diagnosisModalOpen}
+                    onOpenChange={setDiagnosisModalOpen}
+                    initialStep={diagnosisModalStep}
+                    onUnlockPaid={() => {
+                        setDiagnosisModalOpen(false);
+                        setPaidDiagnosisModalOpen(true);
+                    }}
+                />
+
+                <PaidDiagnosisModal
+                    open={paidDiagnosisModalOpen}
+                    onOpenChange={setPaidDiagnosisModalOpen}
+                />
             </div>
         </ChapterWrapper>
     );

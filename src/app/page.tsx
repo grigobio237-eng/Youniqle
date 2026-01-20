@@ -67,7 +67,7 @@ function OnboardingDialog({ open, onOpenChange }: { open: boolean, onOpenChange:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md text-center p-12 rounded-[40px] border-none shadow-2xl bg-white">
+      <DialogContent className="sm:max-w-md text-center p-6 md:p-12 rounded-[32px] md:rounded-[40px] border-none shadow-2xl bg-white">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -78,8 +78,8 @@ function OnboardingDialog({ open, onOpenChange }: { open: boolean, onOpenChange:
           >
             <div className="text-7xl mb-4 grayscale-[0.2]">{currentStep.icon}</div>
             <DialogHeader>
-              <DialogTitle className="text-3xl font-black text-center tracking-tight text-obsidian">{currentStep.title}</DialogTitle>
-              <DialogDescription className="text-lg whitespace-pre-line pt-4 text-center text-slate font-medium leading-relaxed">
+              <DialogTitle className="text-2xl md:text-3xl font-black text-center tracking-tight text-obsidian">{currentStep.title}</DialogTitle>
+              <DialogDescription className="text-base md:text-lg whitespace-pre-line pt-4 text-center text-slate font-medium leading-relaxed">
                 {currentStep.desc}
               </DialogDescription>
             </DialogHeader>
@@ -128,23 +128,23 @@ function GateIntro({ onStart }: { onStart: () => void }) {
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
             <span>Youniqle Recovery Protocol v2.5</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-obsidian leading-[1.1] tracking-tighter break-keep">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-obsidian leading-[1.2] md:leading-[1.1] tracking-tighter break-keep">
             번아웃에서 벗어나<br />
             <span className="text-chapter-accent">진짜 '나'로 돌아가는 시간</span>
           </h1>
-          <p className="text-xl md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
+          <p className="text-lg md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
             감각에 의존하던 휴식을 넘어, 당신의 몸이 보내는 신호를<br className="hidden md:block" />
             정밀하게 해석하는 가장 과학적이고 프라이빗한 솔루션.
           </p>
         </div>
 
         <div className="flex flex-col gap-4 w-full max-w-lg mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4 w-full">
-            <Button size="lg" onClick={onStart} className="btn-primary flex-1 h-20 text-xl rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
+          <div className="flex flex-col sm:flex-row gap-4 w-full px-4 md:px-0">
+            <Button size="lg" onClick={onStart} className="btn-primary flex-1 h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
               60초 정밀 진단 시작
             </Button>
-            <Button asChild className="bg-obsidian text-mist flex-1 h-20 text-xl rounded-[24px] shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 active:translate-y-0 border-none">
-              <Link href="/products">회복 키트 큐레이션 바로가기</Link>
+            <Button asChild className="bg-obsidian text-mist flex-1 h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 active:translate-y-0 border-none">
+              <Link href="/products">회복 키트 큐레이션</Link>
             </Button>
           </div>
         </div>
@@ -205,7 +205,7 @@ function QuestionForm({ questions, onComplete }: { questions: Question[]; onComp
   const isLastStep = step === questions.length - 1;
 
   return (
-    <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-12">
+    <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-8 md:py-12">
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
@@ -237,7 +237,7 @@ function QuestionForm({ questions, onComplete }: { questions: Question[]; onComp
         >
           <div className="space-y-2">
             <span className="text-primary font-bold text-sm">Q{currentQ.id}. {currentQ.category}</span>
-            <h2 className="text-2xl font-bold text-gray-800 leading-snug">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
               {currentQ.text}
             </h2>
           </div>

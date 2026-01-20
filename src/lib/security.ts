@@ -24,7 +24,7 @@ export interface SecurityConfig {
 
 const defaultSecurityConfig: SecurityConfig = {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
+    origin: process.env.NODE_ENV === 'production'
       ? [process.env.NEXT_PUBLIC_APP_URL || 'https://youniqle.com']
       : ['http://localhost:3000', 'http://localhost:3001'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -42,7 +42,7 @@ const defaultSecurityConfig: SecurityConfig = {
     credentials: true
   },
   headers: {
-    contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss:; frame-ancestors 'none';",
+    contentSecurityPolicy: "default-src 'self'; media-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss:; frame-ancestors 'none';",
     xFrameOptions: 'DENY',
     xContentTypeOptions: true,
     xXSSProtection: true,
@@ -78,15 +78,15 @@ export class SecurityManager {
     // 보안 헤더
     response.headers.set('Content-Security-Policy', this.config.headers.contentSecurityPolicy);
     response.headers.set('X-Frame-Options', this.config.headers.xFrameOptions);
-    
+
     if (this.config.headers.xContentTypeOptions) {
       response.headers.set('X-Content-Type-Options', 'nosniff');
     }
-    
+
     if (this.config.headers.xXSSProtection) {
       response.headers.set('X-XSS-Protection', '1; mode=block');
     }
-    
+
     response.headers.set('Referrer-Policy', this.config.headers.referrerPolicy);
     response.headers.set('Permissions-Policy', this.config.headers.permissionsPolicy);
 
@@ -101,7 +101,7 @@ export class SecurityManager {
 
   public validateOrigin(origin: string | null): boolean {
     if (!origin) return false;
-    
+
     if (Array.isArray(this.config.cors.origin)) {
       return this.config.cors.origin.includes(origin);
     } else if (typeof this.config.cors.origin === 'string') {
@@ -109,7 +109,7 @@ export class SecurityManager {
     } else if (this.config.cors.origin === true) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -125,7 +125,7 @@ export class SecurityManager {
       }
       return sanitized;
     }
-    
+
     return input;
   }
 
@@ -143,28 +143,28 @@ export class SecurityManager {
 
   public validateApiKey(apiKey: string | null): boolean {
     if (!apiKey) return false;
-    
+
     const validApiKeys = process.env.API_KEYS?.split(',') || [];
     return validApiKeys.includes(apiKey);
   }
 
   public validateJWT(token: string | null): boolean {
     if (!token) return false;
-    
+
     try {
       // JWT 토큰 형식 검증 (실제 검증은 별도 라이브러리 사용)
       const parts = token.split('.');
       if (parts.length !== 3) return false;
-      
+
       // 헤더와 페이로드가 유효한 Base64인지 확인
       const header = JSON.parse(atob(parts[0]));
       const payload = JSON.parse(atob(parts[1]));
-      
+
       // 만료 시간 확인
       if (payload.exp && payload.exp < Date.now() / 1000) {
         return false;
       }
-      
+
       return true;
     } catch {
       return false;
@@ -172,8 +172,8 @@ export class SecurityManager {
   }
 
   public generateNonce(): string {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15);
+    return Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
   }
 
   public hashPassword(password: string): string {
@@ -201,7 +201,7 @@ export function createSecurityMiddleware(config?: Partial<SecurityConfig>) {
 
   return (req: NextRequest) => {
     const origin = req.headers.get('origin');
-    
+
     // CORS 검증
     if (origin && !securityManager.validateOrigin(origin)) {
       return NextResponse.json(
@@ -266,8 +266,8 @@ export class SecurityLogger {
     return SecurityLogger.instance;
   }
 
-  public log(type: 'security_violation' | 'rate_limit' | 'invalid_auth' | 'suspicious_activity', 
-             ip: string, userAgent: string, details: any) {
+  public log(type: 'security_violation' | 'rate_limit' | 'invalid_auth' | 'suspicious_activity',
+    ip: string, userAgent: string, details: any) {
     this.logs.push({
       timestamp: new Date(),
       type,
@@ -294,11 +294,11 @@ export class SecurityLogger {
 
   public getLogs(type?: string, limit: number = 100) {
     let filteredLogs = this.logs;
-    
+
     if (type) {
       filteredLogs = this.logs.filter(log => log.type === type);
     }
-    
+
     return filteredLogs
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);

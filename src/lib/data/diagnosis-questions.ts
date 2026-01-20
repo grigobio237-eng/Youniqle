@@ -554,7 +554,7 @@ const QUESTION_SETS_PART_2: DiagnosisQuestionData[][] = [
     ]
 ];
 
-const QUESTION_SETS = [...QUESTION_SETS_PART_1, ...QUESTION_SETS_PART_2];
+const QUESTION_SETS = [...QUESTION_SETS_PART_1];
 
 export const FREE_DIAGNOSIS_QUESTIONS = QUESTION_SETS[0];
 
