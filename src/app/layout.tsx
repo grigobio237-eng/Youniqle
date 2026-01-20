@@ -7,8 +7,10 @@ import SessionProvider from '@/components/providers/SessionProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import NudgeFeaturesProvider from '@/components/providers/NudgeFeaturesProvider';
 import { ToastProvider } from '@/components/ui/toast';
+import AiManagerChat from '@/components/chat/AiManagerChat';
 
 const inter = Inter({ subsets: ['latin'] });
+
 
 export const metadata: Metadata = {
   title: 'Youniqle - 번아웃 극복을 위한 AI 맞춤 회복 솔루션',
@@ -67,6 +69,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <Footer />
+                <AiManagerChat />
               </ToastProvider>
             </NudgeFeaturesProvider>
           </LanguageProvider>
