@@ -45,6 +45,7 @@ export async function PATCH(
         break;
 
       case 'update-commission':
+      case 'updateCommissionRate':
         // 수수료율 변경
         if (!partner.partnerSettings) {
           partner.partnerSettings = {

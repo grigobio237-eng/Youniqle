@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { 
+import {
   Table,
   TableBody,
   TableCell,
@@ -13,14 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { 
-  Mail, 
-  Search, 
-  Filter, 
-  Download, 
-  Send, 
-  Users, 
-  CheckCircle, 
+import {
+  Mail,
+  Search,
+  Filter,
+  Download,
+  Send,
+  Users,
+  CheckCircle,
   XCircle,
   MoreHorizontal,
   Plus
@@ -77,11 +77,11 @@ export default function NewsletterDashboard() {
       });
 
       const response = await fetch(`/api/admin/newsletter?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('뉴스레터 데이터를 불러올 수 없습니다.');
       }
-      
+
       const data = await response.json();
       setSubscribers(data.subscribers);
       setStats(data.stats);
@@ -199,7 +199,7 @@ export default function NewsletterDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{(stats?.total || 0).toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -209,7 +209,7 @@ export default function NewsletterDashboard() {
               <CheckCircle className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.active.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-600">{(stats?.active || 0).toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -219,7 +219,7 @@ export default function NewsletterDashboard() {
               <XCircle className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.unsubscribed.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-red-600">{(stats?.unsubscribed || 0).toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -229,7 +229,7 @@ export default function NewsletterDashboard() {
               <Mail className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{stats.bounced.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-orange-600">{(stats?.bounced || 0).toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -239,7 +239,7 @@ export default function NewsletterDashboard() {
               <Send className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalUsage.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-600">{(stats?.totalUsage || 0).toLocaleString()}</div>
             </CardContent>
           </Card>
         </div>

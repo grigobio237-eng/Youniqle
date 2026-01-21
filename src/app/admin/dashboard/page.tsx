@@ -106,12 +106,13 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      title: '총 회원 수',
+      title: '일간 신규 회원',
       value: stats?.totalUsers || 0,
       icon: Users,
-      change: stats?.userGrowth || 0,
+      change: (stats as any)?.dailyUserGrowth || 0,
       href: '/admin/users',
-      color: 'text-blue-600'
+      color: 'text-blue-600',
+      isDaily: true
     },
     {
       title: '총 상품 수',
@@ -122,42 +123,53 @@ export default function AdminDashboard() {
       color: 'text-green-600'
     },
     {
-      title: '총 주문 수 (결제)',
+      title: '일간 주문 수',
       value: stats?.totalOrders || 0,
       icon: ShoppingCart,
-      change: stats?.activityMetrics?.totalAttempts
-        ? Math.round(((stats?.totalOrders || 0) / (stats?.activityMetrics?.totalAttempts + (stats?.totalOrders || 0))) * 100)
-        : 0,
+      change: (stats as any)?.dailyOrderGrowth || 0,
       href: '/admin/orders',
       color: 'text-orange-600',
-      isConversion: true
+      isDaily: true
     },
     {
-      title: '총 매출',
+      title: '일간 매출액',
       value: `₩${(stats?.totalRevenue || 0).toLocaleString()}`,
       icon: DollarSign,
-      change: stats?.revenueGrowth || 0,
+      change: (stats as any)?.dailyRevenueGrowth || 0,
       href: '/admin/analytics',
-      color: 'text-purple-600'
+      color: 'text-purple-600',
+      isDaily: true
     }
   ];
 
   return (
-    <div className="w-full space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-text-primary">관리자 대시보드</h1>
-          <p className="text-text-secondary mt-1">
-            grigobio.co.kr 관리 시스템
-          </p>
+    <div className="w-full space-y-8">
+      {/* Header with Premium Dark Card */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#0F172A] p-8 shadow-2xl">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">관리자 대시보드</h1>
+            <p className="text-slate-400 max-w-lg">
+              Youniqle 관리 엔진이 가동 중입니다. 오늘의 성과와 서비스 활동을 한눈에 모니터링하세요.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-indigo-400" />
+              <span className="text-sm font-medium text-white">
+                {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+              </span>
+            </div>
+            <div className="px-4 py-2 rounded-2xl bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-indigo-400 animate-pulse" />
+              <span className="text-sm font-medium text-indigo-100">시스템 정상</span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-text-secondary" />
-          <span className="text-sm text-text-secondary">
-            {new Date().toLocaleDateString('ko-KR')}
-          </span>
-        </div>
+
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px]" />
       </div>
 
       {/* Stats Cards */}
@@ -167,47 +179,48 @@ export default function AdminDashboard() {
           const isPositive = stat.change >= 0;
 
           return (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-text-secondary">
+            <Card key={index} className="group hover:shadow-2xl transition-all duration-300 border-none shadow-md overflow-hidden">
+              <CardContent className="p-6 relative">
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-text-primary">
+                    <p className="text-3xl font-black text-slate-900">
                       {stat.value}
                     </p>
                     {stat.change !== 0 && (
-                      <div className={`flex items-center text-sm ${stat.isConversion ? 'text-blue-600' : (isPositive ? 'text-green-600' : 'text-red-600')
-                        }`}>
-                        {stat.isConversion ? (
-                          <Activity className="h-4 w-4 mr-1" />
-                        ) : (
-                          isPositive ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />
-                        )}
-                        {stat.isConversion ? `전환율 ${stat.change}%` : `${Math.abs(stat.change)}%`}
+                      <div className={`flex items-center text-xs font-bold mt-2 px-2 py-1 rounded-full w-fit ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                        {isPositive ? <ArrowUpRight className="h-3 w-3 mr-1" /> : <ArrowDownRight className="h-3 w-3 mr-1" />}
+                        <span>
+                          {`${Math.abs(stat.change)}%`}
+                        </span>
+                        <span className="ml-1 opacity-70 font-normal">
+                          {(stat as any).isDaily ? '전일 대비' : '전월 대비'}
+                        </span>
                       </div>
                     )}
                   </div>
-                  <div className={`p-3 rounded-full bg-gray-100 ${stat.color}`}>
+                  <div className={`p-4 rounded-2xl transition-transform group-hover:scale-110 duration-300 ${stat.color} bg-slate-50`}>
                     <Icon className="h-6 w-6" />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <Button variant="ghost" size="sm" asChild className="w-full">
-                    <Link href={stat.href}>
-                      자세히 보기
-                    </Link>
-                  </Button>
+
+                {/* Subtle progress bar at the bottom */}
+                <div className="absolute bottom-0 left-0 h-1 bg-slate-100 w-full overflow-hidden">
+                  <div
+                    className={`h-full opacity-30 ${stat.color.replace('text-', 'bg-')}`}
+                    style={{ width: isPositive ? '100%' : '30%' }}
+                  />
                 </div>
               </CardContent>
             </Card>
           );
         })}
-      </div>
+      </div >
 
       {/* Recovery Hub Monitoring */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      < div className="grid grid-cols-1 md:grid-cols-3 gap-6" >
         <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
@@ -243,12 +256,12 @@ export default function AdminDashboard() {
             <p className="text-xs opacity-60 mt-1">1F-5F 전체 등록 아이템</p>
           </CardContent>
         </Card>
-      </div>
+      </div >
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      < div className="grid grid-cols-1 lg:grid-cols-2 gap-6" >
         {/* Recent Users */}
-        <Card>
+        < Card >
           <CardHeader>
             <CardTitle>최근 가입 회원</CardTitle>
             <CardDescription>
@@ -287,10 +300,10 @@ export default function AdminDashboard() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card >
 
         {/* Recent Orders */}
-        <Card>
+        < Card >
           <CardHeader>
             <CardTitle>최근 주문</CardTitle>
             <CardDescription>
@@ -334,11 +347,11 @@ export default function AdminDashboard() {
               </Button>
             </div>
           </CardContent>
-        </Card>
-      </div>
+        </Card >
+      </div >
 
       {/* Quick Actions */}
-      <Card>
+      < Card >
         <CardHeader>
           <CardTitle>빠른 작업</CardTitle>
           <CardDescription>
@@ -360,9 +373,9 @@ export default function AdminDashboard() {
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all">
-              <Link href="/admin/omakase">
-                <Activity className="h-6 w-6 text-purple-500" />
-                <span className="font-bold">신청 관리</span>
+              <Link href="/admin/orders">
+                <ShoppingCart className="h-6 w-6 text-purple-500" />
+                <span className="font-bold">주문 관리</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
@@ -379,7 +392,7 @@ export default function AdminDashboard() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card >
     </div >
   );
 }

@@ -104,7 +104,7 @@ export async function PATCH(
 ) {
   try {
     const { id: userId } = await params;
-    const { action, data } = await request.json();
+    const { action, data, amount } = await request.json();
 
     await connectDB();
 
@@ -115,6 +115,8 @@ export async function PATCH(
         { status: 404 }
       );
     }
+
+    const adjustAmount = amount || (data && data.amount) || (data && data.points) || 0;
 
     switch (action) {
       case 'update':
@@ -128,7 +130,7 @@ export async function PATCH(
         break;
 
       case 'suspend':
-        // 계정 정지 (임시 구현)
+        // 계정 정지 (임시 구현: 이메일 인증 해제)
         user.emailVerified = false;
         break;
 
@@ -142,8 +144,14 @@ export async function PATCH(
         break;
 
       case 'addPoints':
+      case 'grantPoints':
         // 포인트 추가
-        user.points += data.points || 0;
+        user.points += adjustAmount;
+        break;
+
+      case 'deductPoints':
+        // 포인트 차감
+        user.points = Math.max(0, user.points - adjustAmount);
         break;
 
       default:

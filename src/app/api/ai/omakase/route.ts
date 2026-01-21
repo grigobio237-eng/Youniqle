@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
+import connectDB from '@/lib/db';
+import ConciergeRequest from '@/models/ConciergeRequest';
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,6 +23,21 @@ export async function POST(request: NextRequest) {
             goal,
             budget,
             symptoms: symptoms || []
+        });
+
+        // Save to DB
+        await connectDB();
+        await ConciergeRequest.create({
+            userId: session?.user?.email || 'anonymous',
+            userName: session?.user?.name || 'Anonymous',
+            userEmail: session?.user?.email,
+            painPoint,
+            goal,
+            budget,
+            symptoms: symptoms || [],
+            aiAnalysis: plans.analysis,
+            suggestedPlans: plans.plans,
+            status: 'pending'
         });
 
         return NextResponse.json(plans);

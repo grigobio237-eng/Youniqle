@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
+
     if (decoded.type !== 'partner') {
       return NextResponse.json(
         { error: '파트너 권한이 필요합니다.' },
@@ -39,32 +39,41 @@ export async function GET(request: NextRequest) {
       name: partner.name,
       email: partner.email,
       phone: partner.phone,
-      
+
       // 사업자 정보
       businessName: partner.partnerApplication?.businessName,
       businessNumber: partner.partnerApplication?.businessNumber,
       businessAddress: partner.partnerApplication?.businessAddress,
       businessPhone: partner.partnerApplication?.businessPhone,
       businessDescription: partner.partnerApplication?.businessDescription,
-      
+
       // 정산 정보
       bankName: partner.partnerApplication?.bankName,
       bankAccount: partner.partnerApplication?.bankAccount,
       accountHolder: partner.partnerApplication?.accountHolder,
       commissionRate: partner.partnerSettings?.commissionRate || 10,
-      
+
       // 알림 설정
       notificationEmail: partner.partnerSettings?.notificationEmail || partner.email,
       notificationPhone: partner.partnerSettings?.notificationPhone || partner.phone,
       autoApproval: partner.partnerSettings?.autoApproval || false,
-      
-      // 알림 옵션 (기본값 설정)
-      emailNotifications: {
+
+      // 알림 옵션
+      emailNotifications: partner.partnerSettings?.emailNotifications || {
         newOrder: true,
         lowStock: true,
         paymentReceived: true,
         systemUpdates: true
-      }
+      },
+
+      // 운영 설정
+      businessHours: partner.partnerSettings?.businessHours || {},
+      autoReplyMessage: partner.partnerSettings?.autoReplyMessage || '',
+      autoReplyEnabled: partner.partnerSettings?.autoReplyEnabled || false,
+
+      // 브랜딩
+      shopLogo: partner.partnerSettings?.shopLogo || '',
+      shopBanner: partner.partnerSettings?.shopBanner || ''
     };
 
     return NextResponse.json(settings);
@@ -90,7 +99,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
+
     if (decoded.type !== 'partner') {
       return NextResponse.json(
         { error: '파트너 권한이 필요합니다.' },
@@ -100,7 +109,7 @@ export async function PATCH(request: NextRequest) {
 
     const partnerId = decoded.id;
     const updates = await request.json();
-    
+
     await connectDB();
 
     const partner = await User.findById(partnerId);
@@ -168,11 +177,31 @@ export async function PATCH(request: NextRequest) {
       partner.partnerSettings = partner.partnerSettings || {};
       partner.partnerSettings.emailNotifications = updates.emailNotifications;
     }
+    if (updates.businessHours) {
+      partner.partnerSettings = partner.partnerSettings || {};
+      partner.partnerSettings.businessHours = updates.businessHours;
+    }
+    if (updates.autoReplyMessage !== undefined) {
+      partner.partnerSettings = partner.partnerSettings || {};
+      partner.partnerSettings.autoReplyMessage = updates.autoReplyMessage;
+    }
+    if (updates.autoReplyEnabled !== undefined) {
+      partner.partnerSettings = partner.partnerSettings || {};
+      partner.partnerSettings.autoReplyEnabled = updates.autoReplyEnabled;
+    }
+    if (updates.shopLogo !== undefined) {
+      partner.partnerSettings = partner.partnerSettings || {};
+      partner.partnerSettings.shopLogo = updates.shopLogo;
+    }
+    if (updates.shopBanner !== undefined) {
+      partner.partnerSettings = partner.partnerSettings || {};
+      partner.partnerSettings.shopBanner = updates.shopBanner;
+    }
 
     await partner.save();
 
-    return NextResponse.json({ 
-      message: '설정이 저장되었습니다.' 
+    return NextResponse.json({
+      message: '설정이 저장되었습니다.'
     });
 
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getUserProgress, getMembershipLevel, TierType } from '@/lib/progress';
 
 // --- Types ---
 export interface PavilionItem {
@@ -89,6 +90,12 @@ export function usePavilionState() {
     const [budget, setBudget] = useState(50000000);
     const [omakaseFilterFloor, setOmakaseFilterFloor] = useState<number | null>(null);
 
+    // Search state
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Access state
+    const [showLoungeNudge, setShowLoungeNudge] = useState(false);
+
     // Initialize
     useEffect(() => {
         setMounted(true);
@@ -134,6 +141,33 @@ export function usePavilionState() {
 
     const currentFloorOwners = useMemo(() => pavilionData[activeFloor] || [], [pavilionData, activeFloor]);
 
+    const filteredOwners = useMemo(() => {
+        if (!searchQuery.trim()) return currentFloorOwners;
+
+        const query = searchQuery.toLowerCase();
+        return currentFloorOwners.map(owner => {
+            // Check if owner matches
+            const nameMatch = owner.name.toLowerCase().includes(query);
+            const roleMatch = owner.role.toLowerCase().includes(query);
+            const bioMatch = owner.bio.toLowerCase().includes(query);
+
+            // Filter items that match
+            const matchingItems = owner.items.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.subtitle?.toLowerCase().includes(query) ||
+                item.description.toLowerCase().includes(query)
+            );
+
+            if (nameMatch || roleMatch || bioMatch || matchingItems.length > 0) {
+                return {
+                    ...owner,
+                    items: matchingItems.length > 0 ? matchingItems : owner.items
+                };
+            }
+            return null;
+        }).filter(Boolean) as FloorOwner[];
+    }, [currentFloorOwners, searchQuery]);
+
     // Handlers
     const handleArtistClick = useCallback((id: string) => {
         setSelectedArtistId(id);
@@ -160,12 +194,23 @@ export function usePavilionState() {
     }, [selectedOwner, activeFloor, router]);
 
     const handleFloorChange = useCallback((floor: number) => {
+        // Access Check: 5F requires REBORN tier
+        if (floor === 5) {
+            const p = getUserProgress();
+            const m = getMembershipLevel(p.totalPoints, p.currentStreak);
+            if (m.level === 'RESET') {
+                setShowLoungeNudge(true);
+                return; // Block access to 5F
+            }
+        }
+
         setActiveFloor(floor);
         setSelectedOwner(null);
         setIsInsideRoom(false);
         setSelectedItem(null);
         setSelectedArtistId(null);
         setViewMode(floor === 5 ? 'STANDARD' : 'ART_GRID');
+        setShowLoungeNudge(false);
     }, []);
 
     const enterRoom = useCallback(() => {
@@ -237,6 +282,9 @@ export function usePavilionState() {
         omakaseSelection,
         budget,
         omakaseFilterFloor,
+        searchQuery,
+        filteredOwners,
+        showLoungeNudge,
 
         // Setters
         setActiveFloor,
@@ -259,6 +307,8 @@ export function usePavilionState() {
         setOmakaseSelection,
         setBudget,
         setOmakaseFilterFloor,
+        setSearchQuery,
+        setShowLoungeNudge,
 
         // Handlers
         handleArtistClick,

@@ -16,7 +16,10 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Download
+  Download,
+  CheckSquare,
+  Square,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { canTransitionTo, STATUS_INFO } from '@/lib/orderStatusRules';
@@ -29,6 +32,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Order {
   _id: string;
@@ -116,6 +120,11 @@ export default function PartnerOrdersPage() {
     startDate: '',
     endDate: '',
   });
+  // Bulk selection states
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState('');
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -176,6 +185,64 @@ export default function PartnerOrdersPage() {
     } catch (error) {
       console.error('주문 상태 업데이트 오류:', error);
       toast.error('주문 상태 업데이트 중 오류가 발생했습니다.');
+    }
+  };
+
+  // Bulk status update handler
+  const handleBulkStatusUpdate = async () => {
+    if (!bulkStatus || selectedOrders.length === 0) return;
+
+    setIsBulkProcessing(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const orderId of selectedOrders) {
+      try {
+        const response = await fetch(`/api/partner/orders/${orderId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: bulkStatus }),
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (error) {
+        failCount++;
+      }
+    }
+
+    setIsBulkProcessing(false);
+    setIsBulkDialogOpen(false);
+    setSelectedOrders([]);
+    setBulkStatus('');
+    fetchOrders();
+
+    if (failCount === 0) {
+      toast.success(`${successCount}개 주문의 상태가 변경되었습니다.`);
+    } else {
+      toast.warning(`${successCount}개 성공, ${failCount}개 실패`);
+    }
+  };
+
+  // Toggle single order selection
+  const toggleOrderSelection = (orderId: string) => {
+    setSelectedOrders(prev =>
+      prev.includes(orderId)
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  // Toggle all orders selection
+  const toggleAllOrders = () => {
+    if (selectedOrders.length === filteredOrders.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(filteredOrders.map(o => o._id));
     }
   };
 
@@ -333,6 +400,34 @@ export default function PartnerOrdersPage() {
           </Button>
         </div>
 
+        {/* Bulk Action Bar */}
+        {selectedOrders.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckSquare className="h-5 w-5 text-blue-600" />
+              <span className="font-medium text-blue-900">
+                {selectedOrders.length}개 주문 선택됨
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedOrders([])}
+              >
+                선택 해제
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setIsBulkDialogOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                일괄 상태 변경
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <Card>
           <CardContent className="p-6">
@@ -375,6 +470,9 @@ export default function PartnerOrdersPage() {
                     <SelectItem value="refunded">환불완료</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button variant="ghost" size="icon" onClick={fetchOrders} title="새로고침">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -391,119 +489,141 @@ export default function PartnerOrdersPage() {
               </CardContent>
             </Card>
           ) : (
-            filteredOrders.map((order) => (
-              <Card key={order._id}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* Order Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <h3 className="text-lg font-semibold">{order.orderNumber}</h3>
-                        <Badge className={statusColors[order.status]}>
-                          {getStatusIcon(order.status)}
-                          <span className="ml-1">{statusLabels[order.status]}</span>
-                        </Badge>
-                        <Badge className={paymentStatusColors[order.paymentStatus]}>
-                          {paymentStatusLabels[order.paymentStatus]}
-                        </Badge>
+            <>
+              {/* Select All Header */}
+              <div className="flex items-center gap-3 px-4 py-2 bg-mist rounded-xl">
+                <Checkbox
+                  checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
+                  onCheckedChange={toggleAllOrders}
+                  id="select-all"
+                />
+                <Label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                  전체 선택 ({filteredOrders.length}개)
+                </Label>
+              </div>
+
+              {filteredOrders.map((order) => (
+                <Card key={order._id} className={`transition-all ${selectedOrders.includes(order._id) ? 'ring-2 ring-blue-500 bg-blue-50/50' : ''}`}>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                      {/* Checkbox */}
+                      <div className="flex items-start pt-1">
+                        <Checkbox
+                          checked={selectedOrders.includes(order._id)}
+                          onCheckedChange={() => toggleOrderSelection(order._id)}
+                        />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
-                          <p className="text-sm text-gray-600">{order.customer.name}</p>
-                          <p className="text-sm text-gray-600">{order.customer.email}</p>
-                          <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                      {/* Order Info */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <h3 className="text-lg font-semibold">{order.orderNumber}</h3>
+                          <Badge className={statusColors[order.status]}>
+                            {getStatusIcon(order.status)}
+                            <span className="ml-1">{statusLabels[order.status]}</span>
+                          </Badge>
+                          <Badge className={paymentStatusColors[order.paymentStatus]}>
+                            {paymentStatusLabels[order.paymentStatus]}
+                          </Badge>
                         </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
-                          <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
-                          <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
-                          <p className="text-sm text-gray-600">
-                            {order.shippingAddress.address} {order.shippingAddress.detail}
-                          </p>
-                        </div>
-                      </div>
 
-                      {/* Order Items */}
-                      <div className="mb-4">
-                        <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
-                        <div className="space-y-2">
-                          {order.items.map((item, index) => (
-                            <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                              <img
-                                src={item.image}
-                                alt={item.productName}
-                                crossOrigin="anonymous"
-                                className="w-12 h-12 object-cover rounded"
-                              />
-                              <div className="flex-1">
-                                <p className="font-medium">{item.productName}</p>
-                                <p className="text-sm text-gray-600">
-                                  {item.quantity}개 × ₩{item.price.toLocaleString()}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
+                            <p className="text-sm text-gray-600">{order.customer.name}</p>
+                            <p className="text-sm text-gray-600">{order.customer.email}</p>
+                            <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
+                            <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
+                            <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
+                            <p className="text-sm text-gray-600">
+                              {order.shippingAddress.address} {order.shippingAddress.detail}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Order Items */}
+                        <div className="mb-4">
+                          <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
+                          <div className="space-y-2">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                <img
+                                  src={item.image}
+                                  alt={item.productName}
+                                  crossOrigin="anonymous"
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                                <div className="flex-1">
+                                  <p className="font-medium">{item.productName}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {item.quantity}개 × ₩{item.price.toLocaleString()}
+                                  </p>
+                                </div>
+                                <p className="font-semibold">
+                                  ₩{(item.quantity * item.price).toLocaleString()}
                                 </p>
                               </div>
-                              <p className="font-semibold">
-                                ₩{(item.quantity * item.price).toLocaleString()}
-                              </p>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-600">
+                            <div>주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}</div>
+                            {order.trackingNumber && (
+                              <div className="mt-1">
+                                <span className="font-medium">송장번호: </span>
+                                <span>{order.trackingNumber}</span>
+                                {order.courierCompany && (
+                                  <span className="text-gray-500"> ({order.courierCompany})</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-lg font-bold text-primary">
+                            총 ₩{order.totalAmount.toLocaleString()}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
-                          <div>주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}</div>
-                          {order.trackingNumber && (
-                            <div className="mt-1">
-                              <span className="font-medium">송장번호: </span>
-                              <span>{order.trackingNumber}</span>
-                              {order.courierCompany && (
-                                <span className="text-gray-500"> ({order.courierCompany})</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div className="text-lg font-bold text-primary">
-                          총 ₩{order.totalAmount.toLocaleString()}
-                        </div>
+                      {/* Actions */}
+                      <div className="flex flex-col gap-2 lg:w-48">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => handleViewDetail(order)}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          상세보기
+                        </Button>
+
+                        {/* 동적으로 상태 변경 버튼 생성 (파트너 권한) */}
+                        {['confirmed', 'preparing', 'shipped', 'delivered'].map((status) => {
+                          if (canTransitionTo(order.status, status, 'partner')) {
+                            const statusInfo = STATUS_INFO[status as keyof typeof STATUS_INFO];
+                            return (
+                              <Button
+                                key={status}
+                                size="sm"
+                                onClick={() => handleStatusUpdate(order._id, status)}
+                                className="w-full"
+                              >
+                                {statusInfo.label}
+                              </Button>
+                            );
+                          }
+                          return null;
+                        })}
                       </div>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-col gap-2 lg:w-48">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => handleViewDetail(order)}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        상세보기
-                      </Button>
-
-                      {/* 동적으로 상태 변경 버튼 생성 (파트너 권한) */}
-                      {['confirmed', 'preparing', 'shipped', 'delivered'].map((status) => {
-                        if (canTransitionTo(order.status, status, 'partner')) {
-                          const statusInfo = STATUS_INFO[status as keyof typeof STATUS_INFO];
-                          return (
-                            <Button
-                              key={status}
-                              size="sm"
-                              onClick={() => handleStatusUpdate(order._id, status)}
-                              className="w-full"
-                            >
-                              {statusInfo.label}
-                            </Button>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                  </CardContent>
+                </Card>
+              ))}
+            </>
           )}
         </div>
       </div>
@@ -760,6 +880,54 @@ export default function PartnerOrdersPage() {
             <Button onClick={handleDownload}>
               <Download className="h-4 w-4 mr-2" />
               다운로드
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 일괄 상태 변경 다이얼로그 */}
+      <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>일괄 상태 변경</DialogTitle>
+            <DialogDescription>
+              {selectedOrders.length}개의 주문 상태를 일괄 변경합니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>변경할 상태</Label>
+              <Select value={bulkStatus} onValueChange={setBulkStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="상태 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="confirmed">주문 확인</SelectItem>
+                  <SelectItem value="preparing">상품 준비중</SelectItem>
+                  <SelectItem value="delivered">배송완료</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-text-secondary mt-2">
+                * 배송중 상태는 송장번호 입력이 필요하여 일괄 변경이 불가합니다.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
+              취소
+            </Button>
+            <Button
+              onClick={handleBulkStatusUpdate}
+              disabled={!bulkStatus || isBulkProcessing}
+            >
+              {isBulkProcessing ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  처리중...
+                </>
+              ) : (
+                '상태 변경'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

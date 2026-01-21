@@ -5,13 +5,13 @@ import { withAdminAuth } from '@/lib/authMiddleware';
 
 const INITIAL_PAVILION_DATA = [
     {
-        floor: 1, // Art Gallery
+        floor: 1, // 아트 갤러리
         owners: [
             {
                 id: 'artist-a',
-                name: 'Master A',
-                role: 'Media Artist',
-                bio: '디지털 생명력과 회복의 메시지를 담는 미디어 아트의 거장입니다.',
+                name: '마스터 A (Master A)',
+                role: '미디어 아티스트',
+                bio: '디지털 생명력과 유니클의 회복 철학을 시각화하는 미디어 아트의 거장입니다.',
                 items: [
                     { id: 'art-a1', type: 'ARTWORK', title: 'Eternal Recovery I', description: '영원한 회복의 첫 번째 전조를 시각화한 대작입니다.', specs: { size: '250x250cm', medium: 'Digital mix' }, price: '₩25,000,000', rental: '₩1,200,000' },
                     { id: 'art-a2', type: 'ARTWORK', title: 'Soul Resonance', description: '영혼의 공명을 담은 위치 가변형 작품입니다.', specs: { size: '180x210cm', medium: 'NFT Board' }, price: '₩18,000,000', rental: '₩800,000' },
@@ -20,9 +20,9 @@ const INITIAL_PAVILION_DATA = [
             },
             {
                 id: 'artist-b',
-                name: 'Master B',
-                role: 'Digital Sculptor',
-                bio: '가상 공간에서의 형태와 질감을 재정의하는 디지털 조각가입니다.',
+                name: '마스터 B (Master B)',
+                role: '디지털 조각가',
+                bio: '가상 공간에서의 형태와 질감을 재정의하며 새로운 회복의 미학을 탐구하는 디지털 조각가입니다.',
                 items: [
                     { id: 'art-b1', type: 'ARTWORK', title: 'Virtual Form', description: '가상 세계의 본질을 담은 조각 작품입니다.', specs: { platform: 'Unity 3D', format: 'Interactive' }, price: '₩12,000,000' },
                     { id: 'art-b2', type: 'ARTWORK', title: 'Cybernetic Anatomy', description: '인간과 기계의 융합을 탐구하는 디지털 정밀 조형물입니다.', specs: { format: 'USDZ', textures: '8K PBR' }, price: '₩15,500,000' },
@@ -41,13 +41,13 @@ const INITIAL_PAVILION_DATA = [
         ]
     },
     {
-        floor: 2, // Prestige Shop
+        floor: 2, // 체험 샵
         owners: [
             {
                 id: 'shop-a',
-                name: 'Elena Vance',
-                role: 'Luxury Curator',
-                bio: '전 세계 최상위 1%를 위한 회복 솔루션 아이템을 큐레이션합니다.',
+                name: '엘레나 반스 (Elena Vance)',
+                role: '럭셔리 큐레이터',
+                bio: '전 세계 최상위 1%의 프리미엄 회복 솔루션 아이템을 엄선하여 큐레이션합니다.',
                 items: [
                     { id: 'shop-p1', type: 'PRODUCT', title: 'Nano-Ceramic Kit', description: '스위스 연구소의 기술력이 집약된 세포 재생 홈케어 시스템입니다.', specs: { tech: 'Nano-Cell', origin: 'Switzerland' }, price: '₩3,500,000' },
                     { id: 'shop-p2', type: 'PRODUCT', title: 'Obsidian Diffuser', description: '심신 안정을 돕는 아이슬란드산 고밀도 흑요석 디퓨저 세트입니다.', specs: { material: 'Volcanic Rock', scent: 'Deep Forest' }, price: '₩850,000' },
@@ -67,7 +67,7 @@ const INITIAL_PAVILION_DATA = [
         ]
     },
     {
-        floor: 3, // Dynamic Coaching
+        floor: 3, // 라이프 코칭
         owners: [
             {
                 id: 'coach-a',
@@ -92,7 +92,7 @@ const INITIAL_PAVILION_DATA = [
         ]
     },
     {
-        floor: 4, // Medical Archive
+        floor: 4, // 메디컬 체크
         owners: [
             {
                 id: 'med-a',
@@ -117,17 +117,21 @@ const INITIAL_PAVILION_DATA = [
         ]
     },
     {
-        floor: 5, // Omakase Suite
+        floor: 5, // 김미정원장 전용라운지
         owners: [
             {
                 id: 'omakase-master',
-                name: 'The Orchestrator',
-                role: 'Custom Architect',
-                bio: '당신만의 완벽한 회복 여정을 위한 모든 아이템을 조율합니다.',
-                items: [
-                    { id: 'omakase-o1', type: 'OMAKASE', title: 'Ultimate Recovery Suite', description: '1~4층의 모든 혜택이 집약된 단 하나의 맞춤형 패키지입니다.', specs: { customization: 'Full-Range', concierge: '24/7' }, price: 'Custom Quote' },
-                    { id: 'omakase-o2', type: 'OMAKASE', title: 'Executive Wellness Pass', description: '핵심 케어 요소만 엄선하여 바쁜 경영진을 위해 설계된 집중 패키지입니다.', specs: { quick: 'Yes', quality: 'Top-Tier' }, price: '₩80,000,000' },
-                ]
+                name: '김미정 원장',
+                role: 'Representative Director',
+                bio: '"시술은 기적이 아닙니다. 회복된 몸 위에 놓일 때 비로소 완성되는 도구일 뿐입니다."',
+                image: '/images/kim-mijeong-profile.jpg',
+                items: [],
+                specs: {
+                    totalSlots: '50',
+                    occupiedSlots: '47',
+                    welcomeMessage: '이곳은 오직 당신만을 위해 준비된 비공개 회복 라운지입니다.',
+                    introTitle: 'Representative Director Lounge'
+                }
             }
         ]
     }

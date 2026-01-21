@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Lock, ShieldCheck, CreditCard } from 'lucide-react';
+import { Check, Lock, ShieldCheck, CreditCard, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 function SubscribeContent() {
@@ -31,44 +31,20 @@ function SubscribeContent() {
         setIsLoading(true);
 
         try {
-            // 1. 결제 요청 정보 가져오기
-            const res = await fetch('/api/subscription/payment/request', { method: 'POST' });
+            // [DEV BYPASS] Call bypass API instead of NicePay
+            const res = await fetch('/api/subscription/payment/bypass', { method: 'POST' });
             const data = await res.json();
 
-            if (!data.success) {
-                alert(data.error || '결제 요청 초기화 실패');
+            if (data.success) {
+                // Redirect to lounge with success message
+                router.push('/lounge?subscribed=true');
+            } else {
+                alert(data.error || '구독 처리 실패');
                 setIsLoading(false);
-                return;
             }
-
-            // 2. 나이스페이 결제창 호출 (Form Submit)
-            const { authUrl, formData } = data;
-
-            // 동적 폼 생성 및 제출
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = authUrl;
-            form.acceptCharset = 'euc-kr'; // 나이스페이 인코딩
-
-            for (const key in formData) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = formData[key];
-                form.appendChild(input);
-            }
-
-            document.body.appendChild(form);
-
-            // 새 창으로 열기 (팝업 차단 가능성 있음, 혹은 현재 창 이동)
-            // 모바일/PC 환경 고려하여 보통은 현재창 이동이 안전하나, 
-            // 나이스페이 v3은 보통 팝업이나 레이어보다는 페이지 이동/팝업 방식 사용.
-            // 여기서는 현재 창에서 이동하도록 함.
-            form.submit();
-
         } catch (error) {
             console.error(error);
-            alert('결제 진행 중 오류가 발생했습니다.');
+            alert('구독 처리 중 오류가 발생했습니다.');
             setIsLoading(false);
         }
     };
@@ -117,7 +93,9 @@ function SubscribeContent() {
                 <div className="md:w-1/2 p-8 md:p-12 bg-white flex flex-col justify-center">
                     <div className="text-center mb-10">
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">멤버십 구독</h2>
-                        <p className="text-gray-500">안전한 결제를 위해 나이스페이를 이용합니다.</p>
+                        <p className="text-gray-500 font-medium text-sm bg-blue-50 py-2 px-4 rounded-full inline-block">
+                            테스트 기간: 즉시 시작 가능합니다
+                        </p>
                     </div>
 
                     <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
@@ -139,11 +117,11 @@ function SubscribeContent() {
                     >
                         {isLoading ? (
                             <span className="flex items-center">
-                                <span className="animate-spin mr-2">⏳</span> 처리중...
+                                <Loader2 className="animate-spin mr-2 h-5 w-5" /> 처리중...
                             </span>
                         ) : (
                             <span className="flex items-center">
-                                <CreditCard className="mr-2 w-5 h-5" /> 결제하고 시작하기
+                                <CreditCard className="mr-2 w-5 h-5" /> 구독하고 시작하기
                             </span>
                         )}
                     </Button>

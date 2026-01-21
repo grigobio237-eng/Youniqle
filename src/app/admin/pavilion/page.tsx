@@ -36,6 +36,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { motion, AnimatePresence } from 'framer-motion';
+import LoungeControlCenter from '@/components/admin/pavilion/LoungeControlCenter';
 
 // --- Types ---
 interface PavilionItem {
@@ -299,7 +300,7 @@ export default function PavilionAdminPage() {
                 <div className="space-y-1">
                     <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic flex items-center gap-3">
                         <Globe className="w-10 h-10 text-indigo-600" />
-                        PAVILION <span className="text-indigo-600">MANAGEMENT</span>
+                        RECOVERY <span className="text-indigo-600">PAVILION</span>
                     </h1>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Digital Twin Space Control Center</p>
                 </div>
@@ -322,7 +323,7 @@ export default function PavilionAdminPage() {
                         onClick={() => setActiveFloor(f)}
                         className={`px-10 py-4 rounded-2xl font-black text-xs transition-all uppercase tracking-tighter ${activeFloor === f ? 'bg-white text-indigo-600 shadow-md scale-105' : 'text-slate-400 hover:text-slate-600'}`}
                     >
-                        {f}F {f === 1 ? 'Art Gallery' : f === 2 ? 'Shop' : f === 3 ? 'Coaching' : f === 4 ? 'Medical' : 'Omakase'}
+                        {f}F {f === 1 ? '아트 갤러리' : f === 2 ? '체험 샵' : f === 3 ? '라이프 코칭' : f === 4 ? '메디컬 체크' : '김미정원장 전용라운지'}
                     </button>
                 ))}
             </nav>
@@ -335,7 +336,12 @@ export default function PavilionAdminPage() {
             ) : (
                 <div className="space-y-6">
                     {/* List/Detail Layout */}
-                    {!selectedOwner ? (
+                    {activeFloor === 5 ? (
+                        <LoungeControlCenter
+                            floorData={currentFloor}
+                            onSave={() => handleSaveFloor(5)}
+                        />
+                    ) : !selectedOwner ? (
                         /* --- TABLE VIEW (Excel Style) --- */
                         <div className="space-y-6 bg-white p-8 rounded-[32px] shadow-sm border border-slate-100">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">

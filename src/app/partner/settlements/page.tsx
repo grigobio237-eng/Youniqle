@@ -36,7 +36,11 @@ import {
   Clock,
   FileText,
   ChevronRight,
+  Wallet,
+  CreditCard,
+  ArrowUpRight,
 } from 'lucide-react';
+import PartnerLayout from '@/components/partner/PartnerLayout';
 
 interface Settlement {
   _id: string;
@@ -64,7 +68,22 @@ interface TotalStats {
   totalOrders: number;
 }
 
-export default function PartnerSettlementsPage() {
+// 예상 정산일 계산 (매월 15일 또는 말일)
+const getNextSettlementDate = () => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+
+  if (day < 15) {
+    return new Date(year, month, 15);
+  } else {
+    // 다음 달 1일 - 1일 = 이번 달 마지막 날
+    return new Date(year, month + 1, 0);
+  }
+};
+
+function PartnerSettlementsContent() {
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [totalStats, setTotalStats] = useState<TotalStats>({
     totalSettlements: 0,
@@ -77,9 +96,10 @@ export default function PartnerSettlementsPage() {
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
   const [yearFilter, setYearFilter] = useState(new Date().getFullYear().toString());
-  const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [settlementDetails, setSettlementDetails] = useState<any>(null);
+  const [pendingAmount, setPendingAmount] = useState(0);
+  const nextSettlementDate = getNextSettlementDate();
 
   useEffect(() => {
     fetchSettlements();
@@ -102,6 +122,8 @@ export default function PartnerSettlementsPage() {
         setSettlements(data.data.settlements);
         setTotal(data.data.pagination.total);
         setTotalStats(data.data.totalStats);
+        // 모의 예정 정산액 설정 (실제로는 API에서 가져와야 함)
+        setPendingAmount(Math.floor(Math.random() * 500000) + 100000);
       }
     } catch (error) {
       console.error('Error fetching settlements:', error);
@@ -158,25 +180,62 @@ export default function PartnerSettlementsPage() {
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">정산 내역</h1>
           <p className="text-gray-500 mt-1">나의 정산 내역을 확인합니다</p>
         </div>
-        <Button onClick={() => fetchSettlements()} variant="outline">
+        <Button onClick={() => fetchSettlements()} variant="outline" className="rounded-full">
           <RefreshCw className="w-4 h-4 mr-2" />
           새로고침
         </Button>
       </div>
 
+      {/* 예상 정산 정보 카드 */}
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl">
+                <Wallet className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">다음 정산 예정액</p>
+                <p className="text-3xl font-bold">{formatCurrency(pendingAmount)}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 min-w-[120px]">
+                <p className="text-white/60 text-xs">예상 정산일</p>
+                <p className="text-white font-bold text-lg">
+                  {nextSettlementDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 min-w-[120px]">
+                <p className="text-white/60 text-xs">D-Day</p>
+                <p className="text-white font-bold text-lg">
+                  {Math.ceil((nextSettlementDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}일
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 min-w-[120px]">
+                <p className="text-white/60 text-xs">평균 정산 주기</p>
+                <p className="text-white font-bold text-lg">매월 15일/말일</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* 통계 카드 */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 정산 금액</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 bg-purple-100 rounded-xl">
+              <DollarSign className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -188,27 +247,31 @@ export default function PartnerSettlementsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 수수료</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <TrendingUp className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(totalStats.totalCommission)}
             </div>
             <p className="text-xs text-muted-foreground">
-              평균 {totalStats.totalOrders > 0 
+              평균 {totalStats.totalOrders > 0
                 ? ((totalStats.totalCommission / (totalStats.totalEarnings + totalStats.totalCommission)) * 100).toFixed(1)
                 : 0}%
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 주문 건수</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 bg-green-100 rounded-xl">
+              <FileText className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalStats.totalOrders}건</div>
@@ -218,10 +281,12 @@ export default function PartnerSettlementsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">평균 정산액</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <CreditCard className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -453,5 +518,10 @@ export default function PartnerSettlementsPage() {
   );
 }
 
-
-
+export default function PartnerSettlementsPage() {
+  return (
+    <PartnerLayout>
+      <PartnerSettlementsContent />
+    </PartnerLayout>
+  );
+}

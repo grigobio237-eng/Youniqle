@@ -1,19 +1,20 @@
 
-import { SimcheungDiagnosisEngine, DiagnosisQuestion } from '../../lib/logic/simcheung-diagnosis';
+import { SimcheungDiagnosisEngine } from '../../lib/logic/simcheung-diagnosis';
+import { FullDiagnosisQuestion } from '../../lib/data/full-diagnosis-questions';
 
 describe('SimcheungDiagnosisEngine', () => {
     // Mock Questions: 2 Domains (N, E), 2 Facets each domain, 2 Items each facet = 8 Questions
-    const mockQuestions: DiagnosisQuestion[] = [
-        { id: 1, domain: 'N', facet: 1, isReverseKey: false },
-        { id: 2, domain: 'N', facet: 1, isReverseKey: true }, // Reverse
-        { id: 3, domain: 'N', facet: 2, isReverseKey: false },
-        { id: 4, domain: 'N', facet: 2, isReverseKey: false },
-        { id: 5, domain: 'E', facet: 1, isReverseKey: false },
-        { id: 6, domain: 'E', facet: 1, isReverseKey: false },
-        { id: 7, domain: 'E', facet: 2, isReverseKey: true },
-        { id: 8, domain: 'E', facet: 2, isReverseKey: false },
-        { id: 9, domain: 'O', facet: 1, isReverseKey: false }, // Filler to reach 10 items
-        { id: 10, domain: 'O', facet: 1, isReverseKey: false },
+    const mockQuestions: FullDiagnosisQuestion[] = [
+        { id: 1, text: '', domain: 'Neuroticism', domainChar: 'N', facet: '', facetIndex: 1, key: '+' },
+        { id: 2, text: '', domain: 'Neuroticism', domainChar: 'N', facet: '', facetIndex: 1, key: '-' }, // Reverse
+        { id: 3, text: '', domain: 'Neuroticism', domainChar: 'N', facet: '', facetIndex: 2, key: '+' },
+        { id: 4, text: '', domain: 'Neuroticism', domainChar: 'N', facet: '', facetIndex: 2, key: '+' },
+        { id: 5, text: '', domain: 'Extraversion', domainChar: 'E', facet: '', facetIndex: 1, key: '+' },
+        { id: 6, text: '', domain: 'Extraversion', domainChar: 'E', facet: '', facetIndex: 1, key: '+' },
+        { id: 7, text: '', domain: 'Extraversion', domainChar: 'E', facet: '', facetIndex: 2, key: '-' },
+        { id: 8, text: '', domain: 'Extraversion', domainChar: 'E', facet: '', facetIndex: 2, key: '+' },
+        { id: 9, text: '', domain: 'Openness', domainChar: 'O', facet: '', facetIndex: 1, key: '+' }, // Filler to reach 10 items
+        { id: 10, text: '', domain: 'Openness', domainChar: 'O', facet: '', facetIndex: 1, key: '+' },
     ];
 
     test('should calculate correct scores with full answers', () => {
@@ -56,7 +57,7 @@ describe('SimcheungDiagnosisEngine', () => {
     test('should detect long string responding', () => {
         // 10 identical answers (need more questions for this check usually, loop 10 times)
         // Logic checks > 10. Let's make 12 questions
-        const longQuestions = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, domain: 'N', facet: 1, isReverseKey: false } as DiagnosisQuestion));
+        const longQuestions = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, text: '', domain: 'Neuroticism', domainChar: 'N', facet: '', facetIndex: 1, key: '+' } as FullDiagnosisQuestion));
         const answers: Record<number, number> = {};
         longQuestions.forEach(q => answers[q.id] = 3); // All 3
 

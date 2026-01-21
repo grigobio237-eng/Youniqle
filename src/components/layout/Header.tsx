@@ -88,7 +88,6 @@ export default function Header() {
     { label: '실제 회복 스토리', href: '/cases', desc: '다른 사용자들의 성공적인 회복 사례 연구' },
     { label: '회복 상점', href: '/products', desc: '과학적으로 검증된 회복 제품' },
     { label: '회복 도구함', href: '/utils', desc: '일상에서 즉시 활용 가능한 실용 도구' },
-    { label: '비밀회복 컨시어지', href: '/omakase', desc: '프리미엄 맞춤형 회복 서비스' },
     { label: '회복 체험관', href: '/pavilion', desc: '5층 구조의 인터랙티브 가상 공간' },
     { label: '멤버십', href: '/membership', desc: '등급별 혜택 및 리워드 프로그램' },
   ];

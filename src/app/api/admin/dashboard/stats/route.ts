@@ -60,17 +60,48 @@ export async function GET() {
         ]);
 
         // 2. 매출 및 성장률 계산
-        const completedOrders = await Order.find({ status: { $in: ['completed', 'delivered'] } });
+        const completedOrders = await Order.find({
+            $or: [
+                { paymentStatus: 'completed' },
+                { status: { $in: ['completed', 'delivered'] } }
+            ]
+        });
         const totalRevenue = completedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        // 기간별 성장률 계산
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfYesterday = new Date(startOfToday);
+        startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+        const startOfTwoDaysAgo = new Date(startOfYesterday);
+        startOfTwoDaysAgo.setDate(startOfTwoDaysAgo.getDate() - 1);
 
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // User Growth (Cumulative vs Last 30 days)
         const recentUserCount = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
         const previousUserCount = totalUsers - recentUserCount;
         const userGrowth = previousUserCount > 0 ? Math.round((recentUserCount / previousUserCount) * 100) : 0;
 
+        // Daily Metrics
+        const [todayUsers, yesterdayUsers, todayOrdersRaw, yesterdayOrdersRaw] = await Promise.all([
+            User.countDocuments({ createdAt: { $gte: startOfToday } }),
+            User.countDocuments({ createdAt: { $gte: startOfYesterday, $lt: startOfToday } }),
+            Order.find({ createdAt: { $gte: startOfToday }, status: { $ne: 'cancelled' } }),
+            Order.find({ createdAt: { $gte: startOfYesterday, $lt: startOfToday }, status: { $ne: 'cancelled' } })
+        ]);
+
+        const todayRevenue = todayOrdersRaw.reduce((sum, o) => sum + o.totalAmount, 0);
+        const yesterdayRevenue = yesterdayOrdersRaw.reduce((sum, o) => sum + o.totalAmount, 0);
+
+        const dailyUserGrowth = yesterdayUsers > 0 ? Math.round(((todayUsers - yesterdayUsers) / yesterdayUsers) * 100) : (todayUsers > 0 ? 100 : 0);
+        const dailyRevenueGrowth = yesterdayRevenue > 0 ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100) : (todayRevenue > 0 ? 100 : 0);
+        const dailyOrderGrowth = yesterdayOrdersRaw.length > 0 ? Math.round(((todayOrdersRaw.length - yesterdayOrdersRaw.length) / yesterdayOrdersRaw.length) * 100) : (todayOrdersRaw.length > 0 ? 100 : 0);
+
         // 3. 인기 상품 조회 (Aggregation)
         const productSales = await Order.aggregate([
+            { $match: { status: { $ne: 'cancelled' } } },
             { $unwind: '$items' },
             { $group: { _id: '$items.productId', sales: { $sum: '$items.quantity' } } },
             { $sort: { sales: -1 } },
@@ -95,7 +126,10 @@ export async function GET() {
             todayVisitors: Math.floor(Math.random() * 100) + 50,
             totalReviews,
             userGrowth,
-            revenueGrowth: 12,
+            revenueGrowth: dailyRevenueGrowth || 12, // Default to 12 if no data
+            dailyUserGrowth,
+            dailyRevenueGrowth,
+            dailyOrderGrowth,
             recentUsers: recentUsers.map(user => ({
                 id: user._id.toString(),
                 name: user.name,
@@ -121,7 +155,7 @@ export async function GET() {
                 totalDiagnoses,
                 totalAiAdvices,
                 totalScoreLogs,
-                totalAttempts // Added totalAttempts to activityMetrics
+                totalAttempts
             },
             recentActivities: [
                 ...recentDiagnoses.map(d => ({

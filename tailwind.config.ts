@@ -45,7 +45,7 @@ const config: Config = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "var(--text-secondary)",
+          DEFAULT: "var(--line)",
           foreground: "var(--text-secondary)",
         },
         accent: {
@@ -59,6 +59,13 @@ const config: Config = {
         card: {
           DEFAULT: "var(--surface)",
           foreground: "var(--text-primary)",
+        },
+        luxury: {
+          gold: "var(--luxury-gold)",
+          ivory: "var(--luxury-ivory)",
+          silk: "var(--luxury-silk)",
+          emerald: "var(--luxury-emerald)",
+          navy: "var(--luxury-navy)",
         },
       },
       fontFamily: {

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import PartnerLayout from '@/components/partner/PartnerLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,19 +10,23 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
-import { 
-  User, 
-  Building2, 
-  CreditCard, 
-  Bell, 
-  Lock, 
+import {
+  User,
+  Building2,
+  CreditCard,
+  Bell,
+  Lock,
   Save,
   AlertCircle,
   CheckCircle2,
   Mail,
   Phone,
   MapPin,
-  Briefcase
+  Briefcase,
+  Clock,
+  MessageSquare,
+  Image,
+  Upload
 } from 'lucide-react';
 
 interface PartnerSettings {
@@ -29,20 +34,20 @@ interface PartnerSettings {
   name: string;
   email: string;
   phone?: string;
-  
+
   // 파트너 정보
   businessName?: string;
   businessNumber?: string;
   businessAddress?: string;
   businessPhone?: string;
   businessDescription?: string;
-  
+
   // 정산 정보
   bankName?: string;
   bankAccount?: string;
   accountHolder?: string;
   commissionRate: number;
-  
+
   // 알림 설정
   notificationEmail?: string;
   notificationPhone?: string;
@@ -53,15 +58,52 @@ interface PartnerSettings {
     paymentReceived: boolean;
     systemUpdates: boolean;
   };
+  // 운영 설정
+  businessHours?: {
+    monday: { open: string; close: string; isOpen: boolean };
+    tuesday: { open: string; close: string; isOpen: boolean };
+    wednesday: { open: string; close: string; isOpen: boolean };
+    thursday: { open: string; close: string; isOpen: boolean };
+    friday: { open: string; close: string; isOpen: boolean };
+    saturday: { open: string; close: string; isOpen: boolean };
+    sunday: { open: string; close: string; isOpen: boolean };
+  };
+  autoReplyMessage?: string;
+  autoReplyEnabled?: boolean;
+  // 브랜딩
+  shopLogo?: string;
+  shopBanner?: string;
 }
 
 const tabs = [
   { id: 'basic', label: '기본 정보', icon: User },
   { id: 'business', label: '사업자 정보', icon: Building2 },
+  { id: 'hours', label: '운영 설정', icon: Clock },
+  { id: 'branding', label: '상점 브랜딩', icon: Image },
   { id: 'payment', label: '정산 정보', icon: CreditCard },
   { id: 'notifications', label: '알림 설정', icon: Bell },
   { id: 'security', label: '보안', icon: Lock }
 ];
+
+const defaultBusinessHours = {
+  monday: { open: '09:00', close: '18:00', isOpen: true },
+  tuesday: { open: '09:00', close: '18:00', isOpen: true },
+  wednesday: { open: '09:00', close: '18:00', isOpen: true },
+  thursday: { open: '09:00', close: '18:00', isOpen: true },
+  friday: { open: '09:00', close: '18:00', isOpen: true },
+  saturday: { open: '10:00', close: '17:00', isOpen: false },
+  sunday: { open: '10:00', close: '17:00', isOpen: false },
+};
+
+const dayLabels: Record<string, string> = {
+  monday: '월요일',
+  tuesday: '화요일',
+  wednesday: '수요일',
+  thursday: '목요일',
+  friday: '금요일',
+  saturday: '토요일',
+  sunday: '일요일',
+};
 
 export default function PartnerSettingsPage() {
   const [activeTab, setActiveTab] = useState('basic');
@@ -86,7 +128,12 @@ export default function PartnerSettingsPage() {
       lowStock: true,
       paymentReceived: true,
       systemUpdates: true
-    }
+    },
+    businessHours: defaultBusinessHours,
+    autoReplyMessage: '안녕하세요! 문의를 접수하였습니다. 영업시간 내에 답변 드리겠습니다.',
+    autoReplyEnabled: false,
+    shopLogo: '',
+    shopBanner: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -96,6 +143,9 @@ export default function PartnerSettingsPage() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -115,9 +165,110 @@ export default function PartnerSettingsPage() {
     }
   };
 
+  const handleBrandingImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'banner') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 용량 제한 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('파일 크기는 10MB를 초과할 수 없습니다.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'partner-branding');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(prev => ({
+          ...prev,
+          [type === 'logo' ? 'shopLogo' : 'shopBanner']: data.url
+        }));
+        toast.success(type === 'logo' ? '로고가 업로드되었습니다.' : '배너가 업로드되었습니다.');
+      } else {
+        const error = await response.json();
+        toast.error(error.error || '이미지 업로드에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast.error('이미지 업로드 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+      // 같은 파일 다시 올릴 수 있도록 초기화
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveHours = async () => {
+    if (!settings) return;
+
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/partner/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessHours: settings.businessHours,
+          autoReplyMessage: settings.autoReplyMessage,
+          autoReplyEnabled: settings.autoReplyEnabled
+        })
+      });
+
+      if (response.ok) {
+        toast.success('운영 설정이 저장되었습니다.');
+        setMessage({ type: 'success', text: '운영 설정이 저장되었습니다.' });
+      } else {
+        toast.error('저장에 실패했습니다.');
+      }
+    } catch (error) {
+      toast.error('저장 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveBranding = async () => {
+    if (!settings) return;
+
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/partner/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopLogo: settings.shopLogo,
+          shopBanner: settings.shopBanner
+        })
+      });
+
+      if (response.ok) {
+        toast.success('브랜딩 정보가 저장되었습니다.');
+        setMessage({ type: 'success', text: '브랜딩 정보가 저장되었습니다.' });
+      } else {
+        toast.error('저장에 실패했습니다.');
+      }
+    } catch (error) {
+      toast.error('저장 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSaveBasicInfo = async () => {
     if (!settings) return;
-    
+
     setSaving(true);
     setMessage(null);
 
@@ -146,7 +297,7 @@ export default function PartnerSettingsPage() {
 
   const handleSaveBusinessInfo = async () => {
     if (!settings) return;
-    
+
     setSaving(true);
     setMessage(null);
 
@@ -176,7 +327,7 @@ export default function PartnerSettingsPage() {
 
   const handleSavePaymentInfo = async () => {
     if (!settings) return;
-    
+
     setSaving(true);
     setMessage(null);
 
@@ -206,7 +357,7 @@ export default function PartnerSettingsPage() {
 
   const handleSaveNotificationSettings = async () => {
     if (!settings) return;
-    
+
     setSaving(true);
     setMessage(null);
 
@@ -308,11 +459,10 @@ export default function PartnerSettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {tab.label}
@@ -428,6 +578,218 @@ export default function PartnerSettingsPage() {
             </Card>
           )}
 
+          {/* 운영 설정 */}
+          {activeTab === 'hours' && (
+            <div className="space-y-6">
+              {/* 영업시간 설정 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    영업시간 설정
+                  </CardTitle>
+                  <CardDescription>요일별 영업시간을 설정하세요</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(dayLabels).map(([day, label]) => {
+                    const hours = settings.businessHours?.[day as keyof typeof defaultBusinessHours] || defaultBusinessHours[day as keyof typeof defaultBusinessHours];
+                    return (
+                      <div key={day} className="flex items-center gap-4 p-3 border rounded-xl">
+                        <div className="w-20">
+                          <Label className="font-medium">{dayLabels[day]}</Label>
+                        </div>
+                        <Switch
+                          checked={hours.isOpen}
+                          onCheckedChange={(checked) => {
+                            setSettings({
+                              ...settings,
+                              businessHours: {
+                                ...settings.businessHours!,
+                                [day]: { ...hours, isOpen: checked }
+                              }
+                            });
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="time"
+                            value={hours.open}
+                            disabled={!hours.isOpen}
+                            className="w-32"
+                            onChange={(e) => {
+                              setSettings({
+                                ...settings,
+                                businessHours: {
+                                  ...settings.businessHours!,
+                                  [day]: { ...hours, open: e.target.value }
+                                }
+                              });
+                            }}
+                          />
+                          <span className="text-gray-500">~</span>
+                          <Input
+                            type="time"
+                            value={hours.close}
+                            disabled={!hours.isOpen}
+                            className="w-32"
+                            onChange={(e) => {
+                              setSettings({
+                                ...settings,
+                                businessHours: {
+                                  ...settings.businessHours!,
+                                  [day]: { ...hours, close: e.target.value }
+                                }
+                              });
+                            }}
+                          />
+                        </div>
+                        <Badge variant={hours.isOpen ? "default" : "secondary"}>
+                          {hours.isOpen ? '영업' : '휴무'}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+
+              {/* 자동 응답 설정 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    자동 응답 메시지
+                  </CardTitle>
+                  <CardDescription>영업시간 외 고객 문의에 자동 응답 메시지를 보냅니다</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>자동 응답 활성화</Label>
+                      <p className="text-sm text-gray-500">영업시간 외 자동 응답 발송</p>
+                    </div>
+                    <Switch
+                      checked={settings.autoReplyEnabled}
+                      onCheckedChange={(checked) => setSettings({ ...settings, autoReplyEnabled: checked })}
+                    />
+                  </div>
+                  <div>
+                    <Label>자동 응답 메시지</Label>
+                    <textarea
+                      className="w-full p-3 border border-gray-300 rounded-md resize-none mt-2"
+                      rows={4}
+                      value={settings.autoReplyMessage || ''}
+                      onChange={(e) => setSettings({ ...settings, autoReplyMessage: e.target.value })}
+                      placeholder="자동 응답 메시지를 입력하세요"
+                      disabled={!settings.autoReplyEnabled}
+                    />
+                  </div>
+                  <Button onClick={handleSaveHours} disabled={saving} className="w-full md:w-auto">
+                    <Save className="h-4 w-4 mr-2" />
+                    {saving ? '저장 중...' : '저장'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* 상점 브랜딩 */}
+          {activeTab === 'branding' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Image className="h-5 w-5" />
+                    상점 로고 & 배너
+                  </CardTitle>
+                  <CardDescription>파빌리온에 표시될 상점 이미지를 업로드하세요</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* 로고 업로드 */}
+                  <div>
+                    <Label>상점 로고</Label>
+                    <p className="text-sm text-gray-500 mb-2">권장 크기: 200x200px (정사각형)</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
+                        {settings.shopLogo ? (
+                          <img src={settings.shopLogo} alt="로고" className="w-full h-full object-cover" />
+                        ) : (
+                          <Upload className="h-8 w-8 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <input
+                          type="file"
+                          ref={logoInputRef}
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => handleBrandingImageUpload(e, 'logo')}
+                        />
+                        <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()}>
+                          <Upload className="h-4 w-4 mr-2" />
+                          이미지 업로드
+                        </Button>
+                        {settings.shopLogo && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600"
+                            onClick={() => setSettings({ ...settings, shopLogo: '' })}
+                          >
+                            삭제
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 배너 업로드 */}
+                  <div>
+                    <Label>상점 배너</Label>
+                    <p className="text-sm text-gray-500 mb-2">권장 크기: 1200x400px (3:1 비율)</p>
+                    <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
+                      {settings.shopBanner ? (
+                        <img src={settings.shopBanner} alt="배너" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center">
+                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">배너 이미지 업로드</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        type="file"
+                        ref={bannerInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handleBrandingImageUpload(e, 'banner')}
+                      />
+                      <Button variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        배너 업로드
+                      </Button>
+                      {settings.shopBanner && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600"
+                          onClick={() => setSettings({ ...settings, shopBanner: '' })}
+                        >
+                          삭제
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <Button onClick={handleSaveBranding} disabled={saving} className="w-full md:w-auto">
+                    <Save className="h-4 w-4 mr-2" />
+                    {saving ? '저장 중...' : '저장'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* 정산 정보 */}
           {activeTab === 'payment' && (
             <Card>
@@ -467,8 +829,10 @@ export default function PartnerSettingsPage() {
                       id="commissionRate"
                       type="number"
                       value={settings.commissionRate}
-                      onChange={(e) => setSettings({ ...settings, commissionRate: Number(e.target.value) })}
+                      readOnly
+                      className="bg-gray-50 font-medium text-gray-500 cursor-not-allowed"
                     />
+                    <p className="text-xs text-gray-500 mt-1">수수료율은 관리자가 설정하며 파트너가 직접 수정할 수 없습니다.</p>
                   </div>
                 </div>
                 <Button onClick={handleSavePaymentInfo} disabled={saving} className="w-full md:w-auto">
@@ -506,7 +870,7 @@ export default function PartnerSettingsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -546,7 +910,7 @@ export default function PartnerSettingsPage() {
                     ))}
                   </div>
                 </div>
-                
+
                 <Button onClick={handleSaveNotificationSettings} disabled={saving} className="w-full md:w-auto">
                   <Save className="h-4 w-4 mr-2" />
                   {saving ? '저장 중...' : '저장'}
@@ -592,14 +956,14 @@ export default function PartnerSettingsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     비밀번호는 최소 6자 이상이어야 하며, 영문, 숫자, 특수문자를 포함하는 것을 권장합니다.
                   </AlertDescription>
                 </Alert>
-                
+
                 <Button onClick={handlePasswordChange} disabled={saving} className="w-full md:w-auto">
                   <Lock className="h-4 w-4 mr-2" />
                   {saving ? '변경 중...' : '비밀번호 변경'}

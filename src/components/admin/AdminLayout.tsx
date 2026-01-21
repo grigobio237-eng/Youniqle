@@ -228,7 +228,7 @@ const navigationItems = [
     description: '커뮤니티 글 및 동영상 관리'
   },
   {
-    name: '비밀 가상공간 관리',
+    name: '회복 체험관 관리',
     href: '/admin/pavilion',
     icon: Globe,
     description: '1층~5층 파빌리온 콘텐츠 및 아티스트 관리'

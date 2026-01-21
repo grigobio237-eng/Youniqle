@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
 
         // 상품 추천 생성
         let productRecs: RecommendationItem[] = [];
-        if (includeProducts) {
+        if (includeProducts && categoryScores) {
             const weakest = getWeakestCategory(categoryScores);
             const keywords = PRODUCT_KEYWORDS[weakest.category]?.[weakest.level] || [];
 

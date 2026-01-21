@@ -200,16 +200,18 @@ export const authOptions: AuthOptions = {
         token.image = token.image || user.image;
         token.role = (user as any).role;
         token.grade = (user as any).grade;
+        token.subscription = (user as any).subscription;
       }
 
       // 소셜 로그인의 경우 role이 없을 수 있으므로 DB에서 한 번 더 확인 (성능을 위해 필요할 때만)
-      if (token.email && !token.role) {
+      if (token.email && (!token.role || !token.subscription)) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });
           if (dbUser) {
             token.role = dbUser.role;
             token.grade = dbUser.grade;
+            token.subscription = dbUser.subscription;
             if (!token.id) token.id = dbUser._id.toString();
           }
         } catch (error) {
@@ -230,6 +232,7 @@ export const authOptions: AuthOptions = {
         (session.user as any).providerId = token.providerId as string;
         (session.user as any).role = token.role as string;
         (session.user as any).grade = token.grade as string;
+        (session.user as any).subscription = token.subscription;
       }
       return session;
     },

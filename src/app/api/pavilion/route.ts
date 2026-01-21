@@ -58,10 +58,18 @@ const INITIAL_DATA = [
         floor: 5,
         owners: [
             {
-                id: 'omakase-master', name: 'The Orchestrator', role: 'Custom Architect', bio: '당신만의 완벽한 회복 여정을 위한 모든 아이템을 조율합니다.',
-                items: [
-                    { id: 'omakase-o1', type: 'OMAKASE', title: 'Ultimate Recovery Suite', description: '1~4층의 모든 혜택이 집약된 단 하나의 맞춤형 패키지입니다.', specs: { customization: 'Full-Range' }, price: 'Custom Quote' },
-                ]
+                id: 'omakase-master',
+                name: '김미정 원장',
+                role: 'Representative Director',
+                bio: '"시술은 기적이 아닙니다. 회복된 몸 위에 놓일 때 비로소 완성되는 도구일 뿐입니다."',
+                image: '/images/kim-mijeong-profile.jpg',
+                items: [],
+                specs: {
+                    totalSlots: '50',
+                    occupiedSlots: '47',
+                    welcomeMessage: '이곳은 검증된 소수만을 위한 비밀 회복 연구소입니다.',
+                    introTitle: 'Secret Recovery Lab'
+                }
             }
         ]
     }

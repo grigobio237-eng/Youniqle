@@ -383,7 +383,6 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                   <img
                     src={partner.avatar}
                     alt={partner.name}
-                    crossOrigin="anonymous"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
@@ -492,16 +491,127 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
 
       {/* Main content */}
       <div className="lg:ml-64">
-        {/* Mobile menu button */}
-        <div className="lg:hidden p-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
+        {/* Fixed Header Bar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b">
+          <div className="flex items-center justify-between p-4">
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Search (Desktop) */}
+            <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
+                <Input
+                  type="text"
+                  placeholder="상품, 주문번호 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 rounded-full bg-mist border-0 focus-visible:ring-1"
+                />
+              </div>
+            </form>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-2">
+              {/* Notifications */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative rounded-full">
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 p-0">
+                  <div className="p-4 border-b bg-mist">
+                    <h3 className="font-bold text-sm">알림</h3>
+                    <p className="text-xs text-text-secondary">읽지 않은 알림 {unreadCount}개</p>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.slice(0, 5).map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-3 border-b last:border-0 hover:bg-mist transition-colors ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-0.5 p-1.5 rounded-lg ${getNotificationColor(notification.type)}`}>
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-text-primary truncate">{notification.title}</p>
+                            <p className="text-xs text-text-secondary line-clamp-2">{notification.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{formatTimeAgo(notification.createdAt)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {notifications.length === 0 && (
+                      <div className="p-6 text-center text-text-secondary">
+                        <Bell className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                        <p className="text-sm">새로운 알림이 없습니다</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 border-t">
+                    <Button variant="ghost" size="sm" className="w-full text-xs">모든 알림 보기</Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                      {partner.avatar ? (
+                        <img src={partner.avatar} alt={partner.name} className="w-8 h-8 rounded-full object-cover" crossOrigin="anonymous" />
+                      ) : (
+                        <Store className="h-4 w-4 text-white" />
+                      )}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div>
+                      <p className="font-medium">{partner.name || '파트너'}</p>
+                      <p className="text-xs text-text-secondary">{partner.businessName || '파트너샵'}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/partner/settings" className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      설정
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/" className="cursor-pointer">
+                      <Store className="h-4 w-4 mr-2" />
+                      쇼핑몰 보기
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    로그아웃
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </header>
 
         {/* Page content */}
         <main className="p-6">

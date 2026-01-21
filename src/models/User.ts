@@ -60,6 +60,19 @@ export interface IUser extends Document {
       paymentReceived: boolean;
       systemUpdates: boolean;
     };
+    businessHours?: {
+      monday: { open: string; close: string; isOpen: boolean };
+      tuesday: { open: string; close: string; isOpen: boolean };
+      wednesday: { open: string; close: string; isOpen: boolean };
+      thursday: { open: string; close: string; isOpen: boolean };
+      friday: { open: string; close: string; isOpen: boolean };
+      saturday: { open: string; close: string; isOpen: boolean };
+      sunday: { open: string; close: string; isOpen: boolean };
+    };
+    autoReplyMessage?: string;
+    autoReplyEnabled?: boolean;
+    shopLogo?: string;
+    shopBanner?: string;
   };
   partnerStats?: {
     totalProducts: number;
@@ -243,7 +256,19 @@ const UserSchema = new Schema<IUser>({
       lowStock: { type: Boolean, default: true },
       paymentReceived: { type: Boolean, default: true },
       systemUpdates: { type: Boolean, default: true }
-    }
+    },
+    businessHours: {
+      type: Map,
+      of: new Schema({
+        open: { type: String, default: '09:00' },
+        close: { type: String, default: '18:00' },
+        isOpen: { type: Boolean, default: true }
+      }, { _id: false })
+    },
+    autoReplyMessage: { type: String, trim: true },
+    autoReplyEnabled: { type: Boolean, default: false },
+    shopLogo: { type: String, trim: true },
+    shopBanner: { type: String, trim: true }
   },
   partnerStats: {
     totalProducts: { type: Number, default: 0 },

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getUserProgress, getMembershipLevel, UserProgress, TierType } from '@/lib/progress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -9,17 +10,68 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Award, Activity, RefreshCcw, Zap, Sprout, Flower2, Sun, Share2, Crown, Lock, ArrowRight } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
-type TierType = 'RESET' | 'REBORN' | 'RESTART';
+// TierType은 @/lib/progress에서 임포트함
 type SeedingType = 'SEED' | 'BLOOM' | 'GLOW' | 'ECHO';
 
 export default function MembershipPage() {
-    const [userTier] = useState<TierType>('RESET');
-    const [recoveryProgress] = useState(45);
-    const [seedingLevel] = useState<SeedingType>('SEED');
-    const [points] = useState(1250);
+    const [progress, setProgress] = useState<UserProgress | null>(null);
+    const [points, setPoints] = useState(0);
+    const [streak, setStreak] = useState(0);
+
+    useEffect(() => {
+        const p = getUserProgress();
+        setProgress(p);
+        setPoints(p.totalPoints);
+        setStreak(p.currentStreak);
+    }, []);
+
+    const m = getMembershipLevel(points, streak);
+    const userTier = m.level;
 
     return (
         <ChapterWrapper chapter="membership" className="container mx-auto px-4 py-20 pb-32 min-h-screen">
+            {/* 0. Nudge Section */}
+            {m.nextLevel !== 'MAX' && (
+                <div className="max-w-4xl mx-auto mb-16 animate-in fade-in slide-in-from-top-4 duration-1000">
+                    <div className="bg-luxury-navy text-white rounded-[32px] p-8 md:p-12 relative overflow-hidden shadow-2xl border border-white/10">
+                        {/* Background Deco */}
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-luxury-gold/20 blur-[100px] rounded-full" />
+
+                        <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                            <div className="flex-1 space-y-4">
+                                <div className="inline-flex items-center px-3 py-1 bg-white/10 rounded-full text-[8px] font-black tracking-widest uppercase border border-white/5">
+                                    Next Milestone
+                                </div>
+                                <h2 className="text-2xl md:text-4xl font-black tracking-tight leading-tight">
+                                    <span className="text-luxury-gold">Reborn</span> 등급까지 <br />
+                                    <span className="text-4xl md:text-5xl">{m.pointsToNext}점</span> & <span className="text-4xl md:text-5xl">{m.streakToNext}일</span> 남았습니다.
+                                </h2>
+                                <p className="text-white/40 text-sm font-medium italic">
+                                    * {userTier === 'RESET' ? '매일의 진단과 기록으로 당신의 영향력을 증명하세요.' : '이미 충분히 잘하고 계십니다. 5층 전용 라운지가 곧 당신을 기다립니다.'}
+                                </p>
+                            </div>
+
+                            <div className="shrink-0 flex flex-col items-center gap-2">
+                                <div className="relative w-24 h-24 md:w-32 md:h-32 flex items-center justify-center">
+                                    <svg className="w-full h-full -rotate-90">
+                                        <circle cx="50%" cy="50%" r="45%" className="stroke-white/5 fill-none" strokeWidth="6" />
+                                        <circle cx="50%" cy="50%" r="45%" className="stroke-luxury-gold fill-none transition-all duration-1000" strokeWidth="6" strokeDasharray={`${m.progress * 2.8} 280`} style={{ strokeDashoffset: '0' }} />
+                                    </svg>
+                                    <div className="absolute flex flex-col items-center">
+                                        <span className="text-2xl font-black tracking-tighter">{m.progress}%</span>
+                                    </div>
+                                </div>
+                                <Link href="/ai-navigator">
+                                    <Button className="bg-luxury-gold text-luxury-navy font-black text-xs h-10 px-6 rounded-full hover:scale-105 transition-all">
+                                        오늘의 회복 기록하기
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="mb-24 text-center space-y-8 max-w-3xl mx-auto">
                 <div className="inline-flex items-center px-4 py-1.5 bg-chapter-accent/5 text-chapter-accent rounded-full text-[10px] font-black tracking-widest uppercase border border-chapter-accent/20">
@@ -40,10 +92,12 @@ export default function MembershipPage() {
                         title="Reset"
                         period="1개월차"
                         icon={<RefreshCcw className="h-6 w-6" />}
-                        isActive={userTier === 'RESET'}
+                        isActive={userTier === 'RESET' || userTier === 'REBORN' || userTier === 'RESTART'}
+                        isFocus={userTier === 'RESET'}
                         description="멈추고 다시 세팅하는 시간"
                         benefits={['Daily Recovery Gate 접근 권한', 'AI 네비게이터 기본 코칭', '기초 회복 키트 구매 자격']}
-                        progress={userTier === 'RESET' ? recoveryProgress : 100}
+                        progress={userTier === 'RESET' ? m.progress : 100}
+                        requirements="신규 가입 즉시 부여"
                     />
 
                     {/* Tier 2: Reborn */}
@@ -51,10 +105,12 @@ export default function MembershipPage() {
                         title="Reborn"
                         period="3~6개월"
                         icon={<Zap className="h-6 w-6" />}
-                        isActive={userTier === 'REBORN'}
+                        isActive={userTier === 'REBORN' || userTier === 'RESTART'}
+                        isFocus={userTier === 'REBORN'}
                         description="에너지가 다시 차오르는 시기"
-                        benefits={['비밀회복 컨시어지(오마카세) 신청 권한', '프리미엄 심층 리포트 열람', '신제품 베타 테스터 우선권']}
-                        progress={userTier === 'REBORN' ? recoveryProgress : (userTier === 'RESET' ? 0 : 100)}
+                        benefits={['5층 프라이빗 라운지 AI 플랜 설계 권한', '프리미엄 심층 리포트 열람', '신제품 베타 테스터 우선권']}
+                        progress={userTier === 'REBORN' ? m.progress : (userTier === 'RESET' ? 0 : 100)}
+                        requirements="500점 & 30일 연속 기록"
                     />
 
                     {/* Tier 3: Restart */}
@@ -63,9 +119,11 @@ export default function MembershipPage() {
                         period="6개월+"
                         icon={<Award className="h-6 w-6" />}
                         isActive={userTier === 'RESTART'}
+                        isFocus={userTier === 'RESTART'}
                         description="새로운 삶으로의 확장"
                         benefits={['SAPIENET 랩 투어 초대', '회복 큐레이터 자격 부여', '전용 프라이빗 라운지 입장']}
-                        progress={userTier === 'RESTART' ? recoveryProgress : 0}
+                        progress={userTier === 'RESTART' ? m.progress : 0}
+                        requirements="1500점 & 60일 연속 기록"
                     />
                 </div>
             </section>
@@ -139,44 +197,57 @@ export default function MembershipPage() {
     );
 }
 
-function TierCard({ title, period, icon, isActive, description, benefits, progress }: any) {
+function TierCard({ title, period, icon, isActive, isFocus, description, benefits, progress, requirements }: any) {
     return (
-        <Card className={`relative overflow-hidden transition-all duration-700 rounded-[40px] border-line flex flex-col p-10 ${isActive ? 'bg-surface border-chapter-accent shadow-2xl ring-1 ring-chapter-accent/20' : 'bg-surface/30 opacity-40 grayscale group hover:grayscale-0 hover:opacity-100 hover:border-line'}`}>
+        <Card className={`relative overflow-hidden transition-all duration-700 rounded-[40px] border-line flex flex-col p-10 
+            ${isActive ? 'bg-surface border-chapter-accent/20' : 'bg-surface/30 opacity-40 grayscale'} 
+            ${isFocus ? 'ring-2 ring-chapter-accent shadow-[0_32px_64px_-16px_rgba(var(--chapter-accent-rgb),0.15)] scale-[1.02] bg-surface border-chapter-accent' : ''}`}>
             <CardHeader className="p-0 space-y-6 mb-8">
                 <div className="flex justify-between items-start">
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isActive ? 'bg-chapter-accent text-background shadow-lg shadow-chapter-accent/20' : 'bg-background border border-line text-text-secondary'}`}>
                         {icon}
                     </div>
-                    <Badge className={`${isActive ? 'bg-chapter-accent text-background' : 'bg-background border-line text-text-secondary'} font-black text-[10px] tracking-widest h-7 px-3`}>
+                    <Badge className={`${isActive ? 'bg-chapter-accent text-background' : 'bg-background border-line text-text-secondary'} font-black text-[10px] tracking-widest h-7 px-3 uppercase`}>
                         {period}
                     </Badge>
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-text-primary tracking-tight uppercase">{title}</h3>
-                    <p className={`text-sm font-bold ${isActive ? 'text-chapter-accent' : 'text-text-secondary'}`}>{description}</p>
+                    <h3 className="text-3xl font-black text-text-primary tracking-tight uppercase leading-none">{title}</h3>
+                    <p className={`text-xs font-bold ${isActive ? 'text-chapter-accent' : 'text-text-secondary'}`}>{description}</p>
                 </div>
             </CardHeader>
             <CardContent className="p-0 space-y-10 flex-1 flex flex-col">
                 <div className="space-y-4">
-                    <div className="flex justify-between text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-60">
+                    <div className="flex justify-between text-[8px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">
                         <span>Tier Progress</span>
                         <span>{progress}%</span>
                     </div>
-                    <Progress value={progress} className={`h-1.5 bg-background transition-all ${isActive ? '[&>div]:bg-chapter-accent' : '[&>div]:bg-text-secondary'}`} />
+                    <Progress value={progress} className={`h-1 bg-background transition-all ${isActive ? '[&>div]:bg-chapter-accent' : '[&>div]:bg-text-secondary'}`} />
                 </div>
 
                 <ul className="space-y-4 flex-1">
                     {benefits.map((benefit: string, idx: number) => (
-                        <li key={idx} className="text-sm font-medium flex items-center gap-3 text-text-primary">
-                            <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-chapter-accent' : 'bg-text-secondary'}`}></div>
+                        <li key={idx} className="text-xs font-bold flex items-start gap-4 text-text-primary leading-tight">
+                            <div className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${isActive ? 'bg-chapter-accent' : 'bg-text-secondary'}`}></div>
                             {benefit}
                         </li>
                     ))}
                 </ul>
 
-                {!isActive && (
-                    <div className="pt-6 border-t border-line/10 flex items-center justify-center gap-2 text-[10px] font-black text-text-secondary uppercase tracking-widest">
-                        <Lock className="w-3 h-3" /> Access Restricted
+                {!isActive ? (
+                    <div className="pt-6 border-t border-line/10 flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-2 text-[10px] font-black text-text-secondary uppercase tracking-widest opacity-60">
+                            <Lock className="w-3 h-3" /> Access Restricted
+                        </div>
+                        <div className="px-4 py-2 bg-slate-50 rounded-xl text-[9px] font-black text-chapter-accent/60 uppercase tracking-tighter">
+                            Requirement: {requirements}
+                        </div>
+                    </div>
+                ) : isFocus && (
+                    <div className="pt-6 border-t border-line/10">
+                        <div className="flex items-center justify-center gap-2 text-[10px] font-black text-chapter-accent uppercase tracking-[0.3em]">
+                            <Activity className="w-3 h-3 animate-pulse" /> Active Member
+                        </div>
                     </div>
                 )}
             </CardContent>

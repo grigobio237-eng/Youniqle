@@ -59,6 +59,11 @@ interface Partner {
   };
   partnerSettings?: {
     commissionRate: number;
+    businessHours?: Record<string, { open: string; close: string; isOpen: boolean }>;
+    autoReplyMessage?: string;
+    autoReplyEnabled?: boolean;
+    shopLogo?: string;
+    shopBanner?: string;
   };
   partnerStats?: {
     totalProducts: number;
@@ -106,6 +111,8 @@ export default function AdminPartnersPage() {
 
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [editCommissionRate, setEditCommissionRate] = useState<number>(10);
+  const [savingCommission, setSavingCommission] = useState(false);
 
   useEffect(() => {
     fetchPartners();
@@ -144,6 +151,34 @@ export default function AdminPartnersPage() {
       }
     } catch (error) {
       console.error('Partner action failed:', error);
+    }
+  };
+
+  const handleSaveCommissionRate = async () => {
+    if (!selectedPartner) return;
+    setSavingCommission(true);
+    try {
+      const response = await fetch(`/api/admin/partners/${selectedPartner.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateCommissionRate', data: { commissionRate: editCommissionRate } }),
+      });
+      if (response.ok) {
+        alert('수수료율이 저장되었습니다.');
+        fetchPartners();
+        // Update selectedPartner locally
+        setSelectedPartner(prev => prev ? {
+          ...prev,
+          partnerSettings: { ...prev.partnerSettings, commissionRate: editCommissionRate }
+        } : null);
+      } else {
+        alert('수수료율 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to save commission rate:', error);
+      alert('수수료율 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSavingCommission(false);
     }
   };
 
@@ -527,9 +562,90 @@ export default function AdminPartnersPage() {
                       <span className="text-slate font-bold">계좌번호:</span>
                       <span className="font-medium text-obsidian">{selectedPartner.partnerApplication?.bankAccount}</span>
                     </div>
+                    {/* 수수료율 수정 */}
+                    {selectedPartner.partnerStatus === 'approved' && (
+                      <div className="pt-4 border-t">
+                        <label className="text-slate font-bold block mb-2">수수료율 (%)</label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={editCommissionRate}
+                            onChange={(e) => setEditCommissionRate(Number(e.target.value))}
+                            className="w-24"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleSaveCommissionRate}
+                            disabled={savingCommission}
+                          >
+                            {savingCommission ? '저장 중...' : '저장'}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">현재 수수료율: {selectedPartner.partnerSettings?.commissionRate || 10}%</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
+
+              {/* 운영/브랜딩 정보 (승인된 파트너만) */}
+              {selectedPartner.partnerStatus === 'approved' && selectedPartner.partnerSettings && (
+                <div className="space-y-6">
+                  <h4 className="text-lg font-bold border-b pb-2">운영 및 브랜딩 정보</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* 상점 로고 */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-slate">상점 로고</p>
+                      {selectedPartner.partnerSettings.shopLogo ? (
+                        <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-line bg-mist">
+                          <img src={selectedPartner.partnerSettings.shopLogo} alt="상점 로고" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
+                      )}
+                    </div>
+                    {/* 상점 배너 */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-slate">상점 배너</p>
+                      {selectedPartner.partnerSettings.shopBanner ? (
+                        <div className="w-full h-24 rounded-xl overflow-hidden border-2 border-line bg-mist">
+                          <img src={selectedPartner.partnerSettings.shopBanner} alt="상점 배너" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-full h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
+                      )}
+                    </div>
+                  </div>
+                  {/* 자동 응답 */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-bold text-slate">자동 응답 설정</p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={selectedPartner.partnerSettings.autoReplyEnabled ? 'default' : 'secondary'}>
+                        {selectedPartner.partnerSettings.autoReplyEnabled ? '활성화' : '비활성화'}
+                      </Badge>
+                    </div>
+                    {selectedPartner.partnerSettings.autoReplyMessage && (
+                      <p className="text-sm text-obsidian bg-mist/30 p-3 rounded-xl">{selectedPartner.partnerSettings.autoReplyMessage}</p>
+                    )}
+                  </div>
+                  {/* 영업시간 */}
+                  {selectedPartner.partnerSettings.businessHours && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-slate">영업시간</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                        {Object.entries(selectedPartner.partnerSettings.businessHours).map(([day, hours]) => (
+                          <div key={day} className={`p-2 rounded-lg ${hours.isOpen ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                            <span className="font-bold">{day === 'monday' ? '월' : day === 'tuesday' ? '화' : day === 'wednesday' ? '수' : day === 'thursday' ? '목' : day === 'friday' ? '금' : day === 'saturday' ? '토' : '일'}</span>
+                            {hours.isOpen ? `: ${hours.open}-${hours.close}` : ': 휴무'}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 증빙 서류 */}
               {selectedPartner.partnerApplication?.partnerType !== 'shopper' && (
