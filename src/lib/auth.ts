@@ -75,7 +75,8 @@ export const authOptions: AuthOptions = {
             name: user.name,
             image: user.avatar,
             provider: user.provider,
-            role: user.role, // role 추가
+            role: user.role,
+            grade: user.grade,
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -197,7 +198,8 @@ export const authOptions: AuthOptions = {
         token.name = token.name || user.name;
         token.email = token.email || user.email;
         token.image = token.image || user.image;
-        token.role = (user as any).role; // role 추가
+        token.role = (user as any).role;
+        token.grade = (user as any).grade;
       }
 
       // 소셜 로그인의 경우 role이 없을 수 있으므로 DB에서 한 번 더 확인 (성능을 위해 필요할 때만)
@@ -207,6 +209,7 @@ export const authOptions: AuthOptions = {
           const dbUser = await User.findOne({ email: token.email });
           if (dbUser) {
             token.role = dbUser.role;
+            token.grade = dbUser.grade;
             if (!token.id) token.id = dbUser._id.toString();
           }
         } catch (error) {
@@ -225,7 +228,8 @@ export const authOptions: AuthOptions = {
         (session.user as any).image = token.image as string;
         (session.user as any).provider = token.provider as string;
         (session.user as any).providerId = token.providerId as string;
-        (session.user as any).role = token.role as string; // role 추가
+        (session.user as any).role = token.role as string;
+        (session.user as any).grade = token.grade as string;
       }
       return session;
     },

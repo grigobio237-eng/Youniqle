@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { RefreshCw, Download, Share2, ChevronLeft, Lock, Sparkles, CheckCircle2 } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { MockPaymentModal } from '@/components/payment/MockPaymentModal';
-import { PaidDiagnosisModal } from '@/components/diagnosis/PaidDiagnosisModal';
+import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { SimcheungDiagnosisEngine } from '@/lib/logic/simcheung-diagnosis';
 import html2canvas from 'html2canvas';
@@ -61,7 +61,7 @@ export default function DeepDiagnosisReportPage() {
     const [loading, setLoading] = useState(true);
     const [result, setResult] = useState<DeepDiagnosisResult | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
-    const [paidDiagnosisModalOpen, setPaidDiagnosisModalOpen] = useState(false);
+    const [deepDiagnosisModalOpen, setDeepDiagnosisModalOpen] = useState(false);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
     const reportRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ export default function DeepDiagnosisReportPage() {
 
     const handlePaymentSuccess = () => {
         setPaymentOpen(false);
-        setPaidDiagnosisModalOpen(true);
+        setDeepDiagnosisModalOpen(true);
     };
 
     // PDF Download Logic
@@ -223,17 +223,56 @@ export default function DeepDiagnosisReportPage() {
     let tScores = { N: 50, E: 50, O: 50, A: 50, C: 50 };
     let isPaid = false;
     let chartData: { subject: string; score: number; fullMark: number; color: string; }[] = [];
+    let big5DomainData: { subject: string; abbreviation: string; score: number; color: string; facets: { name: string; score: number }[] }[] = [];
+
+    const domainColors: Record<string, string> = {
+        'N': '#f43f5e', // Rose
+        'E': '#f59e0b', // Amber
+        'O': '#10b981', // Emerald
+        'A': '#3b82f6', // Blue
+        'C': '#8b5cf6', // Violet
+    };
+
+    const domainNames: Record<string, string> = {
+        'N': '신경증 (Neuroticism)',
+        'E': '외향성 (Extraversion)',
+        'O': '개방성 (Openness)',
+        'A': '우호성 (Agreeableness)',
+        'C': '성실성 (Conscientiousness)',
+    };
 
     if (result && (result.type?.toUpperCase() === 'PAID' || result.type?.toUpperCase() === 'DEEP')) {
         isPaid = true;
-        tScores = (result.metadata?.tScores?.domains as any) || tScores;
-        const std = SimcheungDiagnosisEngine.mapPaidToStandard({ domains: tScores });
+        const domains = (result.metadata?.tScores?.domains as any) || tScores;
+        const facets = (result.metadata?.tScores?.facets as any) || {};
+
+        // Prepare chartData for PMSS radar chart
+        const std = SimcheungDiagnosisEngine.mapPaidToStandard({ domains });
         chartData = [
             { subject: '신체', score: std.physical, fullMark: 100, color: '#f43f5e' },
             { subject: '멘탈', score: std.mental, fullMark: 100, color: '#f59e0b' },
             { subject: '수면', score: std.sleep, fullMark: 100, color: '#3b82f6' },
             { subject: '생활', score: std.lifestyle, fullMark: 100, color: '#10b981' },
         ];
+
+        // Prepare big5DomainData for detailed Big 5 analysis
+        big5DomainData = Object.keys(domains).map(key => {
+            const domainFacets = Object.keys(facets)
+                .filter(facetKey => facetKey.startsWith(key))
+                .map(facetKey => ({
+                    name: facetKey.substring(1), // Remove the domain prefix (e.g., N1 -> 1)
+                    score: facets[facetKey]
+                }));
+
+            return {
+                subject: domainNames[key] || key,
+                abbreviation: key,
+                score: domains[key],
+                color: domainColors[key] || '#cccccc',
+                facets: domainFacets
+            };
+        });
+
     } else if (result && result.type?.toUpperCase() === 'FREE') {
         isPaid = false;
         // The DB result.categoryScores is already PMSS standardized (from save route update)
@@ -476,10 +515,10 @@ export default function DeepDiagnosisReportPage() {
 
                             <div className="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden divide-y divide-slate-100">
                                 {chartData.map((domain) => {
-                                    const domainChar = domain.subject.includes('신경증') ? 'N' :
-                                        domain.subject.includes('외향성') ? 'E' :
-                                            domain.subject.includes('개방성') ? 'O' :
-                                                domain.subject.includes('우호성') ? 'A' : 'C';
+                                    const domainChar = domain.subject.includes('신체') || domain.subject.includes('외향성') ? 'E' :
+                                        domain.subject.includes('멘탈') || domain.subject.includes('신경증') ? 'N' :
+                                            domain.subject.includes('생활') || domain.subject.includes('성실성') ? 'C' :
+                                                domain.subject.includes('수면') ? 'N' : 'O'; // Simplified mapping
 
                                     const facets = result?.metadata?.tScores?.facets || {};
                                     const domainFacets = Object.entries(facets)
@@ -553,9 +592,9 @@ export default function DeepDiagnosisReportPage() {
                     onSuccess={handlePaymentSuccess}
                 />
 
-                <PaidDiagnosisModal
-                    open={paidDiagnosisModalOpen}
-                    onOpenChange={setPaidDiagnosisModalOpen}
+                <DeepDiagnosisModal
+                    open={deepDiagnosisModalOpen}
+                    onOpenChange={setDeepDiagnosisModalOpen}
                 />
             </div>
         </ChapterWrapper>

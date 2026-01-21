@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, User, Calendar } from 'lucide-react';
+import PavilionReviewSection from './PavilionReviewSection';
 
 interface Artist {
     id: string;
@@ -23,6 +24,7 @@ interface ArtGalleryUIProps {
     subtitle?: string;
     enterButtonText?: string;
     onViewSchedule?: () => void;
+    showReviews?: boolean;
 }
 
 export default function ArtGalleryUI({
@@ -35,7 +37,8 @@ export default function ArtGalleryUI({
     title = "Art Gallery",
     subtitle = "Visionaries of Recovery",
     enterButtonText = "갤러리 입장하기",
-    onViewSchedule
+    onViewSchedule,
+    showReviews = false
 }: ArtGalleryUIProps) {
     const selectedArtist = artists.find(a => a.id === selectedArtistId);
 
@@ -173,6 +176,13 @@ export default function ArtGalleryUI({
                                         </button>
                                     )}
                                 </div>
+
+                                {showReviews && (
+                                    <PavilionReviewSection
+                                        targetId={selectedArtist.id}
+                                        targetName={selectedArtist.name}
+                                    />
+                                )}
                             </motion.div>
                         </div>
                     </motion.div>

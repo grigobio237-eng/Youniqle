@@ -7,7 +7,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, ContactShadows, MeshReflectorMaterial, Html, Text, PerspectiveCamera, Float, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { User } from 'lucide-react';
-import { FloorOwner } from '@/app/pavilion/page';
+import { FloorOwner } from '@/hooks/usePavilionState';
 
 // --- Components ---
 

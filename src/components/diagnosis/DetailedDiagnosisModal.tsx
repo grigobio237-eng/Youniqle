@@ -159,10 +159,16 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
                         <AnalyzingView key="analyzing" />
                     )}
                     {step === 'result' && result && (
-                        <ResultView key="result" result={result} onClose={handleClose} onUnlockPaid={onUnlockPaid} />
+                        <ResultView
+                            key="result"
+                            result={result}
+                            onClose={handleClose}
+                            onUnlockPaid={onUnlockPaid}
+                        />
                     )}
                 </AnimatePresence>
             </DialogContent>
+
         </Dialog>
     );
 }
@@ -289,6 +295,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
 
     const handlePaymentSuccess = () => {
         setPaymentOpen(false);
+        onClose(); // Close the free result view
         if (onUnlockPaid) onUnlockPaid();
     };
 

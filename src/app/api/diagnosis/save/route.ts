@@ -8,6 +8,7 @@ import Diagnosis from '@/models/Diagnosis';
 import { ALL_QUESTIONS } from '@/lib/data/diagnosis-questions';
 import { FULL_DIAGNOSIS_QUESTIONS } from '@/lib/data/full-diagnosis-questions';
 import { SimcheungDiagnosisEngine } from '@/lib/logic/simcheung-diagnosis';
+import { IPIP60_QUESTIONS } from '@/lib/data/ipip60-questions';
 
 export async function POST(request: NextRequest) {
     try {
@@ -40,13 +41,14 @@ export async function POST(request: NextRequest) {
                 rawScores: result.rawScores,
                 lowestCategory: result.lowestCategory
             };
-        } else {
-            // Deep Diagnosis (Future)
+        } else if (type === 'paid' || type === 'deep' || type === 'DEEP') {
+            // Deep Diagnosis
             scores = result.tScores.domains;
-            totalScore = 0; // Not a single score concept usually, maybe average?
+            totalScore = Math.round(Object.values(result.tScores.domains as Record<string, number>).reduce((a, b) => a + b, 0) / 5);
             metadata = {
                 tScores: result.tScores,
-                validity: result.validity
+                validity: result.validity,
+                interpretations: result.interpretations || []
             };
         }
 
@@ -87,12 +89,12 @@ export async function POST(request: NextRequest) {
                     totalScoreVal = result.totalScore;
                     resultTitle = `간편 진단 결과: ${result.totalScore}점`;
                     resultDescription = `${result.lowestCategory} 영역의 케어가 시급합니다.`;
-                } else if (type === 'paid') {
+                } else if (type === 'paid' || type === 'DEEP' || type === 'deep') {
                     // Use Shared Mapping Logic
                     categoryScores = SimcheungDiagnosisEngine.mapPaidToStandard({ domains: result.tScores.domains });
                     const t = result.tScores.domains;
                     totalScoreVal = Math.round((t.N + t.E + t.O + t.A + t.C) / 5); // Average T-score
-                    resultTitle = `심층 심리 진단 (Premium)`;
+                    resultTitle = type.toUpperCase() === 'DEEP' ? `심층 심리 진단 (IPIP-60)` : `심층 심리 진단 (Premium)`;
                     resultDescription = `5대 요인 및 30개 국면 정밀 분석 완료`;
                 }
 
@@ -107,6 +109,8 @@ export async function POST(request: NextRequest) {
                         if (type === 'paid') {
                             // Paid: ID is number (1-60)
                             qData = FULL_DIAGNOSIS_QUESTIONS.find(q => q.id === Number(qId));
+                        } else if (type.toUpperCase() === 'DEEP') {
+                            qData = IPIP60_QUESTIONS.find(q => q.id === Number(qId));
                         } else {
                             // Free: ID is string (M1-1 etc)
                             qData = ALL_QUESTIONS.find(q => q.id === qId);

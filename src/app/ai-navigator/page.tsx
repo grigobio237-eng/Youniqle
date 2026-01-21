@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
-import { PaidDiagnosisModal } from '@/components/diagnosis/PaidDiagnosisModal';
+import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 
 // 카테고리별 상태 메시지
@@ -78,7 +78,7 @@ export default function AiNavigatorPage() {
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [diagnosisModalOpen, setDiagnosisModalOpen] = useState(false);
     const [diagnosisModalStep, setDiagnosisModalStep] = useState<'intro' | 'result'>('intro');
-    const [paidDiagnosisModalOpen, setPaidDiagnosisModalOpen] = useState(false);
+    const [deepDiagnosisModalOpen, setDeepDiagnosisModalOpen] = useState(false);
 
     // 프로토콜 관련 상태
     const [protocols, setProtocols] = useState<any[]>([]);
@@ -561,13 +561,13 @@ export default function AiNavigatorPage() {
                     initialStep={diagnosisModalStep}
                     onUnlockPaid={() => {
                         setDiagnosisModalOpen(false);
-                        setPaidDiagnosisModalOpen(true);
+                        setDeepDiagnosisModalOpen(true);
                     }}
                 />
 
-                <PaidDiagnosisModal
-                    open={paidDiagnosisModalOpen}
-                    onOpenChange={setPaidDiagnosisModalOpen}
+                <DeepDiagnosisModal
+                    open={deepDiagnosisModalOpen}
+                    onOpenChange={setDeepDiagnosisModalOpen}
                 />
             </div>
         </ChapterWrapper>
