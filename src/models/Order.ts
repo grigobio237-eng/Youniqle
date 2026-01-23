@@ -4,10 +4,10 @@ export interface IOrder extends Document {
   orderNumber: string;
   userId: mongoose.Types.ObjectId;
   items: Array<{
-    productId: mongoose.Types.ObjectId;
+    productId: any; // mongoose.Types.ObjectId or string
     name: string;
     price: number;
-    qty: number;
+    quantity: number;
     imageUrl?: string;
     partnerId?: mongoose.Types.ObjectId; // 각 상품의 파트너 ID
   }>;
@@ -74,7 +74,7 @@ const OrderSchema = new Schema<IOrder>({
     required: true,
   },
   items: [{
-    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    productId: { type: Schema.Types.Mixed, required: true },
     name: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },

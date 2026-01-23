@@ -43,13 +43,13 @@ export default function OnboardingGuide({ show, onClose }: OnboardingGuideProps)
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="max-w-xl w-full bg-white rounded-[40px] shadow-2xl overflow-hidden"
+                        className="max-w-xl w-full bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
-                        <div className="p-12 space-y-8">
+                        <div className="p-8 md:p-12 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar">
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
                                     <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em]">Guide</span>
-                                    <h2 className="text-3xl font-black text-obsidian italic tracking-tighter uppercase leading-none">
+                                    <h2 className="text-2xl md:text-3xl font-black text-obsidian italic tracking-tighter uppercase leading-none">
                                         HOW TO <span className="text-[#D4AF37]">ENJOY</span>
                                     </h2>
                                 </div>
@@ -58,21 +58,21 @@ export default function OnboardingGuide({ show, onClose }: OnboardingGuideProps)
                                 </button>
                             </div>
 
-                            <div className="space-y-12 py-4">
+                            <div className="space-y-8 md:space-y-12 py-2 md:py-4">
                                 {STEPS.map((step, idx) => (
                                     <motion.div
                                         key={idx}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.1 }}
-                                        className="flex gap-6 items-start"
+                                        className="flex gap-4 md:gap-6 items-start"
                                     >
-                                        <div className="w-16 h-16 rounded-[24px] bg-slate-50 flex items-center justify-center flex-shrink-0">
-                                            {step.icon}
+                                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-[18px] md:rounded-[24px] bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                            {React.cloneElement(step.icon as React.ReactElement, { className: 'w-6 h-6 md:w-8 md:h-8 text-[#D4AF37]' })}
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="text-lg font-black text-obsidian uppercase italic tracking-tight">{step.title}</h3>
-                                            <p className="text-sm font-medium text-obsidian/40 leading-relaxed break-keep">
+                                            <h3 className="text-base md:text-lg font-black text-obsidian uppercase italic tracking-tight">{step.title}</h3>
+                                            <p className="text-xs md:text-sm font-medium text-obsidian/40 leading-relaxed break-keep">
                                                 {step.desc}
                                             </p>
                                         </div>
@@ -82,7 +82,7 @@ export default function OnboardingGuide({ show, onClose }: OnboardingGuideProps)
 
                             <button
                                 onClick={onClose}
-                                className="w-full h-20 bg-obsidian text-white rounded-[24px] font-black uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 text-lg"
+                                className="w-full h-16 md:h-20 bg-obsidian text-white rounded-[20px] md:rounded-[24px] font-black uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 text-base md:text-lg"
                             >
                                 <Check size={20} />
                                 Start Experience

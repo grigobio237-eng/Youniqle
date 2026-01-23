@@ -188,8 +188,8 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
 
     if (step === 'MAIN') {
         return (
-            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto animate-in fade-in duration-1000">
-                <div className="container mx-auto px-4 py-20">
+            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto animate-in fade-in duration-1000 pt-48 md:pt-0">
+                <div className="container mx-auto px-4 py-12 md:py-20">
                     <section className="max-w-6xl mx-auto">
                         <div className="flex flex-col lg:flex-row gap-16 items-center">
                             {/* Left: Visual Content */}
@@ -285,7 +285,7 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
 
     if (step === 'FORM') {
         return (
-            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto pt-32 pb-20">
+            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto pt-48 md:pt-32 pb-20">
                 <div className="container mx-auto px-4 max-w-2xl">
                     <div className="mb-12 text-center space-y-4">
                         <Crown className="w-10 h-10 text-luxury-gold mx-auto" />
@@ -536,7 +536,7 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
 
     if (step === 'RESULT' && aiPlans) {
         return (
-            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto pt-32 pb-20">
+            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto pt-48 md:pt-32 pb-20">
                 <div className="container mx-auto px-4 max-w-6xl">
                     <div className="text-center mb-16 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Badge className="bg-luxury-gold/10 text-luxury-gold border-none font-black px-4 py-1.5 uppercase tracking-widest text-[10px]">엄선된 관리 결과</Badge>

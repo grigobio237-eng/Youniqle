@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     // NextAuth 세션으로 사용자 인증
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -36,9 +36,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('주문 내역 조회 오류:', error);
     return NextResponse.json(
-      { 
-        error: '주문 내역 조회 중 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '주문 내역 조회 중 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   // MongoDB 세션 변수
   let mongoSession = null;
-  
+
   try {
     const body = await request.json();
     const { items, shippingAddress, paymentMethod, totalAmount, usedPoints, couponDiscount, couponCode } = body;
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    
+
     // MongoDB 트랜잭션 시작 (replica set이 구성된 경우에만 작동)
     const mongoose = await import('mongoose');
     try {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // NextAuth 세션으로 사용자 인증
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     // 사용자 확인
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
-    
+
     if (!user) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -92,17 +92,22 @@ export async function POST(request: NextRequest) {
     // 재고 확인 (단순화)
     const Product = (await import('@/models/Product')).default;
     for (const item of items) {
+      // Founder Pass 등 가상 상품은 DB 조회 및 재고 체크 건너뜀
+      if (typeof item.productId === 'string' && item.productId.startsWith('founder-')) {
+        continue;
+      }
+
       const product = await Product.findById(item.productId);
-      
+
       if (!product) {
-        return NextResponse.json({ 
-          error: `상품을 찾을 수 없습니다: ${item.productId}` 
+        return NextResponse.json({
+          error: `상품을 찾을 수 없습니다: ${item.productId}`
         }, { status: 400 });
       }
-      
+
       if (product.stock < item.quantity) {
-        return NextResponse.json({ 
-          error: `재고가 부족합니다. (가능: ${product.stock}개, 요청: ${item.quantity}개)` 
+        return NextResponse.json({
+          error: `재고가 부족합니다. (가능: ${product.stock}개, 요청: ${item.quantity}개)`
         }, { status: 400 });
       }
     }
@@ -110,11 +115,11 @@ export async function POST(request: NextRequest) {
     // 쿠폰 재검증 (주문 생성 시점에 다시 확인)
     let validatedCouponDiscount = 0;
     let validatedCouponCode: string | undefined = undefined;
-    
+
     if (couponCode && couponDiscount && couponDiscount > 0) {
       try {
         const { validateCoupon } = await import('@/lib/couponValidator');
-        
+
         // 장바구니 항목을 검증용 형식으로 변환
         const cartItemsForValidation = await Promise.all(items.map(async (item: any) => {
           const product = await Product.findById(item.productId);
@@ -151,9 +156,9 @@ export async function POST(request: NextRequest) {
         } else {
           validatedCouponDiscount = couponDiscount;
         }
-        
+
         validatedCouponCode = couponCode;
-        
+
         console.log(`쿠폰 재검증 완료: ${couponCode}, 할인 ${validatedCouponDiscount}원`);
       } catch (error) {
         console.error('쿠폰 재검증 오류:', error);
@@ -199,7 +204,7 @@ export async function POST(request: NextRequest) {
           `주문 사용 (주문번호: ${orderNumber})`,
           order._id
         );
-        
+
         if (!pointResult.success) {
           console.error('포인트 사용 실패:', pointResult.error);
           // 트랜잭션 롤백
@@ -215,7 +220,7 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        
+
         console.log(`✅ 포인트 사용 완료: ${pointResult.usedPoints}P 사용, 잔액 ${pointResult.newBalance}P`);
       } catch (error) {
         console.error('포인트 사용 처리 오류:', error);
@@ -255,14 +260,14 @@ export async function POST(request: NextRequest) {
         select: 'name images price category'
       });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: '주문이 성공적으로 생성되었습니다.',
-      order: savedOrder 
+      order: savedOrder
     }, { status: 201 });
 
   } catch (error) {
     console.error('주문 생성 오류:', error);
-    
+
     // 트랜잭션 롤백
     if (mongoSession) {
       try {
@@ -272,11 +277,11 @@ export async function POST(request: NextRequest) {
         console.error('트랜잭션 롤백 오류:', abortError);
       }
     }
-    
+
     return NextResponse.json(
-      { 
-        error: '주문 생성 중 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '주문 생성 중 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );

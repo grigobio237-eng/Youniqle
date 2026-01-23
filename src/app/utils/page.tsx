@@ -243,16 +243,16 @@ function UtilsContent() {
         <ChapterWrapper chapter="utils">
             <div className="max-w-[1440px] mx-auto px-6 py-12 space-y-20">
                 {/* Hero Section */}
-                <div className="relative overflow-hidden rounded-[40px] bg-obsidian text-mist p-12 lg:p-20 group">
+                <div className="relative overflow-hidden rounded-[40px] bg-obsidian text-mist p-8 md:p-12 lg:p-20 group text-center md:text-left flex flex-col items-center md:items-start">
                     <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/10 to-transparent opacity-50"></div>
-                    <div className="relative z-10 max-w-2xl space-y-6">
-                        <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-4 py-1.5 rounded-full backdrop-blur-md">
+                    <div className="relative z-10 max-w-2xl space-y-4 md:space-y-6">
+                        <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-4 py-1.5 rounded-full backdrop-blur-md inline-block">
                             Utility Hub v2.0
                         </Badge>
-                        <h1 className="text-5xl lg:text-7xl font-black tracking-tighter leading-none italic">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-tight md:leading-none italic">
                             SUPERCHARGED<br />EXPERIENCE
                         </h1>
-                        <p className="text-xl lg:text-2xl font-medium opacity-60 leading-relaxed max-w-lg">
+                        <p className="text-base md:text-xl lg:text-2xl font-medium opacity-60 leading-relaxed max-w-lg">
                             그리 고 바이오가 제안하는 고성능 유틸리티 도구들을 만나보세요. 단순한 기능을 넘어 최상의 경험을 제공합니다.
                         </p>
                         <div className="flex flex-wrap gap-4 pt-4">

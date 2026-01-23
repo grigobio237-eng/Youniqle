@@ -7,7 +7,7 @@ export interface IUser extends Document {
   phone?: string;
   avatar?: string;
   role: 'member' | 'partner' | 'admin';
-  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
+  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
   points: number;
   referralCode?: string; // 추천인 아이디
   referredBy?: string; // 추천받은 사용자의 추천인 코드
@@ -169,7 +169,7 @@ const UserSchema = new Schema<IUser>({
   },
   grade: {
     type: String,
-    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul'],
+    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'essence', 'balance', 'miracle'],
     default: 'cedar',
   },
   points: {

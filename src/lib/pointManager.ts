@@ -8,7 +8,10 @@ export const POINT_EARN_RATES = {
   rooter: 0.015,  // 1.5%
   bloomer: 0.02,  // 2%
   glower: 0.025,  // 2.5%
-  ecosoul: 0.03   // 3%
+  ecosoul: 0.03,  // 3%
+  essence: 0.05,  // 5% (Founder Pass Tier 1)
+  balance: 0.10,  // 10% (Founder Pass Tier 2)
+  miracle: 0.15   // 15% (Founder Pass Tier 3)
 } as const;
 
 // 포인트 만료 기간 (일)
@@ -252,7 +255,7 @@ export async function validatePointUsage(
     const maxUsable = Math.floor(orderAmount * 0.5);
     // 최소 사용 단위 (예: 10P)
     const MIN_UNIT = 10;
-    
+
     if (amount > user.points) {
       return { isValid: false, error: '포인트가 부족합니다.', maxUsable: Math.min(user.points, maxUsable) };
     }
@@ -282,7 +285,7 @@ export async function validatePointUsage(
 export async function processExpiredPoints(): Promise<{ processedCount: number; expiredAmount: number }> {
   try {
     const now = new Date();
-    
+
     // 만료된 포인트 조회
     const expiredTransactions = await PointTransaction.find({
       type: 'earned',

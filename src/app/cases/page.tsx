@@ -321,24 +321,24 @@ export default function CasesPage() {
                 </p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-20">
-                <TabsList className="flex justify-center bg-transparent gap-4 mb-16 flex-wrap">
-                    <TabsTrigger value="OFFICIAL" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">공식 인증 사례</TabsTrigger>
-                    <TabsTrigger value="AI_SIMULATION" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all">AI 가상 사례 (Beta)</TabsTrigger>
-                    <TabsTrigger value="WEBTOON" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:border-primary font-black transition-all">📖 웹툰 스토리</TabsTrigger>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12 md:mb-20">
+                <TabsList className="flex justify-center bg-transparent gap-2 md:gap-4 mb-8 md:mb-16 flex-wrap h-auto">
+                    <TabsTrigger value="OFFICIAL" className="px-4 md:px-8 py-2 md:py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all text-xs md:text-sm">공식 인증 사례</TabsTrigger>
+                    <TabsTrigger value="AI_SIMULATION" className="px-4 md:px-8 py-2 md:py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-chapter-accent data-[state=active]:text-background data-[state=active]:border-chapter-accent font-black transition-all text-xs md:text-sm">AI 가상 사례 (Beta)</TabsTrigger>
+                    <TabsTrigger value="WEBTOON" className="px-4 md:px-8 py-2 md:py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:border-primary font-black transition-all text-xs md:text-sm">📖 웹툰 스토리</TabsTrigger>
                     {session?.user && (
-                        <TabsTrigger value="MY_WEBTOON" className="px-8 py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-obsidian data-[state=active]:text-white data-[state=active]:border-obsidian font-black transition-all">📁 내 웹툰</TabsTrigger>
+                        <TabsTrigger value="MY_WEBTOON" className="px-4 md:px-8 py-2 md:py-3 rounded-full border border-line text-text-secondary data-[state=active]:bg-obsidian data-[state=active]:text-white data-[state=active]:border-obsidian font-black transition-all text-xs md:text-sm">📁 내 웹툰</TabsTrigger>
                     )}
                 </TabsList>
 
-                <TabsContent value="OFFICIAL" className="space-y-12">
-                    <div className="flex justify-center flex-wrap gap-2">
+                <TabsContent value="OFFICIAL" className="space-y-8 md:space-y-12">
+                    <div className="flex justify-center flex-wrap gap-2 md:gap-3 px-2">
                         {['ALL', '만성피로', '통증/붓기', 'MENTAL'].map((f) => (
                             <Button
                                 key={f}
                                 variant="outline"
                                 onClick={() => setFilter(f)}
-                                className={`rounded-full px-6 font-bold transition-all ${filter === f ? 'bg-text-primary text-background border-text-primary' : 'bg-transparent text-text-secondary border-line'}`}
+                                className={`rounded-full px-4 md:px-6 h-10 md:h-12 text-xs md:text-sm font-bold transition-all ${filter === f ? 'bg-text-primary text-background border-text-primary' : 'bg-transparent text-text-secondary border-line'}`}
                             >
                                 {f === 'ALL' ? '전체' : `#${f}`}
                             </Button>

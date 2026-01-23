@@ -192,6 +192,34 @@ function CheckoutPageContent() {
         const quantity = searchParams?.get('quantity');
 
         if (productId && quantity) {
+          // Founder Pass와 같은 가상 상품 처리
+          if (productId.startsWith('founder-')) {
+            const name = searchParams?.get('name') || 'Founder Pass';
+            const price = parseInt(searchParams?.get('price') || '0');
+
+            const tempCart: Cart = {
+              _id: 'temp-founder',
+              items: [{
+                _id: 'temp-founder-item',
+                productId: {
+                  _id: productId, // 가상 ID 사용
+                  name: name,
+                  price: price,
+                  images: ['/images/founder-pass-badge.png'], // 기본 이미지 또는 적절한 경로
+                  slug: productId
+                },
+                quantity: parseInt(quantity),
+                price: price,
+                addedAt: new Date().toISOString()
+              }],
+              totalItems: parseInt(quantity),
+              totalAmount: price * parseInt(quantity)
+            };
+            setCart(tempCart);
+            setLoading(false);
+            return;
+          }
+
           const productResponse = await fetch(`/api/products/${productId}`, {
             credentials: 'include',
           });

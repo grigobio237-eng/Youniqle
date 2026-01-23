@@ -122,41 +122,60 @@ function GateIntro({ onStart }: { onStart: () => void }) {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-3xl space-y-16 relative z-10"
+        className="max-w-3xl space-y-12 relative z-10"
       >
-        <div className="space-y-8">
+        {/* Hero Section */}
+        <div className="space-y-6">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
-            <span>Youniqle Recovery Protocol v2.5</span>
+            <span>Founder Pass Now Open</span>
           </div>
           <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-obsidian leading-[1.2] md:leading-[1.1] tracking-tighter break-keep">
-            번아웃에서 벗어나<br />
-            <span className="text-chapter-accent">진짜 '나'로 돌아가는 시간</span>
+            당신의 회복을<br />
+            <span className="text-chapter-accent">'시스템'으로 바꿉니다</span>
           </h1>
           <p className="text-lg md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
-            감각에 의존하던 휴식을 넘어, 당신의 몸이 보내는 신호를<br className="hidden md:block" />
-            정밀하게 해석하는 가장 과학적이고 프라이빗한 솔루션.
+            유전자 · 웰니스 · 회복 설계를 하나의 구조로
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 w-full max-w-lg mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4 w-full px-4 md:px-0">
-            <Button size="lg" onClick={onStart} className="btn-primary flex-1 h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
-              60초 정밀 진단 시작
-            </Button>
-            <Button asChild className="bg-obsidian text-mist flex-1 h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 active:translate-y-0 border-none">
-              <Link href="/products">회복 키트 큐레이션</Link>
-            </Button>
-          </div>
+        {/* Primary CTA */}
+        <div className="flex flex-col gap-4 w-full max-w-md mx-auto px-4 md:px-0">
+          <Button asChild size="lg" className="btn-primary w-full h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
+            <Link href="/founder-pass">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Founder Pass 알아보기
+            </Link>
+          </Button>
+          <p className="text-sm text-slate/60">
+            ESSENCE 39만원 · BALANCE 69만원 · MIRACLE 99만원
+          </p>
         </div>
 
-        <div className="pt-16 border-t border-line flex justify-center gap-16 md:gap-24">
-          <div className="space-y-2">
-            <span className="block font-black text-obsidian text-3xl md:text-4xl tracking-tight">12,403+</span>
-            <span className="text-xs font-bold text-slate uppercase tracking-widest">Protocol Records</span>
-          </div>
-          <div className="space-y-2">
-            <span className="block font-black text-obsidian text-3xl md:text-4xl tracking-tight">96.8%</span>
-            <span className="text-xs font-bold text-slate uppercase tracking-widest">Recovery Success</span>
+        {/* Secondary Actions */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+          <Button variant="outline" onClick={onStart} className="h-12 px-6 rounded-full border-line hover:bg-obsidian/5">
+            무료 60초 진단 체험
+          </Button>
+          <Button variant="ghost" asChild className="h-12 px-6 rounded-full hover:bg-obsidian/5">
+            <Link href="/products">회복 큐레이션 보기 <ArrowRight className="w-4 h-4 ml-1" /></Link>
+          </Button>
+        </div>
+
+        {/* Trust Section */}
+        <div className="pt-12 border-t border-line">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12 text-sm text-slate">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-status-good" />
+              <span>정보·연결·설계 플랫폼</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-status-good" />
+              <span>7일 이내 100% 환불 보장</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-status-good" />
+              <span>(주)사피에넷 운영</span>
+            </div>
           </div>
         </div>
       </motion.div>

@@ -43,7 +43,7 @@ export default function ArtGalleryUI({
     const selectedArtist = artists.find(a => a.id === selectedArtistId);
 
     return (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-start md:justify-center bg-white/95 backdrop-blur-sm pointer-events-auto overflow-y-auto py-20 pb-32">
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-start md:justify-center bg-white/95 backdrop-blur-sm pointer-events-auto overflow-y-auto pt-48 md:pt-20 pb-32">
             <AnimatePresence mode="wait">
                 {viewMode === 'GRID' && (
                     <motion.div
