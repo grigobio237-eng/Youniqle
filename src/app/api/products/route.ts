@@ -32,7 +32,10 @@ async function getProductsHandler(request: NextRequest) {
     const cacheKey = CacheKeys.products(
       validatedQuery.page || 1,
       validatedQuery.limit || 20,
-      validatedQuery
+      {
+        ...validatedQuery,
+        pavilionFloorId: validatedQuery.pavilionFloorId || 'none'
+      }
     );
 
     // 캐시에서 데이터 조회
@@ -65,6 +68,14 @@ async function getProductsHandler(request: NextRequest) {
     } else {
       // 기본값: 일반 상점에서는 펀딩 상품 제외 (isFunding이 true가 아닌 것들)
       filter.isFunding = { $ne: true };
+    }
+
+    // Pavilion Filter (Exclusivity)
+    if (validatedQuery.pavilionFloorId) {
+      filter.pavilionFloorId = validatedQuery.pavilionFloorId;
+    } else {
+      // 중요: pavilionFloorId가 명시되지 않은 일반 요청에서는 파빌리온 전용 상품을 제외함
+      filter.pavilionFloorId = { $exists: false };
     }
 
     // Build sort object

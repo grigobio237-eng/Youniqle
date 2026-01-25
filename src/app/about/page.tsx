@@ -32,7 +32,7 @@ export default function AboutPage() {
 
                 <p className="text-xl md:text-2xl text-text-secondary leading-relaxed font-medium max-w-xl">
                   Youniqle은 (주)사피에넷(Sapienet)의 회복 큐레이션 브랜드입니다. <br />
-                  우리는 '감각'이 아닌 '데이터'로 증명된 회복의 가치를 제안합니다.
+                  우리는 &apos;감각&apos;이 아닌 &apos;데이터&apos;로 증명된 회복의 가치를 제안합니다.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-6">
@@ -135,7 +135,7 @@ export default function AboutPage() {
               <h3 className="text-3xl md:text-5xl font-black text-text-primary tracking-tighter">우리의 이야기</h3>
               <div className="space-y-8 text-xl text-text-secondary leading-relaxed font-medium">
                 <p>
-                  Youniqle은 프리미엄을 '생활 가능한 가격'으로 연결하는 큐레이션 커머스입니다.
+                  Youniqle은 프리미엄을 &apos;생활 가능한 가격&apos;으로 연결하는 큐레이션 커머스입니다.
                   우리는 파트너사와의 직접 협업, 데이터 기반 수요 예측, 표준화된 품질 검수를 통해 과장 없는 정보를 제공합니다.
                 </p>
                 <p>
@@ -143,7 +143,7 @@ export default function AboutPage() {
                   가격, 원산지, 구성, 사후 보장 범위를 투명하게 안내하고, 구매 이후에도 빠르게 돕는 것이 Youniqle의 기본입니다.
                 </p>
                 <p>
-                  운영사 (주)사피에넷(Sapienet)은 독자적인 '리커버리 OS' 기술력을 바탕으로,
+                  운영사 (주)사피에넷(Sapienet)은 독자적인 &apos;리커버리 OS&apos; 기술력을 바탕으로,
                   단순한 소비를 넘어 사용자의 데이터가 회복의 결과로 이어질 수 있도록 돕습니다.
                 </p>
               </div>

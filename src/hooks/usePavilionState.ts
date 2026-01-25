@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { getUserProgress, getMembershipLevel, TierType } from '@/lib/progress';
 
 // --- Types ---
@@ -51,6 +52,7 @@ const ARTIST_PORTRAITS: Record<string, string> = {
 };
 
 export function usePavilionState() {
+    const { data: session } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialFloor = parseInt(searchParams?.get('floor') || '1', 10);
@@ -198,7 +200,13 @@ export function usePavilionState() {
         if (floor === 5) {
             const p = getUserProgress();
             const m = getMembershipLevel(p.totalPoints, p.currentStreak);
-            if (m.level === 'RESET') {
+
+            // Check both calculated tier and DB tier from session
+            const userTier = (session?.user as any)?.tier as TierType | undefined;
+            const isRebornOrHigher = m.level === 'REBORN' || m.level === 'RESTART' ||
+                userTier === 'REBORN' || userTier === 'RESTART';
+
+            if (!isRebornOrHigher) {
                 setShowLoungeNudge(true);
                 return; // Block access to 5F
             }

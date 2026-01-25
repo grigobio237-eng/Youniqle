@@ -11,6 +11,7 @@ export const PRODUCT_CATEGORIES = [
   { value: 'beauty', label: '뷰티', labelEn: 'Beauty' },
   { value: 'sports', label: '스포츠', labelEn: 'Sports' },
   { value: 'books', label: '도서', labelEn: 'Books' },
+  { value: 'stem-cell', label: '줄기세포', labelEn: 'Stem Cell' },
 ] as const;
 
 // 카테고리 value 타입

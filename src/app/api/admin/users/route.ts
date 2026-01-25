@@ -6,10 +6,10 @@ import Order from '@/models/Order';
 async function getUsersHandler(request: NextRequest) {
   try {
     await connectDB();
-    
+
     // 관리자 토큰 검증 (쿠키 방식)
     const token = request.cookies.get('admin-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
     }
@@ -17,14 +17,14 @@ async function getUsersHandler(request: NextRequest) {
     try {
       const jwt = require('jsonwebtoken');
       const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      
+
       if (!decoded || decoded.type !== 'admin') {
         return NextResponse.json({ error: '유효하지 않은 관리자 토큰입니다.' }, { status: 401 });
       }
 
       // 관리자 권한 확인
       const user = await User.findById(decoded.id);
-      
+
       if (!user || user.role !== 'admin') {
         return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
       }
@@ -36,24 +36,29 @@ async function getUsersHandler(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const role = searchParams.get('role') || 'all';
     const grade = searchParams.get('grade') || 'all';
+    const tier = searchParams.get('tier') || 'all';
     const sort = searchParams.get('sort') || 'newest';
 
     // 검색 조건 구성
     const filter: any = {};
-    
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (role !== 'all') {
       filter.role = role;
     }
-    
+
     if (grade !== 'all') {
       filter.grade = grade;
+    }
+
+    if (tier !== 'all') {
+      filter.tier = tier;
     }
 
     // 정렬 조건 구성
@@ -87,14 +92,15 @@ async function getUsersHandler(request: NextRequest) {
         const orders = await Order.find({ userId: user._id });
         const totalOrders = orders.length;
         const totalSpent = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-        
+
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
           phone: user.phone,
           role: user.role,
-          grade: user.grade || 'cedar', // 기본값으로 cedar 설정
+          grade: user.grade || 'cedar',
+          tier: user.tier || 'RESET',
           points: user.points,
           provider: user.provider,
           emailVerified: user.emailVerified,

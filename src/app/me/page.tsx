@@ -45,6 +45,7 @@ import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianG
 import { motion } from 'framer-motion';
 import DynamicHero from '@/components/me/DynamicHero';
 import MembershipProgress from '@/components/me/MembershipProgress';
+import AccessTierCard from '@/components/me/AccessTierCard';
 import AILatestBrief from '@/components/me/AILatestBrief';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 
@@ -440,17 +441,24 @@ export default function MyPage() {
           {/* Dynamic Hero Section */}
           <DynamicHero userName={session.user?.name || '요원'} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mb-10">
-            {/* Membership Progress (Left) */}
-            <div className="lg:col-span-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 mb-6">
+            {/* Membership Rewards (Left) */}
+            <div className="lg:col-span-3">
               <MembershipProgress
                 currentGrade={userData?.grade || 'cedar'}
                 currentPoints={userData?.points || 0}
               />
             </div>
 
-            {/* Recovery Growth Quote/Brief (Middle) */}
-            <div className="lg:col-span-4">
+            {/* Access Tier (Left-Center) */}
+            <div className="lg:col-span-3">
+              <AccessTierCard
+                currentTier={userData?.tier || 'RESET'}
+              />
+            </div>
+
+            {/* Recovery Growth Quote/Brief (Center) */}
+            <div className="lg:col-span-3">
               <AILatestBrief
                 solution={history[0]?.aiSolution}
                 createdAt={history[0]?.createdAt}
@@ -458,41 +466,41 @@ export default function MyPage() {
             </div>
 
             {/* Quick Stats (Right) */}
-            <div className="lg:col-span-4 grid grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5" />
+            <div className="lg:col-span-3 grid grid-cols-2 gap-3">
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                  <ShoppingBag className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
-                  <p className="text-2xl font-black text-obsidian tracking-tighter">0</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
+                  <p className="text-xl font-black text-obsidian tracking-tighter">0</p>
                 </div>
               </div>
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
-                  <Ticket className="w-5 h-5" />
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                  <Ticket className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
-                  <p className="text-2xl font-black text-obsidian tracking-tighter">2</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
+                  <p className="text-xl font-black text-obsidian tracking-tighter">2</p>
                 </div>
               </div>
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
-                  <Activity className="w-5 h-5" />
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                  <Activity className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
-                  <p className="text-2xl font-black text-obsidian tracking-tighter">{history.length}</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
+                  <p className="text-xl font-black text-obsidian tracking-tighter">{history.length}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                  <Zap className="w-5 h-5" />
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                  <Zap className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
-                  <p className="text-2xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
+                  <p className="text-xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
                 </div>
               </div>
             </div>
@@ -523,9 +531,16 @@ export default function MyPage() {
                       <p className="text-sm font-bold text-slate flex items-center gap-2 opacity-60">
                         <Mail className="h-3 w-3" /> {session.user?.email}
                       </p>
-                      <Badge className="mt-2 bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-3">
-                        {(session.user as any)?.provider || 'Email Member'}
-                      </Badge>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-3">
+                          {(session.user as any)?.provider || 'Email Member'}
+                        </Badge>
+                        {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
+                          <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[9px] uppercase tracking-widest px-3 flex items-center gap-1">
+                            <Zap className="w-2.5 h-2.5" /> FOUNDER PASS
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
 

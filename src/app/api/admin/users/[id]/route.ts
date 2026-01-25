@@ -126,6 +126,7 @@ export async function PATCH(
         if (data.phone) user.phone = data.phone;
         if (data.role) user.role = data.role;
         if (data.grade) user.grade = data.grade;
+        if (data.tier) user.tier = data.tier; // tier 직접 업데이트
         if (data.points !== undefined) user.points = data.points;
         break;
 
@@ -140,6 +141,15 @@ export async function PATCH(
         const currentIndex = grades.indexOf(user.grade);
         if (currentIndex < grades.length - 1) {
           user.grade = grades[currentIndex + 1];
+        }
+        break;
+
+      case 'promoteTier':
+        // 접근 권한 등급 상승 (RESET → REBORN → RESTART)
+        const tiers = ['RESET', 'REBORN', 'RESTART'];
+        const currentTierIndex = tiers.indexOf(user.tier || 'RESET');
+        if (currentTierIndex < tiers.length - 1) {
+          user.tier = tiers[currentTierIndex + 1];
         }
         break;
 
@@ -171,6 +181,7 @@ export async function PATCH(
         email: user.email,
         role: user.role,
         grade: user.grade,
+        tier: user.tier,
         points: user.points
       }
     });

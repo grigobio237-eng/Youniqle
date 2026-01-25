@@ -27,6 +27,8 @@ import {
   Crown,
   Star,
   TrendingUp,
+  Zap,
+  Sparkles,
   XCircle
 } from 'lucide-react';
 import {
@@ -43,6 +45,7 @@ interface User {
   phone?: string;
   role: 'member' | 'partner' | 'admin' | 'user';
   grade?: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
+  tier?: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
   points: number;
   provider: 'local' | 'google' | 'kakao' | 'naver';
   emailVerified: boolean;
@@ -61,7 +64,10 @@ const gradeColors = {
   rooter: 'bg-green-100 text-green-800',
   bloomer: 'bg-blue-100 text-blue-800',
   glower: 'bg-purple-100 text-purple-800',
-  ecosoul: 'bg-yellow-100 text-yellow-800'
+  ecosoul: 'bg-yellow-100 text-yellow-800',
+  essence: 'bg-emerald-100 text-emerald-800',
+  balance: 'bg-violet-100 text-violet-800',
+  miracle: 'bg-amber-100 text-amber-800'
 };
 
 const gradeIcons = {
@@ -69,7 +75,10 @@ const gradeIcons = {
   rooter: Star,
   bloomer: TrendingUp,
   glower: Crown,
-  ecosoul: Crown
+  ecosoul: Crown,
+  essence: Zap,
+  balance: Star,
+  miracle: Sparkles
 };
 
 export default function AdminUsersPage() {
@@ -78,6 +87,7 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [gradeFilter, setGradeFilter] = useState<string>('all');
+  const [tierFilter, setTierFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
 
   // User detail modal
@@ -88,7 +98,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [searchQuery, roleFilter, gradeFilter, sortBy]);
+  }, [searchQuery, roleFilter, gradeFilter, tierFilter, sortBy]);
 
   const fetchUsers = async () => {
     try {
@@ -96,6 +106,7 @@ export default function AdminUsersPage() {
       if (searchQuery) params.append('search', searchQuery);
       if (roleFilter !== 'all') params.append('role', roleFilter);
       if (gradeFilter !== 'all') params.append('grade', gradeFilter);
+      if (tierFilter !== 'all') params.append('tier', tierFilter);
       params.append('sort', sortBy);
 
       const response = await fetch(`/api/admin/users?${params}`, {
@@ -347,6 +358,22 @@ export default function AdminUsersPage() {
                   <SelectItem value="bloomer">BLOOMER</SelectItem>
                   <SelectItem value="glower">GLOWER</SelectItem>
                   <SelectItem value="ecosoul">ECOSOUL</SelectItem>
+                  <SelectItem value="essence">ESSENCE (Founder)</SelectItem>
+                  <SelectItem value="balance">BALANCE (Founder)</SelectItem>
+                  <SelectItem value="miracle">MIRACLE (Founder)</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Tier Filter */}
+              <Select value={tierFilter} onValueChange={setTierFilter}>
+                <SelectTrigger className="w-full md:w-40">
+                  <SelectValue placeholder="접근 권한" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">모든 권한</SelectItem>
+                  <SelectItem value="RESET">RESET</SelectItem>
+                  <SelectItem value="REBORN">REBORN</SelectItem>
+                  <SelectItem value="RESTART">RESTART</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -387,6 +414,12 @@ export default function AdminUsersPage() {
                       <div className="flex items-center space-x-3">
                         <h3 className="font-medium text-text-primary">{user.name}</h3>
                         {getGradeDisplay(user.grade || 'cedar')}
+                        <Badge className={`${user.tier === 'RESTART' ? 'bg-purple-100 text-purple-800' :
+                          user.tier === 'REBORN' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                          {user.tier || 'RESET'}
+                        </Badge>
                         <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                           {user.role === 'admin' ? '관리자' :
                             user.role === 'partner' ? '파트너' : '회원'}
@@ -447,7 +480,10 @@ export default function AdminUsersPage() {
                           계정 정지
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleUserAction(user.id, 'promote')}>
-                          등급 상승
+                          회원 등급 상승
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleUserAction(user.id, 'promoteTier')}>
+                          접근 등급 상승 (REBORN/RESTART)
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleUserAction(user.id, 'delete')}
@@ -487,8 +523,17 @@ export default function AdminUsersPage() {
                   <p className="font-medium">{selectedUser.role === 'admin' ? '관리자' : selectedUser.role === 'partner' ? '파트너' : '회원'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">등급</p>
+                  <p className="text-sm text-gray-500">회원 등급</p>
                   <p className="font-medium">{(selectedUser.grade || 'CEDAR').toUpperCase()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">접근 등급</p>
+                  <Badge className={`${selectedUser.tier === 'RESTART' ? 'bg-purple-100 text-purple-800' :
+                    selectedUser.tier === 'REBORN' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                    {selectedUser.tier || 'RESET'}
+                  </Badge>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">가입일</p>

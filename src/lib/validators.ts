@@ -437,6 +437,11 @@ export const commonSchemas = {
     isFunding: {
       required: false,
       type: 'boolean' as const
+    },
+    pavilionFloorId: {
+      required: false,
+      type: 'string' as const,
+      sanitize: true
     }
   }
 };

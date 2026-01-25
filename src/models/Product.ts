@@ -4,6 +4,8 @@ export interface IProduct extends Document {
   name: string;
   slug: string;
   price: number;
+  minPrice?: number;
+  maxPrice?: number;
   originalPrice?: number;
   stock: number;
   minStock?: number; // 최소 재고 수준
@@ -79,6 +81,14 @@ const ProductSchema = new Schema<IProduct>({
   price: {
     type: Number,
     required: true,
+    min: 0,
+  },
+  minPrice: {
+    type: Number,
+    min: 0,
+  },
+  maxPrice: {
+    type: Number,
     min: 0,
   },
   originalPrice: {

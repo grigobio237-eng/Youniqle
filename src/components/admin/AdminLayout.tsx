@@ -142,6 +142,12 @@ const navigationItems = [
         href: '/admin/ai-builder',
         icon: Sparkles,
         description: 'AI싱크클럽 전용 AI 빌더'
+      },
+      {
+        name: '줄기세포 전용 빌더',
+        href: '/admin/pavilion-builder',
+        icon: Zap,
+        description: '파빌리온 5층 전용 AI 빌더'
       }
     ]
   },

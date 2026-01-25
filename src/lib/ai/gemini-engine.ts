@@ -536,14 +536,15 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
         targetAge?: string[];
         length: 5 | 7 | 9 | 'auto';
         isFunding?: boolean;
+        isStemCellSolution?: boolean;
         referenceImage?: string; // Base64
     }): Promise<any> {
         const lengthCount = input.length === 'auto' ? '6' : String(input.length);
         const targetInfo = `타겟 고객: ${input.targetGender?.join(', ')} / 연령대: ${input.targetAge?.join(', ')}`;
 
         const prompt = `
-당신은 대한민국 최고의 이커머스 상세페이지 기획 전문가이며, 유니클(Youniqle)의 브랜드 디렉터입니다.
-당실의 임무는 유니클의 고유한 '회복(Recovery) 설계' 철학을 담은 상세페이지 기획안을 작성하는 것입니다.
+당신은 대한민국 최고의 이커머스 상세페이지 기획 전문가이자, 유니클(Youniqle) 소속의 피부미용・성형외과・정형외과 전문 메디컬 마케터입니다.
+당신의 임무는 유니클의 고유한 '회복(Recovery) 설계' 철학을 의료적 신뢰감과 브랜드의 세련미를 결합하여 상세페이지 기획안으로 도출하는 것입니다.
 
 **CRITICAL: 모든 결과물은 반드시 '한글'로만 작성하세요.**
 **CRITICAL: 기존의 장점 나열 방식이 아닌, 아래의 [유니클 5단계 구조]를 엄격히 따르세요.**
@@ -582,31 +583,46 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
    - **엔딩 문구**: 반드시 "유니클은 효과를 약속하지 않습니다. 회복을 설계합니다." 문구를 이 섹션의 마지막 키 메시지로 포함하세요.
 
 [기획 지침]
+${input.isStemCellSolution ? `
+**[무형 메디컬 솔루션 전용 시각화 가이드라인 - CRITICAL]**
+- **제품(앰플, 병, 박스, 패키지)을 묘사하지 마세요.** 양산형 상품이 아니므로 실물 제품 사진이 없습니다.
+- 대신 다음의 요소들을 비주얼 프롬프트(visualPrompt)에 적극 반영하세요:
+  1. **전문적인 공간**: 프라이빗한 프리미엄 라운지, 정갈하고 깨끗한 시술실, 현대적인 메디컬 센터 분위기.
+  2. **추상적 회복**: 피부 세포가 깨어나는 생동감 있는 빛, 정제된 유효 성분이 흐르는 듯한 과학적 그래픽, 치유의 에너지.
+  3. **메디컬 프로세스**: 현미경 속의 질서 있는 구조, PRP 추출 과정의 정교함, 전문 장비를 암시하는 정돈된 금속과 빛의 조화.
+  4. **고객 경험**: 시술을 통해 얻게 될 '맑고 투명한 피부결', '탄력 있는 안색'을 상징하는 비주얼적 메타포.
+` : `
 - 비주얼 프롬프트: 제품 스테이징(대리석, 신선한 식물, 깨끗한 빛)이 강조된 한글 묘사.
+`}
 - 모든 섹션의 분위기는 '치유, 정돈됨, 프리미엄'이어야 함.
 
-## 출력 형식 (JSON Array) - 설명 없이 JSON만 출력하세요.
-[
-  {
-    "id": "section-1",
-    "title": "회복 키워드 선언 (한글)",
-    "logicalSections": ["Recovery_Keyword"],
-    "keyMessage": "핵심 한글 카피",
-    "visualPrompt": "제품이 돋보이는 한글 비주얼 설명",
-    "productPosition": "center",
-    "productSize": "medium"
-  }
-]`;
+## 출력 형식 (JSON) - 설명 없이 JSON만 출력하세요.
+- **CRITICAL**: 아래 정의된 "sections" 배열에는 **정확히 ${lengthCount}개**의 섹션 객체가 포함되어야 합니다. (임의로 줄이거나 늘리지 마세요)
+
+{
+  "summary": "전체 솔루션을 아우르는 1-2문장의 함축적이고 매력적인 요약 문구 (썸네일 카드 노출용)",
+  "sections": [
+    {
+      "id": "section-1",
+      "title": "기획 섹션 제목",
+      "logicalSections": ["Mechanism"],
+      "keyMessage": "핵심 한글 카피",
+      "visualPrompt": "비주얼 가이드라인을 준수한 한글 상세 묘사",
+      "productPosition": "none",
+      "productSize": "none"
+    }
+  ]
+}`;
 
         const text = await this.generateWithFallback(prompt, "대한민국 상세페이지 전략가 모드 (한글 100% 필수)", 0.7);
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
 
         if (jsonMatch) {
             try {
                 return JSON.parse(jsonMatch[0]);
             } catch (e) {
                 console.error("Failed to parse JSON response", e);
-                return [];
+                return { summary: '', sections: [] };
             }
         }
         throw new Error('상세페이지 기획안 생성에 실패했습니다.');
@@ -712,6 +728,7 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
         keyMessage: string;
         referenceImage?: string; // Base64
         aspectRatio?: "9:16" | "1:1";
+        isStemCellSolution?: boolean;
     }): Promise<string> {
         if (!process.env.GEMINI_API_KEY) {
             throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.');
@@ -737,9 +754,13 @@ ${input.gender ? `- 성별: ${input.gender}` : ''}
                     ]
                 });
 
+                const basePrefix = input.isStemCellSolution
+                    ? `High quality professional Medical and clinical photography. Focus on healing environments, professional procedures, and microscopic cell recovery. ABSOLUTELY NO product bottles, no packaging, no retail containers.`
+                    : `High quality e-commerce product photography.`;
+
                 const promptParts: any[] = [
                     {
-                        text: `High quality e-commerce product photography. ${input.prompt}. 
+                        text: `${basePrefix} ${input.prompt}. 
 CRITICAL: Please overlay the following Korean text clearly on the image in a stylish typography: "${input.keyMessage}".
 The overall style should be premium, clean, and reflect a "Recovery" theme.
 Aspect Ratio: ${input.aspectRatio || "9:16"}`

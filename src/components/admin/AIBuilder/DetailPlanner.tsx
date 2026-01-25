@@ -387,7 +387,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                 isFunding: info.isFunding,
                 stock: 999,
                 status: 'active',
-                approvalStatus: mode === 'partner' ? 'pending' : 'approved' // 파트너는 승인 대기, 어드민은 즉시 승인
+                approvalStatus: mode === 'partner' ? 'pending' : 'approved', // 파트너는 승인 대기, 어드민은 즉시 승인
             };
 
             // mode에 따라 상품 등록 API 엔드포인트를 분기
@@ -615,76 +615,78 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                             )}
                         </button>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+            }
 
-            {step === 2 && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-slate-900">AI 기획 전략 초안</h2>
-                        <button
-                            onClick={() => setStep(1)}
-                            className="text-sm font-bold text-slate-400 hover:text-slate-600"
-                        >
-                            정보 수정
-                        </button>
-                    </div>
+            {
+                step === 2 && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-slate-900">AI 기획 전략 초안</h2>
+                            <button
+                                onClick={() => setStep(1)}
+                                className="text-sm font-bold text-slate-400 hover:text-slate-600"
+                            >
+                                정보 수정
+                            </button>
+                        </div>
 
-                    <div className="space-y-4">
-                        {segments.map((seg, idx) => (
-                            <div key={seg.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                                <div className="p-1 bg-slate-50 flex border-b border-slate-100">
-                                    <div className="px-4 py-2 text-xs font-bold text-slate-400">PAGE {idx + 1}</div>
-                                </div>
-                                <div className="p-6 grid md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex flex-wrap gap-2">
-                                                {seg.logicalSections.map((tag, tIdx) => (
-                                                    <span key={tIdx} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase">
-                                                        {tag}
-                                                    </span>
-                                                ))}
+                        <div className="space-y-4">
+                            {segments.map((seg, idx) => (
+                                <div key={seg.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                                    <div className="p-1 bg-slate-50 flex border-b border-slate-100">
+                                        <div className="px-4 py-2 text-xs font-bold text-slate-400">PAGE {idx + 1}</div>
+                                    </div>
+                                    <div className="p-6 grid md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {seg.logicalSections.map((tag, tIdx) => (
+                                                        <span key={tIdx} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase">
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <button
+                                                    onClick={() => handleRegenerateSegment(seg.id)}
+                                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                    title="기획안 다시 짜기"
+                                                >
+                                                    <RefreshCw size={14} className={seg.isGenerating ? 'animate-spin' : ''} />
+                                                </button>
                                             </div>
-                                            <button
-                                                onClick={() => handleRegenerateSegment(seg.id)}
-                                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                                                title="기획안 다시 짜기"
-                                            >
-                                                <RefreshCw size={14} className={seg.isGenerating ? 'animate-spin' : ''} />
-                                            </button>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Key Copy</label>
+                                                <input
+                                                    type="text"
+                                                    value={seg.keyMessage}
+                                                    onChange={(e) => updateSegment(seg.id, 'keyMessage', e.target.value)}
+                                                    className="w-full px-0 py-2 text-lg font-bold text-slate-800 border-b-2 border-transparent bg-white focus:border-blue-400 outline-none transition-all placeholder:text-slate-300"
+                                                    placeholder="섹션의 핵심 메시지를 입력하세요"
+                                                />
+                                            </div>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Key Copy</label>
-                                            <input
-                                                type="text"
-                                                value={seg.keyMessage}
-                                                onChange={(e) => updateSegment(seg.id, 'keyMessage', e.target.value)}
-                                                className="w-full px-0 py-2 text-lg font-bold text-slate-800 border-b-2 border-transparent bg-white focus:border-blue-400 outline-none transition-all placeholder:text-slate-300"
-                                                placeholder="섹션의 핵심 메시지를 입력하세요"
+                                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Visual Prompt</label>
+                                            <textarea
+                                                value={seg.visualPrompt}
+                                                onChange={(e) => updateSegment(seg.id, 'visualPrompt', e.target.value)}
+                                                rows={2}
+                                                className="w-full p-3 text-sm text-slate-600 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-blue-100 outline-none resize-none transition-all"
+                                                placeholder="화면 구성을 설명하는 프롬프트"
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Visual Prompt</label>
-                                        <textarea
-                                            value={seg.visualPrompt}
-                                            onChange={(e) => updateSegment(seg.id, 'visualPrompt', e.target.value)}
-                                            rows={2}
-                                            className="w-full p-3 text-sm text-slate-600 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-blue-100 outline-none resize-none transition-all"
-                                            placeholder="화면 구성을 설명하는 프롬프트"
-                                        />
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
 
-                    <div className="sticky bottom-8 flex justify-center pt-16 pb-8 z-50">
-                        <button
-                            onClick={generateAllImages}
-                            disabled={isGeneratingImages}
-                            className={`
+                        <div className="sticky bottom-8 flex justify-center pt-16 pb-8 z-50">
+                            <button
+                                onClick={generateAllImages}
+                                disabled={isGeneratingImages}
+                                className={`
                                 relative group overflow-hidden px-20 py-7 
                                 bg-gradient-to-r from-orange-500 via-rose-500 to-purple-600 
                                 hover:from-orange-600 hover:via-rose-600 hover:to-purple-700 
@@ -697,76 +699,78 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 ring-12 ring-rose-50/50
                                 animate-bounce-subtle
                             `}
-                        >
-                            <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-full" />
-                            {isGeneratingImages ? (
-                                <>
-                                    <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>상세 이미지 AI 생성 중...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="relative z-10 drop-shadow-lg">✨ 위 기획으로 상세페이지 이미지 생성 시작하기</span>
-                                    <div className="bg-white/20 p-2.5 rounded-2xl group-hover:rotate-12 transition-transform shadow-inner">
-                                        <RefreshCw size={28} />
-                                    </div>
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === 3 && (
-                <div className="space-y-12 animate-in zoom-in duration-500">
-                    <div className="flex flex-col md:flex-row items-center justify-between no-print gap-4">
-                        <h2 className="text-2xl font-bold text-slate-900">생성된 상세페이지</h2>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            <button
-                                onClick={() => setStep(2)}
-                                className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-all"
                             >
-                                기획 수정
-                            </button>
-                            <button
-                                className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
-                                onClick={handleDownloadAsImage}
-                            >
-                                <Download size={16} /> 상세 이미지 다운로드
+                                <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-full" />
+                                {isGeneratingImages ? (
+                                    <>
+                                        <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>상세 이미지 AI 생성 중...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="relative z-10 drop-shadow-lg">✨ 위 기획으로 상세페이지 이미지 생성 시작하기</span>
+                                        <div className="bg-white/20 p-2.5 rounded-2xl group-hover:rotate-12 transition-transform shadow-inner">
+                                            <RefreshCw size={28} />
+                                        </div>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
+                )
+            }
 
-                    <div id="detail-page-container" className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 print-image-container">
-                        {segments.map((seg) => (
-                            <div key={seg.id} className="relative w-full aspect-[9/16] bg-slate-100 group">
-                                {seg.imageUrl ? (
-                                    <>
-                                        <img
-                                            src={seg.imageUrl.startsWith('data:') ? seg.imageUrl : (seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`)}
-                                            alt={seg.title}
-                                            className="w-full h-full object-cover block"
-                                            crossOrigin="anonymous"
-                                        />
-                                        <button
-                                            onClick={() => handleRegenerateImage(seg.id)}
-                                            className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg text-slate-600 hover:text-blue-600 no-print transition-all opacity-0 group-hover:opacity-100"
-                                            title="이미지 다시 생성"
-                                        >
-                                            <RefreshCw size={18} className={seg.isGenerating ? 'animate-spin' : ''} />
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center space-y-3 no-print">
-                                        <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
-                                        <p className="text-sm font-bold text-slate-500">이미지 생성 중...</p>
-                                    </div>
-                                )}
+            {
+                step === 3 && (
+                    <div className="space-y-12 animate-in zoom-in duration-500">
+                        <div className="flex flex-col md:flex-row items-center justify-between no-print gap-4">
+                            <h2 className="text-2xl font-bold text-slate-900">생성된 상세페이지</h2>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                <button
+                                    onClick={() => setStep(2)}
+                                    className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-all"
+                                >
+                                    기획 수정
+                                </button>
+                                <button
+                                    className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
+                                    onClick={handleDownloadAsImage}
+                                >
+                                    <Download size={16} /> 상세 이미지 다운로드
+                                </button>
                             </div>
-                        ))}
-                    </div>
+                        </div>
 
-                    <style jsx global>{`
+                        <div id="detail-page-container" className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 print-image-container">
+                            {segments.map((seg) => (
+                                <div key={seg.id} className="relative w-full aspect-[9/16] bg-slate-100 group">
+                                    {seg.imageUrl ? (
+                                        <>
+                                            <img
+                                                src={seg.imageUrl.startsWith('data:') ? seg.imageUrl : (seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`)}
+                                                alt={seg.title}
+                                                className="w-full h-full object-cover block"
+                                                crossOrigin="anonymous"
+                                            />
+                                            <button
+                                                onClick={() => handleRegenerateImage(seg.id)}
+                                                className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg text-slate-600 hover:text-blue-600 no-print transition-all opacity-0 group-hover:opacity-100"
+                                                title="이미지 다시 생성"
+                                            >
+                                                <RefreshCw size={18} className={seg.isGenerating ? 'animate-spin' : ''} />
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center space-y-3 no-print">
+                                            <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+                                            <p className="text-sm font-bold text-slate-500">이미지 생성 중...</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        <style jsx global>{`
                         @media print {
                             body * {
                                 visibility: hidden;
@@ -798,10 +802,10 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                         }
                     `}</style>
 
-                    <div className="text-center pt-10 no-print flex flex-col items-center gap-4">
-                        <button
-                            onClick={() => setStep(4)}
-                            className={`
+                        <div className="text-center pt-10 no-print flex flex-col items-center gap-4">
+                            <button
+                                onClick={() => setStep(4)}
+                                className={`
                                 relative group overflow-hidden px-16 py-6 
                                 bg-gradient-to-r from-blue-600 to-indigo-700 
                                 hover:from-blue-700 hover:to-indigo-800 
@@ -811,76 +815,78 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 transition-all duration-300 flex items-center gap-4
                                 ring-8 ring-blue-50/50
                             `}
-                        >
-                            <span className="relative z-10">상세페이지 완료 및 썸네일 생성하기 →</span>
-                            <div className="bg-white/20 p-1.5 rounded-lg group-hover:translate-x-1 transition-transform">
-                                <RefreshCw size={18} />
-                            </div>
-                        </button>
-                        <button
-                            onClick={() => setStep(1)}
-                            className="text-slate-400 text-sm font-bold hover:underline"
-                        >
-                            처음으로 돌아가기
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === 4 && (
-                <div className="space-y-8 animate-in slide-in-from-right duration-500">
-                    <div className="text-center space-y-2">
-                        <h2 className="text-3xl font-extrabold text-slate-900">AI 썸네일 생성</h2>
-                        <p className="text-slate-500">상품의 첫인상을 결정할 프리미엄 썸네일을 만듭니다.</p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-8 items-start">
-                        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-6">
-                            <div className="space-y-4">
-                                <label className="block text-sm font-bold text-slate-700">디자인 스타일</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {[
-                                        { id: 'premium', label: '프리미엄' },
-                                        { id: 'lifestyle', label: '라이프스타일' },
-                                        { id: 'clean', label: '깔끔한' },
-                                        { id: 'creative', label: '크리에이티브' }
-                                    ].map(s => (
-                                        <button
-                                            key={s.id}
-                                            onClick={() => setThumbnailOptions({ ...thumbnailOptions, style: s.id })}
-                                            className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${thumbnailOptions.style === s.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-50 bg-slate-50 text-slate-500 hover:border-slate-100'}`}
-                                        >
-                                            {s.label}
-                                        </button>
-                                    ))}
+                            >
+                                <span className="relative z-10">상세페이지 완료 및 썸네일 생성하기 →</span>
+                                <div className="bg-white/20 p-1.5 rounded-lg group-hover:translate-x-1 transition-transform">
+                                    <RefreshCw size={18} />
                                 </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                    <span className="text-sm font-bold text-slate-700">모델(사람) 포함</span>
-                                    <input
-                                        type="checkbox"
-                                        checked={thumbnailOptions.includeModel}
-                                        onChange={e => setThumbnailOptions({ ...thumbnailOptions, includeModel: e.target.checked })}
-                                        className="w-6 h-6 accent-blue-600"
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                    <span className="text-sm font-bold text-slate-700">상품명 텍스트 포함</span>
-                                    <input
-                                        type="checkbox"
-                                        checked={thumbnailOptions.addText}
-                                        onChange={e => setThumbnailOptions({ ...thumbnailOptions, addText: e.target.checked })}
-                                        className="w-6 h-6 accent-blue-600"
-                                    />
-                                </div>
-                            </div>
-
+                            </button>
                             <button
-                                onClick={handleGenerateThumbnail}
-                                disabled={isGeneratingThumbnail}
-                                className={`
+                                onClick={() => setStep(1)}
+                                className="text-slate-400 text-sm font-bold hover:underline"
+                            >
+                                처음으로 돌아가기
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                step === 4 && (
+                    <div className="space-y-8 animate-in slide-in-from-right duration-500">
+                        <div className="text-center space-y-2">
+                            <h2 className="text-3xl font-extrabold text-slate-900">AI 썸네일 생성</h2>
+                            <p className="text-slate-500">상품의 첫인상을 결정할 프리미엄 썸네일을 만듭니다.</p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-8 items-start">
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-6">
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-bold text-slate-700">디자인 스타일</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { id: 'premium', label: '프리미엄' },
+                                            { id: 'lifestyle', label: '라이프스타일' },
+                                            { id: 'clean', label: '깔끔한' },
+                                            { id: 'creative', label: '크리에이티브' }
+                                        ].map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setThumbnailOptions({ ...thumbnailOptions, style: s.id })}
+                                                className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${thumbnailOptions.style === s.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-50 bg-slate-50 text-slate-500 hover:border-slate-100'}`}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                                        <span className="text-sm font-bold text-slate-700">모델(사람) 포함</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={thumbnailOptions.includeModel}
+                                            onChange={e => setThumbnailOptions({ ...thumbnailOptions, includeModel: e.target.checked })}
+                                            className="w-6 h-6 accent-blue-600"
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                                        <span className="text-sm font-bold text-slate-700">상품명 텍스트 포함</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={thumbnailOptions.addText}
+                                            onChange={e => setThumbnailOptions({ ...thumbnailOptions, addText: e.target.checked })}
+                                            className="w-6 h-6 accent-blue-600"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={handleGenerateThumbnail}
+                                    disabled={isGeneratingThumbnail}
+                                    className={`
                                     w-full py-5 rounded-2xl font-black text-xl 
                                     bg-gradient-to-r from-blue-600 to-indigo-700 
                                     hover:from-blue-700 hover:to-indigo-800 
@@ -888,56 +894,56 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                     transition-all duration-300 flex items-center justify-center gap-4
                                     disabled:opacity-50
                                 `}
-                            >
-                                {isGeneratingThumbnail ? (
+                                >
+                                    {isGeneratingThumbnail ? (
+                                        <>
+                                            <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span>AI가 프리미엄 썸네일 생성 중...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>✨ 썸네일 생성하기</span>
+                                            <div className="bg-white/20 p-1.5 rounded-lg hover:rotate-12 transition-transform">
+                                                <RefreshCw size={18} />
+                                            </div>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            <div className="aspect-square bg-slate-900 rounded-3xl overflow-hidden shadow-2xl relative flex items-center justify-center">
+                                {thumbnailImage ? (
                                     <>
-                                        <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>AI가 프리미엄 썸네일 생성 중...</span>
+                                        <img src={thumbnailImage} alt="Thumbnail" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                        <button
+                                            onClick={handleGenerateThumbnail}
+                                            className="absolute top-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all"
+                                        >
+                                            <RefreshCw size={20} className={isGeneratingThumbnail ? 'animate-spin' : ''} />
+                                        </button>
                                     </>
                                 ) : (
-                                    <>
-                                        <span>✨ 썸네일 생성하기</span>
-                                        <div className="bg-white/20 p-1.5 rounded-lg hover:rotate-12 transition-transform">
-                                            <RefreshCw size={18} />
+                                    <div className="text-center space-y-4">
+                                        <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto">
+                                            <div className="w-8 h-8 text-slate-600">🖼️</div>
                                         </div>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-
-                        <div className="aspect-square bg-slate-900 rounded-3xl overflow-hidden shadow-2xl relative flex items-center justify-center">
-                            {thumbnailImage ? (
-                                <>
-                                    <img src={thumbnailImage} alt="Thumbnail" className="w-full h-full object-cover" crossOrigin="anonymous" />
-                                    <button
-                                        onClick={handleGenerateThumbnail}
-                                        className="absolute top-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all"
-                                    >
-                                        <RefreshCw size={20} className={isGeneratingThumbnail ? 'animate-spin' : ''} />
-                                    </button>
-                                </>
-                            ) : (
-                                <div className="text-center space-y-4">
-                                    <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto">
-                                        <div className="w-8 h-8 text-slate-600">🖼️</div>
+                                        <p className="text-slate-500 font-bold">생성된 썸네일이 여기에 표시됩니다</p>
                                     </div>
-                                    <p className="text-slate-500 font-bold">생성된 썸네일이 여기에 표시됩니다</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="pt-8 flex justify-center gap-4">
-                        <button
-                            onClick={() => setStep(3)}
-                            className="px-8 py-3 text-slate-400 font-bold hover:text-slate-600"
-                        >
-                            이전으로
-                        </button>
-                        <button
-                            onClick={handleRegisterProduct}
-                            disabled={!thumbnailImage || isRegistering}
-                            className={`
+                        <div className="pt-8 flex justify-center gap-4">
+                            <button
+                                onClick={() => setStep(3)}
+                                className="px-8 py-3 text-slate-400 font-bold hover:text-slate-600"
+                            >
+                                이전으로
+                            </button>
+                            <button
+                                onClick={handleRegisterProduct}
+                                disabled={!thumbnailImage || isRegistering}
+                                className={`
                                 relative group overflow-hidden px-16 py-6 
                                 bg-gradient-to-r from-blue-600 to-indigo-700 
                                 hover:from-blue-700 hover:to-indigo-800 
@@ -949,72 +955,75 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                 ring-8 ring-blue-50/50
                                 ${!isRegistering && thumbnailImage ? 'animate-bounce-subtle' : ''}
                             `}
-                        >
-                            <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-500 ease-in-out -skew-x-12 -translate-x-full" />
-                            {isRegistering ? (
-                                <>
-                                    <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>AI 상품 등록 중...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="relative z-10">🚀 쇼핑몰에 최종 출시하기</span>
-                                    <div className="bg-white/20 p-2 rounded-xl group-hover:rotate-12 transition-transform">
-                                        <Download size={24} className="rotate-180" />
-                                    </div>
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === 5 && (
-                <div className="text-center py-12 space-y-8 animate-in zoom-in duration-500">
-                    <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4">
-                        ✅
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-4xl font-extrabold text-slate-900">상품 등록 완료!</h2>
-                        <p className="text-slate-500 text-lg">AI가 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl max-w-xl mx-auto space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <button
-                                onClick={handleDownloadAll}
-                                className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
                             >
-                                <div className="text-2xl group-hover:scale-110 transition-transform">📥</div>
-                                <div className="font-bold text-slate-800">이미지 저장</div>
-                            </button>
-                            <button
-                                onClick={() => window.print()}
-                                className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
-                            >
-                                <div className="text-2xl group-hover:scale-110 transition-transform">📄</div>
-                                <div className="font-bold text-slate-800">PDF 기획서 소장</div>
-                            </button>
-                        </div>
-
-                        <div className="pt-4 space-y-3">
-                            <a
-                                href="/admin/products"
-                                className="block w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100"
-                            >
-                                상품 관리 페이지로 이동
-                            </a>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="block w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all"
-                            >
-                                새로운 상품 기획하기
+                                <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-500 ease-in-out -skew-x-12 -translate-x-full" />
+                                {isRegistering ? (
+                                    <>
+                                        <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>AI 상품 등록 중...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="relative z-10">🚀 쇼핑몰에 최종 출시하기</span>
+                                        <div className="bg-white/20 p-2 rounded-xl group-hover:rotate-12 transition-transform">
+                                            <Download size={24} className="rotate-180" />
+                                        </div>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+
+            {
+                step === 5 && (
+                    <div className="text-center py-12 space-y-8 animate-in zoom-in duration-500">
+                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4">
+                            ✅
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-4xl font-extrabold text-slate-900">상품 등록 완료!</h2>
+                            <p className="text-slate-500 text-lg">AI가 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
+                        </div>
+
+                        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl max-w-xl mx-auto space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    onClick={handleDownloadAll}
+                                    className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
+                                >
+                                    <div className="text-2xl group-hover:scale-110 transition-transform">📥</div>
+                                    <div className="font-bold text-slate-800">이미지 저장</div>
+                                </button>
+                                <button
+                                    onClick={() => window.print()}
+                                    className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
+                                >
+                                    <div className="text-2xl group-hover:scale-110 transition-transform">📄</div>
+                                    <div className="font-bold text-slate-800">PDF 기획서 소장</div>
+                                </button>
+                            </div>
+
+                            <div className="pt-4 space-y-3">
+                                <a
+                                    href="/admin/products"
+                                    className="block w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100"
+                                >
+                                    상품 관리 페이지로 이동
+                                </a>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="block w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all"
+                                >
+                                    새로운 상품 기획하기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div >
     );
 };
 

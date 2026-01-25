@@ -195,7 +195,7 @@ export default function RecommendationSection({
     items.forEach(item => observer.observe(item));
 
     return () => observer.disconnect();
-  }, [currentItems]); // handleItemView 제거
+  }, [currentItems, handleItemView]);
 
   if (loading) {
     return (

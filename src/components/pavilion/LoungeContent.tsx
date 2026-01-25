@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
     Lock,
     ArrowRight,
@@ -21,13 +22,17 @@ import {
     Crown,
     ScrollText,
     HeartPulse,
-    UserCircle2
+    UserCircle2,
+    Dna,
+    Home
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import LoungeLegacySection from './LoungeLegacySection';
+import LoungeProductTab from './LoungeProductTab';
 
 interface LoungeContentProps {
     owners: any[];
@@ -37,6 +42,8 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
     const { data: session } = useSession();
     const [step, setStep] = useState('MAIN'); // MAIN, FORM, LOADING, RESULT, SUBMITTED
     const [formStep, setFormStep] = useState(1);
+    const [activeTab, setActiveTab] = useState('lounge-home');
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
     // Wire real data from owners[0]
     const master = owners?.[0];
@@ -58,7 +65,6 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
         total: parseInt(masterSpecs.totalSlots || '50')
     });
 
-    // Unified AI plan synchronization (Local + Server)
     // Unified AI plan synchronization (Local + Server)
     useEffect(() => {
         // 1. Instant sync from local storage (No dependencies)
@@ -97,6 +103,15 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
             syncFromServer();
         }
     }, [session]);
+
+    // Update active tab based on query param
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        const tab = searchParams?.get('tab');
+        if (tab && (tab === 'lounge-home' || tab === 'stem-cell-products')) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     // Save newly generated plans to local storage
     useEffect(() => {
@@ -186,97 +201,135 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
         }
     };
 
+    const handleTabChange = (value: string) => {
+        console.log('[Lounge] Tab changed to:', value);
+        setActiveTab(value);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     if (step === 'MAIN') {
         return (
-            <div className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto animate-in fade-in duration-1000 pt-48 md:pt-0">
+            <div ref={scrollContainerRef} className="absolute inset-0 z-30 bg-luxury-silk overflow-y-auto animate-in fade-in duration-1000 pt-48 md:pt-0">
                 <div className="container mx-auto px-4 py-12 md:py-20">
                     <section className="max-w-6xl mx-auto">
-                        <div className="flex flex-col lg:flex-row gap-16 items-center">
-                            {/* Left: Visual Content */}
-                            <div className="flex-1 relative w-full aspect-[4/5] rounded-[60px] overflow-hidden luxury-shadow luxury-border">
-                                <Image
-                                    src="/images/kim-mijeong-profile.jpg"
-                                    alt="Representative Director"
-                                    fill
-                                    className="object-cover"
-                                    priority
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-luxury-navy via-transparent to-transparent opacity-60" />
-                                <div className="absolute bottom-10 left-10 right-10 flex justify-between items-end">
-                                    <div className="space-y-1">
-                                        <h3 className="text-white text-3xl font-black italic">{master?.name || 'Mijeong Kim'}</h3>
-                                        <p className="text-luxury-gold text-xs font-black uppercase tracking-widest">{master?.role || 'Representative Director'}</p>
-                                    </div>
-                                    <Badge className="bg-luxury-gold text-luxury-navy border-none font-black px-6 py-2 rounded-full text-[10px] tracking-[0.2em]">
-                                        PRINCIPAL
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            {/* Right: Content & Action */}
-                            <div className="flex-1 space-y-10">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-[2px] bg-luxury-gold" />
-                                        <span className="text-xs font-black luxury-gold-text uppercase tracking-[0.4em]">원장 전용 프라이빗 라운지</span>
-                                    </div>
-                                    <h1 className="text-5xl md:text-7xl font-black text-luxury-navy tracking-tighter leading-[0.9] italic">
-                                        {masterSpecs.introTitle || 'Secret Recovery Lab'}
-                                    </h1>
-                                </div>
-
-                                <div className="space-y-6 text-slate-600 font-medium leading-relaxed md:text-lg">
-                                    <p>
-                                        {master?.bio || '유니클의 정점, 김미정 원장 1:1 컨시어지입니다.'}
-                                    </p>
-                                    <p className="text-sm opacity-70">
-                                        {masterSpecs.welcomeMessage || '당신만의 완벽한 회복 여정을 위한 모든 아이템을 조율합니다.'}
-                                    </p>
-                                </div>
-
-                                <div className="pt-6 space-y-8">
-                                    <div className="flex items-center gap-6">
-                                        <div className="space-y-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">이번 달 수용량</p>
-                                            <p className="text-xl font-black text-luxury-navy">{slots.occupied} / {slots.total} <span className="text-xs text-luxury-gold">슬롯 사용됨</span></p>
-                                        </div>
-                                        {slots.occupied < slots.total ? (
-                                            <div className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2">
-                                                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                                신규 신청 가능
-                                            </div>
-                                        ) : (
-                                            <div className="bg-red-50 text-red-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100 animate-pulse">
-                                                대기열 운영 중
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <Button
-                                        onClick={() => aiPlans ? setStep('RESULT') : setStep('FORM')}
-                                        className="w-full md:w-auto px-12 h-20 bg-luxury-navy text-white rounded-[32px] font-black text-lg uppercase tracking-widest shadow-2xl shadow-luxury-navy/20 transition-all hover:scale-105 active:scale-95 group"
+                        {/* 탭 네비게이션 */}
+                        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+                            <div className="flex justify-center mb-12 relative z-50">
+                                <TabsList className="bg-white/50 backdrop-blur-md p-2 rounded-full border border-slate-100 shadow-lg pointer-events-auto">
+                                    <TabsTrigger
+                                        value="lounge-home"
+                                        className="data-[state=active]:bg-luxury-navy data-[state=active]:text-white rounded-full px-8 py-3 font-black text-xs uppercase tracking-widest transition-all"
                                     >
-                                        {aiPlans ? '나의 맞춤 회복 플랜 확인하기' : '나만의 맞춤 회복 플랜 설계하기'} <ArrowRight className="ml-4 w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                                    </Button>
-
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
-                                        * Personal Recovery Protocol & Custom Curation
-                                    </p>
-                                </div>
+                                        <Home className="w-4 h-4 mr-2" />
+                                        라운지 홈
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="stem-cell-products"
+                                        className="data-[state=active]:bg-luxury-gold data-[state=active]:text-luxury-navy rounded-full px-8 py-3 font-black text-xs uppercase tracking-widest transition-all"
+                                    >
+                                        <Dna className="w-4 h-4 mr-2" />
+                                        줄기세포 솔루션
+                                    </TabsTrigger>
+                                </TabsList>
                             </div>
-                        </div>
 
-                        {/* Integration of Legacy Content (Profile, Consultation, Philosophy, FAQ) */}
-                        <LoungeLegacySection
-                            master={master}
-                            session={session}
-                            subscriptionActive={!!(session?.user && (session.user as any).subscription?.status === 'active')}
-                            aiPlans={aiPlans}
-                            onShowResults={aiPlans ? () => {
-                                setStep('RESULT');
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                            } : undefined}
-                        />
+                            {/* 라운지 홈 탭 */}
+                            <TabsContent value="lounge-home" className="mt-0">
+                                <div className="flex flex-col lg:flex-row gap-16 items-center">
+                                    {/* Left: Visual Content */}
+                                    <div className="flex-1 relative w-full aspect-[4/5] rounded-[60px] overflow-hidden luxury-shadow luxury-border">
+                                        <Image
+                                            src="/images/kim-mijeong-profile.jpg"
+                                            alt="Representative Director"
+                                            fill
+                                            className="object-cover"
+                                            priority
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-luxury-navy via-transparent to-transparent opacity-60" />
+                                        <div className="absolute bottom-10 left-10 right-10 flex justify-between items-end">
+                                            <div className="space-y-1">
+                                                <h3 className="text-white text-3xl font-black italic">{master?.name || 'Mijeong Kim'}</h3>
+                                                <p className="text-luxury-gold text-xs font-black uppercase tracking-widest">{master?.role || 'Representative Director'}</p>
+                                            </div>
+                                            <Badge className="bg-luxury-gold text-luxury-navy border-none font-black px-6 py-2 rounded-full text-[10px] tracking-[0.2em]">
+                                                PRINCIPAL
+                                            </Badge>
+                                        </div>
+                                    </div>
+
+                                    {/* Right: Content & Action */}
+                                    <div className="flex-1 space-y-10">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-[2px] bg-luxury-gold" />
+                                                <span className="text-xs font-black luxury-gold-text uppercase tracking-[0.4em]">원장 전용 프라이빗 라운지</span>
+                                            </div>
+                                            <h1 className="text-5xl md:text-7xl font-black text-luxury-navy tracking-tighter leading-[0.9] italic">
+                                                {masterSpecs.introTitle || 'Secret Recovery Lab'}
+                                            </h1>
+                                        </div>
+
+                                        <div className="space-y-6 text-slate-600 font-medium leading-relaxed md:text-lg">
+                                            <p>
+                                                {master?.bio || '유니클의 정점, 김미정 원장 1:1 컨시어지입니다.'}
+                                            </p>
+                                            <p className="text-sm opacity-70">
+                                                {masterSpecs.welcomeMessage || '당신만의 완벽한 회복 여정을 위한 모든 아이템을 조율합니다.'}
+                                            </p>
+                                        </div>
+
+                                        <div className="pt-6 space-y-8">
+                                            <div className="flex items-center gap-6">
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">이번 달 수용량</p>
+                                                    <p className="text-xl font-black text-luxury-navy">{slots.occupied} / {slots.total} <span className="text-xs text-luxury-gold">슬롯 사용됨</span></p>
+                                                </div>
+                                                {slots.occupied < slots.total ? (
+                                                    <div className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2">
+                                                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                                                        신규 신청 가능
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-red-50 text-red-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100 animate-pulse">
+                                                        대기열 운영 중
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <Button
+                                                onClick={() => aiPlans ? setStep('RESULT') : setStep('FORM')}
+                                                className="w-full md:w-auto px-12 h-20 bg-luxury-navy text-white rounded-[32px] font-black text-lg uppercase tracking-widest shadow-2xl shadow-luxury-navy/20 transition-all hover:scale-105 active:scale-95 group"
+                                            >
+                                                {aiPlans ? '나의 맞춤 회복 플랜 확인하기' : '나만의 맞춤 회복 플랜 설계하기'} <ArrowRight className="ml-4 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                                            </Button>
+
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+                                                * Personal Recovery Protocol & Custom Curation
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Integration of Legacy Content (Profile, Consultation, Philosophy, FAQ) */}
+                                <LoungeLegacySection
+                                    master={master}
+                                    session={session}
+                                    subscriptionActive={!!(session?.user && (session.user as any).subscription?.status === 'active')}
+                                    aiPlans={aiPlans}
+                                    onShowResults={aiPlans ? () => {
+                                        setStep('RESULT');
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    } : undefined}
+                                />
+                            </TabsContent>
+
+                            {/* 줄기세포 솔루션 탭 */}
+                            <TabsContent value="stem-cell-products" className="mt-0">
+                                <LoungeProductTab category="줄기세포" />
+                            </TabsContent>
+                        </Tabs>
                     </section>
                 </div>
             </div>

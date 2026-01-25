@@ -39,9 +39,11 @@ interface Question {
 interface QuestionSectionProps {
   productId: string;
   productName: string;
+  forceShowForm?: boolean;
+  onFormShown?: () => void;
 }
 
-export default function QuestionSection({ productId, productName }: QuestionSectionProps) {
+export default function QuestionSection({ productId, productName, forceShowForm, onFormShown }: QuestionSectionProps) {
   const { data: session } = useSession();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,13 @@ export default function QuestionSection({ productId, productName }: QuestionSect
   const [submitting, setSubmitting] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    if (forceShowForm) {
+      setShowForm(true);
+      if (onFormShown) onFormShown();
+    }
+  }, [forceShowForm]);
 
   // 문의 폼 상태
   const [formData, setFormData] = useState({
@@ -178,7 +187,7 @@ export default function QuestionSection({ productId, productName }: QuestionSect
             {productName}에 대한 문의사항을 남겨주세요
           </p>
         </div>
-        
+
         {session?.user && (
           <Button
             onClick={() => setShowForm(!showForm)}
@@ -352,11 +361,10 @@ export default function QuestionSection({ productId, productName }: QuestionSect
                           <span className="font-medium text-blue-900">
                             {answer.userId.name}
                           </span>
-                          <Badge className={`text-xs ${
-                            answer.isOfficial 
-                              ? 'bg-blue-100 text-blue-800' 
+                          <Badge className={`text-xs ${answer.isOfficial
+                              ? 'bg-blue-100 text-blue-800'
                               : 'bg-gray-100 text-gray-800'
-                          }`}>
+                            }`}>
                             {answer.isOfficial ? '공식 답변' : '일반 답변'}
                           </Badge>
                           <span className="text-sm text-blue-600">

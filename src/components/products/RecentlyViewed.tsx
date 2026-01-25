@@ -13,6 +13,8 @@ interface Product {
   _id: string;
   name: string;
   price: number;
+  minPrice?: number;
+  maxPrice?: number;
   originalPrice?: number;
   images: Array<{
     url: string;
@@ -58,16 +60,16 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
   const saveRecentlyViewed = (product: Product) => {
     const saved = localStorage.getItem('recentlyViewed');
     let products = saved ? JSON.parse(saved) : [];
-    
+
     // 중복 제거
     products = products.filter((p: Product) => p._id !== product._id);
-    
+
     // 맨 앞에 추가
     products.unshift(product);
-    
+
     // 최대 20개까지 저장
     products = products.slice(0, 20);
-    
+
     localStorage.setItem('recentlyViewed', JSON.stringify(products));
     setProducts(products);
   };
@@ -189,7 +191,7 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
                         )}
                       </div>
                     </Link>
-                    
+
                     {/* 삭제 버튼 */}
                     <Button
                       variant="destructive"
@@ -214,35 +216,41 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
                       </Badge>
                     )}
                   </div>
-                  
+
                   <div className="mt-3 space-y-2">
                     {/* 카테고리 */}
                     <Badge variant="outline" className="text-xs">
                       {product.category}
                     </Badge>
-                    
+
                     {/* 상품명 */}
                     <h4 className="font-medium text-sm line-clamp-2">
-                      <Link 
+                      <Link
                         href={`/products/${product._id}`}
                         className="hover:text-blue-600 transition-colors"
                       >
                         {product.name}
                       </Link>
                     </h4>
-                    
+
                     {/* 가격 */}
                     <div>
                       <div className="font-bold text-blue-600">
-                        {formatPrice(product.price)}
+                        {product.category === 'stem-cell' && (product.minPrice || product.maxPrice) ? (
+                          <>
+                            {formatPrice(product.minPrice || 0)} ~ {formatPrice(product.maxPrice || 0)}
+                          </>
+                        ) : (
+                          formatPrice(product.price)
+                        )}
                       </div>
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.originalPrice && product.originalPrice > product.price && product.category !== 'stem-cell' && (
                         <div className="text-xs text-gray-500 line-through">
                           {formatPrice(product.originalPrice)}
                         </div>
                       )}
                     </div>
-                    
+
                     {/* 장바구니 버튼 */}
                     <Button
                       size="sm"
@@ -268,15 +276,15 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
 export function addToRecentlyViewed(product: Product) {
   const saved = localStorage.getItem('recentlyViewed');
   let products = saved ? JSON.parse(saved) : [];
-  
+
   // 중복 제거
   products = products.filter((p: Product) => p._id !== product._id);
-  
+
   // 맨 앞에 추가
   products.unshift(product);
-  
+
   // 최대 20개까지 저장
   products = products.slice(0, 20);
-  
+
   localStorage.setItem('recentlyViewed', JSON.stringify(products));
 }

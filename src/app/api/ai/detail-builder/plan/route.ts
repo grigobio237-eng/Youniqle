@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { name, category, price, keywords, promotion, targetGender, targetAge, length, referenceImage, isFunding } = body;
+        const { name, category, price, keywords, promotion, targetGender, targetAge, length, referenceImage, isFunding, isStemCellSolution } = body;
 
         if (!name || !category || !keywords) {
             return NextResponse.json({ error: '필수 정보가 누락되었습니다.' }, { status: 400 });
@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
             targetAge,
             length: length || 7,
             referenceImage,
-            isFunding // Pass isFunding
+            isFunding,
+            isStemCellSolution
         });
 
         return NextResponse.json({ success: true, plan });

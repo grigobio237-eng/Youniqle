@@ -200,6 +200,7 @@ export const authOptions: AuthOptions = {
         token.image = token.image || user.image;
         token.role = (user as any).role;
         token.grade = (user as any).grade;
+        token.tier = (user as any).tier;
         token.subscription = (user as any).subscription;
       }
 
@@ -211,6 +212,7 @@ export const authOptions: AuthOptions = {
           if (dbUser) {
             token.role = dbUser.role;
             token.grade = dbUser.grade;
+            token.tier = dbUser.tier;
             token.subscription = dbUser.subscription;
             if (!token.id) token.id = dbUser._id.toString();
           }
@@ -232,6 +234,7 @@ export const authOptions: AuthOptions = {
         (session.user as any).providerId = token.providerId as string;
         (session.user as any).role = token.role as string;
         (session.user as any).grade = token.grade as string;
+        (session.user as any).tier = token.tier as string;
         (session.user as any).subscription = token.subscription;
       }
       return session;

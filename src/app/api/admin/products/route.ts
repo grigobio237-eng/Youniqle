@@ -137,6 +137,8 @@ export async function POST(request: NextRequest) {
       name,
       slug,
       price,
+      minPrice,
+      maxPrice,
       originalPrice,
       stock,
       category,
@@ -148,7 +150,9 @@ export async function POST(request: NextRequest) {
       nutritionInfo,
       originInfo,
       clothingInfo,
-      electronicsInfo
+      electronicsInfo,
+      pavilionFloorId,
+      pavilionPosition
     } = await request.json();
 
     // 필수 필드 검증
@@ -175,6 +179,8 @@ export async function POST(request: NextRequest) {
       name,
       slug,
       price,
+      minPrice,
+      maxPrice,
       originalPrice,
       stock: stock || 0,
       category,
@@ -190,6 +196,8 @@ export async function POST(request: NextRequest) {
       originInfo: originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined,
       clothingInfo: clothingInfo && Object.values(clothingInfo).some(v => v) ? clothingInfo : undefined,
       electronicsInfo: electronicsInfo && Object.values(electronicsInfo).some(v => v) ? electronicsInfo : undefined,
+      pavilionFloorId,
+      pavilionPosition
     });
 
     await product.save();

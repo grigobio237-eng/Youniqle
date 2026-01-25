@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { visualPrompt, keyMessage, referenceImage, sectionId } = body;
+        const { visualPrompt, keyMessage, referenceImage, sectionId, isStemCellSolution } = body;
 
         console.log(`[Diagnostic] API Request for section ${sectionId}. API Key present: ${!!process.env.GEMINI_API_KEY} (${process.env.GEMINI_API_KEY?.substring(0, 5)}...)`);
 
@@ -24,7 +24,8 @@ export async function POST(request: NextRequest) {
             prompt: visualPrompt,
             keyMessage: keyMessage,
             referenceImage: referenceImage,
-            aspectRatio: "9:16"
+            aspectRatio: "9:16",
+            isStemCellSolution: !!isStemCellSolution
         });
 
         return NextResponse.json({

@@ -34,13 +34,16 @@ import {
   Bell,
   MessageCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Sparkles
 } from 'lucide-react';
 
 interface Product {
   _id: string;
   name: string;
   price: number;
+  minPrice?: number;
+  maxPrice?: number;
   originalPrice?: number;
   stock: number;
   category: string;
@@ -124,6 +127,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+  const [openInquiryForm, setOpenInquiryForm] = useState(false);
+
   useEffect(() => {
     if (product) {
       // 최근 본 상품에 추가
@@ -131,6 +136,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         _id: product._id,
         name: product.name,
         price: product.price,
+        minPrice: product.minPrice,
+        maxPrice: product.maxPrice,
         originalPrice: product.originalPrice,
         images: product.images,
         category: product.category,
@@ -358,18 +365,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        {/* 브레드크럼 */}
-        <div className="flex items-center space-x-2 text-sm text-text-secondary mb-6">
-          <Link href="/" className="hover:text-primary">홈</Link>
-          <span>/</span>
-          <Link href="/products" className="hover:text-primary">상품</Link>
-          <span>/</span>
-          <Link href={`/products?category=${product.category}`} className="hover:text-primary">
-            {product.category}
+        {/* 브레드크럼 또는 뒤로가기 버튼 */}
+        {product.category === 'stem-cell' ? (
+          <Link
+            href="/pavilion?floor=5&tab=stem-cell-products"
+            className="flex items-center text-sm font-bold text-text-secondary hover:text-primary mb-6 transition-all group"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+            줄기세포 솔루션 리스트로 돌아가기
           </Link>
-          <span>/</span>
-          <span className="text-text-primary">{product.name}</span>
-        </div>
+        ) : (
+          <div className="flex items-center space-x-2 text-sm text-text-secondary mb-6">
+            <Link href="/" className="hover:text-primary">홈</Link>
+            <span>/</span>
+            <Link href="/products" className="hover:text-primary">상품</Link>
+            <span>/</span>
+            <Link href={`/products?category=${product.category}`} className="hover:text-primary">
+              {product.category}
+            </Link>
+            <span>/</span>
+            <span className="text-text-primary">{product.name}</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* 이미지 갤러리 */}
@@ -495,14 +512,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               ) : (
                 <div className="flex items-baseline space-x-3 mb-6">
-                  {product.originalPrice && product.originalPrice > product.price && (
-                    <span className="text-xl text-text-secondary line-through">
-                      {formatPrice(product.originalPrice)}원
-                    </span>
+                  {product.category === 'stem-cell' && (product.minPrice || (product as any).minPrice) && (product.maxPrice || (product as any).maxPrice) ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-4xl font-black text-primary">
+                        ₩{formatPrice(product.minPrice || (product as any).minPrice)}
+                      </span>
+                      <span className="text-slate-300 font-bold text-2xl">~</span>
+                      <span className="text-4xl font-black text-primary">
+                        ₩{formatPrice(product.maxPrice || (product as any).maxPrice)}
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-xl text-text-secondary line-through">
+                          {formatPrice(product.originalPrice)}원
+                        </span>
+                      )}
+                      <span className="text-4xl font-bold text-primary">
+                        {formatPrice(product.price)}원
+                      </span>
+                    </>
                   )}
-                  <span className="text-4xl font-bold text-primary">
-                    {formatPrice(product.price)}원
-                  </span>
                 </div>
               )}
             </div>
@@ -510,14 +541,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* 재고 상태 */}
             {!product.isFunding && (
               <div className="flex items-center justify-between py-4 border-y border-line">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-text-secondary">재고 상태:</span>
-                  <span className={`font-bold ${product.stock > 10 ? 'text-status-good' :
-                    product.stock > 0 ? 'text-status-amber' : 'text-status-danger'
-                    }`}>
-                    {product.stock > 0 ? `${product.stock}개 남음` : '품절'}
-                  </span>
-                </div>
+                {product.category !== 'stem-cell' && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-text-secondary">재고 상태:</span>
+                    <span className={`font-bold ${product.stock > 10 ? 'text-status-good' :
+                      product.stock > 0 ? 'text-status-amber' : 'text-status-danger'
+                      }`}>
+                      {product.stock > 0 ? `${product.stock}개 남음` : '품절'}
+                    </span>
+                  </div>
+                )}
                 {/* 재입고 알림 버튼 */}
                 {product.stock === 0 && (
                   <Button
@@ -544,7 +577,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {/* 수량 선택 */}
-            {product.stock > 0 && (
+            {product.category !== 'stem-cell' && product.stock > 0 && (
               <div className="flex items-center space-x-6">
                 <span className="text-sm font-bold text-text-primary">{product.isFunding ? '참여 구좌 수' : '구매 수량'}</span>
                 <div className="flex items-center bg-gray-100 rounded-xl p-1">
@@ -572,26 +605,37 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {/* 총 가격 */}
-            <div className="bg-mist p-6 rounded-3xl">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-bold text-text-primary">{product.isFunding ? '총 펀딩 금액' : '주문 금액'}</span>
-                <span className={`text-3xl font-black ${product.isFunding ? 'text-status-amber' : 'text-primary'}`}>
-                  {formatPrice(product.price * quantity)}원
-                </span>
+            {product.category !== 'stem-cell' && (
+              <div className="bg-mist p-6 rounded-3xl">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-text-primary">{product.isFunding ? '총 펀딩 금액' : '주문 금액'}</span>
+                  <span className={`text-3xl font-black ${product.isFunding ? 'text-status-amber' : 'text-primary'}`}>
+                    {formatPrice(product.price * quantity)}원
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 액션 버튼들 */}
             <div className="space-y-3 pt-4">
               <Button
-                onClick={() => window.location.href = `/checkout?product=${product._id}&quantity=${quantity}`}
-                disabled={product.stock === 0}
-                className={`w-full text-xl py-8 rounded-[16px] font-black shadow-lg transition-all active:scale-[0.98] ${product.isFunding
-                  ? 'bg-status-amber hover:bg-amber-700 shadow-amber-200'
-                  : 'btn-primary shadow-blue-100'
+                onClick={() => {
+                  if (product.category === 'stem-cell') {
+                    setOpenInquiryForm(true);
+                    scrollToQnA();
+                  } else {
+                    window.location.href = `/checkout?product=${product._id}&quantity=${quantity}`;
+                  }
+                }}
+                disabled={product.stock === 0 && product.category !== 'stem-cell'}
+                className={`w-full text-xl py-8 rounded-[16px] font-black shadow-lg transition-all active:scale-[0.98] ${product.category === 'stem-cell'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-purple-200'
+                  : product.isFunding
+                    ? 'bg-status-amber hover:bg-amber-700 shadow-amber-200'
+                    : 'btn-primary shadow-blue-100'
                   }`}
               >
-                {product.stock === 0 ? '품절되었습니다' : (product.isFunding ? '지금 펀딩하기' : '지금 구매하기')}
+                {product.category === 'stem-cell' ? '지금 상담하기' : (product.stock === 0 ? '품절되었습니다' : (product.isFunding ? '지금 펀딩하기' : '지금 구매하기'))}
               </Button>
 
               <div className="flex space-x-3">
@@ -605,7 +649,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   {isInWishlist ? '관심 상품 해제' : '관심 상품 등록'}
                 </Button>
 
-                {!product.isFunding && (
+                {product.category !== 'stem-cell' && !product.isFunding && (
                   <Button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0 || addingToCart}
@@ -636,8 +680,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             </div>
 
-            {/* 배송/결제/교환 안내 (펀딩 제외, 펀딩 설명 추가) */}
-            {!product.isFunding ? (
+            {/* 배송/결제/교환 안내 (펀딩 및 줄기세포 제외) */}
+            {product.category !== 'stem-cell' && !product.isFunding ? (
               <div className="space-y-4 mt-8">
                 {/* 배송 정보 */}
                 <div className="bg-blue-50 p-4 rounded-lg space-y-2">
@@ -688,7 +732,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : product.isFunding ? (
               <div className="space-y-4 mt-8">
                 <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
                   <h3 className="font-bold text-gray-900 mb-3 flex items-center">
@@ -700,6 +744,21 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <p>• 목표 달성 시 결제가 진행되며, 종료일 이후 순차 발송됩니다.</p>
                     <p>• 단순 변심에 의한 환불은 펀딩 종료 전까지만 가능합니다.</p>
                     <p>• 프로젝트 사정에 따라 발송이 지연될 수 있습니다.</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* 줄기세포 전용 안내 */
+              <div className="space-y-4 mt-8">
+                <div className="bg-purple-50 p-6 rounded-[24px] border border-purple-100">
+                  <h3 className="font-bold text-purple-900 mb-3 flex items-center italic">
+                    <Sparkles className="h-5 w-5 mr-2 text-purple-600" />
+                    Premium Consultation
+                  </h3>
+                  <div className="text-sm text-purple-800 space-y-3 font-medium">
+                    <p>• 본 프로그램은 개인의 피부 상태에 따른 1:1 맞춤형 정밀 진단 후 진행됩니다.</p>
+                    <p>• '상담하기'를 통해 희망하시는 시술 부위와 고민을 남겨주시면 담당 메디컬 마케터가 24시간 내에 연락드립니다.</p>
+                    <p>• 프라이빗 라운지 예약은 확정 알림 후 최종 완료됩니다.</p>
                   </div>
                 </div>
               </div>
@@ -750,6 +809,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           <QuestionSection
             productId={product._id}
             productName={product.name}
+            forceShowForm={openInquiryForm}
+            onFormShown={() => setOpenInquiryForm(false)}
           />
         </div>
 

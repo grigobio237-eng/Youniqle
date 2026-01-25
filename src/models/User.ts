@@ -8,6 +8,7 @@ export interface IUser extends Document {
   avatar?: string;
   role: 'member' | 'partner' | 'admin';
   grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
+  tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급 (파빌리온 5층 등)
   points: number;
   referralCode?: string; // 추천인 아이디
   referredBy?: string; // 추천받은 사용자의 추천인 코드
@@ -171,6 +172,11 @@ const UserSchema = new Schema<IUser>({
     type: String,
     enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'essence', 'balance', 'miracle'],
     default: 'cedar',
+  },
+  tier: {
+    type: String,
+    enum: ['RESET', 'REBORN', 'RESTART'],
+    default: 'RESET',
   },
   points: {
     type: Number,
