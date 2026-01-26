@@ -1,35 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
+import jwt from 'jsonwebtoken';
+import { verifyAdminToken } from '@/lib/auth';
 
 async function getUsersHandler(request: NextRequest) {
   try {
     await connectDB();
 
-    // 관리자 토큰 검증 (쿠키 방식)
-    const token = request.cookies.get('admin-token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: '인증 토큰이 필요합니다.' }, { status: 401 });
-    }
-
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-
-      if (!decoded || decoded.type !== 'admin') {
-        return NextResponse.json({ error: '유효하지 않은 관리자 토큰입니다.' }, { status: 401 });
-      }
-
-      // 관리자 권한 확인
-      const user = await User.findById(decoded.id);
-
-      if (!user || user.role !== 'admin') {
-        return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
-      }
-    } catch (error) {
-      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    // 관리자 권한 검증 (통합 유틸리티 사용)
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      console.error('❌ 관리자 권한 검증 실패:', auth.error);
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

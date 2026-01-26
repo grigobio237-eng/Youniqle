@@ -3,6 +3,8 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
 import Review from '@/models/Review';
+import { verifyAdminToken } from '@/lib/auth';
+import { isValidObjectId } from 'mongoose';
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +12,18 @@ export async function GET(
 ) {
   try {
     const { id: userId } = await params;
+
+    // 관리자 권한 검증
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
+
+    // 유효한 ID 형식인지 확인
+    if (!isValidObjectId(userId)) {
+      return NextResponse.json({ error: '유효하지 않은 사용자 ID 형식입니다.' }, { status: 400 });
+    }
+
     await connectDB();
 
     // 사용자 상세 정보 조회
@@ -104,6 +118,17 @@ export async function PATCH(
 ) {
   try {
     const { id: userId } = await params;
+
+    // 관리자 권한 검증
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
+
+    if (!isValidObjectId(userId)) {
+      return NextResponse.json({ error: '유효하지 않은 사용자 ID 형식입니다.' }, { status: 400 });
+    }
+
     const { action, data, amount } = await request.json();
 
     await connectDB();
@@ -201,6 +226,18 @@ export async function DELETE(
 ) {
   try {
     const { id: userId } = await params;
+
+    // 관리자 권한 검증
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
+
+    // 유효한 ID 형식인지 확인
+    if (!isValidObjectId(userId)) {
+      return NextResponse.json({ error: '유효하지 않은 사용자 ID 형식입니다.' }, { status: 400 });
+    }
+
     await connectDB();
 
     // 관리자 계정은 삭제 불가
