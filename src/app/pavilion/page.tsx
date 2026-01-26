@@ -161,7 +161,7 @@ function PavilionContent() {
                         <motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
-                            className="max-w-2xl w-full bg-white rounded-[48px] overflow-hidden shadow-2xl relative p-12 md:p-20 text-center space-y-10"
+                            className="max-w-2xl w-full bg-white rounded-[32px] md:rounded-[48px] overflow-y-auto max-h-[90vh] shadow-2xl relative p-8 md:p-20 text-center space-y-8 md:space-y-10 scrollbar-hide"
                         >
                             <div className="absolute -top-20 -right-20 w-64 h-64 bg-luxury-gold/10 blur-[80px] rounded-full" />
 
