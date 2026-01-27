@@ -116,10 +116,18 @@ export default function MembershipPage() {
     const activeTier = tierOrder[Math.max(calculatedTierIndex, dbTierIndex)];
     const userGradeIndex = GRADE_ORDER.indexOf(userGrade);
 
+    // 등급 순서 정의 (비교용) - m.nextLevel 계산을 위해 필요
+    const nextTierMap: Record<TierType, TierType | 'MAX'> = {
+        'RESET': 'REBORN',
+        'REBORN': 'RESTART',
+        'RESTART': 'MAX'
+    };
+    const nextLevel = nextTierMap[activeTier];
+
     return (
         <ChapterWrapper chapter="membership" className="container mx-auto px-4 py-20 pb-32 min-h-screen">
             {/* 0. Nudge Section */}
-            {m.nextLevel !== 'MAX' && (
+            {nextLevel !== 'MAX' && (
                 <div className="max-w-4xl mx-auto mb-16 animate-in fade-in slide-in-from-top-4 duration-1000">
                     <div className="bg-luxury-navy text-white rounded-[32px] p-8 md:p-12 relative overflow-hidden shadow-2xl border border-white/10">
                         {/* Background Deco */}
@@ -131,7 +139,7 @@ export default function MembershipPage() {
                                     Next Milestone
                                 </div>
                                 <h2 className="text-2xl md:text-4xl font-black tracking-tight leading-tight">
-                                    <span className="text-luxury-gold uppercase">{m.nextLevel}</span> 등급까지 <br />
+                                    <span className="text-luxury-gold uppercase">{nextLevel}</span> 등급까지 <br />
                                     <span className="text-4xl md:text-5xl">{m.pointsToNext}점</span> & <span className="text-4xl md:text-5xl">{m.streakToNext}일</span> 남았습니다.
                                 </h2>
                                 <p className="text-white/40 text-sm font-medium italic">

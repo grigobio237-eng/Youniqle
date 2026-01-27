@@ -97,12 +97,28 @@ export function usePavilionState() {
 
     // Access state
     const [showLoungeNudge, setShowLoungeNudge] = useState(false);
+    const [dbUserTier, setDbUserTier] = useState<TierType | null>(null);
 
     // Initialize
     useEffect(() => {
         setMounted(true);
         fetchPavilionData();
+        fetchUserTier();
     }, []);
+
+    const fetchUserTier = async () => {
+        try {
+            const res = await fetch('/api/auth/me');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.user?.tier) {
+                    setDbUserTier(data.user.tier as TierType);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch user tier for access control:', error);
+        }
+    };
 
     // Set initial view mode when data loads
     useEffect(() => {
@@ -201,10 +217,11 @@ export function usePavilionState() {
             const p = getUserProgress();
             const m = getMembershipLevel(p.totalPoints, p.currentStreak);
 
-            // Check both calculated tier and DB tier from session
-            const userTier = (session?.user as any)?.tier as TierType | undefined;
-            const isRebornOrHigher = m.level === 'REBORN' || m.level === 'RESTART' ||
-                userTier === 'REBORN' || userTier === 'RESTART';
+            // Check: 1) Points-based tier, 2) DB tier (manual upgrade), 3) Session tier (fallback)
+            const sessionTier = (session?.user as any)?.tier as TierType | undefined;
+            const currentActiveTier = dbUserTier || sessionTier || m.level;
+
+            const isRebornOrHigher = currentActiveTier === 'REBORN' || currentActiveTier === 'RESTART';
 
             if (!isRebornOrHigher) {
                 setShowLoungeNudge(true);
