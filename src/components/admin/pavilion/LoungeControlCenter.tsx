@@ -82,6 +82,30 @@ export default function LoungeControlCenter({ floorData, onSave }: LoungeControl
         }
     };
 
+    const handleApprove = async (id: string) => {
+        try {
+            setSaving(true);
+            const res = await fetch(`/api/admin/concierge/requests/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'approved' })
+            });
+
+            if (res.ok) {
+                alert('승인 처리가 완료되었습니다.');
+                setSelectedRequest(null);
+                fetchRequests();
+            } else {
+                alert('승인 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Approval Error:', error);
+            alert('오류가 발생했습니다.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleSave = async () => {
         try {
             setSaving(true);
@@ -449,8 +473,12 @@ export default function LoungeControlCenter({ floorData, onSave }: LoungeControl
 
                                 {/* Actions */}
                                 <div className="flex gap-4 pt-6 border-t border-slate-100">
-                                    <Button className="flex-1 h-14 bg-luxury-navy text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all">
-                                        승인 처리 및 마스터 알림
+                                    <Button
+                                        className="flex-1 h-14 bg-luxury-navy text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all"
+                                        onClick={() => handleApprove(selectedRequest._id)}
+                                        disabled={saving}
+                                    >
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : '승인 처리 및 마스터 알림'}
                                     </Button>
                                     <Button variant="outline" className="h-14 px-8 rounded-2xl border-slate-200 font-black text-xs text-slate-400" onClick={() => setSelectedRequest(null)}>
                                         상세 닫기

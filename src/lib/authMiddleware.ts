@@ -105,8 +105,8 @@ export async function authenticatePartner(request: NextRequest): Promise<{ user:
 }
 
 // API 핸들러 래퍼 (인증 필요)
-export function withAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+export function withAuth(handler: (request: NextRequest, user: any, context?: any) => Promise<NextResponse>) {
+  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     const authResult = await authenticateToken(request);
 
     if (authResult.error) {
@@ -116,13 +116,13 @@ export function withAuth(handler: (request: NextRequest, user: any) => Promise<N
       );
     }
 
-    return handler(request, authResult.user);
+    return handler(request, authResult.user, context);
   };
 }
 
 // API 핸들러 래퍼 (관리자 권한 필요)
-export function withAdminAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+export function withAdminAuth(handler: (request: NextRequest, user: any, context?: any) => Promise<NextResponse>) {
+  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     const authResult = await authenticateAdmin(request);
 
     if (authResult.error) {
@@ -132,13 +132,13 @@ export function withAdminAuth(handler: (request: NextRequest, user: any) => Prom
       );
     }
 
-    return handler(request, authResult.user);
+    return handler(request, authResult.user, context);
   };
 }
 
 // API 핸들러 래퍼 (파트너 권한 필요)
-export function withPartnerAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+export function withPartnerAuth(handler: (request: NextRequest, user: any, context?: any) => Promise<NextResponse>) {
+  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     const authResult = await authenticatePartner(request);
 
     if (authResult.error) {
@@ -148,7 +148,7 @@ export function withPartnerAuth(handler: (request: NextRequest, user: any) => Pr
       );
     }
 
-    return handler(request, authResult.user);
+    return handler(request, authResult.user, context);
   };
 }
 

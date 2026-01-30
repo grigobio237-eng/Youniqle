@@ -9,6 +9,7 @@ import Review from '@/models/Review';
 import Diagnosis from '@/models/Diagnosis';
 import AiAdvice from '@/models/AiAdvice';
 import RecoveryScore from '@/models/RecoveryScore';
+import ConciergeRequest from '@/models/ConciergeRequest';
 
 export async function GET() {
     try {
@@ -32,7 +33,8 @@ export async function GET() {
             recentUsers,
             recentOrders,
             recentDiagnoses,
-            recentAiAdvices
+            recentAiAdvices,
+            pendingConciergeCount
         ] = await Promise.all([
             User.countDocuments(),
             Product.countDocuments({ status: 'active' }),
@@ -56,7 +58,8 @@ export async function GET() {
             })
                 .populate('userId', 'name email').sort({ createdAt: -1 }).limit(10).select('userId totalAmount status createdAt'),
             Diagnosis.find().populate('userId', 'name email').sort({ createdAt: -1 }).limit(5),
-            AiAdvice.find().populate('userId', 'name email').sort({ createdAt: -1 }).limit(5)
+            AiAdvice.find().populate('userId', 'name email').sort({ createdAt: -1 }).limit(5),
+            ConciergeRequest.countDocuments({ status: 'pending' })
         ]);
 
         // 2. 매출 및 성장률 계산
@@ -123,6 +126,7 @@ export async function GET() {
             totalProducts,
             totalOrders,
             totalRevenue,
+            pendingConciergeCount,
             todayVisitors: Math.floor(Math.random() * 100) + 50,
             totalReviews,
             userGrowth,

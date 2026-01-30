@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   User,
   Mail,
+  MessageCircle,
   Phone,
   MapPin,
   Settings,
@@ -90,6 +91,7 @@ export default function MyPage() {
   const [partnerApplicationLoading, setPartnerApplicationLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [userStatus, setUserStatus] = useState<any>(null);
 
   // WebP 변환 유틸리티
   const convertToWebP = async (file: File): Promise<File> => {
@@ -188,9 +190,22 @@ export default function MyPage() {
     }
   };
 
+  const fetchUserStatus = async () => {
+    try {
+      const res = await fetch('/api/me/status');
+      if (res.ok) {
+        const data = await res.json();
+        setUserStatus(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user status:', error);
+    }
+  };
+
   useEffect(() => {
     if (session?.user) {
       fetchHistory();
+      fetchUserStatus();
     }
   }, [session]);
 
@@ -440,6 +455,106 @@ export default function MyPage() {
 
           {/* Dynamic Hero Section */}
           <DynamicHero userName={session.user?.name || '요원'} />
+
+          {/* Service Progress Status Cards */}
+          {(userStatus?.concierge || userStatus?.inquiry) && (
+            <div className="flex flex-col gap-4 mb-8">
+              {/* Concierge Status */}
+              {userStatus?.concierge && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                          <Clock className={`w-7 h-7 ${userStatus.concierge.status === 'pending' ? 'animate-pulse' : ''}`} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Service Status Protocol</p>
+                          <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                            {userStatus.concierge.painPoint} 회복 컨시어지
+                            <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                              userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                'bg-slate-50 text-slate-500 border-slate-200'
+                              }`}>
+                              {userStatus.concierge.status === 'pending' ? '검토 중' :
+                                userStatus.concierge.status === 'approved' ? '승인 완료' : '진행 중'}
+                            </Badge>
+                          </h3>
+                          <p className="text-sm font-medium text-slate mt-1">
+                            {userStatus.concierge.status === 'pending' ? '관리자가 의뢰서를 검토하고 있습니다.' :
+                              userStatus.concierge.status === 'approved' ? '회복 프로토콜이 승인되었습니다. 상세 내용을 확인하세요.' :
+                                '신청 내용을 처리 중입니다.'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="w-full md:w-auto">
+                        <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                          <Link href="/me/history">진행 내역 보기</Link>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 w-full bg-slate-50 px-8 pb-8">
+                      <div className="h-full bg-slate-200 rounded-full relative">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: userStatus.concierge.status === 'approved' ? '100%' : '50%' }}
+                          className={`absolute left-0 top-0 h-full rounded-full ${userStatus.concierge.status === 'approved' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_10px_rgba(79,70,229,0.5)]'
+                            }`}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* Inquiry Status */}
+              {userStatus?.inquiry && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600">
+                          <MessageCircle className={`w-7 h-7 ${userStatus.inquiry.status === 'pending' ? 'animate-pulse' : ''}`} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Support Status Protocol</p>
+                          <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                            [{userStatus.inquiry.type === 'product' ? '상품' : '일반'}] {userStatus.inquiry.subject}
+                            <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                              userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                'bg-slate-50 text-slate-500 border-slate-200'
+                              }`}>
+                              {userStatus.inquiry.status === 'pending' ? '답변 대기' :
+                                userStatus.inquiry.status === 'resolved' ? '해결 완료' :
+                                  userStatus.inquiry.status === 'in_progress' ? '처리 중' : '진행 중'}
+                            </Badge>
+                          </h3>
+                          <p className="text-sm font-medium text-slate mt-1">
+                            {userStatus.inquiry.status === 'pending' ? '관리자가 문의 내용을 확인하고 있습니다.' :
+                              userStatus.inquiry.status === 'resolved' ? '문의에 대한 답변이 완료되었습니다.' :
+                                '담당자가 내용을 확인 및 답변을 준비 중입니다.'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="w-full md:w-auto">
+                        <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                          <Link href="/me/history">문의 내역 보기</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 mb-6">
             {/* Membership Rewards (Left) */}

@@ -44,6 +44,12 @@ export default function DailyCheckInPopup() {
                 return; // Already checked in today
             }
 
+            // 1.1 Check SessionStorage to avoid re-showing in same session if dismissed
+            const sessionKey = `daily_checkin_dismissed_${session.user?.email}`;
+            if (sessionStorage.getItem(sessionKey)) {
+                return;
+            }
+
             // 2. Fetch question from API
             try {
                 setLoading(true);
@@ -68,6 +74,17 @@ export default function DailyCheckInPopup() {
 
         checkDailyStatus();
     }, [session]);
+
+    const handleClose = () => {
+        setIsVisible(false);
+        // Mark as dismissed for today in LocalStorage even if not answered
+        const today = new Date().toDateString();
+        if (session?.user?.email) {
+            localStorage.setItem(`daily_checkin_${session.user.email}`, today);
+            // Also set in SessionStorage for extra safety during current navigation
+            sessionStorage.setItem(`daily_checkin_dismissed_${session.user.email}`, 'true');
+        }
+    };
 
     const handleAnswer = async (value: string) => {
         setSelectedOption(value);
@@ -113,7 +130,7 @@ export default function DailyCheckInPopup() {
                         <div className="absolute left-10 bottom-10 w-20 h-20 bg-blue-100 rounded-full blur-xl" />
 
                         <button
-                            onClick={() => setIsVisible(false)}
+                            onClick={handleClose}
                             className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-white/80 rounded-full transition-colors z-10"
                         >
                             <X className="w-5 h-5 text-slate" />

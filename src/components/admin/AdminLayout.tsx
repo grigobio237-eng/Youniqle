@@ -255,6 +255,7 @@ const navigationItems = [
 
 interface NotificationData {
   pendingPartners: number;
+  pendingConcierge: number;
   total: number;
 }
 
@@ -263,8 +264,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState<NotificationData>({ pendingPartners: 0, total: 0 });
+  const [notifications, setNotifications] = useState<NotificationData>({ pendingPartners: 0, pendingConcierge: 0, total: 0 });
   const [language, setLanguage] = useState('ko');
+  const [imgError, setImgError] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -452,12 +454,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="p-4 border-b bg-primary/5">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                {admin.avatar ? (
+                {admin.avatar && !imgError ? (
                   <img
                     src={admin.avatar}
                     alt={admin.name}
-                    crossOrigin="anonymous"
                     className="w-10 h-10 rounded-full object-cover"
+                    onError={() => setImgError(true)}
                   />
                 ) : (
                   <Shield className="h-5 w-5 text-primary" />
@@ -481,7 +483,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const safePathname = pathname || '';
               const isActive = safePathname === item.href || (item.subItems && item.subItems.some(sub => safePathname === sub.href));
               const isPartnersMenu = item.href === '/admin/partners';
-              const showNotification = isPartnersMenu && notifications.pendingPartners > 0;
+              const isPavilionMenu = item.href === '/admin/pavilion';
+              const showNotification = (isPartnersMenu && notifications.pendingPartners > 0) || (isPavilionMenu && notifications.pendingConcierge > 0);
+              const badgeCount = isPartnersMenu ? notifications.pendingPartners : (isPavilionMenu ? notifications.pendingConcierge : 0);
               const hasSubItems = item.subItems && item.subItems.length > 0;
 
               return (
@@ -501,7 +505,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                           variant="destructive"
                           className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs p-0 min-w-[20px]"
                         >
-                          {notifications.pendingPartners}
+                          {badgeCount}
                         </Badge>
                       )}
                     </div>
@@ -514,7 +518,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             className={`text-xs ${isActive ? 'bg-red-500 text-white' : 'bg-red-500 text-white'
                               }`}
                           >
-                            {notifications.pendingPartners}
+                            {badgeCount}
                           </Badge>
                         )}
                       </div>

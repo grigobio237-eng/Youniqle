@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
+import ConciergeRequest from '@/models/ConciergeRequest';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +13,12 @@ export async function GET(request: NextRequest) {
     // 승인 대기 중인 파트너 수 조회
     const pendingPartnersCount = await User.countDocuments({
       partnerStatus: 'pending'
-    }).maxTimeMS(3000); // 쿼리 타임아웃 3초
+    }).maxTimeMS(3000);
+
+    // 대기 중인 컨시어지 신청 수 조회
+    const pendingConciergeCount = await ConciergeRequest.countDocuments({
+      status: 'pending'
+    }).maxTimeMS(3000);
 
     return NextResponse.json({
       notifications: [],
@@ -33,7 +39,8 @@ export async function GET(request: NextRequest) {
         limit: 10
       },
       pendingPartners: pendingPartnersCount,
-      total: pendingPartnersCount
+      pendingConcierge: pendingConciergeCount,
+      total: pendingPartnersCount + pendingConciergeCount
     });
 
   } catch (error) {
@@ -43,6 +50,7 @@ export async function GET(request: NextRequest) {
       notifications: [],
       stats: { total: 0, unread: 0, pending: 0, recent: 0 },
       pendingPartners: 0,
+      pendingConcierge: 0,
       total: 0
     });
   }

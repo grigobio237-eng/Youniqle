@@ -18,9 +18,12 @@ import {
   Calendar,
   Layers,
   HeartPulse,
-  BrainCircuit
+  BrainCircuit,
+  BellRing,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 interface DashboardStats {
   totalUsers: number;
@@ -31,6 +34,7 @@ interface DashboardStats {
   totalReviews: number;
   userGrowth: number;
   revenueGrowth: number;
+  pendingConciergeCount?: number;
   recentUsers: Array<{
     id: string;
     name: string;
@@ -171,6 +175,30 @@ export default function AdminDashboard() {
         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px]" />
         <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px]" />
       </div>
+
+      {/* Alert Card for Pending Concierge */}
+      {stats?.pendingConciergeCount && stats.pendingConciergeCount > 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-rose-50 border border-rose-100 rounded-3xl p-6 flex items-center justify-between shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+              <BellRing className="w-6 h-6 animate-bounce" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-rose-900">새로운 컨시어지 신청이 있습니다</h3>
+              <p className="text-sm text-rose-600 font-medium">현재 {stats.pendingConciergeCount}건의 신청이 대기 중입니다. 지금 바로 확인하고 승인 처리를 진행하세요.</p>
+            </div>
+          </div>
+          <Button asChild className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-6 h-12 font-black transition-all hover:scale-105">
+            <Link href="/admin/pavilion">
+              확인하러 가기 <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
+        </motion.div>
+      ) : null}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
