@@ -20,16 +20,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // Generate context based on time
+        // Generate context based on time (Always use Asia/Seoul for KST)
         const now = new Date();
-        const hour = now.getHours();
-        const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-        const dayOfWeek = days[now.getDay()];
+        const kstOptions: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false, weekday: 'long' };
+        const kstFormatter = new Intl.DateTimeFormat('ko-KR', kstOptions);
+        const parts = kstFormatter.formatToParts(now);
+
+        const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+        const dayOfWeek = parts.find(p => p.type === 'weekday')?.value || '오늘';
 
         let timeOfDay = '아침';
-        if (hour >= 12) timeOfDay = '오후';
-        if (hour >= 18) timeOfDay = '저녁';
-        if (hour >= 22 || hour < 5) timeOfDay = '밤';
+        if (hour >= 12 && hour < 18) timeOfDay = '오후';
+        else if (hour >= 18 && hour < 22) timeOfDay = '저녁';
+        else if (hour >= 22 || hour < 6) timeOfDay = '밤';
 
         // TODO: Retrieve recent recovery score context if available
         const recentContext = '';

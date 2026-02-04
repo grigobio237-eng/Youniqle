@@ -15,7 +15,7 @@ export class GeminiAIEngine {
         systemInstruction?: string,
         temperature: number = 0.7
     ): Promise<string> {
-        const models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash'];
+        const models = ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash-exp'];
         let lastError: any;
 
         for (const modelName of models) {
@@ -28,7 +28,7 @@ export class GeminiAIEngine {
                         { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
                         { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                     ],
-                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "model" } : undefined
+                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
                 });
 
                 const result = await model.generateContent({

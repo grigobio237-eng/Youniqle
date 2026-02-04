@@ -83,7 +83,7 @@ export default function TimeBasedMessage({
     onDismiss,
     className = '',
 }: TimeBasedMessageProps) {
-    const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('morning');
+    const [timeOfDay, setTimeOfDay] = useState<TimeOfDay | null>(null);
     const [dismissed, setDismissed] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -106,7 +106,7 @@ export default function TimeBasedMessage({
         return () => clearInterval(interval);
     }, []);
 
-    const content = useMemo(() => TIME_BASED_CONTENT[timeOfDay], [timeOfDay]);
+    const content = useMemo(() => (timeOfDay ? TIME_BASED_CONTENT[timeOfDay] : null), [timeOfDay]);
 
     const handleDismiss = () => {
         setDismissed(true);
@@ -115,7 +115,7 @@ export default function TimeBasedMessage({
         onDismiss?.();
     };
 
-    if (!mounted || dismissed) return null;
+    if (!mounted || dismissed || !content) return null;
 
     if (variant === 'compact') {
         return (
