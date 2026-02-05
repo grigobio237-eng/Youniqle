@@ -38,7 +38,16 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({ cart });
+      // 삭제된 상품 등으로 인해 productId가 null인 아이템 필터링
+      const validItems = (cart.items || []).filter((item: any) => item.productId);
+      const filteredCart = {
+        ...cart,
+        items: validItems,
+        totalItems: validItems.reduce((sum: number, item: any) => sum + item.quantity, 0),
+        totalAmount: validItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
+      };
+
+      return NextResponse.json({ cart: filteredCart });
     } else {
       // 익명 사용자의 경우 빈 장바구니 반환
       return NextResponse.json({
@@ -52,9 +61,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get cart error:', error);
     return NextResponse.json(
-      { 
-        error: '서버 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '서버 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );
@@ -84,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // NextAuth 세션으로 사용자 인증
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
@@ -151,23 +160,30 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    await cart.save();
-
     // 업데이트된 장바구니 반환
     const updatedCart = await Cart.findById(cart._id)
       .populate('items.productId', 'name price images slug')
       .lean();
 
+    // 삭제된 상품 등으로 인해 productId가 null인 아이템 필터링
+    const validItems = (updatedCart?.items || []).filter((item: any) => item.productId);
+    const filteredCart = {
+      ...updatedCart,
+      items: validItems,
+      totalItems: validItems.reduce((sum: number, item: any) => sum + item.quantity, 0),
+      totalAmount: validItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
+    };
+
     return NextResponse.json({
       message: '장바구니에 상품이 추가되었습니다.',
-      cart: updatedCart,
+      cart: filteredCart,
     });
   } catch (error) {
     console.error('Add to cart error:', error);
     return NextResponse.json(
-      { 
-        error: '서버 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '서버 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );
@@ -190,7 +206,7 @@ export async function DELETE(request: NextRequest) {
 
     // NextAuth 세션으로 사용자 인증
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
@@ -234,9 +250,9 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Remove from cart error:', error);
     return NextResponse.json(
-      { 
-        error: '서버 오류가 발생했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.' 
+      {
+        error: '서버 오류가 발생했습니다.',
+        details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },
       { status: 500 }
     );

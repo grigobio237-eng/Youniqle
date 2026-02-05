@@ -258,15 +258,14 @@ function CheckoutPageContent() {
             if (data.cart && data.cart.items) {
               if (selectedIds) {
                 const selectedIdArray = selectedIds.split(',');
-                const filteredItems = data.cart.items.filter((item: CartItem) =>
-                  selectedIdArray.includes(item._id)
-                );
+                const filteredItems = (data.cart.items || [])
+                  .filter((item: CartItem) => item && selectedIdArray.includes(item._id));
 
                 const filteredCart = {
                   ...data.cart,
                   items: filteredItems,
-                  totalItems: filteredItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-                  totalAmount: filteredItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
+                  totalItems: filteredItems.reduce((sum: number, item: CartItem) => sum + (item?.quantity || 0), 0),
+                  totalAmount: filteredItems.reduce((sum: number, item: CartItem) => sum + ((item?.price || 0) * (item?.quantity || 0)), 0)
                 };
 
                 setCart(filteredCart);
@@ -352,7 +351,7 @@ function CheckoutPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: couponCode,
-          cartItems: cart?.items || [],
+          cartItems: (cart?.items || []).filter(item => item && item.productId),
           totalAmount: cart?.totalAmount || 0
         })
       });
@@ -427,12 +426,14 @@ function CheckoutPageContent() {
       const totalAmountToPay = subtotalAfterCoupon + currentDeliveryFee - usePoints;
 
       const orderData = {
-        items: (cart?.items || []).map(item => ({
-          productId: item.productId?._id,
-          name: item.productId?.name,
-          price: item.price,
-          quantity: item.quantity
-        })),
+        items: (cart?.items || [])
+          .filter(item => item && item.productId)
+          .map(item => ({
+            productId: item.productId?._id,
+            name: item.productId?.name || '정보 없음',
+            price: item.price || 0,
+            quantity: item.quantity || 0
+          })),
         shippingAddress: {
           label: '기본 배송지',
           recipient: shippingAddress.recipient,
@@ -821,22 +822,24 @@ function CheckoutPageContent() {
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-4 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
-                  {cart.items.map((item) => (
-                    <div key={item._id} className="flex gap-4 items-center">
-                      <div className="w-12 h-12 rounded-lg bg-white/10 flex-shrink-0 relative overflow-hidden">
-                        <Image
-                          src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
-                          alt={item.productId.name}
-                          fill
-                          className="object-cover"
-                        />
+                  {(cart?.items || [])
+                    .filter(item => item && item._id)
+                    .map((item) => (
+                      <div key={item._id} className="flex gap-4 items-center">
+                        <div className="w-12 h-12 rounded-lg bg-white/10 flex-shrink-0 relative overflow-hidden">
+                          <Image
+                            src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
+                            alt={item.productId?.name || '상품'}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold line-clamp-1">{item.productId?.name || '정보 없음'}</p>
+                          <p className="text-[10px] opacity-50 font-medium">{item.quantity}개 / {((item.price || 0) * (item.quantity || 0)).toLocaleString()}원</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold line-clamp-1">{item.productId.name}</p>
-                        <p className="text-[10px] opacity-50 font-medium">{item.quantity}개 / {(item.price * item.quantity).toLocaleString()}원</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 <div className="h-px bg-white/10" />

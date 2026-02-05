@@ -115,16 +115,18 @@ export default function OrdersPage() {
 
   const handleReorder = async (order: Order) => {
     try {
-      const addToCartPromises = (order?.items || []).map(item =>
-        fetch('/api/cart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productId: item.productId?._id,
-            quantity: item.quantity,
-          }),
-        })
-      );
+      const addToCartPromises = (order?.items || [])
+        .filter(item => item && item.productId?._id)
+        .map(item =>
+          fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              productId: item.productId?._id,
+              quantity: item.quantity || 1,
+            }),
+          })
+        );
 
       const results = await Promise.all(addToCartPromises);
       const failed = results.filter(r => !r.ok);
@@ -237,9 +239,9 @@ export default function OrdersPage() {
                         {order?.items?.[0]?.productId?.name || '정보 없음'} {order?.items && order.items.length > 1 ? `외 ${order.items.length - 1}건` : ''}
                       </h4>
                       <div className="flex items-center justify-center md:justify-start gap-4 mt-1">
-                        <span className="text-xl font-black text-obsidian tracking-tighter">{order.totalAmount.toLocaleString()}원</span>
+                        <span className="text-xl font-black text-obsidian tracking-tighter">{(order?.totalAmount || 0).toLocaleString()}원</span>
                         <span className="h-4 w-px bg-line" />
-                        <span className="text-xs font-bold text-slate">{order.items.reduce((acc, curr) => acc + curr.quantity, 0)} items</span>
+                        <span className="text-xs font-bold text-slate">{(order?.items || []).reduce((acc, curr) => acc + (curr?.quantity || 0), 0)} items</span>
                       </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">

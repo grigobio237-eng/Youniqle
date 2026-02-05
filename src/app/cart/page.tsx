@@ -71,7 +71,11 @@ export default function CartPage() {
         const data = await response.json();
         if (data.cart && data.cart.items) {
           setCart(data.cart);
-          const allItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
+          const allItemIds = new Set<string>(
+            (data.cart.items || [])
+              .filter((item: any) => item && item._id)
+              .map((item: CartItem) => item._id)
+          );
           setSelectedItems(allItemIds);
         } else {
           setCart({ items: [], totalItems: 0, totalAmount: 0 } as any);
@@ -99,7 +103,11 @@ export default function CartPage() {
     if (selectedItems.size === (cart?.items?.length || 0)) {
       setSelectedItems(new Set());
     } else {
-      const allIds = new Set((cart?.items || []).map(item => item._id));
+      const allIds = new Set(
+        (cart?.items || [])
+          .filter(item => item && item._id)
+          .map(item => item._id)
+      );
       setSelectedItems(allIds);
     }
   };
@@ -107,8 +115,8 @@ export default function CartPage() {
   const getSelectedTotal = () => {
     if (!cart) return 0;
     return (cart?.items || [])
-      .filter(item => selectedItems.has(item._id))
-      .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      .filter(item => item && selectedItems.has(item._id))
+      .reduce((sum, item) => sum + ((item?.price || 0) * (item?.quantity || 0)), 0);
   };
 
   const updateQuantity = async (productId: string, newQuantity: number) => {
@@ -226,71 +234,73 @@ export default function CartPage() {
             </div>
 
             <div className="space-y-4">
-              {(cart?.items || []).map((item) => (
-                <Card key={item._id} className={`border-none shadow-sm rounded-[36px] overflow-hidden transition-all duration-500 hover:shadow-xl group ${selectedItems.has(item._id) ? 'bg-white' : 'bg-white/50 opacity-60'}`}>
-                  <CardContent className="p-8">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                      <Checkbox
-                        checked={selectedItems.has(item._id)}
-                        onCheckedChange={() => toggleItemSelection(item._id)}
-                        className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent"
-                      />
-
-                      <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner">
-                        <Image
-                          src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
-                          alt={item.productId?.name || '상품'}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-700"
+              {(cart?.items || [])
+                .filter(item => item && item._id)
+                .map((item) => (
+                  <Card key={item._id} className={`border-none shadow-sm rounded-[36px] overflow-hidden transition-all duration-500 hover:shadow-xl group ${selectedItems.has(item._id) ? 'bg-white' : 'bg-white/50 opacity-60'}`}>
+                    <CardContent className="p-8">
+                      <div className="flex flex-col md:flex-row items-center gap-8">
+                        <Checkbox
+                          checked={selectedItems.has(item._id)}
+                          onCheckedChange={() => toggleItemSelection(item._id)}
+                          className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent"
                         />
-                        <div className="absolute inset-0 bg-obsidian/5 group-hover:bg-transparent transition-colors" />
-                      </div>
 
-                      <div className="flex-1 w-full text-center md:text-left">
-                        <Link href={`/products/${item.productId?.slug || ''}`} className="inline-block group/link">
-                          <h3 className="font-black text-2xl text-obsidian mb-2 tracking-tight group-hover/link:text-chapter-accent transition-colors">
-                            {item.productId?.name || '정보 없음'}
-                          </h3>
-                        </Link>
-                        <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
-                          <span className="text-xl font-black text-chapter-accent">
-                            {item.price.toLocaleString()}원
-                          </span>
-                          <span className="text-[10px] font-black text-slate uppercase tracking-widest opacity-30 mt-1">Per Unit</span>
+                        <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner">
+                          <Image
+                            src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
+                            alt={item.productId?.name || '상품'}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-obsidian/5 group-hover:bg-transparent transition-colors" />
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center bg-mist/50 p-1.5 rounded-2xl border border-line">
-                            <button
-                              className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
-                              onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
-                              disabled={updating === item.productId._id || item.quantity <= 1}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                            <span className="w-12 text-center font-black text-lg">{item.quantity}</span>
-                            <button
-                              className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
-                              onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
-                              disabled={updating === item.productId._id || item.quantity >= 99}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
+                        <div className="flex-1 w-full text-center md:text-left">
+                          <Link href={`/products/${item.productId?.slug || ''}`} className="inline-block group/link">
+                            <h3 className="font-black text-2xl text-obsidian mb-2 tracking-tight group-hover/link:text-chapter-accent transition-colors">
+                              {item.productId?.name || '정보 없음'}
+                            </h3>
+                          </Link>
+                          <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
+                            <span className="text-xl font-black text-chapter-accent">
+                              {item.price.toLocaleString()}원
+                            </span>
+                            <span className="text-[10px] font-black text-slate uppercase tracking-widest opacity-30 mt-1">Per Unit</span>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeItem(item.productId._id)}
-                            className="w-12 h-12 rounded-2xl text-slate hover:text-status-danger hover:bg-status-danger/5"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </Button>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center bg-mist/50 p-1.5 rounded-2xl border border-line">
+                              <button
+                                className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                                onClick={() => item?.productId?._id && updateQuantity(item.productId._id, item.quantity - 1)}
+                                disabled={!item?.productId?._id || updating === item.productId._id || item.quantity <= 1}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <span className="w-12 text-center font-black text-lg">{item?.quantity || 0}</span>
+                              <button
+                                className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                                onClick={() => item?.productId?._id && updateQuantity(item.productId._id, item.quantity + 1)}
+                                disabled={!item?.productId?._id || updating === item.productId._id || item.quantity >= 99}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => item?.productId?._id && removeItem(item.productId._id)}
+                              className="w-12 h-12 rounded-2xl text-slate hover:text-status-danger hover:bg-status-danger/5"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
 
             <Button asChild variant="ghost" className="h-14 px-8 text-slate font-black rounded-2xl hover:text-obsidian hover:bg-white transition-all">
