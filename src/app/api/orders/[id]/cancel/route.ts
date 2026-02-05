@@ -12,7 +12,7 @@ export async function PUT(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
@@ -20,11 +20,17 @@ export async function PUT(
     const { id: orderId } = await params;
 
     await connectDB();
+    const User = (await import('@/models/User')).default;
+    const user = await User.findOne({ email: session.user.email });
+
+    if (!user) {
+      return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
+    }
 
     // 주문 조회 및 소유자 확인
-    const order = await Order.findOne({ 
+    const order = await Order.findOne({
       _id: orderId,
-      userId: session.user.email
+      userId: user._id
     });
 
     if (!order) {
@@ -33,8 +39,8 @@ export async function PUT(
 
     // 취소 가능한 상태 확인 (pending, confirmed만 취소 가능)
     if (!['pending', 'confirmed'].includes(order.status)) {
-      return NextResponse.json({ 
-        error: '취소할 수 없는 주문입니다.' 
+      return NextResponse.json({
+        error: '취소할 수 없는 주문입니다.'
       }, { status: 400 });
     }
 
@@ -54,14 +60,14 @@ export async function PUT(
     // 주문 상태를 cancelled로 변경
     order.status = 'cancelled';
     order.updatedAt = new Date();
-    
+
     await order.save();
 
     // 고객에게 취소 알림 및 환불 안내 발송
     try {
       const User = (await import('@/models/User')).default;
       const customer = await User.findOne({ email: session.user.email });
-      
+
       if (customer && customer.email) {
         // 주문 취소 알림
         await sendOrderStatusNotification(
@@ -70,7 +76,7 @@ export async function PUT(
           customer.email,
           'cancelled'
         );
-        
+
         // 환불 안내 (결제 완료된 주문인 경우)
         if (order.paymentStatus === 'paid') {
           await sendRefundNotification(
@@ -86,9 +92,9 @@ export async function PUT(
       // 알림 발송 실패는 주문 취소를 막지 않음
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: '주문이 취소되었습니다.',
-      order 
+      order
     });
 
   } catch (error) {

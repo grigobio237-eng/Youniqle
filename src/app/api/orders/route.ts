@@ -90,10 +90,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 재고 확인 (단순화)
+    // 유효성 검사 및 데이터 백업을 거친 새로운 아이템 배열
+    const validatedItems = [];
     const Product = (await import('@/models/Product')).default;
+
     for (const item of items) {
-      // Founder Pass 등 가상 상품은 DB 조회 및 재고 체크 건너뜀
+      // Founder Pass 등 가상 상품은 예외 처리
       if (typeof item.productId === 'string' && item.productId.startsWith('founder-')) {
+        validatedItems.push(item);
         continue;
       }
 
@@ -110,6 +114,16 @@ export async function POST(request: NextRequest) {
           error: `재고가 부족합니다. (가능: ${product.stock}개, 요청: ${item.quantity}개)`
         }, { status: 400 });
       }
+
+      // 💥 핵심: 상품 정보 백업 (이미지, 이름, 파트너ID)
+      validatedItems.push({
+        productId: product._id, // 문자열일 수 있으므로 ID 객체로 변환
+        quantity: item.quantity,
+        price: product.price, // 가격 변조 방지: DB 가격 사용
+        name: product.name,   // 이름 백업
+        imageUrl: product.images?.[0]?.url || product.images?.[0] || '', // 이미지 URL 백업
+        partnerId: product.partnerId
+      });
     }
 
     // 쿠폰 재검증 (주문 생성 시점에 다시 확인)
@@ -179,7 +193,9 @@ export async function POST(request: NextRequest) {
     const order = new Order({
       userId: user._id,
       orderNumber,
-      items,
+      orderNumber,
+      items: validatedItems,
+      totalAmount,
       totalAmount,
       status: 'pending',
       paymentStatus: 'pending',
