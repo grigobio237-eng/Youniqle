@@ -38,6 +38,7 @@ interface ProductListProps {
 }
 
 export default function ProductList({ searchParams }: ProductListProps) {
+  const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -56,17 +57,21 @@ export default function ProductList({ searchParams }: ProductListProps) {
         if (searchParams.q) params.append('q', searchParams.q);
         if (searchParams.category) params.append('category', searchParams.category);
         if (searchParams.sort) params.append('sort', searchParams.sort);
-        if (searchParams.sort) params.append('sort', searchParams.sort);
         if (searchParams.page) params.append('page', searchParams.page);
-        if (searchParams.isFunding) params.append('isFunding', searchParams.isFunding); // Pass isFunding
+        if (searchParams.isFunding) params.append('isFunding', searchParams.isFunding);
+
+        // 관리자용 프리뷰 모드 추가
+        if ((session?.user as any)?.role === 'admin') {
+          params.append('preview', 'true');
+        }
 
         const response = await fetch(`/api/products?${params.toString()}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          // 10초 타임아웃
-          signal: AbortSignal.timeout(10000),
+          // 환경에 따라 느릴 수 있으므로 30초 타임아웃으로 연장
+          signal: AbortSignal.timeout(30000),
         });
 
         if (!response.ok) {
@@ -92,9 +97,8 @@ export default function ProductList({ searchParams }: ProductListProps) {
     };
 
     fetchProducts();
-  }, [searchParams]);
+  }, [searchParams, session]);
 
-  const { data: session } = useSession();
   const router = useRouter();
   const { addToCart, loading: cartLoading } = useCart();
 

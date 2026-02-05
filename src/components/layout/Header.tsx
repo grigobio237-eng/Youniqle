@@ -109,7 +109,7 @@ export default function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-3 group"
             onClick={(e) => {
               // If already checked in today, force refresh/navigation to clear gate state if necessary
               if (typeof window !== 'undefined') {
@@ -120,7 +120,7 @@ export default function Header() {
               }
             }}
           >
-            <div className="relative h-10 w-10">
+            <div className="relative h-10 w-10 transition-transform duration-300 group-hover:scale-105">
               <CharacterImage
                 src="/character/youniqle-1.png"
                 alt="Logo"
@@ -129,7 +129,7 @@ export default function Header() {
                 priority
               />
             </div>
-            <span className="text-xl font-bold text-text-primary">Youniqle</span>
+            <span className="text-xl font-serif-display text-text-primary tracking-tight">Youniqle</span>
           </Link>
 
           {/* Nav */}

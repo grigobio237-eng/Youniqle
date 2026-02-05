@@ -47,11 +47,22 @@ async function getProductsHandler(request: NextRequest) {
 
     await connectDB();
 
-    // Build filter object (승인된 활성 상품만 조회)
-    const filter: any = {
-      status: 'active',
-      approvalStatus: 'approved' // 승인된 상품만 일반 사용자에게 노출
-    };
+    // 세션 확인 (관리자 여부 체크)
+    const { getServerSession } = await import('next-auth/next');
+    const { authOptions } = await import('@/lib/auth');
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user?.role === 'admin';
+    const isPreview = isAdmin && searchParams.get('preview') === 'true';
+
+    // Build filter object
+    const filter: any = {};
+
+    // 일반 사용자: 승인된 활성 상품만 노출
+    // 관리자 프리뷰 모드가 아닌 경우 필터 적용
+    if (!isPreview) {
+      filter.status = 'active';
+      filter.approvalStatus = 'approved';
+    }
 
     if (validatedQuery.q || validatedQuery.search) {
       const searchTerm = validatedQuery.q || validatedQuery.search;

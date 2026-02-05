@@ -186,6 +186,38 @@ export function usePavilionState() {
         }).filter(Boolean) as FloorOwner[];
     }, [currentFloorOwners, searchQuery]);
 
+    const checkAccess = useCallback((floor: number) => {
+        if (floor === 5) {
+            const p = getUserProgress();
+            const m = getMembershipLevel(p.totalPoints, p.currentStreak);
+
+            // Check: 1) Points-based tier, 2) DB tier (manual upgrade), 3) Session tier (fallback)
+            const sessionTier = (session?.user as any)?.tier as TierType | undefined;
+
+            // Reborn 등급 이상인 경우 하나라도 만족하면 접속 허용 (DB값이 RESET이라도 세션이 REBORN이면 허용)
+            const isRebornBase = m.level === 'REBORN' || m.level === 'RESTART';
+            const isRebornDB = dbUserTier === 'REBORN' || dbUserTier === 'RESTART';
+            const isRebornSession = sessionTier === 'REBORN' || sessionTier === 'RESTART';
+
+            const isRebornOrHigher = isRebornBase || isRebornDB || isRebornSession;
+
+            if (!isRebornOrHigher) {
+                setShowLoungeNudge(true);
+                return false;
+            }
+        }
+        return true;
+    }, [dbUserTier, session]);
+
+    // URL 직접 접근이나 탭 변경 시 접근 권한 다시 확인
+    useEffect(() => {
+        if (mounted && activeFloor === 5) {
+            if (!checkAccess(5)) {
+                setActiveFloor(1); // 권한 없으면 1층으로 강제 이동
+            }
+        }
+    }, [activeFloor, checkAccess, mounted]);
+
     // Handlers
     const handleArtistClick = useCallback((id: string) => {
         setSelectedArtistId(id);
@@ -212,22 +244,7 @@ export function usePavilionState() {
     }, [selectedOwner, activeFloor, router]);
 
     const handleFloorChange = useCallback((floor: number) => {
-        // Access Check: 5F requires REBORN tier
-        if (floor === 5) {
-            const p = getUserProgress();
-            const m = getMembershipLevel(p.totalPoints, p.currentStreak);
-
-            // Check: 1) Points-based tier, 2) DB tier (manual upgrade), 3) Session tier (fallback)
-            const sessionTier = (session?.user as any)?.tier as TierType | undefined;
-            const currentActiveTier = dbUserTier || sessionTier || m.level;
-
-            const isRebornOrHigher = currentActiveTier === 'REBORN' || currentActiveTier === 'RESTART';
-
-            if (!isRebornOrHigher) {
-                setShowLoungeNudge(true);
-                return; // Block access to 5F
-            }
-        }
+        if (!checkAccess(floor)) return;
 
         setActiveFloor(floor);
         setSelectedOwner(null);
@@ -236,7 +253,7 @@ export function usePavilionState() {
         setSelectedArtistId(null);
         setViewMode(floor === 5 ? 'STANDARD' : 'ART_GRID');
         setShowLoungeNudge(false);
-    }, []);
+    }, [checkAccess]);
 
     const enterRoom = useCallback(() => {
         setIsInsideRoom(true);

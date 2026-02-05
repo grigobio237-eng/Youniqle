@@ -32,13 +32,28 @@ export async function GET(req: NextRequest) {
                 return NextResponse.json({ error: 'Failed to generate questions' }, { status: 500 });
             }
 
-            // 4. Save to DB
-            dailyQ = await DailyQuestion.create({
-                date: todayStr,
-                dayOfWeek,
-                theme: themeData.theme,
-                questions
-            });
+            // 4. Save to DB with race-condition handling
+            try {
+                dailyQ = await DailyQuestion.create({
+                    date: todayStr,
+                    dayOfWeek,
+                    theme: themeData.theme,
+                    questions
+                });
+            } catch (createError: any) {
+                // E11000: Duplicate key error (someone else saved it while AI was running)
+                if (createError.code === 11000) {
+                    console.log(`[Race Condition Handled] Fetching existing questions for ${todayStr}`);
+                    dailyQ = await DailyQuestion.findOne({ date: todayStr });
+                    if (!dailyQ) {
+                        console.error(`[Critical] Date ${todayStr} exists in index but not found in DB!`);
+                        throw createError;
+                    }
+                } else {
+                    console.error('[Daily Question API] Unexpected DB error during create:', createError);
+                    throw createError;
+                }
+            }
         }
 
         return NextResponse.json({

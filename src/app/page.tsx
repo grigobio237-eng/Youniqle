@@ -108,77 +108,74 @@ function OnboardingDialog({ open, onOpenChange }: { open: boolean, onOpenChange:
   );
 }
 
-// A. Gate Intro View
+// A. Gate Intro View - Luxury Renewal
 function GateIntro({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[90vh] px-4 text-center bg-mist relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-chapter-accent/5 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-reward-gold/5 rounded-full blur-[120px]" />
+    <div className="hero-cinematic noise-texture bg-mist relative overflow-hidden">
+      {/* Decorative Blur Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-20">
+        <div className="absolute -top-[15%] -left-[10%] w-[50%] h-[50%] bg-chapter-accent/10 rounded-full blur-[150px]" />
+        <div className="absolute -bottom-[15%] -right-[10%] w-[50%] h-[50%] bg-reward-gold/10 rounded-full blur-[150px]" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-3xl space-y-12 relative z-10"
-      >
-        {/* Hero Section */}
-        <div className="space-y-6">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-obsidian text-mist rounded-full text-xs font-black tracking-widest uppercase">
-            <span>Founder Pass Now Open</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-obsidian leading-[1.2] md:leading-[1.1] tracking-tighter break-keep">
-            당신의 회복을<br />
-            <span className="text-chapter-accent">'시스템'으로 바꿉니다</span>
+      <div className="max-w-2xl mx-auto space-y-16 relative z-10 stagger-fade-in px-6">
+        {/* Badge */}
+        <div className="inline-flex items-center space-x-2 px-5 py-2.5 bg-obsidian text-mist rounded-full text-[10px] font-black tracking-[0.25em] uppercase">
+          <span>Founder Pass Now Open</span>
+        </div>
+
+        {/* Hero Headline */}
+        <div className="space-y-8">
+          <h1 className="font-serif-display text-4xl sm:text-5xl md:text-7xl text-obsidian leading-[1.15] tracking-tight">
+            당신의 회복을,<br />
+            <span className="text-chapter-accent italic">'시스템'</span>으로.
           </h1>
-          <p className="text-lg md:text-2xl text-slate word-keep-all leading-relaxed max-w-xl mx-auto font-medium">
-            유전자 · 웰니스 · 회복 설계를 하나의 구조로
+          <p className="text-lg md:text-xl text-slate/80 font-light leading-relaxed max-w-md mx-auto">
+            유전자 · 웰니스 · 회복 설계를 하나의 구조로 완성합니다.
           </p>
         </div>
 
         {/* Primary CTA */}
-        <div className="flex flex-col gap-4 w-full max-w-md mx-auto px-4 md:px-0">
-          <Button asChild size="lg" className="btn-primary w-full h-16 md:h-20 text-lg md:text-xl rounded-[20px] md:rounded-[24px] shadow-2xl shadow-chapter-accent/20 hover:-translate-y-1 active:translate-y-0">
+        <div className="flex flex-col gap-5 w-full max-w-sm mx-auto">
+          <Button asChild size="lg" className="btn-primary w-full h-16 md:h-[72px] text-base md:text-lg rounded-[16px] shadow-2xl shadow-chapter-accent/15 hover:-translate-y-0.5 transition-transform duration-300">
             <Link href="/founder-pass">
-              <Sparkles className="w-5 h-5 mr-2" />
-              Founder Pass 알아보기
+              <Sparkles className="w-5 h-5 mr-2.5" />
+              Founder Pass 시작하기
             </Link>
           </Button>
-          <p className="text-sm text-slate/60">
+          <p className="text-xs text-slate/50 tracking-wide">
             ESSENCE 39만원 · BALANCE 69만원 · MIRACLE 99만원
           </p>
         </div>
 
         {/* Secondary Actions */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-          <Button variant="outline" onClick={onStart} className="h-12 px-6 rounded-full border-line hover:bg-obsidian/5">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+          <Button variant="ghost" onClick={onStart} className="h-12 px-6 rounded-full text-sm font-medium hover:bg-obsidian/5 border border-line">
             무료 60초 진단 체험
           </Button>
-          <Button variant="ghost" asChild className="h-12 px-6 rounded-full hover:bg-obsidian/5">
-            <Link href="/products">회복 큐레이션 보기 <ArrowRight className="w-4 h-4 ml-1" /></Link>
+          <Button variant="ghost" asChild className="h-12 px-6 rounded-full text-sm font-medium hover:bg-obsidian/5">
+            <Link href="/products">큐레이션 보기 <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
           </Button>
         </div>
 
-        {/* Trust Section */}
-        <div className="pt-12 border-t border-line">
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12 text-sm text-slate">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-status-good" />
+        {/* Trust Badges */}
+        <div className="pt-10 border-t border-line/50">
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-xs text-slate/60 font-medium">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="w-3.5 h-3.5 text-status-good/80" />
               <span>정보·연결·설계 플랫폼</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-status-good" />
-              <span>7일 이내 100% 환불 보장</span>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="w-3.5 h-3.5 text-status-good/80" />
+              <span>7일 이내 100% 환불</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-status-good" />
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="w-3.5 h-3.5 text-status-good/80" />
               <span>(주)사피에넷 운영</span>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

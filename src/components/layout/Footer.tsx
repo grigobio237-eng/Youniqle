@@ -111,11 +111,11 @@ export default function Footer() {
   const currentSettings = settings || defaultSettings;
 
   return (
-    <footer className={`bg-obsidian text-slate border-t border-line py-16 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
+    <footer className={`bg-obsidian text-slate border-t border-line/30 py-16 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-1 space-y-4">
+          <div className="col-span-1 md:col-span-1 space-y-6">
             <div className="flex items-center space-x-3">
               <div className="relative h-10 w-10">
                 <CharacterImage
@@ -126,11 +126,11 @@ export default function Footer() {
                   sizes="40px"
                 />
               </div>
-              <span className="text-xl font-bold">Youniqle</span>
+              <span className="text-xl font-serif-display tracking-tight text-white">Youniqle</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Youniqle은 (주)사피에넷(Sapienet)의 회복 큐레이션 브랜드입니다. <br />
-              {currentSettings.siteDescription}
+            <p className="text-gray-400 text-sm leading-relaxed font-light">
+              Youniqle은 (주)사피에넷(Sapienet)의<br />
+              회복 큐레이션 브랜드입니다.
             </p>
           </div>
 

@@ -686,8 +686,11 @@ export default function LoungeContent({ owners }: LoungeContentProps) {
                     </p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 mt-12">
-                    <Button className="h-16 px-10 rounded-2xl bg-luxury-gold text-luxury-navy font-black hover:scale-105 transition-all shadow-xl shadow-luxury-gold/20" asChild>
-                        <Link href="/pavilion">로비로 돌아가기</Link>
+                    <Button
+                        onClick={() => setStep('MAIN')}
+                        className="h-16 px-10 rounded-2xl bg-luxury-gold text-luxury-navy font-black hover:scale-105 transition-all shadow-xl shadow-luxury-gold/20"
+                    >
+                        로비로 돌아가기
                     </Button>
                     <Button variant="outline" className="h-16 px-10 rounded-2xl border-slate-200 font-black text-slate-400 hover:bg-white/5" asChild>
                         <Link href="/">홈으로 가기</Link>

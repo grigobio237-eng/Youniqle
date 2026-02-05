@@ -1,4 +1,5 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,6 +36,11 @@
     --luxury-silk: #FFFDF5;
     --luxury-emerald: #064E3B;
     --luxury-navy: #0F172A;
+    
+    /* Premium Renewal Tokens */
+    --luxury-champagne: #F7E7CE;
+    --luxury-charcoal: #2C2C2C;
+    --luxury-platinum: #E5E4E2;
     
     /* Chart Colors (Internal uses these or tailwind classes) */
     --chart-1: #0E1B2C;
@@ -136,6 +142,49 @@
   .luxury-shadow {
     box-shadow: 0 20px 50px rgba(191, 149, 63, 0.1);
   }
+
+  /* Premium Renewal: Serif Typography */
+  .font-serif-display {
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-weight: 500;
+  }
+
+  /* Premium Renewal: Noise Texture Overlay */
+  .noise-texture {
+    position: relative;
+  }
+  .noise-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Premium Renewal: Cinematic Hero */
+  .hero-cinematic {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6rem 1.5rem;
+  }
+
+  /* Premium Renewal: Staggered Fade-In Animation */
+  .stagger-fade-in > * {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: staggerFadeIn 0.8s ease-out forwards;
+  }
+  .stagger-fade-in > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-fade-in > *:nth-child(2) { animation-delay: 0.25s; }
+  .stagger-fade-in > *:nth-child(3) { animation-delay: 0.4s; }
+  .stagger-fade-in > *:nth-child(4) { animation-delay: 0.55s; }
+  .stagger-fade-in > *:nth-child(5) { animation-delay: 0.7s; }
 }
 
 /* 3D Animations */
@@ -177,3 +226,14 @@
   background-size: 200% 100%;
 }
 
+/* Premium Renewal: Stagger Fade-In Keyframes */
+@keyframes staggerFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
