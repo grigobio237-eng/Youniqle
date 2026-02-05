@@ -9,22 +9,22 @@ export async function GET(request: NextRequest) {
   try {
     // 파트너 토큰 검증
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-    
+
     await connectDB();
 
     // 파트너의 상품이 포함된 주문만 조회
     const orders = await Order.find({
       'items.partnerId': decoded.id
     })
-    .populate('items.productId', 'name images')
-    .populate('userId', 'name email phone')
-    .sort({ createdAt: -1 });
+      .populate('items.productId', 'name images')
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 });
 
     // 주문 데이터 변환
     const transformedOrders = orders.map(order => ({
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           productName: item.productId?.name || 'Unknown Product',
           quantity: item.quantity,
           price: item.price,
-          image: item.productId?.images?.[0]?.url || '/placeholder-product.jpg'
+          image: item.productId?.images?.[0]?.url || item.productId?.images?.[0] || ''
         })),
       totalAmount: order.items
         .filter((item: any) => item.partnerId?.toString() === decoded.id)

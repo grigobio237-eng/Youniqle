@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         productName: item.productId?.name || 'Unknown Product',
         quantity: item.quantity,
         price: item.price,
-        image: item.productId?.images?.[0]?.url || '/placeholder-product.jpg',
+        image: item.productId?.images?.[0]?.url || '',
         partnerName: item.productId?.partnerName || '관리자'
       })),
       totalAmount: order.totalAmount,

@@ -246,13 +246,17 @@ export default function CartPage() {
                           className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent"
                         />
 
-                        <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner">
-                          <Image
-                            src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
-                            alt={item.productId?.name || '상품'}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                          />
+                        <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner flex items-center justify-center">
+                          {item.productId?.images?.[0] ? (
+                            <Image
+                              src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0]}
+                              alt={item.productId?.name || '상품'}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                          ) : (
+                            <Package className="h-10 w-10 text-slate opacity-20" />
+                          )}
                           <div className="absolute inset-0 bg-obsidian/5 group-hover:bg-transparent transition-colors" />
                         </div>
 

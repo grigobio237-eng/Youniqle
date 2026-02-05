@@ -76,10 +76,10 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    if (session?.user) {
+    if (status === 'authenticated' && session?.user?.email) {
       fetchOrders();
     }
-  }, [session]);
+  }, [status, session?.user?.email]);
 
   const fetchOrders = async () => {
     if (!session?.user) return;
@@ -223,16 +223,20 @@ export default function OrdersPage() {
                       {(order?.items || []).slice(0, 3).map((item, i) => {
                         const productImage = (item.productId?.images?.[0] as any)?.url ||
                           item.productId?.images?.[0] ||
-                          item.imageUrl ||
-                          '/placeholder-product.jpg';
+                          item.imageUrl;
+
                         return (
-                          <div key={i} className="w-16 h-16 rounded-2xl border-4 border-white bg-mist relative flex-shrink-0 shadow-sm">
-                            <Image
-                              src={productImage}
-                              alt=""
-                              fill
-                              className="object-cover rounded-xl"
-                            />
+                          <div key={i} className="w-16 h-16 rounded-2xl border-4 border-white bg-mist relative flex-shrink-0 shadow-sm overflow-hidden flex items-center justify-center">
+                            {productImage ? (
+                              <Image
+                                src={productImage}
+                                alt=""
+                                fill
+                                className="object-cover rounded-xl"
+                              />
+                            ) : (
+                              <Package className="h-6 w-6 text-slate opacity-20" />
+                            )}
                           </div>
                         );
                       })}
@@ -323,12 +327,15 @@ export default function OrdersPage() {
                     {(selectedOrder?.items || []).map((item, i) => {
                       const itemImage = (item.productId?.images?.[0] as any)?.url ||
                         item.productId?.images?.[0] ||
-                        item.imageUrl ||
-                        '/placeholder-product.jpg';
+                        item.imageUrl;
                       return (
                         <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-line">
-                          <div className="w-12 h-12 bg-mist rounded-xl relative overflow-hidden flex-shrink-0">
-                            <Image src={itemImage} alt="" fill className="object-cover" />
+                          <div className="w-12 h-12 bg-mist rounded-xl relative overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            {itemImage ? (
+                              <Image src={itemImage || ''} alt="" fill className="object-cover" />
+                            ) : (
+                              <Package className="h-4 w-4 text-slate opacity-20" />
+                            )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-black text-obsidian truncate">{item.productId?.name || item.name || '정보 없음'}</p>

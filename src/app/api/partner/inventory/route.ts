@@ -8,17 +8,17 @@ export async function GET(request: NextRequest) {
   try {
     // 파트너 토큰 검증
     const token = request.cookies.get('partner-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: '파트너 토큰이 필요합니다.' }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string; name: string };
-    
+
     // 파트너의 상품들만 조회
     const { connectDB } = await import('@/lib/db');
     await connectDB();
-    
+
     const Product = (await import('@/models/Product')).default;
     const products = await Product.find({ partnerId: decoded.id })
       .select('name stock reservedStock minStock maxStock status category images')
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         status,
         productStatus: product.status,
         category: product.category,
-        image: product.images?.[0]?.url || '/placeholder-product.jpg'
+        image: product.images?.[0]?.url || product.images?.[0] || ''
       };
     });
 
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       totalValue: inventoryData.reduce((sum, item) => sum + (item.currentStock * 10000), 0) // 예상 재고 가치
     };
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       inventory: inventoryData,
       stats
     });

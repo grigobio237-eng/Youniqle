@@ -826,13 +826,17 @@ function CheckoutPageContent() {
                     .filter(item => item && item._id)
                     .map((item) => (
                       <div key={item._id} className="flex gap-4 items-center">
-                        <div className="w-12 h-12 rounded-lg bg-white/10 flex-shrink-0 relative overflow-hidden">
-                          <Image
-                            src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
-                            alt={item.productId?.name || '상품'}
-                            fill
-                            className="object-cover"
-                          />
+                        <div className="w-12 h-12 rounded-lg bg-white/10 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                          {item.productId?.images?.[0] ? (
+                            <Image
+                              src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0]}
+                              alt={item.productId?.name || '상품'}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Package className="h-4 w-4 text-white opacity-20" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold line-clamp-1">{item.productId?.name || '정보 없음'}</p>
