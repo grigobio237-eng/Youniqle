@@ -255,22 +255,26 @@ function CheckoutPageContent() {
             const data = await response.json();
             const selectedIds = searchParams?.get('selectedItems');
 
-            if (selectedIds) {
-              const selectedIdArray = selectedIds.split(',');
-              const filteredItems = data.cart.items.filter((item: CartItem) =>
-                selectedIdArray.includes(item._id)
-              );
+            if (data.cart && data.cart.items) {
+              if (selectedIds) {
+                const selectedIdArray = selectedIds.split(',');
+                const filteredItems = data.cart.items.filter((item: CartItem) =>
+                  selectedIdArray.includes(item._id)
+                );
 
-              const filteredCart = {
-                ...data.cart,
-                items: filteredItems,
-                totalItems: filteredItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-                totalAmount: filteredItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
-              };
+                const filteredCart = {
+                  ...data.cart,
+                  items: filteredItems,
+                  totalItems: filteredItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
+                  totalAmount: filteredItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
+                };
 
-              setCart(filteredCart);
+                setCart(filteredCart);
+              } else {
+                setCart(data.cart);
+              }
             } else {
-              setCart(data.cart);
+              setCart({ items: [], totalItems: 0, totalAmount: 0 } as any);
             }
           }
         }
@@ -313,8 +317,8 @@ function CheckoutPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: couponCode.trim(),
-          cartItems: cart.items,
-          totalAmount: cart.totalAmount
+          cartItems: cart?.items || [],
+          totalAmount: cart?.totalAmount || 0
         })
       });
 
@@ -403,7 +407,7 @@ function CheckoutPageContent() {
   };
 
   const handleOrder = async () => {
-    if (!cart || cart.items.length === 0) return;
+    if (!cart || !cart.items || cart.items.length === 0) return;
 
     if (!shippingAddress.recipient || !shippingAddress.phone || !shippingAddress.address1) {
       alert('모든 필수 정보를 입력해주세요.');
@@ -418,14 +422,14 @@ function CheckoutPageContent() {
     setSubmitting(true);
 
     try {
-      const currentDeliveryFee = cart.totalAmount >= 50000 ? 0 : shippingAddress.shippingMethod === 'express' ? 5000 : 3000;
-      const subtotalAfterCoupon = cart.totalAmount - couponDiscount;
+      const currentDeliveryFee = (cart?.totalAmount || 0) >= 50000 ? 0 : shippingAddress.shippingMethod === 'express' ? 5000 : 3000;
+      const subtotalAfterCoupon = (cart?.totalAmount || 0) - couponDiscount;
       const totalAmountToPay = subtotalAfterCoupon + currentDeliveryFee - usePoints;
 
       const orderData = {
-        items: cart.items.map(item => ({
-          productId: item.productId._id,
-          name: item.productId.name,
+        items: (cart?.items || []).map(item => ({
+          productId: item.productId?._id,
+          name: item.productId?.name,
           price: item.price,
           quantity: item.quantity
         })),
@@ -471,9 +475,9 @@ function CheckoutPageContent() {
       const paymentData = {
         orderId: order.orderNumber || order._id,
         amount: totalAmountToPay,
-        productName: cart.items.length === 1
-          ? cart.items[0].productId.name
-          : `${cart.items[0].productId.name} 외 ${cart.items.length - 1}건`,
+        productName: (cart?.items?.length || 0) === 1
+          ? cart?.items?.[0]?.productId?.name || '정보 없음'
+          : `${cart?.items?.[0]?.productId?.name || '정보 없음'} 외 ${(cart?.items?.length || 0) - 1}건`,
         buyerName: shippingAddress.recipient,
         buyerEmail: session?.user?.email || '',
         buyerTel: shippingAddress.phone,
@@ -533,7 +537,7 @@ function CheckoutPageContent() {
     );
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center px-4">
         <div className="text-center bg-white p-12 rounded-[40px] shadow-xl max-w-md w-full">

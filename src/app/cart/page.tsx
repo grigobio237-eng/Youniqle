@@ -69,10 +69,13 @@ export default function CartPage() {
       const response = await fetch('/api/cart');
       if (response.ok) {
         const data = await response.json();
-        setCart(data.cart);
-        if (data.cart?.items) {
+        if (data.cart && data.cart.items) {
+          setCart(data.cart);
           const allItemIds = new Set<string>(data.cart.items.map((item: CartItem) => item._id));
           setSelectedItems(allItemIds);
+        } else {
+          setCart({ items: [], totalItems: 0, totalAmount: 0 } as any);
+          setSelectedItems(new Set());
         }
       }
     } catch (error) {
@@ -93,17 +96,17 @@ export default function CartPage() {
 
   const toggleAllSelection = () => {
     if (!cart) return;
-    if (selectedItems.size === cart.items.length) {
+    if (selectedItems.size === (cart?.items?.length || 0)) {
       setSelectedItems(new Set());
     } else {
-      const allIds = new Set(cart.items.map(item => item._id));
+      const allIds = new Set((cart?.items || []).map(item => item._id));
       setSelectedItems(allIds);
     }
   };
 
   const getSelectedTotal = () => {
     if (!cart) return 0;
-    return cart.items
+    return (cart?.items || [])
       .filter(item => selectedItems.has(item._id))
       .reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
@@ -170,7 +173,7 @@ export default function CartPage() {
     );
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-mist py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
@@ -214,7 +217,7 @@ export default function CartPage() {
                   className="w-6 h-6 rounded-lg border-line data-[state=checked]:bg-chapter-accent data-[state=checked]:border-chapter-accent"
                 />
                 <label htmlFor="select-all" className="text-sm font-black text-obsidian cursor-pointer select-none">
-                  전체 데이터 선택 <span className="text-slate/40 ml-1">({selectedItems.size}/{cart.items.length})</span>
+                  전체 데이터 선택 <span className="text-slate/40 ml-1">({selectedItems.size}/{cart?.items?.length || 0})</span>
                 </label>
               </div>
               <Button variant="ghost" size="sm" className="text-xs font-black text-slate hover:text-status-danger hover:bg-status-danger/5 h-10 px-4 rounded-xl transition-all">
@@ -223,7 +226,7 @@ export default function CartPage() {
             </div>
 
             <div className="space-y-4">
-              {cart.items.map((item) => (
+              {(cart?.items || []).map((item) => (
                 <Card key={item._id} className={`border-none shadow-sm rounded-[36px] overflow-hidden transition-all duration-500 hover:shadow-xl group ${selectedItems.has(item._id) ? 'bg-white' : 'bg-white/50 opacity-60'}`}>
                   <CardContent className="p-8">
                     <div className="flex flex-col md:flex-row items-center gap-8">
@@ -235,8 +238,8 @@ export default function CartPage() {
 
                       <div className="w-32 h-32 flex-shrink-0 relative rounded-[24px] overflow-hidden bg-mist shadow-inner">
                         <Image
-                          src={(item.productId.images?.[0] as any)?.url || item.productId.images?.[0] || '/placeholder-product.jpg'}
-                          alt={item.productId.name}
+                          src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
+                          alt={item.productId?.name || '상품'}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
@@ -244,9 +247,9 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex-1 w-full text-center md:text-left">
-                        <Link href={`/products/${item.productId.slug}`} className="inline-block group/link">
+                        <Link href={`/products/${item.productId?.slug || ''}`} className="inline-block group/link">
                           <h3 className="font-black text-2xl text-obsidian mb-2 tracking-tight group-hover/link:text-chapter-accent transition-colors">
-                            {item.productId.name}
+                            {item.productId?.name || '정보 없음'}
                           </h3>
                         </Link>
                         <div className="flex items-center justify-center md:justify-start gap-4 mb-6">

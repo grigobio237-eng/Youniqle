@@ -115,12 +115,12 @@ export default function OrdersPage() {
 
   const handleReorder = async (order: Order) => {
     try {
-      const addToCartPromises = order.items.map(item =>
+      const addToCartPromises = (order?.items || []).map(item =>
         fetch('/api/cart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            productId: item.productId._id,
+            productId: item.productId?._id,
             quantity: item.quantity,
           }),
         })
@@ -216,10 +216,10 @@ export default function OrdersPage() {
                 <CardContent className="p-8 pt-6">
                   <div className="flex flex-col md:flex-row gap-8 items-center">
                     <div className="flex -space-x-4 overflow-hidden">
-                      {order.items.slice(0, 3).map((item, i) => (
+                      {(order?.items || []).slice(0, 3).map((item, i) => (
                         <div key={i} className="w-16 h-16 rounded-2xl border-4 border-white bg-mist relative flex-shrink-0 shadow-sm">
                           <Image
-                            src={item.productId.images?.[0] || '/placeholder-product.jpg'}
+                            src={item.productId?.images?.[0] || '/placeholder-product.jpg'}
                             alt=""
                             fill
                             className="object-cover rounded-xl"
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                     </div>
                     <div className="flex-1 text-center md:text-left">
                       <h4 className="font-black text-obsidian text-lg line-clamp-1">
-                        {order.items[0].productId.name} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ''}
+                        {order?.items?.[0]?.productId?.name || '정보 없음'} {order?.items && order.items.length > 1 ? `외 ${order.items.length - 1}건` : ''}
                       </h4>
                       <div className="flex items-center justify-center md:justify-start gap-4 mt-1">
                         <span className="text-xl font-black text-obsidian tracking-tighter">{order.totalAmount.toLocaleString()}원</span>
@@ -310,13 +310,13 @@ export default function OrdersPage() {
                     Requested Equipment
                   </span>
                   <div className="space-y-3">
-                    {selectedOrder.items.map((item, i) => (
+                    {(selectedOrder?.items || []).map((item, i) => (
                       <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-line">
                         <div className="w-12 h-12 bg-mist rounded-xl relative overflow-hidden flex-shrink-0">
-                          <Image src={item.productId.images?.[0] || '/placeholder-product.jpg'} alt="" fill className="object-cover" />
+                          <Image src={item.productId?.images?.[0] || '/placeholder-product.jpg'} alt="" fill className="object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-black text-obsidian truncate">{item.productId.name}</p>
+                          <p className="text-sm font-black text-obsidian truncate">{item.productId?.name || '정보 없음'}</p>
                           <p className="text-[10px] font-bold text-slate opacity-60">{item.quantity} 개 × {item.price.toLocaleString()}원</p>
                         </div>
                         <span className="font-black text-obsidian text-sm">{(item.quantity * item.price).toLocaleString()}원</span>
