@@ -15,7 +15,7 @@ interface WishlistItem {
     _id: string;
     name: string;
     price: number;
-    images: string[];
+    images: Array<{ url: string } | string>;
     category: string;
     stock: number;
     status: 'active' | 'inactive';
@@ -128,8 +128,8 @@ export default function WishlistPage() {
     );
   }
 
-  const activeItems = wishlist.filter(item => item.productId.status === 'active');
-  const inactiveItems = wishlist.filter(item => item.productId.status === 'inactive');
+  const activeItems = (wishlist || []).filter(item => item && item.productId && item.productId.status === 'active');
+  const inactiveItems = (wishlist || []).filter(item => item && item.productId && item.productId.status === 'inactive');
 
   return (
     <div className="min-h-screen bg-mist py-20 px-4">
@@ -175,8 +175,8 @@ export default function WishlistPage() {
                     <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
                       <div className="relative aspect-square overflow-hidden bg-mist">
                         <Image
-                          src={item.productId.images?.[0] || '/placeholder-product.jpg'}
-                          alt={item.productId.name}
+                          src={(item.productId?.images?.[0] as any)?.url || item.productId?.images?.[0] || '/placeholder-product.jpg'}
+                          alt={item.productId?.name || '상품'}
                           fill
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -195,8 +195,8 @@ export default function WishlistPage() {
                         </div>
                       </div>
                       <CardContent className="p-8">
-                        <h3 className="text-lg font-black text-obsidian tracking-tight line-clamp-1 mb-1">{item.productId.name}</h3>
-                        <p className="text-xl font-black text-obsidian tracking-tighter mb-6">{item.productId.price.toLocaleString()}원</p>
+                        <h3 className="text-lg font-black text-obsidian tracking-tight line-clamp-1 mb-1">{item.productId?.name || '정보 없음'}</h3>
+                        <p className="text-xl font-black text-obsidian tracking-tighter mb-6">{(item.productId?.price || 0).toLocaleString()}원</p>
                         <div className="flex gap-2">
                           <Button asChild variant="outline" className="flex-1 h-12 rounded-xl border-line font-black text-xs hover:bg-mist">
                             <Link href={`/products/${item.productId._id}`}>
@@ -228,8 +228,8 @@ export default function WishlistPage() {
                   {inactiveItems.map((item) => (
                     <Card key={item._id} className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white/50 opacity-40 grayscale pointer-events-none">
                       <div className="relative aspect-square bg-mist flex items-center justify-center">
-                        {item.productId.images?.[0] ? (
-                          <Image src={item.productId.images[0]} alt="" fill className="object-cover" />
+                        {(item.productId?.images?.[0]) ? (
+                          <Image src={(item.productId.images[0] as any)?.url || item.productId.images[0]} alt="" fill className="object-cover" />
                         ) : <Heart className="h-16 w-16 text-slate" />}
                         <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                           <Badge className="bg-status-danger text-mist font-black px-4 py-1.5 rounded-full">SOLD OUT</Badge>
