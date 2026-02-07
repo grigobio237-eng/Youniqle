@@ -82,42 +82,51 @@ export default function ItemDetailModal({
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-px bg-obsidian/5 rounded-xl md:rounded-2xl overflow-hidden border border-obsidian/5">
-                                    {item.canvasSize && (
-                                        <div className="p-3 md:p-8 bg-white/40 space-y-1 md:space-y-2">
-                                            <span className="text-[6px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">CANVAS SIZE</span>
-                                            <p className="font-black text-obsidian text-xs md:text-lg">{item.canvasSize}</p>
-                                        </div>
-                                    )}
-                                    {Object.entries(item.specs).map(([key, value]) => (
-                                        <div key={key} className="p-3 md:p-8 bg-white/40 space-y-1 md:space-y-2">
-                                            <span className="text-[6px] md:text-[9px] font-black uppercase tracking-widest text-obsidian/30">{key}</span>
-                                            <p className="font-black text-obsidian text-xs md:text-lg">{value}</p>
-                                        </div>
-                                    ))}
+                                {/* Specs Section - Clean 2-Column Grid */}
+                                <div className="grid grid-cols-2 gap-8 py-2">
+                                    <div className="space-y-2">
+                                        <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">SIZE</span>
+                                        <p className="font-serif italic text-xl text-obsidian">{item.canvasSize || 'Variable'}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">MATERIAL</span>
+                                        <p className="font-serif italic text-xl text-obsidian">{item.specs.material || 'Mixed Media'}</p>
+                                    </div>
                                 </div>
 
-                                <div className="space-y-3 md:space-y-6 pt-2">
-                                    <div className="flex flex-col gap-2 md:gap-4 pb-3 md:pb-4 border-b border-obsidian/5">
+                                {/* Pricing & Actions Section - With Top Border */}
+                                <div className="space-y-8 pt-8 border-t border-gray-100">
+                                    <div className="flex flex-col gap-2">
+                                        {/* Ownership Price */}
+                                        <div className="flex items-baseline justify-between">
+                                            <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">OWNERSHIP</span>
+                                            <span className="font-serif italic text-2xl text-gray-500">
+                                                {item.price === 'Price on Request' ? 'Price on Request' : `₩${Number(parsePrice(item.price)).toLocaleString()}`}
+                                            </span>
+                                        </div>
+
+                                        {/* Rental Price - Highlighted */}
                                         {item.rental && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[8px] md:text-[10px] font-black text-[#D4AF37] uppercase tracking-widest italic">렌탈 (월)</span>
-                                                <span className="text-lg md:text-2xl font-black text-obsidian tracking-tighter">₩{parsePrice(item.rental).toLocaleString()}</span>
+                                            <div className="flex items-baseline justify-between mt-2">
+                                                <span className="text-[10px] font-bold text-[#D4AF37] tracking-[0.3em] uppercase">MONTHLY RENTAL</span>
+                                                <span className="font-black text-4xl text-obsidian tracking-tighter">
+                                                    <span className="text-lg align-top mr-1 font-serif italic text-[#D4AF37]">₩</span>
+                                                    {Number(parsePrice(item.rental)).toLocaleString()}
+                                                </span>
                                             </div>
                                         )}
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-[8px] md:text-[10px] font-black text-obsidian/30 uppercase tracking-widest italic">가치 산정액</span>
-                                            <span className="text-xl md:text-4xl font-black text-obsidian tracking-tighter">₩{parsePrice(item.price).toLocaleString()}</span>
-                                        </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3 md:gap-4">
-                                        <button className="h-12 md:h-20 bg-obsidian text-white rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-4">
-                                            <ShoppingCart size={14} className="md:w-[18px] md:h-[18px]" />
-                                            담기
+                                    {/* Action Buttons */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button className="h-14 border border-black text-black text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                                            구매 문의하기
                                         </button>
-                                        <button className="h-12 md:h-20 border-2 border-obsidian/10 text-obsidian rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all">
-                                            문의하기
+                                        <button
+                                            disabled={!item.rental}
+                                            className="h-14 bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {item.rental ? '대여 신청하기' : '대여 불가'}
                                         </button>
                                     </div>
                                 </div>

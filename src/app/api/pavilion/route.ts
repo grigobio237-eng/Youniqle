@@ -1,25 +1,115 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import PavilionFloor from '@/models/PavilionFloor';
+import mongoose from 'mongoose';
 
-const INITIAL_DATA = [
-    {
-        floor: 1,
-        owners: [
-            {
-                id: 'artist-a', name: 'Master A', role: 'Media Artist', bio: '디지털 생명력과 회복의 메시지를 담는 미디어 아트의 거장입니다.',
-                items: [
-                    { id: 'art-a1', type: 'ARTWORK', title: 'Eternal Recovery I', description: '영원한 회복의 첫 번째 전조를 시각화한 대작입니다.', specs: { size: '250x250cm', medium: 'Digital mix' }, price: '₩25,000,000', rental: '₩1,200,000' },
-                    { id: 'art-a2', type: 'ARTWORK', title: 'Soul Resonance', description: '영혼의 공명을 담은 위치 가변형 작품입니다.', specs: { size: '180x210cm', medium: 'NFT Board' }, price: '₩18,000,000', rental: '₩800,000' },
-                ]
-            },
-            {
-                id: 'artist-b', name: 'Master B', role: 'Digital Sculptor', bio: '가상 공간에서의 형태와 질감을 재정의하는 디지털 조각가입니다.',
-                items: [
-                    { id: 'art-b1', type: 'ARTWORK', title: 'Virtual Form', description: '가상 세계의 본질을 담은 조각 작품입니다.', specs: { platform: 'Unity 3D' }, price: '₩12,000,000' },
-                ]
+// External DB Configuration
+const EXTERNAL_URI = process.env.EXTERNAL_MONGODB_URI;
+const FIREBASE_BUCKET = process.env.EXTERNAL_FIREBASE_BUCKET || 'artfactory-482402.firebasestorage.app';
+
+// Helper to construct Firebase URL
+function getFirebaseUrl(path: string) {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    // Encoding path segments to handle slashes correctly
+    const encodedPath = encodeURIComponent(path);
+    return `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET}/o/${encodedPath}?alt=media`;
+}
+
+async function fetchExternalFloor1Data() {
+    if (!EXTERNAL_URI) {
+        console.warn('EXTERNAL_MONGODB_URI is missing. Skipping external sync.');
+        return [];
+    }
+
+    let conn;
+    try {
+        // Create a separate connection for external DB
+        conn = await mongoose.createConnection(EXTERNAL_URI).asPromise();
+
+        // Fetch approved artworks
+        const artworks = await conn.collection('artworks').find({ status: 'approved' }).toArray();
+        if (artworks.length === 0) return [];
+
+        // Group artworks by artist_id (using 'authorId' or 'artist_id' or 'userId' based on previous inspection, assuming schema uses one of these, let's prioritize 'artist_id' if available, otherwise check others)
+        // Based on inspection, keys were: _id, title, description, artist_id...
+        const artistMap = new Map();
+
+        // Fetch related users (artists)
+        // Collect all unique artist IDs
+        const artistIds = [...new Set(artworks.map(a => a.artist_id).filter(Boolean))];
+
+        // ⚠️ converting string IDs to ObjectId if needed, but assuming they match string/ObjectId format in query
+        // The external User collection use _id as ObjectId usually.
+        // Let's try to fetch users.
+        const users = await conn.collection('users').find({
+            _id: { $in: artistIds.map(id => new mongoose.Types.ObjectId(id)) }
+        }).toArray();
+
+        users.forEach(u => artistMap.set(u._id.toString(), u));
+
+        // Group items by artist
+        const ownersMap = new Map();
+
+        artworks.forEach(art => {
+            const artistId = art.artist_id?.toString();
+            if (!artistId || !artistMap.has(artistId)) return;
+
+            const artist = artistMap.get(artistId);
+
+            if (!ownersMap.has(artistId)) {
+                ownersMap.set(artistId, {
+                    id: `ext-${artistId}`, // Prefix to avoid collision
+                    name: artist.username || artist.name || 'Unknown Artist',
+                    role: artist.role || 'Artist',
+                    bio: artist.introduction || artist.bio || 'No biography available.',
+                    image: getFirebaseUrl(artist.profile_image || artist.avatar_url),
+                    items: []
+                });
             }
-        ]
+
+            const owner = ownersMap.get(artistId);
+            owner.items.push({
+                id: `ext-art-${art._id}`,
+                type: 'ARTWORK',
+                title: art.title,
+                description: art.description || '',
+                price: art.price ? `${art.price.toLocaleString()}` : 'Price on Request', // Removed '₩' here if component adds it, or keep consistent. Component adds it? parsing logic exists. Let's keep raw number or formatted? Component uses parsePrice. Let's provide string.
+                // Actually ItemDetailModal uses parsePrice which strips non-digits. So '₩' is fine.
+                // But let's check parsePrice logic: priceStr.replace(/[^0-9]/g, '').
+                // So "4,500,000" becomes 4500000.
+
+                rental: art.rental_price ? `${art.rental_price.toLocaleString()}` : undefined,
+                image: getFirebaseUrl(art.firebase_storage_path || art.image_url),
+                specs: {
+                    material: art.material || art.category || 'Mixed Media',
+                    year: art.year || (art.createdAt ? new Date(art.createdAt).getFullYear().toString() : '2025')
+                },
+                canvasSize: art.size // Map ONLY to canvasSize to avoid duplication
+            });
+        });
+
+        const owners = Array.from(ownersMap.values());
+
+        // Add backup dummy if empty (optional)
+        if (owners.length === 0) return [];
+
+        return owners;
+
+    } catch (error) {
+        console.error('External DB Fetch Error:', error);
+        return [];
+    } finally {
+        if (conn) {
+            await conn.close();
+        }
+    }
+}
+
+const INITIAL_DATA_INTERNAL_FLOORS = [
+    {
+        floor: 1, // Fallback if external fails or for structure
+        owners: []
     },
     {
         floor: 2,
@@ -79,18 +169,37 @@ export async function GET() {
     try {
         await connectDB();
 
-        let data = await PavilionFloor.find().sort({ floor: 1 });
+        // 1. Fetch Internal Data (Floors 2-5)
+        let internalData = await PavilionFloor.find({ floor: { $ne: 1 } }).lean();
 
-        // Auto-initialize if empty
-        if (data.length === 0) {
-            await PavilionFloor.insertMany(INITIAL_DATA);
-            data = await PavilionFloor.find().sort({ floor: 1 });
+        // If internal DB is empty (first run), populate standard floors
+        if (internalData.length === 0) {
+            // We can just use memory constant for now or seed.
+            // Let's filter INITIAL_DATA for >1
+            internalData = INITIAL_DATA_INTERNAL_FLOORS.filter(f => f.floor > 1);
         }
 
-        // Convert to Record<number, FloorOwner[]> for compatibility with current frontend
+        // 2. Fetch External Data (Floor 1)
+        let floor1Owners = await fetchExternalFloor1Data();
+
+        // If external failed or empty, maybe fallback to internal floor 1 if exists?
+        // But requested behavior is direct sync.
+
+        // 3. Construct Final Response
         const pavilionData: Record<number, any[]> = {};
-        data.forEach((f: any) => {
+
+        // Floor 1
+        pavilionData[1] = floor1Owners;
+
+        // Floors 2-5
+        internalData.forEach((f: any) => {
             pavilionData[f.floor] = f.owners;
+        });
+        // Ensure static Initial Data is used if DB misses them
+        INITIAL_DATA_INTERNAL_FLOORS.forEach(f => {
+            if (f.floor > 1 && !pavilionData[f.floor]) {
+                pavilionData[f.floor] = f.owners;
+            }
         });
 
         return NextResponse.json(pavilionData);
