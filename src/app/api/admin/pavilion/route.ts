@@ -7,9 +7,29 @@ import { withAdminAuth } from '@/lib/authMiddleware';
 async function getPavilionHandler() {
     try {
         await connectDB();
-        const data = await PavilionFloor.find().sort({ floor: 1 });
+        // 1. Fetch Internal Data
+        let data: any[] = await PavilionFloor.find().sort({ floor: 1 }).lean();
+
+        // 2. Fetch External Data for Floor 1
+        const { fetchExternalFloor1Data } = await import('@/lib/pavilionData');
+        const externalFloor1Owners = await fetchExternalFloor1Data();
+
+        // 3. Merge External Data
+        // If external data exists, override or add Floor 1
+        if (externalFloor1Owners.length > 0) {
+            const floor1Index = data.findIndex((f: any) => f.floor === 1);
+            if (floor1Index !== -1) {
+                data[floor1Index].owners = externalFloor1Owners;
+            } else {
+                // Add as first element if missing and sort by floor just in case
+                data.push({ floor: 1, owners: externalFloor1Owners });
+                data.sort((a: any, b: any) => a.floor - b.floor);
+            }
+        }
+
         return NextResponse.json(data);
     } catch (error) {
+        console.error('Admin Pavilion Fetch Error:', error);
         return NextResponse.json({ error: 'Failed to fetch pavilion data' }, { status: 500 });
     }
 }

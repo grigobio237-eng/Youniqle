@@ -11,6 +11,7 @@ export interface IPavilionItem {
     rental?: string;
     image?: string;
     canvasSize?: string;
+    rentalStatus?: string; // 'available' | 'processing' | 'rented' | 'unavailable'
 }
 
 export interface IScheduleSlot {

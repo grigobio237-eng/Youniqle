@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
+    const floor = searchParams.get('floor');
+    const artistId = searchParams.get('artistId');
 
     const query: any = {};
 
@@ -35,6 +37,12 @@ export async function GET(request: NextRequest) {
     }
     if (priority && priority !== 'all') {
       query.priority = priority;
+    }
+    if (floor) {
+      query.floor = parseInt(floor);
+    }
+    if (artistId) {
+      query.artistId = artistId;
     }
 
     const skip = (page - 1) * limit;

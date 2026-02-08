@@ -273,6 +273,8 @@ function PavilionContent() {
             {/* Modals */}
             <ItemDetailModal
                 item={s.selectedItem}
+                floor={s.activeFloor}
+                artistId={s.selectedItem?.artistId || s.selectedOwner?.id}
                 isImageZoomed={s.isImageZoomed}
                 onClose={s.closeItem}
                 onZoom={() => s.setIsImageZoomed(true)}

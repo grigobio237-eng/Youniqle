@@ -77,7 +77,8 @@ export async function GET(req: NextRequest) {
                 canvasSize: undefined,
                 // 상품 상세 페이지 연동을 위한 productId 추가
                 productId: product._id.toString(),
-                slug: product.slug
+                slug: product.slug,
+                artistId: product.partnerId?.toString() // 파트너 ID 추가 (문의 연결용)
             };
         });
 

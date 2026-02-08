@@ -546,7 +546,7 @@ export default function MyPage() {
                       </div>
                       <div className="w-full md:w-auto">
                         <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
-                          <Link href="/me/history">문의 내역 보기</Link>
+                          <Link href="/me/inquiries">문의 내역 보기</Link>
                         </Button>
                       </div>
                     </div>

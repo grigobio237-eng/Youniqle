@@ -18,6 +18,7 @@ export interface PavilionItem {
     image?: string;
     canvasSize?: string;
     productId?: string; // 2층 상품 연결용
+    artistId?: string; // 문의 연결용 파트너 ID
 }
 
 export interface IScheduleSlot {

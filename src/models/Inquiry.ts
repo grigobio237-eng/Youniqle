@@ -5,6 +5,9 @@ export interface IInquiry extends Document {
   userId?: mongoose.Types.ObjectId;
   userEmail: string;
   userName: string;
+  phoneNumber?: string;
+  floor?: number;
+  artistId?: string;
   type: 'general' | 'delivery' | 'payment' | 'product' | 'technical' | 'refund' | 'partnership';
   subject: string;
   content: string;
@@ -60,6 +63,18 @@ const InquirySchema = new Schema<IInquiry>({
   userName: {
     type: String,
     required: true
+  },
+  phoneNumber: {
+    type: String,
+    required: false
+  },
+  floor: {
+    type: Number,
+    required: false
+  },
+  artistId: {
+    type: String,
+    required: false
   },
   type: {
     type: String,

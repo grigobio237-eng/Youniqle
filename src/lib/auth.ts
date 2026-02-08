@@ -214,7 +214,8 @@ export const authOptions: AuthOptions = {
             token.grade = dbUser.grade;
             token.tier = dbUser.tier;
             token.subscription = dbUser.subscription;
-            if (!token.id) token.id = dbUser._id.toString();
+            // Force overwrite token.id with DB _id to avoid using Provider (Google) ID
+            token.id = dbUser._id.toString();
           }
         } catch (error) {
           console.error('[Auth JWT Callback] DB lookup error:', error);

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import ConciergeRequest from '@/models/ConciergeRequest';
+import Inquiry from '@/models/Inquiry';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,6 +22,39 @@ export async function GET(request: NextRequest) {
     const pendingConciergeCount = await ConciergeRequest.countDocuments({
       status: 'pending'
     }).maxTimeMS(3000);
+
+    // 대기 중인 문의(Inquiry) 수 조회
+    const pendingInquiriesCount = await Inquiry.countDocuments({
+      status: 'pending'
+    }).maxTimeMS(3000);
+
+    // 파빌리온 층별/작가별 대기 문의 집계
+    const pavilionInquiries = await Inquiry.aggregate([
+      { $match: { status: 'pending', $or: [{ floor: { $exists: true } }, { artistId: { $exists: true } }] } },
+      {
+        $group: {
+          _id: { floor: "$floor", artistId: "$artistId" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const pavilionCounts = {
+      byFloor: {} as Record<string, number>,
+      byArtist: {} as Record<string, number>
+    };
+
+    pavilionInquiries.forEach((item: any) => {
+      const { floor, artistId } = item._id;
+      const count = item.count;
+
+      if (floor) {
+        pavilionCounts.byFloor[floor] = (pavilionCounts.byFloor[floor] || 0) + count;
+      }
+      if (artistId) {
+        pavilionCounts.byArtist[artistId] = (pavilionCounts.byArtist[artistId] || 0) + count;
+      }
+    });
 
     return NextResponse.json({
       notifications: [],
@@ -40,7 +76,9 @@ export async function GET(request: NextRequest) {
       },
       pendingPartners: pendingPartnersCount,
       pendingConcierge: pendingConciergeCount,
-      total: pendingPartnersCount + pendingConciergeCount
+      pendingInquiries: pendingInquiriesCount,
+      pavilion: pavilionCounts, // 추가된 파빌리온 통계
+      total: pendingPartnersCount + pendingConciergeCount + pendingInquiriesCount
     });
 
   } catch (error) {
@@ -51,6 +89,7 @@ export async function GET(request: NextRequest) {
       stats: { total: 0, unread: 0, pending: 0, recent: 0 },
       pendingPartners: 0,
       pendingConcierge: 0,
+      pavilion: { byFloor: {}, byArtist: {} }, // 빈 객체 반환
       total: 0
     });
   }

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/table";
 import { motion, AnimatePresence } from 'framer-motion';
 import LoungeControlCenter from '@/components/admin/pavilion/LoungeControlCenter';
+import InquiryList from '@/components/admin/InquiryList';
 
 // --- Types ---
 interface PavilionItem {
@@ -175,9 +176,24 @@ export default function PavilionAdminPage() {
     const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [stats, setStats] = useState<{ floorCounts: Record<string, number>, artistCounts: Record<string, number> }>({ floorCounts: {}, artistCounts: {} });
+
     useEffect(() => {
         fetchPavilionData();
+        fetchStats();
     }, []);
+
+    const fetchStats = async () => {
+        try {
+            const res = await fetch('/api/admin/pavilion/stats');
+            if (res.ok) {
+                const data = await res.json();
+                setStats(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch stats:', error);
+        }
+    };
 
     // 층이 바뀌면 선택된 작가 초기화 및 검색어 초기화
     useEffect(() => {
@@ -321,9 +337,14 @@ export default function PavilionAdminPage() {
                     <button
                         key={f}
                         onClick={() => setActiveFloor(f)}
-                        className={`px-10 py-4 rounded-2xl font-black text-xs transition-all uppercase tracking-tighter ${activeFloor === f ? 'bg-white text-indigo-600 shadow-md scale-105' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`relative px-10 py-4 rounded-2xl font-black text-xs transition-all uppercase tracking-tighter ${activeFloor === f ? 'bg-white text-indigo-600 shadow-md scale-105' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                         {f}F {f === 1 ? '아트 갤러리' : f === 2 ? '체험 샵' : f === 3 ? '라이프 코칭' : f === 4 ? '메디컬 체크' : '김미정원장 전용라운지'}
+                        {stats.floorCounts[f] > 0 && (
+                            <Badge className="absolute -top-2 -right-2 bg-red-500 text-white border-white border-2">
+                                {stats.floorCounts[f]}
+                            </Badge>
+                        )}
                     </button>
                 ))}
             </nav>
@@ -405,7 +426,14 @@ export default function PavilionAdminPage() {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="py-3">
-                                                        <span className="text-sm font-black text-slate-700 group-hover:text-indigo-600 transition-colors">{owner.name || 'Anonymous'}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm font-black text-slate-700 group-hover:text-indigo-600 transition-colors">{owner.name || 'Anonymous'}</span>
+                                                            {stats.artistCounts[owner.id] > 0 && (
+                                                                <Badge className="bg-red-500 text-white text-[10px] px-1.5 h-5">
+                                                                    {stats.artistCounts[owner.id]}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </TableCell>
                                                     <TableCell className="py-3">
                                                         <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest border-slate-200 text-slate-500 group-hover:border-indigo-200 group-hover:text-indigo-500 transition-all">
@@ -623,6 +651,30 @@ export default function PavilionAdminPage() {
                                                     <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No assets added yet</p>
                                                 </div>
                                             )}
+                                        </div>
+                                    </section>
+
+                                    {/* Inquiry Management Section */}
+                                    <section className="space-y-8 border-t-4 border-slate-50 pt-12">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="w-2 h-8 bg-rose-500 rounded-full" />
+                                            <h5 className="text-sm font-black uppercase tracking-widest text-slate-800">
+                                                Inquiry Management
+                                                {stats.artistCounts[selectedOwner.id] > 0 && (
+                                                    <Badge className="ml-3 bg-rose-500 hover:bg-rose-600 text-white border-none">
+                                                        {stats.artistCounts[selectedOwner.id]} New Pending
+                                                    </Badge>
+                                                )}
+                                            </h5>
+                                        </div>
+
+                                        <div className="bg-slate-50/50 rounded-[32px] overflow-hidden border border-slate-100 p-6">
+                                            <InquiryList
+                                                artistId={selectedOwner.id}
+                                                floor={activeFloor}
+                                                title={`Inquiries for ${selectedOwner.name}`}
+                                                description="Manage inquiries specifically related to this partner/artist."
+                                            />
                                         </div>
                                     </section>
                                 </div>

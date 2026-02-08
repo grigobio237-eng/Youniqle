@@ -256,6 +256,11 @@ const navigationItems = [
 interface NotificationData {
   pendingPartners: number;
   pendingConcierge: number;
+  pendingInquiries: number;
+  pavilion?: {
+    byFloor: Record<string, number>;
+    byArtist: Record<string, number>;
+  };
   total: number;
 }
 
@@ -264,7 +269,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState<NotificationData>({ pendingPartners: 0, pendingConcierge: 0, total: 0 });
+  const [notifications, setNotifications] = useState<NotificationData>({ pendingPartners: 0, pendingConcierge: 0, pendingInquiries: 0, total: 0 });
   const [language, setLanguage] = useState('ko');
   const [imgError, setImgError] = useState(false);
   const router = useRouter();
@@ -484,8 +489,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const isActive = safePathname === item.href || (item.subItems && item.subItems.some(sub => safePathname === sub.href));
               const isPartnersMenu = item.href === '/admin/partners';
               const isPavilionMenu = item.href === '/admin/pavilion';
-              const showNotification = (isPartnersMenu && notifications.pendingPartners > 0) || (isPavilionMenu && notifications.pendingConcierge > 0);
-              const badgeCount = isPartnersMenu ? notifications.pendingPartners : (isPavilionMenu ? notifications.pendingConcierge : 0);
+              const isInquiriesMenu = item.href === '/admin/inquiries';
+
+              // Calculate Pavilion total (sum of floors + pending concierge)
+              const pavilionTotal = notifications.pavilion?.byFloor
+                ? Object.values(notifications.pavilion.byFloor).reduce((a, b) => a + b, 0)
+                : 0;
+              const pavilionBadgeCount = notifications.pendingConcierge + pavilionTotal;
+
+              const showNotification =
+                (isPartnersMenu && notifications.pendingPartners > 0) ||
+                (isPavilionMenu && pavilionBadgeCount > 0) ||
+                (isInquiriesMenu && notifications.pendingInquiries > 0);
+
+              const badgeCount =
+                isPartnersMenu ? notifications.pendingPartners :
+                  (isPavilionMenu ? pavilionBadgeCount :
+                    (isInquiriesMenu ? notifications.pendingInquiries : 0));
+
               const hasSubItems = item.subItems && item.subItems.length > 0;
 
               return (

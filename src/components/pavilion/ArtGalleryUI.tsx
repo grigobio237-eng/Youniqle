@@ -105,7 +105,7 @@ export default function ArtGalleryUI({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="w-full h-full flex flex-col md:flex-row items-stretch md:items-center justify-start md:justify-center bg-white overflow-y-auto"
+                        className="w-full h-full flex flex-col md:flex-row items-stretch justify-start md:justify-center bg-white overflow-y-auto"
                     >
                         {/* Background Spline/Graphic or Artist Image */}
                         <div className="relative w-full md:w-1/2 min-h-[50vh] md:h-full overflow-hidden flex-shrink-0 bg-mist">
@@ -134,8 +134,9 @@ export default function ArtGalleryUI({
                             </button>
                         </div>
 
-                        <div className="w-full md:w-1/2 p-8 md:p-24 flex flex-col justify-center overflow-y-visible">
+                        <div className="w-full md:w-1/2 p-8 md:p-24 flex flex-col overflow-y-visible">
                             <motion.div
+                                className="my-auto"
                                 initial={{ opacity: 0, x: 50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
@@ -147,7 +148,7 @@ export default function ArtGalleryUI({
                                     {selectedArtist.name}
                                 </h2>
                                 <div className="w-24 h-1 bg-obsidian/10 mb-8" />
-                                <p className="text-xl text-obsidian/60 font-medium leading-relaxed mb-12 max-w-lg">
+                                <p className="text-xl text-obsidian/60 font-medium leading-relaxed mb-12 max-w-lg whitespace-pre-line">
                                     {selectedArtist.bio}
                                 </p>
 
@@ -159,7 +160,7 @@ export default function ArtGalleryUI({
                                         <span className="relative z-10 text-sm font-black uppercase tracking-widest">{enterButtonText}</span>
                                         <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={20} />
                                         <motion.div
-                                            className="absolute inset-0 bg-[#D4AF37]"
+                                            className="absolute inset-0 bg-[#D4AF37] pointer-events-none"
                                             initial={{ x: '-100%' }}
                                             whileHover={{ x: 0 }}
                                             transition={{ type: 'spring', stiffness: 100, damping: 20 }}

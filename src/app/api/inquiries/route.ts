@@ -66,13 +66,6 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user || !session.user.email) {
-      return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: '로그인이 필요합니다.' } },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
     const {
       type = 'general',
@@ -82,7 +75,37 @@ export async function POST(request: NextRequest) {
       attachments,
       tags,
       source = 'website',
+      // Guest fields
+      email,
+      name,
+      phoneNumber,
+      floor,
+      artistId
     } = body;
+
+    // Validate Auth or Guest Info
+    let finalUserEmail = session?.user?.email;
+    let finalUserName = session?.user?.name;
+    let finalUserId = undefined;
+
+    if (session?.user?.email) {
+      // Logged in
+      finalUserEmail = session.user.email;
+      finalUserName = session.user.name || '고객';
+      // Try to find user ID
+      const user = await User.findOne({ email: session.user.email }).lean().exec() as { _id: any } | null;
+      finalUserId = user?._id;
+    } else {
+      // Guest
+      if (!email || !name) {
+        return NextResponse.json(
+          { success: false, error: { code: 'AUTH_OR_CONTACT_REQUIRED', message: '로그인하거나 이름과 이메일을 입력해주세요.' } },
+          { status: 400 }
+        );
+      }
+      finalUserEmail = email;
+      finalUserName = name;
+    }
 
     if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
       return NextResponse.json(
@@ -99,16 +122,6 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-
-    // 사용자 정보 조회 (userId를 얻기 위해)
-    const user = await User.findOne({ email: session.user.email }).lean().exec() as { _id: any } | null;
-    
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: { code: 'USER_NOT_FOUND', message: '사용자를 찾을 수 없습니다.' } },
-        { status: 404 }
-      );
-    }
 
     const inquiryId = await generateInquiryId();
 
@@ -131,9 +144,12 @@ export async function POST(request: NextRequest) {
 
     const inquiry = await Inquiry.create({
       inquiryId,
-      userId: user._id,
-      userEmail: session.user.email,
-      userName: session.user.name || '고객',
+      userId: finalUserId,
+      userEmail: finalUserEmail,
+      userName: finalUserName,
+      phoneNumber: phoneNumber || undefined,
+      floor: floor,
+      artistId: artistId,
       type: ALLOWED_TYPES.has(type) ? type : 'general',
       subject: subject.trim(),
       content: content.trim(),
@@ -180,7 +196,7 @@ export async function GET(request: NextRequest) {
 
     // 사용자 정보 조회 (userId를 얻기 위해)
     const user = await User.findOne({ email: session.user.email }).lean().exec() as { _id?: any } | null;
-    
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const type = searchParams.get('type');
@@ -188,7 +204,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '10', 10), 1), 50);
 
     const filter: Record<string, any> = {
-      $or: user?._id 
+      $or: user?._id
         ? [{ userId: user._id }, { userEmail: session.user.email }]
         : [{ userEmail: session.user.email }],
     };

@@ -77,8 +77,8 @@ export async function PUT(
     if (adminAnswer !== undefined) {
       inquiry.adminAnswer = adminAnswer;
       // 세션에서 직접 ID를 가져오거나 DB에서 조회한 이메일 매칭 사용자 사용
-      // 여기서는 세션에 이미 id가 포함되어 있다고 가정 (auth.ts에서 설정함)
-      inquiry.adminId = (session.user as any).id;
+      const adminId = (session.user as any).id;
+      inquiry.adminId = adminId;
       inquiry.answeredAt = new Date();
       if (inquiry.status === 'pending' || inquiry.status === 'in_progress') {
         inquiry.status = 'resolved';
