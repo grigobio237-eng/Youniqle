@@ -407,10 +407,12 @@ export default function DeepDiagnosisReportPage() {
                                                     <span className="text-sm font-medium text-slate-500 group-hover:text-obsidian transition-colors">{d.subject}</span>
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="h-full bg-chapter-accent/80 rounded-full"
-                                                                style={{ width: `${d.score}%` }}
-                                                            />
+                                                            <div className={`h-full bg-chapter-accent/80 rounded-full insight-bar-${d.subject.replace(/\s+/g, '-')}`} />
+                                                            <style jsx>{`
+                                                                .insight-bar-${d.subject.replace(/\s+/g, '-')} {
+                                                                    width: ${d.score}%;
+                                                                }
+                                                            `}</style>
                                                         </div>
                                                         <span className="text-sm font-bold text-obsidian w-8 text-right">{d.score}</span>
                                                     </div>
@@ -440,7 +442,12 @@ export default function DeepDiagnosisReportPage() {
                         <div className="grid grid-cols-1 gap-6">
                             {isPaid ? chartData.map((domain, idx) => (
                                 <Card key={domain.subject} className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
-                                    <div className={`h-2 w-full bg-gradient-to-r from-transparent via-${domain.color === '#f43f5e' ? 'rose-500' : 'indigo-500'} to-transparent opacity-50`} style={{ backgroundColor: domain.color }} />
+                                    <div className={`h-2 w-full bg-gradient-to-r from-transparent via-${domain.color === '#f43f5e' ? 'rose-500' : 'indigo-500'} to-transparent opacity-50 domain-header-${idx}`} />
+                                    <style jsx>{`
+                                        .domain-header-${idx} {
+                                            background-color: ${domain.color};
+                                        }
+                                    `}</style>
                                     <CardContent className="p-8 bg-white/80 backdrop-blur-sm">
                                         <div className="flex flex-col md:flex-row gap-8 items-center">
                                             {/* Score Ring */}
@@ -528,7 +535,12 @@ export default function DeepDiagnosisReportPage() {
                                     return (
                                         <div key={domain.subject} className="p-6 md:p-8">
                                             <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: domain.color }} />
+                                                <span className={`w-2 h-2 rounded-full domain-dot-${domain.subject.replace(/\s+/g, '-')}`} />
+                                                <style jsx>{`
+                                                    .domain-dot-${domain.subject.replace(/\s+/g, '-')} {
+                                                        background-color: ${domain.color};
+                                                    }
+                                                `}</style>
                                                 {domain.subject} Facets
                                             </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-12">
@@ -538,18 +550,23 @@ export default function DeepDiagnosisReportPage() {
                                                             <span className="font-bold text-slate-700 text-sm group-hover:text-obsidian transition-colors">
                                                                 {getFacetName(facetKey)}
                                                             </span>
-                                                            <span className="text-xs font-bold" style={{ color: score > 60 || score < 40 ? domain.color : '#94a3b8' }}>
+                                                            <span className={`text-xs font-bold facet-score-${facetKey}`}>
                                                                 {score}
                                                             </span>
+                                                            <style jsx>{`
+                                                                .facet-score-${facetKey} {
+                                                                    color: ${score > 60 || score < 40 ? domain.color : '#94a3b8'};
+                                                                }
+                                                            `}</style>
                                                         </div>
                                                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="h-full rounded-full transition-all duration-700 group-hover:opacity-100 opacity-70"
-                                                                style={{
-                                                                    width: `${Math.min(100, (score / 100) * 100)}%`,
-                                                                    backgroundColor: domain.color
-                                                                }}
-                                                            />
+                                                            <div className={`h-full rounded-full transition-all duration-700 group-hover:opacity-100 opacity-70 facet-bar-${facetKey}`} />
+                                                            <style jsx>{`
+                                                                .facet-bar-${facetKey} {
+                                                                    width: ${Math.min(100, (score / 100) * 100)}%;
+                                                                    background-color: ${domain.color};
+                                                                }
+                                                            `}</style>
                                                         </div>
                                                     </div>
                                                 ))}

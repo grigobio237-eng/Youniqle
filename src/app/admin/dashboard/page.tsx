@@ -237,8 +237,7 @@ export default function AdminDashboard() {
                 {/* Subtle progress bar at the bottom */}
                 <div className="absolute bottom-0 left-0 h-1 bg-slate-100 w-full overflow-hidden">
                   <div
-                    className={`h-full opacity-30 ${stat.color.replace('text-', 'bg-')}`}
-                    style={{ width: isPositive ? '100%' : '30%' }}
+                    className={`h-full opacity-30 ${stat.color.replace('text-', 'bg-')} ${isPositive ? 'w-full' : 'w-[30%]'}`}
                   />
                 </div>
               </CardContent>

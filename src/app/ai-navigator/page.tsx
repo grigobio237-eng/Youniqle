@@ -611,10 +611,12 @@ function ForecastModal({ open, onOpenChange, forecast }: { open: boolean, onOpen
                             </div>
 
                             <div className="h-2 bg-line rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-primary transition-all duration-1000 ease-out"
-                                    style={{ width: `${forecast.energyLevel}%` }}
-                                />
+                                <div className="h-full bg-primary transition-all duration-1000 ease-out energy-bar" />
+                                <style jsx>{`
+                                    .energy-bar {
+                                        width: ${forecast.energyLevel}%;
+                                    }
+                                `}</style>
                             </div>
                         </div>
 

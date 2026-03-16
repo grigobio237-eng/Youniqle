@@ -181,6 +181,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                         type="file"
                         accept="image/*"
                         onChange={handleFileInput}
+                        aria-label="인물 사진 업로드"
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <div className="flex flex-col items-center justify-center text-center">
@@ -208,14 +209,16 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
 
                     <Card className="p-6">
                         <h3 className="text-lg font-bold mb-4 text-center">배경 제거 결과</h3>
-                        <div
-                            className="rounded-lg p-4 flex items-center justify-center min-h-[300px]"
-                            style={{
-                                backgroundImage:
-                                    'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
-                                backgroundSize: '20px 20px',
-                            }}
-                        >
+                        <div className="rounded-lg p-4 flex items-center justify-center min-h-[300px] checkerboard-bg">
+                            <style jsx>{`
+                                .checkerboard-bg {
+                                    background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
+                                                    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
+                                                    linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
+                                                    linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+                                    background-size: 20px 20px;
+                                }
+                            `}</style>
                             {processedImage ? (
                                 <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
                             ) : (

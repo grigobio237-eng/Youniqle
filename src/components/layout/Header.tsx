@@ -84,12 +84,30 @@ export default function Header() {
   };
 
   const menuItems = [
-    { label: 'AI 네비게이터', href: '/ai-navigator', desc: '매일의 진단 데이터를 분석한 맞춤 회복 가이드' },
-    { label: '실제 회복 스토리', href: '/cases', desc: '다른 사용자들의 성공적인 회복 사례 연구' },
-    { label: '회복 상점', href: '/products', desc: '과학적으로 검증된 회복 제품' },
-    { label: '회복 도구함', href: '/utils', desc: '일상에서 즉시 활용 가능한 실용 도구' },
-    { label: '회복 체험관', href: '/pavilion', desc: '5층 구조의 인터랙티브 가상 공간' },
-    { label: '멤버십', href: '/membership', desc: '등급별 혜택 및 리워드 프로그램' },
+    { 
+      label: 'Youniqle 갤러리', 
+      href: '/gallery/artworks',
+      desc: '작품 및 작가 소개',
+      subItems: [
+        { label: '작품 갤러리', href: '/gallery/artworks' },
+        { label: '참여 작가', href: '/gallery/artists' },
+      ]
+    },
+    { label: 'Youniqle 스토어', href: '/products', desc: '회복 관련 제품' },
+    { label: 'Youniqle 트레이너', href: '/trainer', desc: '전문 코칭 서비스' },
+    { label: '네비게이터', href: '/ai-navigator', desc: '맞춤 회복 루틴 안내' },
+    { label: '힐링센터', href: '/healing-center', desc: '가상 공간 탐험 및 명상' },
+    { 
+      label: '커뮤니티', 
+      href: '/community/lounge',
+      desc: '유저 소통 공간',
+      subItems: [
+        { label: '유저 라운지', href: '/community/lounge' },
+        { label: '미디어 쉐어', href: '/community/media' },
+        { label: '리커버리 툴스', href: '/utils' },
+      ]
+    },
+    { label: 'Youniqle ?', href: '/about', desc: '브랜드 및 정책 안내' },
   ];
 
   const handleSignOut = async () => {
@@ -134,25 +152,40 @@ export default function Header() {
 
           {/* Nav */}
           {!isGateMode ? (
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-6">
               {menuItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname.startsWith(item.href);
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`text-sm font-semibold transition-all duration-200 relative py-2 ${isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                  <div key={item.label} className="relative group">
+                    <Link
+                      href={item.href}
+                      className={`text-sm font-semibold transition-all duration-200 relative py-2 ${
+                        isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
                       }`}
-                  >
-                    {item.label}
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-underline"
-                        className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                        transition={{ duration: 0.3 }}
-                      />
+                    >
+                      {item.label}
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-underline"
+                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                    </Link>
+                    {item.subItems && (
+                      <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-line rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                        {item.subItems.map((sub) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            className="block px-4 py-3 text-sm text-text-secondary hover:bg-mist hover:text-primary font-medium transition-colors"
+                          >
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
                     )}
-                  </Link>
+                  </div>
                 );
               })}
             </nav>
@@ -202,20 +235,35 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {!isGateMode && isMenuOpen && (
-          <div className="md:hidden border-t py-4">
+          <div className="md:hidden border-t py-4 max-h-[80vh] overflow-y-auto">
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm font-bold text-text-secondary px-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
+                <div key={item.label} className="flex flex-col space-y-2">
+                  <Link
+                    href={item.href}
+                    className="text-sm font-bold text-text-secondary px-4 py-2 bg-mist/30 rounded-lg"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                  {item.subItems && (
+                    <div className="pl-8 flex flex-col space-y-2 border-l-2 border-line ml-6">
+                      {item.subItems.map(sub => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          className="text-xs font-semibold text-text-secondary py-1"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
               {!session && (
-                <Link href="/auth/signin" className="text-sm font-bold text-primary px-2" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/auth/signin" className="text-sm font-bold text-primary px-4 mt-4" onClick={() => setIsMenuOpen(false)}>
                   로그인
                 </Link>
               )}

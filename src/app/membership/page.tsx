@@ -151,7 +151,12 @@ export default function MembershipPage() {
                                 <div className="relative w-24 h-24 md:w-32 md:h-32 flex items-center justify-center">
                                     <svg className="w-full h-full -rotate-90">
                                         <circle cx="50%" cy="50%" r="45%" className="stroke-white/5 fill-none" strokeWidth="6" />
-                                        <circle cx="50%" cy="50%" r="45%" className="stroke-luxury-gold fill-none transition-all duration-1000" strokeWidth="6" strokeDasharray={`${m.progress * 2.8} 280`} style={{ strokeDashoffset: '0' }} />
+                                        <circle cx="50%" cy="50%" r="45%" className="stroke-luxury-gold fill-none transition-all duration-1000 membership-progress" strokeWidth="6" strokeDasharray={`${m.progress * 2.8} 280`} />
+                                        <style jsx>{`
+                                            .membership-progress {
+                                                stroke-dashoffset: 0;
+                                            }
+                                        `}</style>
                                     </svg>
                                     <div className="absolute flex flex-col items-center">
                                         <span className="text-2xl font-black tracking-tighter">{m.progress}%</span>

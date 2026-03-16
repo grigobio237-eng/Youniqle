@@ -178,8 +178,7 @@ export default function LadderGamePage() {
                     {players.map((p, i) => (
                         <div
                             key={`p-${i}`}
-                            className="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-2"
-                            style={{ position: 'absolute', left: `${(i * 100) / (playerCount - 1)}%`, transform: 'translateX(-50%)' }}
+                            className={`flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-2 ladder-player-${i}`}
                             onClick={() => onPlayerClick(i)}
                         >
                             <span className={`text-xs font-bold mb-1 whitespace-nowrap ${(activePath === i || showAllResult) ? 'text-indigo-600' : 'text-gray-600'}`}>
@@ -189,6 +188,13 @@ export default function LadderGamePage() {
                                 ${(activePath === i) ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-gray-200 text-gray-500'}`}>
                                 <User className="w-3 h-3" />
                             </div>
+                            <style jsx>{`
+                                .ladder-player-${i} {
+                                    position: absolute;
+                                    left: ${(i * 100) / (playerCount - 1)}%;
+                                    transform: translateX(-50%);
+                                }
+                            `}</style>
                         </div>
                     ))}
                 </div>
@@ -198,8 +204,7 @@ export default function LadderGamePage() {
                     {rewards.map((r, i) => (
                         <div
                             key={`r-${i}`}
-                            className="flex flex-col-reverse items-center w-2"
-                            style={{ position: 'absolute', left: `${(i * 100) / (playerCount - 1)}%`, transform: 'translateX(-50%)' }}
+                            className={`flex flex-col-reverse items-center w-2 ladder-reward-${i}`}
                         >
                             <span className={`text-xs font-bold mt-1 whitespace-nowrap transition-all duration-500
                                 ${(activePath !== null && results[activePath] === i && !isAnimating) || (showAllResult && Object.values(results).includes(i))
@@ -213,6 +218,13 @@ export default function LadderGamePage() {
                                     : 'bg-gray-100 border-gray-200 text-gray-400'}`}>
                                 <Trophy className="w-4 h-4" />
                             </div>
+                            <style jsx>{`
+                                .ladder-reward-${i} {
+                                    position: absolute;
+                                    left: ${(i * 100) / (playerCount - 1)}%;
+                                    transform: translateX(-50%);
+                                }
+                            `}</style>
                         </div>
                     ))}
                 </div>

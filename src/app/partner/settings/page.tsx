@@ -26,8 +26,18 @@ import {
   Clock,
   MessageSquare,
   Image,
-  Upload
+  Upload,
+  Plus,
+  Trash2
 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 
 interface PartnerSettings {
   // 기본 정보
@@ -73,6 +83,24 @@ interface PartnerSettings {
   // 브랜딩
   shopLogo?: string;
   shopBanner?: string;
+
+  // 코치 정보
+  partnerType?: string;
+  coachProfile?: {
+    title: string;
+    specialty: string;
+    philosophy: string;
+    description: string;
+    certifications: string[];
+    programs: Array<{
+      title: string;
+      duration: string;
+      intensity: 'Low' | 'Medium' | 'High' | 'Mild';
+      price: string;
+      tags: string[];
+    }>;
+    profileImage: string;
+  };
 }
 
 const tabs = [
@@ -133,7 +161,16 @@ export default function PartnerSettingsPage() {
     autoReplyMessage: '안녕하세요! 문의를 접수하였습니다. 영업시간 내에 답변 드리겠습니다.',
     autoReplyEnabled: false,
     shopLogo: '',
-    shopBanner: ''
+    shopBanner: '',
+    coachProfile: {
+      title: '',
+      specialty: '',
+      philosophy: '',
+      description: '',
+      certifications: [],
+      programs: [],
+      profileImage: ''
+    }
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -279,17 +316,50 @@ export default function PartnerSettingsPage() {
         body: JSON.stringify({
           name: settings.name,
           phone: settings.phone,
+          businessName: settings.businessName,
+          businessNumber: settings.businessNumber,
+          businessAddress: settings.businessAddress,
+          businessPhone: settings.businessPhone,
           businessDescription: settings.businessDescription
         })
       });
 
       if (response.ok) {
+        toast.success('기본 정보가 저장되었습니다.');
         setMessage({ type: 'success', text: '기본 정보가 저장되었습니다.' });
       } else {
-        setMessage({ type: 'error', text: '저장에 실패했습니다.' });
+        toast.error('저장에 실패했습니다.');
       }
     } catch (error) {
-      setMessage({ type: 'error', text: '저장 중 오류가 발생했습니다.' });
+      toast.error('저장 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveCoachProfile = async () => {
+    if (!settings || !settings.coachProfile) return;
+
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/partner/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coachProfile: settings.coachProfile
+        })
+      });
+
+      if (response.ok) {
+        toast.success('코치 프로필이 저장되었습니다.');
+        setMessage({ type: 'success', text: '코치 프로필이 저장되었습니다.' });
+      } else {
+        toast.error('저장에 실패했습니다.');
+      }
+    } catch (error) {
+      toast.error('저장 중 오류가 발생했습니다.');
     } finally {
       setSaving(false);
     }
@@ -469,6 +539,18 @@ export default function PartnerSettingsPage() {
                 </button>
               );
             })}
+            {settings.partnerType === 'coach' && (
+              <button
+                onClick={() => setActiveTab('coach')}
+                className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'coach'
+                  ? 'border-chapter-accent text-chapter-accent'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+              >
+                <Briefcase className="h-4 w-4 mr-2" />
+                코치 프로필
+              </button>
+            )}
           </nav>
         </div>
 
@@ -723,6 +805,7 @@ export default function PartnerSettingsPage() {
                           className="hidden"
                           accept="image/*"
                           onChange={(e) => handleBrandingImageUpload(e, 'logo')}
+                          aria-label="상점 로고 업로드"
                         />
                         <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()}>
                           <Upload className="h-4 w-4 mr-2" />
@@ -763,6 +846,7 @@ export default function PartnerSettingsPage() {
                         className="hidden"
                         accept="image/*"
                         onChange={(e) => handleBrandingImageUpload(e, 'banner')}
+                        aria-label="상점 배너 업로드"
                       />
                       <Button variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()}>
                         <Upload className="h-4 w-4 mr-2" />
@@ -970,6 +1054,219 @@ export default function PartnerSettingsPage() {
                 </Button>
               </CardContent>
             </Card>
+          )}
+          {/* 코치 프로필 설정 */}
+          {activeTab === 'coach' && settings.partnerType === 'coach' && settings.coachProfile && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>코치 전문성 정보</CardTitle>
+                  <CardDescription>유니클 트레이너 페이지에 노출될 전문 정보를 입력하세요</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="coachTitle">전문 타이틀 (예: Senior Recovery Curator)</Label>
+                      <Input
+                        id="coachTitle"
+                        value={settings.coachProfile.title}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          coachProfile: { ...settings.coachProfile!, title: e.target.value }
+                        })}
+                        placeholder="전문화된 직함을 입력하세요"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="coachSpecialty">주요 전문 분야 (예: Neuromuscular Reset)</Label>
+                      <Input
+                        id="coachSpecialty"
+                        value={settings.coachProfile.specialty}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          coachProfile: { ...settings.coachProfile!, specialty: e.target.value }
+                        })}
+                        placeholder="핵심 전문 분야를 입력하세요"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="coachPhilosophy">전문 철학 (한 문장 요약)</Label>
+                    <Input
+                      id="coachPhilosophy"
+                      value={settings.coachProfile.philosophy}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        coachProfile: { ...settings.coachProfile!, philosophy: e.target.value }
+                      })}
+                      placeholder="내면의 평화가 신체 회복의 시작임을 증명합니다."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="coachDescription">상세 소개</Label>
+                    <Textarea
+                      id="coachDescription"
+                      rows={4}
+                      value={settings.coachProfile.description}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        coachProfile: { ...settings.coachProfile!, description: e.target.value }
+                      })}
+                      placeholder="자신의 경력과 철학을 상세히 설명해주세요."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>자격 사항 (엔터로 구분)</Label>
+                    <Textarea
+                      rows={3}
+                      value={settings.coachProfile.certifications.join('\n')}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        coachProfile: {
+                          ...settings.coachProfile!,
+                          certifications: e.target.value.split('\n').filter(s => s.trim() !== '')
+                        }
+                      })}
+                      placeholder="보유하신 자격증이나 교육 이수 사항을 입력하세요."
+                    />
+                  </div>
+
+                  <Button onClick={handleSaveCoachProfile} disabled={saving}>
+                    <Save className="h-4 w-4 mr-2" />
+                    {saving ? '저장 중...' : '프로필 저장'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>코칭 프로그램</CardTitle>
+                      <CardDescription>제공하시는 회복 프로그램을 등록하고 관리하세요</CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      const newProgram = {
+                        title: '새 프로그램',
+                        duration: '60 min',
+                        intensity: 'Medium' as const,
+                        price: '100,000₩',
+                        tags: []
+                      };
+                      setSettings({
+                        ...settings,
+                        coachProfile: {
+                          ...settings.coachProfile!,
+                          programs: [...settings.coachProfile!.programs, newProgram]
+                        }
+                      });
+                    }}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      프로그램 추가
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {settings.coachProfile.programs.map((program, index) => (
+                      <div key={index} className="p-4 border rounded-xl space-y-4">
+                        <div className="flex justify-between items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                            <div className="space-y-2">
+                              <Label>프로그램 명</Label>
+                              <Input
+                                value={program.title}
+                                onChange={(e) => {
+                                  const newPrograms = [...settings.coachProfile!.programs];
+                                  newPrograms[index].title = e.target.value;
+                                  setSettings({
+                                    ...settings,
+                                    coachProfile: { ...settings.coachProfile!, programs: newPrograms }
+                                  });
+                                }}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>소요 시간 (예: 90 min)</Label>
+                              <Input
+                                value={program.duration}
+                                onChange={(e) => {
+                                  const newPrograms = [...settings.coachProfile!.programs];
+                                  newPrograms[index].duration = e.target.value;
+                                  setSettings({
+                                    ...settings,
+                                    coachProfile: { ...settings.coachProfile!, programs: newPrograms }
+                                  });
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="text-red-500 ml-4" onClick={() => {
+                            const newPrograms = [...settings.coachProfile!.programs];
+                            newPrograms.splice(index, 1);
+                            setSettings({
+                              ...settings,
+                              coachProfile: { ...settings.coachProfile!, programs: newPrograms }
+                            });
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>강도</Label>
+                            <Select
+                              value={program.intensity}
+                              onValueChange={(val: any) => {
+                                const newPrograms = [...settings.coachProfile!.programs];
+                                newPrograms[index].intensity = val;
+                                setSettings({
+                                  ...settings,
+                                  coachProfile: { ...settings.coachProfile!, programs: newPrograms }
+                                });
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="강도 선택" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Low">Low</SelectItem>
+                                <SelectItem value="Mild">Mild</SelectItem>
+                                <SelectItem value="Medium">Medium</SelectItem>
+                                <SelectItem value="High">High</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>가격 (예: 180,000₩)</Label>
+                            <Input
+                              value={program.price}
+                              onChange={(e) => {
+                                const newPrograms = [...settings.coachProfile!.programs];
+                                newPrograms[index].price = e.target.value;
+                                setSettings({
+                                  ...settings,
+                                  coachProfile: { ...settings.coachProfile!, programs: newPrograms }
+                                });
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {settings.coachProfile.programs.length > 0 && (
+                    <Button onClick={handleSaveCoachProfile} disabled={saving} className="mt-6">
+                      <Save className="h-4 w-4 mr-2" />
+                      {saving ? '저장 중...' : '프로그램 정보 저장'}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           )}
         </div>
       </div>

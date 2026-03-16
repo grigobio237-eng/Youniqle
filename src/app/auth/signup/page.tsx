@@ -253,6 +253,7 @@ function SignupContent() {
                   checked={formData.marketingConsent}
                   onChange={handleInputChange}
                   className="h-4 w-4 bg-background border-line rounded text-primary focus:ring-primary"
+                  aria-label="마케팅 정보 수신 동의"
                 />
                 <Label htmlFor="marketingConsent" className="text-sm text-text-secondary font-medium cursor-pointer">
                   마케팅 정보 수신에 동의합니다 (선택사항)

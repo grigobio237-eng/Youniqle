@@ -132,6 +132,7 @@ export default function DailyCheckInPopup() {
                         <button
                             onClick={handleClose}
                             className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-white/80 rounded-full transition-colors z-10"
+                            aria-label="닫기"
                         >
                             <X className="w-5 h-5 text-slate" />
                         </button>

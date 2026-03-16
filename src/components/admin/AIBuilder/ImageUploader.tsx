@@ -66,6 +66,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ label, onImageSelected, p
                     accept="image/*"
                     onChange={handleFileChange}
                     disabled={isRemovingBackground}
+                    aria-label={label}
                 />
             </div>
         </div>

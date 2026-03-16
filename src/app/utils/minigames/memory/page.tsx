@@ -222,13 +222,13 @@ export default function MemoryGamePage() {
                                 </Button>
                             </div>
 
-                            <div
-                                className="grid gap-4 mx-auto"
-                                style={{
-                                    gridTemplateColumns: `repeat(${DIFFICULTY_CONFIG[difficulty].cols}, minmax(0, 1fr))`,
-                                    maxWidth: '600px'
-                                }}
-                            >
+                            <div className="grid gap-4 mx-auto memory-grid">
+                                <style jsx>{`
+                                    .memory-grid {
+                                        grid-template-columns: repeat(${DIFFICULTY_CONFIG[difficulty].cols}, minmax(0, 1fr));
+                                        max-width: 600px;
+                                    }
+                                `}</style>
                                 {cards.map((card, index) => (
                                     <CardItem
                                         key={card.id}

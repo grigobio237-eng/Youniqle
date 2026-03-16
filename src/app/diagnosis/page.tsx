@@ -369,7 +369,12 @@ export default function DiagnosisPage() {
                                         <div className="text-[10px] font-black uppercase tracking-widest text-slate">{item.label}</div>
                                         <div className="text-3xl font-black text-obsidian">{item.score}<span className="text-sm opacity-20">/{item.max}</span></div>
                                         <div className="w-full bg-mist h-1.5 rounded-full overflow-hidden">
-                                            <div className="bg-chapter-accent h-full" style={{ width: `${(item.score / item.max) * 100}%` }} />
+                                            <div className="bg-chapter-accent h-full category-bar" />
+                                            <style jsx>{`
+                                                .category-bar {
+                                                    width: ${(item.score / item.max) * 100}%;
+                                                }
+                                            `}</style>
                                         </div>
                                     </Card>
                                 ))}

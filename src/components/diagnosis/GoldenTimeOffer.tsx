@@ -129,9 +129,14 @@ export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOffer
                             </span>
                             <h2 className="text-2xl md:text-3xl font-black text-white leading-tight mb-3 drop-shadow-md">
                                 {userName}님만을 위한<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-200" style={{ textShadow: '0 0 20px rgba(255,255,255,0.3)' }}>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-200 premium-text">
                                     프리미엄 힐링 오디오 가이드
                                 </span>
+                                <style jsx>{`
+                                    .premium-text {
+                                        text-shadow: 0 0 20px rgba(255,255,255,0.3);
+                                    }
+                                `}</style>
                             </h2>
                             <p className="text-slate-200 text-sm leading-relaxed font-medium">
                                 {script === "AI_LOADING"
@@ -144,15 +149,18 @@ export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOffer
                         {isPlaying && (
                             <div className="flex items-center justify-center md:justify-start gap-1 h-8">
                                 {[...Array(20)].map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className="w-1.5 bg-emerald-400 rounded-full animate-music-bar shadow-[0_0_10px_theme(colors.emerald.400)]"
-                                        style={{
-                                            height: `${Math.random() * 100}%`,
-                                            animationDelay: `${i * 0.05}s`,
-                                            animationDuration: '0.8s'
-                                        }}
-                                    />
+                                    <React.Fragment key={i}>
+                                        <div
+                                            className={`w-1.5 bg-emerald-400 rounded-full animate-music-bar shadow-[0_0_10px_theme(colors.emerald.400)] music-bar-${i}`}
+                                        />
+                                        <style jsx>{`
+                                            .music-bar-${i} {
+                                                height: ${Math.random() * 100}%;
+                                                animation-delay: ${i * 0.05}s;
+                                                animation-duration: 0.8s;
+                                            }
+                                        `}</style>
+                                    </React.Fragment>
                                 ))}
                             </div>
                         )}

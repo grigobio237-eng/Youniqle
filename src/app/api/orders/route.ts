@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // MongoDB 트랜잭션 시작 (replica set이 구성된 경우에만 작동)
-    const mongoose = await import('mongoose');
+    const mongoose = (await import('mongoose')).default;
     try {
-      mongoSession = await mongoose.default.startSession();
+      mongoSession = await mongoose.startSession();
       mongoSession.startTransaction();
       console.log('🔄 트랜잭션 시작');
     } catch (sessionError) {
@@ -101,11 +101,14 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      const product = await Product.findById(item.productId);
+      // productId가 객체(ObjectId)일 경우 문자열로 변환하여 처리
+      const productIdStr = typeof item.productId === 'object' ? item.productId.toString() : item.productId;
+
+      const product = await Product.findById(productIdStr);
 
       if (!product) {
         return NextResponse.json({
-          error: `상품을 찾을 수 없습니다: ${item.productId}`
+          error: `상품을 찾을 수 없습니다: ${productIdStr}`
         }, { status: 400 });
       }
 
@@ -193,9 +196,7 @@ export async function POST(request: NextRequest) {
     const order = new Order({
       userId: user._id,
       orderNumber,
-      orderNumber,
       items: validatedItems,
-      totalAmount,
       totalAmount,
       status: 'pending',
       paymentStatus: 'pending',

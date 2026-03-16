@@ -84,7 +84,7 @@ function SubscribeContent() {
                             <div className="bg-white/10 p-2 rounded-lg">
                                 <Check className="w-5 h-5 text-[#d4af37]" />
                             </div>
-                            <span>오프라인 시술 우선 예약</span>
+                            <span>오프라인 케어 우선 예약</span>
                         </div>
                     </div>
                 </div>

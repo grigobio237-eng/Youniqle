@@ -163,7 +163,9 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
             });
             const data = await res.json();
             if (data.success) {
-                setSegments(data.plan);
+                // Fix: Handle both array and object format (with sections)
+                const newSegments = Array.isArray(data.plan) ? data.plan : (data.plan.sections || []);
+                setSegments(newSegments);
                 setStep(2);
             } else {
                 throw new Error(data.error);
@@ -501,6 +503,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                             value={info.category}
                                             onChange={(e) => setInfo({ ...info, category: e.target.value })}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 outline-none"
+                                            aria-label="카테고리 선택"
                                         >
                                             {PRODUCT_CATEGORIES.map(cat => (
                                                 <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -870,6 +873,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                             checked={thumbnailOptions.includeModel}
                                             onChange={e => setThumbnailOptions({ ...thumbnailOptions, includeModel: e.target.checked })}
                                             className="w-6 h-6 accent-blue-600"
+                                            aria-label="모델(사람) 포함"
                                         />
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
@@ -879,6 +883,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                             checked={thumbnailOptions.addText}
                                             onChange={e => setThumbnailOptions({ ...thumbnailOptions, addText: e.target.checked })}
                                             className="w-6 h-6 accent-blue-600"
+                                            aria-label="상품명 텍스트 포함"
                                         />
                                     </div>
                                 </div>
@@ -918,6 +923,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                         <button
                                             onClick={handleGenerateThumbnail}
                                             className="absolute top-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all"
+                                            aria-label="썸네일 다시 생성"
                                         >
                                             <RefreshCw size={20} className={isGeneratingThumbnail ? 'animate-spin' : ''} />
                                         </button>

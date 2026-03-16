@@ -193,16 +193,22 @@ export default function SpotTheDifferencePage() {
                                     alt="Office Original"
                                     className="w-full h-full object-cover grayscale-[0.2]"
                                 />
-                                {/* Differences Overlay (Visual markers for found items) */}
                                 {differences.map(d => d.found && (
-                                    <motion.div
-                                        key={`orig-${d.id}`}
-                                        initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                        className="absolute w-12 h-12 border-4 border-rose-500 rounded-full flex items-center justify-center bg-rose-500/10 shadow-lg z-20"
-                                        style={{ left: `${d.x}%`, top: `${d.y}%`, transform: 'translate(-50%, -50%)' }}
-                                    >
-                                        <CheckCircle2 className="w-6 h-6 text-rose-500" />
-                                    </motion.div>
+                                    <div key={`orig-${d.id}`}>
+                                        <motion.div
+                                            initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                            className={`absolute w-12 h-12 border-4 border-rose-500 rounded-full flex items-center justify-center bg-rose-500/10 shadow-lg z-20 diff-marker-${d.id}`}
+                                        >
+                                            <CheckCircle2 className="w-6 h-6 text-rose-500" />
+                                        </motion.div>
+                                        <style jsx>{`
+                                            .diff-marker-${d.id} {
+                                                left: ${d.x}%;
+                                                top: ${d.y}%;
+                                                transform: translate(-50%, -50%);
+                                            }
+                                        `}</style>
+                                    </div>
                                 ))}
                             </Card>
                         </div>
@@ -226,14 +232,21 @@ export default function SpotTheDifferencePage() {
 
                                 {/* Found Markers */}
                                 {differences.map(d => d.found && (
-                                    <motion.div
-                                        key={`mod-found-${d.id}`}
-                                        initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                        className="absolute w-12 h-12 border-4 border-rose-500 rounded-full flex items-center justify-center bg-rose-500/10 shadow-lg z-20"
-                                        style={{ left: `${d.x}%`, top: `${d.y}%`, transform: 'translate(-50%, -50%)' }}
-                                    >
-                                        <CheckCircle2 className="w-6 h-6 text-rose-500" />
-                                    </motion.div>
+                                    <div key={`mod-found-${d.id}`}>
+                                        <motion.div
+                                            initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                            className={`absolute w-12 h-12 border-4 border-rose-500 rounded-full flex items-center justify-center bg-rose-500/10 shadow-lg z-20 mod-diff-marker-${d.id}`}
+                                        >
+                                            <CheckCircle2 className="w-6 h-6 text-rose-500" />
+                                        </motion.div>
+                                        <style jsx>{`
+                                            .mod-diff-marker-${d.id} {
+                                                left: ${d.x}%;
+                                                top: ${d.y}%;
+                                                transform: translate(-50%, -50%);
+                                            }
+                                        `}</style>
+                                    </div>
                                 ))}
 
                                 {/* Penalty Overlay */}
@@ -341,44 +354,74 @@ function DifferenceElements({ differences, hint }: { differences: Difference[], 
         <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
             {/* Diff 1: Ceiling light count (Removed one on modified) */}
             {!differences[0].found && (
-                <div
-                    className={`absolute w-[10%] h-[15%] bg-black/60 blur-[2px] transition-all duration-500 ${hint === 1 ? 'animate-ping opacity-100 bg-rose-500/50' : 'opacity-0'}`}
-                    style={{ left: '15%', top: '35%', transform: 'translate(-50%, -50%) skew(-10deg)' }}
-                />
+                <>
+                    <div className={`absolute w-[10%] h-[15%] bg-black/60 blur-[2px] transition-all duration-500 diff-elem-1 ${hint === 1 ? 'animate-ping opacity-100 bg-rose-500/50' : 'opacity-0'}`} />
+                    <style jsx>{`
+                        .diff-elem-1 {
+                            left: 15%;
+                            top: 35%;
+                            transform: translate(-50%, -50%) skew(-10deg);
+                        }
+                    `}</style>
+                </>
             )}
 
             {/* Diff 2: Desk Tumbler (Changed color/size subtly) */}
             {!differences[1].found && (
-                <div
-                    className={`absolute w-8 h-12 bg-indigo-400/30 rounded-t-lg blur-[1px] ${hint === 2 ? 'ring-4 ring-rose-500 animate-pulse bg-rose-500/30' : ''}`}
-                    style={{ left: '45%', top: '72%', transform: 'translate(-50%, -50%)' }}
-                />
+                <>
+                    <div className={`absolute w-8 h-12 bg-indigo-400/30 rounded-t-lg blur-[1px] diff-elem-2 ${hint === 2 ? 'ring-4 ring-rose-500 animate-pulse bg-rose-500/30' : ''}`} />
+                    <style jsx>{`
+                        .diff-elem-2 {
+                            left: 45%;
+                            top: 72%;
+                            transform: translate(-50%, -50%);
+                        }
+                    `}</style>
+                </>
             )}
 
             {/* Diff 3: Wall clock needles (Rotated) */}
             {!differences[2].found && (
-                <div
-                    className={`absolute w-10 h-10 border-2 border-slate-400/20 rounded-full ${hint === 3 ? 'bg-rose-500/20 scale-150 animate-bounce' : ''}`}
-                    style={{ left: '78%', top: '25%', transform: 'translate(-50%, -50%) rotate(45deg)' }}
-                >
-                    <div className="absolute left-1/2 top-1/2 w-0.5 h-3 bg-slate-900/20 -translate-x-1/2 -translate-y-full" />
-                </div>
+                <>
+                    <div className={`absolute w-10 h-10 border-2 border-slate-400/20 rounded-full diff-elem-3 ${hint === 3 ? 'bg-rose-500/20 scale-150 animate-bounce' : ''}`}>
+                        <div className="absolute left-1/2 top-1/2 w-0.5 h-3 bg-slate-900/20 -translate-x-1/2 -translate-y-full" />
+                    </div>
+                    <style jsx>{`
+                        .diff-elem-3 {
+                            left: 78%;
+                            top: 25%;
+                            transform: translate(-50%, -50%) rotate(45deg);
+                        }
+                    `}</style>
+                </>
             )}
 
             {/* Diff 4: Plant leaf direction (Inverted) */}
             {!differences[3].found && (
-                <div
-                    className={`absolute w-16 h-16 bg-emerald-900/10 rounded-full transition-transform ${hint === 4 ? 'scale-150 opacity-100 bg-rose-500/20 animate-pulse' : 'opacity-0'}`}
-                    style={{ left: '62%', top: '55%', transform: 'translate(-50%, -50%) scaleX(-1)' }}
-                />
+                <>
+                    <div className={`absolute w-16 h-16 bg-emerald-900/10 rounded-full transition-transform diff-elem-4 ${hint === 4 ? 'scale-150 opacity-100 bg-rose-500/20 animate-pulse' : 'opacity-0'}`} />
+                    <style jsx>{`
+                        .diff-elem-4 {
+                            left: 62%;
+                            top: 55%;
+                            transform: translate(-50%, -50%) scaleX(-1);
+                        }
+                    `}</style>
+                </>
             )}
 
             {/* Diff 5: Chair Logo (Faded away) */}
             {!differences[4].found && (
-                <div
-                    className={`absolute w-6 h-4 bg-white/40 blur-[4px] ${hint === 5 ? 'opacity-100 bg-rose-500/50 scale-200 animate-ping' : 'opacity-0'}`}
-                    style={{ left: '30%', top: '48%', transform: 'translate(-50%, -50%)' }}
-                />
+                <>
+                    <div className={`absolute w-6 h-4 bg-white/40 blur-[4px] diff-elem-5 ${hint === 5 ? 'opacity-100 bg-rose-500/50 scale-200 animate-ping' : 'opacity-0'}`} />
+                    <style jsx>{`
+                        .diff-elem-5 {
+                            left: 30%;
+                            top: 48%;
+                            transform: translate(-50%, -50%);
+                        }
+                    `}</style>
+                </>
             )}
         </div>
     );

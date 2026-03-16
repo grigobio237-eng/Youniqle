@@ -199,6 +199,7 @@ export default function SecretShopPopup({ open, onOpenChange }: SecretShopPopupP
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="block bg-white rounded-2xl p-4 border border-line hover:border-reward-gold/50 hover:shadow-lg transition-all group"
+                                                aria-label={`${product.title} 상세 보기 (새 창)`}
                                             >
                                                 <ProductCard product={product} />
                                             </a>
@@ -207,6 +208,7 @@ export default function SecretShopPopup({ open, onOpenChange }: SecretShopPopupP
                                                 href={product.link}
                                                 onClick={() => onOpenChange(false)}
                                                 className="block bg-white rounded-2xl p-4 border border-line hover:border-reward-gold/50 hover:shadow-lg transition-all group"
+                                                aria-label={`${product.title} 상세 보기`}
                                             >
                                                 <ProductCard product={product} />
                                             </Link>

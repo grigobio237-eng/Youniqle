@@ -138,6 +138,7 @@ export default function TimeBasedMessage({
                             <button
                                 onClick={handleDismiss}
                                 className="text-slate/50 hover:text-slate p-1"
+                                aria-label="닫기"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -174,6 +175,7 @@ export default function TimeBasedMessage({
                         <button
                             onClick={handleDismiss}
                             className="text-slate/50 hover:text-slate p-2"
+                            aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -225,6 +227,7 @@ export default function TimeBasedMessage({
                 <button
                     onClick={handleDismiss}
                     className="absolute top-3 right-3 text-slate/50 hover:text-slate p-1"
+                    aria-label="닫기"
                 >
                     <X className="w-4 h-4" />
                 </button>

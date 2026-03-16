@@ -205,6 +205,7 @@ export default function RoulettePage() {
                                                 onClick={() => handleRemoveItem(idx)}
                                                 className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                                                 disabled={items.length <= 2}
+                                                aria-label={`${item} 삭제`}
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>

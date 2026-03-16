@@ -179,10 +179,12 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                     <span className="text-sm text-gray-600 w-2">{rating}</span>
                     <Star className="h-3 w-3 text-yellow-400 fill-current" />
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-yellow-400 h-2 rounded-full"
-                        style={{ width: `${percentage}%` }}
-                      />
+                      <div className="bg-yellow-400 h-2 rounded-full rating-bar" />
+                      <style jsx>{`
+                        .rating-bar {
+                          width: ${percentage}%;
+                        }
+                      `}</style>
                     </div>
                     <span className="text-sm text-gray-600 w-8">{count}</span>
                   </div>
@@ -204,6 +206,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="border rounded px-2 py-1 text-sm"
+                aria-label="정렬 기준"
               >
                 <option value="newest">최신순</option>
                 <option value="rating">별점순</option>
@@ -217,6 +220,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                 value={filterRating}
                 onChange={(e) => setFilterRating(e.target.value)}
                 className="border rounded px-2 py-1 text-sm"
+                aria-label="별점 필터"
               >
                 <option value="">전체</option>
                 <option value="5">5점</option>

@@ -5,30 +5,20 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports to reduce initial bundle size
-const FloatingPomodoroTimer = dynamic(
-    () => import('@/components/pomodoro/FloatingPomodoroTimer'),
-    { ssr: false }
-);
 
-const SocialProofProvider = dynamic(
-    () => import('@/components/social/SocialProofProvider'),
-    { ssr: false }
-);
+
+
 
 const TimeBasedMessage = dynamic(
     () => import('@/components/nudge/TimeBasedMessage'),
     { ssr: false }
 );
 
-const DailyCheckInPopup = dynamic(
-    () => import('@/components/nudge/DailyCheckInPopup'),
-    { ssr: false }
-);
+
 
 interface NudgeFeaturesProviderProps {
     children: React.ReactNode;
     enablePomodoro?: boolean;
-    enableSocialProof?: boolean;
     enableTimeBasedMessage?: boolean;
 }
 
@@ -45,8 +35,7 @@ const EXCLUDED_PATHS = [
 
 export default function NudgeFeaturesProvider({
     children,
-    enablePomodoro = true,
-    enableSocialProof = true,
+    enablePomodoro = false,
     enableTimeBasedMessage = true,
 }: NudgeFeaturesProviderProps) {
     const pathname = usePathname();
@@ -90,11 +79,8 @@ export default function NudgeFeaturesProvider({
     }
 
     return (
-        <SocialProofProvider enabled={enableSocialProof}>
+        <>
             {children}
-
-            {/* Floating Pomodoro Timer */}
-            {showPomodoro && <FloatingPomodoroTimer defaultMinimized />}
 
             {/* Time-based Message Popup */}
             {showTimeMessage && (
@@ -104,9 +90,6 @@ export default function NudgeFeaturesProvider({
                     onDismiss={() => setShowTimeMessage(false)}
                 />
             )}
-
-            {/* AI Daily Check-in */}
-            <DailyCheckInPopup />
-        </SocialProofProvider>
+        </>
     );
 }

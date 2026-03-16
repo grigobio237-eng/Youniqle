@@ -75,6 +75,34 @@ export interface IUser extends Document {
     shopLogo?: string;
     shopBanner?: string;
   };
+  coachProfile?: {
+    title?: string; // 예: Senior Recovery Curator
+    specialty?: string; // 예: Neuromuscular Reset & Sleep Optimization
+    philosophy?: string; // 전문 철학
+    description?: string; // 상세 소개
+    certifications?: string[]; // 자격 사항
+    programs?: Array<{
+      id: string;
+      title: string;
+      duration: string;
+      intensity: 'Low' | 'Medium' | 'High' | 'Mild';
+      price: string;
+      tags: string[];
+    }>;
+    rating?: number;
+    reviews?: number;
+    profileImage?: string;
+    availability?: Array<{
+      date: string;
+      slots: string[];
+      isAllDay?: boolean;
+    }>;
+    socialMedia?: {
+      youtube?: string;
+      instagram?: string;
+      tiktok?: string;
+    };
+  };
   partnerStats?: {
     totalProducts: number;
     totalOrders: number;
@@ -125,6 +153,13 @@ export interface IUser extends Document {
     status: 'active' | 'inactive';
     plan: 'lounge_chat';
     expiresAt: Date;
+  };
+  pavilionInfo?: {
+    characterImage?: string;
+    roomDescription?: string;
+    roomMusic?: string;
+    roomTheme?: string;
+    isActive: boolean;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -276,6 +311,33 @@ const UserSchema = new Schema<IUser>({
     shopLogo: { type: String, trim: true },
     shopBanner: { type: String, trim: true }
   },
+  coachProfile: {
+    title: { type: String, trim: true },
+    specialty: { type: String, trim: true },
+    philosophy: { type: String, trim: true },
+    description: { type: String, trim: true },
+    certifications: [{ type: String, trim: true }],
+    programs: [{
+      title: { type: String, trim: true },
+      duration: { type: String, trim: true },
+      intensity: { type: String, enum: ['Low', 'Medium', 'High', 'Mild'], default: 'Medium' },
+      price: { type: String, trim: true },
+      tags: [{ type: String, trim: true }]
+    }],
+    rating: { type: Number, default: 0 },
+    reviews: { type: Number, default: 0 },
+    profileImage: { type: String, trim: true },
+    availability: [{
+      date: { type: String, required: true },
+      slots: [{ type: String }],
+      isAllDay: { type: Boolean, default: false }
+    }],
+    socialMedia: {
+      youtube: { type: String, trim: true },
+      instagram: { type: String, trim: true },
+      tiktok: { type: String, trim: true }
+    }
+  },
   partnerStats: {
     totalProducts: { type: Number, default: 0 },
     totalOrders: { type: Number, default: 0 },
@@ -326,6 +388,13 @@ const UserSchema = new Schema<IUser>({
     status: { type: String, enum: ['active', 'inactive'], default: 'inactive' },
     plan: { type: String, enum: ['lounge_chat'] },
     expiresAt: { type: Date }
+  },
+  pavilionInfo: {
+    characterImage: { type: String, trim: true },
+    roomDescription: { type: String, trim: true },
+    roomMusic: { type: String, trim: true },
+    roomTheme: { type: String, trim: true },
+    isActive: { type: Boolean, default: true }
   },
   diagnosisResults: [{
     type: { type: String, enum: ['free', 'deep'], required: true },

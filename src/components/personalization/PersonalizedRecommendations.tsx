@@ -297,10 +297,12 @@ export default function PersonalizedRecommendations({
                 {/* 추천 점수 */}
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${item.score * 100}%` }}
-                    />
+                    <div className={`bg-blue-600 h-2 rounded-full transition-all duration-300 rec-score-${index}`} />
+                    <style jsx>{`
+                      .rec-score-${index} {
+                        width: ${item.score * 100}%;
+                      }
+                    `}</style>
                   </div>
                   <span className="text-xs text-gray-500">
                     {(item.score * 100).toFixed(0)}%

@@ -142,12 +142,6 @@ const navigationItems = [
         href: '/admin/ai-builder',
         icon: Sparkles,
         description: 'AI싱크클럽 전용 AI 빌더'
-      },
-      {
-        name: '줄기세포 전용 빌더',
-        href: '/admin/pavilion-builder',
-        icon: Zap,
-        description: '파빌리온 5층 전용 AI 빌더'
       }
     ]
   },
@@ -234,10 +228,10 @@ const navigationItems = [
     description: '커뮤니티 글 및 동영상 관리'
   },
   {
-    name: '회복 체험관 관리',
-    href: '/admin/pavilion',
-    icon: Globe,
-    description: '1층~5층 파빌리온 콘텐츠 및 아티스트 관리'
+    name: '자동 영상 만들기',
+    href: '/admin/auto-video',
+    icon: Sparkles,
+    description: 'AI 기반 유튜브 영상 자동 생성'
   },
   {
     name: '분석',
@@ -257,10 +251,6 @@ interface NotificationData {
   pendingPartners: number;
   pendingConcierge: number;
   pendingInquiries: number;
-  pavilion?: {
-    byFloor: Record<string, number>;
-    byArtist: Record<string, number>;
-  };
   total: number;
 }
 
@@ -276,8 +266,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
 
   useEffect(() => {
+    // /admin 루트 경로로 접근 시 대기 없이 바로 로그인 페이지로 리다이렉트
+    if (pathname === '/admin') {
+      setLoading(false);
+      router.replace('/admin/login');
+      return;
+    }
     checkAdminAuth();
-  }, []);
+  }, [pathname, router]);
 
   useEffect(() => {
     if (admin) {
@@ -317,20 +313,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       // 환경 정보 로깅
       logEnvironmentInfo();
 
-      // 유틸리티 함수를 사용하여 API URL 생성
-      const apiUrl = getAdminApiUrl('/auth/verify');
+      // Use relative URL for more reliable same-origin requests in dev environment
+      const apiUrl = '/api/admin/auth/verify';
 
-      console.log('Admin auth check URL:', apiUrl);
+      console.log('--- Admin Auth Check Start ---');
+      console.log('Path:', pathname);
 
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
-        credentials: 'include',
-        // 10초 타임아웃
-        signal: AbortSignal.timeout(10000),
+        credentials: 'include'
       });
+
 
       console.log('Admin auth response status:', response.status);
 
@@ -491,21 +488,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const isPavilionMenu = item.href === '/admin/pavilion';
               const isInquiriesMenu = item.href === '/admin/inquiries';
 
-              // Calculate Pavilion total (sum of floors + pending concierge)
-              const pavilionTotal = notifications.pavilion?.byFloor
-                ? Object.values(notifications.pavilion.byFloor).reduce((a, b) => a + b, 0)
-                : 0;
-              const pavilionBadgeCount = notifications.pendingConcierge + pavilionTotal;
+              // Remove pavilion total calculations
 
               const showNotification =
                 (isPartnersMenu && notifications.pendingPartners > 0) ||
-                (isPavilionMenu && pavilionBadgeCount > 0) ||
                 (isInquiriesMenu && notifications.pendingInquiries > 0);
 
               const badgeCount =
                 isPartnersMenu ? notifications.pendingPartners :
-                  (isPavilionMenu ? pavilionBadgeCount :
-                    (isInquiriesMenu ? notifications.pendingInquiries : 0));
+                  (isInquiriesMenu ? notifications.pendingInquiries : 0);
 
               const hasSubItems = item.subItems && item.subItems.length > 0;
 
@@ -582,6 +573,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 className="flex-1 text-sm bg-transparent border-none outline-none text-text-secondary focus:text-text-primary"
+                aria-label="언어 선택"
               >
                 <option value="ko">한국어</option>
                 <option value="en">English</option>

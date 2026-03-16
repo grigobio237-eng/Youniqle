@@ -1,8 +1,22 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { NavigatorInput, NavigatorOutput, OmakaseInput, OmakaseOutput } from './types';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Initialize Gemini AI (Lazy initialization to avoid env loading issues)
+let _genAI: GoogleGenerativeAI | null = null;
+let _studioGenAI: GoogleGenerativeAI | null = null;
+
+const getGenAI = () => {
+    if (!_genAI) _genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    return _genAI;
+};
+
+const getStudioGenAI = () => {
+    if (!_studioGenAI) {
+        const key = process.env.GEMINI_STUDIO_API_KEY || process.env.GEMINI_API_KEY || '';
+        _studioGenAI = new GoogleGenerativeAI(key);
+    }
+    return _studioGenAI;
+};
 
 // Real Gemini AI Engine for Recovery OS
 export class GeminiAIEngine {
@@ -10,40 +24,204 @@ export class GeminiAIEngine {
     // AI Model Configuration
     // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
     // Secondary: gemini-1.5-flash (Stable, Reliable fallback)
-    private static async generateWithFallback(
+    // Generate image and save to file with multimodal support (Supports multiple reference images)
+    public static async generateImageAndSave(
+        prompt: string,
+        outputPath: string,
+        referenceImages?: string | string[],
+        aspectRatio: "9:16" | "4:3" | "1:1" = "9:16"
+    ): Promise<string> {
+        console.log(`[Gemini] Generating image for technical prompt: ${prompt.substring(0, 100)}...`);
+
+        let failureReason = '';
+        let lastError: any;
+
+        const images = Array.isArray(referenceImages) ? referenceImages : referenceImages ? [referenceImages] : [];
+
+        // 1. Try Gemini Native Image Generation (Multimodal if referenceImages provided)
+        try {
+            const models = [
+                'nano-banana-pro-preview',
+                'gemini-2.5-flash-image',
+                'gemini-3-pro-image-preview',
+                'gemini-2.0-flash',
+                'gemini-flash-latest'
+            ];
+
+            for (const modelName of models) {
+                try {
+                    const engines = [getGenAI()];
+                    if (process.env.GEMINI_STUDIO_API_KEY && process.env.GEMINI_STUDIO_API_KEY !== process.env.GEMINI_API_KEY) {
+                        engines.push(getStudioGenAI());
+                    }
+
+                    for (const engine of engines) {
+                        try {
+                            const model = engine.getGenerativeModel({
+                                model: modelName,
+                                safetySettings: [
+                                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                ]
+                            });
+
+                            const promptParts: any[] = [{
+                                text: `
+                            [SYSTEM INSTRUCTION: VISUAL REPLICATION MODE]
+                            1. BRAND INTEGRITY: Provided reference images contain the "GRICO" logo and specific design. DUPLICATE THE LOGO EXACTLY. NEVER imagine new brands like "L'ECLAT". 
+                            2. CHARACTER INTEGRITY: DUPLICATE the provided model's facial features and hair 1:1. 
+                            3. TASK: Generate a photorealistic image mirroring the provided reference images as the SOLE SOURCE OF TRUTH. 
+                            4. USER PROMPT: ${prompt}`
+                            }];
+
+                            for (const imgBase64 of images) {
+                                const base64Content = imgBase64.split(',')[1] || imgBase64;
+                                promptParts.push({
+                                    inlineData: {
+                                        data: base64Content,
+                                        mimeType: "image/png"
+                                    }
+                                });
+                            }
+
+                            const result = await model.generateContent({
+                                contents: [{ role: 'user', parts: promptParts }],
+                                generationConfig: {
+                                    ...(modelName.includes('image') ? {
+                                        //@ts-ignore
+                                        imageConfig: {
+                                            aspectRatio: aspectRatio,
+                                            imageSize: "1K"
+                                        }
+                                    } : {})
+                                } as any
+                            });
+
+                            const response = await result.response;
+                            const parts = response.candidates?.[0]?.content?.parts;
+
+                            if (parts) {
+                                for (const part of parts) {
+                                    if ((part as any).inlineData) {
+                                        const base64Data = (part as any).inlineData.data;
+                                        const buffer = Buffer.from(base64Data, 'base64');
+                                        require('fs').writeFileSync(outputPath, buffer);
+                                        console.log(`[Gemini] Image generated via ${modelName} (Multimodal: ${images.length > 0})`);
+                                        return outputPath;
+                                    }
+                                }
+                            }
+                        } catch (innerE: any) {
+                            console.warn(`[Gemini] Model ${modelName} fail: ${innerE.message}`);
+                            lastError = innerE;
+                            continue;
+                        }
+                    }
+                } catch (e: any) {
+                    console.warn(`[Gemini] Global error for ${modelName}: ${e.message}`);
+                    failureReason = e.message;
+                }
+            }
+        } catch (err: any) {
+            console.warn('[Gemini] Native generation loop failed.', err.message);
+        }
+
+        // 2. Fallback to Pollinations AI (Text-only)
+        try {
+            console.log('[Gemini] Falling back to Pollinations AI...');
+            const safePrompt = prompt.replace(/\[.*?\]/g, '').replace(/[^\w\s]/g, ' ').trim().substring(0, 150);
+            const seed = Math.floor(Math.random() * 100000);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(safePrompt)}?width=1080&height=1920&nologo=true&seed=${seed}`;
+
+            const response = await fetch(imageUrl);
+            if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                require('fs').writeFileSync(outputPath, Buffer.from(buffer));
+                return outputPath;
+            }
+        } catch (error: any) {
+            console.warn('[Gemini] Pollinations fallback failed:', error.message);
+        }
+
+        // 3. Final Resort: Placeholder
+        const color = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+        const placeholderUrl = `https://placehold.co/1080x1920/${color}/ffffff.png?text=Generation+Error`;
+        console.error(`[Gemini] ALL image generation methods failed for prompt. Last error: ${failureReason}. Creating placeholder: ${placeholderUrl}`);
+
+        try {
+            const res = await fetch(placeholderUrl);
+            if (res.ok) {
+                const buf = await res.arrayBuffer();
+                require('fs').writeFileSync(outputPath, Buffer.from(buf));
+            }
+        } catch (phError: any) {
+            console.error('[Gemini] Placeholder fallback also failed:', phError.message);
+        }
+        return outputPath;
+    }
+
+    // AI Model Configuration
+    // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
+    // Secondary: gemini-1.5-flash (Stable, Reliable fallback)
+    public static async generateWithFallback(
         prompt: string,
         systemInstruction?: string,
         temperature: number = 0.7
     ): Promise<string> {
-        const models = ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash-exp'];
+        // Optimized model list for stability and availability
+        const models = [
+            'gemini-2.0-flash',
+            'gemini-1.5-flash',
+            'gemini-2.0-flash-exp',
+            'gemini-1.5-pro'
+        ];
         let lastError: any;
 
         for (const modelName of models) {
             try {
-                const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    ],
-                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
-                });
+                // Try with both genAI and studioGenAI
+                const engines = [getGenAI(), getStudioGenAI()];
 
-                const result = await model.generateContent({
-                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: temperature
+                for (const engine of engines) {
+                    try {
+                        const model = engine.getGenerativeModel({
+                            model: modelName,
+                            safetySettings: [
+                                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            ],
+                            systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
+                        });
+
+                        const result = await model.generateContent({
+                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature: temperature
+                            }
+                        });
+                        const response = await result.response;
+                        const text = response.text();
+
+                        if (text) return text;
+                    } catch (innerError: any) {
+                        // If specific engine fails, try next engine for same model
+                        lastError = innerError;
+                        continue;
                     }
-                });
-                const response = await result.response;
-                const text = response.text();
+                }
 
-                if (text) return text;
-
-            } catch (error) {
-                console.warn(`Model ${modelName} failed. Trying next...`, error);
+            } catch (error: any) {
+                // Only log non-404 errors as warnings to reduce noise
+                const isNotFoundError = error.message?.includes('404') || error.message?.includes('not found');
+                if (!isNotFoundError) {
+                    console.warn(`[Gemini] Model ${modelName} failed:`, error.message);
+                } else {
+                    console.log(`[Gemini] Model ${modelName} not available, trying next...`);
+                }
                 lastError = error;
                 continue;
             }
@@ -726,7 +904,7 @@ ${input.isStemCellSolution ? `
     static async generateDetailImage(input: {
         prompt: string;
         keyMessage: string;
-        referenceImage?: string; // Base64
+        referenceImage?: string | string[]; // Base64
         aspectRatio?: "9:16" | "1:1";
         isStemCellSolution?: boolean;
     }): Promise<string> {
@@ -735,85 +913,105 @@ ${input.isStemCellSolution ? `
         }
 
         const models = [
-            'gemini-3-pro-image-preview', // User's preferred model from AI Studio
-            'gemini-2.0-flash-exp',
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-flash'
+            'nano-banana-pro-preview',
+            'gemini-2.5-flash-image',
+            'gemini-3-pro-image-preview',
+            'gemini-2.0-flash',
+            'gemini-flash-latest'
         ];
         let lastError: any;
 
+        const basePrefix = input.isStemCellSolution
+            ? `High quality professional Medical and clinical photography. Focus on healing environments, professional procedures, and microscopic cell recovery. ABSOLUTELY NO product bottles, no packaging, no retail containers.`
+            : `High quality e-commerce product photography. Use the provided product/model images as the absolute visual standard.`;
+
+        const prompt = `${basePrefix} ${input.prompt}. ${input.keyMessage ? `Overlay text: "${input.keyMessage}".` : ''} Aspect Ratio: ${input.aspectRatio || "9:16"}`;
+
+        const images = Array.isArray(input.referenceImage) ? input.referenceImage : input.referenceImage ? [input.referenceImage] : [];
+
         for (const modelName of models) {
             try {
-                const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    ]
-                });
-
-                const basePrefix = input.isStemCellSolution
-                    ? `High quality professional Medical and clinical photography. Focus on healing environments, professional procedures, and microscopic cell recovery. ABSOLUTELY NO product bottles, no packaging, no retail containers.`
-                    : `High quality e-commerce product photography.`;
-
-                const promptParts: any[] = [
-                    {
-                        text: `${basePrefix} ${input.prompt}. 
-CRITICAL: Please overlay the following Korean text clearly on the image in a stylish typography: "${input.keyMessage}".
-The overall style should be premium, clean, and reflect a "Recovery" theme.
-Aspect Ratio: ${input.aspectRatio || "9:16"}`
-                    }
-                ];
-
-                if (input.referenceImage) {
-                    const base64Content = input.referenceImage.split(',')[1] || input.referenceImage;
-                    promptParts.push({
-                        inlineData: {
-                            data: base64Content,
-                            mimeType: "image/png"
-                        }
-                    });
+                const engines = [getGenAI()];
+                if (process.env.GEMINI_STUDIO_API_KEY && process.env.GEMINI_STUDIO_API_KEY !== process.env.GEMINI_API_KEY) {
+                    engines.push(getStudioGenAI());
                 }
 
-                const result = await model.generateContent({
-                    contents: [{ role: 'user', parts: promptParts }],
-                    generationConfig: {
-                        // Include image config for models that support it
-                        ...(modelName.includes('image') ? {
-                            //@ts-ignore
-                            imageConfig: {
-                                aspectRatio: input.aspectRatio || "9:16",
-                                imageSize: "1K"
+                for (const engine of engines) {
+                    try {
+                        const model = engine.getGenerativeModel({
+                            model: modelName,
+                            safetySettings: [
+                                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            ]
+                        });
+
+                        const promptParts: any[] = [{ text: prompt }];
+
+                        for (const imgBase64 of images) {
+                            const base64Content = imgBase64.split(',')[1] || imgBase64;
+                            promptParts.push({ inlineData: { data: base64Content, mimeType: "image/png" } });
+                        }
+
+                        const result = await model.generateContent({
+                            contents: [{ role: 'user', parts: promptParts }],
+                            generationConfig: {
+                                ...(modelName.includes('image') ? {
+                                    //@ts-ignore
+                                    imageConfig: {
+                                        aspectRatio: input.aspectRatio || "9:16",
+                                        imageSize: "1K"
+                                    }
+                                } : {})
+                            } as any
+                        });
+
+                        const response = await result.response;
+                        const parts = response.candidates?.[0]?.content?.parts;
+
+                        if (parts) {
+                            for (const part of parts) {
+                                if ((part as any).inlineData) {
+                                    return `data:image/png;base64,${(part as any).inlineData.data}`;
+                                }
                             }
-                        } : {})
-                    } as any
-                });
-
-                const response = await result.response;
-                const parts = response.candidates?.[0]?.content?.parts;
-
-                if (parts) {
-                    for (const part of parts) {
-                        if ((part as any).inlineData) {
-                            return `data:image/png;base64,${(part as any).inlineData.data}`;
                         }
+                    } catch (innerE: any) {
+                        console.warn(`[Gemini] Detail image model ${modelName} fail: ${innerE.message}`);
+                        lastError = innerE;
+                        continue;
                     }
                 }
-                break;
             } catch (error: any) {
-                console.warn(`[Gemini] Model ${modelName} failed:`, error.message);
+                console.warn(`[Gemini] Detail image global error ${modelName}:`, error.message);
                 lastError = error;
                 continue;
             }
         }
 
-        console.log('[Gemini] All generation models failed or returned no data. Using simulation fallback.');
-        const seed = Math.random().toString(36).substring(7);
-        const w = input.aspectRatio === "1:1" ? 1000 : 900;
-        const h = input.aspectRatio === "1:1" ? 1000 : 1600;
-        return `https://picsum.photos/seed/${seed}/${w}/${h}`;
+        // Fallback to Pollinations for Detail Image as well (better than picsum)
+        try {
+            console.log('[Gemini] Detail image fallback to Pollinations...');
+            const seed = Math.floor(Math.random() * 100000);
+            const w = input.aspectRatio === "1:1" ? 1000 : 1080;
+            const h = input.aspectRatio === "1:1" ? 1000 : 1920;
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt.substring(0, 200))}?width=${w}&height=${h}&nologo=true&seed=${seed}`;
+
+            const response = await fetch(imageUrl);
+            if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
+            }
+        } catch (e) {
+            console.warn('[Gemini] Detail image fallback failed', e);
+        }
+
+        const seedFallback = Math.random().toString(36).substring(7);
+        const fw = input.aspectRatio === "1:1" ? 1000 : 900;
+        const fh = input.aspectRatio === "1:1" ? 1000 : 1600;
+        return `https://picsum.photos/seed/${seedFallback}/${fw}/${fh}`;
     }
 
     // AI Section Image Generation (Old prompt logic, kept for compatibility)
@@ -1017,10 +1215,16 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
     }
 
     /**
-     * 캐릭터 이미지 분석 (Vision)
+     * 범용 비전 분석 (상품, 모델, 캐릭터 모두 대응)
+     * 기존 analyzeCharacterImage를 확장하여 전문적인 분석 제공
      */
-    static async analyzeCharacterImage(imageBase64: string): Promise<string> {
-        const prompt = "Analyze this character image and describe its key visual features (species, colors, accessories, clothing, personality felt) in a concise English prompt format for an AI image generator. Focus on descriptors that help maintain consistency. Return the description only.";
+    static async analyzeVisionImage(imageBase64: string, customInstruction?: string): Promise<string> {
+        const defaultPrompt = `Analyze this image in detail for an AI image generator to replicate its subject EXACTLY.
+        - If it's a PRODUCT: Describe the container shape (bottle, tube, box), specific material/texture (matte, glossy, glass), brand colors, brand name/logo placement, and exact text labels visible.
+        - If it's a PERSON/MODEL: Describe facial features, exact hair style/color, skin tone, estimated age, and clothing style.
+        - Output a concise English prompt snippet that captures these immutable characteristics.`;
+
+        const prompt = customInstruction || defaultPrompt;
 
         try {
             if (!process.env.GEMINI_API_KEY) {
@@ -1028,7 +1232,7 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
                 throw new Error('API key is not configured');
             }
 
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
             const result = await model.generateContent([
                 prompt,
                 {
@@ -1042,11 +1246,18 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
             const text = response.text();
 
             if (!text) throw new Error('Empty response from AI');
-            return text;
+            return text.trim();
         } catch (error: any) {
-            console.error('Gemini Image analysis detail error:', error);
+            console.error('Gemini Vision analysis detail error:', error);
             throw new Error(`AI 분석 중 오류: ${error.message}`);
         }
+    }
+
+    /**
+     * 캐릭터 이미지 분석 (Vision) - 호환성 유지
+     */
+    static async analyzeCharacterImage(imageBase64: string): Promise<string> {
+        return this.analyzeVisionImage(imageBase64);
     }
 
     /**

@@ -201,6 +201,7 @@ function SigninContent() {
                     id="remember"
                     type="checkbox"
                     className="h-4 w-4 bg-background border-line rounded text-primary focus:ring-primary"
+                    aria-label="로그인 상태 유지"
                   />
                   <Label htmlFor="remember" className="text-sm text-text-secondary font-medium cursor-pointer">
                     로그인 상태 유지

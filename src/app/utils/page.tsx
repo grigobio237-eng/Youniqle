@@ -518,6 +518,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                                         value={bedtimeHour}
                                         onChange={(e) => setBedtimeHour(parseInt(e.target.value))}
                                         className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                        aria-label="취침 시간 (시)"
                                     >
                                         {Array.from({ length: 24 }, (_, i) => (
                                             <option key={i} value={i}>{i.toString().padStart(2, '0')}</option>
@@ -528,6 +529,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                                         value={bedtimeMin}
                                         onChange={(e) => setBedtimeMin(parseInt(e.target.value))}
                                         className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                        aria-label="취침 시간 (분)"
                                     >
                                         {[0, 15, 30, 45].map(m => (
                                             <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>
@@ -542,6 +544,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                                         value={wakeHour}
                                         onChange={(e) => setWakeHour(parseInt(e.target.value))}
                                         className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                        aria-label="기상 시간 (시)"
                                     >
                                         {Array.from({ length: 24 }, (_, i) => (
                                             <option key={i} value={i}>{i.toString().padStart(2, '0')}</option>
@@ -552,6 +555,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                                         value={wakeMin}
                                         onChange={(e) => setWakeMin(parseInt(e.target.value))}
                                         className="bg-transparent text-2xl font-black text-obsidian w-14 text-center focus:outline-none"
+                                        aria-label="기상 시간 (분)"
                                     >
                                         {[0, 15, 30, 45].map(m => (
                                             <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>
@@ -622,6 +626,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                     <button
                         onClick={() => onOpenChange(false)}
                         className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors z-20"
+                        aria-label="모달 닫기"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -690,17 +695,19 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                     {/* Visual Progress Header */}
                     <div className="h-56 bg-gradient-to-br from-blue-400 to-indigo-600 flex flex-col items-center justify-center relative overflow-hidden">
                         {/* Wave Background */}
-                        <div
-                            className="absolute bottom-0 left-0 w-full bg-white/20 transition-all duration-1000 ease-out"
-                            style={{ height: `${progress}%` }}
-                        />
+                        <div className="absolute bottom-0 left-0 w-full bg-white/20 transition-all duration-1000 ease-out water-wave" />
+                        <style jsx>{`
+                            .water-wave {
+                                height: ${progress}%;
+                            }
+                        `}</style>
 
                         {/* Bubbles animation */}
                         {progress < 100 && (
                             <div className="absolute inset-0 overflow-hidden">
-                                <div className="absolute bottom-0 left-1/4 w-3 h-3 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-                                <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-white/20 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
-                                <div className="absolute bottom-0 left-3/4 w-4 h-4 bg-white/25 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+                                <div className="absolute bottom-0 left-1/4 w-3 h-3 bg-white/30 rounded-full animate-bounce [animation-delay:0s]" />
+                                <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-white/20 rounded-full animate-bounce [animation-delay:0.5s]" />
+                                <div className="absolute bottom-0 left-3/4 w-4 h-4 bg-white/25 rounded-full animate-bounce [animation-delay:1s]" />
                             </div>
                         )}
 
@@ -729,6 +736,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                             value={goal}
                                             onChange={(e) => setGoal(Math.max(500, Math.min(5000, parseInt(e.target.value) || 2000)))}
                                             className="w-20 text-center border border-line rounded-lg px-2 py-1 text-sm font-bold"
+                                            aria-label="수분 섭취 목표량 (ml)"
                                         />
                                         <span className="text-sm text-slate">ml</span>
                                         <button onClick={() => setShowGoalEdit(false)} className="text-xs text-blue-500 font-bold">확인</button>
@@ -744,9 +752,13 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                         {/* Progress Bar */}
                         <div className="h-3 bg-mist rounded-full overflow-hidden border border-line">
                             <div
-                                className={`h-full transition-all duration-500 ease-out rounded-full ${progress >= 100 ? 'bg-green-500' : 'bg-blue-500'}`}
-                                style={{ width: `${progress}%` }}
+                                className={`h-full transition-all duration-500 ease-out rounded-full ${progress >= 100 ? 'bg-green-500' : 'bg-blue-500'} water-progress-bar`}
                             />
+                            <style jsx>{`
+                                .water-progress-bar {
+                                    width: ${progress}%;
+                                }
+                            `}</style>
                         </div>
 
                         {/* 빠른 추가 버튼 */}
@@ -822,6 +834,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                     <button
                         onClick={() => onOpenChange(false)}
                         className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors z-20"
+                        aria-label="모달 닫기"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -1124,6 +1137,7 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                                             ? 'w-2 bg-green-500'
                                             : 'w-2 bg-line'
                                         }`}
+                                    aria-label={`${i + 1}단계로 이동`}
                                 />
                             ))}
                         </div>
@@ -1132,6 +1146,7 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                     <button
                         onClick={handleClose}
                         className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors z-20"
+                        aria-label="모달 닫기"
                     >
                         <X className="w-5 h-5" />
                     </button>

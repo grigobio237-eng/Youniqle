@@ -145,8 +145,7 @@ export default function TypingPage() {
                     {/* Cursor */}
                     {gameState.status !== 'finished' && (
                         <span
-                            className="border-l-2 border-indigo-500 animate-pulse ml-[1px]"
-                            style={{ display: 'inline-block', height: '1.2em', verticalAlign: 'text-bottom' }}
+                            className="border-l-2 border-indigo-500 animate-pulse ml-[1px] inline-block h-[1.2em] align-text-bottom"
                         />
                     )}
                 </div>
@@ -204,6 +203,7 @@ export default function TypingPage() {
                         onChange={handleInputArray}
                         disabled={gameState.status === 'finished'}
                         autoFocus
+                        aria-label="타이핑 입력"
                     />
 
                     {/* Result Overlay */}

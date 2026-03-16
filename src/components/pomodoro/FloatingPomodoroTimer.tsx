@@ -79,6 +79,7 @@ export default function FloatingPomodoroTimer({
                 >
                     <button
                         onClick={toggleMinimize}
+                        aria-label="타이머 열기"
                         className={`w-16 h-16 rounded-full ${getModeColor()} text-white shadow-2xl flex items-center justify-center group hover:scale-110 transition-transform relative`}
                     >
                         {status === 'running' ? (
@@ -137,12 +138,14 @@ export default function FloatingPomodoroTimer({
                                 <div className="flex items-center gap-1">
                                     <button
                                         onClick={toggleMinimize}
+                                        aria-label="최소화"
                                         className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
                                     >
                                         <Minimize2 className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => setIsVisible(false)}
+                                        aria-label="닫기"
                                         className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
                                     >
                                         <X className="w-4 h-4" />
@@ -199,8 +202,8 @@ export default function FloatingPomodoroTimer({
                                     <div
                                         key={i}
                                         className={`w-3 h-3 rounded-full transition-all ${i <= (completedSessions % 4) || (completedSessions % 4 === 0 && completedSessions > 0 && i === 4)
-                                                ? 'bg-chapter-accent'
-                                                : 'bg-mist border border-line'
+                                            ? 'bg-chapter-accent'
+                                            : 'bg-mist border border-line'
                                             }`}
                                     />
                                 ))}

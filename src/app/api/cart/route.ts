@@ -38,16 +38,24 @@ export async function GET(request: NextRequest) {
         });
       }
 
+      // 타입 정의 추가
+      interface CartItem {
+        productId: any; // Populated product object
+        quantity: number;
+        price: number;
+        [key: string]: any;
+      }
+
       // 삭제된 상품 등으로 인해 productId가 null인 아이템 필터링
-      const validItems = (cart.items || []).filter((item: any) => item.productId);
+      const validItems = ((cart as any).items || []).filter((item: any) => item.productId) as CartItem[];
       const filteredCart = {
         ...cart,
         items: validItems,
-        totalItems: validItems.reduce((sum: number, item: any) => sum + item.quantity, 0),
-        totalAmount: validItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
+        totalItems: validItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
+        totalAmount: validItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
       };
 
-      return NextResponse.json({ cart: filteredCart });
+      return NextResponse.json({ cart: filteredCart } as any);
     } else {
       // 익명 사용자의 경우 빈 장바구니 반환
       return NextResponse.json({
@@ -166,7 +174,7 @@ export async function POST(request: NextRequest) {
       .lean();
 
     // 삭제된 상품 등으로 인해 productId가 null인 아이템 필터링
-    const validItems = (updatedCart?.items || []).filter((item: any) => item.productId);
+    const validItems = ((updatedCart as any)?.items || []).filter((item: any) => item.productId);
     const filteredCart = {
       ...updatedCart,
       items: validItems,

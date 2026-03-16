@@ -37,7 +37,8 @@ import {
   ShoppingBag,
   Heart,
   Activity,
-  Zap
+  Zap,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import ReferralSection from '@/components/ui/ReferralSection';
@@ -49,6 +50,7 @@ import MembershipProgress from '@/components/me/MembershipProgress';
 import AccessTierCard from '@/components/me/AccessTierCard';
 import AILatestBrief from '@/components/me/AILatestBrief';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import QRReferralCard from '@/components/me/QRReferralCard';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -789,6 +791,24 @@ export default function MyPage() {
             </div>
 
             <div className="lg:col-span-4 space-y-8 h-full">
+              {/* QR 초대 카드 */}
+              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-mist transition-all hover:shadow-md">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-amber-50 rounded-2xl text-amber-600">
+                      <Sparkles className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-obsidian tracking-tighter">인비테이션 QR</h3>
+                      <p className="text-[10px] font-bold text-slate uppercase tracking-widest">Invitation Protocol</p>
+                    </div>
+                  </div>
+                  <QRReferralCard 
+                    userName={session.user?.name || ''} 
+                    referralCode={userData?.referralCode || ''} 
+                  />
+                </div>
+              </Card>
 
               {/* 파트너 상태 */}
               {partnerInfo && (
@@ -1008,6 +1028,7 @@ export default function MyPage() {
                                 accept="image/*"
                                 onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                aria-label="증빙서류 업로드"
                               />
                             </div>
 
@@ -1041,6 +1062,7 @@ export default function MyPage() {
                                 accept="image/*"
                                 onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                aria-label="통장사본 업로드"
                               />
                             </div>
                           </div>

@@ -279,6 +279,7 @@ export default function CartPage() {
                                 className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
                                 onClick={() => item?.productId?._id && updateQuantity(item.productId._id, item.quantity - 1)}
                                 disabled={!item?.productId?._id || updating === item.productId._id || item.quantity <= 1}
+                                aria-label="수량 감소"
                               >
                                 <Minus className="h-4 w-4" />
                               </button>
@@ -287,6 +288,7 @@ export default function CartPage() {
                                 className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl disabled:opacity-20 transition-all active:scale-90"
                                 onClick={() => item?.productId?._id && updateQuantity(item.productId._id, item.quantity + 1)}
                                 disabled={!item?.productId?._id || updating === item.productId._id || item.quantity >= 99}
+                                aria-label="수량 증가"
                               >
                                 <Plus className="h-4 w-4" />
                               </button>
@@ -296,6 +298,7 @@ export default function CartPage() {
                               size="icon"
                               onClick={() => item?.productId?._id && removeItem(item.productId._id)}
                               className="w-12 h-12 rounded-2xl text-slate hover:text-status-danger hover:bg-status-danger/5"
+                              aria-label="상품 삭제"
                             >
                               <Trash2 className="h-5 w-5" />
                             </Button>

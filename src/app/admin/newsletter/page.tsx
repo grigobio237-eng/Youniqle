@@ -265,6 +265,7 @@ export default function NewsletterDashboard() {
                 value={statusFilter}
                 onChange={(e) => handleStatusChange(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="구독 상태 필터"
               >
                 <option value="all">모든 상태</option>
                 <option value="active">활성</option>

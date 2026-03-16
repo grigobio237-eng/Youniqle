@@ -303,19 +303,19 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
     return notificationDate.toLocaleDateString('ko-KR');
   };
 
-  // 파빌리온 권한이 있는 파트너 타입 확인
-  const pavilionPartnerTypes = ['artist', 'business', 'shopper', 'coach'];
-  const hasPavilionAccess = partner?.partnerType && pavilionPartnerTypes.includes(partner.partnerType);
+  // 전용 메뉴 권한이 있는 파트너 타입 확인
+  const specialPartnerTypes = ['artist', 'business', 'shopper', 'coach'];
+  const hasSpecialAccess = partner?.partnerType && specialPartnerTypes.includes(partner.partnerType);
 
-  const getPavilionMenuInfo = () => {
+  const getSpecialMenuInfo = () => {
     const type = partner?.partnerType;
-    if (type === 'artist') return { name: '전시 관리', badge: 'ARTIST', description: '가상공간 1층 작품 관리' };
-    if (['business', 'shopper'].includes(type || '')) return { name: '상점 관리', badge: 'SHOP', description: '가상공간 2층 상점 관리' };
-    if (type === 'coach') return { name: '코칭 관리', badge: 'COACH', description: '가상공간 3층 코칭 관리' };
-    return { name: '전시 관리', badge: 'PARTNER', description: '가상공간 전시 관리' };
+    if (type === 'artist') return { name: '전시 관리', badge: 'ARTIST', description: '아티스트 작품 전시 관리' };
+    if (['business', 'shopper'].includes(type || '')) return { name: '상점 관리', badge: 'SHOP', description: '파트너 상점 및 상품 관리' };
+    if (type === 'coach') return { name: '트레이너 설정관리', badge: 'COACH', description: '트레이너 프로필 및 캐릭터 설정' };
+    return { name: '설정 관리', badge: 'PARTNER', description: '파트너 정보 및 노출 관리' };
   };
 
-  const pavilionInfo = getPavilionMenuInfo();
+  const specialMenuInfo = getSpecialMenuInfo();
 
   if (loading) {
     return (
@@ -419,7 +419,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? 'bg-secondary text-white'
+                    ? 'bg-chapter-accent text-white'
                     : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
                     }`}
                   onClick={() => setSidebarOpen(false)}
@@ -436,12 +436,12 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
               );
             })}
 
-            {/* 파빌리온 전용 메뉴 (권한이 있는 경우만) */}
-            {hasPavilionAccess && (
+            {/* 전용 메뉴 (권한이 있는 경우만) */}
+            {hasSpecialAccess && (
               <Link
                 href="/partner/pavilion"
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/partner/pavilion'
-                  ? 'bg-secondary text-white'
+                  ? 'bg-chapter-accent text-white'
                   : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
                   }`}
                 onClick={() => setSidebarOpen(false)}
@@ -449,12 +449,12 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 <Palette className="h-5 w-5" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    {pavilionInfo.name}
-                    <Badge variant="outline" className="text-[9px] h-4 px-1 bg-indigo-50 text-indigo-600 border-indigo-200">{pavilionInfo.badge}</Badge>
+                    {specialMenuInfo.name}
+                    <Badge variant="outline" className="text-[9px] h-4 px-1 bg-indigo-50 text-indigo-600 border-indigo-200">{specialMenuInfo.badge}</Badge>
                   </div>
                   <div className={`text-xs ${pathname === '/partner/pavilion' ? 'text-white/80' : 'text-text-secondary'
                     }`}>
-                    {pavilionInfo.description}
+                    {specialMenuInfo.description}
                   </div>
                 </div>
               </Link>
@@ -469,6 +469,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 className="flex-1 text-sm bg-transparent border-none outline-none text-text-secondary focus:text-text-primary"
+                aria-label="언어 선택"
               >
                 <option value="ko">한국어</option>
                 <option value="en">English</option>

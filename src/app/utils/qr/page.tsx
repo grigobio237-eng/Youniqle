@@ -151,6 +151,7 @@ export default function QRCodePage() {
                                     checked={includeCharacter}
                                     onChange={(e) => setIncludeCharacter(e.target.checked)}
                                     className="w-4 h-4"
+                                    aria-label="Youniqle 캐릭터 로고 포함"
                                 />
                                 <Label htmlFor="character" className="text-base font-semibold cursor-pointer">
                                     Youniqle 캐릭터 로고 포함

@@ -27,39 +27,30 @@ export default function ElevatorUI({ activeFloor, onFloorChange }: ElevatorUIPro
     return (
         <>
             {/* Desktop Vertical Menu */}
-            <div className="hidden md:flex fixed left-10 top-1/2 -translate-y-1/2 z-50 flex-col gap-6">
-                <div className="flex flex-col items-center gap-2 mb-4">
-                    <div className={`w-1 h-32 ${barBg} relative rounded-full overflow-hidden`}>
-                        <motion.div
-                            className="absolute bottom-0 w-full bg-[#D4AF37]"
-                            animate={{ height: `${(activeFloor / 5) * 100}%` }}
-                            transition={{ type: 'spring', stiffness: 100 }}
-                        />
-                    </div>
-                </div>
-
+            <div className="flex flex-col gap-10 items-center justify-center h-full">
                 {floors.map((floor) => (
                     <button
                         key={floor.id}
                         onClick={() => onFloorChange(floor.id)}
-                        className="group relative flex items-center gap-4 outline-none"
+                        className="group relative flex flex-col items-center gap-2 outline-none transition-all duration-300"
                     >
-                        <div className="flex flex-col items-end">
-                            <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeFloor === floor.id ? 'text-[#D4AF37]' : `${mutedTextColor} group-hover:${hoverTextColor}`}`}>
+                        <div className="flex flex-col items-center">
+                            <span className={`text-[8px] font-black uppercase tracking-[0.3em] transition-all duration-300 mb-1 ${activeFloor === floor.id ? 'text-[#D4AF37]' : 'text-obsidian/20 group-hover:text-obsidian/40'}`}>
                                 {floor.name}
                             </span>
-                            <span className={`text-2xl font-black tracking-tighter transition-all duration-300 ${activeFloor === floor.id ? `${baseTextColor} scale-125` : `${mutedTextColor} group-hover:${hoverTextColor}`}`}>
+                            <span className={`text-2xl font-black tracking-tighter transition-all duration-300 ${activeFloor === floor.id ? 'text-obsidian scale-125' : 'text-obsidian/20 group-hover:text-obsidian/40'}`}>
                                 {floor.label}
                             </span>
                         </div>
 
-                        <div className={`w-3 h-3 rounded-full border-2 transition-all duration-300 ${activeFloor === floor.id ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-lg shadow-[#D4AF37]/30' : `${borderColor} group-hover:border-obsidian/20`}`} />
-
                         {activeFloor === floor.id && (
                             <motion.div
                                 layoutId="elevator-indicator"
-                                className="absolute -right-4 w-1 h-8 bg-[#D4AF37] rounded-full"
+                                className="w-1 h-6 bg-[#D4AF37] rounded-full mt-1"
                             />
+                        )}
+                        {activeFloor !== floor.id && (
+                            <div className="w-1.5 h-1.5 rounded-full border border-obsidian/10 mt-1" />
                         )}
                     </button>
                 ))}

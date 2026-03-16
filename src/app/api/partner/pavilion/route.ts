@@ -1,123 +1,154 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import PavilionFloor from '@/models/PavilionFloor';
-import { withPartnerAuth } from '@/lib/authMiddleware';
+import User from '@/models/User';
+import jwt from 'jsonwebtoken';
 
-// Helper to get floor by partner type
-function getFloorByType(partnerType: string): number {
-    switch (partnerType) {
-        case 'artist': return 1;
-        case 'business':
-        case 'shopper': return 2;
-        case 'coach': return 3;
-        default: return 0; // Invalid or other floors
+// GET: 파트너의 파빌리온 설정 조회
+export async function GET(request: NextRequest) {
+  try {
+    const token = request.cookies.get('partner-token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    if (decoded.type !== 'partner') {
+      return NextResponse.json(
+        { error: '파트너 권한이 필요합니다.' },
+        { status: 403 }
+      );
+    }
+
+    const partnerId = decoded.id;
+    await connectDB();
+
+    const partner = await User.findById(partnerId);
+    if (!partner || partner.partnerStatus !== 'approved') {
+      return NextResponse.json(
+        { error: '승인된 파트너가 아닙니다.' },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json({
+      pavilionInfo: {
+        characterImage: '',
+        roomDescription: '',
+        roomMusic: '',
+        roomTheme: 'premium',
+        isActive: true,
+        ...(partner.pavilionInfo || {})
+      },
+      coachProfile: partner.coachProfile
+    });
+
+  } catch (error) {
+    console.error('Pavilion settings fetch error:', error);
+    return NextResponse.json(
+      { error: '설정을 가져올 수 없습니다.' },
+      { status: 500 }
+    );
+  }
 }
 
-// GET: 파트너 본인의 전시 데이터 조회
-async function getPartnerPavilionHandler(request: NextRequest, user: any) {
-    try {
-        await connectDB();
-
-        const partnerType = user.partnerApplication?.partnerType;
-        const floorNum = getFloorByType(partnerType);
-
-        if (floorNum === 0 && user.role !== 'admin') {
-            return NextResponse.json({ error: '전시 관리 권한이 없는 파트너 타입입니다.' }, { status: 403 });
-        }
-
-        // 해당 층 데이터 가져오기 (관리자는 1층 기본 또는 쿼리 파라미터로 확장 가능하지만 일단 1층)
-        const targetFloor = floorNum || 1;
-        const floorData = await PavilionFloor.findOne({ floor: targetFloor });
-
-        if (!floorData) {
-            return NextResponse.json({ error: `Pavilion Floor ${targetFloor} not found` }, { status: 404 });
-        }
-
-        // 현재 파트너의 ID와 일치하는 owner 찾기
-        const partnerId = user._id.toString();
-        let owner = floorData.owners.find((o: any) => o.id === partnerId);
-
-        // 만약 owner가 없다면 기본 정보로 초기화
-        if (!owner) {
-            const roleMap: Record<string, string> = {
-                'artist': '아티스트',
-                'business': '대표자',
-                'shopper': '대표자',
-                'coach': '마스터 코치'
-            };
-
-            owner = {
-                id: partnerId,
-                name: user.name || '파트너',
-                role: roleMap[partnerType] || '전문가',
-                bio: user.partnerApplication?.businessDescription || '소개를 입력해주세요.',
-                image: user.avatar || '',
-                items: []
-            };
-        }
-
-        return NextResponse.json({ owner, floor: targetFloor });
-    } catch (error) {
-        console.error('Fetch partner pavilion error:', error);
-        return NextResponse.json({ error: 'Failed to fetch pavilion data' }, { status: 500 });
+// PATCH: 파트너의 파빌리온 설정 업데이트
+export async function PATCH(request: NextRequest) {
+  try {
+    const token = request.cookies.get('partner-token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
     }
-}
 
-// POST: 파트너 본인의 전시 데이터 업데이트
-async function updatePartnerPavilionHandler(request: NextRequest, user: any) {
-    try {
-        await connectDB();
-        const body = await request.json();
-        const { bio, role, image, items, name, schedule } = body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-        const partnerType = user.partnerApplication?.partnerType;
-        const floorNum = getFloorByType(partnerType);
+    if (decoded.type !== 'partner') {
+      return NextResponse.json(
+        { error: '파트너 권한이 필요합니다.' },
+        { status: 403 }
+      );
+    }
 
-        if (floorNum === 0 && user.role !== 'admin') {
-            return NextResponse.json({ error: '작가, 상점 또는 코치 권한이 필요합니다.' }, { status: 403 });
-        }
+    const partnerId = decoded.id;
+    const { pavilionInfo, coachProfile } = await request.json();
+    
+    console.log('--- RECEIVED DATA ---');
+    console.log('pavilionInfo:', JSON.stringify(pavilionInfo, null, 2));
+    console.log('coachProfile availability count:', coachProfile?.availability?.length || 0);
 
-        const partnerId = user._id.toString();
-        const targetFloor = floorNum || 1;
-        const floorData = await PavilionFloor.findOne({ floor: targetFloor });
+    await connectDB();
 
-        if (!floorData) {
-            return NextResponse.json({ error: `Pavilion Floor ${targetFloor} not found` }, { status: 404 });
-        }
+    const partner = await User.findById(partnerId);
+    if (!partner || partner.partnerStatus !== 'approved') {
+      return NextResponse.json(
+        { error: '승인된 파트너가 아닙니다.' },
+        { status: 403 }
+      );
+    }
 
-        const owners = [...floorData.owners];
-        const ownerIndex = owners.findIndex((o: any) => o.id === partnerId);
+    if (pavilionInfo) {
+      const currentPavilion = partner.pavilionInfo?.toObject ? partner.pavilionInfo.toObject() : (partner.pavilionInfo || {});
+      partner.pavilionInfo = {
+        ...currentPavilion,
+        ...pavilionInfo
+      };
+    }
 
-        const updatedOwner = {
-            id: partnerId,
-            name: name || user.name,
-            role: role || (partnerType === 'artist' ? '아티스트' : '전문가'),
-            bio: bio || '',
-            image: image || '',
-            items: items || [],
-            schedule: schedule || []
+    if (coachProfile) {
+      console.log('--- COACH PROFILE UPDATE ---');
+      console.log('Incoming availability:', JSON.stringify(coachProfile.availability, null, 2));
+      
+      if (!partner.coachProfile) partner.coachProfile = {};
+      
+      // Update simple fields
+      if (coachProfile.title !== undefined) partner.coachProfile.title = coachProfile.title;
+      if (coachProfile.specialty !== undefined) partner.coachProfile.specialty = coachProfile.specialty;
+      if (coachProfile.philosophy !== undefined) partner.coachProfile.philosophy = coachProfile.philosophy;
+      if (coachProfile.description !== undefined) partner.coachProfile.description = coachProfile.description;
+      if (coachProfile.profileImage !== undefined) partner.coachProfile.profileImage = coachProfile.profileImage;
+
+      // Update arrays (Explicit re-assignment for Mongoose)
+      if (coachProfile.availability) {
+        console.log('Explicitly setting availability, count:', coachProfile.availability.length);
+        partner.coachProfile.availability = coachProfile.availability;
+      }
+      if (coachProfile.programs) {
+        partner.coachProfile.programs = coachProfile.programs;
+      }
+      if (coachProfile.socialMedia) {
+        partner.coachProfile.socialMedia = {
+          ...(partner.coachProfile.socialMedia || {}),
+          ...coachProfile.socialMedia
         };
+      }
 
-        if (ownerIndex > -1) {
-            owners[ownerIndex] = updatedOwner;
-        } else {
-            owners.push(updatedOwner);
-        }
-
-        floorData.owners = owners;
-        await floorData.save();
-
-        return NextResponse.json({
-            message: '성공적으로 업데이트되었습니다.',
-            owner: updatedOwner,
-            floor: targetFloor
-        });
-    } catch (error) {
-        console.error('Update partner pavilion error:', error);
-        return NextResponse.json({ error: 'Failed to update pavilion data' }, { status: 500 });
+      // Mark fields as modified
+      partner.markModified('coachProfile');
+      if (coachProfile.availability) partner.markModified('coachProfile.availability');
+      if (coachProfile.programs) partner.markModified('coachProfile.programs');
     }
-}
 
-export const GET = withPartnerAuth(getPartnerPavilionHandler);
-export const POST = withPartnerAuth(updatePartnerPavilionHandler);
+    console.log('Saving partner document for:', partner.email);
+    await partner.save();
+    console.log('Save successful. Saved availability count:', partner.coachProfile?.availability?.length || 0);
+
+    return NextResponse.json({
+      message: '설정이 저장되었습니다.',
+      pavilionInfo: partner.pavilionInfo,
+      coachProfile: partner.coachProfile
+    });
+
+  } catch (error) {
+    console.error('Pavilion settings update error:', error);
+    return NextResponse.json(
+      { error: '설정 저장에 실패했습니다.' },
+      { status: 500 }
+    );
+  }
+}

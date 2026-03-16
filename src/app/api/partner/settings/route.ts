@@ -73,7 +73,19 @@ export async function GET(request: NextRequest) {
 
       // 브랜딩
       shopLogo: partner.partnerSettings?.shopLogo || '',
-      shopBanner: partner.partnerSettings?.shopBanner || ''
+      shopBanner: partner.partnerSettings?.shopBanner || '',
+
+      // 코치 프로필 (코치 파트너인 경우)
+      partnerType: partner.partnerApplication?.partnerType,
+      coachProfile: partner.coachProfile || {
+        title: '',
+        specialty: '',
+        philosophy: '',
+        description: '',
+        certifications: [],
+        programs: [],
+        profileImage: ''
+      }
     };
 
     return NextResponse.json(settings);
@@ -196,6 +208,18 @@ export async function PATCH(request: NextRequest) {
     if (updates.shopBanner !== undefined) {
       partner.partnerSettings = partner.partnerSettings || {};
       partner.partnerSettings.shopBanner = updates.shopBanner;
+    }
+
+    // 코치 프로필 업데이트
+    if (updates.coachProfile) {
+      partner.coachProfile = partner.coachProfile || {};
+      if (updates.coachProfile.title !== undefined) partner.coachProfile.title = updates.coachProfile.title;
+      if (updates.coachProfile.specialty !== undefined) partner.coachProfile.specialty = updates.coachProfile.specialty;
+      if (updates.coachProfile.philosophy !== undefined) partner.coachProfile.philosophy = updates.coachProfile.philosophy;
+      if (updates.coachProfile.description !== undefined) partner.coachProfile.description = updates.coachProfile.description;
+      if (updates.coachProfile.certifications !== undefined) partner.coachProfile.certifications = updates.coachProfile.certifications;
+      if (updates.coachProfile.programs !== undefined) partner.coachProfile.programs = updates.coachProfile.programs;
+      if (updates.coachProfile.profileImage !== undefined) partner.coachProfile.profileImage = updates.coachProfile.profileImage;
     }
 
     await partner.save();

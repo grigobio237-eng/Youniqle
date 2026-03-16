@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { connectDB } from '@/lib/db';
 import CoachingBooking from '@/models/CoachingBooking';
-import PavilionFloor from '@/models/PavilionFloor';
 
 export async function POST(req: NextRequest) {
     try {
@@ -78,25 +77,7 @@ export async function POST(req: NextRequest) {
                     await booking.save();
 
                     // 4. 코치 스케줄 업데이트 (해당 슬롯 점유)
-                    // Floor 3 고정 (코치 층)
-                    const floorData = await PavilionFloor.findOne({ floor: 3 });
-                    if (floorData) {
-                        const owner = floorData.owners.find((o: any) => o.id === booking.coachId);
-                        if (owner && owner.schedule) {
-                            const day = owner.schedule.find((s: any) => s.date === booking.date);
-                            if (day && day.slots) {
-                                const slot = day.slots.find((sl: any) => sl.time === booking.time);
-                                if (slot) {
-                                    slot.isBooked = true;
-                                    slot.bookedBy = booking.userName;
-                                }
-                            } else if (day && day.type === 'FULL_DAY') {
-                                day.isBooked = true; // 대략적인 표현
-                            }
-                            floorData.markModified('owners');
-                            await floorData.save();
-                        }
-                    }
+                    // TODO: 파빌리온 삭제에 따라 코치 모델 분리 및 업데이트 별도 구현 필요
                 }
 
                 return renderSuccessPage(moid, amt, txTid);
@@ -114,7 +95,7 @@ export async function POST(req: NextRequest) {
 }
 
 function renderSuccessPage(moid: string, amt: string, tid: string) {
-    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/pavilion?orderId=${moid}&status=success`;
+    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/trainer?orderId=${moid}&status=success`;
     return new Response(`
         <!DOCTYPE html>
         <html>
@@ -129,7 +110,7 @@ function renderSuccessPage(moid: string, amt: string, tid: string) {
 }
 
 function renderErrorPage(msg: string) {
-    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/pavilion?error=${encodeURIComponent(msg)}`;
+    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/trainer?error=${encodeURIComponent(msg)}`;
     return new Response(`
         <!DOCTYPE html>
         <html>
