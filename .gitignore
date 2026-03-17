@@ -61,7 +61,6 @@ google-tts.json
 !tsconfig.json
 !next.config.json
 !components.json
-!유니클 재구성.docx
 
 # Custom Ignores
 scripts/backups/
@@ -75,4 +74,16 @@ build-output.txt
 docs/
 test-*.js
 scripts/test*.js
-youniqle-eea2f-firebase-adminsdk-fbsvc-*.json
+youniqle-eea2f-firebase-adminsdk- fbsvc-*.json
+
+# Document & Sample Cleanup
+"나이스페이 샘플"
+나이스페이_*
+다국어_*
+무료질문*
+상업용*
+"유니클 재구성.docx"
+"페이지 원본*"
+*.docx
+*.pdf
+*.log
