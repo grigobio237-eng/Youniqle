@@ -5,11 +5,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
+import dynamic from 'next/dynamic';
 import Hero from '@/components/home/Hero';
-import DiagnosisForm, { Question } from '@/components/home/DiagnosisForm';
-import ResultDisplay from '@/components/home/ResultDisplay';
-import DashboardPreview from '@/components/home/DashboardPreview';
-import WebtoonChallengeDialog from '@/components/home/WebtoonChallengeDialog';
+import { Question } from '@/types/diagnosis';
+const DiagnosisForm = dynamic(() => import('@/components/home/DiagnosisForm'), { ssr: false });
+const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), { ssr: false });
+const DashboardPreview = dynamic(() => import('@/components/home/DashboardPreview'), { ssr: false });
+const WebtoonChallengeDialog = dynamic(() => import('@/components/home/WebtoonChallengeDialog'), { ssr: false });
+const LandingContent = dynamic(() => import('@/components/home/LandingContent'), { ssr: false });
 
 // ---------------------------
 // 2. Welcome Modal Component
@@ -106,12 +109,12 @@ export default function HomePage() {
 
     if (storedScore) {
       setScore(parseInt(storedScore));
+      setViewState('DASHBOARD');
+      window.dispatchEvent(new Event('recovery-gate-passed'));
     } else {
-      setScore(75); // Default score for first-time visitors to show a healthy state
+      setScore(75); // Default score for preview
+      setViewState('INTRO');
     }
-
-    setViewState('DASHBOARD');
-    window.dispatchEvent(new Event('recovery-gate-passed'));
   }, []); // Only run once on mount
 
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
@@ -152,10 +155,16 @@ export default function HomePage() {
   // Render appropriate view
   const renderContent = () => {
     if (viewState === 'CHECK') return <div className="min-h-screen bg-mist" />; // Loading
-    if (viewState === 'INTRO') return <Hero onStart={handleStart} />;
     if (viewState === 'QUESTION') return <DiagnosisForm questions={questions} onComplete={handleComplete} />;
     if (viewState === 'RESULT') return <ResultDisplay score={score} answers={answers} userNote={userNote} onEnter={handleEnterDashboard} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
-    return <DashboardPreview score={score} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
+    
+    // Default: Always show Hero + LandingContent
+    return (
+      <>
+        <Hero onStart={handleStart} />
+        <LandingContent onStart={handleStart} />
+      </>
+    );
   }
 
   return (

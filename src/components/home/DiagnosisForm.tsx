@@ -4,13 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
-
-export type Question = {
-  id: number;
-  category: string;
-  text: string;
-  options: { label: string; score: number }[];
-};
+import { Question } from '@/types/diagnosis';
 
 export default function DiagnosisForm({ questions, onComplete }: { questions: Question[]; onComplete: (score: number, answers: any[], userNote: string) => void }) {
   const [step, setStep] = useState(0);
@@ -44,6 +38,14 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       setStep(step - 1);
     }
   };
+
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-pulse text-slate font-medium">질문을 불러오는 중입니다...</div>
+      </div>
+    );
+  }
 
   const currentQ = questions[step];
   const currentAnswer = answers[step];

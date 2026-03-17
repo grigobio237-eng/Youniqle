@@ -14,44 +14,40 @@ export default function Hero({ onStart }: { onStart: () => void }) {
         <div className="absolute -bottom-[15%] -right-[10%] w-[50%] h-[50%] bg-reward-gold/10 rounded-full blur-[150px]" />
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-16 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 px-6">
-        {/* Badge */}
-        <div className="inline-flex items-center space-x-2 px-5 py-2.5 bg-obsidian text-mist rounded-full text-[10px] font-black tracking-[0.25em] uppercase">
-          <span>Founder Pass Now Open</span>
-        </div>
-
+      <div className="max-w-4xl mx-auto space-y-16 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 px-6">
         {/* Hero Headline */}
-        <div className="space-y-8">
-          <h1 className="font-serif-display text-4xl sm:text-5xl md:text-7xl text-obsidian leading-[1.15] tracking-tight">
-            당신의 회복을,<br />
-            <span className="text-chapter-accent italic">'시스템'</span>으로.
-          </h1>
-          <p className="text-lg md:text-xl text-slate/80 font-light leading-relaxed max-w-md mx-auto">
-            유전자 · 웰니스 · 회복 설계를 하나의 구조로 완성합니다.
+        <div className="space-y-10">
+          <div className="space-y-4">
+            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-[1em] block mb-4 opacity-70">Scientific Recovery</span>
+            <h1 className="font-serif-display text-obsidian tracking-tighter leading-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+              <span className="block mb-4">지금 필요한 회복은</span>
+              <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-6">
+                <span className="text-slate/40 font-light italic">느낌이 아니라</span>
+                <span className="text-chapter-accent font-black relative inline-block">
+                  진단
+                  <span className="absolute -bottom-2 left-0 w-full h-1 md:h-2 bg-chapter-accent/30 rounded-full" />
+                </span>
+                <span className="text-obsidian">입니다.</span>
+              </div>
+            </h1>
+          </div>
+          <p className="text-lg md:text-xl text-slate/70 font-medium leading-relaxed max-w-xl mx-auto word-keep-all">
+            60초 안에 현재 상태를 정밀하게 확인하고,<br className="hidden sm:block" />
+            당신에게 최적화된 회복의 경로를 제안받으세요.
           </p>
         </div>
 
         {/* Primary CTA */}
         <div className="flex flex-col gap-5 w-full max-w-sm mx-auto">
-          <Button asChild size="lg" className="btn-primary w-full h-16 md:h-[72px] text-base md:text-lg rounded-[16px] shadow-2xl shadow-chapter-accent/15 hover:-translate-y-0.5 transition-transform duration-300">
-            <Link href="/founder-pass">
-              <Sparkles className="w-5 h-5 mr-2.5" />
-              Founder Pass 시작하기
-            </Link>
+          <Button onClick={onStart} size="lg" className="btn-primary w-full h-16 md:h-[72px] text-base md:text-lg rounded-[20px] shadow-2xl shadow-chapter-accent/15 hover:-translate-y-0.5 transition-transform duration-300">
+            <Sparkles className="w-5 h-5 mr-2.5" />
+            60초 회복 진단 시작하기
           </Button>
-          <p className="text-xs text-slate/50 tracking-wide">
-            ESSENCE 39만원 · BALANCE 69만원 · MIRACLE 99만원
-          </p>
-        </div>
-
-        {/* Secondary Actions */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-          <Button variant="ghost" onClick={onStart} className="h-12 px-6 rounded-full text-sm font-medium hover:bg-obsidian/5 border border-line">
-            무료 60초 진단 체험
-          </Button>
-          <Button variant="ghost" asChild className="h-12 px-6 rounded-full text-sm font-medium hover:bg-obsidian/5">
-            <Link href="/products">큐레이션 보기 <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
-          </Button>
+          <div className="flex justify-center items-center gap-6 text-xs text-slate/60 font-medium">
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> 회복 점수</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> 맞춤 경로</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> 행동 제안</span>
+          </div>
         </div>
 
         {/* Trust Badges */}

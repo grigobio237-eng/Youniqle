@@ -120,47 +120,43 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
       )}
 
       {/* Tabs Menu */}
-      <div className="flex items-center gap-1 mb-12 bg-surface/50 p-1.5 rounded-3xl w-fit border border-line backdrop-blur-md">
-        <Button
-          variant={!isFunding ? "default" : "ghost"}
-          asChild
-          className={`rounded-2xl px-10 h-12 font-black uppercase tracking-widest text-[11px] transition-all ${!isFunding ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
-        >
-          <Link href="/products">일반 상품</Link>
-        </Button>
-        <Button
-          variant={isFunding ? "default" : "ghost"}
-          asChild
-          className={`rounded-2xl px-10 h-12 font-black uppercase tracking-widest text-[11px] transition-all ${isFunding ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
-        >
-          <Link href="/products?isFunding=true">회복 펀딩</Link>
-        </Button>
+      <div className="flex flex-wrap items-center gap-2 mb-12 bg-surface/50 p-2 rounded-[24px] w-fit border border-line backdrop-blur-md">
+        {[
+          { label: '루틴', value: 'routine', icon: '⏰' },
+          { label: '프로그램', value: 'program', icon: '🎓' },
+          { label: '도구', value: 'tool', icon: '🛠️' },
+        ].map((tab) => (
+          <Button
+            key={tab.value}
+            variant={params.category === tab.value ? "default" : "ghost"}
+            asChild
+            className={`rounded-2xl px-8 h-12 font-black transition-all ${params.category === tab.value ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
+          >
+            <Link href={`/products?category=${tab.value}`}>
+              <span className="mr-2">{tab.icon}</span>
+              {tab.label}
+            </Link>
+          </Button>
+        ))}
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6 pb-8 border-b border-line">
         <div className="space-y-2">
           <h1 className="text-4xl font-black text-text-primary tracking-tighter">
-            {isFunding ? '회복 펀딩' : '전체 상품'}
+            회복 솔루션
             <span className="text-primary text-xl font-bold ml-2">
-              {isFunding ? 'Recovery Funding' : 'All Selection'}
+              Recovery Solutions
             </span>
           </h1>
           <p className="text-text-secondary text-lg font-medium opacity-60">
-            {isFunding
-              ? '더 나은 회복을 위한 새로운 프로젝트에 동참하세요'
-              : '당신의 회복 데이터를 완성하는 최고의 파트너들'}
+            진단 결과에 따라 당신에게 최적화된 실행 도구들을 제안합니다.
           </p>
         </div>
-        {/* Simple Quiz-like Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
-          <Button variant="outline" size="sm" asChild className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">
-            <Link href="/products?isFunding=true">🚀 회복 펀딩</Link>
+        {!userScore && (
+          <Button asChild variant="outline" className="rounded-full border-chapter-accent text-chapter-accent font-bold hover:bg-chapter-accent/5">
+            <Link href="/?action=diagnose">60초 진단 후 맞춤 추천 받기</Link>
           </Button>
-          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😴 수면부족</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">😩 만성피로</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">🤰 붓기관리</Button>
-          <Button variant="outline" size="sm" className="rounded-full border-line text-text-secondary hover:text-text-primary hover:border-text-primary shrink-0 px-5 font-bold">🧘 멘탈케어</Button>
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12">

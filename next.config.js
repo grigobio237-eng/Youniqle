@@ -13,16 +13,16 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  outputFileTracingExcludes: {
+    '/api/**/*': [
+      'public/imgly-assets/**/*',
+      'public/imgly/**/*',
+      'public/images/**/*',
+      'public/output/**/*'
+    ]
+  },
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    outputFileTracingExcludes: {
-      '/api/**/*': [
-        'public/imgly-assets/**/*',
-        'public/imgly/**/*',
-        'public/images/**/*',
-        'public/output/**/*'
-      ]
-    }
   },
   images: {
     remotePatterns: [

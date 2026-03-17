@@ -1,0 +1,174 @@
+{
+  "_id": "699eb8acd04cfe0d3bd0694f",
+  "userId": "68e3806faebeaf81990ba714",
+  "topic": "선크림 상품의 트랜드를 분석해서 숏폼을 만들어줘",
+  "productName": "그리고 프리미엄 선크림",
+  "projectType": "product_promo",
+  "status": "pending",
+  "workflow": {
+    "currentStep": "audio",
+    "errors": [],
+    "stepStatus": {
+      "trend": "completed",
+      "script": "completed",
+      "image": "idle",
+      "audio": "completed",
+      "video": "idle",
+      "synthesis": "idle"
+    },
+    "data": {
+      "assets": [
+        {
+          "id": "initial-0",
+          "sceneId": null,
+          "type": "image",
+          "role": "product",
+          "path": "https://firebasestorage.googleapis.com/v0/b/youniqle-eea2f.firebasestorage.app/o/video-assets%2Fupload-1772009541301.webp?alt=media&token=63e09bab-d601-4838-aa58-eba91ae09283",
+          "description": "Actual product image"
+        },
+        {
+          "id": "initial-1",
+          "sceneId": null,
+          "type": "image",
+          "role": "product_cutout",
+          "path": "https://firebasestorage.googleapis.com/v0/b/youniqle-eea2f.firebasestorage.app/o/video-assets-cutout%2Fupload-1772009572274.webp?alt=media&token=584a359b-47e0-4a05-a6f9-96484f0eb426",
+          "description": "Model/Background reference image"
+        },
+        {
+          "id": "initial-2",
+          "sceneId": null,
+          "type": "image",
+          "role": "model",
+          "path": "https://firebasestorage.googleapis.com/v0/b/youniqle-eea2f.firebasestorage.app/o/video-assets%2Fupload-1772009615929.webp?alt=media&token=e6548edb-8d90-4490-8249-78d4ac8f250f",
+          "description": "Model/Background reference image"
+        },
+        {
+          "sceneId": 1,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_1.mp3"
+        },
+        {
+          "sceneId": 2,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_2.mp3"
+        },
+        {
+          "sceneId": 3,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_3.mp3"
+        },
+        {
+          "sceneId": 4,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_4.mp3"
+        },
+        {
+          "sceneId": 5,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_5.mp3"
+        },
+        {
+          "sceneId": 6,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_6.mp3"
+        },
+        {
+          "sceneId": 7,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_7.mp3"
+        },
+        {
+          "sceneId": 8,
+          "type": "audio",
+          "path": "/output/699eb8acd04cfe0d3bd0694f/scene_8.mp3"
+        }
+      ],
+      "trend": {
+        "concepts": [
+          "#피부고민해결 #선크림추천 #자외선차단 #피부톤보정 #데일리선케어",
+          "언박싱 챌린지",
+          "선크림 레이어링 꿀팁"
+        ],
+        "styling": "세련된 필터, ASMR 효과음, 텍스트 애니메이션 활용, 톤앤매너 일관성 유지",
+        "hooks": [
+          "☀️ 단 하나로 끝내는 완벽 선케어!",
+          "✨ 쌩얼 자신감 UP! 톤업 선크림의 정석",
+          "🤔 끈적임 ZERO! 산뜻한 마무리"
+        ],
+        "analysis": "최근 선크림 트렌드는 단순히 자외선 차단 기능뿐 아니라 피부톤 보정, 저자극 성분, 사용 편의성 등을 중요하게 생각합니다. 숏폼에서는 이러한 니즈를 반영하여 제품의 장점을 명확하게 보여주는 것이 중요하며, 공감대를 형성할 수 있는 스토리텔링을 활용하면 더욱 효과적입니다."
+      },
+      "script": {
+        "title": "그리고 프리미엄 선크림: 쌩얼 자신감 UP! 데일리 선케어 루틴",
+        "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health.",
+        "recommendedVoice": {
+          "gender": "FEMALE",
+          "tone": "활기참",
+          "reason": "제품의 긍정적인 효과를 강조하고, 젊은 여성 소비자층에게 친근하게 다가가기 위함."
+        },
+        "scenes": [
+          {
+            "id": 1,
+            "visualPrompt": "Close-up shot of the 'AND. Premium Sun Cream' product packaging. The packaging is sleek and minimalist, with a clean white and gold design. The camera slowly rotates around the product, showcasing its premium quality. Soft, natural light highlights the product's texture.",
+            "audioScript": "☀️ 단 하나로 끝내는 완벽 선케어! 바로, 그리고 프리미엄 선크림!",
+            "duration": 4,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 2,
+            "visualPrompt": "The main character applies 'AND. Premium Sun Cream' to her face in front of a brightly lit mirror. She smiles as she gently blends the cream into her skin. Her movements are deliberate and graceful. Focus on her radiant skin.",
+            "audioScript": "아침마다 쌩얼 자신감을 UP! 시켜주는 톤업 선크림의 정석!",
+            "duration": 5,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 3,
+            "visualPrompt": "Extreme close-up shot of the cream being applied to the skin. Focus on the smooth texture and the way it melts into the skin. ASMR sound effects of the cream being applied.",
+            "audioScript": "바르는 순간, 끈적임 ZERO! 산뜻하게 마무리!",
+            "duration": 3,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 4,
+            "visualPrompt": "The main character is shown engaging in various outdoor activities: walking in the park, sipping coffee at an outdoor cafe, and reading a book by the pool. She looks confident and carefree.",
+            "audioScript": "자외선 걱정 없이, 하루 종일 촉촉하게!",
+            "duration": 6,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 5,
+            "visualPrompt": "The main character is shown applying a second layer of 'AND. Premium Sun Cream' in the afternoon. She emphasizes the importance of reapplication for optimal sun protection. Text overlay: '선크림 레이어링 꿀팁'.",
+            "audioScript": "선크림 레이어링, 잊지 않으셨죠? 덧발라도 답답함 없이 산뜻!",
+            "duration": 4,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 6,
+            "visualPrompt": "Split screen: On one side, a close-up of the main character's glowing skin. On the other side, a shot of the 'AND. Premium Sun Cream' product. Text overlay: '피부고민해결, 선크림추천'.",
+            "audioScript": "피부 고민 해결은 물론, 데일리 선케어까지 책임지는 그리고 프리미엄 선크림!",
+            "duration": 5,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 7,
+            "visualPrompt": "The main character is shown smiling directly at the camera, holding the 'AND. Premium Sun Cream' product. She gives a thumbs-up.",
+            "audioScript": "이제, 그리고 프리미엄 선크림으로 쌩얼 자신감 되찾으세요!",
+            "duration": 3,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          },
+          {
+            "id": 8,
+            "visualPrompt": "End screen with the 'AND. Premium Sun Cream' logo and website address. Call to action: '지금 바로 구매하세요!'.",
+            "audioScript": "그리고 프리미엄 선크림, 지금 바로 만나보세요!",
+            "duration": 4,
+            "mainCharacter": "A young, radiant woman in her late 20s with clear, glowing skin and a natural, effortless style. She has long, flowing brown hair and expressive brown eyes. Her makeup is minimal, highlighting her natural beauty. She exudes confidence and health."
+          }
+        ]
+      }
+    },
+    "nodes": [],
+    "edges": []
+  },
+  "createdAt": "2026-02-25T08:54:04.734Z",
+  "updatedAt": "2026-02-25T08:58:16.650Z",
+  "__v": 1
+}

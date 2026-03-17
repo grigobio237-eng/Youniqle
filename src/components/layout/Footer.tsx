@@ -111,124 +111,39 @@ export default function Footer() {
   const currentSettings = settings || defaultSettings;
 
   return (
-    <footer className={`bg-obsidian text-slate border-t border-line/30 py-16 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div className="col-span-1 md:col-span-1 space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="relative h-10 w-10">
-                <CharacterImage
-                  src="/character/youniqle-1.png"
-                  alt="Youniqle 로고"
-                  fill
-                  className="object-contain"
-                  sizes="40px"
-                />
-              </div>
-              <span className="text-xl font-serif-display tracking-tight text-white">Youniqle</span>
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed font-light">
-              Youniqle은 (주)사피에넷(Sapienet)의<br />
-              회복 큐레이션 브랜드입니다.
-            </p>
-          </div>
+    <footer className={`bg-obsidian text-slate border-t border-line/10 py-10 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
+      <div className="container mx-auto px-6 max-w-6xl">
+        {/* Top Section: Navigation Links */}
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-3 pb-8 border-b border-line/5 text-[13px]">
+          <Link href="/about" className="text-gray-400 hover:text-white transition-colors">유니클 소개</Link>
+          <Link href="/healing-center" className="text-gray-400 hover:text-white transition-colors">힐링센터</Link>
+          <Link href="/trainer" className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
+          <Link href="/gallery/artworks" className="text-gray-400 hover:text-white transition-colors">갤러리</Link>
+          <Link href="/community" className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
+          <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="text-gray-400 hover:text-white transition-colors">제휴 및 입점문의</a>
+        </div>
 
-          {/* Customer Service */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">고객센터</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <span className="text-gray-400">전화: </span>
-                <a href={`tel:${currentSettings.contactInfo.customerServicePhone}`} className="hover:text-primary transition-colors">
-                  {currentSettings.contactInfo.customerServicePhone}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">이메일: </span>
-                <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="hover:text-primary transition-colors">
-                  {currentSettings.contactInfo.customerServiceEmail}
-                </a>
-              </li>
-              <li className="text-gray-400">운영시간: 평일 09:00 - 18:00</li>
-            </ul>
+        {/* Middle Section: Legal Links & Copyright */}
+        <div className="flex flex-wrap items-center justify-between gap-6 pt-6">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium">
+            <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-white transition-colors">이용약관</Link>
+            <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:underline underline-offset-4">개인정보처리방침</Link>
+            <Link href="/support" className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
-
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">빠른 링크</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/products" className="text-gray-400 hover:text-primary transition-colors">
-                  상품 전체보기
-                </Link>
-              </li>
-              <li>
-                <Link href="/orders" className="text-gray-400 hover:text-primary transition-colors">
-                  주문/배송 조회
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => alert('문의하기 기능은 준비 중입니다. 고객센터 이메일을 이용해 주세요.')}
-                  className="text-gray-400 hover:text-primary transition-colors cursor-pointer opacity-60"
-                >
-                  1:1 문의하기
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company Info */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">기업 정보</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>상호명: {currentSettings.companyInfo.companyName}</li>
-              {currentSettings.companyInfo.ceoName && <li>대표이사: {currentSettings.companyInfo.ceoName}</li>}
-              <li>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</li>
-              <li>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</li>
-              {(currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address) && (
-                <li>주소: {currentSettings.businessRegistration.businessAddress || currentSettings.contactInfo.address}</li>
-              )}
-            </ul>
+          <div className="text-gray-600 text-[11px] tracking-tight">
+            © {new Date().getFullYear()} {currentSettings.siteName}. All rights reserved.
           </div>
         </div>
 
-        {/* Trust Badges Section */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="flex flex-wrap justify-center md:justify-start gap-6 items-center">
-            <div className="flex items-center gap-2 text-gray-400">
-              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span className="text-xs font-medium">안전한 결제</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-400">
-              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <span className="text-xs font-medium">SSL 보안 인증</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-400">
-              <svg className="w-5 h-5 text-reward-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-              <span className="text-xs font-medium">개인정보 보호 인증</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            © 2024 {currentSettings.siteName}. All rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              개인정보처리방침
-            </Link>
-            <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-primary transition-colors text-sm">
-              이용약관
-            </Link>
+        {/* Bottom Section: Company Details (Subtle) */}
+        <div className="mt-8 pt-8 border-t border-line/5">
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-[11px] text-gray-500/60 leading-relaxed font-light">
+            <span className="text-gray-500/80 font-medium">상호명: {currentSettings.companyInfo.companyName}</span>
+            <span>대표이사: {currentSettings.companyInfo.ceoName}</span>
+            <span>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</span>
+            <span>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</span>
+            <span className="w-full lg:w-auto">주소: {currentSettings.businessRegistration.businessAddress}</span>
+            <span>고객센터: {currentSettings.contactInfo.customerServiceEmail}</span>
           </div>
         </div>
       </div>
