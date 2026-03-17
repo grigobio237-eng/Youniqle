@@ -132,38 +132,30 @@ export default function Header() {
           </Link>
 
           {/* Nav */}
-          {!isGateMode ? (
-            <nav className="hidden md:flex items-center space-x-6">
-              {menuItems.map((item) => {
-                const isActive = pathname?.startsWith(item.href) || false;
-                return (
-                  <div key={item.label} className="relative group">
-                    <Link
-                      href={item.href}
-                      className={`text-sm font-semibold transition-all duration-200 relative py-2 ${
-                        isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
-                      }`}
-                    >
-                      {item.label}
-                      {isActive && (
-                        <motion.div
-                          layoutId="nav-underline"
-                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                          transition={{ duration: 0.3 }}
-                        />
-                      )}
-                    </Link>
-                  </div>
-                );
-              })}
-            </nav>
-          ) : (
-            <div className="hidden md:block">
-              <span className="text-xs font-black text-chapter-accent/40 uppercase tracking-[0.3em]">
-                Daily Recovery Checkpoint
-              </span>
-            </div>
-          )}
+          <nav className="hidden md:flex items-center space-x-6">
+            {menuItems.map((item) => {
+              const isActive = pathname?.startsWith(item.href) || false;
+              return (
+                <div key={item.label} className="relative group">
+                  <Link
+                    href={item.href}
+                    className={`text-sm font-semibold transition-all duration-200 relative py-2 ${
+                      isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                    }`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-underline"
+                        className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </Link>
+                </div>
+              );
+            })}
+          </nav>
 
           {/* Right Side */}
           <div className="flex items-center space-x-2">
@@ -188,21 +180,19 @@ export default function Header() {
               </Button>
             )}
 
-            {!isGateMode && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {!isGateMode && isMenuOpen && (
+        {isMenuOpen && (
           <div className="md:hidden border-t py-4 max-h-[80vh] overflow-y-auto">
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item) => (
