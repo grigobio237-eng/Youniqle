@@ -12,6 +12,9 @@ export const PRODUCT_CATEGORIES = [
   { value: 'sports', label: '스포츠', labelEn: 'Sports' },
   { value: 'books', label: '도서', labelEn: 'Books' },
   { value: 'stem-cell', label: '줄기세포', labelEn: 'Stem Cell' },
+  { value: 'hospital-service', label: '진료 서비스', labelEn: 'Hospital Service' },
+  { value: 'consultation', label: '상담 프로그램', labelEn: 'Consultation' },
+  { value: 'medical-device', label: '의료 기기/용품', labelEn: 'Medical Device' },
 ] as const;
 
 // 카테고리 value 타입

@@ -42,9 +42,29 @@ interface ProductInfo {
 
 interface DetailPlannerProps {
     mode?: 'admin' | 'partner';
+    partnerType?: string;
 }
 
-const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
+const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerType = 'commerce' }) => {
+    const isMedical = partnerType === 'medical';
+    const labels = {
+        title: isMedical ? '서비스/진료 빌더' : '상세페이지 빌더',
+        productName: isMedical ? '서비스/진료명 *' : '상품명 *',
+        productPlaceholder: isMedical ? '예: 프리미엄 줄기세포 테라피' : '예: 프리미엄 에어프라이어',
+        priceLabel: isMedical ? '비용/가격대' : '가격대',
+        pricePlaceholder: isMedical ? '예: 150,000원' : '예: 49,000원',
+        featuresLabel: isMedical ? '핵심 서비스 특징/효과' : '핵심 회복 키워드',
+        featuresPlaceholder: isMedical ? '이 서비스가 제공하는 핵심 가치와 치료 효과를 입력하세요.' : '상품이 돕는 회복 키워드와 핵심 가치를 입력하세요.',
+        fundingLabel: isMedical ? '특별 프로젝트(펀딩)로 등록' : '펀딩 프로젝트로 등록',
+        planningBtn: isMedical ? '🪄 서비스 기획 시작하기' : '🪄 상세페이지 기획 시작하기',
+        generatingMsg: isMedical ? 'AI가 서비스 전략 기획 중...' : 'AI가 브랜드 전략 기획 중...',
+        registerSuccess: isMedical ? '서비스가 등록되었습니다 (승인 대기)' : '상품이 등록되었습니다 (승인 대기)',
+        emptyMsg: isMedical ? '서비스명과 관련 사진은 필수입니다!' : '상품명과 제품 사진은 필수입니다!',
+        suggestBtn: isMedical ? 'AI 효과 추천' : 'AI 자동 추천',
+        thumbnailBtn: isMedical ? '썸네일 생성' : '썸네일 생성',
+        registerBtn: isMedical ? '서비스 등록' : '상품 등록',
+        registeringMsg: isMedical ? '서비스 등록 중...' : '상품 등록 중...',
+    };
     // [Debug] 카테고리 목록 로드 확인용
     console.log('[DetailPlanner] Current categories:', PRODUCT_CATEGORIES.map(c => c.label));
 
@@ -141,7 +161,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
 
     const handleStartPlanning = async () => {
         if (!info.name || !info.referenceImage) {
-            toast.error('상품명과 제품 사진은 필수입니다!');
+            toast.error(labels.emptyMsg);
             return;
         }
         setLoading(true);
@@ -179,7 +199,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
     };
 
     const handleSuggestFeatures = async () => {
-        if (!info.name) return toast.error('상품명을 먼저 입력해주세요.');
+        if (!info.name) return toast.error(isMedical ? '서비스명을 먼저 입력해주세요.' : '상품명을 먼저 입력해주세요.');
         setLoading(true);
         try {
             const res = await fetch('/api/ai/detail-builder/suggest-features', {
@@ -282,7 +302,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
 
     // 썸네일 생성
     const handleGenerateThumbnail = async () => {
-        if (!info.name) return toast.error('상품명이 필요합니다.');
+        if (!info.name) return toast.error(isMedical ? '서비스명이 필요합니다.' : '상품명이 필요합니다.');
         setIsGeneratingThumbnail(true);
         try {
             const res = await fetch('/api/ai/thumbnail-builder/generate', {
@@ -401,9 +421,9 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
             });
             const regResult = await regRes.json();
 
-            if (!regRes.ok) throw new Error(regResult.error || '상품 등록 실패');
+            if (!regRes.ok) throw new Error(regResult.error || (isMedical ? '서비스 등록 실패' : '상품 등록 실패'));
 
-            toast.success(mode === 'partner' ? '상품이 등록되었습니다 (승인 대기)' : '상품이 즉시 등록되었습니다!', { id: tid });
+            toast.success(mode === 'partner' ? labels.registerSuccess : (isMedical ? '서비스가 즉시 등록되었습니다!' : '상품이 즉시 등록되었습니다!'), { id: tid });
             setStep(5);
         } catch (e: any) {
             console.error(e);
@@ -487,12 +507,12 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                             <h3 className="text-lg font-bold text-slate-800">기본 정보</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1">상품명 *</label>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1">{labels.productName}</label>
                                     <input
                                         type="text"
                                         value={info.name}
                                         onChange={(e) => setInfo({ ...info, name: e.target.value })}
-                                        placeholder="예: 프리미엄 에어프라이어"
+                                        placeholder={labels.productPlaceholder}
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
                                     />
                                 </div>
@@ -511,31 +531,31 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-1">가격대</label>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1">{labels.priceLabel}</label>
                                         <input
                                             type="text"
                                             value={info.price}
                                             onChange={(e) => setInfo({ ...info, price: e.target.value })}
-                                            placeholder="예: 49,000원"
+                                            placeholder={labels.pricePlaceholder}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <label className="block text-sm font-semibold text-slate-700">핵심 회복 키워드</label>
+                                        <label className="block text-sm font-semibold text-slate-700">{labels.featuresLabel}</label>
                                         <button
                                             onClick={handleSuggestFeatures}
                                             className="text-xs text-blue-600 font-bold hover:underline"
                                         >
-                                            AI 자동 추천
+                                            {labels.suggestBtn}
                                         </button>
                                     </div>
                                     <textarea
                                         value={info.features}
                                         onChange={(e) => setInfo({ ...info, features: e.target.value })}
                                         rows={3}
-                                        placeholder="상품이 돕는 회복 키워드와 핵심 가치를 입력하세요."
+                                        placeholder={labels.featuresPlaceholder}
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                     />
                                 </div>
@@ -548,7 +568,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                                         className="w-5 h-5 accent-blue-600 rounded"
                                     />
                                     <label htmlFor="isFunding" className="text-sm font-semibold text-slate-700 cursor-pointer">
-                                        펀딩 프로젝트로 등록 (프로젝트형 기획 적용)
+                                        {labels.fundingLabel}
                                     </label>
                                 </div>
                             </div>
@@ -606,11 +626,11 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin' }) => {
                             {loading ? (
                                 <>
                                     <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                    AI가 브랜드 전략 기획 중...
+                                    {labels.generatingMsg}
                                 </>
                             ) : (
                                 <>
-                                    <span>🪄 상세페이지 기획 시작하기</span>
+                                    <span>{labels.planningBtn}</span>
                                     <div className="bg-white/20 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
                                         <RefreshCw size={18} />
                                     </div>

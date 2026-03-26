@@ -88,7 +88,7 @@ export default function Header() {
     { label: '진단', href: '/ai-navigator', desc: '맞춤 회복 루틴 안내' },
     { label: '소개', href: '/about', desc: '브랜드 및 회복 경로 소개' },
     { label: '솔루션', href: '/products', desc: '회복 솔루션 및 프로그램' },
-    { label: '파트너', href: '/partner', desc: '협업 및 제휴 안내' },
+    { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
   ];
 
   const handleSignOut = async () => {

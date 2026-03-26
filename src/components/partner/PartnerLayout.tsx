@@ -304,18 +304,53 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
   };
 
   // 전용 메뉴 권한이 있는 파트너 타입 확인
-  const specialPartnerTypes = ['artist', 'business', 'shopper', 'coach'];
+  const specialPartnerTypes = ['medical', 'commerce', 'trainer', 'artist'];
   const hasSpecialAccess = partner?.partnerType && specialPartnerTypes.includes(partner.partnerType);
 
   const getSpecialMenuInfo = () => {
     const type = partner?.partnerType;
+    if (type === 'medical') return { name: '병원 설정관리', badge: 'MEDICAL', description: '병원 정보 및 상담 환경 설정' };
+    if (type === 'trainer') return { name: '코치 설정관리', badge: 'TRAINER', description: '코치 프로필 및 캐릭터 설정' };
+    if (type === 'commerce') return { name: '스토어 관리', badge: 'STORE', description: '브랜드 상점 및 스페이스 설정' };
     if (type === 'artist') return { name: '전시 관리', badge: 'ARTIST', description: '아티스트 작품 전시 관리' };
-    if (['business', 'shopper'].includes(type || '')) return { name: '상점 관리', badge: 'SHOP', description: '파트너 상점 및 상품 관리' };
-    if (type === 'coach') return { name: '트레이너 설정관리', badge: 'COACH', description: '트레이너 프로필 및 캐릭터 설정' };
     return { name: '설정 관리', badge: 'PARTNER', description: '파트너 정보 및 노출 관리' };
   };
 
   const specialMenuInfo = getSpecialMenuInfo();
+
+  // 유형별 네비게이션 필터링 및 레이블 변경
+  const getFilteredNavigation = () => {
+    const type = partner?.partnerType;
+    let items = [...navigationItems];
+
+    if (type === 'medical') {
+      // 의료 파트너는 재고/반품만 숨기고 상품/AI빌더는 허용
+      items = items.filter(item => 
+        !['/partner/inventory', '/partner/returns'].includes(item.href)
+      );
+      
+      // 용어 변경 (상품 -> 상담/서비스)
+      return items.map(item => {
+        if (item.href === '/partner/products') {
+          return { ...item, name: '상담/서비스 관리', description: '내 상담 및 진료 서비스 관리' };
+        }
+        if (item.href === '/partner/ai-builder') {
+          return { ...item, name: 'AI 서비스 빌더', description: 'AI로 서비스 상세페이지 만들기' };
+        }
+        return item;
+      });
+    }
+    
+    if (type === 'trainer') {
+      return items.filter(item => 
+        !['/partner/inventory', '/partner/ai-builder'].includes(item.href)
+      );
+    }
+    
+    return items; // commerce 및 기타는 전체 노출
+  };
+
+  const filteredNavigation = getFilteredNavigation();
 
   if (loading) {
     return (
@@ -410,7 +445,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {navigationItems.map((item) => {
+            {filteredNavigation.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
 

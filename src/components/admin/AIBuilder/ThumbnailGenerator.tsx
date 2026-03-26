@@ -34,7 +34,24 @@ interface ThumbnailOptions {
     keywords: string;
 }
 
-export default function ThumbnailGenerator() {
+interface ThumbnailGeneratorProps {
+    partnerType?: string;
+}
+
+export default function ThumbnailGenerator({ partnerType = 'commerce' }: ThumbnailGeneratorProps) {
+    const isMedical = partnerType === 'medical';
+    const labels = {
+        title: isMedical ? '썸네일 스타일 설정' : '썸네일 스타일 설정',
+        desc: isMedical ? '서비스의 매력을 극대화할 스타일을 선택하세요.' : '상품의 매력을 극대화할 스타일을 선택하세요.',
+        productName: isMedical ? '서비스/진료명' : '상품명',
+        namePlaceholder: isMedical ? '서비스명 입력' : '제품명 입력',
+        featuresLabel: isMedical ? '핵심 특징 및 효과' : '핵심 특징 및 USP',
+        featuresPlaceholder: isMedical ? '서비스의 핵심 특징을 입력하거나 AI 추천을 받아보세요.' : '상품의 핵심 특징을 입력하거나 AI 추천을 받아보세요.',
+        fundingLabel: isMedical ? '특별 프로젝트(펀딩)로 등록' : '펀딩 프로젝트로 등록',
+        generateBtn: isMedical ? 'AI 썸네일 생성' : 'AI 썸네일 생성',
+        nameError: isMedical ? '서비스명을 입력해 주세요.' : '상품명을 입력해 주세요.',
+        suggestError: isMedical ? '서비스명을 먼저 입력해주세요.' : '상품명을 먼저 입력해주세요.',
+    };
     const [loading, setLoading] = useState(false);
     const [refImage, setRefImage] = useState<string | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
@@ -53,7 +70,7 @@ export default function ThumbnailGenerator() {
     // Handle Feature Suggestion
     const handleSuggestFeatures = async () => {
         if (!options.name) {
-            toast.error('상품명을 먼저 입력해주세요.');
+            toast.error(labels.suggestError);
             return;
         }
 
@@ -88,7 +105,7 @@ export default function ThumbnailGenerator() {
 
     const handleGenerate = async () => {
         if (!options.name) {
-            toast.error('상품명을 입력해 주세요.');
+            toast.error(labels.nameError);
             return;
         }
         setLoading(true);
@@ -123,8 +140,8 @@ export default function ThumbnailGenerator() {
                 <div className="space-y-6">
                     <Card className="border-none shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-lg">썸네일 스타일 설정</CardTitle>
-                            <CardDescription>상품의 매력을 극대화할 스타일을 선택하세요.</CardDescription>
+                            <CardTitle className="text-lg">{labels.title}</CardTitle>
+                            <CardDescription>{labels.desc}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
@@ -134,7 +151,7 @@ export default function ThumbnailGenerator() {
                                         value={options.category}
                                         onValueChange={(value: string) => setOptions(prev => ({ ...prev, category: value }))}
                                     >
-                                        <SelectTrigger className="h-10 border-slate-200">
+                                        <SelectTrigger id="category" className="h-10 border-slate-200">
                                             <SelectValue placeholder="카테고리" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -147,9 +164,10 @@ export default function ThumbnailGenerator() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>상품명</Label>
+                                    <Label htmlFor="productName">{labels.productName}</Label>
                                     <Input
-                                        placeholder="제품명 입력"
+                                        id="productName"
+                                        placeholder={labels.namePlaceholder}
                                         value={options.name}
                                         onChange={e => setOptions({ ...options, name: e.target.value })}
                                     />
@@ -167,14 +185,14 @@ export default function ThumbnailGenerator() {
                                         htmlFor="isFundingThumb"
                                         className="text-xs font-bold leading-none"
                                     >
-                                        펀딩 프로젝트로 등록
+                                        {labels.fundingLabel}
                                     </Label>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <Label>핵심 특징 및 USP</Label>
+                                    <Label htmlFor="features">{labels.featuresLabel}</Label>
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -187,7 +205,8 @@ export default function ThumbnailGenerator() {
                                     </Button>
                                 </div>
                                 <Textarea
-                                    placeholder="상품의 핵심 특징을 입력하거나 AI 추천을 받아보세요."
+                                    id="features"
+                                    placeholder={labels.featuresPlaceholder}
                                     className="h-20"
                                     value={options.keywords}
                                     onChange={e => setOptions({ ...options, keywords: e.target.value })}
@@ -214,33 +233,31 @@ export default function ThumbnailGenerator() {
                             </div>
 
                             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                <div className="flex items-center gap-2">
+                                <Label htmlFor="includeModel" className="flex items-center gap-2 cursor-pointer">
                                     <UserCircle2 className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm font-medium">모델(사람) 포함</span>
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                </Label>
+                                <Checkbox
+                                    id="includeModel"
                                     checked={options.includeModel}
-                                    onChange={e => setOptions({ ...options, includeModel: e.target.checked })}
+                                    onCheckedChange={(checked) => setOptions({ ...options, includeModel: checked as boolean })}
                                 />
                             </div>
 
                             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                <div className="flex items-center gap-2">
+                                <Label htmlFor="addText" className="flex items-center gap-2 cursor-pointer">
                                     <Type className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm font-medium">텍스트 오버레이</span>
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                </Label>
+                                <Checkbox
+                                    id="addText"
                                     checked={options.addText}
-                                    onChange={e => setOptions({ ...options, addText: e.target.checked })}
+                                    onCheckedChange={(checked) => setOptions({ ...options, addText: checked as boolean })}
                                 />
                             </div>
 
                             <div className="space-y-2 pt-4">
-                                <Label>참조 이미지 (선택)</Label>
+                                <Label htmlFor="refImage">참조 이미지 (선택)</Label>
                                 <div
                                     className={`border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all ${refImage ? 'bg-blue-50 border-blue-200' : 'border-slate-200'
                                         }`}
@@ -251,15 +268,16 @@ export default function ThumbnailGenerator() {
                                             <button
                                                 className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
                                                 onClick={() => setRefImage(null)}
+                                                aria-label="참조 이미지 삭제"
                                             >
                                                 <Trash2 className="h-3 w-3" />
                                             </button>
                                         </div>
                                     ) : (
-                                        <label className="cursor-pointer flex flex-col items-center">
+                                        <label htmlFor="refImage" className="cursor-pointer flex flex-col items-center">
                                             <Upload className="h-6 w-6 text-slate-300 mb-2" />
                                             <span className="text-xs text-slate-400">파일 업로드</span>
-                                            <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
+                                            <input id="refImage" type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
                                         </label>
                                     )}
                                 </div>
@@ -271,7 +289,7 @@ export default function ThumbnailGenerator() {
                                 onClick={handleGenerate}
                             >
                                 {loading ? <Loader2 className="h-6 w-6 animate-spin mr-2" /> : <Sparkles className="h-6 w-6 mr-2" />}
-                                AI 썸네일 생성
+                                {labels.generateBtn}
                             </Button>
                         </CardContent>
                     </Card>

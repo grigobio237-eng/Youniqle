@@ -5,8 +5,26 @@ import DetailPlanner from '@/components/admin/AIBuilder/DetailPlanner';
 import ThumbnailGenerator from '@/components/admin/AIBuilder/ThumbnailGenerator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sparkles, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function PartnerAIBuilderPage() {
+    const [partnerType, setPartnerType] = useState<string>('commerce');
+
+    useEffect(() => {
+        const checkPartner = async () => {
+            try {
+                const response = await fetch('/api/partner/auth/verify');
+                if (response.ok) {
+                    const data = await response.json();
+                    setPartnerType(data.partner?.partnerType || 'commerce');
+                }
+            } catch (error) {
+                console.error('Partner check failed:', error);
+            }
+        };
+        checkPartner();
+    }, []);
+
     return (
         <PartnerLayout>
             <div className="py-6">
@@ -25,11 +43,11 @@ export default function PartnerAIBuilderPage() {
                     </div>
 
                     <TabsContent value="detail" className="mt-0 focus-visible:outline-none">
-                        <DetailPlanner mode="partner" />
+                        <DetailPlanner mode="partner" partnerType={partnerType} />
                     </TabsContent>
 
                     <TabsContent value="thumbnail" className="mt-0 focus-visible:outline-none">
-                        <ThumbnailGenerator />
+                        <ThumbnailGenerator partnerType={partnerType} />
                     </TabsContent>
                 </Tabs>
             </div>

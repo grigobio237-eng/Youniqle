@@ -51,6 +51,7 @@ export default function CoachingManagementPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [partnerType, setPartnerType] = useState<string>('trainer');
   const [pavilionInfo, setPavilionInfo] = useState({
     characterImage: '',
     roomDescription: '',
@@ -68,6 +69,44 @@ export default function CoachingManagementPage() {
     }
   });
   const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
+
+  const isMedical = partnerType === 'medical';
+
+  const labels = {
+    title: isMedical ? '병원 설정관리' : '트레이너 설정관리',
+    badge: isMedical ? '병원 프로필 관리' : '트레이너 프로필 관리',
+    subtitle: isMedical ? '의료 전문가로서의 페르소나, 상담 스케줄 및 미디어 채널을 관리합니다.' : '전문가로서의 페르소나, 스케줄 및 미디어 채널을 관리합니다.',
+    tab1: isMedical ? '프로필/진료공간 설정' : '프로필/공간 설정',
+    tab2: isMedical ? '스케줄/상담상품 관리' : '스케줄/상품 관리',
+    card1Title: isMedical ? '의료진 캐릭터 설정' : '코치 캐릭터 설정',
+    card1Desc: isMedical ? '리스트 및 가상 진료실에 노출될 마스터 캐릭터' : '리스트 및 가상공간에 노출될 마스터 캐릭터',
+    card1UiTitle: isMedical ? 'Expert Reflection Logic' : 'UI Reflection Logic',
+    card1UiDesc: isMedical ? '이미지를 업로드하시면 의료진 리스트에서 더 신뢰감 있게 표현됩니다. 가급적 전문적인 캐릭터 컷을 권장합니다.' : '이미지를 업로드하시면 트레이너 리스트에서 더 품격 있게 표현됩니다. 가급적 전문 스튜디오에서 촬영된 캐릭터 컷을 권장합니다.',
+    protocolTitle: isMedical ? '진료 프로토콜' : '전시 프로토콜',
+    protocolStatus: isMedical ? '상담 노출 활성화' : '퍼블릭 노출 활성화',
+    themeLabel: isMedical ? '진료공간 분위기 설정' : '공간 분위기 설정',
+    musicLabel: isMedical ? '배경 음악 설정' : '배경 음악 설정',
+    musicPlaceholder: isMedical ? '가상 상담실에서 자동 재생될 엠비언스 선택' : '가상 코칭 룸에서 자동 재생될 엠비언스 선택',
+    identityTitle: isMedical ? '의료진 직함' : '트레이너 직함',
+    identityTitlePlaceholder: isMedical ? '예: 대표 원장, 수석 전문의, 재활 전문가' : '예: Senior Recovery Curator, Pro Soccer Coach',
+    specialtyLabel: isMedical ? '주요 진료/전문 분야' : '주요 전문 분야',
+    specialtyPlaceholder: isMedical ? '예: 근골격계 재활, 수면 장애 클리닉' : '예: Neuromuscular Reset, Tactical Analysis',
+    narrativeLabel: isMedical ? '공간 서사 및 진료 철학' : '공간 서사 및 철학',
+    narrativePlaceholder: isMedical ? '가상 상담실에 입장했을 때 노출될 당신만의 진료 철학이나 환영의 인사를 입력하세요.' : '가상 코칭 룸에 입장했을 때 노출될 당신만의 철학이나 환영의 인사를 입력하세요.',
+    programTitle: isMedical ? '상담 상품 및 금액 설정' : '코칭 상품 및 금액 설정',
+    programDesc: isMedical ? '회원에게 제공할 상담 프로그램 리스트' : '회원에게 제공할 코칭 프로그램 리스트',
+    programBtn: isMedical ? '상품 추가' : '상품 추가',
+    programEmpty: isMedical ? '등록된 상담 상품이 없습니다.' : '등록된 코칭 상품이 없습니다.',
+    scheduleTitle: isMedical ? '예약 가능 스케줄 관리' : '예약 가능 스케줄 관리',
+    scheduleDesc: isMedical ? '유저가 선택할 수 있는 상담 예약 시간대 설정' : '유저가 선택할 수 있는 빈 시간대 설정',
+    scheduleFooter: isMedical ? '등록하신 시간에 유저가 진료 및 상담을 예약할 수 있습니다.' : '등록하신 시간에 유저가 코칭을 예약할 수 있습니다.',
+    socialMediaLabel: isMedical ? '의료 전문성 소셜 미디어 연동' : '영상 및 소셜 미디어 연동',
+    socialMediaDesc: isMedical ? '의료진 개인의 전문성을 보여줄 외부 채널을 연결하세요.' : '트레이너 개인의 전문성을 보여줄 외부 채널을 연결하세요.',
+    mediaPolicyHeader: isMedical ? '전문성 증명 정책' : '표시 정책',
+    mediaPolicyBody: isMedical ? '연동된 영상과 SNS 채널은 의료진 상세 페이지 하단의 \'미디어 갤러리\' 영역에 노출되어 전문성을 입증하는 증거가 됩니다.' : '연동된 영상과 SNS 채널은 트레이너 상세 페이지 하단의 \'미디어 갤러리\' 영역에 노출되어 당신의 전문성을 입증하는 증거가 됩니다.',
+    syncHeader: isMedical ? '의료 시스템 동기화 활성화' : '자동 반영 프로토콜 활성화',
+    syncBody: isMedical ? '설정된 데이터는 Master Curator List와 의료진 상세 페이지에 실시간 동기화됩니다. 당신의 페르소나가 유니클 생태계 전반에 걸쳐 신뢰감 있게 표현되도록 관리하십시오.' : '설정된 데이터는 Master Curator List와 트레이너 상세 페이지에 실시간 동기화됩니다. 당신의 페르소나가 유니클 생태계 전반에 걸쳐 일관되게 표현되도록 관리하십시오.'
+  };
 
   const THEME_DESCRIPTIONS = {
     premium: "고급스럽고 격식 있는 분위기로 정교한 하이엔드 회복 프로토콜에 적합합니다.",
@@ -88,6 +127,7 @@ export default function CoachingManagementPage() {
       const response = await fetch('/api/partner/pavilion');
       if (response.ok) {
         const data = await response.json();
+        setPartnerType(data.partnerType || 'trainer');
         setPavilionInfo(data.pavilionInfo);
         if (data.coachProfile) {
           setCoachProfile({
@@ -229,12 +269,12 @@ export default function CoachingManagementPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 md:px-0 mb-4">
           <div>
             <Badge className="bg-chapter-accent/10 text-chapter-accent border-none mb-3 px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-              트레이너 프로필 관리
+              {labels.badge}
             </Badge>
             <h1 className="text-3xl md:text-5xl font-black text-obsidian tracking-tighter">
-              트레이너 설정관리
+              {labels.title}
             </h1>
-            <p className="text-slate font-medium mt-1">전문가로서의 페르소나, 스케줄 및 미디어 채널을 관리합니다.</p>
+            <p className="text-slate font-medium mt-1">{labels.subtitle}</p>
           </div>
           <Button 
             onClick={handleSave} 
@@ -249,10 +289,10 @@ export default function CoachingManagementPage() {
         <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-transparent border-b border-line/10 w-full justify-start rounded-none h-auto p-0 mb-8 gap-8 overflow-x-auto no-scrollbar">
             <TabsTrigger value="profile" className="rounded-none border-b-2 border-transparent data-[state=active]:border-chapter-accent data-[state=active]:bg-transparent data-[state=active]:text-obsidian text-slate font-black uppercase tracking-widest text-[11px] pb-4 px-1">
-              프로필/공간 설정
+              {labels.tab1}
             </TabsTrigger>
             <TabsTrigger value="schedule" className="rounded-none border-b-2 border-transparent data-[state=active]:border-chapter-accent data-[state=active]:bg-transparent data-[state=active]:text-obsidian text-slate font-black uppercase tracking-widest text-[11px] pb-4 px-1">
-              스케줄/상품 관리
+              {labels.tab2}
             </TabsTrigger>
             <TabsTrigger value="video" className="rounded-none border-b-2 border-transparent data-[state=active]:border-chapter-accent data-[state=active]:bg-transparent data-[state=active]:text-obsidian text-slate font-black uppercase tracking-widest text-[11px] pb-4 px-1">
               영상/소셜 연동
@@ -269,9 +309,9 @@ export default function CoachingManagementPage() {
                       <div className="w-8 h-8 rounded-xl bg-chapter-accent/10 flex items-center justify-center text-chapter-accent">
                         <UserIcon size={18} />
                       </div>
-                      코치 캐릭터 설정
+                      {labels.card1Title}
                     </CardTitle>
-                    <CardDescription className="font-bold text-xs">리스트 및 가상공간에 노출될 마스터 캐릭터</CardDescription>
+                    <CardDescription className="font-bold text-xs">{labels.card1Desc}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div 
@@ -320,8 +360,8 @@ export default function CoachingManagementPage() {
                         <Sparkles className="h-5 w-5 text-chapter-accent mt-0.5" />
                       </div>
                       <p className="text-[11px] font-bold text-slate/70 leading-relaxed">
-                        <strong className="text-chapter-accent block mb-1">UI Reflection Logic</strong>
-                        이미지를 업로드하시면 트레이너 리스트에서 더 품격 있게 표현됩니다. 가급적 전문 스튜디오에서 촬영된 캐릭터 컷을 권장합니다.
+                        <strong className="text-chapter-accent block mb-1">{labels.card1UiTitle}</strong>
+                        {labels.card1UiDesc}
                       </p>
                     </div>
                   </CardContent>
@@ -333,7 +373,7 @@ export default function CoachingManagementPage() {
                       <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-chapter-accent">
                         <Layout size={18} />
                       </div>
-                      전시 프로토콜
+                      {labels.protocolTitle}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -342,7 +382,7 @@ export default function CoachingManagementPage() {
                         <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">공개 상태</p>
                         <div className="text-sm font-black flex items-center gap-2">
                            <div className={`w-2 h-2 rounded-full ${pavilionInfo.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]' : 'bg-slate-500'}`} />
-                           {pavilionInfo.isActive ? '퍼블릭 노출 활성화' : '시스템 비활성 상태'}
+                           {pavilionInfo.isActive ? labels.protocolStatus : '시스템 비활성 상태'}
                         </div>
                       </div>
                       <Switch 
@@ -366,7 +406,7 @@ export default function CoachingManagementPage() {
                           <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
                             <Palette size={18} />
                           </div>
-                          <Label className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">공간 분위기 설정</Label>
+                          <Label className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">{labels.themeLabel}</Label>
                         </div>
                         <Badge variant="outline" className="text-[10px] font-black border-slate-100 text-slate/40">{(pavilionInfo.roomTheme || 'premium').toUpperCase()}</Badge>
                       </div>
@@ -413,7 +453,7 @@ export default function CoachingManagementPage() {
                         onValueChange={(v) => setPavilionInfo(prev => ({ ...prev, roomMusic: v }))}
                       >
                         <SelectTrigger className="h-16 rounded-[20px] border-slate-100 bg-slate-50/50 font-bold px-6 focus:ring-chapter-accent" aria-label="배경 음악 선택">
-                          <SelectValue placeholder="가상 코칭 룸에서 자동 재생될 엠비언스 선택" />
+                          <SelectValue placeholder={labels.musicPlaceholder} />
                         </SelectTrigger>
                         <SelectContent className="rounded-2xl border-slate-100">
                           <SelectItem value="deep-rest">Deep Rest (Ambient Synthesis)</SelectItem>
@@ -432,13 +472,13 @@ export default function CoachingManagementPage() {
                           <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                             <BadgeCent size={18} />
                           </div>
-                          <Label htmlFor="coach-title-input" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">트레이너 직함</Label>
+                          <Label htmlFor="coach-title-input" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">{labels.identityTitle}</Label>
                         </div>
                         <Input 
                           id="coach-title-input"
                           value={coachProfile.title}
                           onChange={(e) => setCoachProfile((prev: any) => ({ ...prev, title: e.target.value }))}
-                          placeholder="예: Senior Recovery Curator, Pro Soccer Coach"
+                          placeholder={labels.identityTitlePlaceholder}
                           className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 px-6 font-bold"
                         />
                       </div>
@@ -447,13 +487,13 @@ export default function CoachingManagementPage() {
                           <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
                             <Award size={18} />
                           </div>
-                          <Label htmlFor="coach-specialty-input" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">주요 전문 분야</Label>
+                          <Label htmlFor="coach-specialty-input" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">{labels.specialtyLabel}</Label>
                         </div>
                         <Input 
                           id="coach-specialty-input"
                           value={coachProfile.specialty}
                           onChange={(e) => setCoachProfile((prev: any) => ({ ...prev, specialty: e.target.value }))}
-                          placeholder="예: Neuromuscular Reset, Tactical Analysis"
+                          placeholder={labels.specialtyPlaceholder}
                           className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 px-6 font-bold"
                         />
                       </div>
@@ -465,13 +505,13 @@ export default function CoachingManagementPage() {
                         <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500">
                           <Sparkles size={18} />
                         </div>
-                        <Label htmlFor="coach-description-textarea" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">공간 서사 및 철학</Label>
+                        <Label htmlFor="coach-description-textarea" className="text-sm font-black uppercase tracking-[0.2em] text-slate/60">{labels.narrativeLabel}</Label>
                       </div>
                       <Textarea 
                         id="coach-description-textarea"
                         value={coachProfile.description}
                         onChange={(e) => setCoachProfile((prev: any) => ({ ...prev, description: e.target.value }))}
-                        placeholder="가상 코칭 룸에 입장했을 때 노출될 당신만의 철학이나 환영의 인사를 입력하세요."
+                        placeholder={labels.narrativePlaceholder}
                         className="min-h-[200px] rounded-[32px] border-slate-100 bg-slate-50/50 p-8 font-medium leading-relaxed resize-none focus:ring-chapter-accent/20 transition-all focus:bg-white"
                       />
                     </div>
@@ -492,12 +532,12 @@ export default function CoachingManagementPage() {
                         <div className="w-8 h-8 rounded-xl bg-chapter-accent/10 flex items-center justify-center text-chapter-accent">
                           <DollarSign size={18} />
                         </div>
-                        코칭 상품 및 금액 설정
+                        {labels.programTitle}
                       </CardTitle>
-                      <CardDescription className="font-bold text-xs">회원에게 제공할 코칭 프로그램 리스트</CardDescription>
+                      <CardDescription className="font-bold text-xs">{labels.programDesc}</CardDescription>
                     </div>
                     <Button onClick={addProgram} size="sm" className="bg-chapter-accent text-white rounded-xl gap-1">
-                      <Plus size={14} /> 상품 추가
+                      <Plus size={14} /> {labels.programBtn}
                     </Button>
                    </div>
                 </CardHeader>
@@ -566,7 +606,7 @@ export default function CoachingManagementPage() {
                    ) : (
                      <div className="py-12 text-center bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-100 text-slate/40">
                         <DollarSign size={32} className="mx-auto mb-2 opacity-20" />
-                        <p className="text-sm font-bold">등록된 코칭 상품이 없습니다.</p>
+                        <p className="text-sm font-bold">{labels.programEmpty}</p>
                      </div>
                    )}
                 </CardContent>
@@ -581,9 +621,9 @@ export default function CoachingManagementPage() {
                         <div className="w-8 h-8 rounded-xl bg-chapter-accent/10 flex items-center justify-center text-chapter-accent">
                           <Calendar size={18} />
                         </div>
-                        예약 가능 스케줄 관리
+                        {labels.scheduleTitle}
                       </CardTitle>
-                      <CardDescription className="font-bold text-xs">유저가 선택할 수 있는 빈 시간대 설정</CardDescription>
+                      <CardDescription className="font-bold text-xs">{labels.scheduleDesc}</CardDescription>
                     </div>
                     <Button onClick={addAvailability} size="sm" className="bg-chapter-accent text-white rounded-xl gap-1">
                       <Plus size={14} /> 날짜 추가
@@ -669,7 +709,7 @@ export default function CoachingManagementPage() {
                      </div>
                    )}
                    <p className="text-[10px] text-slate/40 text-center font-bold mt-4 flex items-center justify-center gap-1">
-                     <AlertCircle size={10} /> 등록하신 시간에 유저가 코칭을 예약할 수 있습니다.
+                     <AlertCircle size={10} /> {labels.scheduleFooter}
                    </p>
                 </CardContent>
               </Card>
@@ -682,8 +722,8 @@ export default function CoachingManagementPage() {
                   <div className="w-16 h-16 rounded-[28px] bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
                     <Video size={32} />
                   </div>
-                  <CardTitle className="text-2xl font-black tracking-tight">영상 및 소셜 미디어 연동</CardTitle>
-                  <CardDescription className="text-sm font-bold">트레이너 개인의 전문성을 보여줄 외부 채널을 연결하세요.</CardDescription>
+                  <CardTitle className="text-2xl font-black tracking-tight">{labels.socialMediaLabel}</CardTitle>
+                  <CardDescription className="text-sm font-bold">{labels.socialMediaDesc}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-10 pt-0 space-y-8">
                   <div className="space-y-6">
@@ -750,9 +790,9 @@ export default function CoachingManagementPage() {
                       <AlertCircle className="h-5 w-5 text-amber-500" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-black text-amber-700">표시 정책</p>
+                      <p className="text-xs font-black text-amber-700">{labels.mediaPolicyHeader}</p>
                       <p className="text-[11px] font-bold text-amber-800/60 leading-relaxed">
-                        연동된 영상과 SNS 채널은 트레이너 상세 페이지 하단의 '미디어 갤러리' 영역에 노출되어 당신의 전문성을 입증하는 증거가 됩니다.
+                        {labels.mediaPolicyBody}
                       </p>
                     </div>
                   </div>
@@ -768,10 +808,9 @@ export default function CoachingManagementPage() {
             <CheckCircle2 className="h-10 w-10 text-chapter-accent" />
           </div>
           <div className="space-y-2 text-center md:text-left relative z-10">
-            <h4 className="text-2xl font-black text-obsidian tracking-tighter">자동 반영 프로토콜 활성화</h4>
+            <h4 className="text-2xl font-black text-obsidian tracking-tighter">{labels.syncHeader}</h4>
             <p className="text-slate/70 font-medium text-sm leading-relaxed max-w-lg">
-              설정된 데이터는 <strong>Master Curator List</strong>와 트레이너 상세 페이지에 실시간 동기화됩니다. 
-              당신의 페르소나가 유니클 생태계 전반에 걸쳐 일관되게 표현되도록 관리하십시오.
+              {labels.syncBody}
             </p>
           </div>
         </div>

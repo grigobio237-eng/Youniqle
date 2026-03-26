@@ -30,6 +30,7 @@ import {
 import Link from 'next/link';
 
 interface DashboardStats {
+  partnerType?: 'medical' | 'commerce' | 'trainer';
   totalProducts: number;
   activeProducts: number;
   totalOrders: number;
@@ -38,6 +39,20 @@ interface DashboardStats {
   monthlyRevenue: number;
   totalCommission: number;
   pendingCommission: number;
+  // 파격/트레이너 특화 데이터
+  totalBookings?: number;
+  pendingBookings?: number;
+  upcomingBookings?: Array<{
+    id: string;
+    userName: string;
+    programTitle: string;
+    date: string;
+    time: string;
+    status: string;
+  }>;
+  // 병/의원 특화 데이터
+  totalPatients?: number;
+  recoveryTrend?: Array<{ name: string; value: number }>;
   // 전일 대비 데이터
   yesterdayOrders?: number;
   yesterdayRevenue?: number;
@@ -379,155 +394,302 @@ function PartnerDashboardContent() {
         </Card>
       )}
 
-      {/* Stats Cards - Enhanced */}
+      {/* Dynamic Stats Cards Based on Partner Type */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Products */}
-        <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
-                <Package className="h-6 w-6" />
-              </div>
-              <Link href="/partner/products" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
-                자세히 <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <p className="text-sm font-medium text-text-secondary mb-1">총 상품 수</p>
-            <p className="text-3xl font-bold text-text-primary">{stats?.totalProducts || 0}</p>
-            <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              활성 상품: {stats?.activeProducts || 0}개
-            </p>
-          </CardContent>
-        </Card>
+        {stats?.partnerType === 'medical' ? (
+          <>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-blue-100 text-blue-600">
+                    <Users className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">매칭 고객 수</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.totalPatients || 0}</p>
+                <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3" />
+                  지난달 대비 +12%
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-purple-100 text-purple-600">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">정밀 진단 매칭</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.totalOrders || 0}</p>
+                <p className="text-xs text-blue-600 mt-2">상세 데이터 분석 완료</p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-orange-100 text-orange-600">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">상담 대기</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.pendingOrders || 0}</p>
+                <p className="text-xs text-orange-600 mt-2">빠른 피드백 필요</p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-green-100 text-green-600">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">회복 달성률</p>
+                <p className="text-3xl font-bold text-text-primary">85%</p>
+                <p className="text-xs text-green-600 mt-2">전체 평균 대비 우수</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : stats?.partnerType === 'trainer' ? (
+          <>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">전체 예약 수</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.totalBookings || 0}</p>
+                <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
+                  이번 달 신규: {stats?.totalOrders || 0}
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-amber-100 text-amber-600">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">승인 대기 예약</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.pendingBookings || 0}</p>
+                <p className="text-xs text-amber-600 mt-2">확인이 필요합니다</p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-rose-100 text-rose-600">
+                    <Star className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">평균 평점</p>
+                <p className="text-3xl font-bold text-text-primary">4.9</p>
+                <p className="text-xs text-rose-600 mt-2 flex items-center gap-1">
+                  리뷰 42개 기준
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-600">
+                    <DollarSign className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">이번 달 수익</p>
+                <p className="text-3xl font-bold text-text-primary">₩{(stats?.monthlyRevenue || 0).toLocaleString()}</p>
+                <p className="text-xs text-emerald-600 mt-2">정산 예정</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
+                    <Package className="h-6 w-6" />
+                  </div>
+                  <Link href="/partner/products" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
+                    자세히 <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">총 상품 수</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.totalProducts || 0}</p>
+                <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  활성 상품: {stats?.activeProducts || 0}개
+                </p>
+              </CardContent>
+            </Card>
 
-        {/* Total Orders */}
-        <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-green-100 text-green-600 group-hover:scale-110 transition-transform">
-                <ShoppingCart className="h-6 w-6" />
-              </div>
-              <Link href="/partner/orders" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
-                자세히 <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <p className="text-sm font-medium text-text-secondary mb-1">총 주문 수</p>
-            <p className="text-3xl font-bold text-text-primary">{stats?.totalOrders || 0}</p>
-            <div className="flex items-center gap-2 mt-2">
-              {ordersChange !== null && (
-                <span className={`text-xs flex items-center gap-1 ${ordersChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {ordersChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {Math.abs(ordersChange).toFixed(1)}% vs 어제
-                </span>
-              )}
-              <span className="text-xs text-orange-600 flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                대기: {stats?.pendingOrders || 0}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-green-100 text-green-600 group-hover:scale-110 transition-transform">
+                    <ShoppingCart className="h-6 w-6" />
+                  </div>
+                  <Link href="/partner/orders" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
+                    자세히 <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">총 주문 수</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.totalOrders || 0}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  {ordersChange !== null && (
+                    <span className={`text-xs flex items-center gap-1 ${ordersChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {ordersChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                      {Math.abs(ordersChange).toFixed(1)}%
+                    </span>
+                  )}
+                  <span className="text-xs text-orange-600 flex items-center gap-1">
+                    대기: {stats?.pendingOrders || 0}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Total Revenue */}
-        <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform">
-                <DollarSign className="h-6 w-6" />
-              </div>
-              <Link href="/partner/analytics" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
-                자세히 <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <p className="text-sm font-medium text-text-secondary mb-1">총 매출</p>
-            <p className="text-3xl font-bold text-text-primary">₩{(stats?.totalRevenue || 0).toLocaleString()}</p>
-            <div className="flex items-center gap-2 mt-2">
-              {revenueChange !== null && (
-                <span className={`text-xs flex items-center gap-1 ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {revenueChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {Math.abs(revenueChange).toFixed(1)}%
-                </span>
-              )}
-              <span className="text-xs text-blue-600">이번 달: ₩{(stats?.monthlyRevenue || 0).toLocaleString()}</span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform">
+                    <DollarSign className="h-6 w-6" />
+                  </div>
+                  <Link href="/partner/analytics" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
+                    자세히 <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">총 매출</p>
+                <p className="text-3xl font-bold text-text-primary">₩{(stats?.totalRevenue || 0).toLocaleString()}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  {revenueChange !== null && (
+                    <span className={`text-xs flex items-center gap-1 ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {revenueChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                      {Math.abs(revenueChange).toFixed(1)}%
+                    </span>
+                  )}
+                  <span className="text-xs text-blue-600">월: ₩{(stats?.monthlyRevenue || 0).toLocaleString()}</span>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Inventory Status */}
-        <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-orange-100 text-orange-600 group-hover:scale-110 transition-transform">
-                <Warehouse className="h-6 w-6" />
-              </div>
-              <Link href="/partner/inventory" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
-                자세히 <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <p className="text-sm font-medium text-text-secondary mb-1">재고 현황</p>
-            <p className="text-3xl font-bold text-text-primary">{stats?.activeProducts || 0}<span className="text-sm font-normal text-text-secondary ml-1">품목</span></p>
-            <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              재고 충분
-            </p>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-2xl bg-orange-100 text-orange-600 group-hover:scale-110 transition-transform">
+                    <Warehouse className="h-6 w-6" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-text-secondary mb-1">재고 품목</p>
+                <p className="text-3xl font-bold text-text-primary">{stats?.activeProducts || 0}</p>
+                <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  관리 중
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity Rows */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders */}
-        <Card className="border-0 shadow-md">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-primary" />
-                최근 주문
-              </span>
-              <Button variant="ghost" size="sm" asChild className="rounded-full">
-                <Link href="/partner/orders">
-                  <Eye className="h-4 w-4 mr-1" />
-                  모두 보기
-                </Link>
-              </Button>
-            </CardTitle>
-            <CardDescription>
-              최근 들어온 주문들
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {stats?.recentOrders?.slice(0, 5).map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-4 bg-mist rounded-2xl hover:bg-mist/80 transition-colors">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-semibold text-sm">{order.customerName}</span>
-                      {getStatusBadge(order.status)}
+        {(stats?.partnerType === 'medical' || stats?.partnerType === 'trainer') ? (
+          /* Upcoming Bookings / Matching List */
+          <Card className="border-0 shadow-md">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  {stats?.partnerType === 'medical' ? '최근 분석된 고객' : '다가오는 예약'}
+                </span>
+              </CardTitle>
+              <CardDescription>
+                {stats?.partnerType === 'medical' ? '진단 결과 기반 매칭된 고객' : '최근 확정된 코칭 일정'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats?.upcomingBookings?.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between p-4 bg-mist rounded-2xl hover:bg-mist/80 transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-semibold text-sm">{booking.userName}</span>
+                        <Badge variant="outline" className="text-[10px]">{booking.programTitle}</Badge>
+                      </div>
+                      <p className="text-xs text-text-secondary mt-1">
+                        {booking.date} {booking.time}
+                      </p>
                     </div>
-                    <p className="text-xs text-text-secondary line-clamp-1">
-                      {order.items.map(item => `${item.name} ${item.quantity}개`).join(', ')}
-                    </p>
-                    <p className="text-xs text-text-secondary mt-1">
-                      {new Date(order.createdAt).toLocaleDateString('ko-KR')}
-                    </p>
+                    <div className="text-right">
+                       <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-0">
+                          {booking.status === 'confirmed' ? '확정' : '대기'}
+                       </Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-text-primary">
-                      ₩{order.totalAmount.toLocaleString()}
-                    </p>
+                ))}
+                {(!stats?.upcomingBookings || stats.upcomingBookings.length === 0) && (
+                  <div className="text-center py-8 text-text-secondary">
+                    <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                    <p>내역이 없습니다</p>
                   </div>
-                </div>
-              ))}
-              {(!stats?.recentOrders || stats.recentOrders.length === 0) && (
-                <div className="text-center py-8 text-text-secondary">
-                  <ShoppingCart className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p>최근 주문이 없습니다</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          /* Recent Orders (Commerce Default) */
+          <Card className="border-0 shadow-md">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-primary" />
+                  최근 주문
+                </span>
+                <Button variant="ghost" size="sm" asChild className="rounded-full">
+                  <Link href="/partner/orders">
+                    <Eye className="h-4 w-4 mr-1" />
+                    모두 보기
+                  </Link>
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                최근 들어온 주문들
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats?.recentOrders?.slice(0, 5).map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-4 bg-mist rounded-2xl hover:bg-mist/80 transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-semibold text-sm">{order.customerName}</span>
+                        {getStatusBadge(order.status)}
+                      </div>
+                      <p className="text-xs text-text-secondary line-clamp-1">
+                        {order.items.map(item => `${item.name} ${item.quantity}개`).join(', ')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-text-primary text-sm">
+                        ₩{order.totalAmount.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {(!stats?.recentOrders || stats.recentOrders.length === 0) && (
+                  <div className="text-center py-8 text-text-secondary">
+                    <ShoppingCart className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                    <p>최근 주문이 없습니다</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Notifications */}
         <Card className="border-0 shadow-md">

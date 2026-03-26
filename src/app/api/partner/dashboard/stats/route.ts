@@ -166,7 +166,52 @@ export async function GET(request: NextRequest) {
       }
     ];
 
+    // 파트너 유형별 추가 데이터 조회
+    let typeSpecificStats = {};
+    if (partner.partnerApplication?.partnerType === 'trainer' || partner.partnerApplication?.partnerType === 'medical') {
+        const CoachingBooking = (await import('@/models/CoachingBooking')).default;
+        const [totalBookings, pendingBookings, upcomingBookings] = await Promise.all([
+            CoachingBooking.countDocuments({ coachId: partnerId }),
+            CoachingBooking.countDocuments({ coachId: partnerId, status: 'pending' }),
+            CoachingBooking.find({ 
+                coachId: partnerId, 
+                status: 'confirmed',
+                date: { $gte: new Date().toISOString().split('T')[0] }
+            }).sort({ date: 1, time: 1 }).limit(5)
+        ]);
+        
+        typeSpecificStats = {
+            totalBookings,
+            pendingBookings,
+            upcomingBookings: upcomingBookings.map(b => ({
+                id: b._id.toString(),
+                userName: b.userName,
+                programTitle: b.programTitle,
+                date: b.date,
+                time: b.time,
+                status: b.status
+            }))
+        };
+    }
+
+    if (partner.partnerApplication?.partnerType === 'medical') {
+        const Diagnosis = (await import('@/models/Diagnosis')).default;
+        // 병/의원의 경우 이 파트너가 추천된 진단 결과 또는 이 파트너와 연계된 고객들의 통계
+        // (현재는 전체 진단 트렌드 샘플 또는 연계 로직에 따른 데이터)
+        const totalMatchingDiagnosis = await Diagnosis.countDocuments({}); 
+        typeSpecificStats = {
+            ...typeSpecificStats,
+            totalPatients: totalMatchingDiagnosis,
+            recoveryTrend: [
+                { name: '리듬', value: 40 },
+                { name: '집중', value: 35 },
+                { name: '프리미엄', value: 25 }
+            ]
+        };
+    }
+
     const stats = {
+      partnerType: partner.partnerApplication?.partnerType || 'commerce',
       totalProducts,
       activeProducts,
       totalOrders,
@@ -177,7 +222,7 @@ export async function GET(request: NextRequest) {
       pendingCommission: pendingCommission[0]?.total || 0,
       recentOrders: recentOrders.map(order => ({
         id: order._id.toString(),
-        customerName: order.userId.name,
+        customerName: order.userId?.name || '알 수 없음',
         totalAmount: order.partnerOrders.find((po: any) => po.partnerId.toString() === partnerId)?.subtotal || 0,
         status: order.partnerOrders.find((po: any) => po.partnerId.toString() === partnerId)?.status || 'pending',
         createdAt: order.createdAt,
@@ -189,6 +234,7 @@ export async function GET(request: NextRequest) {
         sales: item.sales,
         revenue: item.revenue
       })),
+      ...typeSpecificStats,
       notifications
     };
 

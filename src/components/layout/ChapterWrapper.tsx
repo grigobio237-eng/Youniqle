@@ -11,7 +11,9 @@ export type ChapterType =
     | 'omakase'
     | 'utils'
     | 'my-page'
-    | 'diagnosis-report';
+    | 'diagnosis-report'
+    | 'partner'
+    | 'brand';
 
 interface ChapterWrapperProps {
     chapter: ChapterType;

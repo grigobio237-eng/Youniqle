@@ -80,6 +80,7 @@ interface Product {
 function PartnerProductsContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [partnerType, setPartnerType] = useState<string>('commerce');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -128,6 +129,33 @@ function PartnerProductsContent() {
       warranty: '',
     },
   });
+
+  const isMedical = partnerType === 'medical';
+  const labels = {
+    title: isMedical ? '내 상담/서비스 관리' : '내 상품 관리',
+    addBtn: isMedical ? '상담/서비스 등록' : '상품 등록',
+    editTitle: isMedical ? '상담/서비스 수정' : '상품 수정',
+    newTitle: isMedical ? '새 상담/서비스 등록' : '새 상품 등록',
+    nameLabel: isMedical ? '상담/서비스명 *' : '상품명 *',
+    summaryLabel: isMedical ? '상담/서비스 요약 *' : '상품 요약 *',
+    descLabel: isMedical ? '상담/서비스 상세 설명 *' : '상품 상세 설명 *',
+    emptyTitle: isMedical ? '등록된 상담/서비스가 없습니다' : '등록된 상품이 없습니다',
+    emptyDesc: isMedical ? '첫 번째 상담/서비스를 등록해보세요.' : '첫 번째 상품을 등록해보세요.',
+    deleteTitle: isMedical ? '상담/서비스 삭제 확인' : '상품 삭제 확인',
+    deleteDesc: isMedical ? '정말로 이 서비스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.' : '정말로 이 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+    toastAdd: isMedical ? '상담/서비스가 등록되었습니다.' : '상품이 등록되었습니다.',
+    toastEdit: isMedical ? '상담/서비스가 수정되었습니다.' : '상품이 수정되었습니다.',
+    toastDelete: isMedical ? '상담/서비스가 삭제되었습니다.' : '상품이 삭제되었습니다.',
+    toastRegisterFail: isMedical ? '서비스 등록에 실패했습니다.' : '상품 등록에 실패했습니다.',
+    fetchError: isMedical ? '조회 중 오류가 발생했습니다.' : '상품 조회 중 오류가 발생했습니다.',
+    registerError: isMedical ? '등록 중 오류가 발생했습니다.' : '상품 등록 중 오류가 발생했습니다.',
+    deleteError: isMedical ? '삭제 중 오류가 발생했습니다.' : '상품 삭제 중 오류가 발생했습니다.',
+    queryPlaceholder: isMedical ? '서비스명을 입력하면 자동 생성됩니다' : '상품명을 입력하면 자동 생성됩니다',
+    fundingLabel: isMedical ? '특별 프로젝트(펀딩)로 등록' : '펀딩 프로젝트로 등록',
+    fundingDesc: isMedical ? '이 서비스/프로그램을 크라우드 펀딩 형태로 진행합니다.' : '이 상품을 크라우드 펀딩 형태로 진행합니다. 목표 금액과 종료일을 설정해주세요.',
+    aiBuilderBtn: isMedical ? 'AI로 서비스 상세페이지 만들기' : 'AI로 상세페이지 만들기',
+    aiBuilderDesc: isMedical ? '상담/진료 이미지가 준비되었다면 AI 빌더를 추천합니다!' : '이미지가 준비되었다면 AI 빌더를 추천합니다!'
+  };
 
   // 카테고리 목록 (전체 프로젝트 공통 사용)
   const categories = PRODUCT_CATEGORIES;
@@ -367,6 +395,7 @@ function PartnerProductsContent() {
 
   useEffect(() => {
     fetchProducts();
+    checkPartner();
 
     // URL 파라미터 확인하여 다이얼로그 열기
     const urlParams = new URLSearchParams(window.location.search);
@@ -374,6 +403,18 @@ function PartnerProductsContent() {
       setIsDialogOpen(true);
     }
   }, []);
+
+  const checkPartner = async () => {
+    try {
+      const response = await fetch('/api/partner/auth/verify');
+      if (response.ok) {
+        const data = await response.json();
+        setPartnerType(data.partner?.partnerType || 'commerce');
+      }
+    } catch (error) {
+      console.error('Partner check failed:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -385,8 +426,8 @@ function PartnerProductsContent() {
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('상품 조회 오류:', error);
-      toast.error('상품 조회 중 오류가 발생했습니다.');
+      console.error('Fetch error:', error);
+      toast.error(labels.fetchError);
     } finally {
       setLoading(false);
     }
@@ -426,18 +467,18 @@ function PartnerProductsContent() {
       });
 
       if (response.ok) {
-        toast.success(editingProduct ? '상품이 수정되었습니다.' : '상품이 등록되었습니다.');
+        toast.success(editingProduct ? labels.toastEdit : labels.toastAdd);
         setIsDialogOpen(false);
         setEditingProduct(null);
         resetForm();
         fetchProducts();
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || '상품 등록에 실패했습니다.');
+        toast.error(errorData.error || labels.toastRegisterFail);
       }
     } catch (error) {
-      console.error('상품 등록 오류:', error);
-      toast.error('상품 등록 중 오류가 발생했습니다.');
+      console.error('Register error:', error);
+      toast.error(labels.registerError);
     }
   };
 
@@ -545,15 +586,15 @@ function PartnerProductsContent() {
       });
 
       if (response.ok) {
-        toast.success('상품이 삭제되었습니다.');
+        toast.success(labels.toastDelete);
         fetchProducts();
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || '상품 삭제에 실패했습니다.');
+        toast.error(errorData.error || '삭제에 실패했습니다.');
       }
     } catch (error) {
-      console.error('상품 삭제 오류:', error);
-      toast.error('상품 삭제 중 오류가 발생했습니다.');
+      console.error('Delete error:', error);
+      toast.error(labels.deleteError);
     }
   };
 
@@ -568,24 +609,24 @@ function PartnerProductsContent() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">내 상품 관리</h1>
+        <h1 className="text-3xl font-bold">{labels.title}</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
               <Plus className="h-4 w-4 mr-2" />
-              상품 등록
+              {labels.addBtn}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingProduct ? '상품 수정' : '새 상품 등록'}
+                {editingProduct ? labels.editTitle : labels.newTitle}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">상품명 *</Label>
+                  <Label htmlFor="name">{labels.nameLabel}</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -603,7 +644,7 @@ function PartnerProductsContent() {
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="상품명을 입력하면 자동 생성됩니다"
+                    placeholder={labels.queryPlaceholder}
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -685,9 +726,9 @@ function PartnerProductsContent() {
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFunding: checked as boolean }))}
                 />
                 <div className="space-y-1">
-                  <Label htmlFor="isFunding" className="font-semibold">펀딩 프로젝트로 등록</Label>
+                  <Label htmlFor="isFunding" className="font-semibold">{labels.fundingLabel}</Label>
                   <p className="text-sm text-gray-500">
-                    이 상품을 크라우드 펀딩 형태로 진행합니다. 목표 금액과 종료일을 설정해주세요.
+                    {labels.fundingDesc}
                   </p>
                 </div>
               </div>
@@ -717,7 +758,7 @@ function PartnerProductsContent() {
               )}
 
               <div>
-                <Label htmlFor="summary">상품 요약 *</Label>
+                <Label htmlFor="summary">{labels.summaryLabel}</Label>
                 <Textarea
                   id="summary"
                   value={formData.summary}
@@ -727,15 +768,15 @@ function PartnerProductsContent() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">상세 설명 *</Label>
+                <Label htmlFor="description">{labels.descLabel}</Label>
                 <div className="flex items-center space-x-2 mb-2">
                   <Link href="/partner/ai-builder">
                     <Button type="button" variant="outline" size="sm" className="text-blue-600 border-blue-200 bg-blue-50">
                       <Sparkles className="h-4 w-4 mr-2" />
-                      AI로 상세페이지 만들기
+                      {labels.aiBuilderBtn}
                     </Button>
                   </Link>
-                  <p className="text-xs text-gray-500">이미지가 준비되었다면 AI 빌더를 추천합니다!</p>
+                  <p className="text-xs text-gray-500">{labels.aiBuilderDesc}</p>
                 </div>
                 <ProductDescriptionEditor
                   value={formData.description}
@@ -776,11 +817,11 @@ function PartnerProductsContent() {
             <Card>
               <CardContent className="text-center py-8">
                 <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">등록된 상품이 없습니다</h3>
-                <p className="text-gray-600 mb-4">첫 번째 상품을 등록해보세요.</p>
+                <h3 className="text-lg font-semibold mb-2">{labels.emptyTitle}</h3>
+                <p className="text-gray-600 mb-4">{labels.emptyDesc}</p>
                 <Button onClick={resetForm}>
                   <Plus className="h-4 w-4 mr-2" />
-                  상품 등록
+                  {labels.addBtn}
                 </Button>
               </CardContent>
             </Card>
@@ -898,9 +939,9 @@ function PartnerProductsContent() {
       <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog(prev => ({ ...prev, open }))}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>상품 삭제 확인</DialogTitle>
+            <DialogTitle>{labels.deleteTitle}</DialogTitle>
             <DialogDescription>
-              정말로 이 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+              {labels.deleteDesc}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
