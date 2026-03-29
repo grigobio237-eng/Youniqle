@@ -104,7 +104,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
                 <h3 className="text-2xl font-bold text-obsidian mb-2">프리미엄 회복</h3>
                 <p className="text-slate/70 text-sm leading-relaxed">
                   몰입과 깊은 치유의 경험.<br />
-                  가상 공간과 오프라인 센터를 연계합니다.
+                  오프라인 힐링센터와 연계된 프라이빗 케어.
                 </p>
               </div>
               <ul className="space-y-3 text-xs font-medium text-slate/50">

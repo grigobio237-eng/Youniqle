@@ -19,7 +19,7 @@ import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 const CATEGORY_STATUS_MESSAGES: Record<string, Record<string, { message: string; action: string; actionLink: string }>> = {
     critical: {
         physical: { message: '신체 피로가 심각한 수준입니다. 즉각적인 휴식이 필요합니다.', action: '긴급 스트레칭', actionLink: '/utils?tool=stretch' },
-        mental: { message: '정신적 스트레스가 한계에 도달했습니다.', action: 'AI 긴급 상담', actionLink: '/ai-advice' },
+        mental: { message: '정신적 스트레스가 한계에 도달했습니다.', action: '긴급 상담', actionLink: '/ai-advice' },
         sleep: { message: '수면 부족이 건강을 위협하고 있습니다.', action: '수면 환경 체크', actionLink: '/utils?tool=sleep' },
         lifestyle: { message: '생활 패턴의 전면적인 재정립이 필요합니다.', action: '수분 밸런스 체크', actionLink: '/utils?tool=water' }
     },
@@ -30,16 +30,16 @@ const CATEGORY_STATUS_MESSAGES: Record<string, Record<string, { message: string;
         lifestyle: { message: '생활 습관을 점검해 보세요.', action: '생활 밸런스 점검', actionLink: '/utils' }
     },
     mid: {
-        physical: { message: '신체 상태는 양호하지만 관리가 필요합니다.', action: '유연성 유지', actionLink: '/utils?tool=stretch' },
-        mental: { message: '정서적으로 안정적인 편입니다.', action: '마음 챙김', actionLink: '/utils/breathing' },
-        sleep: { message: '수면 품질은 괜찮은 편입니다.', action: '수면 최적화', actionLink: '/utils?tool=sleep' },
-        lifestyle: { message: '생활 패턴이 비교적 규칙적입니다.', action: '밸런스 유지', actionLink: '/utils' }
+        physical: { message: '신체 상태는 양호하지만 관리가 필요합니다.', action: '회복의 궤적', actionLink: '/dashboard' },
+        mental: { message: '정서적으로 안정적인 편입니다.', action: '정서의 심해', actionLink: '/dashboard' },
+        sleep: { message: '수면 품질은 괜찮은 편입니다.', action: '수면의 리듬', actionLink: '/dashboard' },
+        lifestyle: { message: '생활 패턴이 비교적 규칙적입니다.', action: '일상의 온기', actionLink: '/dashboard' }
     },
     high: {
-        physical: { message: '신체 상태가 매우 좋습니다!', action: '퍼포먼스 강화', actionLink: '/utils?tool=stretch' },
-        mental: { message: '멘탈이 매우 건강합니다!', action: '몰입 확장', actionLink: '/utils/breathing' },
-        sleep: { message: '수면 품질이 우수합니다!', action: '현재 유지', actionLink: '/utils?tool=sleep' },
-        lifestyle: { message: '생활 습관이 이상적입니다!', action: '밸런스 유지', actionLink: '/utils' }
+        physical: { message: '신체 상태가 매우 좋습니다!', action: '최상의 활력', actionLink: '/dashboard' },
+        mental: { message: '멘탈이 매우 건강합니다!', action: '내면의 확장', actionLink: '/dashboard' },
+        sleep: { message: '수면 품질이 우수합니다!', action: '고요의 깊이', actionLink: '/dashboard' },
+        lifestyle: { message: '생활 습관이 이상적입니다!', action: '삶의 조화', actionLink: '/dashboard' }
     }
 };
 
@@ -236,7 +236,7 @@ export default function AiNavigatorPage() {
                                         <Sparkles className="w-3 h-3 mr-2" />
                                         Real-time Analysis
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">AI 리커버리<br />네비게이터</h1>
+                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">리커버리<br />네비게이터</h1>
 
                                     <div className="bg-surface/50 border border-line p-6 rounded-[32px] inline-flex items-center gap-6">
                                         <div>
@@ -304,7 +304,7 @@ export default function AiNavigatorPage() {
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Zap className="w-5 h-5 fill-current" />
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight">AI 맞춤 분석 리포트</h2>
+                                    <h2 className="text-2xl font-black tracking-tight">맞춤 분석 리포트</h2>
                                 </div>
 
                                 {weakestInfo?.statusInfo ? (
@@ -339,7 +339,7 @@ export default function AiNavigatorPage() {
                                                     </Button>
                                                 )}
                                                 <Button asChild variant="outline" className="h-12 rounded-xl px-6 font-bold">
-                                                    <Link href="/ai-advice">AI 상세 조언</Link>
+                                                    <Link href="/ai-advice">1일 추천 루틴</Link>
                                                 </Button>
                                                 <Button variant="outline" className="h-12 rounded-xl px-6 font-bold text-slate-500 border-slate-300" onClick={() => { setDiagnosisModalStep('result'); setDiagnosisModalOpen(true); }}>
                                                     진단 결과 다시보기
@@ -355,7 +355,7 @@ export default function AiNavigatorPage() {
                                                 아직 심층 진단을<br />완료하지 않았습니다.
                                             </h3>
                                             <p className="text-sm font-medium text-slate opacity-80">
-                                                60초 만에 끝나는 AI 진단으로<br />나의 회복 유형을 알아보세요.
+                                                60초 만에 끝나는 회복 진단으로<br />나의 회복 유형을 알아보세요.
                                             </p>
                                             <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 bg-primary text-background font-black rounded-xl px-6">
                                                 지금 진단 시작하기 <ArrowRight className="w-4 h-4 ml-2" />
@@ -365,7 +365,7 @@ export default function AiNavigatorPage() {
                                 )}
                             </div>
 
-                            {/* Step 2: 심층 분석 리포트 (Protocols Replaced) */}
+                            {/* Step 2: 심층 분석 리포트 */}
                             <div className="space-y-8 relative">
                                 <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">02</div>
                                 <div className="flex items-center gap-3">
@@ -400,6 +400,44 @@ export default function AiNavigatorPage() {
                                 </Card>
                             </div>
 
+                            {/* Step 3: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
+                            <div className="space-y-8 relative">
+                                <div className="absolute -left-20 -top-4 text-[140px] font-black text-primary/[0.05] leading-none select-none pointer-events-none italic">Event</div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <h2 className="text-2xl font-black tracking-tight">Perfect Recovery Design</h2>
+                                </div>
+
+                                <Card className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl relative group">
+                                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-all duration-700" />
+                                    <CardContent className="p-10 relative z-10 flex flex-col md:flex-row items-center gap-10">
+                                        <div className="flex-1 space-y-6 text-center md:text-left">
+                                            <Badge className="bg-primary text-background text-[10px] font-black uppercase tracking-widest px-3 py-1">Medical Event Only</Badge>
+                                            <h3 className="text-3xl md:text-4xl font-black text-mist leading-tight tracking-tighter">
+                                                시술은 끝났어도<br />
+                                                <span className="text-primary italic">회복은 이제 시작</span>입니다.
+                                            </h3>
+                                            <p className="text-mist/70 font-medium leading-relaxed max-w-md">
+                                                줄기세포·성형 시술을 앞두고 계신가요? <br />
+                                                유니클의 정밀 문진을 통해 당신만의 72시간 집중 회복 프로토콜을 설계하세요.
+                                            </p>
+                                            <Button asChild size="lg" className="h-16 px-10 rounded-[20px] bg-primary hover:bg-primary/90 text-background text-lg font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                                                <Link href="/event/consultation">
+                                                    시술 전 심층 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                        <div className="w-48 h-48 md:w-64 md:h-64 bg-mist/5 rounded-[40px] flex items-center justify-center text-6xl relative overflow-hidden border border-mist/10 backdrop-blur-sm">
+                                            🧭
+                                            <div className="absolute inset-0 border-2 border-primary/20 rounded-[40px] animate-pulse" />
+                                        </div>
+                                    </CardContent>
+                                    <div className="h-1 w-full bg-primary/30" />
+                                </Card>
+                            </div>
+
                             {/* Step 3: AI 추천 파트너 상품 */}
                             <div className="space-y-8 relative">
                                 <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
@@ -409,7 +447,7 @@ export default function AiNavigatorPage() {
                                             <Package className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-black tracking-tight">AI 추천 회복 도구</h2>
+                                            <h2 className="text-2xl font-black tracking-tight">추천 회복 도구</h2>
                                             <p className="text-xs text-slate font-medium mt-1">자사 상품 + 파트너 큐레이션</p>
                                         </div>
                                     </div>
@@ -583,7 +621,7 @@ function ForecastModal({ open, onOpenChange, forecast }: { open: boolean, onOpen
                 <div className="relative">
                     <DialogHeader className="sr-only">
                         <DialogTitle>내일의 회복 예보</DialogTitle>
-                        <DialogDescription>AI가 분석한 당신의 내일 컨디션입니다.</DialogDescription>
+                        <DialogDescription>분석한 당신의 내일 컨디션입니다.</DialogDescription>
                     </DialogHeader>
 
                     <div className="h-48 bg-gradient-to-br from-obsidian to-primary/20 flex flex-col items-center justify-center relative overflow-hidden p-8">

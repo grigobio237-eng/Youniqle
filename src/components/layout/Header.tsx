@@ -84,11 +84,12 @@ export default function Header() {
   };
 
   const menuItems = [
-    { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
+    { label: 'Youniqle?', href: '/about', desc: '브랜드 및 회복 경로 소개' },
     { label: '진단', href: '/ai-navigator', desc: '맞춤 회복 루틴 안내' },
-    { label: '소개', href: '/about', desc: '브랜드 및 회복 경로 소개' },
+    { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
     { label: '솔루션', href: '/products', desc: '회복 솔루션 및 프로그램' },
     { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
+    ...(session?.user?.isNavigator ? [{ label: '네비게이터', href: '/navigator', desc: '네비게이터 전용 공간' }] : []),
   ];
 
   const handleSignOut = async () => {
@@ -102,7 +103,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}

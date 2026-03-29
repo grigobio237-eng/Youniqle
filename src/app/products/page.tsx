@@ -119,12 +119,11 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
         </div>
       )}
 
-      {/* Tabs Menu */}
       <div className="flex flex-wrap items-center gap-2 mb-12 bg-surface/50 p-2 rounded-[24px] w-fit border border-line backdrop-blur-md">
         {[
-          { label: '루틴', value: 'routine', icon: '⏰' },
-          { label: '프로그램', value: 'program', icon: '🎓' },
-          { label: '도구', value: 'tool', icon: '🛠️' },
+          { label: '회복 갤러리', value: 'gallery', icon: '🎨', href: '/gallery/artworks' },
+          { label: '치유의 여정', value: 'program', icon: '🧭', href: '/healing-center' },
+          { label: '도구', value: 'tool', icon: '🛠️', href: '/utils' },
         ].map((tab) => (
           <Button
             key={tab.value}
@@ -132,7 +131,7 @@ export default function ProductsPage({ searchParams }: ProductsPageProps) {
             asChild
             className={`rounded-2xl px-8 h-12 font-black transition-all ${params.category === tab.value ? 'bg-primary text-background shadow-lg' : 'text-text-secondary hover:text-text-primary'}`}
           >
-            <Link href={`/products?category=${tab.value}`}>
+            <Link href={tab.href}>
               <span className="mr-2">{tab.icon}</span>
               {tab.label}
             </Link>

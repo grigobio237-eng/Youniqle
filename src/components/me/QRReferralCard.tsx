@@ -17,7 +17,7 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
   const [downloading, setDownloading] = useState(false);
 
   const referralLink = typeof window !== 'undefined' 
-    ? `${window.location.origin}/auth/signup?ref=${referralCode}` 
+    ? `${window.location.origin}/member/${referralCode}` 
     : '';
 
   const handleDownload = async () => {

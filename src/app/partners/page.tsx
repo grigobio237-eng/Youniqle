@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Users, BarChart, Zap, ShieldCheck, ChevronRight, MessageSquare } from 'lucide-react';
@@ -93,18 +94,16 @@ export default function PartnerPage() {
                 ))}
               </div>
             </div>
-            <div className="flex-1 w-full aspect-square bg-mist rounded-[60px] border border-line p-12 flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/5 to-transparent" />
-               <div className="relative z-10 w-full h-full bg-white rounded-[40px] shadow-2xl border border-line p-8 space-y-6">
-                  <div className="h-8 w-1/3 bg-mist rounded-full animate-pulse" />
-                  <div className="h-32 w-full bg-mist/50 rounded-3xl" />
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="h-20 bg-mist/30 rounded-2xl" />
-                    <div className="h-20 bg-mist/30 rounded-2xl" />
-                    <div className="h-20 bg-mist/30 rounded-2xl" />
-                  </div>
-                  <div className="h-24 w-full bg-chapter-accent/5 rounded-3xl border border-chapter-accent/10" />
-               </div>
+            <div className="flex-1 w-full relative rounded-[60px] border border-line overflow-hidden shadow-2xl">
+               <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/5 to-transparent z-10 pointer-events-none rounded-[60px]" />
+               <Image
+                 src="/images/partner-dashboard-preview.png"
+                 alt="파트너 전용 데이터 대시보드 미리보기"
+                 width={800}
+                 height={600}
+                 className="w-full h-auto object-cover rounded-[60px]"
+                 priority
+               />
             </div>
           </div>
         </div>

@@ -23,6 +23,16 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
       setProgress(userProgress);
       setChecklistProgress(checkProgress);
 
+      // Check for Navigator QR entry or active recovery mode
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('from') === 'navigator_qr') {
+        localStorage.setItem('recovery_mode', 'active');
+        localStorage.setItem('recovery_procedure_date', new Date().toISOString());
+      }
+
+      const isRecovery = localStorage.getItem('recovery_mode') === 'active';
+      setIsRecoveryActive(isRecovery);
+
       // Mark diagnosis as complete
       if (!userProgress.todayChecklist.diagnosis) {
         const { updateChecklist } = require('@/lib/progress');
@@ -32,6 +42,8 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
       }
     }
   }, []);
+
+  const [isRecoveryActive, setIsRecoveryActive] = React.useState(false);
 
   const handleChecklistItem = (item: string, points: number) => {
     if (typeof window !== 'undefined') {
@@ -53,6 +65,27 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
 
   return (
     <div className="min-h-screen pb-20 bg-mist">
+      {/* Recovery Guard Banner - Only visible when recovery mode is active */}
+      {isRecoveryActive && (
+        <section className="bg-obsidian py-4 border-b border-white/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 animate-pulse" />
+          <div className="container mx-auto max-w-5xl px-4 relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-background animate-bounce-slow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Real-time Recovery Guard Active</p>
+                <p className="text-mist font-bold text-sm">시술 후 집중 회복 모니터링 중입니다. (1일차)</p>
+              </div>
+            </div>
+            <Button asChild size="sm" className="bg-primary text-background font-black rounded-xl hover:scale-105 transition-transform">
+              <Link href="/event/monitoring">상태 체크하기</Link>
+            </Button>
+          </div>
+        </section>
+      )}
+
       {/* Top Status Card */}
       <section className="bg-white border-b border-line py-12 px-4 shadow-sm">
         <div className="container mx-auto max-w-5xl">
@@ -402,7 +435,7 @@ function SiteGuide() {
     },
     {
       title: "힐링센터",
-      desc: "내면의 평화를 위한 몰입형 가상 공간에서 치유의 시간을 경험하세요.",
+      desc: "프라이빗 라운지에서 특별한 힐링 코칭 서비스와 케어를 만나보세요.",
       icon: "🏛️",
       color: "bg-reward-gold/10 text-reward-gold"
     },

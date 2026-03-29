@@ -303,20 +303,6 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
     return notificationDate.toLocaleDateString('ko-KR');
   };
 
-  // 전용 메뉴 권한이 있는 파트너 타입 확인
-  const specialPartnerTypes = ['medical', 'commerce', 'trainer', 'artist'];
-  const hasSpecialAccess = partner?.partnerType && specialPartnerTypes.includes(partner.partnerType);
-
-  const getSpecialMenuInfo = () => {
-    const type = partner?.partnerType;
-    if (type === 'medical') return { name: '병원 설정관리', badge: 'MEDICAL', description: '병원 정보 및 상담 환경 설정' };
-    if (type === 'trainer') return { name: '코치 설정관리', badge: 'TRAINER', description: '코치 프로필 및 캐릭터 설정' };
-    if (type === 'commerce') return { name: '스토어 관리', badge: 'STORE', description: '브랜드 상점 및 스페이스 설정' };
-    if (type === 'artist') return { name: '전시 관리', badge: 'ARTIST', description: '아티스트 작품 전시 관리' };
-    return { name: '설정 관리', badge: 'PARTNER', description: '파트너 정보 및 노출 관리' };
-  };
-
-  const specialMenuInfo = getSpecialMenuInfo();
 
   // 유형별 네비게이션 필터링 및 레이블 변경
   const getFilteredNavigation = () => {
@@ -471,29 +457,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
               );
             })}
 
-            {/* 전용 메뉴 (권한이 있는 경우만) */}
-            {hasSpecialAccess && (
-              <Link
-                href="/partner/pavilion"
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/partner/pavilion'
-                  ? 'bg-chapter-accent text-white'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
-                  }`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Palette className="h-5 w-5" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    {specialMenuInfo.name}
-                    <Badge variant="outline" className="text-[9px] h-4 px-1 bg-indigo-50 text-indigo-600 border-indigo-200">{specialMenuInfo.badge}</Badge>
-                  </div>
-                  <div className={`text-xs ${pathname === '/partner/pavilion' ? 'text-white/80' : 'text-text-secondary'
-                    }`}>
-                    {specialMenuInfo.description}
-                  </div>
-                </div>
-              </Link>
-            )}
+
           </nav>
 
           {/* Language Selection */}

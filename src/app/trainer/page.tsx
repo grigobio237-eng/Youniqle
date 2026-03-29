@@ -251,7 +251,7 @@ export default function TrainerPage() {
                         <ShieldCheck className="w-4 h-4 text-emerald-500" /> 코치 철학
                       </h3>
                       <p className="text-slate/80 leading-relaxed font-medium italic text-sm">
-                        "{selectedTrainer.description || selectedTrainer.pavilionInfo?.roomDescription || 'The philosophy of this curator is being synthesized.'}"
+                        "{selectedTrainer.description || 'The philosophy of this curator is being synthesized.'}"
                       </p>
                     </div>
 

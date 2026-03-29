@@ -5,6 +5,8 @@ import Order from '@/models/Order';
 import jwt from 'jsonwebtoken';
 import { verifyAdminToken } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic'; // 추가: 데이터 갱신 누락 방지를 위한 캐시 비활성화
+
 async function getUsersHandler(request: NextRequest) {
   try {
     await connectDB();
@@ -86,6 +88,7 @@ async function getUsersHandler(request: NextRequest) {
           grade: user.grade || 'cedar',
           tier: user.tier || 'RESET',
           points: user.points,
+          isNavigator: user.isNavigator,
           provider: user.provider,
           emailVerified: user.emailVerified,
           marketingConsent: user.marketingConsent,

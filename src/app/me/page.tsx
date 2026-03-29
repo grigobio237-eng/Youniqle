@@ -835,6 +835,27 @@ export default function MyPage() {
                 </Card>
               )}
 
+              {/* 네비게이터 전용 기능 */}
+              {userData?.isNavigator && (
+                <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-primary/20 transition-all hover:shadow-md">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex justify-between items-start">
+                      <div className="p-4 rounded-2xl bg-primary/10 text-primary">
+                        <ShieldCheck className="h-6 w-6" />
+                      </div>
+                      <Badge className="bg-primary text-mist font-black text-[9px] uppercase tracking-widest px-3 border-none shadow-sm">NAVIGATOR</Badge>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-primary tracking-tight">내 고객 문진표 관리</h3>
+                      <p className="text-xs font-medium text-slate mt-1 leading-relaxed">추천 코드를 통해 가입한 고객들의 사전 문진(Recovery Design) 리포트를 확인하고 PDF로 다운로드합니다.</p>
+                    </div>
+                    <Button asChild className="w-full h-12 rounded-xl font-black text-xs shadow-lg bg-primary hover:bg-primary/90 text-mist">
+                      <Link href="/me/consultations">문진표 목록 열람</Link>
+                    </Button>
+                  </div>
+                </Card>
+              )}
+
               {/* 바로가기 그리드 */}
               <div className="grid grid-cols-2 gap-4">
                 {[

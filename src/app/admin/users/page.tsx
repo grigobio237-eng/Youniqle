@@ -46,6 +46,7 @@ interface User {
   role: 'member' | 'partner' | 'admin' | 'user';
   grade?: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
   tier?: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
+  isNavigator?: boolean; // 영업사원(네비게이터) 지정 여부
   points: number;
   provider: 'local' | 'google' | 'kakao' | 'naver';
   emailVerified: boolean;
@@ -429,6 +430,12 @@ export default function AdminUsersPage() {
                             인증완료
                           </Badge>
                         )}
+                        {user.isNavigator && (
+                          <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-none flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" />
+                            <span>네비게이터</span>
+                          </Badge>
+                        )}
                       </div>
 
                       <div className="flex items-center space-x-4 mt-2 text-sm text-text-secondary">
@@ -484,6 +491,9 @@ export default function AdminUsersPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleUserAction(user.id, 'promoteTier')}>
                           접근 등급 상승 (REBORN/RESTART)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleUserAction(user.id, 'toggleNavigator')}>
+                          {user.isNavigator ? '네비게이터 권한 해제' : '네비게이터 승인 (영업사원)'}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleUserAction(user.id, 'delete')}

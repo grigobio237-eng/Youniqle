@@ -77,6 +77,7 @@ export const authOptions: AuthOptions = {
             provider: user.provider,
             role: user.role,
             grade: user.grade,
+            referredBy: user.referredBy,
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -135,34 +136,47 @@ export const authOptions: AuthOptions = {
 
           console.log('[SignIn] DB Operation Result:', result ? 'Success' : 'Failed');
 
-          // 추천인 연결 (신규 가입자에게만 적용)
+          // 앱/웹 QR 접속 (쿠키 참조) 시, 신규/기존 회원 관계없이 연결 진행
           try {
-            // createdAt과 updatedAt이 같으면 방금 생성된 신규 사용자
-            const isNewUser = result.createdAt.getTime() === result.updatedAt.getTime();
+            console.log('[SignIn] Checking referral cookie for user connection...');
+            const cookieStore = await cookies();
+            const referralCode = cookieStore.get('referral_code')?.value;
 
-            if (isNewUser) {
-              console.log('[SignIn] New user detected, checking referral cookie...');
-              const cookieStore = await cookies();
-              const referralCode = cookieStore.get('referral_code')?.value;
+            if (referralCode) {
+              console.log(`[SignIn] Referral code found: ${referralCode}`);
 
-              if (referralCode) {
-                console.log(`[SignIn] Referral code found: ${referralCode}`);
+              // 추천인(앱 회원 또는 병원 네비게이터) 존재 확인
+              const referrer = await User.findOne({ referralCode: referralCode });
+              if (referrer) {
+                console.log(`[SignIn] Referrer found: ${referrer.email}`);
+                
+                const isNewUser = result.createdAt.getTime() === result.updatedAt.getTime();
+                let isUpdated = false;
 
-                // 추천인 존재 확인
-                const referrer = await User.findOne({ referralCode: referralCode });
-                if (referrer) {
-                  console.log(`[SignIn] Referrer found: ${referrer.email}`);
+                // 1. 신규 유저인 경우에만 기본 조직도(referredBy) 업데이트
+                if (isNewUser) {
                   result.referredBy = referralCode;
-                  await result.save();
-                  console.log('[SignIn] Referral connection saved successfully');
+                  isUpdated = true;
+                }
+
+                // 2. 추천인이 네비게이터(영업사원)인 경우 방문 목적(recentNavigator) 이력 업데이트
+                if (referrer.isNavigator) {
+                  result.recentNavigator = referralCode;
+                  isUpdated = true;
+                }
+
+                if (isUpdated) {
+                  // 기존 데이터의 스키마 에러(passwordHash 등)로 인해 저장이 무시되는 것을 막기 위해 강제 저장
+                  await result.save({ validateBeforeSave: false });
+                  console.log('[SignIn] Referral/Navigator connection saved successfully');
                 } else {
-                  console.log('[SignIn] Referral code invalid - referrer not found');
+                  console.log('[SignIn] Existing user scanned non-navigator QR, skipping connection');
                 }
               } else {
-                console.log('[SignIn] No referral code in cookies');
+                console.log('[SignIn] Referral code invalid - referrer not found');
               }
             } else {
-              console.log('[SignIn] Existing user, skipping referral connection');
+              console.log('[SignIn] No referral code in cookies');
             }
           } catch (referralError) {
             console.error('[SignIn] Referral Error:', referralError);
@@ -202,10 +216,13 @@ export const authOptions: AuthOptions = {
         token.grade = (user as any).grade;
         token.tier = (user as any).tier;
         token.subscription = (user as any).subscription;
+        token.referredBy = (user as any).referredBy;
+        token.isNavigator = (user as any).isNavigator;
+        token.recentNavigator = (user as any).recentNavigator;
       }
 
       // 소셜 로그인의 경우 role이 없을 수 있으므로 DB에서 한 번 더 확인 (성능을 위해 필요할 때만)
-      if (token.email && (!token.role || !token.subscription)) {
+      if (token.email && (!token.role || !token.subscription || token.recentNavigator === undefined)) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });
@@ -214,6 +231,9 @@ export const authOptions: AuthOptions = {
             token.grade = dbUser.grade;
             token.tier = dbUser.tier;
             token.subscription = dbUser.subscription;
+            token.referredBy = dbUser.referredBy;
+            token.isNavigator = dbUser.isNavigator;
+            token.recentNavigator = dbUser.recentNavigator;
             // Force overwrite token.id with DB _id to avoid using Provider (Google) ID
             token.id = dbUser._id.toString();
           }
@@ -237,6 +257,9 @@ export const authOptions: AuthOptions = {
         (session.user as any).grade = token.grade as string;
         (session.user as any).tier = token.tier as string;
         (session.user as any).subscription = token.subscription;
+        (session.user as any).referredBy = token.referredBy as string;
+        (session.user as any).isNavigator = token.isNavigator as boolean;
+        (session.user as any).recentNavigator = token.recentNavigator as string;
       }
       return session;
     },

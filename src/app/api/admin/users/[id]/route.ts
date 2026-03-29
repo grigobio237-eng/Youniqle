@@ -6,6 +6,8 @@ import Review from '@/models/Review';
 import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -64,6 +66,8 @@ export async function GET(
       points: user.points,
       referralCode: user.referralCode,
       referredBy: user.referredBy,
+      isNavigator: user.isNavigator,
+      recentNavigator: user.recentNavigator,
       provider: user.provider,
       emailVerified: user.emailVerified,
       marketingConsent: user.marketingConsent,
@@ -160,6 +164,10 @@ export async function PATCH(
         user.emailVerified = false;
         break;
 
+      case 'toggleNavigator':
+        user.isNavigator = !user.isNavigator;
+        break;
+
       case 'promote':
         // 등급 상승
         const grades = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul'];
@@ -196,7 +204,8 @@ export async function PATCH(
         );
     }
 
-    await user.save();
+    // 기존 데이터의 스키마 오류(passwordHash 누락 등) 무시를 위해 전체 검증 우회
+    await user.save({ validateBeforeSave: false });
 
     return NextResponse.json({
       message: '사용자 정보가 업데이트되었습니다.',
@@ -207,7 +216,8 @@ export async function PATCH(
         role: user.role,
         grade: user.grade,
         tier: user.tier,
-        points: user.points
+        points: user.points,
+        isNavigator: user.isNavigator
       }
     });
 

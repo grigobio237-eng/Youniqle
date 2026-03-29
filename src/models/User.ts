@@ -11,7 +11,9 @@ export interface IUser extends Document {
   tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급 (파빌리온 5층 등)
   points: number;
   referralCode?: string; // 추천인 아이디
-  referredBy?: string; // 추천받은 사용자의 추천인 코드
+  referredBy?: string; // 추천받은 사용자의 추천인 코드 (원 초대자)
+  isNavigator: boolean; // 네비게이터(영업사원) 승인 여부
+  recentNavigator?: string; // 가장 최근에 방문/스캔한 네비게이터 코드 (진료 시나리오용 분리)
   provider?: 'local' | 'google' | 'kakao' | 'naver';
   providerId?: string;
   marketingConsent: boolean;
@@ -223,7 +225,14 @@ const UserSchema = new Schema<IUser>({
     sparse: true, // null 값은 인덱스에서 제외
   },
   referredBy: {
-    type: String,
+    type: String, // 회원가입 시점에만 등록되는 영구적인 원 초대자
+  },
+  isNavigator: {
+    type: Boolean,
+    default: false, // 기본적으로는 네비게이터(영업사원) 아님
+  },
+  recentNavigator: {
+    type: String, // 가장 최근 스캔한 네비게이터 코드
   },
   provider: {
     type: String,

@@ -1548,4 +1548,58 @@ JSON 형식:
             return { response: "죄송해요, 잠시 연결이 원활하지 않네요. 🙏 잠시 후 다시 질문해 주시겠어요?" };
         }
     }
+    
+    // Recovery OS: Generate specialized chat response for post-procedure care
+    static async generateRecoveryChatResponse(message: string, context: { 
+        userName: string; 
+        day: number;
+        symptoms: Record<string, string>;
+    }): Promise<string> {
+        const prompt = `
+당신은 '유니클(Youniqle)' 회복 센터의 대표원장이자 회복 전문의 **김미정**입니다.
+시술 후 ${context.day}일차를 맞이한 환자 ${context.userName}님과 1:1 상담을 진행 중입니다.
+
+## 현재 환자 상태
+- 시술 후 경과: ${context.day}일차
+- 기록된 증상: 통증(${context.symptoms.pain}), 붓기(${context.symptoms.swelling}), 열감(${context.symptoms.fever})
+
+## 상담 가이드라인
+1. **전문가 페르소나**: 20년 경력의 전문의로서 신뢰를 주되, 환자의 불안을 달래는 따뜻한 말투(~요, ~죠 세)를 사용하세요.
+2. **증상 기반 조언**: 환자가 기록한 증상(특히 수면방해, 심함 등)이 있다면 그에 대한 의학적 메커니즘을 쉽게 설명하고 안심시키세요.
+3. **한글 100%**: 모든 답변은 한국어로 작성하며, 필요시 다정한 이모지를 1-2개 사용하세요.
+4. **간결성**: 3-4문장 내외로 핵심만 짚어주세요.
+
+## 환자 메시지
+"${message}"
+`;
+        return await this.generateWithFallback(prompt, "회복 전문의 김미정 모드", 0.7);
+    }
+
+    // Recovery OS: Generate automated recovery guide based on real-time data
+    static async generateRecoveryAdvice(input: {
+        userName: string;
+        day: number;
+        symptoms: Record<string, string>;
+        completedProtocols: number;
+        totalProtocols: number;
+    }): Promise<string> {
+        const prompt = `
+당신은 제미나이 AI 회복 어드바이저입니다. 환자의 실시간 데이터를 정밀 분석하여 오늘의 회복 리포트를 작성하세요.
+
+## 데이터 분석 대상
+- 사용자: ${input.userName}
+- 경과일: 시술 후 ${input.day}일차
+- 증상 데이터: 통증(${input.symptoms.pain}), 붓기(${input.symptoms.swelling}), 열감(${input.symptoms.fever})
+- 프로토콜 이행률: ${input.completedProtocols} / ${input.totalProtocols}
+
+## 출력 요구사항
+1. **일반 텍스트 형식**: \`#\` 이나 \`*\` 와 같은 마크다운 기호를 절대 사용하지 마세요. (예: \`##\` 대신 \`[상태 분석]\` 처럼 작성)
+2. **구조화된 리포트**: [상태 분석], [권고 사항], [실천 플랜]의 3단 구조로 작성하세요.
+3. **가독성**: 각 섹션 사이는 빈 줄로 구분하고, 불필요한 강조 기호를 제외한 깔끔한 텍스트로만 구성하세요.
+4. **실전 조언**: 구체적인 행동 가이드를 포함하세요.
+
+응답은 다른 인사말 없이 바로 리포트 본문으로 시작하세요.
+`;
+        return await this.generateWithFallback(prompt, "AI 회복 어드바이저 모드", 0.6);
+    }
 }

@@ -81,6 +81,7 @@ function SearchParamsHandler({
 // 4. Main Component
 // ---------------------------
 export default function HomePage() {
+  const router = useRouter();
   const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT' | 'DASHBOARD'>('CHECK');
   const [score, setScore] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);
@@ -89,8 +90,10 @@ export default function HomePage() {
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
 
   useEffect(() => {
-    // 2. Initial state & questions fetch
-    const lastCheck = localStorage.getItem('recovery_last_check');
+    // welcome=true 인 경우(신규 가입) → 랜딩 그대로 보여줌
+    const params = new URLSearchParams(window.location.search);
+    const isWelcome = params.get('welcome') === 'true';
+
     const storedScore = localStorage.getItem('recovery_last_score');
 
     const fetchQuestions = async () => {
@@ -107,15 +110,15 @@ export default function HomePage() {
 
     fetchQuestions();
 
-    if (storedScore) {
+    if (storedScore && !isWelcome) {
       setScore(parseInt(storedScore));
-      setViewState('DASHBOARD');
-      window.dispatchEvent(new Event('recovery-gate-passed'));
+      setViewState('INTRO'); // 기존 DASHBOARD 및 강제 리다이렉트 제거: 재접속 시 무조건 랜딩/히어로 섹션 노출
     } else {
       setScore(75); // Default score for preview
       setViewState('INTRO');
     }
   }, []); // Only run once on mount
+
 
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
@@ -149,7 +152,8 @@ export default function HomePage() {
     // recalculate stored score to pass (since dashboard expects 0-100)
     const s = 100 - (score * 4);
     setScore(s);
-    setViewState('DASHBOARD');
+    // 대시보드 상태를 활성화하지 않고(화면 깜빡임 방지), 백그라운드에서 바로 진단 페이지로 라우팅
+    router.push('/ai-navigator');
   };
 
   // Render appropriate view
@@ -157,8 +161,9 @@ export default function HomePage() {
     if (viewState === 'CHECK') return <div className="min-h-screen bg-mist" />; // Loading
     if (viewState === 'QUESTION') return <DiagnosisForm questions={questions} onComplete={handleComplete} />;
     if (viewState === 'RESULT') return <ResultDisplay score={score} answers={answers} userNote={userNote} onEnter={handleEnterDashboard} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
+    if (viewState === 'DASHBOARD') return <DashboardPreview score={score} onOpenWebtoon={handleOpenWebtoon} />;
     
-    // Default: Always show Hero + LandingContent
+    // Default: Always show Hero + LandingContent (INTRO)
     return (
       <>
         <Hero onStart={handleStart} />

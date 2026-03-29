@@ -25,7 +25,8 @@ import {
   Calendar,
   ArrowUpRight,
   Warehouse,
-  Sparkles
+  Sparkles,
+  QrCode
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -92,11 +93,22 @@ function PartnerDashboardContent() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    // 기존 파트너 토큰 삭제
+    // 기존 파트너 토큰 삭제 (필요한 경우에만 수행하도록 검토 필요, 일단 유지)
     document.cookie = 'partner-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    console.log('파트너 대시보드 페이지 접근, 기존 토큰 삭제 완료');
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+      if (!partnerInfo) setPartnerError('인증 확인 시간이 초과되었습니다. 페이지를 새로고침해 주세요.');
+    }, 10000); // 10초 타임아웃
+
     fetchDashboardStats();
     fetchPartnerInfo();
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, []);
 
   const fetchPartnerInfo = async () => {
@@ -338,61 +350,64 @@ function PartnerDashboardContent() {
         </div>
       </div>
 
-      {/* Premium Welcome Card */}
-      {partnerInfo && partnerInfo.name && (
-        <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-          <CardContent className="p-0">
-            <div className="relative">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute inset-0 dashboard-pattern" />
-                <style jsx>{`
-                  .dashboard-pattern {
-                    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-                  }
-                `}</style>
+      {/* Quick Actions - Enhanced (최상단으로 이동) */}
+      <Card className="border-0 shadow-lg overflow-hidden bg-white rounded-[32px]">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 p-8">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+            <Sparkles className="h-5 w-5 text-primary" />
+            빠른 작업
+          </CardTitle>
+          <CardDescription>
+            자주 사용하는 파트너 기능들입니다. 상점 운영을 위해 필요한 도구를 선택하세요.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <Link href="/partner/products?action=new" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-blue-50 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+                <Package className="h-6 w-6" />
               </div>
-
-              <div className="relative p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
-                {/* Avatar */}
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl ring-4 ring-white/20">
-                  <Store className="h-10 w-10 text-white" />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 text-white">
-                  <h2 className="text-2xl font-bold mb-1">
-                    안녕하세요, {partnerInfo.name}님! 👋
-                  </h2>
-                  <div className="flex flex-wrap items-center gap-3 text-white/70 text-sm mb-3">
-                    <span className="flex items-center gap-1">
-                      <Store className="h-4 w-4" />
-                      {partnerInfo.businessName || '파트너샵'}
-                    </span>
-                    <span className="w-1 h-1 rounded-full bg-white/40"></span>
-                    <span>수수료율 {partnerInfo.commissionRate}%</span>
-                  </div>
-                  <p className="text-white/60 text-sm">
-                    파트너 대시보드에 오신 것을 환영합니다. 오늘도 좋은 하루 되세요!
-                  </p>
-                </div>
-
-                {/* Quick Stats Mini Cards */}
-                <div className="flex gap-4">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 min-w-[100px] text-center">
-                    <p className="text-white/60 text-xs mb-1">이번달 매출</p>
-                    <p className="text-white font-bold text-lg">₩{((stats?.monthlyRevenue || 0) / 10000).toFixed(0)}만</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 min-w-[100px] text-center">
-                    <p className="text-white/60 text-xs mb-1">대기중 주문</p>
-                    <p className="text-white font-bold text-lg">{stats?.pendingOrders || 0}건</p>
-                  </div>
-                </div>
+              <span className="text-sm font-medium">상품 등록</span>
+            </Link>
+            <Link href="/partner/orders" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-green-50 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-green-100 text-green-600 mb-3 group-hover:scale-110 transition-transform">
+                <ShoppingCart className="h-6 w-6" />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              <span className="text-sm font-medium">주문 관리</span>
+            </Link>
+            <Link href="/partner/inventory" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-orange-50 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-orange-100 text-orange-600 mb-3 group-hover:scale-110 transition-transform">
+                <Warehouse className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium">재고 관리</span>
+            </Link>
+            <Link href="/partner/analytics" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-purple-50 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 mb-3 group-hover:scale-110 transition-transform">
+                <BarChart3 className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium">매출 분석</span>
+            </Link>
+            <Link href="/partner/content" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-pink-50 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-pink-100 text-pink-600 mb-3 group-hover:scale-110 transition-transform">
+                <FileText className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium">콘텐츠 작성</span>
+            </Link>
+            <Link href="/partner/scan" className="group flex flex-col items-center p-4 rounded-2xl bg-amber-50 hover:bg-amber-100 hover:shadow-md transition-all text-center border border-amber-100">
+              <div className="p-3 rounded-2xl bg-amber-100 text-amber-600 mb-3 group-hover:scale-110 transition-transform">
+                <QrCode className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium text-amber-900 font-bold">고객 QR 스캔</span>
+            </Link>
+            <Link href="/partner/settings" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-slate-100 hover:shadow-md transition-all text-center">
+              <div className="p-3 rounded-2xl bg-slate-200 text-slate-600 mb-3 group-hover:scale-110 transition-transform">
+                <Store className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium">설정</span>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Dynamic Stats Cards Based on Partner Type */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -787,58 +802,6 @@ function PartnerDashboardContent() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions - Enhanced */}
-      <Card className="border-0 shadow-md overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100">
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            빠른 작업
-          </CardTitle>
-          <CardDescription>
-            자주 사용하는 파트너 기능들
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <Link href="/partner/products?action=new" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-blue-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 mb-3 group-hover:scale-110 transition-transform">
-                <Package className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">상품 등록</span>
-            </Link>
-            <Link href="/partner/orders" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-green-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-green-100 text-green-600 mb-3 group-hover:scale-110 transition-transform">
-                <ShoppingCart className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">주문 관리</span>
-            </Link>
-            <Link href="/partner/inventory" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-orange-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-orange-100 text-orange-600 mb-3 group-hover:scale-110 transition-transform">
-                <Warehouse className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">재고 관리</span>
-            </Link>
-            <Link href="/partner/analytics" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-purple-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 mb-3 group-hover:scale-110 transition-transform">
-                <BarChart3 className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">매출 분석</span>
-            </Link>
-            <Link href="/partner/content" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-pink-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-pink-100 text-pink-600 mb-3 group-hover:scale-110 transition-transform">
-                <FileText className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">콘텐츠 작성</span>
-            </Link>
-            <Link href="/partner/settings" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-slate-100 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-slate-200 text-slate-600 mb-3 group-hover:scale-110 transition-transform">
-                <Store className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium">설정</span>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -66,6 +66,12 @@ const navigationItems = [
     description: '사용자 정보 및 활동 모니터링'
   },
   {
+    name: '사전 문진 관리',
+    href: '/admin/consultations',
+    icon: Target,
+    description: '고객 사전 문진(Recovery Design) 리포트'
+  },
+  {
     name: '파트너 관리',
     href: '/admin/partners',
     icon: Store,

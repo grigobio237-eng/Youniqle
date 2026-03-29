@@ -368,7 +368,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         {/* 브레드크럼 또는 뒤로가기 버튼 */}
         {product.category === 'stem-cell' ? (
           <Link
-            href="/pavilion?floor=5&tab=stem-cell-products"
+            href="/products?category=stem-cell"
             className="flex items-center text-sm font-bold text-text-secondary hover:text-primary mb-6 transition-all group"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />

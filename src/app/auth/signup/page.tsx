@@ -36,10 +36,10 @@ function SignupContent() {
 
   const handleSocialLogin = async (provider: string) => {
     if (provider === 'google') {
-      const handled = await handleWebViewOAuth(provider, '/');
+      const handled = await handleWebViewOAuth(provider, '/?welcome=true');
       if (handled) return;
     }
-    signIn(provider, { callbackUrl: '/' });
+    signIn(provider, { callbackUrl: '/?welcome=true' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
