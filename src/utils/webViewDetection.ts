@@ -80,9 +80,9 @@ export const handleWebViewOAuth = async (
     const encodedCallbackUrl = encodeURIComponent(`${baseUrl}${callbackUrl}`);
     const authUrl = `${baseUrl}/api/auth/signin/${provider}?callbackUrl=${encodedCallbackUrl}`;
 
-    // 모바일에서 외부 브라우저로 열기
-    window.open(authUrl, '_blank', 'noopener,noreferrer');
-    return true; // 외부 브라우저로 열기 성공
+    // 모바일에서 외부 브라우저로 열기 (안정성을 위해 현재 창 리다이렉트 사용)
+    window.location.href = authUrl;
+    return true; // 리다이렉트 시도 성공
   } catch (error) {
     console.error('Failed to open in external browser:', error);
     return false;

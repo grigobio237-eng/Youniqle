@@ -222,7 +222,7 @@ export default function TimeBasedMessage({
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className={`fixed bottom-20 right-6 z-40 w-80 ${content.bgColor} border rounded-[24px] p-5 shadow-2xl ${className}`}
+                className={`fixed bottom-4 left-4 right-4 md:bottom-20 md:right-6 md:left-auto z-[60] w-auto md:w-80 ${content.bgColor} border rounded-[24px] p-5 shadow-2xl ${className}`}
             >
                 <button
                     onClick={handleDismiss}
@@ -232,22 +232,22 @@ export default function TimeBasedMessage({
                     <X className="w-4 h-4" />
                 </button>
 
-                <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-xl ${content.color} bg-white/80 flex items-center justify-center`}>
+                <div className="flex items-center gap-3 mb-3 pr-6">
+                    <div className={`w-10 h-10 rounded-xl ${content.color} bg-white/80 flex items-center justify-center flex-shrink-0`}>
                         {content.icon}
                     </div>
-                    <div>
-                        <p className={`text-sm font-bold ${content.color}`}>{content.greeting}</p>
-                        <p className="text-xs text-slate">{content.message}</p>
+                    <div className="min-w-0">
+                        <p className={`text-sm font-bold ${content.color} truncate`}>{content.greeting}</p>
+                        <p className="text-[10px] md:text-xs text-slate truncate">{content.message}</p>
                     </div>
                 </div>
 
-                <p className="text-xs text-obsidian font-medium bg-white/60 rounded-lg px-3 py-2 mb-3">
+                <p className="text-[10px] md:text-xs text-obsidian font-medium bg-white/60 rounded-lg px-3 py-2 mb-3">
                     {content.tip}
                 </p>
 
                 {showLossAversion && content.lossAversionMessage && (
-                    <p className="text-[10px] text-status-amber font-medium flex items-start gap-1.5 mb-3">
+                    <p className="text-[9px] md:text-[10px] text-status-amber font-medium flex items-start gap-1.5 mb-3">
                         <AlertTriangle className="w-3 h-3 flex-shrink-0 mt-0.5" />
                         {content.lossAversionMessage}
                     </p>

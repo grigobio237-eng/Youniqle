@@ -221,8 +221,8 @@ export const authOptions: AuthOptions = {
         token.recentNavigator = (user as any).recentNavigator;
       }
 
-      // 소셜 로그인의 경우 role이 없을 수 있으므로 DB에서 한 번 더 확인 (성능을 위해 필요할 때만)
-      if (token.email && (!token.role || !token.subscription || token.recentNavigator === undefined)) {
+      // 사용자 정보 로드 및 추천 코드 동기화
+      if (token.email && (!token.role || !token.subscription || token.referralCode === undefined)) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });
@@ -234,6 +234,19 @@ export const authOptions: AuthOptions = {
             token.referredBy = dbUser.referredBy;
             token.isNavigator = dbUser.isNavigator;
             token.recentNavigator = dbUser.recentNavigator;
+            
+            // 추천 코드가 없는 경우 자동 생성 (ID 기반)
+            if (!dbUser.referralCode) {
+              const base = dbUser._id.toString().slice(-6).toUpperCase();
+              const newCode = `RF${base}`;
+              dbUser.referralCode = newCode;
+              await dbUser.save({ validateBeforeSave: false });
+              token.referralCode = newCode;
+              console.log(`[JWT] Generated new referralCode for ${dbUser.email}: ${newCode}`);
+            } else {
+              token.referralCode = dbUser.referralCode;
+            }
+
             // Force overwrite token.id with DB _id to avoid using Provider (Google) ID
             token.id = dbUser._id.toString();
           }
@@ -258,6 +271,7 @@ export const authOptions: AuthOptions = {
         (session.user as any).tier = token.tier as string;
         (session.user as any).subscription = token.subscription;
         (session.user as any).referredBy = token.referredBy as string;
+        (session.user as any).referralCode = token.referralCode as string;
         (session.user as any).isNavigator = token.isNavigator as boolean;
         (session.user as any).recentNavigator = token.recentNavigator as string;
       }

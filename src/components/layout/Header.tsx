@@ -104,7 +104,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-3 md:px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
@@ -120,7 +120,7 @@ export default function Header() {
               }
             }}
           >
-            <div className="relative h-10 w-10 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-8 w-8 md:h-10 md:w-10 transition-transform duration-300 group-hover:scale-105">
               <CharacterImage
                 src="/character/youniqle-1.png"
                 alt="Logo"
@@ -129,7 +129,7 @@ export default function Header() {
                 priority
               />
             </div>
-            <span className="text-xl font-serif-display text-text-primary tracking-tight">Youniqle</span>
+            <span className="text-lg md:text-xl font-serif-display text-text-primary tracking-tight">Youniqle</span>
           </Link>
 
           {/* Nav */}
@@ -159,7 +159,7 @@ export default function Header() {
           </nav>
 
           {/* Right Side */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 md:space-x-2">
             <Link href="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />

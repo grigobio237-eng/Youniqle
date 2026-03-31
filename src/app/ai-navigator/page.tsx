@@ -238,12 +238,12 @@ export default function AiNavigatorPage() {
                                     </div>
                                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter">리커버리<br />네비게이터</h1>
 
-                                    <div className="bg-surface/50 border border-line p-6 rounded-[32px] inline-flex items-center gap-6">
-                                        <div>
-                                            <div className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1">Recovery Score</div>
-                                            <div className="text-5xl font-black text-primary">{todayScore}</div>
+                                    <div className="bg-surface/50 border border-line p-5 md:p-6 rounded-[24px] md:rounded-[32px] flex items-center gap-4 md:gap-6 w-full md:w-auto">
+                                        <div className="flex-shrink-0">
+                                            <div className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-widest mb-1">Recovery Score</div>
+                                            <div className="text-4xl md:text-5xl font-black text-primary">{todayScore}</div>
                                         </div>
-                                        <div className="text-xs font-medium text-text-secondary leading-tight opacity-60">
+                                        <div className="text-[10px] md:text-xs font-medium text-text-secondary leading-tight opacity-60">
                                             지난 7일 대비<br />
                                             <span className={`font-bold ${todayScore > 50 ? 'text-status-good' : 'text-status-danger'}`}>
                                                 {todayScore > 50 ? '+' : '-'}{Math.abs(todayScore - 50)}% 변화
@@ -299,7 +299,7 @@ export default function AiNavigatorPage() {
 
                             {/* Step 1: 카테고리별 상태 분석 */}
                             <div className="space-y-8 relative">
-                                <div className="absolute -left-20 -top-14 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">01</div>
+                                <div className="absolute -left-4 md:-left-20 -top-8 md:-top-14 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">01</div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Zap className="w-5 h-5 fill-current" />
@@ -318,7 +318,7 @@ export default function AiNavigatorPage() {
                                                 <span className="text-sm font-bold text-text-secondary">{weakestInfo.score}/40점</span>
                                             </div>
 
-                                            <h3 className="text-2xl font-black text-text-primary">
+                                            <h3 className="text-xl md:text-2xl font-black text-text-primary">
                                                 {weakestInfo.statusInfo.message}
                                             </h3>
 
@@ -326,22 +326,22 @@ export default function AiNavigatorPage() {
                                                 {aiAdvice || '오늘의 분석 결과를 바탕으로 아래 추천 프로토콜을 확인하세요.'}
                                             </p>
 
-                                            <div className="flex gap-3 pt-2">
+                                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
                                                 {weakestInfo.statusInfo.actionLink === '/utils' ? (
-                                                    <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 bg-primary text-background font-black rounded-xl px-6">
+                                                    <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 w-full sm:w-auto bg-primary text-background font-black rounded-xl px-6">
                                                         {weakestInfo.statusInfo.action} <ArrowRight className="w-4 h-4 ml-2" />
                                                     </Button>
                                                 ) : (
-                                                    <Button asChild className="h-12 bg-primary text-background font-black rounded-xl px-6">
+                                                    <Button asChild className="h-12 w-full sm:w-auto bg-primary text-background font-black rounded-xl px-6">
                                                         <Link href={weakestInfo.statusInfo.actionLink}>
                                                             {weakestInfo.statusInfo.action} <ArrowRight className="w-4 h-4 ml-2" />
                                                         </Link>
                                                     </Button>
                                                 )}
-                                                <Button asChild variant="outline" className="h-12 rounded-xl px-6 font-bold">
+                                                <Button asChild variant="outline" className="h-12 w-full sm:w-auto rounded-xl px-6 font-bold">
                                                     <Link href="/ai-advice">1일 추천 루틴</Link>
                                                 </Button>
-                                                <Button variant="outline" className="h-12 rounded-xl px-6 font-bold text-slate-500 border-slate-300" onClick={() => { setDiagnosisModalStep('result'); setDiagnosisModalOpen(true); }}>
+                                                <Button variant="outline" className="h-12 w-full sm:w-auto rounded-xl px-6 font-bold text-slate-500 border-slate-300" onClick={() => { setDiagnosisModalStep('result'); setDiagnosisModalOpen(true); }}>
                                                     진단 결과 다시보기
                                                 </Button>
                                             </div>
@@ -367,7 +367,7 @@ export default function AiNavigatorPage() {
 
                             {/* Step 2: 심층 분석 리포트 */}
                             <div className="space-y-8 relative">
-                                <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">02</div>
+                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">02</div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Package className="w-5 h-5" />
@@ -402,7 +402,7 @@ export default function AiNavigatorPage() {
 
                             {/* Step 3: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
                             <div className="space-y-8 relative">
-                                <div className="absolute -left-20 -top-4 text-[140px] font-black text-primary/[0.05] leading-none select-none pointer-events-none italic">Event</div>
+                                <div className="absolute -left-2 md:-left-20 -top-12 md:-top-4 text-4xl md:text-[140px] font-black text-primary/[0.02] md:text-primary/[0.05] leading-none select-none pointer-events-none italic">Event</div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Sparkles className="w-5 h-5" />
@@ -410,28 +410,28 @@ export default function AiNavigatorPage() {
                                     <h2 className="text-2xl font-black tracking-tight">Perfect Recovery Design</h2>
                                 </div>
 
-                                <Card className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl relative group">
-                                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-all duration-700" />
-                                    <CardContent className="p-10 relative z-10 flex flex-col md:flex-row items-center gap-10">
-                                        <div className="flex-1 space-y-6 text-center md:text-left">
+                                <Card className="bg-obsidian border-none rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl relative group">
+                                    <div className="absolute top-0 right-0 w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-all duration-700" />
+                                    <CardContent className="p-8 md:p-10 relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-10">
+                                        <div className="flex-1 space-y-4 md:space-y-6 text-center md:text-left">
                                             <Badge className="bg-primary text-background text-[10px] font-black uppercase tracking-widest px-3 py-1">Medical Event Only</Badge>
-                                            <h3 className="text-3xl md:text-4xl font-black text-mist leading-tight tracking-tighter">
+                                            <h3 className="text-2xl md:text-4xl font-black text-mist leading-tight tracking-tighter">
                                                 시술은 끝났어도<br />
-                                                <span className="text-primary italic">회복은 이제 시작</span>입니다.
+                                                <span className="text-[#00FFD1] drop-shadow-[0_0_15px_rgba(0,255,209,0.3)] italic">회복은 이제 시작</span>입니다.
                                             </h3>
-                                            <p className="text-mist/70 font-medium leading-relaxed max-w-md">
+                                            <p className="text-mist/70 text-sm md:text-base font-medium leading-relaxed max-w-md mx-auto md:mx-0">
                                                 줄기세포·성형 시술을 앞두고 계신가요? <br />
                                                 유니클의 정밀 문진을 통해 당신만의 72시간 집중 회복 프로토콜을 설계하세요.
                                             </p>
-                                            <Button asChild size="lg" className="h-16 px-10 rounded-[20px] bg-primary hover:bg-primary/90 text-background text-lg font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                                            <Button asChild size="lg" className="h-14 md:h-16 w-full md:w-auto px-10 rounded-[20px] bg-primary hover:bg-primary/90 text-background text-base md:text-lg font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
                                                 <Link href="/event/consultation">
-                                                    시술 전 심층 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
+                                                    심층 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
                                                 </Link>
                                             </Button>
                                         </div>
-                                        <div className="w-48 h-48 md:w-64 md:h-64 bg-mist/5 rounded-[40px] flex items-center justify-center text-6xl relative overflow-hidden border border-mist/10 backdrop-blur-sm">
+                                        <div className="w-40 h-40 md:w-64 md:h-64 bg-mist/5 rounded-[32px] md:rounded-[40px] flex items-center justify-center text-5xl md:text-6xl relative overflow-hidden border border-mist/10 backdrop-blur-sm">
                                             🧭
-                                            <div className="absolute inset-0 border-2 border-primary/20 rounded-[40px] animate-pulse" />
+                                            <div className="absolute inset-0 border-2 border-primary/20 rounded-[32px] md:rounded-[40px] animate-pulse" />
                                         </div>
                                     </CardContent>
                                     <div className="h-1 w-full bg-primary/30" />
@@ -440,7 +440,7 @@ export default function AiNavigatorPage() {
 
                             {/* Step 3: AI 추천 파트너 상품 */}
                             <div className="space-y-8 relative">
-                                <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
+                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
@@ -516,7 +516,7 @@ export default function AiNavigatorPage() {
 
                             {/* Step 4: 내일의 예보 */}
                             <div className="space-y-8 relative">
-                                <div className="absolute -left-20 -top-4 text-[140px] font-black text-obsidian/[0.03] leading-none select-none pointer-events-none">04</div>
+                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">04</div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Calendar className="w-5 h-5" />

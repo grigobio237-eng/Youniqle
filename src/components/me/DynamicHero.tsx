@@ -49,37 +49,30 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
     }
 
     return (
-        <section className={`rounded-[32px] md:rounded-[48px] p-6 md:p-16 bg-gradient-to-br ${bgGradient} relative overflow-hidden mb-8 md:mb-16 min-h-[250px] md:min-h-[400px] flex items-center shadow-2xl`}>
+        <section className={`rounded-[32px] md:rounded-[48px] p-5 md:p-16 bg-gradient-to-br ${bgGradient} relative overflow-hidden mb-6 md:mb-16 min-h-[200px] md:min-h-[400px] flex items-center shadow-2xl`}>
             {/* Background Atmosphere */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                <div className={`absolute -top-1/4 -right-1/4 w-3/4 h-3/4 rounded-full blur-[120px] ${accentColor} opacity-50`} />
-                <div className={`absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full blur-[100px] bg-blue-500/10 opacity-30`} />
-
-                {/* Micro-sparkles */}
-                <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" />
-                    <div className="absolute top-3/4 left-1/2 w-1 h-1 bg-white rounded-full animate-ping [animation-delay:1s]" />
-                    <div className="absolute top-1/2 left-2/3 w-1 h-1 bg-white rounded-full animate-ping [animation-delay:1.5s]" />
-                </div>
+                <div className={`absolute -top-1/4 -right-1/4 w-3/4 h-3/4 rounded-full blur-[80px] md:blur-[120px] ${accentColor} opacity-50`} />
+                <div className={`absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full blur-[60px] md:blur-[100px] bg-blue-500/10 opacity-30`} />
             </div>
 
-            <div className="container mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 px-2 md:px-0">
-                <div className="flex-1 text-center md:text-left space-y-5 md:space-y-10">
+            <div className="container mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12 px-1 md:px-0">
+                <div className="flex-1 text-center md:text-left space-y-4 md:space-y-10">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center space-x-2 px-4 py-1.5 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 shadow-inner"
+                        className="inline-flex items-center space-x-2 px-3 py-1 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 shadow-inner"
                     >
-                        <Icon className={`w-3.5 h-3.5 ${iconColor} fill-current animate-pulse`} />
-                        <span className="text-[11px] md:text-xs font-black text-white/90 uppercase tracking-[0.2em]">{timeText} CHECKPOINT</span>
+                        <Icon className={`w-3 h-3 md:w-3.5 md:h-3.5 ${iconColor} fill-current animate-pulse`} />
+                        <span className="text-[9px] md:text-xs font-black text-white/90 uppercase tracking-[0.2em]">{timeText} CHECKPOINT</span>
                     </motion.div>
 
-                    <div className="space-y-3 md:space-y-6">
+                    <div className="space-y-2 md:space-y-6">
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-3xl md:text-6xl lg:text-7xl font-black text-white leading-[1.15] md:leading-tight tracking-tighter max-w-full md:max-w-3xl break-keep"
+                            className="text-xl sm:text-2xl md:text-6xl lg:text-7xl font-black text-white leading-[1.2] md:leading-tight tracking-tighter max-w-full md:max-w-3xl break-keep"
                         >
                             {greeting}, <br className="hidden md:block" /> {userName}님.
                         </motion.h1>
@@ -87,10 +80,10 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex items-center justify-center md:justify-start gap-3"
+                            className="flex items-center justify-center md:justify-start gap-2 md:gap-3"
                         >
-                            <span className="h-[1px] w-8 md:w-12 bg-white/30" />
-                            <p className="text-white/70 text-base md:text-2xl font-medium tracking-tight">
+                            <span className="h-[1px] w-6 md:w-12 bg-white/30" />
+                            <p className="text-white/70 text-sm md:text-2xl font-medium tracking-tight">
                                 {timeText.charAt(0).toUpperCase() + timeText.slice(1)} Recovery Protocol Active.
                             </p>
                         </motion.div>

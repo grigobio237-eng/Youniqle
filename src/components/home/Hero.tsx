@@ -18,20 +18,20 @@ export default function Hero({ onStart }: { onStart: () => void }) {
         {/* Hero Headline */}
         <div className="space-y-10">
           <div className="space-y-4">
-            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-[1em] block mb-4 opacity-70">Scientific Recovery</span>
-            <h1 className="font-serif-display text-obsidian tracking-tighter leading-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-              <span className="block mb-4">지금 필요한 회복은</span>
-              <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-6">
+            <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[1em] block mb-2 md:mb-4 opacity-70">Scientific Recovery</span>
+            <h1 className="font-serif-display text-obsidian tracking-tighter leading-[1.1] text-3xl sm:text-5xl md:text-7xl">
+              <span className="block mb-2 md:mb-4">지금 필요한 회복은</span>
+              <div className="flex flex-wrap justify-center items-center gap-x-2 md:gap-x-6">
                 <span className="text-slate/40 font-light italic">느낌이 아니라</span>
                 <span className="text-chapter-accent font-black relative inline-block">
                   진단
-                  <span className="absolute -bottom-2 left-0 w-full h-1 md:h-2 bg-chapter-accent/30 rounded-full" />
+                  <span className="absolute -bottom-1 md:-bottom-2 left-0 w-full h-1 md:h-2 bg-chapter-accent/30 rounded-full" />
                 </span>
                 <span className="text-obsidian">입니다.</span>
               </div>
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-slate/70 font-medium leading-relaxed max-w-xl mx-auto word-keep-all">
+          <p className="text-sm md:text-xl text-slate/70 font-medium leading-relaxed max-w-xl mx-auto break-keep">
             60초 안에 현재 상태를 정밀하게 확인하고,<br className="hidden sm:block" />
             당신에게 최적화된 회복의 경로를 제안받으세요.
           </p>

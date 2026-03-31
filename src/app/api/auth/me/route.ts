@@ -24,6 +24,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 추천 코드가 없는 경우 자동 생성 (ID 기반)
+    if (!user.referralCode) {
+      const base = user._id.toString().slice(-6).toUpperCase();
+      const newCode = `RF${base}`;
+      user.referralCode = newCode;
+      await user.save({ validateBeforeSave: false });
+      console.log(`[/api/auth/me] Generated new referralCode for ${user.email}: ${newCode}`);
+    }
+
     const userResponse = {
       id: user._id,
       email: user.email,
