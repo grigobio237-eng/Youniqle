@@ -205,58 +205,52 @@ const PavilionDetailPlanner = () => {
         }
     };
 
-    // 이미지 전체 다운로드 (Blob 방식 - 안정성 및 파일명 보존 개선)
+    // 이미지 전체 다운로드 (서버 사이드 ZIP + 정적 파일 다운로드 - blob: URL 완전 제거)
     const handleDownloadAll = async () => {
-        const tid = toast.loading('이미지를 준비 중입니다...');
-        const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+        const tid = toast.loading('서버에서 압축 파일을 생성 중입니다...');
         
-        // 오전의 성공 사례와 유사하게 파일명 정제 (시스템 금칙어만 제거)
-        const safePrefix = (info.name || 'stemcell')
-            .replace(/[/\\?%*:|"<>]/g, '-') // 윈도우/맥 금칙어만 하이픈으로 치환
+        // 파일명 정제
+        const safePrefix = (info.name || '상품이미지')
+            .replace(/[/\\?%*:|"<>]/g, '-')
             .trim();
 
         try {
-            const downloadImage = async (url: string, filename: string) => {
-                const response = await fetch(url);
-                const originalBlob = await response.blob();
-                
-                // 1. MIME 타입을 명시적으로 image/png로 재지정 (브라우저 인식률 개선)
-                const imageBlob = new Blob([originalBlob], { type: 'image/png' });
-                const blobUrl = window.URL.createObjectURL(imageBlob);
-                
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                // 2. download 속성에 직접 대입 (브라우저가 파일명을 확실히 인지하게 함)
-                link.download = filename; 
-                
-                document.body.appendChild(link);
-                link.click();
-                
-                // 충분한 시간을 두고 제거 및 메모리 해제
-                setTimeout(() => {
-                    if (document.body.contains(link)) {
-                        document.body.removeChild(link);
-                    }
-                    window.URL.revokeObjectURL(blobUrl);
-                }, 15000); 
-            };
+            // 1. 다운로드 대상 이미지 목록 생성
+            const images = [
+                { url: thumbnailImage, name: `${safePrefix}_썸네일.png` },
+                ...segments.map((s, i) => ({ url: s.imageUrl, name: `${safePrefix}_상세_${i + 1}.png` }))
+            ].filter(t => !!t.url) as { url: string; name: string }[];
 
-            if (thumbnailImage) {
-                await downloadImage(thumbnailImage, `${safePrefix}_썸네일.png`);
-                await delay(800); // 실행 간격을 800ms로 추가 상향하여 브라우저의 보안 정책 우회
+            console.log(`[Download] Requesting server-side ZIP for ${images.length} images.`);
+
+            // 2. 서버 API에 요청하여 ZIP 파일을 서버에 생성/저장
+            const response = await fetch('/api/admin/download-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images, prefix: safePrefix }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
             }
 
-            for (let i = 0; i < segments.length; i++) {
-                const seg = segments[i];
-                if (seg.imageUrl) {
-                    await downloadImage(seg.imageUrl, `${safePrefix}_상세_${i + 1}.png`);
-                    await delay(800);
-                }
-            }
-            toast.success('이미지 다운로드 요청을 모두 보냈습니다.', { id: tid });
+            const result = await response.json();
+            console.log(`[Download] Server ZIP ready: ${result.downloadUrl} (${result.size} bytes)`);
+
+            // 3. 서버의 정적 파일을 직접 다운로드 (blob: URL 사용하지 않음!)
+            //    window.open으로 서버 파일에 직접 접근하면 크롬이 일반 다운로드로 처리합니다.
+            const link = document.createElement('a');
+            link.href = result.downloadUrl;
+            link.download = result.filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success(`압축 파일 다운로드가 시작되었습니다! (${(result.size / 1024 / 1024).toFixed(1)}MB)`, { id: tid });
         } catch (error) {
-            console.error('Download error:', error);
-            toast.error('이미지 다운로드 중 오류가 발생했습니다.', { id: tid });
+            console.error('[Download Error]', error);
+            toast.error('다운로드 중 오류가 발생했습니다. 다시 시도해 주세요.', { id: tid });
         }
     };
 

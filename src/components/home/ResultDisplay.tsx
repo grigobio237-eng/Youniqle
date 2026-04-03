@@ -4,15 +4,49 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, RefreshCw, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck } from 'lucide-react';
+import { useRecovery } from '@/contexts/RecoveryContext';
 
 export default function ResultDisplay({ score, answers, userNote, onEnter, onOpenWebtoon }: { score: number; answers: any[]; userNote: string; onEnter: () => void; onOpenWebtoon: () => void }) {
+  const { journey } = useRecovery();
   const [showNextStepsDialog, setShowNextStepsDialog] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
 
+  // Context-aware UI Labels
+  const getRoadmapInfo = () => {
+    switch (journey) {
+      case 'CLINICAL_PRE':
+        return {
+          badge: "Clinical: Pre-visit",
+          title: "성공적인 시술을 위한 Doctor's Note",
+          cta: "의료진에게 공유하기",
+          nextActionTitle: "의사 상담용 리포트 준비",
+          nextActionDesc: "안전하고 효과적인 시술을 위해 상담 시 이 리포트를 함께 보여주세요."
+        };
+      case 'CLINICAL_POST':
+        return {
+          badge: "Clinical: Post-visit",
+          title: "골든타임 72시간 집중 회복 전술",
+          cta: "회복 타임라인 확인하기",
+          nextActionTitle: "72시간 세밀 모니터링",
+          nextActionDesc: "시술 후 가장 중요한 3일간의 변화를 실시간으로 밀착 관리합니다."
+        };
+      default:
+        return {
+          badge: "Personalized Roadmap",
+          title: "당신만을 위한 회복 로드맵",
+          cta: "맞춤 플랜 확인하기",
+          nextActionTitle: "일상 루틴 설계 받기",
+          nextActionDesc: "실시간 데이터를 분석한 나만의 활력 행동 가이드"
+        };
+    }
+  };
+
+  const info = getRoadmapInfo();
+
   // 최근에 네비게이터(영업사원)의 QR을 스캔한 유저 = 시술/문진 집중 케어 대상 (기존 추천인 referredBy와 분리)
-  const isEventUser = !!(session?.user as any)?.recentNavigator;
+  const isEventUser = !!(session?.user as any)?.recentNavigator || journey?.startsWith('CLINICAL');
 
   // Logic: 0-7 (Low), 8-15 (Mid), 16+ (High)
   let level = 'LOW';
@@ -96,12 +130,19 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
     <>
       <div className="max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-12 animate-fade-in pb-20">
         <div className="space-y-4">
-          <h2 className="text-sm font-black text-slate uppercase tracking-[0.2em]">Daily Recovery Score</h2>
-          <div className="text-8xl font-black text-chapter-accent tracking-tighter">{recoveryScore}</div>
-          <p className="text-lg font-bold text-obsidian/60">{scoreLevel}</p>
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
+            {info.badge}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tight break-keep">{info.title}</h2>
+          <div className="relative inline-block mt-8">
+            <div className="text-9xl font-black text-chapter-accent tracking-tighter tabular-nums">{recoveryScore}</div>
+            <div className="absolute -top-4 -right-8 w-16 h-16 bg-reward-gold/10 rounded-full blur-xl animate-pulse" />
+          </div>
+          <p className="text-xl font-bold text-obsidian/60">{scoreLevel}</p>
         </div>
 
-        <div className="p-10 bg-white rounded-[40px] shadow-2xl shadow-chapter-accent/5 space-y-6 border border-line">
+        <div className="p-10 bg-white rounded-[40px] shadow-2xl shadow-chapter-accent/5 space-y-6 border border-line relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-chapter-accent" />
           <div className="flex justify-center mb-4">{icon}</div>
           <h3 className="text-2xl font-black text-obsidian tracking-tight">{metaphorTitle}</h3>
           <p className="text-slate font-medium leading-relaxed">{title}</p>
@@ -111,8 +152,8 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
         </div>
 
         <div className="flex flex-col gap-4 w-full">
-          <Button size="lg" onClick={handleNextSteps} className="btn-primary w-full h-20 text-xl rounded-[24px] shadow-xl shadow-chapter-accent/20">
-            다음 단계 설계하기 <ArrowRight className="ml-3 h-6 w-6" />
+          <Button size="lg" onClick={handleNextSteps} className="btn-primary w-full h-20 text-xl rounded-[24px] shadow-xl shadow-chapter-accent/20 group">
+            {info.cta} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
           </Button>
 
           <Button
@@ -122,10 +163,10 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
             className="w-full h-16 text-lg rounded-[24px] border-line font-bold text-slate hover:text-obsidian hover:border-chapter-accent group"
           >
             <span className="mr-2 group-hover:rotate-12 transition-transform">🎨</span>
-            웹툰으로 내 데이터 남기기
+            회복 기록을 웹툰으로 남기기
           </Button>
           <Button variant="ghost" onClick={onEnter} className="text-slate/60 hover:text-obsidian underline underline-offset-4 text-sm mt-2">
-            진단 결과 리포트 보기
+            전체 분석 데이터 보기
           </Button>
         </div>
       </div>
@@ -140,56 +181,56 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
 
             <div className="space-y-3 relative">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
-                Recommendation
+                Action Items
               </div>
               <h3 className="text-3xl font-black text-obsidian tracking-tight leading-tight">
-                {isEventUser ? '완벽한 시술 결과를 위한 제안' : `${levelInfo(recoveryScore).level}를 위한 제안`}
+                {info.nextActionTitle}
               </h3>
               <p className="text-sm text-slate font-medium leading-relaxed">
-                {isEventUser ? '시술의 완성은 회복입니다. 지금 바로 맞춤 관리를 시작하세요.' : nextStepMessage}
+                {info.nextActionDesc}
               </p>
             </div>
 
             <div className="space-y-4 relative">
               {/* 일일 루틴 설계 받기 / 시술 전 심층 문진 */}
               <button 
-                onClick={() => navigateTo(isEventUser ? '/event/consultation' : '/ai-navigator')} 
+                onClick={() => navigateTo(journey === 'CLINICAL_PRE' ? '/event/consultation' : '/ai-navigator')} 
                 className="w-full p-6 text-left rounded-[28px] border-2 border-line hover:border-chapter-accent hover:bg-chapter-accent/[0.02] transition-all group relative overflow-hidden active:scale-[0.98]"
               >
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-3">
                     <div className="p-3 rounded-2xl bg-chapter-accent/10 text-chapter-accent group-hover:scale-110 transition-transform">
-                      <Sparkles className="w-6 h-6" />
+                      {journey === 'CLINICAL_PRE' ? <FileText className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
                     </div>
                     <span className="text-lg font-black text-obsidian">
-                      {isEventUser ? '시술 전 심층 문진 시작하기' : '일일 루틴 설계 받기'}
+                      {journey === 'CLINICAL_PRE' ? '의사 상담용 리포트 출력' : '맞춤 회복 루틴 시작하기'}
                     </span>
                   </div>
                   <ArrowRight className="w-5 h-5 text-line group-hover:text-chapter-accent group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-sm text-slate font-medium pl-14">
-                  {isEventUser ? '성공적인 시술 결과를 위한 1:1 맞춤 회복 플랜' : '실시간 데이터를 분석한 나만의 활력 행동 가이드'}
+                  {journey === 'CLINICAL_PRE' ? '상담 시 활용 가능한 정밀 데이터를 문두로 정리합니다' : '실시간 데이터를 분석한 나만의 활력 행동 가이드'}
                 </p>
               </button>
               
               {/* 회복 갤러리 / 시술 집중 모니터링 */}
               <button 
-                onClick={() => navigateTo(isEventUser ? '/event/monitoring' : '/gallery/artworks')} 
+                onClick={() => navigateTo(journey === 'CLINICAL_POST' ? '/event/monitoring' : '/gallery/artworks')} 
                 className="w-full p-6 text-left rounded-[28px] border-2 border-line hover:border-reward-gold hover:bg-reward-gold/[0.02] transition-all group relative overflow-hidden active:scale-[0.98]"
               >
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-3">
                     <div className="p-3 rounded-2xl bg-reward-gold/10 text-reward-gold group-hover:scale-110 transition-transform">
-                      <div className="text-xl">🎨</div>
+                      {journey === 'CLINICAL_POST' ? <Clock className="w-6 h-6" /> : <div className="text-xl">🎨</div>}
                     </div>
                     <span className="text-lg font-black text-obsidian">
-                      {isEventUser ? '시술 집중 모니터링 시작 (72h)' : '회복 갤러리'}
+                      {journey === 'CLINICAL_POST' ? '72h 집중 모니터링 시작' : '회복 갤러리 감상'}
                     </span>
                   </div>
                   <ArrowRight className="w-5 h-5 text-line group-hover:text-reward-gold group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-sm text-slate font-medium pl-14">
-                  {isEventUser ? '골든타임 72시간 동안 발생할 수 있는 변화를 실시간으로 밀착 관리합니다' : '나만의 회복 여정을 시각적인 예술 기록으로 감상하세요'}
+                  {journey === 'CLINICAL_POST' ? '골든타임 동안 발생할 수 있는 신체 변화를 밀착 추적합니다' : '나만의 회복 여정을 시각적인 예술 기록으로 확인하세요'}
                 </p>
               </button>
             </div>

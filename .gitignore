@@ -1,4 +1,4 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 .pnp
 .pnp.js
@@ -52,6 +52,7 @@ next-env.d.ts
 *.tmp
 *.temp
 /tmp/
+public/tmp-downloads/
 
 # Security & Secrets
 google-tts.json

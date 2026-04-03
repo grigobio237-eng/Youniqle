@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 
 import dynamic from 'next/dynamic';
 import Hero from '@/components/home/Hero';
+import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 const DiagnosisForm = dynamic(() => import('@/components/home/DiagnosisForm'), { ssr: false });
 const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), { ssr: false });
@@ -81,12 +82,14 @@ function SearchParamsHandler({
 // 4. Main Component
 // ---------------------------
 export default function HomePage() {
+  const { journey } = useRecovery();
   const router = useRouter();
   const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT' | 'DASHBOARD'>('CHECK');
   const [score, setScore] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);
   const [userNote, setUserNote] = React.useState('');
   const [questions, setQuestions] = React.useState<Question[]>([]);
+  const [currentQuestionsJourney, setCurrentQuestionsJourney] = React.useState<string | null>(null);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
 
   useEffect(() => {
@@ -95,20 +98,6 @@ export default function HomePage() {
     const isWelcome = params.get('welcome') === 'true';
 
     const storedScore = localStorage.getItem('recovery_last_score');
-
-    const fetchQuestions = async () => {
-      try {
-        const res = await fetch('/api/questions/daily');
-        if (res.ok) {
-          const data = await res.json();
-          setQuestions(data.questions);
-        }
-      } catch (error) {
-        console.error('Failed to fetch daily questions:', error);
-      }
-    };
-
-    fetchQuestions();
 
     if (storedScore && !isWelcome) {
       setScore(parseInt(storedScore));
@@ -122,22 +111,27 @@ export default function HomePage() {
 
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
-  const handleStart = () => {
-    if (questions.length > 0) {
+  const handleStart = async () => {
+    // If we already have questions for the CURRENT journey, just show them
+    if (questions.length > 0 && currentQuestionsJourney === journey) {
       setViewState('QUESTION');
-    } else {
-      // Retry fetching
-      fetch('/api/questions/daily')
-        .then(res => res.json())
-        .then(data => {
-          if (data.questions) {
-            setQuestions(data.questions);
-            setViewState('QUESTION');
-          } else {
-            alert('질문을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
-          }
-        })
-        .catch(() => alert('네트워크 오류가 발생했습니다.'));
+      return;
+    }
+
+    // Otherwise, fetch context-specific questions
+    try {
+      const res = await fetch(`/api/questions/daily?journey=${journey || 'WELLNESS'}`);
+      if (res.ok) {
+        const data = await res.json();
+        setQuestions(data.questions);
+        setCurrentQuestionsJourney(journey || 'WELLNESS');
+        setViewState('QUESTION');
+      } else {
+        alert('맞춤 문항을 생성할 수 없습니다. 잠시 후 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch questions:', error);
+      alert('네트워크 오류가 발생했습니다.');
     }
   };
 

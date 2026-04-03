@@ -32,6 +32,16 @@ interface UtilityCard {
 
 const utilities: UtilityCard[] = [
     {
+        id: 'food-scanner',
+        title: 'AI 회복 식단 스캐너',
+        description: '카메라로 식단을 분석하고 현재 내 몸의 회복 데이터를 진단',
+        icon: '🍱',
+        category: ['건강', '회복', '이미지'],
+        href: '/utils/food-scanner',
+        badge: 'AI NEW',
+        stats: { users: 'AI', rating: 5.0 },
+    },
+    {
         id: 'bmi',
         title: 'BMI 계산기',
         description: '신장과 체중으로 건강 지수 분석',

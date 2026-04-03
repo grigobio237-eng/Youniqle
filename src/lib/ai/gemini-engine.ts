@@ -469,21 +469,40 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
     }
 
     // Daily Question Generator
-    static async generateDailyQuestions(theme: string, keywords: string): Promise<any[]> {
+    static async generateDailyQuestions(theme: string, keywords: string, journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS'): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY is missing');
             throw new Error('GEMINI_API_KEY is not set');
         }
 
         try {
-            const prompt = `당신은 회복 심리학 전문가입니다.
+            let contextInstruction = "";
+            if (journey === 'CLINICAL_PRE') {
+                contextInstruction = `사용자는 현재 '시술/수술 전' 단계입니다. 
+중요 목표: 시술 성공을 위한 최상의 컨디션 유지 및 의사 상담 준비.
+질문 방향: 전날 수면 질, 복용 약물(주의사항) 준수 여부, 현재 불안도, 신체 에너지 레벨, 필요한 질문 사항 유무.`;
+            } else if (journey === 'CLINICAL_POST') {
+                contextInstruction = `사용자는 현재 '시술/수술 후 72시간 골든타임' 관리 단계입니다. 
+중요 목표: 이상 증상 조기 발견 및 안정적 회복 가이드.
+질문 방향: 통증 정도, 부종(부기) 상태, 처방 약 복용 여부, 휴식 정도, 어지러움이나 이상 증세 유무.`;
+            } else {
+                contextInstruction = `사용자는 '일상 회복(Wellness)' 단계입니다. 
+중요 목표: 일상의 리듬 회복 및 에너지 최적화.
+질문 방향: 피로도, 감정 상태, 집중력, 신체적 활력, 스트레스 관리.`;
+            }
+
+            const prompt = `당신은 메디컬 회복 컨시어지이자 심리 전문가입니다.
 오늘의 테마는 "${theme}"이며, 핵심 키워드는 "${keywords}"입니다.
-이 테마에 맞춰 사용자의 하루 컨디션을 점검할 수 있는 **5개의 객관식 질문**을 만들어주세요.
+
+## 상황 지침
+${contextInstruction}
+
+위 지침에 맞춰 사용자의 현재 상태를 점검할 수 있는 **5개의 객관식 질문**을 만들어주세요.
 
 ## 요구사항
-1. 질문은 따뜻하고 공감가는 어조로 작성해주세요.
-2. 각 질문에는 3개의 선택지가 있어야 합니다. (점수: 0=좋음, 3=보통, 5=나쁨)
-3. 카테고리는 [피로, 수면, 몸, 감정, 집중, 관계, 자존감] 중에서 적절히 선택하거나 테마에 맞게 정해주세요.
+1. 질문은 매우 전문적이면서도 따뜻한 어조로 작성해주세요.
+2. 각 질문에는 3개의 선택지가 있어야 합니다. (점수: 0=최상/관리잘됨, 3=보통/주의, 5=나쁨/불안정)
+3. 카테고리는 [신체, 환경, 심리, 영양, 행동] 중에서 적절히 선택하거나 테마에 맞게 정해주세요.
 
 ## 응답 형식 (JSON Array)
 [
@@ -492,9 +511,9 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
     "category": "카테고리",
     "text": "질문 내용",
     "options": [
-      { "label": "나쁜 상태 (예: 너무 피곤해요)", "score": 5 },
-      { "label": "보통 상태", "score": 3 },
-      { "label": "좋은 상태", "score": 0 }
+      { "label": "매우 안정적임/좋음", "score": 0 },
+      { "label": "보통/그저 그럼", "score": 3 },
+      { "label": "불안정/나쁨/주의필요", "score": 5 }
     ]
   },
   ...

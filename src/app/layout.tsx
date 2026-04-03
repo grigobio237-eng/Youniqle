@@ -48,6 +48,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { RecoveryProvider } from '@/contexts/RecoveryContext';
+
 export default function RootLayout({
   children,
 }: {
@@ -65,12 +67,14 @@ export default function RootLayout({
           <LanguageProvider>
             <NudgeFeaturesProvider>
               <ToastProvider>
-                <ConditionalHeader />
-                <main className="flex-1 pt-16">
-                  {children}
-                </main>
-                <Footer />
-                <AiManagerChat />
+                <RecoveryProvider>
+                  <ConditionalHeader />
+                  <main className="flex-1 pt-16">
+                    {children}
+                  </main>
+                  <Footer />
+                  <AiManagerChat />
+                </RecoveryProvider>
               </ToastProvider>
             </NudgeFeaturesProvider>
           </LanguageProvider>

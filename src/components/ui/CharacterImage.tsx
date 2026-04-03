@@ -46,7 +46,7 @@ export default function CharacterImage({
       height={height}
       className={className}
       priority={priority}
-      sizes={sizes}
+      sizes={sizes || (fill ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" : undefined)}
       onError={() => setHasError(true)}
     />
   );

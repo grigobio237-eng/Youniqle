@@ -113,8 +113,34 @@ export default function Footer() {
   return (
     <footer className={`bg-obsidian text-slate border-t border-line/10 py-10 ${shouldShowFooterOnMobile ? '' : 'hidden md:block'}`}>
       <div className="container mx-auto px-6 max-w-6xl">
+        {/* Re-engagement Section (Step 7) */}
+        <div className="py-16 border-b border-line/10 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="space-y-4 text-center md:text-left">
+            <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-chapter-accent/20 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
+              Stay Re-connected
+            </div>
+            <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">다음에 또 만나면<br />더 정확한 피드백을 드려요</h3>
+            <p className="text-gray-500 text-sm font-medium">데이터가 쌓일수록 당신의 회복 플랜은 더 정교해집니다.</p>
+          </div>
+          <div className="w-full max-w-md space-y-4">
+            <div className="flex gap-2">
+              <input 
+                type="email" 
+                placeholder="이메일 주소를 입력하세요" 
+                className="flex-1 h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-chapter-accent transition-all"
+              />
+              <button className="h-14 px-8 bg-chapter-accent text-white font-black text-sm rounded-2xl hover:bg-chapter-accent/90 transition-all shadow-lg shadow-chapter-accent/20 whitespace-nowrap">
+                알림 받기
+              </button>
+            </div>
+            <p className="text-[10px] text-gray-600 text-center md:text-left">
+              구독 시 <Link href="/privacy" className="underline">개인정보처리방침</Link>에 동의하는 것으로 간주됩니다.
+            </p>
+          </div>
+        </div>
+
         {/* Top Section: Navigation Links */}
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-3 pb-8 border-b border-line/5 text-[13px]">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-3 py-8 border-b border-line/5 text-[13px]">
           <Link href="/about" className="text-gray-400 hover:text-white transition-colors">유니클 소개</Link>
           <Link href="/healing-center" className="text-gray-400 hover:text-white transition-colors">힐링센터</Link>
           <Link href="/trainer" className="text-gray-400 hover:text-white transition-colors">트레이너</Link>

@@ -155,10 +155,21 @@ export default function PreProcedureForm() {
     }
   };
 
+  const getProgressWidth = () => {
+    switch (step) {
+      case 1: return "w-1/5";
+      case 2: return "w-2/5";
+      case 3: return "w-3/5";
+      case 4: return "w-4/5";
+      case 5: return "w-full";
+      default: return "w-0";
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
       <Card className="border-none shadow-2xl bg-surface/80 backdrop-blur-xl rounded-[32px] overflow-hidden">
-        <div className="h-2 bg-primary w-full transition-all duration-500" style={{ width: `${(step / 5) * 100}%` }} />
+        <div className={`h-2 bg-primary transition-all duration-500 ${getProgressWidth()}`} />
         <CardHeader className="pt-10 pb-6 text-center">
           <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery Design</CardTitle>
           <CardDescription className="text-lg font-medium text-text-secondary">
