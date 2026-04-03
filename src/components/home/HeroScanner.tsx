@@ -82,27 +82,66 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
         setShowWebcam(false);
     }, [stream]);
 
+    const compressImage = (base64: string): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1024;
+                const MAX_HEIGHT = 1024;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+        });
+    };
+
     // 3. Analysis Logic
     const analyzeImage = async (imageData: string) => {
-        setCapturedImage(imageData);
         setStatus('scanning');
         setLoading(true);
         stopWebcam();
 
         try {
+            // Resize and compress for mobile optimization
+            const compressedData = await compressImage(imageData);
+            setCapturedImage(compressedData);
+
             const response = await fetch('/api/ai/food-analysis', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: imageData, journey })
+                body: JSON.stringify({ image: compressedData, journey })
             });
 
-            if (!response.ok) throw new Error('Analysis failed');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Analysis failed');
+            }
 
             const data = await response.json();
             setResult(data);
             setStatus('result');
-        } catch (err) {
-            toast.error("AI 분석 중 오류가 발생했습니다.");
+        } catch (err: any) {
+            console.error('Analysis Error:', err);
+            toast.error(err.message || "AI 분석 중 오류가 발생했습니다.");
             setStatus('idle');
         } finally {
             setLoading(false);
