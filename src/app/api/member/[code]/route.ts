@@ -12,8 +12,11 @@ export async function GET(
     await dbConnect();
     const { code } = await params;
 
-    // referralCode로 회원 조회
-    const member = await User.findOne({ referralCode: code, isDeleted: { $ne: true } })
+    // referralCode로 회원 조회 (대소문자 구분 없이 검색)
+    const member = await User.findOne({ 
+      referralCode: { $regex: new RegExp(`^${code}$`, 'i') }, 
+      isDeleted: { $ne: true } 
+    })
       .select('name email referralCode referredBy grade tier points createdAt diagnosisResults')
       .lean();
 

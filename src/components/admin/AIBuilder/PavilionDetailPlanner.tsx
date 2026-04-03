@@ -16,7 +16,8 @@ import {
     ArrowRight,
     ArrowLeft,
     Loader2,
-    Zap
+    Zap,
+    Package
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -204,9 +205,13 @@ const PavilionDetailPlanner = () => {
         }
     };
 
-    // 이미지 전체 다운로드 (Blob 방식 - CORS 해결)
+    // 이미지 전체 다운로드 (Blob 방식 - 안정성 개선)
     const handleDownloadAll = async () => {
         const tid = toast.loading('이미지를 준비 중입니다...');
+        const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+        // 파일명으로 사용할 수 없는 특수문자 제거 (\ / : ? * " < > |)
+        const safePrefix = (info.name || 'stemcell').replace(/[/\\?%*:|"<>]/g, '-').trim();
+
         try {
             const downloadImage = async (url: string, filename: string) => {
                 const response = await fetch(url);
@@ -218,20 +223,23 @@ const PavilionDetailPlanner = () => {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                window.URL.revokeObjectURL(blobUrl);
+                // 브라우저가 파일 쓰기를 완전히 마칠 수 있도록 충분히 긴 시간(10초) 뒤에 해제
+                setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
             };
 
             if (thumbnailImage) {
-                await downloadImage(thumbnailImage, `${info.name}_썸네일.png`);
+                await downloadImage(thumbnailImage, `${safePrefix}_썸네일.png`);
+                await delay(300); // 브라우저의 전역 다중 다운로드 차단 방지를 위해 약간의 간격을 둠
             }
 
             for (let i = 0; i < segments.length; i++) {
                 const seg = segments[i];
                 if (seg.imageUrl) {
-                    await downloadImage(seg.imageUrl, `${info.name}_상세_${i + 1}.png`);
+                    await downloadImage(seg.imageUrl, `${safePrefix}_상세_${i + 1}.png`);
+                    await delay(300);
                 }
             }
-            toast.success('이미지 다운로드가 완료되었습니다.', { id: tid });
+            toast.success('이미지 다운로드 요청을 모두 보냈습니다.', { id: tid });
         } catch (error) {
             console.error('Download error:', error);
             toast.error('이미지 다운로드 중 오류가 발생했습니다.', { id: tid });
@@ -254,7 +262,7 @@ const PavilionDetailPlanner = () => {
     const handleFinalPost = async () => {
         if (!thumbnailImage) return toast.error('썸네일이 필요합니다.');
         setIsRegistering(true);
-        const tid = toast.loading('파빌리온 5층 라운지에 솔루션을 게시하는 중...');
+        const tid = toast.loading('관리자 상품 목록에 솔루션을 등록하는 중...');
 
         try {
             const safeBaseName = `pavilion5_${Math.random().toString(36).substring(2, 8)}`;
@@ -299,14 +307,14 @@ const PavilionDetailPlanner = () => {
                 minPrice: minVal,
                 maxPrice: maxVal,
                 category: 'stem-cell',
-                summary: generatedSummary || info.keywords.slice(0, 100),
-                description: descriptionHtml,
+                summary: generatedSummary || info.keywords.slice(0, 100) || `${info.name} 줄기세포 솔루션`,
+                description: descriptionHtml || `<p>${info.name} 줄기세포 솔루션 상품이 등록되었습니다.</p>`,
                 descriptionIsHtml: true,
                 images: imageUrls.map(url => ({ url })),
                 stock: 999,
                 status: 'active',
-                approvalStatus: 'approved',
-                pavilionFloorId: 'floor-5' // 5층 라운지 강제 지정
+                approvalStatus: 'pending',
+                pavilionFloorId: null // 게시 위치 추후 결정
             };
 
             const regRes = await fetch('/api/admin/products', {
@@ -316,7 +324,7 @@ const PavilionDetailPlanner = () => {
             });
 
             if (regRes.ok) {
-                toast.success('축하합니다! 줄기세포 솔루션이 활성화되었습니다.', { id: tid });
+                toast.success('줄기세포 솔루션이 등록되었습니다 (승인 대기).', { id: tid });
                 setStep(1); // Reset
                 setInfo({ name: '', keywords: '', minPrice: '', maxPrice: '', category: 'stem-cell', length: 'auto' });
                 setThumbnailImage(null);
@@ -635,8 +643,8 @@ const PavilionDetailPlanner = () => {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4">
                         <div className="space-y-2">
                             <h2 className="text-3xl font-black text-slate-800 tracking-tight italic">최종 솔루션 검수</h2>
-                            <p className="text-slate-500 font-medium whitespace-pre-line">파빌리온 5층 라운지에 등록되기 전 마지막 단계입니다.
-                                게판 버튼 클릭 시 즉시 활성화됩니다.</p>
+                            <p className="text-slate-500 font-medium whitespace-pre-line">관리자 상품 목록에 등록되기 전 마지막 단계입니다.
+                                게시판 버튼 클릭 시 승인 대기 상태로 등록됩니다.</p>
                         </div>
                         <div className="flex gap-3">
                             <Button
@@ -660,8 +668,8 @@ const PavilionDetailPlanner = () => {
                                 disabled={isRegistering}
                                 className="h-14 px-10 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black gap-2 shadow-xl shadow-purple-200/50 no-print transition-all hover:scale-105"
                             >
-                                {isRegistering ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={18} />}
-                                5층 라운지 즉시 게시
+                                {isRegistering ? <Loader2 className="animate-spin" /> : <Package size={18} />}
+                                관리자 상품등록
                             </Button>
                         </div>
                     </div>

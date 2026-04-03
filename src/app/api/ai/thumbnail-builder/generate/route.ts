@@ -26,14 +26,14 @@ export async function POST(request: NextRequest) {
         };
 
         const visualPrompt = isStemCellSolution
-            ? `유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 느껴지는 프리미엄 메디컬 솔루션 이미지입니다.
+            ? `[Style: Professional Medical Photography, Healing Moody Vibes, Clean Aesthetics] 유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 느껴지는 프리미엄 메디컬 솔루션 이미지입니다.
 스타일: ${styleDescriptions[style as keyof typeof styleDescriptions] || styleDescriptions.premium}
 특징: ${keywords || '전문적인 메디컬 케어 환경'}
 ${includeModel ? '모델(사람)이 전문적인 케어를 통해 생동감을 얻거나 편안하게 회복하는 모습 포함' : '정교한 의료 환경 및 치유 무드'}
 브랜드 무드: 치유, 활력, 깨끗함, 과학적 신뢰
 절대 금기: 제품 용기(병, 박스, 앰플)를 묘사하지 마세요.
 비율: 1:1 정방형`
-            : `유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 느껴지는 고퀄리티 이커머스 썸네일 이미지입니다.
+            : `[Style: High-End E-commerce Photography, Vibrant, Clean] 유니클(Youniqle)의 브랜드 철학인 **'회복(Recovery)'**이 느껴지는 고퀄리티 이커머스 썸네일 이미지입니다.
 스타일: ${styleDescriptions[style as keyof typeof styleDescriptions] || styleDescriptions.premium}
 특징: ${keywords || '전문적인 제품 샷'}
 ${includeModel ? '모델(사람)이 제품을 통해 생동감을 얻거나 편안하게 회복하는 자연스러운 모습 포함' : '제품 단독 샷'}

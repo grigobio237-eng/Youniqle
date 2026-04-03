@@ -119,7 +119,7 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button
-                                    className="bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+                                    className="bg-emerald-600 hover:bg-emerald-700 w-full md:w-auto"
                                     onClick={handleShare}
                                 >
                                     <Share2 className="h-4 w-4 mr-2" />

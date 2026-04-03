@@ -152,11 +152,13 @@ export async function POST(request: NextRequest) {
       clothingInfo,
       electronicsInfo,
       pavilionFloorId,
-      pavilionPosition
+      pavilionPosition,
+      status,
+      approvalStatus
     } = await request.json();
 
-    // 필수 필드 검증
-    if (!name || !price || !category || !summary || !description) {
+    // 필수 필드 검증 (price가 0일 수 있으므로 주의)
+    if (!name || price === undefined || price === null || !category || !summary || description === undefined || description === null) {
       return NextResponse.json(
         { error: '필수 필드를 모두 입력해주세요.' },
         { status: 400 }
@@ -174,7 +176,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 새 상품 생성 (관리자가 등록하면 자동 승인)
+    // 새 상품 생성
     const product = new Product({
       name,
       slug,
@@ -189,8 +191,8 @@ export async function POST(request: NextRequest) {
       descriptionIsHtml: descriptionIsHtml || false,
       images: images || [],
       featured: featured || false,
-      status: 'active',
-      approvalStatus: 'approved', // 관리자가 직접 등록하면 자동 승인
+      status: status || 'active',
+      approvalStatus: approvalStatus || 'approved', // 관리자가 직접 등록하면 기본 자동 승인이지만 요청에 따라 변경 가능
       // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
       nutritionInfo: nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined,
       originInfo: originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined,

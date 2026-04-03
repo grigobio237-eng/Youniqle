@@ -786,30 +786,61 @@ export default function MyPage() {
                 </CardContent>
               </Card>
 
-              {/* 친구 초대 섹션 */}
-              <ReferralSection referralCode={userData?.referralCode} />
+              {/* 통합 인비테이션 허브 (링크 + QR) */}
+              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
+                <CardHeader className="p-8 md:p-10 pb-0 border-none">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
+                        <Sparkles className="h-7 w-7" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">인비테이션 허브</h3>
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Invitation & Referral Protocol</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-emerald-100 text-emerald-700 border-none font-black text-[10px] px-3 py-1">COMMUNITY</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 md:p-10 pt-8 space-y-10">
+                  {/* 상단 안내 문구 */}
+                  <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                    <div className="relative bg-white p-6 rounded-[28px] border border-emerald-100/50">
+                      <h4 className="font-black text-obsidian mb-2 text-lg tracking-tight">회복의 기쁨을 함께 나누세요</h4>
+                      <p className="text-sm font-medium text-slate leading-relaxed">
+                        초대 링크를 통해 가입한 친구가 유니클의 유료 서비스를 이용하면<br className="hidden md:block" /> 
+                        본인과 친구 모두에게 특별한 회복 리워드가 적립됩니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+                    {/* 왼쪽: 링크 복사 및 대시보드 */}
+                    <div className="space-y-8">
+                      <ReferralSection referralCode={userData?.referralCode} />
+                    </div>
+
+                    {/* 오른쪽: QR 카드 가시성 강화 */}
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-full text-center mb-2">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Visual Share Link</p>
+                        <p className="text-sm font-bold text-obsidian">QR 인비테이션 카드</p>
+                      </div>
+                      <QRReferralCard 
+                        userName={session.user?.name || ''} 
+                        referralCode={userData?.referralCode || ''} 
+                      />
+                      <p className="text-[10px] text-slate-400 font-medium text-center max-w-[200px]">
+                        위 이미지를 길게 누르거나 저장하여 SNS에 배포할 수 있습니다.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="lg:col-span-4 space-y-8 h-full">
-              {/* QR 초대 카드 */}
-              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-mist transition-all hover:shadow-md">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-amber-50 rounded-2xl text-amber-600">
-                      <Sparkles className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-obsidian tracking-tighter">인비테이션 QR</h3>
-                      <p className="text-[10px] font-bold text-slate uppercase tracking-widest">Invitation Protocol</p>
-                    </div>
-                  </div>
-                  <QRReferralCard 
-                    userName={session.user?.name || ''} 
-                    referralCode={userData?.referralCode || ''} 
-                  />
-                </div>
-              </Card>
-
               {/* 파트너 상태 */}
               {partnerInfo && (
                 <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-mist transition-all hover:shadow-md">

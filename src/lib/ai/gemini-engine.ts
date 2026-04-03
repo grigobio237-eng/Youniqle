@@ -925,7 +925,12 @@ ${input.isStemCellSolution ? `
             ? `High quality professional Medical and clinical photography. Focus on healing environments, professional procedures, and microscopic cell recovery. ABSOLUTELY NO product bottles, no packaging, no retail containers.`
             : `High quality e-commerce product photography. Use the provided product/model images as the absolute visual standard.`;
 
-        const prompt = `${basePrefix} ${input.prompt}. ${input.keyMessage ? `Overlay text: "${input.keyMessage}".` : ''} Aspect Ratio: ${input.aspectRatio || "9:16"}`;
+        // 한글 가독성 강화를 위한 텍스트 오버레이 프롬프트 개선
+        const textOverlayInstruction = input.keyMessage 
+            ? `Explicitly render the following Korean text (Hangul characters) as a clean, modern, and readable graphic overlay: "${input.keyMessage}". Use professional Korean typography, ensuring all characters are clear and correctly spelled in Hangul script. High quality graphic design layout.`
+            : '';
+
+        const prompt = `${basePrefix} ${input.prompt}. ${textOverlayInstruction} Aspect Ratio: ${input.aspectRatio || "9:16"}`;
 
         const images = Array.isArray(input.referenceImage) ? input.referenceImage : input.referenceImage ? [input.referenceImage] : [];
 

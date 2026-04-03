@@ -48,9 +48,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. 코드가 있으면 유효성 검증
+    // 3. 코드가 있으면 유효성 검증 (대소문자 구분 없이 검색)
     if (codeToCheck) {
-      const referrer = await User.findOne({ referralCode: codeToCheck });
+      const referrer = await User.findOne({ 
+        referralCode: { $regex: new RegExp(`^${codeToCheck}$`, 'i') } 
+      });
       if (referrer) {
         validReferredBy = referrer.referralCode;
         console.log(`Referral linked: New user invited by ${referrer.email} (${referrer.referralCode})`);

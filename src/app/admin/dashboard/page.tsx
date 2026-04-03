@@ -188,12 +188,12 @@ export default function AdminDashboard() {
               <BellRing className="w-6 h-6 animate-bounce" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-rose-900">새로운 컨시어지 신청이 있습니다</h3>
-              <p className="text-sm text-rose-600 font-medium">현재 {stats.pendingConciergeCount}건의 신청이 대기 중입니다. 지금 바로 확인하고 승인 처리를 진행하세요.</p>
+              <h3 className="text-lg font-bold text-rose-900">새로운 심층 회복 설계 요청이 있습니다</h3>
+              <p className="text-sm text-rose-600 font-medium">현재 {stats.pendingConciergeCount}건의 신청이 대기 중입니다. 지금 바로 확인하고 전용 설계를 제안하세요.</p>
             </div>
           </div>
           <Button asChild className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-6 h-12 font-black transition-all hover:scale-105">
-            <Link href="/admin/pavilion">
+            <Link href="/admin/consultations">
               확인하러 가기 <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>
@@ -275,12 +275,12 @@ export default function AdminDashboard() {
         <Card className="bg-gradient-to-br from-amber-400 to-orange-500 text-white border-none shadow-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
-              <Layers className="w-4 h-4" /> 파빌리온 아이템
+              <Layers className="w-4 h-4" /> 줄기세포 전용 솔루션
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-black">28</div>
-            <p className="text-xs opacity-60 mt-1">1F-5F 전체 등록 아이템</p>
+            <p className="text-xs opacity-60 mt-1">승인 대기 및 등록 완료 솔루션</p>
           </CardContent>
         </Card>
       </div >
@@ -394,9 +394,9 @@ export default function AdminDashboard() {
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all">
-              <Link href="/admin/pavilion">
+              <Link href="/admin/consultations">
                 <Layers className="h-6 w-6 text-emerald-500" />
-                <span className="font-bold">파빌리온 관리</span>
+                <span className="font-bold">회복 설계 관리</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-24 flex-col gap-1 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all">

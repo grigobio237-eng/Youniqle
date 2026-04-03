@@ -401,9 +401,9 @@ export default function AiNavigatorPage() {
                             </div>
 
                             {/* Step 3: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
-                            <div className="space-y-8 relative">
-                                <div className="absolute -left-2 md:-left-20 -top-12 md:-top-4 text-4xl md:text-[140px] font-black text-primary/[0.02] md:text-primary/[0.05] leading-none select-none pointer-events-none italic">Event</div>
-                                <div className="flex items-center gap-3">
+                            <div className="space-y-8 relative mt-12 md:mt-20 pt-16 md:pt-24">
+                                <div className="absolute left-0 md:left-4 top-0 md:top-4 text-5xl md:text-[100px] font-black text-slate-900/[0.03] leading-none select-none pointer-events-none italic z-0 uppercase tracking-tighter">Event</div>
+                                <div className="flex items-center gap-3 relative z-10">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Sparkles className="w-5 h-5" />
                                     </div>
