@@ -205,38 +205,52 @@ const PavilionDetailPlanner = () => {
         }
     };
 
-    // 이미지 전체 다운로드 (Blob 방식 - 안정성 개선)
+    // 이미지 전체 다운로드 (Blob 방식 - 안정성 및 파일명 보존 개선)
     const handleDownloadAll = async () => {
         const tid = toast.loading('이미지를 준비 중입니다...');
         const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-        // 파일명으로 사용할 수 없는 특수문자 제거 (\ / : ? * " < > |)
-        const safePrefix = (info.name || 'stemcell').replace(/[/\\?%*:|"<>]/g, '-').trim();
+        
+        // 오전의 성공 사례와 유사하게 파일명 정제 (시스템 금칙어만 제거)
+        const safePrefix = (info.name || 'stemcell')
+            .replace(/[/\\?%*:|"<>]/g, '-') // 윈도우/맥 금칙어만 하이픈으로 치환
+            .trim();
 
         try {
             const downloadImage = async (url: string, filename: string) => {
                 const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
+                const originalBlob = await response.blob();
+                
+                // 1. MIME 타입을 명시적으로 image/png로 재지정 (브라우저 인식률 개선)
+                const imageBlob = new Blob([originalBlob], { type: 'image/png' });
+                const blobUrl = window.URL.createObjectURL(imageBlob);
+                
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = filename;
+                // 2. download 속성에 직접 대입 (브라우저가 파일명을 확실히 인지하게 함)
+                link.download = filename; 
+                
                 document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link);
-                // 브라우저가 파일 쓰기를 완전히 마칠 수 있도록 충분히 긴 시간(10초) 뒤에 해제
-                setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+                
+                // 충분한 시간을 두고 제거 및 메모리 해제
+                setTimeout(() => {
+                    if (document.body.contains(link)) {
+                        document.body.removeChild(link);
+                    }
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 15000); 
             };
 
             if (thumbnailImage) {
                 await downloadImage(thumbnailImage, `${safePrefix}_썸네일.png`);
-                await delay(300); // 브라우저의 전역 다중 다운로드 차단 방지를 위해 약간의 간격을 둠
+                await delay(800); // 실행 간격을 800ms로 추가 상향하여 브라우저의 보안 정책 우회
             }
 
             for (let i = 0; i < segments.length; i++) {
                 const seg = segments[i];
                 if (seg.imageUrl) {
                     await downloadImage(seg.imageUrl, `${safePrefix}_상세_${i + 1}.png`);
-                    await delay(300);
+                    await delay(800);
                 }
             }
             toast.success('이미지 다운로드 요청을 모두 보냈습니다.', { id: tid });
