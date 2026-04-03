@@ -145,13 +145,16 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                     <Camera className="w-8 h-8 text-white/50" />
                 </div>
                 <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-white tracking-tight uppercase italic">Click to Scan</h3>
-                    <p className="text-white/50 text-sm font-medium">지금 바로 스캔하고 맞춤 점수를 확인하세요</p>
+                    <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Ready to Scan</h3>
+                    <p className="text-white/60 text-xs font-bold leading-relaxed break-keep px-4">
+                        식단, 시술 부위, 또는 회복 보조제를 촬영하세요.<br />
+                        AI가 실시간으로 당신의 회복 점수를 분석합니다.
+                    </p>
                 </div>
                 <div className="flex gap-2">
-                    <Badge variant="outline" className="border-white/10 text-white/30 font-bold bg-white/5">DIET</Badge>
-                    <Badge variant="outline" className="border-white/10 text-white/30 font-bold bg-white/5">RECOVERY</Badge>
-                    <Badge variant="outline" className="border-white/10 text-white/30 font-bold bg-white/5">AI</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">MEAL</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">AREA</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">MEDS</Badge>
                 </div>
             </div>
 

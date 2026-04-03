@@ -22,7 +22,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           {/* Left: Brand & Diagnosis */}
-          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700">
+          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-2 lg:order-1">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.8em] opacity-70">Scientific Recovery</span>
@@ -67,7 +67,7 @@ export default function Hero({ onStart }: { onStart: () => void }) {
           </div>
 
           {/* Right: The AI Scanner Hook */}
-          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200 order-1 lg:order-2">
             <div className="absolute -inset-4 bg-gradient-to-tr from-chapter-accent/5 to-reward-gold/5 rounded-[60px] blur-3xl opacity-50" />
             <div className="relative">
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-chapter-accent/5 rounded-full blur-2xl animate-pulse" />
