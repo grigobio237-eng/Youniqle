@@ -11,8 +11,9 @@ import { useRecovery } from '@/contexts/RecoveryContext';
 
 interface AnalysisResult {
     foodName: string;
-    recoveryPoints: string[];
-    analysis: string;
+    summary: string;
+    nutritionTable: { label: string; value: string; benefit: string; }[];
+    futureDirection: string;
     matchScore: number;
 }
 
@@ -191,9 +192,9 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">MEAL</Badge>
-                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">AREA</Badge>
-                    <Badge variant="outline" className="border-white/20 text-white/40 font-black text-[9px] uppercase tracking-widest bg-white/5">MEDS</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">MEAL</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">AREA</Badge>
+                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">MEDS</Badge>
                 </div>
             </div>
 
@@ -237,14 +238,14 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                         <div className="absolute bottom-6 left-8 right-8 flex items-end justify-between text-white">
                             <div>
-                                <h4 className="text-3xl font-black italic uppercase tracking-tighter">{result.foodName}</h4>
+                                <h4 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter">{result.foodName}</h4>
                                 <div className="text-[10px] font-black uppercase tracking-widest text-chapter-accent flex items-center gap-1">
                                     <Activity className="w-3 h-3" /> Recovery Point
                                 </div>
                             </div>
                             <div className="text-right">
-                                <span className="text-xs font-black uppercase tracking-widest block mb-1 opacity-60">SCORE</span>
-                                <span className="text-4xl font-black italic">{result.matchScore}<span className="text-lg opacity-40">/100</span></span>
+                                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-60">SCORE</span>
+                                <span className="text-2xl md:text-4xl font-black italic">{result.matchScore}<span className="text-sm opacity-40">/100</span></span>
                             </div>
                         </div>
                         <button 
@@ -257,12 +258,46 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                         </button>
                     </div>
                     <CardContent className="p-8 space-y-8">
+                        {/* 1. Summary Section */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-slate/40">
-                                <Brain className="w-4 h-4 text-reward-gold" /> Personalized Insight
+                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate/60">
+                                <Brain className="w-4 h-4 text-reward-gold" /> Personalized Summary
                             </div>
-                            <p className="text-lg font-medium leading-relaxed italic text-obsidian bg-mist/30 p-6 rounded-[32px] border border-line/30">
-                                "{result.analysis}"
+                            <p className="text-lg md:text-2xl font-black leading-tight text-obsidian bg-mist/30 p-5 rounded-[32px] border border-line/30 italic">
+                                "{result.summary}"
+                            </p>
+                        </div>
+
+                        {/* 2. Nutrition & Impact Table */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate/60">
+                                <Activity className="w-4 h-4 text-chapter-accent" /> Recovery Analysis
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {result.nutritionTable?.map((item, idx) => (
+                                    <div key={idx} className="flex flex-col p-5 rounded-[24px] bg-white border border-line/50 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-[10px] font-black text-slate/60 uppercase tracking-widest">{item.label}</span>
+                                            <Badge variant="outline" className="text-[10px] font-bold border-chapter-accent/20 text-chapter-accent bg-chapter-accent/5">
+                                                {item.value}
+                                            </Badge>
+                                        </div>
+                                        <p className="text-xs font-bold text-obsidian leading-snug">
+                                            {item.benefit}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 3. Future Direction */}
+                        <div className="p-6 rounded-[32px] bg-obsidian text-white space-y-3 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-chapter-accent/20 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
+                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/70 relative z-10">
+                                <Sparkles className="w-4 h-4 text-chapter-accent" /> Next Step Guide
+                            </div>
+                            <p className="text-sm font-bold leading-relaxed relative z-10">
+                                {result.futureDirection}
                             </p>
                         </div>
 
@@ -270,7 +305,7 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                         <div className="pt-6 border-t border-line space-y-6">
                             <div className="text-center space-y-2">
                                 <h4 className="text-xl font-black text-obsidian tracking-tight">회복 여정을 선택하세요</h4>
-                                <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest">Select your path to get precision feedback</p>
+                                <p className="text-[10px] font-bold text-slate/60 uppercase tracking-widest">Select your path to get precision feedback</p>
                             </div>
                             
                             <div className="space-y-4">
@@ -304,7 +339,7 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                                             exit={{ opacity: 0, height: 0 }}
                                             className="bg-mist/50 p-4 rounded-[24px] border border-line overflow-hidden"
                                         >
-                                            <div className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-3 text-center">세부 상황 선택</div>
+                                            <div className="text-[10px] font-black text-slate/60 uppercase tracking-widest mb-3 text-center">세부 상황 선택</div>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button 
                                                     onClick={() => setJourney('CLINICAL_PRE')}
@@ -328,8 +363,8 @@ export default function HeroScanner({ onStart }: { onStart: () => void }) {
                                 onClick={onStart}
                                 size="lg" 
                                 disabled={!journey}
-                                className={`w-full h-20 rounded-[24px] text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${
-                                    !journey ? 'bg-mist text-slate/30' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'
+                                className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${
+                                    !journey ? 'bg-mist text-slate/50' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'
                                 }`}
                             >
                                 {journey && <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />}

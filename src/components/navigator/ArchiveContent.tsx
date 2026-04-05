@@ -561,13 +561,13 @@ const ArchiveContent = () => {
               {/* Hover Summary Overlay for ID-ed cards */}
               {card.id && (
                 <div className="absolute inset-0 bg-obsidian/95 p-8 opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-center translate-y-full group-hover:translate-y-0 duration-500">
-                   <p className="text-[10px] font-black text-mist/40 uppercase tracking-[0.2em] mb-2 items-center flex gap-2">
+                   <p className="text-[10px] font-black text-mist/70 uppercase tracking-[0.2em] mb-2 items-center flex gap-2">
                      <Quote className="w-3 h-3" /> Quick Summary
                    </p>
                    <p className="text-mist text-lg font-serif italic leading-relaxed">
                      "{card.summary}"
                    </p>
-                   <div className="mt-6 flex items-center gap-2 text-mist/60 text-[10px] font-black uppercase tracking-widest">
+                   <div className="mt-6 flex items-center gap-2 text-mist/80 text-[10px] font-black uppercase tracking-widest">
                      Double Click for Full Details <Activity className="w-3 h-3 animate-pulse" />
                    </div>
                 </div>
@@ -710,7 +710,7 @@ const ArchiveContent = () => {
                         <p className="text-sm font-black text-obsidian">{point.label}</p>
                         {point.id && <ChevronRight className="w-3 h-3 text-chapter-accent opacity-0 group-hover/point:opacity-100 transition-opacity" />}
                       </div>
-                      <p className="text-xs text-slate/40 font-bold">{point.sub}</p>
+                      <p className="text-xs text-slate/60 font-bold">{point.sub}</p>
                     </div>
                   </button>
                 ))}
@@ -737,11 +737,11 @@ const ArchiveContent = () => {
                     className={`flex items-start gap-4 p-4 rounded-2xl border text-left transition-all group/sol ${
                       point.id 
                         ? 'bg-obsidian text-white border-white/10 hover:bg-white hover:text-obsidian hover:border-chapter-accent hover:shadow-xl' 
-                        : 'bg-obsidian/80 text-white/40 border-white/5 opacity-50'
+                        : 'bg-obsidian/80 text-white/70 border-white/5 opacity-50'
                     }`}
                   >
                     <point.icon className={`w-5 h-5 mt-0.5 transition-colors ${
-                      point.id ? 'text-mist group-hover/sol:text-chapter-accent' : 'text-mist/20'
+                      point.id ? 'text-mist group-hover/sol:text-chapter-accent' : 'text-mist/60'
                     }`} />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -749,7 +749,7 @@ const ArchiveContent = () => {
                         {point.id && <ChevronRight className="w-3 h-3 text-chapter-accent opacity-0 group-hover/sol:opacity-100 transition-opacity" />}
                       </div>
                       <p className={`text-xs font-bold transition-colors ${
-                        point.id ? 'text-mist/40 group-hover/sol:text-slate' : 'text-mist/20'
+                        point.id ? 'text-mist/70 group-hover/sol:text-slate' : 'text-mist/50'
                       }`}>{point.sub}</p>
                     </div>
                   </button>
@@ -764,7 +764,7 @@ const ArchiveContent = () => {
                   <div className="text-5xl font-serif italic text-line">03</div>
                   <h4 className="text-2xl font-black text-obsidian tracking-tight">"상대방에 따라 다르게 말해요"</h4>
                 </div>
-                <div className="px-4 py-1.5 rounded-full bg-mist text-[10px] font-black uppercase text-slate/40 tracking-widest">맞춤형 화법</div>
+                <div className="px-4 py-1.5 rounded-full bg-mist text-[10px] font-black uppercase text-slate/60 tracking-widest">맞춤형 화법</div>
              </div>
              <div className="grid md:grid-cols-3 gap-6">
                 {[
@@ -791,11 +791,11 @@ const ArchiveContent = () => {
              </div>
              <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4 border-l-2 border-chapter-accent/40 pl-6">
-                   <h5 className="text-[10px] font-black uppercase text-mist/40 tracking-[0.2em]">기존 매출 불가침</h5>
+                   <h5 className="text-[10px] font-black uppercase text-mist/70 tracking-[0.2em]">기존 매출 불가침</h5>
                    <p className="text-lg font-bold">"원장님의 진료 수익은 건드리지 않습니다. 우리는 새로 만든 '비의료 가치'만 나눕니다."</p>
                 </div>
                 <div className="space-y-4 border-l-2 border-chapter-accent/40 pl-6">
-                   <h5 className="text-[10px] font-black uppercase text-mist/40 tracking-[0.2em]">배분이 아니라 재창출</h5>
+                   <h5 className="text-[10px] font-black uppercase text-mist/70 tracking-[0.2em]">배분이 아니라 재창출</h5>
                    <p className="text-lg font-bold">"고객이 더 만족해서 병원을 다시 찾게 만드는 '재방문 구조'를 함께 만듭니다."</p>
                 </div>
              </div>

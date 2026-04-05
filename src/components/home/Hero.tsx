@@ -33,33 +33,33 @@ export default function Hero({ onStart }: { onStart: () => void }) {
                   </motion.div>
                 )}
               </div>
-              <h1 className="text-4xl md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
+              <h1 className="text-2xl md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
                 당신이 머무는 공간,<br />
                 보는 것과 듣는 것,<br />
                 그리고 먹는 모든 것이<br />
                 <span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 조각</span>입니다.
               </h1>
-              <p className="text-lg md:text-xl text-slate/70 font-medium leading-relaxed">
-                식단, 사운드, 시각 데이터를 통합한<br className="hidden md:block" />
+              <p className="text-base md:text-xl text-slate/70 font-medium leading-relaxed">
+                식단, 사운드, 시각 데이터를 통합한 <br className="hidden md:block" />
                 유니클만의 맞춤형 회복 큐레이션
               </p>
               
               <div className="pt-4 space-y-6">
                 <div className="flex flex-wrap gap-4">
-                  <Button onClick={onStart} size="lg" className="btn-primary h-14 md:h-16 px-8 rounded-2xl text-lg font-black shadow-xl shadow-chapter-accent/20 group">
+                  <Button onClick={onStart} size="lg" className="btn-primary h-12 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group">
                     <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                     60초 정밀 진단 시작
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
-                <p className="text-sm font-bold text-chapter-accent flex items-center gap-2">
+                <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">
                   <div className="w-2 h-2 bg-chapter-accent rounded-full animate-pulse" />
                   60초 진단으로 맞춤 회복 피드백 받기
-                </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-8 text-xs text-slate/40 font-black uppercase tracking-widest">
+            <div className="flex flex-wrap items-center gap-8 text-xs text-slate/60 font-black uppercase tracking-widest">
               <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 회복 점수 리포트</span>
               <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 시술/수술 케어</span>
               <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 일상 리듬 설계</span>
@@ -67,9 +67,9 @@ export default function Hero({ onStart }: { onStart: () => void }) {
           </div>
 
           {/* Right: The AI Scanner Hook */}
-          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200 order-1 lg:order-2">
+          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200 order-1 lg:order-2 flex justify-center lg:block">
             <div className="absolute -inset-4 bg-gradient-to-tr from-chapter-accent/5 to-reward-gold/5 rounded-[60px] blur-3xl opacity-50" />
-            <div className="relative">
+            <div className="relative w-full">
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-chapter-accent/5 rounded-full blur-2xl animate-pulse" />
               <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-reward-gold/5 rounded-full blur-3xl animate-pulse delay-1000" />
               <HeroScanner onStart={onStart} />

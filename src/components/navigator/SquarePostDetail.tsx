@@ -327,7 +327,7 @@ export default function SquarePostDetail({ postId, onClose, onEdit, onDeleteSucc
                        <div className="flex items-center justify-between">
                          <p className="text-sm font-black text-obsidian">{comment.authorName}</p>
                          <div className="flex items-center gap-3">
-                           <span className="text-[10px] font-bold text-slate/30">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                           <span className="text-[10px] font-bold text-slate/50">{new Date(comment.createdAt).toLocaleDateString()}</span>
                            {(comment.authorId.toString() === currentUserId || session?.user?.role === 'admin') && (
                              <button 
                                onClick={() => handleDeleteComment(comment._id)}
@@ -346,7 +346,7 @@ export default function SquarePostDetail({ postId, onClose, onEdit, onDeleteSucc
                     </div>
                   </div>
                 )) : (
-                  <p className="text-xs text-slate/30 font-bold uppercase tracking-widest text-center py-10 opacity-50">첫 번째 댓글을 남겨보세요</p>
+                  <p className="text-xs text-slate/50 font-bold uppercase tracking-widest text-center py-10 opacity-70">첫 번째 댓글을 남겨보세요</p>
                 )}
               </div>
             </div>
@@ -363,7 +363,7 @@ export default function SquarePostDetail({ postId, onClose, onEdit, onDeleteSucc
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="동료에게 의견을 남겨보세요..."
-              className="flex-1 border-none focus-visible:ring-0 font-bold placeholder:text-slate/30 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+              className="flex-1 border-none focus-visible:ring-0 font-bold placeholder:text-slate/60 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
               aria-label="댓글 내용"
               title="댓글 내용"
             />

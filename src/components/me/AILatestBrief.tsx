@@ -29,12 +29,12 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                         <Brain className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">AI Weekly Brief</p>
+                        <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">AI Weekly Brief</p>
                         <h3 className="text-xl font-black tracking-tight">AI 맞춤 리커버리 요약</h3>
                     </div>
                 </div>
                 {createdAt && (
-                    <span className="text-[10px] font-bold text-white/30">
+                    <span className="text-[10px] font-bold text-white/60">
                         {new Date(createdAt).toLocaleDateString()}
                     </span>
                 )}
@@ -51,7 +51,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                             <item.icon className="w-5 h-5" />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black opacity-40 uppercase mb-1">{item.title}</p>
+                            <p className="text-[10px] font-black opacity-70 uppercase mb-1">{item.title}</p>
                             <p className="text-xs font-bold leading-snug line-clamp-1">{item.content}</p>
                         </div>
                     </div>

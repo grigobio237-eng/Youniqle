@@ -36,7 +36,7 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         lossAversionMessage: '아침 루틴을 건너뛰면 오전 집중력이 30% 저하될 수 있어요',
         recommendedProducts: ['에너지 부스터', '모닝 비타민', '그린티'],
         color: 'text-amber-600',
-        bgColor: 'bg-amber-50 border-amber-200',
+        bgColor: 'bg-white/90 md:bg-amber-50/90 backdrop-blur-xl border-amber-200/50',
     },
     afternoon: {
         icon: <Sun className="w-5 h-5" />,
@@ -46,7 +46,7 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         lossAversionMessage: '지금 회복하지 않으면 저녁까지 피로가 20% 더 누적될 수 있어요',
         recommendedProducts: ['테아닌 차', '아로마 스프레이', '명상 가이드'],
         color: 'text-chapter-accent',
-        bgColor: 'bg-chapter-accent/5 border-chapter-accent/20',
+        bgColor: 'bg-white/90 md:bg-chapter-accent/10 backdrop-blur-xl border-chapter-accent/30',
     },
     evening: {
         icon: <Sunset className="w-5 h-5" />,
@@ -56,7 +56,7 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         lossAversionMessage: '지금 휴식을 시작하지 않으면 다음 날 피로 회복이 40% 느려질 수 있어요',
         recommendedProducts: ['블루라이트 차단 안경', '수면 스프레이', '릴렉싱 오일'],
         color: 'text-purple-600',
-        bgColor: 'bg-purple-50 border-purple-200',
+        bgColor: 'bg-white/90 md:bg-purple-50/90 backdrop-blur-xl border-purple-200/50',
     },
     night: {
         icon: <Moon className="w-5 h-5" />,
@@ -66,7 +66,7 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         lossAversionMessage: '지금 자지 않으면 내일 컨디션이 50% 이상 저하될 수 있어요',
         recommendedProducts: ['수면 유도 백색소음', '멜라토닌', '허브 베개'],
         color: 'text-indigo-600',
-        bgColor: 'bg-indigo-50 border-indigo-200',
+        bgColor: 'bg-white/90 md:bg-indigo-50/90 backdrop-blur-xl border-indigo-200/50',
     },
 };
 

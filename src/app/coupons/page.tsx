@@ -222,7 +222,10 @@ export default function CouponsPage() {
 
                           <div className="space-y-2 text-[11px] font-bold text-slate">
                             {coupon.minOrderAmount && (
-                              <p className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate" /> {coupon.minOrderAmount.toLocaleString()}원 이상 구매 시</p>
+                              <div className="flex items-center gap-2 text-xs text-slate/60 font-medium tracking-tight">
+                                <div className="w-1 h-1 rounded-full bg-slate-300" />
+                                {coupon.minOrderAmount.toLocaleString()}원 이상 구매 시
+                              </div>
                             )}
                             <p className="flex items-center gap-2">
                               <Calendar className="h-3 w-3" />

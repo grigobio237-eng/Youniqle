@@ -89,7 +89,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
       {/* Search and Action Bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate/40" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate/60" />
           <Input 
             type="text" 
             placeholder="제목이나 작성자로 검색..." 
@@ -129,7 +129,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-obsidian"></div>
-          <p className="text-sm font-bold text-slate/40 uppercase tracking-widest">Loading Square Feed...</p>
+          <p className="text-sm font-bold text-slate/60 uppercase tracking-widest">Loading Square Feed...</p>
         </div>
       ) : filteredPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -192,7 +192,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-slate/40">
+                  <div className="flex items-center gap-4 text-slate/60">
                     <div className="flex items-center gap-1">
                       <Heart className="w-3.5 h-3.5" />
                       <span className="text-[10px] font-bold">{post.likes?.length || 0}</span>
@@ -216,7 +216,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
           <div className="w-20 h-20 bg-mist rounded-full flex items-center justify-center text-4xl">📭</div>
           <div>
             <h3 className="text-xl font-black text-obsidian tracking-tight">작성된 게시글이 없습니다</h3>
-            <p className="text-slate/40 font-medium">첫 번째 노하우를 공유하는 주인공이 되어보세요!</p>
+            <p className="text-slate/70 font-bold">첫 번째 노하우를 공유하는 주인공이 되어보세요!</p>
           </div>
           <Button 
             onClick={onPostCreate}

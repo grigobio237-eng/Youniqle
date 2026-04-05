@@ -49,8 +49,8 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
             Recovery Tools
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tight">다른 유용한 도구도 확인해 보세요</h2>
-          <p className="text-slate/60 text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 AI 도구들입니다.</p>
+          <h2 className="text-xl md:text-5xl font-black text-obsidian tracking-tight">다른 유용한 도구도 확인해 보세요</h2>
+          <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 AI 도구들입니다.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -86,7 +86,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
       {/* 2. Path Preview (Visual Roadmap) */}
       <section className="container mx-auto px-6 space-y-16">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
+          <h2 className="text-xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
           <p className="text-slate/60 font-medium">당신의 결과에 따라 활성화되는 3가지 정밀 로드맵</p>
         </div>
 
@@ -105,7 +105,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
                   생활 패턴과 생체 리듬을 정상화합니다.
                 </p>
               </div>
-              <ul className="space-y-4 text-xs font-bold text-slate/40">
+              <ul className="space-y-4 text-xs font-bold text-slate/60">
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-chapter-accent rounded-full" /> 수면 패턴 최적화</li>
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-chapter-accent rounded-full" /> 스트레스 이완 가이드</li>
               </ul>
@@ -121,12 +121,12 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
               </div>
               <div>
                 <h3 className="text-3xl font-black text-mist mb-3 tracking-tight">집중 회복</h3>
-                <p className="text-mist/40 text-sm leading-relaxed">
+                <p className="text-mist/70 text-sm leading-relaxed">
                   확실한 변화와 관리가 필요할 때.<br />
                   전문화된 도구와 코칭으로 집중 케어합니다.
                 </p>
               </div>
-              <ul className="space-y-4 text-xs font-bold text-mist/20">
+              <ul className="space-y-4 text-xs font-bold text-mist/60">
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-reward-gold rounded-full" /> 맞춤형 영양 및 도구</li>
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-reward-gold rounded-full" /> 전문가 1:1 연결</li>
               </ul>
@@ -147,7 +147,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
                   오프라인 힐링센터와 연계된 프라이빗 케어.
                 </p>
               </div>
-              <ul className="space-y-4 text-xs font-bold text-slate/40">
+              <ul className="space-y-4 text-xs font-bold text-slate/60">
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-status-normal rounded-full" /> 힐링센터 익스클루시브</li>
                 <li className="flex items-center gap-3"><div className="w-2 h-2 bg-status-normal rounded-full" /> 개인화된 멤버십 혜택</li>
               </ul>
@@ -162,10 +162,10 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
           <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <div className="relative z-10 space-y-10">
             <div className="space-y-4">
-              <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">당신의 세계를 스캔하세요.<br />진정한 회복은 지금부터입니다.</h2>
-              <p className="text-white/40 text-lg md:text-xl font-medium">유니클의 데이터 기반 회복 프로토콜에 합류하세요</p>
+              <h2 className="text-2xl md:text-6xl font-black text-white leading-tight tracking-tight">당신의 세계를 스캔하세요.<br />진정한 회복은 지금부터입니다.</h2>
+              <p className="text-white/70 text-base md:text-xl font-medium">유니클의 데이터 기반 회복 프로토콜에 합류하세요</p>
             </div>
-            <Button onClick={onStart} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-20 md:h-24 px-16 rounded-[32px] text-xl md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden">
+            <Button onClick={onStart} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-16 md:h-24 px-12 md:px-16 rounded-[24px] md:rounded-[32px] text-lg md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               <Sparkles className="w-8 h-8 mr-4 group-hover:rotate-12 transition-transform" />
               60초 정밀 진단 시작하기

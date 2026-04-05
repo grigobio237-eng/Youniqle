@@ -139,15 +139,15 @@ function DeepIntroView({ onStart, onClose }: { onStart: () => void, onClose: () 
                 <div className="grid grid-cols-3 gap-8 w-full max-w-md pt-4">
                     <div className="flex flex-col items-center">
                         <span className="text-2xl mb-1">📋</span>
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">60 문항</span>
+                        <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">60 문항</span>
                     </div>
                     <div className="flex flex-col items-center border-x border-white/10">
                         <span className="text-2xl mb-1">⏱️</span>
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">약 7분</span>
+                        <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">약 7분</span>
                     </div>
                     <div className="flex flex-col items-center">
                         <span className="text-2xl mb-1">⚖️</span>
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">T-Score 규준</span>
+                        <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">T-Score 규준</span>
                     </div>
                 </div>
             </div>
@@ -244,9 +244,9 @@ function DeepAnalyzingView() {
             <div>
                 <h2 className="text-3xl font-black mb-4">데이터 정밀 분석 중</h2>
                 <div className="space-y-3">
-                    <p className="text-white/40 text-sm animate-pulse">• IPIP-NEO-60 규준 대조 중...</p>
-                    <p className="text-white/40 text-sm animate-pulse delay-700">• 30개 심리 국면 가중치 산출 중...</p>
-                    <p className="text-white/40 text-sm animate-pulse delay-1000">• 요인 간 상호작용 내러티브 생성 중...</p>
+                    <p className="text-white/60 text-sm animate-pulse">• IPIP-NEO-60 규준 대조 중...</p>
+                    <p className="text-white/60 text-sm animate-pulse delay-700">• 30개 심리 국면 가중치 산출 중...</p>
+                    <p className="text-white/60 text-sm animate-pulse delay-1000">• 요인 간 상호작용 내러티브 생성 중...</p>
                 </div>
             </div>
         </motion.div>

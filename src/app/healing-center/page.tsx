@@ -163,7 +163,7 @@ export default function HealingCenterPage() {
                                     </div>
                                     <div className="h-px bg-white/10" />
                                     <div className="space-y-4">
-                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">과학적 가치</p>
+                                        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.3em]">과학적 가치</p>
                                         <p className="text-white/60 text-xs leading-relaxed">
                                             본 솔루션은 마스터의 정밀한 회복 프로토콜에 따라 생체 데이터 최적화를 목표로 설계되었습니다.
                                         </p>
@@ -172,7 +172,7 @@ export default function HealingCenterPage() {
 
                                 <div className="flex justify-between items-end border-t border-white/10 pt-8">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">독점 제공가</p>
+                                        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.3em]">독점 제공가</p>
                                         <p className="text-3xl font-serif text-white tracking-tighter">{selectedProduct.price?.toLocaleString()}₩</p>
                                     </div>
                                     <Button className="h-16 px-12 bg-white text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#D4AF37] transition-all">

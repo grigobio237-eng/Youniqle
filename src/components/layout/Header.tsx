@@ -103,7 +103,9 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full border-b border-line transition-all duration-300 ${
+      isMenuOpen ? 'bg-background shadow-xl' : 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80'
+    }`}>
       <div className="container mx-auto px-3 md:px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -118,6 +120,7 @@ export default function Header() {
                   window.dispatchEvent(new Event('recovery-gate-passed'));
                 }
               }
+              setIsMenuOpen(false);
             }}
           >
             <div className="relative h-8 w-8 md:h-10 md:w-10 transition-transform duration-300 group-hover:scale-105">
@@ -194,22 +197,29 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t py-4 max-h-[80vh] overflow-y-auto">
-            <nav className="flex flex-col space-y-4">
+          <div className="md:hidden border-t py-6 max-h-[85vh] overflow-y-auto bg-background animate-in slide-in-from-top-4 duration-300">
+            <nav className="flex flex-col space-y-6 px-4">
               {menuItems.map((item) => (
-                <div key={item.label} className="flex flex-col space-y-2">
+                <div key={item.label} className="flex flex-col space-y-1">
                   <Link
                     href={item.href}
-                    className="text-sm font-bold text-text-secondary px-4 py-2 bg-mist/30 rounded-lg"
+                    className="flex flex-col gap-1 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {item.label}
+                    <span className="text-lg font-black text-text-primary group-active:text-primary transition-colors">
+                      {item.label}
+                    </span>
+                    <span className="text-[11px] font-medium text-text-secondary opacity-70">
+                      {item.desc}
+                    </span>
                   </Link>
+                  <div className="h-px bg-line/10 w-full mt-2" />
                 </div>
               ))}
               {!session && (
-                <Link href="/auth/signin" className="text-sm font-bold text-primary px-4 mt-4" onClick={() => setIsMenuOpen(false)}>
-                  로그인
+                <Link href="/auth/signin" className="group flex flex-col gap-1" onClick={() => setIsMenuOpen(false)}>
+                  <span className="text-lg font-black text-primary">로그인</span>
+                  <span className="text-[11px] font-medium text-text-secondary opacity-70">회원 서비스 이용을 위한 로그인</span>
                 </Link>
               )}
             </nav>

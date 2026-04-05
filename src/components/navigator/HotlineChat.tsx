@@ -124,7 +124,7 @@ export default function HotlineChat() {
                 Technical Expert
               </div>
             </div>
-            <p className="text-mist/40 text-[10px] uppercase font-bold tracking-widest mt-0.5">
+            <p className="text-mist/70 text-[10px] uppercase font-bold tracking-widest mt-0.5">
                Consultation Assistant Engine
             </p>
           </div>
@@ -132,7 +132,7 @@ export default function HotlineChat() {
         
         <button 
           onClick={handleReset}
-          className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/40 hover:text-white"
+          className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/70 hover:text-white"
           title="대화 초기화"
         >
           <RefreshCw className="w-4 h-4" />
@@ -170,7 +170,7 @@ export default function HotlineChat() {
                         <p key={i} className={i > 0 ? 'mt-3' : ''}>{line}</p>
                      ))}
                    </div>
-                   <span className="text-[10px] font-black uppercase text-slate/30 tracking-widest px-2">
+                   <span className="text-[10px] font-black uppercase text-slate/50 tracking-widest px-2">
                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                    </span>
                 </div>
@@ -200,7 +200,7 @@ export default function HotlineChat() {
                   <div className="w-1.5 h-1.5 bg-slate/20 rounded-full animate-bounce [animation-delay:-0.15s]" />
                   <div className="w-1.5 h-1.5 bg-slate/20 rounded-full animate-bounce" />
                </div>
-               <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest">
+               <span className="text-[10px] font-black text-slate/60 uppercase tracking-widest">
                   Analyzing consultation point...
                </span>
             </div>
@@ -219,7 +219,7 @@ export default function HotlineChat() {
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isLoading}
             placeholder="궁금한 내용을 쉽게 물어보세요 (예: 줄기세포의 종류와 차이점)"
-            className="flex-1 border-none focus-visible:ring-0 bg-transparent font-bold placeholder:text-slate/30 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+            className="flex-1 border-none focus-visible:ring-0 bg-transparent font-bold placeholder:text-slate/60 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
           />
           <Button 
             type="submit"
@@ -231,15 +231,16 @@ export default function HotlineChat() {
         </form>
         
         <div className="mt-4 flex items-center justify-center gap-6">
-           <div className="flex items-center gap-1.5 text-slate/30">
+           <div className="flex items-center gap-1.5 text-slate/60">
               <HelpCircle className="w-3.5 h-3.5" />
               <span className="text-[10px] font-black uppercase tracking-widest">Technical Support ID: Expert-2.0</span>
            </div>
            <div className="w-1 h-1 bg-line rounded-full" />
-           <p className="text-[10px] font-black uppercase text-slate/30 tracking-widest italic">
+           <p className="text-[10px] font-black uppercase text-slate/60 tracking-widest italic">
               AI responses are for reference only.
            </p>
         </div>
+
       </div>
 
       {/* Decor Elements */}

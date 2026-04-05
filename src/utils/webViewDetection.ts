@@ -11,13 +11,25 @@ export const isWebView = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+  
+  // 1. Chrome Safe Guard: 크롬 브라우저 자체인 경우 (모바일 크롬 포함)
+  // 안드로이드 WebView는 'Chrome/'이 포함되지만 반드시 '; wv)'가 함께 포함됩니다.
+  // 일반 크롬 앱이나 데스크톱 크롬은 '; wv)'가 없습니다.
+  const isChrome = /Chrome\//i.test(userAgent) && !/Safari\//i.test(userAgent) === false; // Safari/는 크롬 UA에도 포함됨
+  const hasWebViewMarker = /; wv\)/i.test(userAgent) || /WebView/i.test(userAgent);
+  
+  // 진짜 크롬 브라우저라면 WebView가 아닌 것으로 우선 판정
+  if (/Chrome\//i.test(userAgent) && !hasWebViewMarker) {
+    return false;
+  }
 
-  // WebView 감지 패턴
+  // 2. WebView 감지 패턴 - 더 정교하게 수정
   const webViewPatterns = [
-    /wv/i, // Android WebView
+    /Version\/.*Chrome\/.*Mobile.*Safari\//i, // Android WebView 특정 패턴
+    /; wv\)/i, // Android WebView Standard marker
     /WebView/i,
     /(iPhone|iPod|iPad)(?!.*Safari\/)/i, // iOS WebView (Safari가 아닌 경우)
-    /Android.*(wv|\.0\.0\.0)/i,
+    /Android.*(; wv\))/i, // Android WebView (버전 번호 0.0.0 충돌 방지)
     /FBAN|FBAV/i, // Facebook in-app browser
     /Line/i, // LINE in-app browser
     /NAVER/i, // Naver in-app browser
@@ -37,17 +49,23 @@ export const openExternalBrowser = (targetUrl: string) => {
 
   const userAgent = navigator.userAgent;
   const isAndroid = /Android/i.test(userAgent);
+  
+  // 크롬 브라우저 자체인지 확인 (크롬인데 오감지된 경우 대비)
+  const isChrome = /Chrome/i.test(userAgent) && !/wv/i.test(userAgent);
 
-  if (isAndroid) {
+  if (isAndroid && !isChrome) {
     // Android: Chrome으로 강제 오픈 (Intent Scheme)
     // S.browser_fallback_url은 크롬이 없을 경우 대비
     const urlWithoutProtocol = targetUrl.replace(/^https?:\/\//, '');
     const intentUrl = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(targetUrl)};end`;
 
-    // Chrome이 없으면 기본 브라우저로 
-    window.location.href = intentUrl;
+    try {
+      window.location.href = intentUrl;
+    } catch (e) {
+      window.location.href = targetUrl;
+    }
   } else {
-    // iOS 및 기타: 새 창 열기 시도 (팝업 차단될 수 있음)
+    // iOS 및 기타 또는 이미 크롬인 경우: 새 창 열기 시도
     window.location.href = targetUrl;
   }
 };
