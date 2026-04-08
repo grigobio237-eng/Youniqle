@@ -272,30 +272,30 @@ const PROTOCOL_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>
     }
 };
 
-// 카테고리별 콘텐츠 매핑
+// 카테고리별 콘텐츠 매핑 (회복 케이스 제거 및 최신 기능으로 교환)
 const CONTENT_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>> = {
     physical: {
         critical: [
             {
-                id: 'content-cases-physical',
+                id: 'content-analysis-physical',
                 type: 'content',
-                title: '신체 회복 성공 사례',
-                description: '비슷한 상태에서 회복한 실제 이야기',
-                link: '/cases?category=physical',
-                icon: '📖',
-                tag: 'CASE',
+                title: 'AI 비디오 자세 진단',
+                description: '카메라로 실시간 신체 밸런스 점검',
+                link: '/analysis/video',
+                icon: '👁️',
+                tag: 'AI_DIAGNOSIS',
                 priority: 85,
                 category: 'physical'
             }
         ],
         low: [
             {
-                id: 'content-cases-physical-low',
+                id: 'content-analysis-posture-low',
                 type: 'content',
-                title: '피로 극복 사례 분석',
-                description: '만성 피로를 이겨낸 회원들의 비결',
-                link: '/cases?category=fatigue',
-                icon: '📖',
+                title: '실시간 체형 교정 분석',
+                description: '틀어진 자세를 바로잡는 정밀 측정',
+                link: '/analysis/video',
+                icon: '👁️',
                 priority: 70,
                 category: 'physical'
             }
@@ -306,25 +306,25 @@ const CONTENT_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>>
     mental: {
         critical: [
             {
-                id: 'content-cases-mental',
+                id: 'content-therapy-sound-mental',
                 type: 'content',
-                title: '번아웃 극복 실제 사례',
-                description: '정신적 한계를 넘어선 회복 스토리',
-                link: '/cases?category=burnout',
-                icon: '📖',
-                tag: 'STORY',
+                title: '딥 사운드 테라피',
+                description: '뇌파를 안정시키고 스트레스를 비워내는 소리',
+                link: '/therapy/sound',
+                icon: '🎧',
+                tag: 'STRESS_FREE',
                 priority: 85,
                 category: 'mental'
             }
         ],
         low: [
             {
-                id: 'content-stress-management',
+                id: 'content-sound-nature-mental',
                 type: 'content',
-                title: '스트레스 관리 가이드',
-                description: '일상 속 스트레스 해소법',
-                link: '/cases?category=stress',
-                icon: '📖',
+                title: '자연음 힐링 명상',
+                description: '숲과 비의 소리로 정서적 균형 회복',
+                link: '/therapy/sound',
+                icon: '🌊',
                 priority: 70,
                 category: 'mental'
             }
@@ -335,25 +335,25 @@ const CONTENT_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>>
     sleep: {
         critical: [
             {
-                id: 'content-cases-sleep',
+                id: 'content-therapy-sound-sleep',
                 type: 'content',
-                title: '불면증 극복 사례',
-                description: '수면 장애를 이겨낸 실제 경험담',
-                link: '/cases?category=sleep',
-                icon: '📖',
-                tag: 'CASE',
+                title: '수면 집중 델타파 케어',
+                description: '숙면을 유도하는 전문 주파수 테라피',
+                link: '/therapy/sound',
+                icon: '🌙',
+                tag: 'DEEP_SLEEP',
                 priority: 85,
                 category: 'sleep'
             }
         ],
         low: [
             {
-                id: 'content-sleep-tips',
+                id: 'content-sound-brown-noise',
                 type: 'content',
-                title: '숙면을 위한 과학적 팁',
-                description: '연구로 검증된 수면 개선법',
-                link: '/cases?category=sleep',
-                icon: '📖',
+                title: '입면 유도 브라운 노이즈',
+                description: '잡념을 없애고 빠르게 잠들 수 있게 돕는 소리',
+                link: '/therapy/sound',
+                icon: '🎧',
                 priority: 70,
                 category: 'sleep'
             }
@@ -364,13 +364,13 @@ const CONTENT_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>>
     lifestyle: {
         critical: [
             {
-                id: 'content-lifestyle-reset',
+                id: 'content-analysis-lifestyle',
                 type: 'content',
-                title: '생활 패턴 리셋 사례',
-                description: '라이프스타일을 바꾼 회복 여정',
-                link: '/cases?category=lifestyle',
-                icon: '📖',
-                tag: 'CASE',
+                title: 'AI 라이프 패턴 분석',
+                description: '데이터로 보는 나의 생활 습관 불균형',
+                link: '/analysis/video',
+                icon: '👁️',
+                tag: 'DATA_CHECK',
                 priority: 85,
                 category: 'lifestyle'
             }

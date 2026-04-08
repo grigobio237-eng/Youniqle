@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Music, Scan, Layout, Sparkles } from 'lucide-react';
 import RealtimeActivityBanner from '@/components/social/RealtimeActivityBanner';
 import DiagnosisBasedRecommendations from '@/components/personalization/DiagnosisBasedRecommendations';
 
@@ -23,7 +23,6 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
       setProgress(userProgress);
       setChecklistProgress(checkProgress);
 
-      // Check for Navigator QR entry or active recovery mode
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('from') === 'navigator_qr') {
         localStorage.setItem('recovery_mode', 'active');
@@ -33,7 +32,6 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
       const isRecovery = localStorage.getItem('recovery_mode') === 'active';
       setIsRecoveryActive(isRecovery);
 
-      // Mark diagnosis as complete
       if (!userProgress.todayChecklist.diagnosis) {
         const { updateChecklist } = require('@/lib/progress');
         const updated = updateChecklist('diagnosis', 5);
@@ -64,8 +62,8 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
   const levelInfo = getLevelInfo(displayScore);
 
   return (
-    <div className="min-h-screen pb-20 bg-mist">
-      {/* Recovery Guard Banner - Only visible when recovery mode is active */}
+    <div className="min-h-screen pb-20 bg-mist text-obsidian">
+      {/* Recovery Guard Banner */}
       {isRecoveryActive && (
         <section className="bg-obsidian py-4 border-b border-white/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 animate-pulse" />
@@ -74,9 +72,9 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-background animate-bounce-slow">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
-              <div>
+              <div className="text-mist">
                 <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Real-time Recovery Guard Active</p>
-                <p className="text-mist font-bold text-sm">시술 후 집중 회복 모니터링 중입니다. (1일차)</p>
+                <p className="font-bold text-sm">시술 후 집중 회복 모니터링 중입니다. (1일차)</p>
               </div>
             </div>
             <Button asChild size="sm" className="bg-primary text-background font-black rounded-xl hover:scale-105 transition-transform">
@@ -90,7 +88,6 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
       <section className="bg-white border-b border-line py-12 px-4 shadow-sm">
         <div className="container mx-auto max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
-            {/* Status Info */}
             <div className="lg:col-span-8 space-y-8">
               <div className="flex items-center gap-6">
                 <div className={`w-28 h-28 rounded-[32px] ${levelInfo.bg} flex items-center justify-center text-5xl shadow-inner border border-line`}>
@@ -123,7 +120,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
                   <p className="text-xs text-slate font-medium mt-1">다음 등급까지 {pointsToNext}pt</p>
                 </div>
               </div>
-              <div className="flex flex-wrap justify-center gap-4 relative z-10">
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 relative z-10">
                 <Button 
                   size="lg" 
                   className="bg-obsidian text-background font-black rounded-2xl h-16 px-10 shadow-xl hover:scale-105 transition-transform"
@@ -141,7 +138,6 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
               </div>
             </div>
 
-            {/* Membership/Points Progress */}
             <div className="lg:col-span-4 bg-obsidian text-mist rounded-[40px] p-8 flex flex-col justify-between shadow-2xl">
               <div>
                 <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 opacity-60">Reward Progress</h3>
@@ -183,7 +179,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
         <div className="bg-obsidian text-mist rounded-[40px] p-10 shadow-2xl relative overflow-hidden group">
           <div className="absolute -right-10 -top-10 w-64 h-64 bg-chapter-accent/20 rounded-full blur-3xl group-hover:bg-chapter-accent/30 transition-colors duration-700" />
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="space-y-3">
+            <div className="space-y-3 text-mist">
               <span className="text-xs font-black text-reward-gold tracking-[0.3em] uppercase">Target of the Today Protocol</span>
               <h3 className="text-3xl font-black tracking-tight">{levelInfo.char} {displayScore >= 70 ? '활기 유지와 데이터 최적화' : '집중 회복 케어 모드'}</h3>
               <p className="text-mist/60 font-medium">오늘의 미션 {checklistProgress.total}개를 완료하고 회복의 증명을 획득하세요.</p>
@@ -200,7 +196,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
                   transition={{ duration: 1.5, ease: "easeOut" }}
                 />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center font-black text-xl">
+              <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-mist">
                 {checklistProgress.percentage}%
               </div>
             </div>
@@ -220,7 +216,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Diagnosis */}
+            {/* 1. Diagnosis */}
             <div className={`flex items-center justify-between p-6 rounded-[24px] border ${progress?.todayChecklist?.diagnosis ? 'bg-status-good/5 border-status-good/20' : 'bg-mist/30 border-line'}`}>
               <div className="flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.diagnosis ? 'bg-status-good text-mist' : 'bg-white text-slate border border-line'}`}>
@@ -234,9 +230,9 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
               <span className="text-sm font-black text-status-good">+5pt</span>
             </div>
 
-            {/* AI Advice */}
+            {/* 2. AI Advice (Navigator) */}
             <Link
-              href="/ai-advice"
+              href="/ai-navigator"
               onClick={() => !progress?.todayChecklist?.aiAdvice && handleChecklistItem('aiAdvice', 3)}
               className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent/5 border-chapter-accent/20' : 'bg-mist/30 border-line hover:border-chapter-accent'}`}
             >
@@ -245,8 +241,8 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
                   {progress?.todayChecklist?.aiAdvice ? '✓' : '2'}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-obsidian">AI 루틴 설계</h3>
-                  <p className="text-sm text-slate font-medium">오늘의 개별 맞춤 가이드</p>
+                  <h3 className="font-extrabold text-obsidian">AI 맞춤 루틴 확인</h3>
+                  <p className="text-sm text-slate font-medium">네비게이터의 실시간 분석</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -255,28 +251,28 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
               </div>
             </Link>
 
-            {/* Content */}
+            {/* 3. Sound Therapy (New replacement for cases) */}
             <Link
-              href="/cases"
+              href="/therapy/sound"
               onClick={() => !progress?.todayChecklist?.content && handleChecklistItem('content', 2)}
-              className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.content ? 'bg-status-normal/5 border-status-normal/20' : 'bg-mist/30 border-line hover:border-status-normal'}`}
+              className={`flex items-center justify-between p-6 rounded-[24px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.content ? 'bg-blue-500/5 border-blue-500/20' : 'bg-mist/30 border-line hover:border-blue-500'}`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.content ? 'bg-status-normal text-mist' : 'bg-white text-slate border border-line'}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${progress?.todayChecklist?.content ? 'bg-blue-500 text-mist' : 'bg-white text-slate border border-line text-blue-500'}`}>
                   {progress?.todayChecklist?.content ? '✓' : '3'}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-obsidian">경험 데이터 분석</h3>
-                  <p className="text-sm text-slate font-medium">성공적인 회복 케이스 연구</p>
+                  <h3 className="font-extrabold text-obsidian">딥 사운드 명상</h3>
+                  <p className="text-sm text-slate font-medium">3중 레이어 주파수 테라피</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-status-normal">+2pt</span>
+                <span className="text-sm font-black text-blue-500">+2pt</span>
                 <ChevronRight className="w-5 h-5 text-line" />
               </div>
             </Link>
 
-            {/* Utility */}
+            {/* 4. Utility */}
             <Link
               href="/utils"
               onClick={() => !progress?.todayChecklist?.utility && handleChecklistItem('utility', 3)}
@@ -288,7 +284,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
                 </div>
                 <div>
                   <h3 className="font-extrabold text-obsidian">정밀 툴 활성화</h3>
-                  <p className="text-sm text-slate font-medium">스마트 타이머 및 호흡 도구</p>
+                  <p className="text-sm text-slate font-medium">호흡 가이드 및 바이오 툴</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -342,43 +338,43 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
           <h2 className="text-3xl font-black italic text-obsidian tracking-tight">
             RECOMMENDED <span className="text-chapter-accent">TOOLS</span>
           </h2>
-          <span className="text-xs font-black text-slate uppercase tracking-[0.2em]">Reset Protocol v1.2</span>
+          <span className="text-xs font-black text-slate uppercase tracking-[0.2em]">Reset Protocol v1.3</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/therapy/sound" className="group">
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-blue-500 hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl -mr-12 -mt-12" />
+              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🎧</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">실시간 사운드 테라피</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">알고리즘으로 합성된 자연의 소리로 뇌파를 동기화</p>
+              <div className="mt-auto text-xs font-black text-blue-500 tracking-widest uppercase group-hover:translate-x-1 transition-transform">Start Healing &gt;</div>
+            </div>
+          </Link>
+
+          <Link href="/analysis/video" className="group">
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-emerald-500 hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-12 -mt-12" />
+              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">👁️</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">AI 비디오 자세 분석</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">카메라를 통해 실시간 신체 밸런스 및 피로도 측정</p>
+              <div className="mt-auto text-xs font-black text-emerald-500 tracking-widest uppercase group-hover:translate-x-1 transition-transform">Run Analysis &gt;</div>
+            </div>
+          </Link>
+
           <Link href="/utils/breathing" className="group">
-            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-chapter-accent hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-chapter-accent/5 rounded-full blur-2xl -mr-12 -mt-12" />
+            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-reward-gold hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-reward-gold/5 rounded-full blur-2xl -mr-12 -mt-12" />
               <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🌬️</div>
-              <h3 className="text-xl font-black text-obsidian mb-2">3분 마인드풀 호흡</h3>
-              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">뇌의 피로를 씻어내는 가장 빠른 데이터 초기화 방법</p>
-              <div className="mt-auto text-xs font-black text-chapter-accent tracking-widest uppercase group-hover:translate-x-1 transition-transform">Activate Protocol &gt;</div>
-            </div>
-          </Link>
-
-          <Link href="/utils?tool=stretch" className="group">
-            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-status-normal hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-status-normal/5 rounded-full blur-2xl -mr-12 -mt-12" />
-              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">🧘</div>
-              <h3 className="text-xl font-black text-obsidian mb-2">오피스 리셋 스트레칭</h3>
-              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">경직된 신체 데이터를 즉각적으로 유연하게 교정</p>
-              <div className="mt-auto text-xs font-black text-status-normal tracking-widest uppercase group-hover:translate-x-1 transition-transform">Activate Protocol &gt;</div>
-            </div>
-          </Link>
-
-          <Link href="/utils?tool=water" className="group">
-            <div className="bg-white border border-line rounded-[32px] p-8 hover:border-[#0E3A3A] hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#0E3A3A]/5 rounded-full blur-2xl -mr-12 -mt-12" />
-              <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">💧</div>
-              <h3 className="text-xl font-black text-obsidian mb-2">수분 밸런스 체크</h3>
-              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">오늘 체내 수분 유지력을 실시간으로 체크</p>
-              <div className="mt-auto text-xs font-black text-[#0E3A3A] tracking-widest uppercase group-hover:translate-x-1 transition-transform">Check Balance &gt;</div>
+              <h3 className="text-xl font-black text-obsidian mb-2">마인드풀 호흡 가이드</h3>
+              <p className="text-sm text-slate font-medium mb-6 leading-relaxed">바이오 데이터와 연동된 정밀 호흡 리듬 컨트롤</p>
+              <div className="mt-auto text-xs font-black text-reward-gold tracking-widest uppercase group-hover:translate-x-1 transition-transform">Start Guide &gt;</div>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* Best Products - 진단 기반 추천 */}
+      {/* 진단 기반 추천 */}
       <section className="container mx-auto px-4 pb-12 max-w-5xl">
         <DiagnosisBasedRecommendations
           limit={6}
@@ -389,14 +385,14 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
         />
       </section>
 
-      {/* Quick Links */}
+      {/* Quick Links Updated */}
       <section className="container mx-auto px-4 pb-20 max-w-5xl">
         <h2 className="text-2xl font-black text-obsidian mb-8 tracking-tight">빠른 이동</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: '회복 케이스', href: '/cases', icon: '📖' },
+            { label: '사운드 테라피', href: '/therapy/sound', icon: '🎧' },
             { label: 'AI 네비게이터', href: '/ai-navigator', icon: '🤖' },
-            { label: '리커버리 샵', href: '/products', icon: '🛒' },
+            { label: '비디오 분석', href: '/analysis/video', icon: '👁️' },
             { label: '멤버십 혜택', href: '/membership', icon: '🎖️' },
           ].map((link) => (
             <Link key={link.href} href={link.href} className="group">
@@ -424,25 +420,25 @@ function SiteGuide() {
     {
       title: "AI 네비게이터",
       desc: "매일의 진단 데이터를 분석하여 당신만을 위한 맞춤 회복 루틴과 조언을 제공합니다.",
-      icon: "🤖",
+      icon: <Sparkles className="w-6 h-6" />,
       color: "bg-chapter-accent/10 text-chapter-accent"
     },
     {
-      title: "회복 케이스",
-      desc: "다른 사용자들의 성공적인 회복 사례를 연구하고 나에게 맞는 솔루션을 찾아보세요.",
-      icon: "📖",
-      color: "bg-status-normal/10 text-status-normal"
+      title: "사운드 테라피",
+      desc: "알고리즘으로 생성된 3중 레이어 힐링 사운드로 뇌파 안정과 깊은 휴식을 유도합니다.",
+      icon: <Music className="w-6 h-6" />,
+      color: "bg-blue-500/10 text-blue-500"
     },
     {
-      title: "힐링센터",
-      desc: "프라이빗 라운지에서 특별한 힐링 코칭 서비스와 케어를 만나보세요.",
-      icon: "🏛️",
-      color: "bg-reward-gold/10 text-reward-gold"
+      title: "비디오 자세 분석",
+      desc: "카메라를 통해 실시간 자세 불균형과 신체 피로도를 정밀하게 측정하고 기록합니다.",
+      icon: <Scan className="w-6 h-6" />,
+      color: "bg-emerald-500/10 text-emerald-500"
     },
     {
       title: "실생활 유틸리티",
-      desc: "호흡 가이드, BMI 계산기 등 일상에서 즉시 활용 가능한 도구들을 모아두었습니다.",
-      icon: "🛠️",
+      desc: "호흡 가이드, 수분 밸런스 등 일상에서 즉시 활용 가능한 바이오 툴을 제공합니다.",
+      icon: <Layout className="w-6 h-6" />,
       color: "bg-obsidian/10 text-obsidian"
     }
   ];
@@ -456,7 +452,7 @@ function SiteGuide() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {guides.map((guide, i) => (
           <div key={i} className="p-6 rounded-[24px] bg-mist/30 border border-line/50 hover:border-primary/30 transition-all group">
-            <div className={`w-12 h-12 rounded-2xl ${guide.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform`}>
+            <div className={`w-12 h-12 rounded-2xl ${guide.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
               {guide.icon}
             </div>
             <h3 className="font-extrabold text-obsidian mb-2">{guide.title}</h3>

@@ -10,61 +10,93 @@ export async function GET(req: NextRequest) {
 
         const { searchParams } = new URL(req.url);
         const journey = (searchParams.get('journey') || 'WELLNESS') as 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST';
+        const medicalCategory = searchParams.get('medicalCategory') || null;
 
         // 1. Get Today's Date (YYYY-MM-DD)
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0];
         const dayOfWeek = now.getDay(); // 0-6
 
-        // 2. Check DB (Include journey in search to separate different clinical/wellness sets)
-        // Note: If model doesn't have journey field, we can use a composite key or just allow it.
-        // For now, let's assume we want to differentiate.
-        let dailyQ = await DailyQuestion.findOne({ date: todayStr, journey: journey });
+        console.log(`[DailyQ] Request for journey: ${journey}, Category: ${medicalCategory} on ${todayStr}`);
+
+        // 2. Check DB
+        let dailyQ = await DailyQuestion.findOne({ 
+            date: todayStr, 
+            journey: journey,
+            medicalCategory: medicalCategory 
+        });
 
         if (!dailyQ) {
-            // 3. Generate if not exists
-            console.log(`Generating ${journey} questions for ${todayStr}...`);
+            console.log(`[DailyQ] No existing questions for ${journey}(${medicalCategory}). Generating via AI...`);
 
             const themeData = DAILY_THEMES[dayOfWeek] || DAILY_THEMES[1];
+            
+            // Call AI with journey and medical context
+            const questions = await GeminiAIEngine.generateDailyQuestions(
+                themeData.theme, 
+                themeData.keywords, 
+                journey,
+                medicalCategory
+            );
 
-            // Call AI with journey context
-            const questions = await GeminiAIEngine.generateDailyQuestions(themeData.theme, themeData.keywords, journey);
-
-            if (!questions || questions.length === 0) {
+            if (!questions || !Array.isArray(questions) || questions.length === 0) {
+                console.error(`[DailyQ] AI Generation failed or returned empty.`);
                 return NextResponse.json({ error: 'Failed to generate questions' }, { status: 500 });
             }
+
+            console.log(`[DailyQ] AI Success! Generated ${questions.length} questions. Saving to DB...`);
 
             // 4. Save to DB
             try {
                 dailyQ = await DailyQuestion.create({
                     date: todayStr,
                     dayOfWeek,
-                    theme: `${themeData.theme} (${journey})`,
+                    theme: `${themeData.theme} (${journey}${medicalCategory ? ` - ${medicalCategory}` : ''})`,
                     questions,
-                    journey: journey // Ensure this field exists in your Mongoose model or skip if not strict
+                    journey: journey,
+                    medicalCategory: medicalCategory
                 });
+                console.log(`[DailyQ] Created successfully. ID: ${dailyQ._id}`);
             } catch (createError: any) {
                 if (createError.code === 11000) {
-                    dailyQ = await DailyQuestion.findOne({ date: todayStr, journey: journey });
+                    console.warn(`[DailyQ] Index collision. Finding existing record...`);
+                    dailyQ = await DailyQuestion.findOne({ 
+                        date: todayStr, 
+                        journey: journey,
+                        medicalCategory: medicalCategory 
+                    });
+                    
+                    if (!dailyQ) {
+                        dailyQ = await DailyQuestion.findOne({ date: todayStr, journey: journey });
+                    }
                 } else {
+                    console.error(`[DailyQ] DB Save Error:`, createError);
                     throw createError;
                 }
             }
+        } else {
+            console.log(`[DailyQ] Returning existing record for ${journey}(${medicalCategory}).`);
+        }
+
+        if (!dailyQ) {
+            return NextResponse.json({ error: '데이터를 불러올 수 없습니다.' }, { status: 404 });
         }
 
         return NextResponse.json({
-            questions: dailyQ.questions,
+            questions: dailyQ.questions || [],
             theme: dailyQ.theme,
             date: dailyQ.date,
-            journey: dailyQ.journey
+            journey: dailyQ.journey,
+            medicalCategory: dailyQ.medicalCategory
         });
 
     } catch (error: any) {
-        console.error('Daily Question API Error:', error);
+        console.error('[DailyQ] API Router Error:', error);
         return NextResponse.json({
+            questions: [], // Return empty array to prevent client crash
             error: error.message || 'Internal Server Error',
             details: error.toString(),
-            stack: error.stack
-        }, { status: 500 });
+            theme: '에러 발생 (기본 문항로드)'
+        }, { status: 200 }); // Return 200 with empty data to allow safe parsing on client
     }
 }

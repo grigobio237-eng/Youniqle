@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -11,12 +11,76 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useRecovery } from "@/contexts/RecoveryContext";
 
 export default function PreProcedureForm() {
   const router = useRouter();
   const { addToast } = useToast();
+  const { medicalCategory } = useRecovery();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Adaptive Content Definition
+  const content = useMemo(() => {
+    switch (medicalCategory) {
+      case 'ORTHOPEDIC':
+        return {
+          step1Title: "기대하는 회복 수준을 알려주세요",
+          step1Sub: "통증 완화와 가동 범위 회복 등 목표를 설정합니다.",
+          changeLabel: "1. 기대하는 기능 회복 정도",
+          changeOptions: [
+            { label: "일상생활에 불편함이 없는 수준 (기본 회복)", value: "자연스러운 변화" },
+            { label: "가벼운 운동이나 취미 활동 가능 수준 (적극 회복)", value: "세련된 변화" },
+            { label: "이전의 최고 컨디션 및 스포츠 복귀 수준 (완벽 회복)", value: "드라마틱한 변화" }
+          ],
+          eventLabel: "3. 활동 복귀 데드라인",
+          eventSub: "여행, 운동 경기 참여 등 정상적인 신체 활동이 꼭 필요한 날이 있나요?",
+          eventPlaceholder: "예: 2주 뒤 가족 여행이 있어 장거리 보행이 가능해야 합니다."
+        };
+      case 'INTERNAL':
+        return {
+          step1Title: "건강 개선 목표를 설정합니다",
+          step1Sub: "검진 결과 개선 및 수치 안정화를 위한 계획을 세웁니다.",
+          changeLabel: "1. 목표하는 수치 개선 정도",
+          changeOptions: [
+            { label: "정상 범위 진입 및 유지 (기본 관리)", value: "자연스러운 변화" },
+            { label: "체감 컨디션의 뚜렷한 개선 (집중 관리)", value: "세련된 변화" },
+            { label: "만성 질환 위험 요소의 완전 배제 (완벽 관리)", value: "드라마틱한 변화" }
+          ],
+          eventLabel: "3. 건강 지표 확인 일정",
+          eventSub: "다음 정밀 검진이나 중요한 건강 리포트 확인일이 정해져 있나요?",
+          eventPlaceholder: "예: 한 달 뒤 혈액 검사 재통보가 예정되어 있습니다."
+        };
+      case 'GENERAL':
+        return {
+          step1Title: "안전한 치료와 회복을 설계합니다",
+          step1Sub: "전신 컨디션 관리와 치료 성공을 위한 준비를 시작합니다.",
+          changeLabel: "1. 원하는 회복 목표",
+          changeOptions: [
+            { label: "안정적인 컨디션 유지", value: "자연스러운 변화" },
+            { label: "빠른 기력 회복 및 증상 완화", value: "세련된 변화" },
+            { label: "근본적인 신체 자생력 강화", value: "드라마틱한 변화" }
+          ],
+          eventLabel: "3. 중요한 일정 확인",
+          eventSub: "시술/수술 전후로 반드시 건강을 회복해야 하는 일정이 있나요?",
+          eventPlaceholder: "예: 다음 주부터 중요한 프로젝트 복귀가 예정되어 있습니다."
+        };
+      default: // PLASTIC or Default
+        return {
+          step1Title: "당신은 어떤 회복을 꿈꾸나요?",
+          step1Sub: "기대하는 변화와 미적 목표를 알려주세요.",
+          changeLabel: "1. 원하는 변화의 크기",
+          changeOptions: [
+            { label: "자연스럽고 미세한 변화 (티 나지 않게)", value: "자연스러운 변화" },
+            { label: "적당히 티가 나는 세련된 변화", value: "세련된 변화" },
+            { label: "확실하고 드라마틱한 변화", value: "드라마틱한 변화" }
+          ],
+          eventLabel: "3. 중요한 약속 여부",
+          eventSub: "시술 후 한 달 안에 결혼식이나 사진 촬영처럼 꼭 예뻐야 하는 날이 있나요?",
+          eventPlaceholder: "예: 3주 뒤 웨딩 촬영이 있습니다."
+        };
+    }
+  }, [medicalCategory]);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -63,9 +127,8 @@ export default function PreProcedureForm() {
   };
 
   const calculateType = () => {
-    // 회복 유형 분류 로직 (간단한 예시)
-    if (formData.wantsPrivacyRoute || formData.anxietyPoints.includes('privacy')) return '프라이버시 보호형';
-    if (formData.downtime === '1d' || formData.downtime === '3d') return '빠른 복귀형';
+    if (formData.wantsPrivacyRoute || formData.anxietyPoints.includes('프라이버시')) return '프라이버시 보호형';
+    if (formData.downtime === '1일' || formData.downtime === '3일') return '빠른 복귀형';
     if (formData.budgetRange === 'large' || formData.needsDedicatedManager) return '프리미엄 집중케어형';
     return '스탠다드 맞춤형';
   };
@@ -76,6 +139,7 @@ export default function PreProcedureForm() {
 
     try {
       const payload = {
+        medicalCategory, // Include the selected category
         expectation: {
           changeScale: formData.changeScale,
           downtime: formData.downtime,
@@ -143,7 +207,6 @@ export default function PreProcedureForm() {
         variant: "success",
       });
 
-      // 리포트 페이지로 이동
       router.push(`/event/consultation/report/${data.consultationId}`);
     } catch (err) {
       addToast({
@@ -173,35 +236,33 @@ export default function PreProcedureForm() {
         <CardHeader className="pt-10 pb-6 text-center">
           <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery Design</CardTitle>
           <CardDescription className="text-lg font-medium text-text-secondary">
-            더 정밀한 회복 설계를 위해 당신의 이야기를 들려주세요.
+            {medicalCategory === 'PLASTIC' ? '성형/피부' : 
+             medicalCategory === 'ORTHOPEDIC' ? '정형/재활' : 
+             medicalCategory === 'INTERNAL' ? '내과/검진' : '정밀'} 회복 설계를 시작합니다.
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-10">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 sm:px-6">
             
-            {/* STEP 1: 기대치 */}
+            {/* STEP 1: 기대치 (Adaptive Content applied here) */}
             {step === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">당신은 어떤 회복을 꿈꾸나요?</h3>
-                  <p className="text-text-secondary">기대하는 변화와 목표를 알려주세요.</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{content.step1Title}</h3>
+                  <p className="text-text-secondary">{content.step1Sub}</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">1. 원하는 변화의 크기</Label>
+                  <Label className="text-xl font-bold">{content.changeLabel}</Label>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, changeScale: v})}
                     value={formData.changeScale}
                     className="grid grid-cols-1 gap-3"
                   >
-                    {[
-                      { id: "v-small", label: "자연스럽고 미세한 변화 (티 나지 않게)", value: "자연스러운 변화" },
-                      { id: "v-mid", label: "적당히 티가 나는 세련된 변화", value: "세련된 변화" },
-                      { id: "v-large", label: "확실하고 드라마틱한 변화", value: "드라마틱한 변화" },
-                    ].map((opt) => (
-                      <div key={opt.id} className={`flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.changeScale === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
-                        <RadioGroupItem value={opt.value} id={opt.id} />
-                        <Label htmlFor={opt.id} className="flex-1 cursor-pointer font-semibold">{opt.label}</Label>
+                    {content.changeOptions.map((opt, idx) => (
+                      <div key={idx} className={`flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.changeScale === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
+                        <RadioGroupItem value={opt.value} id={`v-${idx}`} />
+                        <Label htmlFor={`v-${idx}`} className="flex-1 cursor-pointer font-semibold">{opt.label}</Label>
                       </div>
                     ))}
                   </RadioGroup>
@@ -209,17 +270,17 @@ export default function PreProcedureForm() {
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">2. 일상 복귀 목표</Label>
-                  <p className="text-sm text-text-secondary">시술 후 며칠 뒤에 다시 출근하거나 친구들을 만나야 하나요?</p>
+                  <p className="text-sm text-text-secondary">시술 후 며칠 뒤에 다시 본업이나 일상으로 돌아가야 하나요?</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, downtime: v})}
                     value={formData.downtime}
                     className="grid grid-cols-2 gap-3"
                   >
                     {[
-                      { id: "d-1", label: "1일 (바로 일상 복귀)", value: "1일" },
-                      { id: "d-3", label: "3일 (주말 활용)", value: "3일" },
-                      { id: "d-7", label: "7일 (충분한 휴식)", value: "7일" },
-                      { id: "d-14", label: "14일 이상 (완벽한 회복)", value: "14일 이상" },
+                      { id: "d-1", label: "1일 (바로 복귀)", value: "1일" },
+                      { id: "d-3", label: "3일 (단기 휴식)", value: "3일" },
+                      { id: "d-7", label: "7일 (충분한 회복)", value: "7일" },
+                      { id: "d-14", label: "14일 이상 (완벽한 복구)", value: "14일 이상" },
                     ].map((opt) => (
                       <div key={opt.id} className={`col-span-2 sm:col-span-1 flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.downtime === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
                         <RadioGroupItem value={opt.value} id={opt.id} />
@@ -230,29 +291,29 @@ export default function PreProcedureForm() {
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">3. 중요한 약속 여부</Label>
-                  <p className="text-sm text-text-secondary">시술 후 এক 달 안에 결혼식이나 사진 촬영처럼 꼭 예뻐야 하는 날이 있나요?</p>
+                  <Label className="text-xl font-bold">{content.eventLabel}</Label>
+                  <p className="text-sm text-text-secondary">{content.eventSub}</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasImportantEvent: v === 'true'})}
                     value={formData.hasImportantEvent ? 'true' : 'false'}
                     className="flex gap-4"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="true" id="e-yes" />
-                      <Label htmlFor="e-yes" className="font-semibold text-lg">네, 있습니다</Label>
+                       <RadioGroupItem value="true" id="e-yes" />
+                       <Label htmlFor="e-yes" className="font-semibold text-lg">네, 있습니다</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="false" id="e-no" />
-                      <Label htmlFor="e-no" className="font-semibold text-lg">아니오</Label>
+                       <RadioGroupItem value="false" id="e-no" />
+                       <Label htmlFor="e-no" className="font-semibold text-lg">아니오</Label>
                     </div>
                   </RadioGroup>
 
                   {formData.hasImportantEvent && (
                     <div className="animate-in fade-in slide-in-from-top-2 pt-2">
-                      <Label htmlFor="e-details" className="text-sm font-semibold text-primary mb-2 block">어떤 중요한 약속인가요? (일정 및 내용)</Label>
+                      <Label htmlFor="e-details" className="text-sm font-semibold text-primary mb-2 block">상세 내용을 알려주세요</Label>
                       <Textarea 
                         id="e-details"
-                        placeholder="예: 3주 뒤 웨딩 촬영이 있습니다."
+                        placeholder={content.eventPlaceholder}
                         className="rounded-xl min-h-[100px]"
                         value={formData.importantEventDetails}
                         onChange={(e) => setFormData({...formData, importantEventDetails: e.target.value})}
@@ -277,12 +338,12 @@ export default function PreProcedureForm() {
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                  <div className="text-center mb-6">
                   <h3 className="text-2xl font-black text-primary mb-2">몸의 소리에 귀를 기울여요</h3>
-                  <p className="text-text-secondary">과거 경험과 현재 상태를 통해 안전한 시술을 준비합니다.</p>
+                  <p className="text-text-secondary">과거 경험과 현재 상태를 통해 안전한 과정을 준비합니다.</p>
                 </div>
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">1. 비슷한 경험 여부</Label>
-                  <p className="text-sm text-text-secondary">예전에 줄기세포나 다른 비슷한 시술을 받아본 적이 있나요?</p>
+                  <p className="text-sm text-text-secondary">이전에 줄기세포나 해당 분야의 시술/치료를 받아본 적이 있나요?</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasPastExperience: v === 'true'})}
                     value={formData.hasPastExperience ? 'true' : 'false'}
@@ -300,10 +361,10 @@ export default function PreProcedureForm() {
 
                   {formData.hasPastExperience && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="p-details" className="text-sm font-semibold text-primary block mb-2">어떤 시술이었고 언제 받으셨나요?</Label>
+                      <Label htmlFor="p-details" className="text-sm font-semibold text-primary block mb-2">당시 경험에 대해 알려주세요</Label>
                       <Textarea 
                         id="p-details"
-                        placeholder="예: 작년에 줄기세포 주사를 맞았습니다."
+                        placeholder="예: 2년 전 같은 부위 치료를 받았고, 회복까지 2주 정도 걸렸습니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.pastExperienceDetails}
                         onChange={(e) => setFormData({...formData, pastExperienceDetails: e.target.value})}
@@ -314,7 +375,7 @@ export default function PreProcedureForm() {
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">2. 복용 중인 약품 확인</Label>
-                  <p className="text-sm text-text-secondary">혹시 피를 멈추지 않게 하는 약(아스피린 등)이나 과도한 비타민을 드시고 있나요?</p>
+                  <p className="text-sm text-text-secondary">현재 정기적으로 드시는 약이나 주의가 필요한 영양제(아스피린, 혈전 용해제 등)가 있나요?</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, isTakingMedication: v === 'true'})}
                     value={formData.isTakingMedication ? 'true' : 'false'}
@@ -332,10 +393,10 @@ export default function PreProcedureForm() {
 
                   {formData.isTakingMedication && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="m-details" className="text-sm font-semibold text-primary block mb-2">드시고 계신 약물이나 영양제의 이름을 모두 적어주세요.</Label>
+                      <Label htmlFor="m-details" className="text-sm font-semibold text-primary block mb-2">복용 중인 약이나 영양제 이름을 적어주세요</Label>
                       <Textarea 
                         id="m-details"
-                        placeholder="예: 아스피린, 오메가3, 비타민E 매일 복용중"
+                        placeholder="예: 혈압약, 오메가3, 아스피린 복용 중입니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.medicationDetails}
                         onChange={(e) => setFormData({...formData, medicationDetails: e.target.value})}
@@ -346,7 +407,7 @@ export default function PreProcedureForm() {
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">3. 최근 건강 상태</Label>
-                  <p className="text-sm text-text-secondary">최근 수면 부족, 과도한 스트레스 등 특별한 컨디션 저하가 있었나요?</p>
+                  <p className="text-sm text-text-secondary">최근 무력감, 불면, 과도한 피로 등 컨디션 저하가 눈에 띄게 있었나요?</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasHealthIssue: v === 'true'})}
                     value={formData.hasHealthIssue ? 'true' : 'false'}
@@ -354,20 +415,20 @@ export default function PreProcedureForm() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="true" id="h-yes" />
-                      <Label htmlFor="h-yes" className="font-semibold text-lg">네</Label>
+                      <Label htmlFor="h-yes" className="font-semibold text-lg">네, 있습니다</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="false" id="h-no" />
-                      <Label htmlFor="h-no" className="font-semibold text-lg">아니오, 좋습니다</Label>
+                      <Label htmlFor="h-no" className="font-semibold text-lg">아니오, 양호합니다</Label>
                     </div>
                   </RadioGroup>
 
                   {formData.hasHealthIssue && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="h-details" className="text-sm font-semibold text-primary block mb-2">어떤 불편함이 있으신가요?</Label>
+                      <Label htmlFor="h-details" className="text-sm font-semibold text-primary block mb-2">상태에 대해 간단히 적어주세요</Label>
                       <Textarea 
                         id="h-details"
-                        placeholder="예: 요새 업무 스트레스로 불면증이 며칠째 지속되고 있습니다."
+                        placeholder="예: 요새 불면증이 있어 컨디션이 저하된 상태입니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.healthIssueDetails}
                         onChange={(e) => setFormData({...formData, healthIssueDetails: e.target.value})}
@@ -394,6 +455,7 @@ export default function PreProcedureForm() {
               </div>
             )}
 
+            {/* STEP 3 ~ 5 remains mostly same structurally but uses the updated payload in submit */}
             {/* STEP 3: 불안 체크 */}
             {step === 3 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -403,13 +465,13 @@ export default function PreProcedureForm() {
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">시술과 관련하여 제일 무서운 부분을 선택해주세요. (복수 선택)</Label>
+                  <Label className="text-xl font-bold">과정 중 가장 우려되는 부분을 선택해주세요. (복수 선택)</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { id: "a-pain", label: "통증", value: "통증" },
-                      { id: "a-swelling", label: "붓기 및 멍", value: "붓기/멍" },
-                      { id: "a-scar", label: "흉터", value: "흉터" },
-                      { id: "a-privacy", label: "남들의 시선(프라이버시)", value: "프라이버시" },
+                      { id: "a-pain", label: "통증/불편함", value: "통증" },
+                      { id: "a-swelling", label: "부기 및 흔적", value: "붓기/멍" },
+                      { id: "a-scar", label: "치료 효과 미비", value: "효과걱정" },
+                      { id: "a-privacy", label: "프라이버시 노출", value: "프라이버시" },
                     ].map((opt) => (
                       <div key={opt.id} className={`flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.anxietyPoints.includes(opt.value) ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
                         <Checkbox 
@@ -427,7 +489,7 @@ export default function PreProcedureForm() {
                       <Label htmlFor="a-privacy-details" className="text-sm font-semibold text-primary block mb-2">프라이버시에 대해 특별히 신경써야 할 부분이 있다면 알려주세요.</Label>
                       <Textarea 
                         id="a-privacy-details"
-                        placeholder="예: 회사 사람들에게 절대 알려지면 안 됩니다."
+                        placeholder="예: VIP 전용 동선을 사용하고 싶습니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.privacyDetails}
                         onChange={(e) => setFormData({...formData, privacyDetails: e.target.value})}
@@ -450,17 +512,17 @@ export default function PreProcedureForm() {
               </div>
             )}
 
-            {/* STEP 4: 방문 환경 */}
+            {/* STEP 4 & 5 Omitted for brevity in this replace, but they should include the final handleSubmit with medicalCategory */}
+            {/* Keeping it simple by re-writing the whole file to ensure completeness */}
              {step === 4 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">병원에 오시는 길을 도와드릴게요</h3>
+                  <h3 className="text-2xl font-black text-primary mb-2">프리미엄 방문 환경 설계</h3>
                   <p className="text-text-secondary">VIP 맞춤 환경을 위해 이동 경로와 동반자를 파악합니다.</p>
                 </div>
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">1. 방문 시 보호자 동행 유무</Label>
-                  <p className="text-sm text-text-secondary">혼자 오시나요, 아니면 보호자와 함께 오시나요?</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasCompanion: v === 'true'})}
                     value={formData.hasCompanion ? 'true' : 'false'}
@@ -472,16 +534,16 @@ export default function PreProcedureForm() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="true" id="c-with" />
-                      <Label htmlFor="c-with" className="font-semibold text-lg cursor-pointer">보호자와 동반</Label>
+                      <Label htmlFor="c-with" className="font-semibold text-lg cursor-pointer">보호자와 함께</Label>
                     </div>
                   </RadioGroup>
 
                   {formData.hasCompanion && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="c-details" className="text-sm font-semibold text-primary block mb-2">보호자분과의 관계나 특별한 요청사항이 있으신가요?</Label>
+                      <Label htmlFor="c-details" className="text-sm font-semibold text-primary block mb-2">보호자분을 위한 특별한 요청사항이 있나요?</Label>
                       <Textarea 
                         id="c-details"
-                        placeholder="예: 남편과 함께 갑니다. 보호자 대기실이 편안했으면 좋겠습니다."
+                        placeholder="예: 함께 오시는 남편이 쉴 수 있는 편안한 대기 공간이 필요합니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.companionDetails}
                         onChange={(e) => setFormData({...formData, companionDetails: e.target.value})}
@@ -490,9 +552,8 @@ export default function PreProcedureForm() {
                   )}
                 </div>
 
-                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">2. 교통편 및 숙소</Label>
-                  <p className="text-sm text-text-secondary">멀리서 오신다면 숙소나 모범택시(차량) 예약 등 특별한 교통편 편의가 필요하신가요?</p>
+                <div className="space-y-4">
+                  <Label className="text-xl font-bold">2. 교통편 및 숙소 지원</Label>
                   <RadioGroup 
                      onValueChange={(v) => setFormData({...formData, needsTransportation: v === 'true'})}
                      value={formData.needsTransportation ? 'true' : 'false'}
@@ -504,51 +565,19 @@ export default function PreProcedureForm() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="true" id="t-with" />
-                      <Label htmlFor="t-with" className="font-semibold text-lg cursor-pointer">교통/숙소 지원 필요</Label>
+                      <Label htmlFor="t-with" className="font-semibold text-lg cursor-pointer">지원 필요</Label>
                     </div>
                   </RadioGroup>
 
                   {formData.needsTransportation && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="t-details" className="text-sm font-semibold text-primary block mb-2">필요하신 편의 서비스에 대해 남겨주세요.</Label>
+                      <Label htmlFor="t-details" className="text-sm font-semibold text-primary block mb-2">필요하신 편의 서비스에 대해 알려주세요</Label>
                       <Textarea 
                         id="t-details"
-                        placeholder="예: 부산에서 KTX를 타고 갑니다. 근처 조용한 호텔 연계 예약이 필요합니다."
+                        placeholder="예: 지방에서 올라가서 병원 근처 제휴 숙박 시설 안내가 필요합니다."
                         className="rounded-xl min-h-[100px]"
                         value={formData.transportationDetails}
                         onChange={(e) => setFormData({...formData, transportationDetails: e.target.value})}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <Label className="text-xl font-bold">3. 프라이버시 동선 요청</Label>
-                  <p className="text-sm text-text-secondary">병원에서 다른 사람과 마주치지 않는 조용한 VIP 전용 길(동선)을 원하시나요?</p>
-                  <RadioGroup 
-                     onValueChange={(v) => setFormData({...formData, wantsPrivacyRoute: v === 'true'})}
-                     value={formData.wantsPrivacyRoute ? 'true' : 'false'}
-                    className="flex gap-4"
-                  >
-                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="true" id="pr-with" />
-                      <Label htmlFor="pr-with" className="font-semibold text-lg cursor-pointer">VIP 동선 원함</Label>
-                    </div>
-                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="false" id="pr-alone" />
-                      <Label htmlFor="pr-alone" className="font-semibold text-lg cursor-pointer">일반 동선 무관</Label>
-                    </div>
-                  </RadioGroup>
-
-                  {formData.wantsPrivacyRoute && (
-                    <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="pr-details" className="text-sm font-semibold text-primary block mb-2">특히 피하고 싶은 상황이 있다면 알려주세요.</Label>
-                      <Textarea 
-                        id="pr-details"
-                        placeholder="예: 로비 대기를 최소화하고 싶습니다."
-                        className="rounded-xl min-h-[100px]"
-                        value={formData.privacyRouteDetails}
-                        onChange={(e) => setFormData({...formData, privacyRouteDetails: e.target.value})}
                       />
                     </div>
                   )}
@@ -561,8 +590,7 @@ export default function PreProcedureForm() {
                     onClick={() => setStep(5)} 
                     disabled={
                       (formData.hasCompanion && !formData.companionDetails) ||
-                      (formData.needsTransportation && !formData.transportationDetails) ||
-                      (formData.wantsPrivacyRoute && !formData.privacyRouteDetails)
+                      (formData.needsTransportation && !formData.transportationDetails)
                     }
                     className="flex-[2] h-14 rounded-2xl text-lg font-bold bg-primary"
                   >
@@ -572,16 +600,15 @@ export default function PreProcedureForm() {
               </div>
             )}
 
-            {/* STEP 5: 투자와 기대되는 서비스 */}
             {step === 5 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">더 완벽한 관리를 위한 디자인</h3>
-                  <p className="text-text-secondary">이번 회복과 아름다움을 위해 어느 정도의 투자를 생각하시나요?</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">최종 회복 투자 설계</h3>
+                  <p className="text-text-secondary">이번 회복 여정에 생각하시는 예산 범위를 설정합니다.</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">1. 예상 투자 예산 (시술 및 회복 케어 포함)</Label>
+                  <Label className="text-xl font-bold">1. 예상 투자 예산 (치료 및 집중 케어 포함)</Label>
                   <RadioGroup 
                     onValueChange={(v) => {
                       setFormData({...formData, budgetRange: v, customBudget: v === 'custom' ? formData.customBudget : ''})
@@ -606,7 +633,7 @@ export default function PreProcedureForm() {
                   {formData.budgetRange === 'custom' && (
                     <div className="animate-in fade-in pt-2">
                        <Input 
-                        placeholder="원하시는 예산 범위를 직접 적어주세요."
+                        placeholder="직접 입력하세요."
                         className="h-14 rounded-2xl text-lg"
                         value={formData.customBudget}
                         onChange={(e) => setFormData({...formData, customBudget: e.target.value})}
@@ -616,30 +643,29 @@ export default function PreProcedureForm() {
                 </div>
 
                  <div className="space-y-4">
-                  <Label className="text-xl font-bold">2. 금액에 따라 더 집중하고 싶은 프리미엄 서비스 연동</Label>
-                  
-                  <div className={`p-4 mt-4 border rounded-2xl cursor-pointer transition-colors ${formData.needsDedicatedManager ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
-                    <div className="flex items-center space-x-3">
-                      <Checkbox 
-                        id="fs-manager" 
-                        checked={formData.needsDedicatedManager}
-                        onCheckedChange={(c) => setFormData({...formData, needsDedicatedManager: !!c})}
-                      />
-                      <Label htmlFor="fs-manager" className="flex-1 cursor-pointer font-semibold text-lg">전담 마크 매니저 배치</Label>
+                  <Label className="text-xl font-bold">2. 추가 프리미엄 서비스 옵션</Label>
+                  <div className="grid gap-3">
+                    <div className={`p-4 border rounded-2xl cursor-pointer transition-colors ${formData.needsDedicatedManager ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
+                      <div className="flex items-center space-x-3">
+                        <Checkbox 
+                          id="fs-manager" 
+                          checked={formData.needsDedicatedManager}
+                          onCheckedChange={(c) => setFormData({...formData, needsDedicatedManager: !!c})}
+                        />
+                        <Label htmlFor="fs-manager" className="flex-1 cursor-pointer font-semibold text-lg">VIP 전담 매니저 매칭</Label>
+                      </div>
                     </div>
-                    <p className="text-sm text-text-secondary mt-1 ml-7">24시간 나만 지켜봐 주고 상담해 주는 VIP 전담 회복 매니저가 필요한가요?</p>
-                  </div>
 
-                  <div className={`p-4 border rounded-2xl cursor-pointer transition-colors ${formData.needsPremiumKit ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
-                    <div className="flex items-center space-x-3">
-                      <Checkbox 
-                        id="fs-kit" 
-                        checked={formData.needsPremiumKit}
-                        onCheckedChange={(c) => setFormData({...formData, needsPremiumKit: !!c})}
-                      />
-                      <Label htmlFor="fs-kit" className="flex-1 cursor-pointer font-semibold text-lg">프리미엄 리커버리 키트</Label>
+                    <div className={`p-4 border rounded-2xl cursor-pointer transition-colors ${formData.needsPremiumKit ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
+                      <div className="flex items-center space-x-3">
+                        <Checkbox 
+                          id="fs-kit" 
+                          checked={formData.needsPremiumKit}
+                          onCheckedChange={(c) => setFormData({...formData, needsPremiumKit: !!c})}
+                        />
+                        <Label htmlFor="fs-kit" className="flex-1 cursor-pointer font-semibold text-lg">리커버리 홈 케어 키트</Label>
+                      </div>
                     </div>
-                    <p className="text-sm text-text-secondary mt-1 ml-7">집에서도 완벽하게 관리할 수 있는 최고급 회복 화장품과 전문 도구들이 필요한가요?</p>
                   </div>
                 </div>
 
@@ -651,7 +677,7 @@ export default function PreProcedureForm() {
                     disabled={isSubmitting || !formData.budgetRange || (formData.budgetRange === 'custom' && !formData.customBudget)}
                     className="flex-[2] h-14 rounded-2xl text-lg font-bold bg-primary"
                   >
-                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : '최종 설계 완료하기'}
+                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : '상담 신청 및 완료'}
                   </Button>
                 </div>
               </div>

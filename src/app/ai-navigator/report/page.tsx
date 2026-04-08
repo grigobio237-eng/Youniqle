@@ -6,9 +6,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, TrendingUp, TrendingDown, Activity, Moon, Sun, Brain } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function WeeklyReportPage() {
+    const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
+    const userName = session?.user?.name || '요원';
 
     // Mock Data for Weekly Analysis
     const weeklyData = [
@@ -49,7 +52,7 @@ export default function WeeklyReportPage() {
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                     </Button>
-                    <h1 className="text-lg font-bold">주간 회복 리포트</h1>
+                    <h1 className="text-lg font-bold">{userName} 님의 주간 회복 리포트</h1>
                 </div>
             </header>
 
@@ -76,8 +79,8 @@ export default function WeeklyReportPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="p-4 bg-gray-50 rounded-xl">
-                            <h3 className="font-bold text-gray-900 mb-1">"주말 관리가 핵심이에요"</h3>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-blue-100">
+                            <h3 className="font-bold text-gray-900 mb-1">"{userName} 님, 주말 관리가 핵심이에요"</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
                                 평일 평균 점수는 양호하지만, 금요일부터 회복 점수가 급격히 떨어지는 패턴이 반복되고 있습니다.
                                 이번 주말에는 고강도 활동보다는 정적인 휴식을 취해보는 것이 어떨까요?
@@ -126,7 +129,7 @@ export default function WeeklyReportPage() {
 
                 {/* 3. Category Radar Chart */}
                 <div>
-                    <h2 className="text-lg font-bold mb-4">영역별 밸런스</h2>
+                    <h2 className="text-lg font-bold mb-4">{userName} 님의 회복 밸런스</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Card>
                             <CardContent className="p-4 flex items-center justify-center">
@@ -137,7 +140,7 @@ export default function WeeklyReportPage() {
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11 }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                             <Radar
-                                                name="내 점수"
+                                                name={`${userName} 님의 점수`}
                                                 dataKey="A"
                                                 stroke="#2563eb"
                                                 strokeWidth={2}
@@ -155,7 +158,7 @@ export default function WeeklyReportPage() {
                                 <CardContent className="p-4 flex items-start gap-3">
                                     <Moon className="w-5 h-5 text-red-500 mt-0.5" />
                                     <div>
-                                        <h4 className="font-bold text-red-700 text-sm">수면 부족 경고</h4>
+                                        <h4 className="font-bold text-red-700 text-sm">{userName} 님, 수면 부족 경고</h4>
                                         <p className="text-xs text-red-600 mt-1">
                                             평균 수면 시간이 5시간대로 떨어졌습니다.
                                             이번 주는 12시 이전 취침을 목표로 해보세요.

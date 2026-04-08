@@ -47,7 +47,6 @@ import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianG
 import { motion } from 'framer-motion';
 import DynamicHero from '@/components/me/DynamicHero';
 import MembershipProgress from '@/components/me/MembershipProgress';
-import AccessTierCard from '@/components/me/AccessTierCard';
 import AILatestBrief from '@/components/me/AILatestBrief';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import QRReferralCard from '@/components/me/QRReferralCard';
@@ -560,22 +559,17 @@ export default function MyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 mb-6">
             {/* Membership Rewards (Left) */}
-            <div className="lg:col-span-3">
-              <MembershipProgress
-                currentGrade={userData?.grade || 'cedar'}
-                currentPoints={userData?.points || 0}
-              />
-            </div>
-
-            {/* Access Tier (Left-Center) */}
-            <div className="lg:col-span-3">
-              <AccessTierCard
-                currentTier={userData?.tier || 'RESET'}
-              />
+            <div className="lg:col-span-4 transition-transform hover:scale-[1.01]">
+              <Link href="/membership" className="block h-full">
+                <MembershipProgress
+                  currentGrade={userData?.grade || 'cedar'}
+                  currentPoints={userData?.points || 0}
+                />
+              </Link>
             </div>
 
             {/* Recovery Growth Quote/Brief (Center) */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <AILatestBrief
                 solution={history[0]?.aiSolution}
                 createdAt={history[0]?.createdAt}
@@ -583,7 +577,7 @@ export default function MyPage() {
             </div>
 
             {/* Quick Stats (Right) */}
-            <div className="lg:col-span-3 grid grid-cols-2 gap-3">
+            <div className="lg:col-span-4 grid grid-cols-2 gap-3">
               <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
                   <ShoppingBag className="w-4 h-4" />
@@ -744,15 +738,15 @@ export default function MyPage() {
                               </linearGradient>
                             </defs>
                             <Area
-                              type="monotone"
-                              dataKey="score"
-                              stroke="#10b981"
-                              strokeWidth={3}
-                              fillOpacity={1}
-                              fill="url(#curveColor)"
+                               type="monotone"
+                               dataKey="score"
+                               stroke="#10b981"
+                               strokeWidth={3}
+                               fillOpacity={1}
+                               fill="url(#curveColor)"
                             />
                             <Tooltip
-                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '10px' }}
+                               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '10px' }}
                             />
                           </AreaChart>
                         </ResponsiveContainer>
@@ -799,339 +793,13 @@ export default function MyPage() {
                         <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Invitation & Referral Protocol</p>
                       </div>
                     </div>
-                    <Badge className="bg-emerald-100 text-emerald-700 border-none font-black text-[10px] px-3 py-1">COMMUNITY</Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="p-8 md:p-10 pt-8 space-y-10">
-                  {/* 상단 안내 문구 */}
-                  <div className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                    <div className="relative bg-white p-6 rounded-[28px] border border-emerald-100/50">
-                      <h4 className="font-black text-obsidian mb-2 text-lg tracking-tight">회복의 기쁨을 함께 나누세요</h4>
-                      <p className="text-sm font-medium text-slate leading-relaxed">
-                        초대 링크를 통해 가입한 친구가 유니클의 유료 서비스를 이용하면<br className="hidden md:block" /> 
-                        본인과 친구 모두에게 특별한 회복 리워드가 적립됩니다.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                    {/* 왼쪽: 링크 복사 및 대시보드 */}
-                    <div className="space-y-8">
-                      <ReferralSection referralCode={userData?.referralCode} />
-                    </div>
-
-                    {/* 오른쪽: QR 카드 가시성 강화 */}
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-full text-center mb-2">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Visual Share Link</p>
-                        <p className="text-sm font-bold text-obsidian">QR 인비테이션 카드</p>
-                      </div>
-                      <QRReferralCard 
-                        userName={session.user?.name || ''} 
-                        referralCode={userData?.referralCode || ''} 
-                      />
-                      <p className="text-[10px] text-slate-400 font-medium text-center max-w-[200px]">
-                        위 이미지를 길게 누르거나 저장하여 SNS에 배포할 수 있습니다.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="lg:col-span-4 space-y-8 h-full">
-              {/* 파트너 상태 */}
-              {partnerInfo && (
-                <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-mist transition-all hover:shadow-md">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex justify-between items-start">
-                      <div className={`p-4 rounded-2xl ${partnerInfo.bgColor} ${partnerInfo.color}`}>
-                        <partnerInfo.icon className="h-6 w-6" />
-                      </div>
-                      {partnerInfo.status === 'approved' && (
-                        <Badge className="bg-status-good text-mist font-black text-[9px] uppercase tracking-widest px-3 border-none shadow-sm shadow-status-good/20">ACTIVE</Badge>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className={`text-xl font-black ${partnerInfo.color} tracking-tight`}>{partnerInfo.title}</h3>
-                      <p className="text-xs font-medium text-slate mt-1 leading-relaxed">{partnerInfo.description}</p>
-                    </div>
-                    {partnerInfo.action && (
-                      <Button onClick={partnerInfo.action} className={`w-full h-12 rounded-xl font-black text-xs shadow-lg transition-all ${partnerInfo.status === 'approved' ? 'bg-status-good text-mist' : 'bg-obsidian text-mist'}`}>
-                        {partnerInfo.status === 'approved' ? '파트너 대시보드' : partnerInfo.status === 'rejected' ? '다시 신청하기' : '시작 프로토콜'}
-                      </Button>
-                    )}
-                  </div>
-                </Card>
-              )}
-
-              {/* 네비게이터 전용 기능 */}
-              {userData?.isNavigator && (
-                <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden p-8 border border-primary/20 transition-all hover:shadow-md">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex justify-between items-start">
-                      <div className="p-4 rounded-2xl bg-primary/10 text-primary">
-                        <ShieldCheck className="h-6 w-6" />
-                      </div>
-                      <Badge className="bg-primary text-mist font-black text-[9px] uppercase tracking-widest px-3 border-none shadow-sm">NAVIGATOR</Badge>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-primary tracking-tight">내 고객 문진표 관리</h3>
-                      <p className="text-xs font-medium text-slate mt-1 leading-relaxed">추천 코드를 통해 가입한 고객들의 사전 문진(Recovery Design) 리포트를 확인하고 PDF로 다운로드합니다.</p>
-                    </div>
-                    <Button asChild className="w-full h-12 rounded-xl font-black text-xs shadow-lg bg-primary hover:bg-primary/90 text-mist">
-                      <Link href="/me/consultations">문진표 목록 열람</Link>
-                    </Button>
-                  </div>
-                </Card>
-              )}
-
-              {/* 바로가기 그리드 */}
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { href: '/orders', label: '주문 내역', icon: ClipboardList },
-                  { href: '/me/coupons', label: '내 쿠폰함', icon: Ticket },
-                  { href: '/cart', label: '장바구니', icon: ShoppingBag },
-                  { href: '/wishlist', label: '관심 목록', icon: Heart },
-                  { href: '/me/addresses', label: '주소 관리', icon: MapPin },
-                  { href: '/me/payment-methods', label: '결제 수단', icon: CreditCard },
-                ].map((link, i) => (
-                  <Link key={i} href={link.href} className="group relative bg-white p-6 rounded-[28px] border border-mist shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center active:scale-95">
-                    <div className="p-3 bg-mist rounded-2xl text-slate group-hover:bg-chapter-accent group-hover:text-mist transition-colors">
-                      <link.icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[11px] font-black text-obsidian tracking-tight">{link.label}</span>
-                  </Link>
-                ))}
-              </div>
-
-              {/* 위기 관리 (하단 메뉴) */}
-              <Card className="border-none bg-mist/50 rounded-[32px] p-8 space-y-4">
-                <Button asChild variant="ghost" className="w-full justify-between h-12 px-2 text-slate hover:bg-white rounded-xl transition-all">
-                  <Link href="/me/notifications" className="flex items-center gap-3">
-                    <Bell className="h-4 w-4" />
-                    <span className="text-xs font-black">알림 프로토콜 설정</span>
-                    <ChevronRight className="h-3 w-3 ml-auto opacity-30" />
-                  </Link>
-                </Button>
-                <div className="h-px bg-line/20 w-full" />
-                <div className="flex gap-2">
-                  <Button variant="ghost" onClick={() => signOut({ callbackUrl: '/' })} className="flex-1 justify-center h-10 text-slate hover:text-obsidian text-[10px] font-bold">
-                    로그아웃
-                  </Button>
-                  <div className="w-px bg-line/20 h-4 self-center" />
-                  <Button asChild variant="ghost" className="flex-1 justify-center h-10 text-slate hover:text-status-danger text-[10px] font-bold">
-                    <Link href="/me/delete-account">회원 탈퇴</Link>
-                  </Button>
-                </div>
               </Card>
             </div>
           </div>
         </div>
-
-        {/* 파트너 신청 모달 리뉴얼 (스타일만 업그레이드) */}
-        {showPartnerApplication && (
-          <div className="fixed inset-0 bg-obsidian/90 backdrop-blur-md flex items-center justify-center z-[100] p-6 overflow-y-auto">
-            <Card className="max-w-3xl w-full border-none shadow-2xl rounded-[48px] bg-white overflow-hidden my-auto">
-              <div className="p-10 md:p-16">
-                <div className="flex items-center justify-between mb-12">
-                  <div>
-                    <h2 className="text-3xl font-black text-obsidian tracking-tighter">파트너 권한 신청</h2>
-                    <p className="text-xs font-black text-slate uppercase tracking-widest mt-1">Specialist Authority Protocol</p>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => setShowPartnerApplication(false)} className="rounded-full hover:bg-mist h-12 w-12"><X className="h-6 w-6" /></Button>
-                </div>
-
-                <form onSubmit={(e) => { e.preventDefault(); handlePartnerApplicationSubmit(); }} className="space-y-12">
-
-                  {/* 1. 카테고리 선택 섹션 */}
-                  <div className="mb-12">
-                    <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1 mb-4 block">파트너 유형 선택</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        { id: 'shopper', title: '쇼퍼 (Shopper)', desc: '사업자등록증 없이 일반 상품 판매', icon: ShoppingBag },
-                        { id: 'business', title: '사업장회원 (Business)', desc: '파빌리언 2층 상점 입점 및 운영', icon: Store },
-                        { id: 'coach', title: '코치 회원 (Coach)', desc: '파빌리언 3층 샵 운영 (운동/건강)', icon: User },
-                        { id: 'artist', title: '작가 회원 (Artist)', desc: '1층 갤러리 운영 및 작품 게시', icon: FileImage },
-                      ].map((type) => (
-                        <div
-                          key={type.id}
-                          onClick={() => handlePartnerApplicationChange('partnerType', type.id)}
-                          className={`p-6 rounded-[28px] border-2 cursor-pointer transition-all flex items-start gap-4 ${partnerApplicationData.partnerType === type.id ? 'border-obsidian bg-obsidian/5' : 'border-line hover:border-obsidian/30 hover:bg-mist/30'}`}
-                        >
-                          <div className={`p-3 rounded-2xl ${partnerApplicationData.partnerType === type.id ? 'bg-obsidian text-mist' : 'bg-mist text-slate'}`}>
-                            <type.icon className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-black text-obsidian text-sm">{type.title}</h4>
-                            <p className="text-[11px] font-medium text-slate mt-1">{type.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 2. 입력 폼 섹션 (유형 선택 시 노출) */}
-                  {partnerApplicationData.partnerType && (
-                    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div className="space-y-6">
-                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                              {partnerApplicationData.partnerType === 'shopper' ? '활동명 (닉네임)' :
-                                partnerApplicationData.partnerType === 'coach' ? '샵 이름 (상호명)' :
-                                  partnerApplicationData.partnerType === 'artist' ? '갤러리 이름' : '상호명 / 성함'}
-                              <span className="text-red-500 ml-1">*</span>
-                            </Label>
-                            <Input value={partnerApplicationData.businessName} onChange={(e) => handlePartnerApplicationChange('businessName', e.target.value)} required placeholder={partnerApplicationData.partnerType === 'shopper' ? "활동명을 입력하세요" : "정식 명칭을 입력하십시오"} className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          </div>
-
-                          {/* 사업자 번호: 쇼퍼는 숨김, 그 외는 노출 (코치/작가는 선택 사항일 수 있으나 입력 권장) */}
-                          {partnerApplicationData.partnerType !== 'shopper' && (
-                            <div className="space-y-3">
-                              <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                                {partnerApplicationData.partnerType === 'business' ? '사업자 번호 (필수)' : '사업자 번호 (선택)'}
-                                {partnerApplicationData.partnerType === 'business' && <span className="text-red-500 ml-1">*</span>}
-                              </Label>
-                              <Input value={partnerApplicationData.businessNumber} onChange={(e) => handlePartnerApplicationChange('businessNumber', e.target.value)} required={partnerApplicationData.partnerType === 'business'} placeholder="000-00-00000" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                            </div>
-                          )}
-
-                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                              연락처 <span className="text-red-500 ml-1">*</span>
-                            </Label>
-                            <Input value={partnerApplicationData.businessPhone} onChange={(e) => handlePartnerApplicationChange('businessPhone', e.target.value)} required placeholder="010-XXXX-XXXX" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          </div>
-
-                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                              소개글 <span className="text-red-500 ml-1">*</span>
-                            </Label>
-                            <Input value={partnerApplicationData.businessDescription} onChange={(e) => handlePartnerApplicationChange('businessDescription', e.target.value)} required placeholder="간단한 소개를 입력해주세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          </div>
-                        </div>
-
-                        <div className="space-y-6">
-                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                              {partnerApplicationData.partnerType === 'shopper' ? '활동 지역 (선택)' : '사업장/활동 주소'}
-                              {partnerApplicationData.partnerType !== 'shopper' && <span className="text-red-500 ml-1">*</span>}
-                            </Label>
-                            <GoogleAddressSearch onAddressSelect={(a) => { handlePartnerApplicationChange('businessZipCode', a.zonecode); handlePartnerApplicationChange('businessAddress', a.address); }} />
-                            <Input value={partnerApplicationData.businessAddress} placeholder="기본 주소" className="h-14 rounded-2xl bg-mist/50 border-line text-xs font-bold" readOnly />
-                            <Input value={partnerApplicationData.businessDetailAddress} onChange={(e) => handlePartnerApplicationChange('businessDetailAddress', e.target.value)} placeholder="상세 주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                          정산 계좌 정보 (수익금 정산용) <span className="text-red-500 ml-1">*</span>
-                        </Label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Input value={partnerApplicationData.bankName} onChange={(e) => handlePartnerApplicationChange('bankName', e.target.value)} required placeholder="은행명" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          <Input value={partnerApplicationData.accountHolder} onChange={(e) => handlePartnerApplicationChange('accountHolder', e.target.value)} required placeholder="예금주" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          <Input value={partnerApplicationData.bankAccount} onChange={(e) => handlePartnerApplicationChange('bankAccount', e.target.value)} required placeholder="계좌번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                        </div>
-                      </div>
-
-                      {/* 증빙 서류: 쇼퍼는 숨김 */}
-                      {partnerApplicationData.partnerType !== 'shopper' && (
-                        <div className="space-y-6">
-                          <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">
-                            증빙 서류 전송 {partnerApplicationData.partnerType === 'business' && <span className="text-red-500 ml-1">*</span>}
-                          </Label>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className={`relative p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all overflow-hidden ${previewUrls.businessRegistrationImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
-                              {previewUrls.businessRegistrationImage ? (
-                                <>
-                                  <div className="absolute inset-0 z-0">
-                                    <Image src={previewUrls.businessRegistrationImage} alt="Preview" fill className="object-cover opacity-50" />
-                                  </div>
-                                  <div className="relative z-10 w-14 h-14 rounded-[18px] flex items-center justify-center bg-status-good text-white shadow-lg">
-                                    <CheckCircle className="h-6 w-6" />
-                                  </div>
-                                  <div className="relative z-10 text-center">
-                                    <p className="text-xs font-black text-obsidian shadow-sm">
-                                      {partnerApplicationData.partnerType === 'business' ? '사업자등록증' :
-                                        partnerApplicationData.partnerType === 'coach' ? '자격증 사본' : '포트폴리오/작품증빙'}
-                                    </p>
-                                    <p className="text-[10px] font-bold text-status-good mt-1 font-black bg-white/50 px-2 py-0.5 rounded-full inline-block backdrop-blur-sm">선택 완료</p>
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="w-14 h-14 rounded-[18px] flex items-center justify-center bg-mist text-slate">
-                                    <FileImage className="h-6 w-6" />
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-xs font-black text-obsidian">
-                                      {partnerApplicationData.partnerType === 'business' ? '사업자등록증' :
-                                        partnerApplicationData.partnerType === 'coach' ? '자격증 사본' : '포트폴리오/작품증빙'}
-                                    </p>
-                                    <p className="text-[10px] font-bold text-slate mt-1">이미지 업로드</p>
-                                  </div>
-                                </>
-                              )}
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleDocumentUpload(e, 'businessRegistrationImage')}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                                aria-label="증빙서류 업로드"
-                              />
-                            </div>
-
-                            <div className={`relative p-8 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-4 transition-all overflow-hidden ${previewUrls.bankStatementImage ? 'border-status-good bg-status-good/5' : 'border-line hover:border-chapter-accent hover:bg-mist/50'}`}>
-                              {previewUrls.bankStatementImage ? (
-                                <>
-                                  <div className="absolute inset-0 z-0">
-                                    <Image src={previewUrls.bankStatementImage} alt="Preview" fill className="object-cover opacity-50" />
-                                  </div>
-                                  <div className="relative z-10 w-14 h-14 rounded-[18px] flex items-center justify-center bg-status-good text-white shadow-lg">
-                                    <CheckCircle className="h-6 w-6" />
-                                  </div>
-                                  <div className="relative z-10 text-center">
-                                    <p className="text-xs font-black text-obsidian shadow-sm">통장 사본</p>
-                                    <p className="text-[10px] font-bold text-status-good mt-1 font-black bg-white/50 px-2 py-0.5 rounded-full inline-block backdrop-blur-sm">선택 완료</p>
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="w-14 h-14 rounded-[18px] flex items-center justify-center bg-mist text-slate">
-                                    <FileImage className="h-6 w-6" />
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-xs font-black text-obsidian">통장 사본</p>
-                                    <p className="text-[10px] font-bold text-slate mt-1">이미지 업로드</p>
-                                  </div>
-                                </>
-                              )}
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleDocumentUpload(e, 'bankStatementImage')}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                                aria-label="통장사본 업로드"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <Button type="submit" disabled={partnerApplicationLoading} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black text-xl shadow-2xl hover:scale-[1.02] transition-all">
-                    {partnerApplicationLoading ? '신청 프로토콜 가동 중...' : '파트너 신청 프로토콜 제출'}
-                  </Button>
-                </form>
-              </div>
-            </Card>
-          </div>
-        )}
       </div>
-    </ChapterWrapper >
+    </ChapterWrapper>
   );
 }

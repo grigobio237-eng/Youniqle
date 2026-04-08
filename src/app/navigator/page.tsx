@@ -4,17 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard } from 'lucide-react';
 import SquareBoard from '@/components/navigator/SquareBoard';
 import SquarePostForm from '@/components/navigator/SquarePostForm';
 import SquarePostDetail from '@/components/navigator/SquarePostDetail';
 import HotlineChat from '@/components/navigator/HotlineChat';
 import ArchiveContent from '@/components/navigator/ArchiveContent';
+import PassOperationGuide from '@/components/navigator/PassOperationGuide';
 
 export default function NavigatorLounge() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'archive' | 'hotline' | 'square'>('archive');
+  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline'>('archive');
   
   // Square State
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -54,16 +55,22 @@ export default function NavigatorLounge() {
       desc: '줄기세포 시술에 대한 필수 기초 상식과 자료',
     },
     {
-      id: 'hotline',
-      label: '자문위 핫라인',
-      icon: MessageCircle,
-      desc: '의료 자문단 및 본사 관리자와의 실시간 채널',
+      id: 'policy',
+      label: '패스 운영 가이드',
+      icon: CreditCard,
+      desc: 'START/SIGNATURE/BLACK 패스 상품 및 정책',
     },
     {
       id: 'square',
       label: '네비게이터 스퀘어',
       icon: Users,
       desc: '현장 네비게이터 간의 노하우 공유 및 소통',
+    },
+    {
+      id: 'hotline',
+      label: '자문위 핫라인',
+      icon: MessageCircle,
+      desc: '의료 자문단 및 본사 관리자와의 실시간 채널',
     },
   ] as const;
 
@@ -87,7 +94,7 @@ export default function NavigatorLounge() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-col md:flex-row gap-4 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -95,7 +102,7 @@ export default function NavigatorLounge() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 text-left p-6 rounded-3xl border transition-all relative overflow-hidden group ${
+                className={`text-left p-6 rounded-3xl border transition-all relative overflow-hidden group ${
                   isActive
                     ? 'bg-obsidian border-obsidian text-mist shadow-xl'
                     : 'bg-white border-line hover:border-chapter-accent/50 text-obsidian shadow-sm'
@@ -111,7 +118,7 @@ export default function NavigatorLounge() {
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="font-black text-xl mb-1">{tab.label}</h3>
-                  <p className={`text-sm ${isActive ? 'text-mist/60' : 'text-slate/60'}`}>
+                  <p className={`text-[11px] leading-relaxed ${isActive ? 'text-mist/60' : 'text-slate/60'}`}>
                     {tab.desc}
                   </p>
                 </div>
@@ -140,6 +147,8 @@ export default function NavigatorLounge() {
                     setIsFormOpen(true);
                   }} 
                 />
+              ) : activeTab === 'policy' ? (
+                <PassOperationGuide />
               ) : activeTab === 'hotline' ? (
                 <HotlineChat />
               ) : activeTab === 'archive' ? (

@@ -87,7 +87,7 @@ export default function Header() {
     { label: 'Youniqle?', href: '/about', desc: '브랜드 및 회복 경로 소개' },
     { label: '진단', href: '/ai-navigator', desc: '맞춤 회복 루틴 안내' },
     { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
-    { label: '솔루션', href: '/products', desc: '회복 솔루션 및 프로그램' },
+    { label: '힐링 라운지', href: '/products', desc: '프리미엄 회복 공간 및 프로그램' },
     { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
     ...(session?.user?.isNavigator ? [{ label: '네비게이터', href: '/navigator', desc: '네비게이터 전용 공간' }] : []),
   ];
@@ -229,4 +229,3 @@ export default function Header() {
     </header>
   );
 }
-

@@ -92,51 +92,6 @@ export function getChecklistProgress(): { completed: number; total: number; perc
     };
 }
 
-export type TierType = 'RESET' | 'REBORN' | 'RESTART';
-
-export function getMembershipLevel(points: number, streak: number): {
-    level: TierType;
-    nextLevel: TierType | 'MAX';
-    pointsToNext: number;
-    streakToNext: number;
-    progress: number;
-} {
-    // RESTART: 1500 points + 60 days streak
-    if (points >= 1500 && streak >= 60) {
-        return {
-            level: 'RESTART',
-            nextLevel: 'MAX',
-            pointsToNext: 0,
-            streakToNext: 0,
-            progress: 100
-        };
-    }
-
-    // REBORN: 500 points + 30 days streak
-    if (points >= 500 && streak >= 30) {
-        const pointsProgress = Math.min((points - 500) / (1500 - 500) * 100, 100);
-        const streakProgress = Math.min((streak - 30) / (60 - 30) * 100, 100);
-        return {
-            level: 'REBORN',
-            nextLevel: 'RESTART',
-            pointsToNext: Math.max(1500 - points, 0),
-            streakToNext: Math.max(60 - streak, 0),
-            progress: Math.round((pointsProgress + streakProgress) / 2)
-        };
-    }
-
-    // RESET: Initial tier
-    const pointsProgress = Math.min(points / 500 * 100, 100);
-    const streakProgress = Math.min(streak / 30 * 100, 100);
-    return {
-        level: 'RESET',
-        nextLevel: 'REBORN',
-        pointsToNext: Math.max(500 - points, 0),
-        streakToNext: Math.max(30 - streak, 0),
-        progress: Math.round((pointsProgress + streakProgress) / 2)
-    };
-}
-
 function getDefaultProgress(): UserProgress {
     const today = new Date().toISOString().split('T')[0];
     return {

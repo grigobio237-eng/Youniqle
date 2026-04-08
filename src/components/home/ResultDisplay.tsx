@@ -4,12 +4,29 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck } from 'lucide-react';
+import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck, Brain } from 'lucide-react';
 import { useRecovery } from '@/contexts/RecoveryContext';
+import { AnalysisResult } from './HeroScanner';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function ResultDisplay({ score, answers, userNote, onEnter, onOpenWebtoon }: { score: number; answers: any[]; userNote: string; onEnter: () => void; onOpenWebtoon: () => void }) {
+export default function ResultDisplay({ 
+  score, 
+  answers, 
+  userNote, 
+  analysisData,
+  onEnter, 
+  onOpenWebtoon 
+}: { 
+  score: number; 
+  answers: any[]; 
+  userNote: string; 
+  analysisData: AnalysisResult | null;
+  onEnter: () => void; 
+  onOpenWebtoon: () => void 
+}) {
   const { journey } = useRecovery();
   const [showNextStepsDialog, setShowNextStepsDialog] = useState(false);
+  const [isDesigning, setIsDesigning] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -117,7 +134,15 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
   }, [recoveryScore, score, metaphor, answers, userNote]);
 
   const handleNextSteps = () => {
-    setShowNextStepsDialog(true);
+    if (journey === 'WELLNESS') {
+      setIsDesigning(true);
+      // Auto-navigate after 2.5 seconds of "designing"
+      setTimeout(() => {
+        router.push('/ai-navigator');
+      }, 2500);
+    } else {
+      setShowNextStepsDialog(true);
+    }
   };
 
   const navigateTo = (path: string) => {
@@ -128,7 +153,7 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
 
   return (
     <>
-      <div className="max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-12 animate-fade-in pb-20">
+      <div className={`max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-12 animate-fade-in pb-20 ${isDesigning ? 'opacity-20 blur-sm pointer-events-none' : ''} transition-all duration-700`}>
         <div className="space-y-4">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
             {info.badge}
@@ -247,6 +272,91 @@ export default function ResultDisplay({ score, answers, userNote, onEnter, onOpe
           </div>
         </div>
       )}
+
+      {/* AI Routine Designer Overlay */}
+      <AnimatePresence>
+        {isDesigning && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-mist/60 backdrop-blur-xl p-8"
+          >
+            <div className="w-full max-w-sm space-y-12 text-center">
+              {/* Animation Header */}
+              <div className="relative w-32 h-32 mx-auto">
+                <motion.div 
+                  animate={{ rotate: 360 }} 
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 border-4 border-dashed border-chapter-accent/30 rounded-full"
+                />
+                <motion.div 
+                  animate={{ scale: [1, 1.1, 1] }} 
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-4 bg-chapter-accent rounded-full flex items-center justify-center text-white shadow-2xl shadow-chapter-accent/40"
+                >
+                  <Sparkles className="w-10 h-10" />
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute -top-2 -right-2 bg-reward-gold text-white p-2 rounded-xl shadow-lg"
+                >
+                  <Brain className="w-4 h-4" />
+                </motion.div>
+              </div>
+
+              {/* Status Message */}
+              <div className="space-y-4">
+                <h3 className="text-3xl font-black text-obsidian tracking-tight">당신만을 위한<br />회복 루틴 설계 중</h3>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex gap-2">
+                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce" />
+                  </div>
+                  <p className="text-sm font-bold text-slate/60 uppercase tracking-widest">Integrating Data Sources</p>
+                </div>
+              </div>
+
+              {/* Combined Data Indicators */}
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { label: "이미지 분석", value: (analysisData?.summary?.split(' ')[0] || "대상") + " 외 키워드", delay: 0 },
+                  { label: "문진 데이터", value: `${recoveryScore}점 회복 프로토콜`, delay: 0.2 },
+                  { label: "환경 조건", value: analysisData?.type === 'SPACE' ? "주변 환경 동기화" : "라이프스타일 매칭", delay: 0.4 }
+                ].map((item, idx) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: item.delay }}
+                    className="flex justify-between items-center bg-white/50 backdrop-blur-sm border border-line/50 p-4 rounded-2xl"
+                  >
+                    <span className="text-[10px] font-black text-slate/50 uppercase tracking-wider">{item.label}</span>
+                    <span className="text-xs font-bold text-obsidian">{item.value}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Progress Bar */}
+              <div className="pt-4">
+                <div className="h-1.5 w-full bg-mist rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 2.2, ease: "easeInOut" }}
+                    className="h-full bg-chapter-accent"
+                  />
+                </div>
+                <p className="mt-3 text-[10px] font-black text-chapter-accent uppercase tracking-[0.2em] animate-pulse">
+                  Synthesizing your personalized roadmap...
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

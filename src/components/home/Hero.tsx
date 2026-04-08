@@ -3,15 +3,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, CheckCircle, ArrowRight, Activity, ShieldCheck } from 'lucide-react';
-import HeroScanner from './HeroScanner';
+import HeroScanner, { AnalysisResult } from './HeroScanner';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { motion } from 'framer-motion';
 
-export default function Hero({ onStart }: { onStart: () => void }) {
+export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
   const { journey, resetJourney } = useRecovery();
 
   return (
-    <div className="hero-cinematic noise-texture bg-mist relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
+    <div id="scanner" className="hero-cinematic noise-texture bg-mist relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
       {/* Decorative Blur Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-20">
         <div className="absolute -top-[15%] -left-[10%] w-[50%] h-[50%] bg-chapter-accent/10 rounded-full blur-[150px]" />

@@ -469,7 +469,12 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
     }
 
     // Daily Question Generator
-    static async generateDailyQuestions(theme: string, keywords: string, journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS'): Promise<any[]> {
+    static async generateDailyQuestions(
+        theme: string, 
+        keywords: string, 
+        journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS',
+        medicalCategory: string | null = null
+    ): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY is missing');
             throw new Error('GEMINI_API_KEY is not set');
@@ -477,18 +482,33 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 
         try {
             let contextInstruction = "";
+            let categorySpecificInstruction = "";
+
+            // 1. Basic Journey Instruction
             if (journey === 'CLINICAL_PRE') {
                 contextInstruction = `사용자는 현재 '시술/수술 전' 단계입니다. 
-중요 목표: 시술 성공을 위한 최상의 컨디션 유지 및 의사 상담 준비.
-질문 방향: 전날 수면 질, 복용 약물(주의사항) 준수 여부, 현재 불안도, 신체 에너지 레벨, 필요한 질문 사항 유무.`;
+중요 목표: 시술 성공을 위한 최상의 컨디션 유지 및 의사 상담 준비.`;
             } else if (journey === 'CLINICAL_POST') {
-                contextInstruction = `사용자는 현재 '시술/수술 후 72시간 골든타임' 관리 단계입니다. 
-중요 목표: 이상 증상 조기 발견 및 안정적 회복 가이드.
-질문 방향: 통증 정도, 부종(부기) 상태, 처방 약 복용 여부, 휴식 정도, 어지러움이나 이상 증세 유무.`;
+                contextInstruction = `사용자는 현재 '시술/수술 후' 관리 단계입니다. 
+중요 목표: 이상 증상 조기 발견 및 안정적 회복 가이드.`;
             } else {
                 contextInstruction = `사용자는 '일상 회복(Wellness)' 단계입니다. 
-중요 목표: 일상의 리듬 회복 및 에너지 최적화.
-질문 방향: 피로도, 감정 상태, 집중력, 신체적 활력, 스트레스 관리.`;
+중요 목표: 일상의 리듬 회복 및 에너지 최적화.`;
+            }
+
+            // 2. Medical Category Specific Instruction (Option B)
+            if (medicalCategory === 'PLASTIC') {
+                categorySpecificInstruction = `진료 분야: [성형외과/피부과]
+집중 사항: 피부 상태, 붓기, 멍, 수술 전 금식 및 주의사항 준수 여부, 프라이버시 고민.`;
+            } else if (medicalCategory === 'ORTHOPEDIC') {
+                categorySpecificInstruction = `진료 분야: [정형외과/재활의학과]
+집중 사항: 통증 수치(NRS), 관절 가동 범위, 무리한 운동 여부, 깁스/부목 상태, 신체 밸런스.`;
+            } else if (medicalCategory === 'INTERNAL') {
+                categorySpecificInstruction = `진료 분야: [내과/건강검진]
+집중 사항: 공복 유지, 복용 약물(혈압/당뇨 등) 조절, 식단 관리, 컨디션 난조 여부, 수치 변화 우려.`;
+            } else if (medicalCategory === 'GENERAL') {
+                categorySpecificInstruction = `진료 분야: [일반/대학병원/수술]
+집중 사항: 전신 컨디션, 보호자 동행 여부, 수술 전 정밀 검사 상태, 복합적인 건강 우려 사항.`;
             }
 
             const prompt = `당신은 메디컬 회복 컨시어지이자 심리 전문가입니다.
@@ -496,6 +516,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 
 ## 상황 지침
 ${contextInstruction}
+${categorySpecificInstruction}
 
 위 지침에 맞춰 사용자의 현재 상태를 점검할 수 있는 **5개의 객관식 질문**을 만들어주세요.
 
@@ -503,6 +524,7 @@ ${contextInstruction}
 1. 질문은 매우 전문적이면서도 따뜻한 어조로 작성해주세요.
 2. 각 질문에는 3개의 선택지가 있어야 합니다. (점수: 0=최상/관리잘됨, 3=보통/주의, 5=나쁨/불안정)
 3. 카테고리는 [신체, 환경, 심리, 영양, 행동] 중에서 적절히 선택하거나 테마에 맞게 정해주세요.
+4. **중요**: 질문 중 하나는 반드시 '약물 복용'이나 '주의사항 준수'와 관련된 것이어야 합니다. (카테고리: "약물")
 
 ## 응답 형식 (JSON Array)
 [
@@ -523,14 +545,19 @@ ${contextInstruction}
 
             const jsonMatch = text.match(/\[[\s\S]*\]/);
             if (jsonMatch) {
-                return JSON.parse(jsonMatch[0]);
+                try {
+                    return JSON.parse(jsonMatch[0]);
+                } catch (pErr) {
+                    console.error('[Gemini] JSON Parse Error in questions:', pErr);
+                    throw new Error('AI 응답을 파싱하는 중 오류가 발생했습니다.');
+                }
             }
 
             // Fallback
             throw new Error('Failed to parse questions');
         } catch (error) {
             console.error('Gemini Question Error:', error);
-            throw error; // Re-throw to be handled by API route
+            throw error; 
         }
     }
     // AI Chat Persona: Director Kim Mi-jeong

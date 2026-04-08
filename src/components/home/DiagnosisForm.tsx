@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CheckCircle, Activity } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle, Activity, Sparkles } from 'lucide-react';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 
@@ -43,7 +43,8 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       questionId: currentQ.id,
       category: currentQ.category,
       score: score,
-      answer: label
+      answer: label,
+      detail: answers[step]?.detail || ''
     };
     setAnswers(newAnswers);
   };
@@ -76,6 +77,9 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
   const currentAnswer = answers[step];
   const progress = ((step + 1) / questions.length) * 100;
   const isLastStep = step === questions.length - 1;
+
+  // Medicine Check
+  const isMedicineQuestion = currentQ.category === '약물' || currentQ.text.includes('복용') || currentQ.text.includes('약');
 
   return (
     <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-8 md:py-12">
@@ -152,6 +156,32 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
               );
             })}
           </div>
+
+          {/* Conditional Medicine Detail Input */}
+          {isMedicineQuestion && currentAnswer && currentAnswer.score > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="space-y-3 pt-2"
+            >
+              <label className="text-sm font-bold text-chapter-accent flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> 어떤 약물을 복용 중이신가요?
+              </label>
+              <textarea
+                value={currentAnswer.detail || ''}
+                onChange={(e) => {
+                  const newAnswers = [...answers];
+                  newAnswers[step] = { ...currentAnswer, detail: e.target.value };
+                  setAnswers(newAnswers);
+                }}
+                placeholder="예: 아스피린, 혈압약, 영양제 등"
+                className="w-full p-4 bg-mist/30 border border-line/50 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm font-medium"
+              />
+              <p className="text-[10px] text-slate/50 leading-relaxed italic">
+                * 입력해주신 정보는 AI가 당신의 상태를 더 정확히 분석하는 데 사용됩니다.
+              </p>
+            </motion.div>
+          )}
 
           {/* User Note Input (Last Step Only) */}
           {isLastStep && (

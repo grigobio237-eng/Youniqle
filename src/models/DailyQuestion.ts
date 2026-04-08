@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IDailyQuestion extends Document {
     date: string; // YYYY-MM-DD format
     journey: string; // 'WELLNESS', 'CLINICAL_PRE', 'CLINICAL_POST'
+    medicalCategory?: string; // 'PLASTIC', 'ORTHOPEDIC', 'INTERNAL', 'GENERAL'
     dayOfWeek: number; // 0-6
     theme: string;
     questions: Array<{
@@ -28,6 +29,11 @@ const DailyQuestionSchema = new Schema<IDailyQuestion>({
         default: 'WELLNESS',
         enum: ['WELLNESS', 'CLINICAL_PRE', 'CLINICAL_POST']
     },
+    medicalCategory: {
+        type: String,
+        required: false,
+        default: null
+    },
     dayOfWeek: {
         type: Number,
         required: true,
@@ -48,11 +54,11 @@ const DailyQuestionSchema = new Schema<IDailyQuestion>({
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 60 * 60 * 24 * 30 // Optional: Auto-delete after 30 days if desired, or keep for history
+        expires: 60 * 60 * 24 * 30 
     }
 });
 
-// Create a composite unique index for date and journey
-DailyQuestionSchema.index({ date: 1, journey: 1 }, { unique: true });
+// Create a composite unique index for date, journey, and medicalCategory
+DailyQuestionSchema.index({ date: 1, journey: 1, medicalCategory: 1 }, { unique: true });
 
 export default mongoose.models.DailyQuestion || mongoose.model<IDailyQuestion>('DailyQuestion', DailyQuestionSchema);

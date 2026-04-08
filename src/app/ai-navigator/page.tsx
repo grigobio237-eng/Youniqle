@@ -10,6 +10,7 @@ import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
@@ -61,6 +62,7 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
 };
 
 export default function AiNavigatorPage() {
+    const { data: session } = useSession();
     const router = useRouter();
     const [scoreHistory, setScoreHistory] = useState<any[]>([]);
     const [todayScore, setTodayScore] = useState(0);
@@ -70,6 +72,8 @@ export default function AiNavigatorPage() {
     const [aiAdvice, setAiAdvice] = useState<string>('');
     const [tomorrowForecast, setTomorrowForecast] = useState<any>(null);
     const [isForecastOpen, setIsForecastOpen] = useState(false);
+
+    const userName = session?.user?.name || '요원';
 
     // 외부 상품 관련 상태
     const [externalProducts, setExternalProducts] = useState<any[]>([]);
@@ -236,7 +240,7 @@ export default function AiNavigatorPage() {
                                         <Sparkles className="w-3 h-3 mr-2" />
                                         Real-time Analysis
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">리커버리<br />네비게이터</h1>
+                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">{userName} 님의<br />리커버리 네비게이터</h1>
 
                                     <div className="bg-surface/50 border border-line p-5 md:p-6 rounded-[24px] md:rounded-[32px] flex items-center gap-4 md:gap-6 w-full md:w-auto">
                                         <div className="flex-shrink-0">
@@ -304,7 +308,7 @@ export default function AiNavigatorPage() {
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Zap className="w-5 h-5 fill-current" />
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight">맞춤 분석 리포트</h2>
+                                    <h2 className="text-2xl font-black tracking-tight">{userName} 님을 위한 맞춤 분석 리포트</h2>
                                 </div>
 
                                 {weakestInfo?.statusInfo ? (
@@ -319,7 +323,7 @@ export default function AiNavigatorPage() {
                                             </div>
 
                                             <h3 className="text-xl md:text-2xl font-black text-text-primary">
-                                                {weakestInfo.statusInfo.message}
+                                                {userName} 님, {weakestInfo.statusInfo.message}
                                             </h3>
 
                                             <p className="text-text-secondary font-medium leading-relaxed opacity-80">
@@ -352,7 +356,7 @@ export default function AiNavigatorPage() {
                                         <CardContent className="p-8 space-y-6">
                                             <div className="text-xs font-bold text-primary tracking-widest uppercase">Analysis Report</div>
                                             <h3 className="text-2xl font-black text-text-primary">
-                                                아직 심층 진단을<br />완료하지 않았습니다.
+                                                {userName} 님, 아직 심층 진단을<br />완료하지 않았습니다.
                                             </h3>
                                             <p className="text-sm font-medium text-slate opacity-80">
                                                 60초 만에 끝나는 회복 진단으로<br />나의 회복 유형을 알아보세요.
@@ -383,7 +387,7 @@ export default function AiNavigatorPage() {
                                                 <span className="text-xs font-bold text-slate-400">최근 업데이트: {new Date().toLocaleDateString()}</span>
                                             </div>
                                             <h3 className="text-2xl font-black text-obsidian leading-tight group-hover:text-primary transition-colors">
-                                                당신의 심리 상태를<br />
+                                                {userName} 님의 심리 상태를<br />
                                                 <span className="text-primary">가장 정밀하게</span> 분석했습니다.
                                             </h3>
                                             <p className="text-sm font-medium text-slate opacity-80 line-clamp-2">
@@ -521,7 +525,7 @@ export default function AiNavigatorPage() {
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
                                         <Calendar className="w-5 h-5" />
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight">내일의 예보</h2>
+                                    <h2 className="text-2xl font-black tracking-tight">{userName} 님의 내일 예보</h2>
                                 </div>
 
                                 <Card className="bg-surface/30 border-dashed border-2 border-line rounded-[32px] hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => setIsForecastOpen(true)}>
@@ -549,6 +553,7 @@ export default function AiNavigatorPage() {
                     open={isForecastOpen}
                     onOpenChange={setIsForecastOpen}
                     forecast={tomorrowForecast}
+                    userName={userName}
                 />
 
                 {/* 브릿지 팝업 */}
@@ -612,7 +617,7 @@ export default function AiNavigatorPage() {
     );
 }
 
-function ForecastModal({ open, onOpenChange, forecast }: { open: boolean, onOpenChange: (open: boolean) => void, forecast: any }) {
+function ForecastModal({ open, onOpenChange, forecast, userName }: { open: boolean, onOpenChange: (open: boolean) => void, forecast: any, userName: string }) {
     if (!forecast) return null;
 
     return (
@@ -621,7 +626,7 @@ function ForecastModal({ open, onOpenChange, forecast }: { open: boolean, onOpen
                 <div className="relative">
                     <DialogHeader className="sr-only">
                         <DialogTitle>내일의 회복 예보</DialogTitle>
-                        <DialogDescription>분석한 당신의 내일 컨디션입니다.</DialogDescription>
+                        <DialogDescription>분석한 {userName} 님의 내일 컨디션입니다.</DialogDescription>
                     </DialogHeader>
 
                     <div className="h-48 bg-gradient-to-br from-obsidian to-primary/20 flex flex-col items-center justify-center relative overflow-hidden p-8">

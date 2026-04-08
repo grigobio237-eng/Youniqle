@@ -2,10 +2,14 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 import { Sparkles, BarChart3, Map, Lightbulb, Zap, Shield, Crown, Users, Camera, Activity, Video, Music, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AnalysisResult } from './HeroScanner';
 
-export default function LandingContent({ onStart }: { onStart: () => void }) {
+export default function LandingContent({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
+  const router = useRouter();
+  
   const utilities = [
     {
       title: "AI Sensory Scanner",
@@ -25,25 +29,25 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
     },
     {
       title: "Video Analysis",
-      desc: "움직임과 자세를 AI로 분석하여 회복을 방해하는 습관을 찾아내고 교정 가이드를 드립니다.",
+      desc: "한 장의 사진으로 거북목과 회복 자세를 AI가 분석하여 고품격 교정 가이드를 드립니다.",
       icon: <Video className="w-6 h-6" />,
       color: "bg-status-normal",
-      action: "분석 시작",
-      link: "/ai-navigator"
+      action: "스냅샷 분석",
+      link: "/analysis/video"
     },
     {
       title: "Sound Therapy",
-      desc: "현재 스트레스 지수에 최적화된 회복 주파수와 사운드스케이프를 큐레이션합니다.",
+      desc: "회복 주파수와 사운드스케이프를 통해 깊은 이완과 명상의 시간을 제공합니다.",
       icon: <Music className="w-6 h-6" />,
       color: "bg-obsidian",
       action: "청취하기",
-      link: "/gallery/artworks"
+      link: "/therapy/sound"
     }
   ];
 
   return (
     <div className="bg-mist space-y-32 pb-32 pt-20">
-      {/* 1. Utility Hub (Action-Provoking Step 6) */}
+      {/* 1. Utility Hub */}
       <section className="container mx-auto px-6 space-y-16">
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
@@ -72,7 +76,18 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
               <div className="mt-10 pt-6 border-t border-line/50">
                 <Button 
                   variant="ghost" 
-                  onClick={util.onClick}
+                  onClick={() => {
+                    if (util.onClick) {
+                        util.onClick();
+                    } else if (util.link) {
+                      if (util.link.startsWith('#')) {
+                        const el = document.querySelector(util.link);
+                        el?.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        router.push(util.link);
+                      }
+                    }
+                  }}
                   className="p-0 h-auto text-chapter-accent font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-transparent group-hover:translate-x-1 transition-transform"
                 >
                   {util.action} <ArrowRight className="w-4 h-4" />
@@ -83,7 +98,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
         </div>
       </section>
 
-      {/* 2. Path Preview (Visual Roadmap) */}
+      {/* 2. Path Preview */}
       <section className="container mx-auto px-6 space-y-16">
         <div className="text-center space-y-4">
           <h2 className="text-xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
@@ -156,7 +171,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
         </div>
       </section>
 
-      {/* 3. Bottom CTA (Step 7 alignment) */}
+      {/* 3. Bottom CTA */}
       <section className="container mx-auto px-6 text-center">
         <div className="bg-obsidian p-20 rounded-[64px] shadow-2xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
@@ -165,7 +180,7 @@ export default function LandingContent({ onStart }: { onStart: () => void }) {
               <h2 className="text-2xl md:text-6xl font-black text-white leading-tight tracking-tight">당신의 세계를 스캔하세요.<br />진정한 회복은 지금부터입니다.</h2>
               <p className="text-white/70 text-base md:text-xl font-medium">유니클의 데이터 기반 회복 프로토콜에 합류하세요</p>
             </div>
-            <Button onClick={onStart} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-16 md:h-24 px-12 md:px-16 rounded-[24px] md:rounded-[32px] text-lg md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden">
+            <Button onClick={() => onStart()} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-16 md:h-24 px-12 md:px-16 rounded-[24px] md:rounded-[32px] text-lg md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               <Sparkles className="w-8 h-8 mr-4 group-hover:rotate-12 transition-transform" />
               60초 정밀 진단 시작하기

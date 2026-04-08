@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -11,6 +10,7 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, RefreshCw, X } from 'lucide-react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { MockPaymentModal } from '../payment/MockPaymentModal';
 import { DiagnosisRadarChart } from '../charts/DiagnosisRadarChart';
 
@@ -22,11 +22,14 @@ interface DetailedDiagnosisModalProps {
 }
 
 export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initialStep = 'intro' }: DetailedDiagnosisModalProps) {
+    const { data: session } = useSession();
     const [step, setStep] = useState<'intro' | 'test' | 'analyzing' | 'result'>('intro');
     const [currentQIndex, setCurrentQIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [result, setResult] = useState<FreeDiagnosisResult | null>(null);
     const [questions, setQuestions] = useState<DiagnosisQuestionData[]>([]);
+
+    const userName = session?.user?.name || '요원';
 
     // Reset or Initialize when opened
     useEffect(() => {
@@ -135,14 +138,14 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-none rounded-[32px] bg-surface shadow-2xl h-[600px] flex flex-col">
                 <DialogHeader className="sr-only">
-                    <DialogTitle>심층 심리 진단</DialogTitle>
+                    <DialogTitle>{userName} 님의 정밀 심리 진단</DialogTitle>
                     <DialogDescription>
                         심리 진단을 통해 당신의 상태를 분석하고 솔루션을 제공합니다.
                     </DialogDescription>
                 </DialogHeader>
                 <AnimatePresence mode="wait">
                     {step === 'intro' && (
-                        <IntroView key="intro" onStart={handleStart} onClose={handleClose} />
+                        <IntroView key="intro" onStart={handleStart} onClose={handleClose} userName={userName} />
                     )}
                     {step === 'test' && (
                         <TestView
@@ -156,7 +159,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
                         />
                     )}
                     {step === 'analyzing' && (
-                        <AnalyzingView key="analyzing" />
+                        <AnalyzingView key="analyzing" userName={userName} />
                     )}
                     {step === 'result' && result && (
                         <ResultView
@@ -164,6 +167,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
                             result={result}
                             onClose={handleClose}
                             onUnlockPaid={onUnlockPaid}
+                            userName={userName}
                         />
                     )}
                 </AnimatePresence>
@@ -175,7 +179,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
 
 // ---------------- Sub Components ----------------
 
-function IntroView({ onStart, onClose }: { onStart: () => void, onClose: () => void }) {
+function IntroView({ onStart, onClose, userName }: { onStart: () => void, onClose: () => void, userName: string }) {
     return (
         <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -190,7 +194,7 @@ function IntroView({ onStart, onClose }: { onStart: () => void, onClose: () => v
                     <span className="text-4xl">🧠</span>
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black text-obsidian mb-4">심층 심리 진단</h2>
+                    <h2 className="text-3xl font-black text-obsidian mb-4">{userName} 님을 위한<br />심층 심리 진단</h2>
                     <p className="text-slate font-medium leading-relaxed max-w-sm mx-auto">
                         나의 마음, 감정, 관계, 신체 4가지 영역을<br />
                         정밀하게 분석하여<br />
@@ -268,7 +272,7 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
     );
 }
 
-function AnalyzingView() {
+function AnalyzingView({ userName }: { userName: string }) {
     return (
         <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -281,12 +285,12 @@ function AnalyzingView() {
                 </div>
             </div>
             <h2 className="text-2xl font-black mb-2">분석 중입니다...</h2>
-            <p className="text-white/60">당신의 응답 패턴을 AI 모델과 대조하여<br />심층 리포트를 생성하고 있습니다.</p>
+            <p className="text-white/60">{userName} 님의 응답 패턴을 AI 모델과 대조하여<br />심층 리포트를 생성하고 있습니다.</p>
         </motion.div>
     );
 }
 
-function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisResult, onClose: () => void, onUnlockPaid?: () => void }) {
+function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeDiagnosisResult, onClose: () => void, onUnlockPaid?: () => void, userName: string }) {
     const [paymentOpen, setPaymentOpen] = useState(false);
 
     const handleUnlockClick = () => {
@@ -323,7 +327,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
             <div className="relative z-10 pt-8 px-6 pb-20 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-6 text-white">
                     <div>
-                        <div className="text-xs font-bold opacity-60 uppercase tracking-widest mb-1">Total Score</div>
+                        <div className="text-xs font-bold opacity-60 uppercase tracking-widest mb-1">{userName} 님의 실시간 점수</div>
                         <div className="text-4xl font-black tracking-tighter">{result.totalScore}<span className="text-lg opacity-50">/100</span></div>
                     </div>
                 </div>
@@ -347,7 +351,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
                             <span className="text-sm">🤖</span> AI Coach Whisper
                         </div>
                         <p className="text-sm font-medium text-obsidian leading-relaxed mt-2">
-                            "회원님, 전반적으로 훌륭하시지만 <span className="text-primary font-black underline decoration-2 underline-offset-2">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
+                            "{userName} 님, 전반적으로 훌륭하시지만 <span className="text-primary font-black underline decoration-2 underline-offset-2">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
                             이 부분만 해결하면 회복 탄력성이 <span className="bg-primary/10 px-1 rounded font-bold">2배</span>는 좋아질 것 같아요. 제가 원인을 찾아드릴까요?"
                         </p>
                     </motion.div>
@@ -358,7 +362,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
                             '{lowestCatName}' 케어가 시급합니다
                         </h3>
                         <p className="text-sm text-slate leading-relaxed">
-                            현재 4가지 영역 중 가장 에너지가 소진된 상태입니다.
+                            {userName} 님, 현재 4가지 영역 중 가장 에너지가 소진된 상태입니다.
                         </p>
                     </div>
 
@@ -366,7 +370,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
                     <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-line shadow-lg bg-white" onClick={handleUnlockClick}>
                         <div className="p-5 filter blur-[6px] select-none pointer-events-none opacity-60">
                             <div className="text-xs font-black text-obsidian uppercase tracking-widest mb-3">Deep Analysis Report</div>
-                            <h3 className="text-lg font-bold text-obsidian mb-2">당신의 {lowestCatName} 점수가 낮은 결정적 원인 3가지</h3>
+                            <h3 className="text-lg font-bold text-obsidian mb-2">{userName} 님의 {lowestCatName} 점수가 낮은 결정적 원인 3가지</h3>
                             <ul className="space-y-2 mt-4 text-sm text-slate">
                                 <li className="flex gap-2"><span>1.</span> <span>무의식적인 스트레스 반응 패턴이...</span></li>
                                 <li className="flex gap-2"><span>2.</span> <span>수면의 질과 연관된 호르몬 불균형이...</span></li>
@@ -380,7 +384,7 @@ function ResultView({ result, onClose, onUnlockPaid }: { result: FreeDiagnosisRe
                                 <span className="text-xl">🔒</span>
                             </div>
                             <h4 className="text-sm font-black text-obsidian mb-1">심층 분석 리포트 잠김</h4>
-                            <p className="text-xs text-slate font-medium mb-4">나의 진짜 원인을 파악하고 싶다면?</p>
+                            <p className="text-xs text-slate font-medium mb-4">{userName} 님의 진짜 원인을 파악하고 싶다면?</p>
                             <Button className="h-10 px-6 rounded-full bg-obsidian text-white font-bold text-xs shadow-lg hover:scale-105 transition-transform" onClick={(e) => { e.stopPropagation(); handleUnlockClick(); }}>
                                 지금 잠금 해제하기
                             </Button>

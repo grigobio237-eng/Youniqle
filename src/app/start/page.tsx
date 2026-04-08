@@ -87,9 +87,9 @@ export default function RecoveryStartPage() {
                                 오늘의 상태 체크하기 <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                         </Button>
-                        <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full" asChild>
-                            <Link href="/cases">
-                                리얼 회복 사례 보기
+                        <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-blue-500 text-blue-500 hover:bg-blue-50" asChild>
+                            <Link href="/therapy/sound">
+                                <Heart className="mr-2 w-5 h-5" /> 사운드 테라피 체험하기
                             </Link>
                         </Button>
                     </div>

@@ -145,6 +145,7 @@ export default function Footer() {
           <Link href="/healing-center" className="text-gray-400 hover:text-white transition-colors">힐링센터</Link>
           <Link href="/trainer" className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
           <Link href="/gallery/artworks" className="text-gray-400 hover:text-white transition-colors">갤러리</Link>
+          <Link href="/products/shop" className="text-gray-400 hover:text-white transition-colors">유니클 스토어</Link>
           <Link href="/community" className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
           <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="text-gray-400 hover:text-white transition-colors">제휴 및 입점문의</a>
         </div>
