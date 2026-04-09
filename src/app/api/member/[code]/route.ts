@@ -3,6 +3,8 @@ import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import Diagnosis from '@/models/Diagnosis';
+import MedicalPassPin from '@/models/MedicalPassPin';
 
 export async function GET(
   request: NextRequest,
@@ -54,11 +56,32 @@ export async function GET(
       }
     }
 
-    // 최신 진단 결과
+    // 최신 진단 결과 (기본 정보 리턴용)
     const diagnosisResults = (member as any).diagnosisResults || [];
     const latestDiagnosis = diagnosisResults.length > 0
       ? diagnosisResults[diagnosisResults.length - 1]
       : null;
+
+    // ─── PIN 검증 및 메디컬 데이터 조회 ───────────────────────────
+    const url = new URL(request.url);
+    const pin = url.searchParams.get('pin');
+    let medicalHistory = null;
+    let isMedicalAuthenticated = false;
+
+    if (pin) {
+      const pinDoc = await MedicalPassPin.findOne({ 
+        userId: (member as any)._id,
+        pin: pin
+      });
+
+      if (pinDoc) {
+        isMedicalAuthenticated = true;
+        // 문진 전체 히스토리 조회 (상세 내역 포함)
+        medicalHistory = await Diagnosis.find({ userId: (member as any)._id })
+          .sort({ createdAt: -1 })
+          .lean();
+      }
+    }
 
     return NextResponse.json({
       viewerRole,
@@ -72,6 +95,8 @@ export async function GET(
         memberSince: (member as any).createdAt,
         latestDiagnosisScore: latestDiagnosis?.totalScore ?? null,
       },
+      medicalHistory,
+      isMedicalAuthenticated
     });
   } catch (error) {
     console.error('[member/[code]] Error:', error);

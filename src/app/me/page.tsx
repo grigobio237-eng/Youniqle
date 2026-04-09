@@ -50,6 +50,7 @@ import MembershipProgress from '@/components/me/MembershipProgress';
 import AILatestBrief from '@/components/me/AILatestBrief';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import QRReferralCard from '@/components/me/QRReferralCard';
+import MedicalPassCard from '@/components/me/MedicalPassCard';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -780,7 +781,7 @@ export default function MyPage() {
                 </CardContent>
               </Card>
 
-              {/* 통합 인비테이션 허브 (링크 + QR) */}
+              {/* 통합 인비테이션 & 메디컬 허브 */}
               <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
                 <CardHeader className="p-8 md:p-10 pb-0 border-none">
                   <div className="flex items-center justify-between">
@@ -789,12 +790,34 @@ export default function MyPage() {
                         <Sparkles className="h-7 w-7" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">인비테이션 허브</h3>
-                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Invitation & Referral Protocol</p>
+                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">디지털 허브</h3>
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Referral & medical pass</p>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
+                <CardContent className="p-8 md:p-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                         <Badge className="bg-emerald-100 text-emerald-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Invitation</Badge>
+                      </div>
+                      <QRReferralCard 
+                        userName={session.user?.name || ''} 
+                        referralCode={userData?.referralCode || ''} 
+                      />
+                    </div>
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                         <Badge className="bg-indigo-100 text-indigo-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Medical Pass</Badge>
+                      </div>
+                      <MedicalPassCard 
+                        userName={session.user?.name || ''} 
+                        referralCode={userData?.referralCode || ''} 
+                      />
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
             </div>
           </div>
