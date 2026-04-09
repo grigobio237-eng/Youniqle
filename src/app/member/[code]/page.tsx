@@ -23,6 +23,7 @@ interface ApiResponse {
   viewerRole: 'self' | 'partner' | 'guest';
   member: MemberInfo;
   medicalHistory?: any[];
+  preConsultation?: any;
   isMedicalAuthenticated?: boolean;
 }
 
@@ -49,6 +50,7 @@ export default function MemberVerifyPage() {
   const [pinInput, setPinInput] = useState('');
   const [selectedReportIdx, setSelectedReportIdx] = useState(0);
   const [isMedicalMode, setIsMedicalMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'clinical' | 'psychology'>('clinical');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -260,10 +262,11 @@ export default function MemberVerifyPage() {
     }
 
     const history = data.medicalHistory || [];
+    const clinicalData = data.preConsultation;
     const currentReport = history[selectedReportIdx];
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10">
+      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10 pb-32">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -284,99 +287,193 @@ export default function MemberVerifyPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* History Sidebar */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
-                <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-6 px-1">Consultation History</h4>
-                <div className="space-y-2">
-                  {history.map((h: any, idx: number) => (
-                    <button key={idx} onClick={() => setSelectedReportIdx(idx)} className={`w-full text-left p-4 rounded-2xl transition-all ${selectedReportIdx === idx ? 'bg-indigo-50 border-2 border-indigo-200' : 'bg-slate-50 border-2 border-transparent hover:bg-slate-100'}`}>
-                      <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-slate-600'}`}>{h.type === 'PRECISION' ? '정밀 진단' : '간편 진단'}</p>
-                      <p className="text-[10px] font-bold text-slate-400 mt-1">{new Date(h.createdAt).toLocaleDateString()}</p>
-                    </button>
-                  ))}
-                  {history.length === 0 && <p className="text-center py-10 text-xs font-bold text-slate-300">이력이 없습니다.</p>}
-                </div>
-              </div>
-            </div>
+          {/* New Tab System */}
+          <div className="flex bg-slate-100 p-1.5 rounded-[24px] w-full max-w-md">
+            <button 
+              onClick={() => setActiveTab('clinical')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'clinical' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <ShieldCheck className="w-4 h-4" /> 사전 문진 리포트
+            </button>
+            <button 
+              onClick={() => setActiveTab('psychology')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'psychology' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <Activity className="w-4 h-4" /> 회복 성향 분석
+            </button>
+          </div>
 
-            {/* Main Report Dashboard */}
-            <div className="lg:col-span-8 space-y-6">
-              {currentReport ? (
-                <motion.div key={selectedReportIdx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                  {/* Summary Card */}
-                  <div className="bg-indigo-900 text-white rounded-[40px] p-10 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-                    <div className="relative z-10 space-y-6">
-                      <p className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.3em]">Recovery Score Dashboard</p>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-7xl font-black tracking-tighter">{currentReport.totalScore}</span>
-                        <span className="text-2xl font-bold opacity-40">/ 100</span>
-                      </div>
-                      <h3 className="text-2xl font-black tracking-tight leading-none">{currentReport.resultTitle}</h3>
-                      <p className="text-indigo-100/60 font-medium leading-relaxed max-w-md">{currentReport.resultDescription}</p>
-                    </div>
-                  </div>
-
-                  {/* Category Scores */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {currentReport.categoryScores && Object.entries(currentReport.categoryScores).map(([key, value]: any) => (
-                      <div key={key} className="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 text-center">
-                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">{key}</p>
-                        <p className={`text-2xl font-black ${value < 50 ? 'text-rose-500' : 'text-indigo-600'}`}>{value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* AI Solution Sections */}
-                  {currentReport.aiSolution && (
-                    <div className="space-y-4">
-                      <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[40px] space-y-4">
-                         <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                            <Sparkles className="w-5 h-5" />
-                            <h4 className="text-lg font-black tracking-tighter">의료 분석 및 솔루션</h4>
-                         </div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm leading-relaxed font-medium text-emerald-900/80">
-                            <div className="space-y-2">
-                               <p className="font-black text-emerald-800">생활 습관 제안</p>
-                               <p>{currentReport.aiSolution.lifestyle || currentReport.aiSolution.nutrition}</p>
-                            </div>
-                            <div className="space-y-2">
-                               <p className="font-black text-emerald-800">회복 전략</p>
-                               <p>{currentReport.aiSolution.analysis}</p>
-                            </div>
-                         </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Detailed Answers */}
-                  <div className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100">
-                    <h4 className="text-lg font-black text-slate-900 tracking-tighter mb-8">상세 문진 답변 내역</h4>
-                    <div className="space-y-6">
-                      {(currentReport.answers || []).map((ans: any, i: number) => (
-                        <div key={i} className="flex gap-6 pb-6 border-b border-slate-50 last:border-none">
-                          <div className="w-2 h-2 rounded-full bg-indigo-200 mt-2 shrink-0" />
-                          <div className="space-y-1">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{ans.category}</p>
-                            <p className="text-sm font-black text-slate-800">{ans.question}</p>
-                            <p className="text-sm font-bold text-indigo-600 mt-2 tracking-tight">답변: {ans.answer}</p>
+          <div className="grid grid-cols-1 gap-8">
+            {activeTab === 'clinical' ? (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                {clinicalData ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Medical History Card */}
+                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 space-y-6">
+                        <h4 className="flex items-center gap-3 text-lg font-black text-slate-900 tracking-tighter uppercase italic">
+                          <Activity className="w-5 h-5 text-indigo-600" /> Medical History
+                        </h4>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">과거 경험</p>
+                            <p className="text-sm font-bold text-slate-700">
+                              {clinicalData.medicalHistory.pastExperience.hasExperience ? `있음: ${clinicalData.medicalHistory.pastExperience.details}` : '없음'}
+                            </p>
+                          </div>
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">현재 복용 약물</p>
+                            <p className="text-sm font-bold text-slate-700">
+                              {clinicalData.medicalHistory.currentMedication.taking ? `있음: ${clinicalData.medicalHistory.currentMedication.details}` : '없음'}
+                            </p>
+                          </div>
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">기타 건강 이슈</p>
+                            <p className="text-sm font-bold text-slate-700">
+                              {clinicalData.medicalHistory.healthStatus.isIssue ? `있음: ${clinicalData.medicalHistory.healthStatus.details}` : '특이사항 없음'}
+                            </p>
                           </div>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Anxiety & Concerns Card */}
+                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 space-y-6">
+                        <h4 className="flex items-center gap-3 text-lg font-black text-slate-900 tracking-tighter uppercase italic">
+                          <ShieldCheck className="w-5 h-5 text-emerald-600" /> Focus Point
+                        </h4>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">집중 중점 관리 및 불안 지점</p>
+                            <div className="flex flex-wrap gap-2">
+                              {(clinicalData.anxiety.points || []).map((p: string, i: number) => (
+                                <Badge key={i} className="bg-white text-emerald-600 border-emerald-100 font-bold px-3 py-1">{p}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">상세 안내 요청 및 보안</p>
+                            <p className="text-sm font-bold text-slate-700">{clinicalData.anxiety.privacyDetails || '특이사항 없음'}</p>
+                          </div>
+                          <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">환자 성향 분류</p>
+                            <p className="text-sm font-black text-indigo-900">{clinicalData.anxiety.classifiedType || '미분류'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expectations Card */}
+                    <div className="bg-indigo-900 text-white rounded-[40px] p-10 shadow-xl space-y-8 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+                       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+                         <div className="space-y-4">
+                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Treatment Expectations</p>
+                            <h5 className="text-2xl font-black tracking-tight">{clinicalData.expectation.changeScale} 지향</h5>
+                            <p className="text-indigo-100/60 text-sm font-medium">선호 회복 기간: {clinicalData.expectation.downtime}</p>
+                         </div>
+                         <div className="space-y-4">
+                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Important Schedule</p>
+                            <p className="text-sm font-bold">
+                              {clinicalData.expectation.importantEvent.hasEvent ? `일정 있음: ${clinicalData.expectation.importantEvent.details}` : '중요 일정 없음'}
+                            </p>
+                            <div className="h-px bg-white/10 w-full my-4" />
+                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Visit Plan</p>
+                            <p className="text-xs text-indigo-100/70">
+                               동반자 {clinicalData.visitPlan.companion.hasCompanion ? clinicalData.visitPlan.companion.details : '없음'} • 
+                               이동지원 {clinicalData.visitPlan.transportation.needsHelp ? '필요' : '직접'} • 
+                               {clinicalData.visitPlan.privacyRoute.wantsPrivacy ? '프라이빗 경로 선호' : '일반 경로'}
+                            </p>
+                         </div>
+                       </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-white rounded-[40px] p-20 text-center shadow-sm border border-slate-100 flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                      <ShieldCheck className="w-10 h-10" />
+                    </div>
+                    <p className="text-slate-400 font-bold">작성된 사전 문진 데이터가 없습니다.</p>
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-4 space-y-4">
+                    <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
+                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-6 px-1">Consultation History</h4>
+                      <div className="space-y-2">
+                        {history.map((h: any, idx: number) => (
+                          <button key={idx} onClick={() => setSelectedReportIdx(idx)} className={`w-full text-left p-4 rounded-2xl transition-all ${selectedReportIdx === idx ? 'bg-indigo-50 border-2 border-indigo-200' : 'bg-slate-50 border-2 border-transparent hover:bg-slate-100'}`}>
+                            <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-slate-600'}`}>{h.type === 'PRECISION' ? '정밀 진단' : '간편 진단'}</p>
+                            <p className="text-[10px] font-bold text-slate-400 mt-1">{new Date(h.createdAt).toLocaleDateString()}</p>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </motion.div>
-              ) : (
-                <div className="bg-white rounded-[40px] p-20 text-center shadow-sm border border-slate-100 flex flex-col items-center gap-6">
-                  <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
-                    <Activity className="w-10 h-10" />
+
+                  <div className="lg:col-span-8 space-y-6">
+                    {currentReport ? (
+                      <div className="space-y-6">
+                        {/* Summary Card */}
+                        <div className="bg-indigo-900 text-white rounded-[40px] p-10 shadow-2xl relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+                          <div className="relative z-10 space-y-6">
+                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.3em]">Recovery Score Dashboard</p>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-7xl font-black tracking-tighter">{currentReport.totalScore}</span>
+                              <span className="text-2xl font-bold opacity-40">/ 100</span>
+                            </div>
+                            <h3 className="text-2xl font-black tracking-tight leading-none">{currentReport.resultTitle}</h3>
+                            <p className="text-indigo-100/60 font-medium leading-relaxed max-w-md">{currentReport.resultDescription}</p>
+                          </div>
+                        </div>
+
+                        {/* Category Scores */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {currentReport.categoryScores && Object.entries(currentReport.categoryScores).map(([key, value]: any) => (
+                            <div key={key} className="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 text-center">
+                              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">{key}</p>
+                              <p className={`text-2xl font-black ${value < 50 ? 'text-rose-500' : 'text-indigo-600'}`}>{value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* AI Solution */}
+                        {currentReport.aiSolution && (
+                          <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[40px] space-y-4">
+                             <h4 className="flex items-center gap-2 text-emerald-600 text-lg font-black tracking-tighter">
+                                <Sparkles className="w-5 h-5" /> 성향 분석 솔루션 요약
+                             </h4>
+                             <p className="text-sm font-medium text-emerald-900/80 leading-relaxed">{currentReport.aiSolution.analysis}</p>
+                          </div>
+                        )}
+
+                        {/* Standard Answers (Collapsible) */}
+                        <div className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100">
+                          <h4 className="text-lg font-black text-slate-900 tracking-tighter mb-8">상세 성향 분석 항목</h4>
+                          <div className="space-y-6">
+                            {(currentReport.answers || []).map((ans: any, i: number) => (
+                              <div key={i} className="flex gap-6 pb-6 border-b border-slate-50 last:border-none">
+                                <div className="w-2 h-2 rounded-full bg-indigo-200 mt-2 shrink-0" />
+                                <div className="space-y-1">
+                                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{ans.category}</p>
+                                  <p className="text-sm font-black text-slate-800">{ans.question}</p>
+                                  <p className="text-sm font-bold text-indigo-600 mt-1">답변: {ans.answer}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-center py-20 text-slate-400">분석 데이터를 선택해 주세요.</p>
+                    )}
                   </div>
-                  <p className="text-slate-400 font-bold">리포트를 선택해주세요.</p>
                 </div>
-              )}
-            </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>

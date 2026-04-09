@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Diagnosis from '@/models/Diagnosis';
 import MedicalPassPin from '@/models/MedicalPassPin';
+import PreConsultation from '@/models/PreConsultation';
 
 export async function GET(
   request: NextRequest,
@@ -66,6 +67,7 @@ export async function GET(
     const url = new URL(request.url);
     const pin = url.searchParams.get('pin');
     let medicalHistory = null;
+    let preConsultation = null;
     let isMedicalAuthenticated = false;
 
     if (pin) {
@@ -76,8 +78,13 @@ export async function GET(
 
       if (pinDoc) {
         isMedicalAuthenticated = true;
-        // 문진 전체 히스토리 조회 (상세 내역 포함)
+        // 문진 전체 히스토리 조회
         medicalHistory = await Diagnosis.find({ userId: (member as any)._id })
+          .sort({ createdAt: -1 })
+          .lean();
+        
+        // 최신 사전 문진(임상 데이터) 조회
+        preConsultation = await PreConsultation.findOne({ user: (member as any)._id })
           .sort({ createdAt: -1 })
           .lean();
       }
@@ -96,6 +103,7 @@ export async function GET(
         latestDiagnosisScore: latestDiagnosis?.totalScore ?? null,
       },
       medicalHistory,
+      preConsultation,
       isMedicalAuthenticated
     });
   } catch (error) {
