@@ -138,16 +138,24 @@ function CustomerPassPreviewContent() {
               <Badge variant="outline" className="border-mist/20 text-mist/60 px-4 py-1 rounded-full uppercase text-[10px] font-black tracking-widest">
                 Membership Spec
               </Badge>
-              <div className="space-y-2">
-                <div className="flex items-baseline justify-center gap-3">
-                  <span className="text-5xl md:text-7xl font-black text-chapter-accent">₩{spec.price}</span>
-                  <span className="text-2xl font-bold opacity-40">/ {spec.period}</span>
+              <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center gap-1">
+                  <span className="text-[10px] font-black tracking-widest text-mist/40 uppercase">Membership Price</span>
+                  <div className="flex items-baseline justify-center gap-3">
+                    <span className={`text-5xl md:text-7xl font-black ${spec.id === 'black' ? 'text-chapter-accent' : 'text-white'} drop-shadow-sm`}>
+                      ₩{spec.price}
+                    </span>
+                    <span className="text-2xl font-bold opacity-40">/ {spec.period}</span>
+                  </div>
                 </div>
-                <p className="text-xl font-bold">{spec.position}</p>
+                <p className="text-xl font-bold text-mist/90">{spec.position}</p>
               </div>
               
               <div className="pt-8">
-                <Button size="lg" className="w-full md:w-auto px-12 h-16 rounded-2xl bg-chapter-accent hover:bg-chapter-accent/90 text-white font-black text-xl shadow-xl shadow-chapter-accent/20 transition-transform hover:scale-105">
+                <Button 
+                  size="lg" 
+                  className={`w-full md:w-auto px-12 h-16 rounded-2xl ${spec.buttonColor || 'bg-chapter-accent'} text-white font-black text-xl shadow-xl transition-transform hover:scale-105`}
+                >
                   멤버십 신청 및 상담 예약하기 <ArrowRight className="ml-2 w-6 h-6" />
                 </Button>
               </div>
