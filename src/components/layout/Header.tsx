@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ShoppingCart, User, Menu, X, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +13,8 @@ import { motion } from 'framer-motion';
 export default function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const loading = status === 'loading';
   const [cartCount, setCartCount] = useState(0);
 
   // Gate Logic
@@ -40,36 +41,16 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    const checkSession = async () => {
-      if (!isMounted) return;
-      try {
-        const response = await fetch('/api/auth/session', { cache: 'no-store' });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.user && isMounted) {
-            setSession(data);
-            fetchCartCount();
-          } else {
-            setSession(null);
-          }
-        }
-      } catch (error) {
-        console.error('Session check failed:', error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    checkSession();
+    if (session) {
+      fetchCartCount();
+    }
 
     const handleCartUpdate = () => fetchCartCount();
     window.addEventListener('cartUpdated', handleCartUpdate);
     return () => {
-      isMounted = false;
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
-  }, []);
+  }, [session]);
 
   const fetchCartCount = async () => {
     try {

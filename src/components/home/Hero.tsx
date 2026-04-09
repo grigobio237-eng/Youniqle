@@ -33,7 +33,7 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
                   </motion.div>
                 )}
               </div>
-              <h1 className="text-2xl md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
+              <h1 className="text-[1.75rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
                 당신이 머무는 공간,<br />
                 보는 것과 듣는 것,<br />
                 그리고 먹는 모든 것이<br />

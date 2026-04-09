@@ -58,6 +58,11 @@ interface User {
   lastLoginAt?: string;
   totalOrders: number;
   totalSpent: number;
+  passInfo?: {
+    type: 'NONE' | 'START' | 'SIGNATURE' | 'BLACK';
+    status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
+    endDate?: string;
+  };
 }
 
 const gradeColors = {
@@ -199,9 +204,26 @@ export default function AdminUsersPage() {
     const colorClass = gradeColors[grade as keyof typeof gradeColors] || 'bg-gray-100 text-gray-800'; // 기본값으로 gray 사용
 
     return (
-      <Badge className={`${colorClass} flex items-center space-x-1`}>
-        <GradeIcon className="h-3 w-3" />
-        <span>{(grade || 'UNKNOWN').toUpperCase()}</span>
+      <Badge className={`${colorClass} flex items-center gap-1 shadow-sm uppercase tracking-tighter text-[10px]`}>
+        <GradeIcon className="w-3 h-3" />
+        {grade}
+      </Badge>
+    );
+  };
+
+  const getPassBadge = (passInfo?: User['passInfo']) => {
+    if (!passInfo || passInfo.type === 'NONE') return null;
+    
+    const colors = {
+      START: 'bg-blue-600 text-white',
+      SIGNATURE: 'bg-chapter-accent text-white font-black',
+      BLACK: 'bg-obsidian text-chapter-accent border border-chapter-accent/50 group-hover:bg-black'
+    };
+    
+    return (
+      <Badge className={`${colors[passInfo.type as keyof typeof colors] || 'bg-gray-500'} flex items-center gap-1 shadow-sm uppercase tracking-tighter text-[10px]`}>
+        <Zap className="h-3 w-3" />
+        {passInfo.type} PASS
       </Badge>
     );
   };
@@ -430,6 +452,7 @@ export default function AdminUsersPage() {
                             인증완료
                           </Badge>
                         )}
+                        {getPassBadge(user.passInfo)}
                         {user.isNavigator && (
                           <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-none flex items-center gap-1">
                             <Sparkles className="h-3 w-3" />

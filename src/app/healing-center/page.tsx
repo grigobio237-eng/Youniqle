@@ -78,7 +78,7 @@ export default function HealingCenterPage() {
             {/* Main Content Layer */}
             <div className="relative z-10 w-full h-full flex flex-col overflow-hidden">
                 {/* Top Status Bar (Sticky) */}
-                <div className="sticky top-0 z-50 w-full h-20 px-10 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-[#0B0D10]/5 shrink-0">
+                <div className="sticky top-0 z-50 w-full h-20 px-6 md:px-10 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-[#0B0D10]/5 shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="p-2 bg-[#0B0D10] rounded-xl shadow-lg shadow-[#0B0D10]/20">
                             <LayoutGrid size={20} className="text-white" />

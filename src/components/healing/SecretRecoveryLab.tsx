@@ -112,8 +112,8 @@ export default function SecretRecoveryLab() {
                         <Badge className="bg-[#D4AF37] text-black border-none px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                             Limited Access
                         </Badge>
-                        <h1 className="text-6xl md:text-8xl font-black text-[#0B0D10] tracking-tighter leading-none italic">
-                            Secret <br className="md:hidden" /> <span className="text-[#D4AF37] tracking-normal">Recovery</span> Lab
+                        <h1 className="text-[2.75rem] sm:text-6xl md:text-8xl font-black text-[#0B0D10] tracking-tighter leading-[1.1] md:leading-none italic">
+                            Secret <br className="sm:hidden" /> <span className="text-[#D4AF37] tracking-normal">Recovery</span> Lab
                         </h1>
                         <p className="text-xl text-[#0B0D10]/60 font-medium max-w-2xl mx-auto">
                             이곳은 유니클 원장의 정밀한 조율 아래, <br />

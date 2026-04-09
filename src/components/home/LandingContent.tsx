@@ -173,14 +173,14 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
 
       {/* 3. Bottom CTA */}
       <section className="container mx-auto px-6 text-center">
-        <div className="bg-obsidian p-20 rounded-[64px] shadow-2xl relative overflow-hidden group">
+        <div className="bg-obsidian p-10 md:p-20 rounded-[48px] md:rounded-[64px] shadow-2xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-          <div className="relative z-10 space-y-10">
+          <div className="relative z-10 flex flex-col items-center space-y-10">
             <div className="space-y-4">
               <h2 className="text-2xl md:text-6xl font-black text-white leading-tight tracking-tight">당신의 세계를 스캔하세요.<br />진정한 회복은 지금부터입니다.</h2>
               <p className="text-white/70 text-base md:text-xl font-medium">유니클의 데이터 기반 회복 프로토콜에 합류하세요</p>
             </div>
-            <Button onClick={() => onStart()} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-16 md:h-24 px-12 md:px-16 rounded-[24px] md:rounded-[32px] text-lg md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden">
+            <Button onClick={() => onStart()} size="lg" className="bg-chapter-accent text-white hover:bg-chapter-accent/90 h-16 md:h-24 px-8 md:px-16 rounded-[24px] md:rounded-[32px] text-lg md:text-2xl font-black shadow-2xl shadow-chapter-accent/40 group relative overflow-hidden w-full md:w-auto">
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               <Sparkles className="w-8 h-8 mr-4 group-hover:rotate-12 transition-transform" />
               60초 정밀 진단 시작하기

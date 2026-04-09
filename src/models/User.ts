@@ -156,6 +156,14 @@ export interface IUser extends Document {
     plan: 'lounge_chat';
     expiresAt: Date;
   };
+  passInfo?: {
+    type: 'NONE' | 'START' | 'SIGNATURE' | 'BLACK';
+    status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
+    startDate?: Date;
+    endDate?: Date;
+    purchaseDate?: Date;
+    navigatorId?: string;
+  };
   pavilionInfo?: {
     characterImage?: string;
     roomDescription?: string;
@@ -397,6 +405,14 @@ const UserSchema = new Schema<IUser>({
     status: { type: String, enum: ['active', 'inactive'], default: 'inactive' },
     plan: { type: String, enum: ['lounge_chat'] },
     expiresAt: { type: Date }
+  },
+  passInfo: {
+    type: { type: String, enum: ['NONE', 'START', 'SIGNATURE', 'BLACK'], default: 'NONE' },
+    status: { type: String, enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'], default: 'ACTIVE' },
+    startDate: { type: Date },
+    endDate: { type: Date },
+    purchaseDate: { type: Date },
+    navigatorId: { type: String }
   },
   pavilionInfo: {
     characterImage: { type: String, trim: true },

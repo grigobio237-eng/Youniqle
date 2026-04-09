@@ -518,7 +518,7 @@ const ArchiveContent = () => {
           <Star className="w-3.5 h-3.5 fill-current" />
           Navigator Core Philosophy
         </div>
-        <h2 className="text-4xl md:text-6xl font-serif text-obsidian tracking-tighter leading-[1.1]">
+        <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-obsidian tracking-tighter leading-[1.1]">
           "우리는 주사를 파는 게 <span className="italic text-slate">아닙니다</span>"
         </h2>
         <p className="text-slate/60 text-lg max-w-2xl mx-auto font-medium leading-relaxed">

@@ -65,14 +65,14 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
                     <div className="absolute bottom-12 left-12 right-12 text-white space-y-2">
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Master Architect</p>
-                        <h2 className="text-4xl font-black tracking-tighter italic">{data.name}</h2>
+                        <h2 className="text-3xl md:text-4xl font-black tracking-tighter italic">{data.name}</h2>
                     </div>
                 </div>
 
                 <div className="space-y-10">
                     <div className="space-y-6">
                         <Quote className="w-12 h-12 text-[#D4AF37] opacity-20" />
-                        <h3 className="text-4xl md:text-5xl font-black text-[#0B0D10] tracking-tighter leading-tight italic">
+                        <h3 className="text-3xl md:text-5xl font-black text-[#0B0D10] tracking-tighter leading-tight italic">
                             "{data.bio}"
                         </h3>
                     </div>
@@ -117,7 +117,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                 <div className="max-w-7xl mx-auto px-6 space-y-20">
                     <div className="text-center space-y-4">
                         <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.5em] block">Core Philosophy</span>
-                        <h2 className="text-5xl font-black text-[#0B0D10] italic tracking-tighter italic">
+                        <h2 className="text-3xl md:text-5xl font-black text-[#0B0D10] italic tracking-tighter">
                             Why <span className="text-[#D4AF37] tracking-normal">Recovery</span> First?
                         </h2>
                     </div>

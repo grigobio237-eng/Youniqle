@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation } from 'lucide-react';
+import PassCatalog from '@/components/navigator/PassCatalog';
 import SquareBoard from '@/components/navigator/SquareBoard';
 import SquarePostForm from '@/components/navigator/SquarePostForm';
 import SquarePostDetail from '@/components/navigator/SquarePostDetail';
@@ -12,10 +13,18 @@ import HotlineChat from '@/components/navigator/HotlineChat';
 import ArchiveContent from '@/components/navigator/ArchiveContent';
 import PassOperationGuide from '@/components/navigator/PassOperationGuide';
 
-export default function NavigatorLounge() {
+function NavigatorLoungeContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline'>('archive');
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline' | 'catalog'>('archive');
+  
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['archive', 'policy', 'square', 'hotline', 'catalog'].includes(tab)) {
+      setActiveTab(tab as any);
+    }
+  }, [searchParams]);
   
   // Square State
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -71,6 +80,12 @@ export default function NavigatorLounge() {
       label: '자문위 핫라인',
       icon: MessageCircle,
       desc: '의료 자문단 및 본사 관리자와의 실시간 채널',
+    },
+    {
+      id: 'catalog',
+      label: '상품 프리젠테이션',
+      icon: Presentation,
+      desc: '고객에게 패스 상품을 제안하고 설명하는 공간',
     },
   ] as const;
 
@@ -153,6 +168,8 @@ export default function NavigatorLounge() {
                 <HotlineChat />
               ) : activeTab === 'archive' ? (
                 <ArchiveContent />
+              ) : activeTab === 'catalog' ? (
+                <PassCatalog />
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
                   <div className="w-24 h-24 bg-mist rounded-full flex items-center justify-center">
@@ -187,5 +204,17 @@ export default function NavigatorLounge() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function NavigatorLounge() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-mist">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <NavigatorLoungeContent />
+    </Suspense>
   );
 }

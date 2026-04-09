@@ -78,7 +78,7 @@ export default function AboutPage() {
               <Sparkles className="w-4 h-4 text-chapter-accent animate-pulse" />
               <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-[0.5em]">The Science of Recovery</span>
             </span>
-            <h1 className="text-6xl md:text-9xl font-black tracking-tighter italic leading-[0.9] text-white drop-shadow-2xl">
+            <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter italic leading-[0.9] text-white drop-shadow-2xl">
               RECOVERY IS <br />
               <span className="text-chapter-accent italic">NOT A FEELING.</span>
             </h1>
@@ -109,7 +109,7 @@ export default function AboutPage() {
               className="space-y-12"
             >
               <div className="space-y-6">
-                <h2 className="text-4xl md:text-7xl font-black tracking-tighter italic leading-tight text-obsidian">
+                <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter italic leading-tight text-obsidian">
                   왜 당신은<br />
                   <span className="text-chapter-accent">회복되지 않는가?</span>
                 </h2>
@@ -175,7 +175,7 @@ export default function AboutPage() {
                   <Layers className="w-4 h-4 text-chapter-accent" />
                   <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Path 01</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Rhythm</h3>
+                <h3 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Rhythm</h3>
                 <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
                   리듬 회복: <br /> 무너진 일상의 기초공사
                 </p>
@@ -314,7 +314,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-10"
             >
-              <h2 className="text-5xl md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian">
+              <h2 className="text-4xl xs:text-5xl sm:text-7xl md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian">
                 CHOOSE YOUR <br />
                 <span className="text-chapter-accent">RECOVERY PATH.</span>
               </h2>
