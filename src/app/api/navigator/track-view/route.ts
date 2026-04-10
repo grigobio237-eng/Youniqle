@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { passId, navigatorId } = await req.json();
+    const { passId, navigatorId, status } = await req.json();
     if (!passId) {
       return NextResponse.json({ error: 'Pass ID is required' }, { status: 400 });
     }
@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
 
     if (navigatorId && mongoose.Types.ObjectId.isValid(navigatorId)) {
       update.$set.navigatorId = new mongoose.Types.ObjectId(navigatorId);
+    }
+
+    if (status) {
+      update.$set.status = status;
     }
 
     const interest = await PassInterest.findOneAndUpdate(

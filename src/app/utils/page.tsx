@@ -263,7 +263,7 @@ function UtilsContent() {
                             SUPERCHARGED<br />EXPERIENCE
                         </h1>
                         <p className="text-base md:text-xl lg:text-2xl font-medium opacity-60 leading-relaxed max-w-lg">
-                            그리 고 바이오가 제안하는 고성능 유틸리티 도구들을 만나보세요. 단순한 기능을 넘어 최상의 경험을 제공합니다.
+                            유니클이 제안하는 고성능 유틸리티 도구들을 만나보세요. 단순한 기능을 넘어 최상의 경험을 제공합니다.
                         </p>
                         <div className="flex flex-wrap gap-4 pt-4">
                             <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">

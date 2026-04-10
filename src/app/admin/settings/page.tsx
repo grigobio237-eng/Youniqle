@@ -21,7 +21,7 @@ interface AdminSettings {
     adminEmail: string;
     timezone: string;
     language: string;
-    
+
     // 회사 정보
     companyInfo: {
       companyName: string;
@@ -31,7 +31,7 @@ interface AdminSettings {
       businessType: string;
       businessStatus: string;
     };
-    
+
     // 사업자등록증 정보
     businessRegistration: {
       registrationNumber: string;
@@ -43,7 +43,7 @@ interface AdminSettings {
       businessFax: string;
       businessEmail: string;
     };
-    
+
     // 통신판매업 신고 정보
     ecommerceRegistration: {
       reportNumber: string;
@@ -51,7 +51,7 @@ interface AdminSettings {
       reportAuthority: string;
       reportStatus: string;
     };
-    
+
     // 연락처 정보
     contactInfo: {
       customerServicePhone: string;
@@ -63,7 +63,7 @@ interface AdminSettings {
       postalCode: string;
       fax: string;
     };
-    
+
     // 법적 고지사항
     legalInfo: {
       privacyPolicyUrl: string;
@@ -109,17 +109,17 @@ export default function AdminSettingsPage() {
       adminEmail: 'admin@youniqle.com',
       timezone: 'Asia/Seoul',
       language: 'ko',
-      
+
       // 회사 정보
       companyInfo: {
-        companyName: '그리고바이오',
+        companyName: '주식회사 사피에넷',
         businessNumber: '000-00-00000',
         ceoName: '',
         establishmentDate: '',
         businessType: '통신판매업',
         businessStatus: '영업중'
       },
-      
+
       // 사업자등록증 정보
       businessRegistration: {
         registrationNumber: '000-00-00000',
@@ -131,7 +131,7 @@ export default function AdminSettingsPage() {
         businessFax: '',
         businessEmail: 'admin@youniqle.com'
       },
-      
+
       // 통신판매업 신고 정보
       ecommerceRegistration: {
         reportNumber: '제2024-서울강남-0000호',
@@ -139,7 +139,7 @@ export default function AdminSettingsPage() {
         reportAuthority: '서울특별시 강남구청',
         reportStatus: '신고완료'
       },
-      
+
       // 연락처 정보
       contactInfo: {
         customerServicePhone: '1588-0000',
@@ -151,7 +151,7 @@ export default function AdminSettingsPage() {
         postalCode: '06292',
         fax: '02-0000-0001'
       },
-      
+
       // 법적 고지사항
       legalInfo: {
         privacyPolicyUrl: '/privacy',
@@ -217,7 +217,7 @@ export default function AdminSettingsPage() {
   const saveSettings = async () => {
     setSaving(true);
     setMessage(null);
-    
+
     try {
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
@@ -244,7 +244,7 @@ export default function AdminSettingsPage() {
     setSettings(prev => {
       // 안전한 접근을 위해 기본값 보장
       const currentSection = prev[section] || {};
-      
+
       if (subKey) {
         return {
           ...prev,

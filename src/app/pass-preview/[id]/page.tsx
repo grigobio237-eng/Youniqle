@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -15,7 +17,8 @@ import {
   ArrowRight,
   Zap,
   Clock,
-  Calendar
+  Calendar,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +33,7 @@ function CustomerPassPreviewContent() {
   const id = params.id as string;
   const spec = PASS_SPECS[id];
   const ref = searchParams.get('ref');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -47,6 +51,31 @@ function CustomerPassPreviewContent() {
       }).catch(err => console.error('Tracking failed:', err));
     }
   }, [status, id, ref, router, spec]);
+
+  const handleApply = async () => {
+    if (status !== 'authenticated') return;
+    
+    setIsSubmitting(true);
+    try {
+      // 1. Update interest status to 'consulting'
+      await fetch('/api/navigator/track-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          passId: id,
+          navigatorId: ref,
+          status: 'consulting'
+        })
+      });
+
+      // 2. Redirect to consultation form
+      router.push('/event/consultation');
+    } catch (err) {
+      console.error('Application failed:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (status === 'loading' || !spec) {
     return (
@@ -154,9 +183,15 @@ function CustomerPassPreviewContent() {
               <div className="pt-8">
                 <Button 
                   size="lg" 
-                  className={`w-full md:w-auto px-12 h-16 rounded-2xl ${spec.buttonColor || 'bg-chapter-accent'} text-white font-black text-xl shadow-xl transition-transform hover:scale-105`}
+                  onClick={handleApply}
+                  disabled={isSubmitting}
+                  className={`w-full md:w-auto px-12 h-16 rounded-2xl ${spec.buttonColor || 'bg-chapter-accent'} text-white font-black text-xl shadow-xl transition-transform hover:scale-105 disabled:opacity-50`}
                 >
-                  멤버십 신청 및 상담 예약하기 <ArrowRight className="ml-2 w-6 h-6" />
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                  ) : (
+                    <>멤버십 신청 및 상담 예약하기 <ArrowRight className="ml-2 w-6 h-6" /></>
+                  )}
                 </Button>
               </div>
             </div>
@@ -182,7 +217,7 @@ function CustomerPassPreviewContent() {
         <div className="text-center pt-12 border-t border-line space-y-4">
           <p className="text-sm font-black text-obsidian italic">"Youniqle의 약속"</p>
           <p className="text-xs font-bold text-slate/40 uppercase tracking-widest max-w-lg mx-auto leading-relaxed">
-            START PASS는 단순한 혜택을 넘어, 당신의 건강한 회복을 돕는 든든한 파트너가 되어 드립니다. 2년 동안 이어지는 프리미엄 케어를 지금 경험해 보세요.
+            {spec.name}는 단순한 혜택을 넘어, 당신의 건강한 회복을 돕는 든든한 파트너가 되어 드립니다. {spec.period} 동안 이어지는 프리미엄 케어를 지금 경험해 보세요.
           </p>
         </div>
       </div>

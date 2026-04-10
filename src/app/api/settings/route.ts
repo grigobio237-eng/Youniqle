@@ -24,17 +24,17 @@ const defaultSettings = {
     adminEmail: 'admin@youniqle.com',
     timezone: 'Asia/Seoul',
     language: 'ko',
-    
+
     // 회사 정보
     companyInfo: {
-      companyName: '그리고바이오',
+      companyName: '주식회사 사피에넷',
       businessNumber: '000-00-00000',
       ceoName: '',
       establishmentDate: '',
       businessType: '통신판매업',
       businessStatus: '영업중'
     },
-    
+
     // 사업자등록증 정보
     businessRegistration: {
       registrationNumber: '000-00-00000',
@@ -46,7 +46,7 @@ const defaultSettings = {
       businessFax: '',
       businessEmail: 'admin@youniqle.com'
     },
-    
+
     // 통신판매업 신고 정보
     ecommerceRegistration: {
       reportNumber: '제2024-서울강남-0000호',
@@ -54,7 +54,7 @@ const defaultSettings = {
       reportAuthority: '서울특별시 강남구청',
       reportStatus: '신고완료'
     },
-    
+
     // 연락처 정보
     contactInfo: {
       customerServicePhone: '1588-0000',
@@ -66,7 +66,7 @@ const defaultSettings = {
       postalCode: '06292',
       fax: '02-0000-0001'
     },
-    
+
     // 법적 고지사항
     legalInfo: {
       privacyPolicyUrl: '/privacy',
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 
     // 설정 조회 또는 기본값 반환
     let settings = await AdminSettings.findOne({ type: 'system' });
-    
+
     if (!settings) {
       // 기본 설정 생성
       settings = new AdminSettings({
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
 
     // 공개적으로 노출해도 되는 정보만 반환
     const generalSettings = settings.settings?.general || defaultSettings.general;
-    
+
     const publicSettings = {
       siteName: generalSettings.siteName || defaultSettings.general.siteName,
       siteDescription: generalSettings.siteDescription || defaultSettings.general.siteDescription,
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('공개 설정 조회 오류:', error);
     return NextResponse.json(
-      { 
+      {
         error: '설정을 불러올 수 없습니다.',
         details: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       },

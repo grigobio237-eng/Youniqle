@@ -265,7 +265,7 @@ const AdminSettingsSchema = new Schema<IAdminSettings>({
     adminEmails: [{
       type: String,
       validate: {
-        validator: function(v: string) {
+        validator: function (v: string) {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         },
         message: '올바른 이메일 형식이 아닙니다.'
@@ -358,7 +358,7 @@ const AdminSettingsSchema = new Schema<IAdminSettings>({
   business: {
     companyName: {
       type: String,
-      default: '그리고바이오'
+      default: '주식회사 사피에넷'
     },
     businessNumber: {
       type: String,
@@ -380,7 +380,7 @@ const AdminSettingsSchema = new Schema<IAdminSettings>({
       type: String,
       default: 'admin@youniqle.com',
       validate: {
-        validator: function(v: string) {
+        validator: function (v: string) {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         },
         message: '올바른 이메일 형식이 아닙니다.'
