@@ -9,6 +9,8 @@ import Link from 'next/link';
 import MinigameGrid from '@/components/utils/MinigameGrid';
 import ContentGrid from '@/components/utils/ContentGrid';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import PostureScanner from '@/components/utils/PostureScanner';
+import SoundTherapy from '@/components/utils/SoundTherapy';
 import { useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -190,6 +192,26 @@ const utilities: UtilityCard[] = [
         href: '/utils?tool=water',
         badge: 'BEST',
         stats: { users: 'PRO', rating: 4.9 },
+    },
+    {
+        id: 'posture',
+        title: 'AI 자세 분석',
+        description: '사진 한 장으로 거북목과 체형 밸런스를 정밀 분석',
+        icon: '🧘',
+        category: ['건강', '회복', '이미지'],
+        href: '/utils?tool=posture',
+        badge: 'AI HOT',
+        stats: { users: 'AI', rating: 5.0 },
+    },
+    {
+        id: 'sound',
+        title: '딥 사운드 테라피',
+        description: '회복 주파수와 사운드스케이프로 깊은 이완 경험',
+        icon: '🎧',
+        category: ['회복', '건강'],
+        href: '/utils?tool=sound',
+        badge: 'NEW',
+        stats: { users: 'Hot', rating: 4.9 },
     }
 ];
 
@@ -214,6 +236,8 @@ function UtilsContent() {
     const [showRecoveryModal, setShowRecoveryModal] = useState(false);
     const [showWaterModal, setShowWaterModal] = useState(false);
     const [showStretchModal, setShowStretchModal] = useState(false);
+    const [showPostureModal, setShowPostureModal] = useState(false);
+    const [showSoundModal, setShowSoundModal] = useState(false);
 
     useEffect(() => {
         if (!searchParams) return;
@@ -224,6 +248,10 @@ function UtilsContent() {
             setShowWaterModal(true);
         } else if (tool === 'stretch') {
             setShowStretchModal(true);
+        } else if (tool === 'posture') {
+            setShowPostureModal(true);
+        } else if (tool === 'sound') {
+            setShowSoundModal(true);
         }
     }, [searchParams]);
 
@@ -246,6 +274,12 @@ function UtilsContent() {
         } else if (id === 'stretch') {
             setShowStretchModal(true);
             router.push('/utils?tool=stretch');
+        } else if (id === 'posture') {
+            setShowPostureModal(true);
+            router.push('/utils?tool=posture');
+        } else if (id === 'sound') {
+            setShowSoundModal(true);
+            router.push('/utils?tool=sound');
         }
     };
 
@@ -403,6 +437,44 @@ function UtilsContent() {
             <RecoveryModal open={showRecoveryModal} onOpenChange={setShowRecoveryModal} />
             <WaterModal open={showWaterModal} onOpenChange={setShowWaterModal} />
             <StretchModal open={showStretchModal} onOpenChange={setShowStretchModal} />
+            
+            {/* AI Posture Analysis Modal */}
+            <Dialog open={showPostureModal} onOpenChange={setShowPostureModal}>
+                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-white">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>AI 자세 분석</DialogTitle>
+                        <DialogDescription>사진 한 장으로 거북목과 체형 밸런스를 정밀 분석합니다.</DialogDescription>
+                    </DialogHeader>
+                    <div className="relative">
+                        <PostureScanner />
+                        <button 
+                            onClick={() => setShowPostureModal(false)}
+                            className="absolute top-6 right-6 w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-obsidian transition-colors z-50"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Deep Sound Therapy Modal */}
+            <Dialog open={showSoundModal} onOpenChange={setShowSoundModal}>
+                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-black">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>딥 사운드 테라피</DialogTitle>
+                        <DialogDescription>회복 주파수와 사운드스케이트로 깊은 이완 경험을 제공합니다.</DialogDescription>
+                    </DialogHeader>
+                    <div className="relative">
+                        <SoundTherapy />
+                        <button 
+                            onClick={() => setShowSoundModal(false)}
+                            className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </ChapterWrapper>
     );
 }

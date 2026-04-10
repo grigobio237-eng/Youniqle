@@ -134,20 +134,6 @@ export default function RecoveryPortalPage() {
         </div>
       </section>
 
-      {/* Footer Banner */}
-      <section className="container mx-auto px-6 pb-24">
-        <div className="bg-surface rounded-[40px] border border-line p-12 text-center md:flex md:text-left md:items-center md:justify-between gap-12 group">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-black text-white">라운지를 넘어서는 회복의 가치</h2>
-            <p className="text-gray-400 font-medium">유니클이 엄선한 상품들은 유니클 스토어에서 확인하실 수 있습니다.</p>
-          </div>
-          <Button asChild size="lg" className="mt-8 md:mt-0 bg-white text-black hover:bg-primary hover:text-white rounded-2xl px-10 h-16 font-black transition-all group-hover:scale-105">
-            <Link href="/products/shop">
-              유니클 스토어 가기 <ExternalLink className="ml-2 w-5 h-5" />
-            </Link>
-          </Button>
-        </div>
-      </section>
     </ChapterWrapper>
   );
 }

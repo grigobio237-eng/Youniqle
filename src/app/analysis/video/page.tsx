@@ -26,10 +26,29 @@ export default function PostureAnalysisPage() {
     const [result, setResult] = useState<PostureResult | null>(null);
     const [loading, setLoading] = useState(false);
     const [isCameraReady, setIsCameraReady] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // --- Device Detection ---
+    useEffect(() => {
+        const checkMobile = () => {
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmall = window.innerWidth < 1024;
+            setIsMobile(isTouch || isSmall);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Camera Logic
     const startWebcam = async () => {
+        if (isMobile) {
+            fileInputRef.current?.click();
+            return;
+        }
+
         setIsCameraReady(false);
         try {
             const constraints: MediaStreamConstraints = {
@@ -67,19 +86,34 @@ export default function PostureAnalysisPage() {
     }, [stream]);
 
     useEffect(() => {
+        let isMounted = true;
+        
         const attachStream = async () => {
             if (status === 'webcam' && stream && videoRef.current) {
                 console.log("[Posture] Attaching stream to video element");
-                videoRef.current.srcObject = stream;
+                
+                // If it's already the same stream, don't re-assign
+                if (videoRef.current.srcObject !== stream) {
+                    videoRef.current.srcObject = stream;
+                }
+                
                 try {
                     await videoRef.current.play();
+                    // Initial fallback: if it's already playing, hide loader soon
+                    if (videoRef.current.readyState >= 3) {
+                        setTimeout(() => { if (isMounted) setIsCameraReady(true); }, 500);
+                    }
                 } catch (playError) {
-                    console.error("[Posture] Autoplay blocked:", playError);
+                    console.error("[Posture] Play error:", playError);
                 }
             }
         };
-        attachStream();
+
+        const timer = setTimeout(attachStream, 100); // Small delay to wait for animation mount
+        
         return () => {
+            isMounted = false;
+            clearTimeout(timer);
             if (status !== 'webcam') stopWebcam();
         };
     }, [status, stream, stopWebcam]);
@@ -140,6 +174,26 @@ export default function PostureAnalysisPage() {
                     </div>
                 </header>
 
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                const base64 = event.target?.result as string;
+                                setCapturedImage(base64);
+                                analyzePosture(base64);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    }} 
+                    accept="image/*" 
+                    className="hidden" 
+                    {...({ capture: 'environment' } as any)}
+                />
+
                 <main>
                     <AnimatePresence mode="wait">
                         {status === 'idle' && (
@@ -190,10 +244,9 @@ export default function PostureAnalysisPage() {
                                     autoPlay 
                                     playsInline 
                                     muted 
-                                    onLoadedMetadata={() => {
-                                        console.log("[Posture] Video Metadata Loaded");
-                                        setIsCameraReady(true);
-                                    }}
+                                    onLoadedMetadata={() => setIsCameraReady(true)}
+                                    onCanPlay={() => setIsCameraReady(true)}
+                                    onPlaying={() => setIsCameraReady(true)}
                                     className={`w-full h-full object-cover transition-opacity duration-700 ${isCameraReady ? 'opacity-100' : 'opacity-0'} grayscale-[0.3]`} 
                                 />
                                 

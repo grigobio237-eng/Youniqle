@@ -29,6 +29,7 @@ export default function FoodScanner() {
     // --- State ---
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('environment');
     const [status, setStatus] = useState<'idle' | 'scanning' | 'result'>('idle');
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -49,11 +50,28 @@ export default function FoodScanner() {
         setIsCameraActive(false);
     }, [stream]);
 
+    // --- Device Detection ---
+    useEffect(() => {
+        const checkMobile = () => {
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmall = window.innerWidth < 1024;
+            setIsMobile(isTouch || isSmall);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     useEffect(() => {
         return () => stopCamera();
     }, [stopCamera]);
 
     const startCamera = async () => {
+        if (isMobile) {
+            fileInputRef.current?.click();
+            return;
+        }
+
         try {
             const constraints = {
                 video: {
@@ -94,7 +112,7 @@ export default function FoodScanner() {
             const response = await fetch('/api/ai/food-analysis', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: imageData })
+                body: JSON.stringify({ image: imageData, journey: 'WELLNESS' })
             });
 
             if (!response.ok) throw new Error('Analysis failed');
@@ -172,6 +190,7 @@ export default function FoodScanner() {
                 className="hidden" 
                 aria-label="음식 이미지 파일 선택"
                 title="음식 이미지 파일 선택"
+                {...({ capture: 'environment' } as any)}
             />
         </div>
     );
