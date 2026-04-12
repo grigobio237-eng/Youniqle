@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Sparkles, PenTool, Image as ImageIcon, ChevronLeft, ChevronRight, CheckCircle, Copy, Download, Camera, UserCircle2, Check, ArrowRight, RefreshCcw } from 'lucide-react';
 import { compressImage } from '@/lib/utils/image-client';
 import { downloadWebtoon } from '@/lib/utils/download';
+import { drawTextOnImageClient } from '@/lib/utils/canvas-text-client';
 
 export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: boolean, onOpenChange: (open: boolean) => void, recoveryData: any }) {
   const [step, setStep] = useState<'STYLE' | 'SCRIPT' | 'CHARACTER' | 'IMAGE' | 'POSTED'>('STYLE');
@@ -139,9 +140,16 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
         })
       });
       if (res.ok) {
-        const { imageUrl } = await res.json();
+        const data = await res.json();
+        const base64Only = data.imageUrl.includes(',') ? data.imageUrl.split(',')[1] : data.imageUrl;
+        
+        // 클라이언트 사이드에서 텍스트 합성
+        const targetPanel = generatedData.panels.find((p: any) => p.panelNumber === panelNumber);
+        const synthesizedBase64 = await drawTextOnImageClient(base64Only, targetPanel?.script || '');
+        const finalImageUrl = `data:image/png;base64,${synthesizedBase64}`;
+        
         const newPanels = generatedData.panels.map((p: any) =>
-          p.panelNumber === panelNumber ? { ...p, imageUrl } : p
+          p.panelNumber === panelNumber ? { ...p, imageUrl: finalImageUrl, cleanImageUrl: `data:image/png;base64,${base64Only}` } : p
         );
         setGeneratedData({ ...generatedData, panels: newPanels });
       } else {
@@ -264,10 +272,15 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
 
         if (res.ok) {
           const data = await res.json();
+          const base64Only = data.imageUrl.includes(',') ? data.imageUrl.split(',')[1] : data.imageUrl;
+          
+          // 클라이언트 사이드에서 텍스트 합성
+          const synthesizedBase64 = await drawTextOnImageClient(base64Only, panel.script);
+          
           updatedPanels[i] = {
             ...panel,
-            imageUrl: data.imageUrl,
-            cleanImageUrl: data.cleanImageUrl
+            imageUrl: `data:image/png;base64,${synthesizedBase64}`,
+            cleanImageUrl: `data:image/png;base64,${base64Only}`
           };
 
           // 한 장 완료될 때마다 상태 업데이트 (실시간 렌더링)

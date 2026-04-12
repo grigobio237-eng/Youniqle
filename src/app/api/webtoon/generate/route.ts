@@ -71,11 +71,10 @@ export async function POST(req: NextRequest) {
                 genre: genre || 'drama'
             });
 
-            const finalImageBase64 = await drawTextOnImage(cleanImageBase64, targetPanel.script);
-
+            // 클라이언트 사이드에서 텍스트 합성을 수행하므로, 서버에서는 이미지만 반환
             return NextResponse.json({
                 success: true,
-                imageUrl: `data:image/png;base64,${finalImageBase64}`,
+                imageUrl: `data:image/png;base64,${cleanImageBase64}`,
                 cleanImageUrl: `data:image/png;base64,${cleanImageBase64}`
             });
         }
