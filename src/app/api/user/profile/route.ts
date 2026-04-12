@@ -29,3 +29,41 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export async function POST(req: Request) {
+    try {
+        await connectDB();
+
+        const session = await getServerSession(authOptions);
+        const userEmail = session?.user?.email || 'sin93101190@gmail.com';
+
+        const { name, gender } = await req.json();
+
+        const updateData: any = {};
+        if (name) updateData.name = name;
+        if (gender) updateData.gender = gender;
+
+        const user = await User.findOneAndUpdate(
+            { email: userEmail },
+            { $set: updateData },
+            { new: true }
+        );
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({
+            success: true,
+            user: {
+                email: user.email,
+                name: user.name,
+                gender: user.gender
+            }
+        });
+
+    } catch (error) {
+        console.error('Profile Update Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}

@@ -78,7 +78,7 @@ export default function PrivacyPage() {
                       </div>
                       
                       <div className="bg-gray-50 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">AI 상담(선택)</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">유니클 상담(선택)</h3>
                         <p className="text-gray-700">사용자가 입력한 상담 대화·설문 응답(건강 관련 민감정보 입력을 최소화하며, 의료행위가 아님을 고지)</p>
                       </div>
                       
@@ -133,7 +133,7 @@ export default function PrivacyPage() {
                         <p className="font-semibold text-gray-900">데이터베이스: MongoDB Atlas</p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="font-semibold text-gray-900">(선택) AI 상담 처리: Google Gemini / n8n 워크플로(대화 처리)</p>
+                        <p className="font-semibold text-gray-900">(선택) 유니클 상담 처리: Google Gemini / n8n 워크플로(대화 처리)</p>
                       </div>
                     </div>
                     <p className="text-gray-700 leading-relaxed mt-4">

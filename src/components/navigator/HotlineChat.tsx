@@ -86,7 +86,7 @@ export default function HotlineChat() {
         };
         setMessages(prev => [...prev, aiMessage]);
       } else {
-        toast.error('AI 응답을 도중 오류가 발생했습니다.');
+        toast.error('유니클 응답 도중 오류가 발생했습니다.');
       }
     } catch (error) {
       console.error('Chat Error:', error);
@@ -118,7 +118,7 @@ export default function HotlineChat() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-serif tracking-tight">자문위 AI 핫라인</h2>
+              <h2 className="text-xl font-serif tracking-tight">자문위 유니클 핫라인</h2>
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-chapter-accent text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
                 <Brain className="w-3 h-3" />
                 Technical Expert
@@ -237,7 +237,7 @@ export default function HotlineChat() {
            </div>
            <div className="w-1 h-1 bg-line rounded-full" />
            <p className="text-[10px] font-black uppercase text-slate/60 tracking-widest italic">
-              AI responses are for reference only.
+              YOUNIQLE responses are for reference only.
            </p>
         </div>
 

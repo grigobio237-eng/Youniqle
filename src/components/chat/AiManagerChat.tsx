@@ -20,7 +20,7 @@ export default function AiManagerChat() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: '안녕하세요! 저는 유니클의 AI 매니저 유니(Uni)예요. 🌿\n사이트 이용 방법, 등급 및 포인트, 파빌리온 운영 등 궁금한 점이 있으시면 무엇이든 물어봐 주세요!',
+            content: '안녕하세요! 저는 유니클의 매니저 유니(Uni)예요. 🌿\n사이트 이용 방법, 등급 및 포인트, 파빌리온 운영 등 궁금한 점이 있으시면 무엇이든 물어봐 주세요!',
             timestamp: new Date(),
         }
     ]);
@@ -74,7 +74,7 @@ export default function AiManagerChat() {
             setMessages(prev => [...prev, assistantMessage]);
 
         } catch (error) {
-            console.error('AI Manager Chat Error:', error);
+            console.error('Youniqle Manager Chat Error:', error);
             const errorMessage: ChatMessage = {
                 id: `error-${Date.now()}`,
                 role: 'assistant',
@@ -109,7 +109,7 @@ export default function AiManagerChat() {
                         exit={{ scale: 0, opacity: 0 }}
                         onClick={() => setIsOpen(true)}
                         className="fixed bottom-[160px] md:bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
-                        aria-label="AI 매니저 열기"
+                        aria-label="유니클 매니저 열기"
                     >
                         <MessageCircle className="w-7 h-7" />
                         {/* Pulse Animation */}
@@ -142,7 +142,7 @@ export default function AiManagerChat() {
                                 </div>
                                 <div>
                                     <h3 className="text-white font-bold text-sm">유니 (Uni)</h3>
-                                    <p className="text-white/70 text-[10px] font-medium">유니클 AI 매니저</p>
+                                    <p className="text-white/70 text-[10px] font-medium">유니클 매니저</p>
                                 </div>
                             </div>
                             <button

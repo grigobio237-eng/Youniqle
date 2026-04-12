@@ -112,7 +112,7 @@ export default function SecretRecoveryLab() {
                         <Badge className="bg-[#D4AF37] text-black border-none px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                             Limited Access
                         </Badge>
-                        <h1 className="text-[2.75rem] sm:text-6xl md:text-8xl font-black text-[#0B0D10] tracking-tighter leading-[1.1] md:leading-none italic">
+                        <h1 className="text-4xl md:text-8xl font-black text-[#0B0D10] tracking-tighter leading-[1.1] md:leading-none italic">
                             Secret <br className="sm:hidden" /> <span className="text-[#D4AF37] tracking-normal">Recovery</span> Lab
                         </h1>
                         <p className="text-xl text-[#0B0D10]/60 font-medium max-w-2xl mx-auto">
@@ -121,7 +121,7 @@ export default function SecretRecoveryLab() {
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                         {[
                             { icon: <Activity className="w-6 h-6" />, label: 'Active Protocols', value: '12', color: 'bg-emerald-50 text-emerald-600' },
                             { icon: <BrainCircuit className="w-6 h-6" />, label: 'AI Accuracy', value: '99.4%', color: 'bg-blue-50 text-blue-600' },
@@ -132,12 +132,12 @@ export default function SecretRecoveryLab() {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: i * 0.1 }}
-                                className="bg-white p-8 rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-[#0B0D10]/5 flex flex-col items-center gap-4"
+                                className="bg-white p-4 md:p-8 rounded-[24px] md:rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-[#0B0D10]/5 flex flex-col items-center gap-2 md:gap-4"
                             >
-                                <div className={`p-4 rounded-2xl ${stat.color}`}>{stat.icon}</div>
+                                <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl ${stat.color}`}>{stat.icon}</div>
                                 <div className="text-center">
-                                    <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-widest mb-1">{stat.label}</p>
-                                    <p className="text-3xl font-black text-[#0B0D10]">{stat.value}</p>
+                                    <p className="text-[8px] md:text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-widest mb-1">{stat.label}</p>
+                                    <p className="text-xl md:text-3xl font-black text-[#0B0D10]">{stat.value}</p>
                                 </div>
                             </motion.div>
                         ))}
@@ -145,7 +145,7 @@ export default function SecretRecoveryLab() {
 
                     <Button 
                         onClick={() => setStep('FORM')}
-                        className="h-20 px-12 bg-[#0B0D10] hover:bg-[#1A1D23] text-white rounded-[24px] text-lg font-black uppercase tracking-widest group transition-all"
+                        className="h-16 md:h-20 px-8 md:px-12 bg-[#0B0D10] hover:bg-[#1A1D23] text-white rounded-[20px] md:rounded-[24px] text-base md:text-lg font-black uppercase tracking-widest group transition-all"
                     >
                         시그니처 프로토콜 설계 시작하기
                         <ChevronRight className="ml-4 w-6 h-6 transition-transform group-hover:translate-x-1" />

@@ -35,13 +35,13 @@ interface UtilityCard {
 const utilities: UtilityCard[] = [
     {
         id: 'food-scanner',
-        title: 'AI 회복 식단 스캐너',
+        title: '유니클 회복 식단 스캐너',
         description: '카메라로 식단을 분석하고 현재 내 몸의 회복 데이터를 진단',
         icon: '🍱',
         category: ['건강', '회복', '이미지'],
         href: '/utils/food-scanner',
-        badge: 'AI NEW',
-        stats: { users: 'AI', rating: 5.0 },
+        badge: 'Youniqle NEW',
+        stats: { users: '10k+', rating: 5.0 },
     },
     {
         id: 'bmi',
@@ -125,12 +125,12 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'remove-bg',
-        title: 'AI 배경 제거',
+        title: '유니클 배경 제거',
         description: '딥러닝 기반 이미지 누끼 제거',
         icon: '✨',
         category: ['이미지'],
         href: '/utils/remove-bg',
-        badge: 'AI',
+        badge: 'Youniqle',
         stats: { users: '12.3k', rating: 4.9 },
     },
     {
@@ -181,7 +181,7 @@ const utilities: UtilityCard[] = [
         category: ['건강', '회복'],
         href: '/utils?tool=sleep',
         badge: 'HOT',
-        stats: { users: 'AI', rating: 4.8 },
+        stats: { users: '8.5k', rating: 4.8 },
     },
     {
         id: 'water',
@@ -195,13 +195,13 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'posture',
-        title: 'AI 자세 분석',
+        title: '유니클 자세 분석',
         description: '사진 한 장으로 거북목과 체형 밸런스를 정밀 분석',
         icon: '🧘',
         category: ['건강', '회복', '이미지'],
         href: '/utils?tool=posture',
-        badge: 'AI HOT',
-        stats: { users: 'AI', rating: 5.0 },
+        badge: 'Youniqle HOT',
+        stats: { users: '15k+', rating: 5.0 },
     },
     {
         id: 'sound',
@@ -371,7 +371,7 @@ function UtilsContent() {
                                             </div>
                                             {util.badge && (
                                                 <Badge className={`border-none px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ${util.badge === 'HOT' ? 'bg-orange-500 text-white animate-pulse' :
-                                                    util.badge === 'AI' ? 'bg-obsidian text-white' :
+                                                    util.badge.includes('Youniqle') ? 'bg-obsidian text-white' :
                                                         'bg-slate/10 text-slate'
                                                     }`}>
                                                     {util.badge}
@@ -438,11 +438,11 @@ function UtilsContent() {
             <WaterModal open={showWaterModal} onOpenChange={setShowWaterModal} />
             <StretchModal open={showStretchModal} onOpenChange={setShowStretchModal} />
             
-            {/* AI Posture Analysis Modal */}
+            {/* Youniqle Posture Analysis Modal */}
             <Dialog open={showPostureModal} onOpenChange={setShowPostureModal}>
                 <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-white">
                     <DialogHeader className="sr-only">
-                        <DialogTitle>AI 자세 분석</DialogTitle>
+                        <DialogTitle>유니클 자세 분석</DialogTitle>
                         <DialogDescription>사진 한 장으로 거북목과 체형 밸런스를 정밀 분석합니다.</DialogDescription>
                     </DialogHeader>
                     <div className="relative">
@@ -450,6 +450,7 @@ function UtilsContent() {
                         <button 
                             onClick={() => setShowPostureModal(false)}
                             className="absolute top-6 right-6 w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-obsidian transition-colors z-50"
+                            aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -469,6 +470,7 @@ function UtilsContent() {
                         <button 
                             onClick={() => setShowSoundModal(false)}
                             className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50"
+                            aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
                         </button>

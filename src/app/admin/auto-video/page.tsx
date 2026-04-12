@@ -212,7 +212,7 @@ export default function AutoVideoPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">자동 영상 생성 (Auto Video) (V2)</h1>
                     <p className="text-muted-foreground mt-2">
-                        AI 에이전트와 함께 단계별로 영상을 기획하고 제작합니다.
+                        유니클 에이전트와 함께 단계별로 영상을 기획하고 제작합니다.
                     </p>
                 </div>
             </div>
@@ -377,7 +377,7 @@ export default function AutoVideoPage() {
                                     </Button>
                                 </div>
                                 <p className="text-xs text-muted-foreground ml-1">
-                                    {selectedType === 'product_promo' ? "이미지, 상품명 및 기획이 준비되면 '프로젝트 생성'을 클릭하세요." : "엔터 키를 누르거나 '프로젝트 생성' 버튼을 클릭하면 AI 트렌드 분석이 시작됩니다."}
+                                    {selectedType === 'product_promo' ? "이미지, 상품명 및 기획이 준비되면 '프로젝트 생성'을 클릭하세요." : "엔터 키를 누르거나 '프로젝트 생성' 버튼을 클릭하면 유니클 트렌드 분석이 시작됩니다."}
                                 </p>
                             </div>
                         </CardContent>

@@ -38,7 +38,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                 console.log('BodyPix model loaded');
             } catch (err) {
                 console.error('Error loading BodyPix:', err);
-                setError('AI 모델을 로드하는 중 오류가 발생했습니다. 브라우저를 새로고침해주세요.');
+                setError('유니클 모델을 로드하는 중 오류가 발생했습니다. 브라우저를 새로고침해주세요.');
                 setModelLoading(false);
             }
         };
@@ -191,7 +191,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                         <h3 className="text-xl font-bold text-gray-900 mb-2">인물 사진을 업로드하세요</h3>
                         <p className="text-gray-600 mb-4">JPG, PNG (최대 10MB)</p>
                         <Button size="lg" className="mt-2" disabled={modelLoading}>
-                            {modelLoading ? 'AI 모델 로딩 중...' : '파일 선택'}
+                            {modelLoading ? '유니클 모델 로딩 중...' : '파일 선택'}
                         </Button>
                     </div>
                 </div>

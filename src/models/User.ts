@@ -10,6 +10,7 @@ export interface IUser extends Document {
   grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
   tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급 (파빌리온 5층 등)
   points: number;
+  gender?: 'male' | 'female' | 'other';
   referralCode?: string; // 추천인 아이디
   referredBy?: string; // 추천받은 사용자의 추천인 코드 (원 초대자)
   isNavigator: boolean; // 네비게이터(영업사원) 승인 여부
@@ -226,6 +227,10 @@ const UserSchema = new Schema<IUser>({
   points: {
     type: Number,
     default: 0,
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other'],
   },
   referralCode: {
     type: String,

@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Lock, Clock, Sparkles, Loader2, Volume2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
+import { Play, Pause, Clock, Loader2 } from 'lucide-react';
+
 
 interface GoldenTimeOfferProps {
     script: string;
     userName?: string;
+    gender?: string;
+    mood?: string;
 }
 
-export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOfferProps) {
+export function GoldenTimeOffer({ script, userName = '회원', gender, mood }: GoldenTimeOfferProps) {
+
     const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -53,8 +55,13 @@ export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOffer
             const response = await fetch('/api/tts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: script }),
+                body: JSON.stringify({ 
+                    text: script,
+                    gender,
+                    mood
+                }),
             });
+
 
             if (!response.ok) {
                 throw new Error('TTS Failed');
@@ -139,9 +146,9 @@ export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOffer
                                 `}</style>
                             </h2>
                             <p className="text-slate-200 text-sm leading-relaxed font-medium">
-                                {script === "AI_LOADING"
-                                    ? "진단 결과를 바탕으로 AI 원장님이 당신만을 위한 힐링 가이드를 작성하고 있습니다. 잠시만 기다려주세요..."
-                                    : "진단 결과, 지금 가장 필요한 위로와 가이드를 AI가 직접 설계했습니다. 이 창을 닫으면 다시 들을 수 없습니다. 지금 바로 청취하세요."}
+                                {script === "YOUNIQLE_LOADING"
+                                    ? "진단 결과를 바탕으로 유니클 원장님이 당신만을 위한 힐링 가이드를 작성하고 있습니다. 잠시만 기다려주세요..."
+                                    : "진단 결과, 지금 가장 필요한 위로와 가이드를 유니클이 직접 설계했습니다. 이 창을 닫으면 다시 들을 수 없습니다. 지금 바로 청취하세요."}
                             </p>
                         </div>
 
@@ -196,20 +203,7 @@ export function GoldenTimeOffer({ script, userName = '회원' }: GoldenTimeOffer
                 </div>
             </motion.div>
 
-            {/* Script Preview (Collapsed/Expanded) */}
-            <div className="mt-4 px-6 py-4 bg-white rounded-2xl border border-gray-100 shadow-sm opacity-80 hover:opacity-100 transition-opacity">
-                <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-                        <Sparkles className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div>
-                        <h4 className="text-xs font-bold text-gray-500 uppercase mb-1">AI Script Preview</h4>
-                        <p className="text-sm text-gray-700 italic">
-                            {script === "AI_LOADING" ? "AI가 내용을 구성 중입니다..." : `"${script}"`}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
         </div>
     );
 }

@@ -36,7 +36,7 @@ const tiers = [
         description: '디지털 회복 루틴을 가볍게 시작하고 싶은 분',
         coreFeatures: [
             { icon: BarChart3, text: 'Digital Bio-Check: 온라인 자가 생체 나이 진단' },
-            { icon: Brain, text: 'AI 루틴 베이직: 기초 주간 회복 리포트' },
+            { icon: Brain, text: '유니클 루틴 베이직: 기초 주간 회복 리포트' },
             { icon: Gift, text: '스타터 키트: 체험 샘플러 1회 제공' },
         ],
         economicBenefits: [
@@ -54,13 +54,13 @@ const tiers = [
         borderColor: 'border-violet-200',
         iconBg: 'bg-violet-100',
         textColor: 'text-violet-700',
-        description: 'AI 기술과 전문가 지식을 깊이 있게 경험하고 싶은 분',
+        description: '유니클 기술과 전문가 지식을 깊이 있게 경험하고 싶은 분',
         popular: true,
         coreFeatures: [
             { icon: Star, text: 'ESSENCE 혜택 전체 포함' },
             { icon: Brain, text: '전문가 디지털 가이드: 8대 무형 자산 VOD 강좌' },
             { icon: BarChart3, text: '3D 갤러리: 회복 데이터 시각화 공간' },
-            { icon: Zap, text: 'AI 내비게이터 플러스: 일일 맞춤 푸시 알림' },
+            { icon: Zap, text: '유니클 내비게이터 플러스: 일일 맞춤 푸시 알림' },
         ],
         economicBenefits: [
             '전 제품 10% 상시 할인',
@@ -81,7 +81,7 @@ const tiers = [
         description: '모든 기능을 활용하여 생체 데이터를 자산화하려는 분',
         coreFeatures: [
             { icon: Crown, text: 'BALANCE 혜택 전체 포함' },
-            { icon: Sparkles, text: 'AI 웹툰 제네레이터: 월 1회 자동 생성' },
+            { icon: Sparkles, text: '유니클 웹툰 제네레이터: 월 1회 자동 생성' },
             { icon: Brain, text: '그룹 멘탈 큐레이팅: 분기별 라이브 웹세미나' },
             { icon: Shield, text: '디지털 금고(Vault): 보안 대시보드 강화 버전' },
         ],
@@ -97,7 +97,7 @@ const tiers = [
 const faqs = [
     {
         q: 'Founder Pass는 의료 서비스인가요?',
-        a: '아닙니다. Youniqle은 의료 행위를 제공하지 않는 "정보·연결·설계 플랫폼"입니다. 건강 관련 정보와 AI 기반 인사이트를 제공하지만, 이는 의료적 진단이나 치료를 대체하지 않습니다.'
+        a: '아닙니다. Youniqle은 의료 행위를 제공하지 않는 "정보·연결·설계 플랫폼"입니다. 건강 관련 정보와 유니클 기반 인사이트를 제공하지만, 이는 의료적 진단이나 치료를 대체하지 않습니다.'
     },
     {
         q: '다단계 구조인가요?',

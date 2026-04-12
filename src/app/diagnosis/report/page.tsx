@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ import jsPDF from 'jspdf';
 import { useToast } from '@/components/ui/toast';
 import { AISolutionSection } from '@/components/diagnosis/AISolutionSection';
 import { GoldenTimeOffer } from '@/components/diagnosis/GoldenTimeOffer';
+import { determineMood } from '@/lib/audio/voice-strategy';
 
 // Type definition for Diagnosis Result
 interface DeepDiagnosisResult {
@@ -63,6 +65,9 @@ export default function DeepDiagnosisReportPage() {
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [deepDiagnosisModalOpen, setDeepDiagnosisModalOpen] = useState(false);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+    const { data: session, update: updateSession } = useSession();
+    const [showGenderModal, setShowGenderModal] = useState(false);
+    const [isUpdatingGender, setIsUpdatingGender] = useState(false);
 
     const reportRef = useRef<HTMLDivElement>(null);
 
@@ -191,6 +196,39 @@ export default function DeepDiagnosisReportPage() {
 
         fetchResult();
     }, [router]);
+
+    // Check if gender is missing when result is loaded
+    useEffect(() => {
+        if (result && session?.user && !(session.user as any).gender) {
+            setShowGenderModal(true);
+        }
+    }, [result, session]);
+
+    const handleGenderSelect = async (gender: 'male' | 'female') => {
+        setIsUpdatingGender(true);
+        try {
+            const res = await fetch('/api/user/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gender }),
+            });
+
+            if (res.ok) {
+                await updateSession({ gender });
+                setShowGenderModal(false);
+                addToast({
+                    title: "성별 정보 업데이트 완료",
+                    description: "맞춤형 오디오 가이드가 준비되었습니다.",
+                    variant: 'success'
+                });
+            }
+        } catch (err) {
+            console.error('Failed to update gender:', err);
+        } finally {
+            setIsUpdatingGender(false);
+        }
+    };
+
 
     if (loading) {
         return (
@@ -586,15 +624,59 @@ export default function DeepDiagnosisReportPage() {
                                     <span className="text-white font-bold text-xl">3</span>
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black text-obsidian">AI 맞춤 솔루션</h3>
+                                    <h3 className="text-2xl font-black text-obsidian">유니클 맞춤 솔루션</h3>
                                     <p className="text-slate-500 text-sm">진단 결과를 바탕으로 설계된 처방전입니다.</p>
                                 </div>
                             </div>
 
                             <GoldenTimeOffer
-                                script={result?.aiSolution?.audioScript || "AI_LOADING"}
-                                userName={result?.metadata?.userInfo?.name || '회원'}
+                                script={result?.aiSolution?.audioScript || "YOUNIQLE_LOADING"}
+                                userName={result?.metadata?.userInfo?.name || session?.user?.name || '회원'}
+                                gender={(session?.user as any)?.gender}
+                                mood={result ? determineMood(result.totalScore, (result.metadata?.tScores?.domains || result.categoryScores || {}) as any) : 'PROFESSIONAL'}
                             />
+
+                            {/* Gender Selection Modal (Elegant Overlay) */}
+                            {showGenderModal && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-in fade-in duration-300">
+                                    <div className="bg-white rounded-[32px] p-8 max-w-sm w-full shadow-2xl scale-in-center border border-white/20">
+                                        <div className="text-center space-y-4">
+                                            <div className="w-16 h-16 bg-chapter-accent/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                <Sparkles className="w-8 h-8 text-chapter-accent" />
+                                            </div>
+                                            <h3 className="text-xl font-black text-obsidian tracking-tight">맞춤 가이드를 위한 성별 선택</h3>
+                                            <p className="text-slate-500 text-sm leading-relaxed">
+                                                가장 편안한 목소리로 가이드를 들려드리기 위해 성별 정보가 필요합니다. 한 번만 선택하시면 이후에도 계속 적용됩니다.
+                                            </p>
+                                            <div className="grid grid-cols-2 gap-4 mt-8">
+                                                <Button 
+                                                    onClick={() => handleGenderSelect('male')}
+                                                    disabled={isUpdatingGender}
+                                                    className="h-24 flex flex-col gap-2 rounded-2xl bg-slate-50 hover:bg-sky-50 border border-slate-100 text-obsidian font-bold shadow-sm transition-all hover:border-sky-200"
+                                                >
+                                                    <span className="text-2xl">🙋‍♂️</span>
+                                                    남성
+                                                </Button>
+                                                <Button 
+                                                    onClick={() => handleGenderSelect('female')}
+                                                    disabled={isUpdatingGender}
+                                                    className="h-24 flex flex-col gap-2 rounded-2xl bg-slate-50 hover:bg-rose-50 border border-slate-100 text-obsidian font-bold shadow-sm transition-all hover:border-rose-200"
+                                                >
+                                                    <span className="text-2xl">🙋‍♀️</span>
+                                                    여성
+                                                </Button>
+                                            </div>
+                                            {isUpdatingGender && (
+                                                <div className="flex items-center justify-center gap-2 text-xs text-slate-400 mt-4">
+                                                    <RefreshCw className="w-3 h-3 animate-spin" />
+                                                    저장 중...
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             <AISolutionSection diagnosisResult={result} />
                         </div>
                     )}
@@ -605,7 +687,7 @@ export default function DeepDiagnosisReportPage() {
                     open={paymentOpen}
                     onOpenChange={setPaymentOpen}
                     price={3900}
-                    productName="심층 심리 분석 리포트 + AI 솔루션"
+                    productName="심층 심리 분석 리포트 + 유니클 솔루션"
                     onSuccess={handlePaymentSuccess}
                 />
 

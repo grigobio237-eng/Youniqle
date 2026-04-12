@@ -241,7 +241,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
                   {progress?.todayChecklist?.aiAdvice ? '✓' : '2'}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-obsidian">AI 맞춤 루틴 확인</h3>
+                  <h3 className="font-extrabold text-obsidian">유니클 맞춤 루틴 확인</h3>
                   <p className="text-sm text-slate font-medium">네비게이터의 실시간 분석</p>
                 </div>
               </div>
@@ -313,7 +313,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
             </div>
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-3 mb-3">
-                <h3 className="font-black text-2xl text-obsidian tracking-tight">AI 코치의 데이터 분석</h3>
+                <h3 className="font-black text-2xl text-obsidian tracking-tight">유니클 매니저의 데이터 분석</h3>
                 <Badge className="bg-chapter-accent/10 text-chapter-accent border-none text-[10px] font-black tracking-tighter uppercase px-2">Real-time Analysis</Badge>
               </div>
               <p className="text-lg text-slate font-medium leading-relaxed italic">
@@ -356,7 +356,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
             <div className="bg-white border border-line rounded-[32px] p-8 hover:border-emerald-500 hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-12 -mt-12" />
               <div className="w-20 h-20 bg-mist rounded-[24px] mb-6 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner">👁️</div>
-              <h3 className="text-xl font-black text-obsidian mb-2">AI 비디오 자세 분석</h3>
+              <h3 className="text-xl font-black text-obsidian mb-2">유니클 비디오 자세 분석</h3>
               <p className="text-sm text-slate font-medium mb-6 leading-relaxed">카메라를 통해 실시간 신체 밸런스 및 피로도 측정</p>
               <div className="mt-auto text-xs font-black text-emerald-500 tracking-widest uppercase group-hover:translate-x-1 transition-transform">Run Analysis &gt;</div>
             </div>
@@ -391,7 +391,7 @@ export default function DashboardPreview({ score, onOpenWebtoon }: { score: numb
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: '사운드 테라피', href: '/therapy/sound', icon: '🎧' },
-            { label: 'AI 네비게이터', href: '/ai-navigator', icon: '🤖' },
+            { label: '유니클 네비게이터', href: '/ai-navigator', icon: '🤖' },
             { label: '비디오 분석', href: '/analysis/video', icon: '👁️' },
             { label: '멤버십 혜택', href: '/membership', icon: '🎖️' },
           ].map((link) => (
@@ -418,7 +418,7 @@ function getLevelInfo(score: number) {
 function SiteGuide() {
   const guides = [
     {
-      title: "AI 네비게이터",
+      title: "유니클 네비게이터",
       desc: "매일의 진단 데이터를 분석하여 당신만을 위한 맞춤 회복 루틴과 조언을 제공합니다.",
       icon: <Sparkles className="w-6 h-6" />,
       color: "bg-chapter-accent/10 text-chapter-accent"
@@ -430,7 +430,7 @@ function SiteGuide() {
       color: "bg-blue-500/10 text-blue-500"
     },
     {
-      title: "비디오 자세 분석",
+      title: "유니클 비디오 자세 분석",
       desc: "카메라를 통해 실시간 자세 불균형과 신체 피로도를 정밀하게 측정하고 기록합니다.",
       icon: <Scan className="w-6 h-6" />,
       color: "bg-emerald-500/10 text-emerald-500"

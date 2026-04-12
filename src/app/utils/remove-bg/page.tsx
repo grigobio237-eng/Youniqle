@@ -11,7 +11,7 @@ const BackgroundRemovalClient = dynamic(() => import('@/components/utils/Backgro
     loading: () => (
         <div className="flex items-center justify-center p-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">AI 모델 로딩 중...</span>
+            <span className="ml-3 text-gray-600">유니클 모델 로딩 중...</span>
         </div>
     ),
 });
@@ -28,9 +28,9 @@ export default function BackgroundRemovalPage() {
                 <Card className="shadow-2xl border-0">
                     <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-xl">
                         <div className="text-6xl mb-4">✨</div>
-                        <CardTitle className="text-4xl font-bold">AI 배경 제거</CardTitle>
+                        <CardTitle className="text-4xl font-bold">유니클 배경 제거</CardTitle>
                         <CardDescription className="text-blue-100 text-lg mt-2">
-                            브라우저에서 바로 처리되는 무료 AI 배경 제거 도구
+                            브라우저에서 바로 처리되는 무료 유니클 배경 제거 도구
                         </CardDescription>
                     </CardHeader>
 

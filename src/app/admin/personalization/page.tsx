@@ -403,7 +403,7 @@ export default function PersonalizationDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>개인화 인사이트</CardTitle>
-              <CardDescription>AI가 생성한 개인화 관련 인사이트</CardDescription>
+              <CardDescription>유니클이 생성한 개인화 관련 인사이트</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">

@@ -29,8 +29,8 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                         <Brain className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">AI Weekly Brief</p>
-                        <h3 className="text-xl font-black tracking-tight">AI 맞춤 리커버리 요약</h3>
+                        <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">YOUNIQLE Weekly Brief</p>
+                        <h3 className="text-xl font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
                     </div>
                 </div>
                 {createdAt && (

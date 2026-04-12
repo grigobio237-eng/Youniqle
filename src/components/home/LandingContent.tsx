@@ -12,7 +12,7 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
   
   const utilities = [
     {
-      title: "AI Sensory Scanner",
+      title: "YOUNIQLE Sensory Scanner",
       desc: "공간의 분위기와 식단의 영양을 한 번에 스캔하여 현재의 회복 상태를 분석합니다.",
       icon: <Camera className="w-6 h-6" />,
       color: "bg-chapter-accent",
@@ -29,7 +29,7 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
     },
     {
       title: "Video Analysis",
-      desc: "한 장의 사진으로 거북목과 회복 자세를 AI가 분석하여 고품격 교정 가이드를 드립니다.",
+      desc: "한 장의 사진으로 거북목과 회복 자세를 유니클이 분석하여 고품격 교정 가이드를 드립니다.",
       icon: <Video className="w-6 h-6" />,
       color: "bg-status-normal",
       action: "스냅샷 분석",
@@ -54,7 +54,7 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
             Recovery Tools
           </div>
           <h2 className="text-xl md:text-5xl font-black text-obsidian tracking-tight">다른 유용한 도구도 확인해 보세요</h2>
-          <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 AI 도구들입니다.</p>
+          <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 정밀 도구들입니다.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

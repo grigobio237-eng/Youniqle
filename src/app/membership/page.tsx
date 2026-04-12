@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Award, Activity, RefreshCcw, Zap, Sprout, Flower2, Sun, Share2, Crown, Lock, ArrowRight, Leaf, Star, Sparkles } from 'lucide-react';
+import { ShoppingBag, Award, Activity, RefreshCcw, Zap, Sprout, Flower2, Sun, Share2, Crown, Lock, ArrowRight, Leaf, Star, Sparkles, Shield, MousePointer2, CheckCircle2 } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import { PASS_SPECS } from '@/lib/constants/passes';
 
 // 구매/활동 기반 회원등급 타입
 type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
@@ -43,21 +44,6 @@ const GRADE_BENEFITS: Record<GradeType, { title: string; desc: string; benefits:
         title: '에코소울',
         desc: '숲의 영혼, 최고 등급',
         benefits: ['글로워 혜택 포함', '신제품 우선 체험', '연간 멤버십 기프트']
-    },
-    essence: {
-        title: '에센스',
-        desc: 'Founder Pass 1단계',
-        benefits: ['생체 나이 진단 1회', '주간 회복 리포트', '전 제품 5% 상시 할인']
-    },
-    balance: {
-        title: '밸런스',
-        desc: 'Founder Pass 2단계',
-        benefits: ['에센스 혜택 전체 포함', '8대 무형 자산 강좌', '전 제품 10% 상시 할인']
-    },
-    miracle: {
-        title: '미라클',
-        desc: 'Founder Pass 최고 등급',
-        benefits: ['밸런스 혜택 전체 포함', 'AI 웹툰 제네레이터', '전 제품 15% 상시 할인']
     }
 };
 
@@ -182,44 +168,52 @@ export default function MembershipPage() {
                 </div>
             </section>
 
-            {/* 2.5 Founder Pass Section */}
+            {/* 2.5 Youniqle Pass Series */}
             <section className="mb-32 max-w-6xl mx-auto">
-                <div className="flex items-center gap-4 mb-12">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-200" />
-                    <div className="flex items-center gap-2 px-6 py-2 bg-obsidian text-white rounded-full shadow-xl">
-                        <Sparkles className="w-5 h-5 text-amber-400" />
-                        <span className="font-black tracking-widest text-xs uppercase">Founder Pass Series</span>
+                <div className="flex items-center gap-4 mb-16">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-chapter-accent/20" />
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="flex items-center gap-2 px-6 py-2 bg-obsidian text-white rounded-full shadow-xl">
+                            <Sparkles className="w-5 h-5 text-amber-400" />
+                            <span className="font-black tracking-widest text-xs uppercase">Youniqle Pass Series</span>
+                        </div>
                     </div>
-                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-200" />
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-chapter-accent/20" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <GradeCard
-                        level="ESSENCE"
-                        icon={<Zap className="w-8 h-8 text-emerald-500" />}
-                        title="에센스"
-                        desc="Digital Starter"
-                        benefits={GRADE_BENEFITS.essence.benefits}
-                        isCurrent={userGrade === 'essence'}
+                        level="START PASS"
+                        icon={<MousePointer2 className="w-8 h-8 text-blue-500" />}
+                        title="스타트 패스"
+                        desc="회복의 시작, 안심 가이드"
+                        benefits={PASS_SPECS.start.keyBenefits.map((b: any) => b.title)}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'START'}
                         isFounder
+                        accentColor="blue"
+                        period={PASS_SPECS.start.period}
                     />
                     <GradeCard
-                        level="BALANCE"
-                        icon={<Star className="w-8 h-8 text-violet-500" />}
-                        title="밸런스"
-                        desc="Tech Enthusiast"
-                        benefits={GRADE_BENEFITS.balance.benefits}
-                        isCurrent={userGrade === 'balance'}
+                        level="SIGNATURE PASS"
+                        icon={<Star className="w-8 h-8 text-amber-500" />}
+                        title="시그니처 패스"
+                        desc="유니클의 정수, 5년의 설계"
+                        benefits={PASS_SPECS.signature.keyBenefits.map((b: any) => b.title)}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'SIGNATURE'}
                         isFounder
+                        accentColor="amber"
+                        period={PASS_SPECS.signature.period}
                     />
                     <GradeCard
-                        level="MIRACLE"
-                        icon={<Crown className="w-8 h-8 text-amber-500" />}
-                        title="미라클"
-                        desc="Power User"
-                        benefits={GRADE_BENEFITS.miracle.benefits}
-                        isCurrent={userGrade === 'miracle'}
+                        level="BLACK PASS"
+                        icon={<Crown className="w-8 h-8 text-slate-300" />}
+                        title="블랙 패스"
+                        desc="프라이빗 컨시어지"
+                        benefits={PASS_SPECS.black.keyBenefits.map((b: any) => b.title)}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'BLACK'}
                         isFounder
+                        accentColor="obsidian"
+                        period={PASS_SPECS.black.period}
                     />
                 </div>
             </section>
@@ -246,42 +240,49 @@ export default function MembershipPage() {
     );
 }
 
-function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder }: any) {
+function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, accentColor = 'chapter-accent', period }: any) {
+    const isObsidian = accentColor === 'obsidian';
+
     return (
-        <Card className={`relative overflow-hidden transition-all duration-500 rounded-[28px] border-line p-6 flex flex-col items-center text-center space-y-3 min-h-[280px]
-            ${isCurrent ? (isFounder ? 'bg-obsidian/5 ring-2 ring-amber-500 shadow-2xl scale-[1.05]' : 'bg-chapter-accent/10 ring-2 ring-chapter-accent shadow-xl') : 'bg-surface shadow-md hover:shadow-lg'}
-            ${isFounder && !isCurrent ? 'border-amber-100 hover:border-amber-300' : ''}`}>
+        <Card className={`relative overflow-hidden transition-all duration-700 rounded-[32px] border-line p-8 flex flex-col items-center text-center space-y-4 min-h-[380px] group
+            ${isCurrent ? (isFounder ? (isObsidian ? 'bg-obsidian text-mist ring-2 ring-slate-400 shadow-2xl scale-[1.05]' : `bg-white ring-2 ring-${accentColor}-500 shadow-2xl scale-[1.05]`) : 'bg-chapter-accent/10 ring-2 ring-chapter-accent shadow-xl') : (isObsidian ? 'bg-surface hover:bg-obsidian hover:text-mist' : 'bg-surface shadow-md hover:shadow-xl')}
+            ${isFounder && !isCurrent ? `border-${accentColor}-100 hover:border-${accentColor}-300` : ''}`}>
 
             {isFounder && (
-                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20">
-                    <Crown className="w-12 h-12" />
+                <div className="absolute -top-4 -right-4 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Crown className="w-24 h-24" />
                 </div>
             )}
 
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isCurrent ? (isFounder ? 'bg-amber-100' : 'bg-chapter-accent/20') : (isFounder ? 'bg-amber-50' : 'bg-chapter-accent/5')}`}>
+            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 ${isCurrent ? (isObsidian ? 'bg-white/10' : `bg-${accentColor}-50`) : (isObsidian ? 'bg-slate-100 group-hover:bg-white/10' : `bg-${accentColor}-50`)}`}>
                 {icon}
             </div>
-            <div className="space-y-1">
-                <div className={`text-[10px] font-black uppercase tracking-widest ${isCurrent ? 'text-chapter-accent' : 'text-text-secondary'}`}>{level}</div>
-                <h4 className="font-black text-base text-text-primary">{title}</h4>
+            <div className="space-y-2">
+                <div className={`text-[10px] font-black uppercase tracking-widest ${isCurrent ? (isObsidian ? 'text-amber-400' : `text-${accentColor}-600`) : (isObsidian ? 'text-slate-400 group-hover:text-amber-400' : 'text-text-secondary')}`}>{level}</div>
+                <h4 className={`font-black text-xl tracking-tight ${isCurrent && isObsidian ? 'text-white' : 'text-text-primary group-hover:text-inherit'}`}>{title}</h4>
             </div>
-            <p className="text-xs font-medium text-text-secondary tracking-tight">{desc}</p>
+            
+            <div className="flex flex-col items-center gap-1">
+                <p className={`text-xs font-bold tracking-tight opacity-70 ${isCurrent && isObsidian ? 'text-mist' : 'text-text-secondary group-hover:text-inherit'}`}>{desc}</p>
+                {period && <Badge variant="secondary" className="text-[9px] font-black px-2 py-0.5 rounded-full">{period}</Badge>}
+            </div>
 
             {/* 혜택 목록 */}
-            <ul className="text-[11px] text-text-secondary space-y-2 pt-2 w-full flex-1">
+            <ul className={`text-xs space-y-3 pt-6 w-full flex-1 ${isCurrent && isObsidian ? 'text-mist/80' : 'text-text-secondary group-hover:text-inherit'}`}>
                 {benefits?.map((benefit: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-2">
-                        <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${isCurrent ? 'bg-chapter-accent' : 'bg-text-secondary/50'}`} />
-                        <span className="text-left leading-relaxed">{benefit}</span>
+                    <li key={idx} className="flex items-start gap-3">
+                        <CheckCircle2 className={`w-3 h-3 mt-1 shrink-0 ${isCurrent ? (isObsidian ? 'text-amber-400' : `text-${accentColor}-500`) : (isObsidian ? 'text-slate-300 group-hover:text-amber-400' : `text-${accentColor}-500`)}`} />
+                        <span className="text-left leading-snug font-medium">{benefit}</span>
                     </li>
                 ))}
             </ul>
 
             {isCurrent && (
-                <div className="pt-2">
-                    <Badge className="bg-chapter-accent text-white border-none text-[9px] font-black uppercase tracking-widest px-3 py-1">MY GRADE</Badge>
+                <div className="pt-4">
+                    <Badge className={`${isObsidian ? 'bg-amber-500' : `bg-${accentColor}-500`} text-white border-none text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg`}>MY PASS</Badge>
                 </div>
             )}
         </Card>
     );
 }
+

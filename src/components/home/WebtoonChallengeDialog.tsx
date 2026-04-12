@@ -202,14 +202,15 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
     if (!characterSheetImage) return;
     setIsSavingCharacter(true);
     try {
-      const res = await fetch('/api/character/save', {
+      const res = await fetch('/api/character', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageUrl: characterSheetImage,
           name: `${visualStyle} 스타일 캐릭터`,
-          description: characterPrompt || '웹툰 챌린지에서 생성된 캐릭터',
-          visualStyle
+          imageData: characterSheetImage, // imageData로 전달 (백엔드 요구사항)
+          prompt: characterPrompt || '웹툰 챌린지에서 생성된 캐릭터',
+          visualStyle,
+          setAsDefault: true
         })
       });
       if (res.ok) {
@@ -229,10 +230,11 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'generate-images',
+          action: 'generate-webtoon',
           panels: editedPanels,
           visualStyle,
           genre,
+          characterPrompt: characterPrompt,
           characterSheetImage: characterSheetImage
         })
       });
@@ -240,15 +242,8 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
       if (res.ok) {
         const data = await res.json();
         
-        // 텍스트 합성 로직 (Client-side)
-        const synthesizedPanels = await Promise.all(
-          data.panels.map(async (panel: any) => {
-            if (!panel.imageUrl || !panel.script) return panel;
-            const textToDraw = panel.bubbleText || panel.script;
-            const synthesizedUrl = await drawTextOnImageClient(panel.imageUrl, textToDraw);
-            return { ...panel, imageUrl: synthesizedUrl };
-          })
-        );
+        // 서버에서 이미 텍스트 합성이 완료되었으므로, 그대로 사용
+        const synthesizedPanels = data.panels;
 
         setGeneratedData({
           ...generatedData,
@@ -387,7 +382,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 rounded-[32px] border-none shadow-3xl bg-white focus:outline-none max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-2xl p-0 rounded-[32px] border-none shadow-3xl bg-white focus:outline-none max-h-[90vh] flex flex-col [&>button]:text-white [&>button]:opacity-100 [&>button]:z-50">
         <DialogHeader className="sr-only">
           <DialogTitle>웹툰 챌린지</DialogTitle>
           <DialogDescription>오늘의 회복 데이터를 웹툰으로 생성합니다.</DialogDescription>
@@ -519,7 +514,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                         onClick={handleSuggestTopics}
                         disabled={isLoadingTopics}
                         className="h-12 w-12 rounded-xl bg-amber-100 hover:bg-amber-200"
-                        title="AI 주제 추천받기"
+                        title="유니클 주제 추천받기"
                       >
                         {isLoadingTopics ? (
                           <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
@@ -551,15 +546,16 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                   </div>
                 )}
               </div>
-
-              <Button
-                onClick={handleStartGeneration}
-                className="w-full h-16 text-lg font-black rounded-2xl bg-obsidian text-mist hover:bg-obsidian/90 shadow-xl transition-all"
-                disabled={isGenerating}
-              >
-                {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-5 w-5 text-reward-gold" />}
-                AI 웹툰 대본 생성 시작
-              </Button>
+              <div className="pt-6">
+                <Button 
+                  className="w-full h-16 rounded-2xl font-black bg-obsidian text-mist shadow-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+                  onClick={handleStartGeneration}
+                  disabled={isGenerating || (topicMode === 'free' && !freeTopic.trim())}
+                >
+                  {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-5 w-5 text-reward-gold" />}
+                  유니클 웹툰 대본 생성 시작
+                </Button>
+              </div>
             </div>
           )}
 
@@ -700,9 +696,9 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                           }`}
                         onClick={() => handleSelectCharacter('prompt')}
                       >
-                        <img src={promptBasedCharacter} alt="AI 프롬프트 기반" className="w-full aspect-square object-cover" />
+                        <img src={promptBasedCharacter} alt="유니클 프롬프트 기반" className="w-full aspect-square object-cover" />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                          <p className="text-white text-xs font-black">📝 AI 프롬프트 기반</p>
+                          <p className="text-white text-xs font-black">📝 유니클 프롬프트 기반</p>
                         </div>
                         {selectedCharacterType === 'prompt' && (
                           <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -732,7 +728,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
               {isGeneratingCharacter && (
                 <div className="aspect-video bg-mist/20 rounded-3xl border-4 border-white shadow-inner flex flex-col items-center justify-center animate-pulse">
                   <Loader2 className="h-10 w-10 animate-spin text-primary mb-3" />
-                  <p className="text-xs font-black text-slate">AI가 두 가지 캐릭터를 그리는 중...</p>
+                  <p className="text-xs font-black text-slate">유니클이 두 가지 캐릭터를 그리는 중...</p>
                 </div>
               )}
 
@@ -778,11 +774,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                           다시 만들기
                         </Button>
                       </div>
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 p-5">
-                        <p className="text-white text-xs font-medium leading-relaxed">
-                          {panel.script}
-                        </p>
-                      </div>
+
                     </div>
                   ))}
                 </div>

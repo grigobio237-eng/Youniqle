@@ -37,7 +37,7 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
     return (
         <section className="py-12 w-full max-w-4xl mx-auto px-6">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-black text-gray-900 mb-4">AI PERSONAL SOLUTION</h2>
+                <h2 className="text-3xl font-black text-gray-900 mb-4">YOUNIQLE PERSONAL SOLUTION</h2>
                 <p className="text-gray-600 text-lg max-w-2xl mx-auto">
                     {renderContent(solution.analysis)}
                 </p>

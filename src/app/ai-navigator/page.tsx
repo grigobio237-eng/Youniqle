@@ -296,7 +296,7 @@ export default function AiNavigatorPage() {
                     </div>
                 </section>
 
-                {/* 2. AI 맞춤 분석 리포트 */}
+                {/* 2. 유니클 맞춤 분석 리포트 */}
                 <section className="py-16">
                     <div className="container mx-auto px-4">
                         <div className="max-w-3xl mx-auto space-y-20">
@@ -442,7 +442,7 @@ export default function AiNavigatorPage() {
                                 </Card>
                             </div>
 
-                            {/* Step 3: AI 추천 파트너 상품 */}
+                            {/* Step 3: 유니클 추천 파트너 상품 */}
                             <div className="space-y-8 relative">
                                 <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
                                 <div className="flex items-center justify-between">

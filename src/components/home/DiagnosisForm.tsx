@@ -178,7 +178,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
                 className="w-full p-4 bg-mist/30 border border-line/50 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm font-medium"
               />
               <p className="text-[10px] text-slate/50 leading-relaxed italic">
-                * 입력해주신 정보는 AI가 당신의 상태를 더 정확히 분석하는 데 사용됩니다.
+                * 입력해주신 정보는 유니클이 당신의 상태를 더 정확히 분석하는 데 사용됩니다.
               </p>
             </motion.div>
           )}

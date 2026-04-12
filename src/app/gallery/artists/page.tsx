@@ -87,7 +87,7 @@ export default function ArtistsPage() {
                                 transition={{ delay: idx * 0.1, duration: 0.6 }}
                                 className="group cursor-pointer"
                             >
-                                <div className="space-y-8">
+                                <Link href={`/gallery/artists/${artist.id}`} className="space-y-8 block">
                                     <div className="relative aspect-square overflow-hidden rounded-full transition-shadow duration-500 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] grayscale group-hover:grayscale-0 transition-all duration-700">
                                         {artist.image ? (
                                             <Image 
@@ -114,11 +114,11 @@ export default function ArtistsPage() {
                                             "{artist.bio}"
                                         </p>
                                         
-                                        <div className="pt-6 border-t border-line inline-block mx-auto">
-                                            <span className="text-[10px] font-black tracking-widest text-obsidian uppercase">View Works ({artist.items?.length || 0})</span>
+                                        <div className="pt-6 border-t border-line inline-block mx-auto group-hover:border-chapter-accent transition-colors">
+                                            <span className="text-[10px] font-black tracking-widest text-obsidian uppercase group-hover:text-chapter-accent transition-colors">View Artist Profile ({artist.items?.length || 0})</span>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             </motion.div>
                         ))}
                     </div>

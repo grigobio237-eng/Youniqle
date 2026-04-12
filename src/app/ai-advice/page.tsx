@@ -247,7 +247,7 @@ export default function AiAdvicePage() {
 
                     <div className="mt-20 pt-12 border-t border-line text-center">
                         <p className="text-text-secondary text-sm font-medium opacity-50">
-                            조언은 사용자의 실시간 데이터와 제미나이 AI 분석을 바탕으로 생성됩니다.
+                            조언은 사용자의 실시간 데이터와 제미나이 유니클 분석을 바탕으로 생성됩니다.
                         </p>
                     </div>
                 </div>

@@ -98,7 +98,8 @@ export async function POST(req: NextRequest) {
                 episodeNumber,
                 genre: genre || 'slice-of-life',
                 userName: user.name || '사용자',
-                panelCount: Number(panelCount)
+                panelCount: Number(panelCount),
+                topic: topic || undefined // 묘사 추가
             });
 
             return NextResponse.json({
@@ -162,86 +163,27 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // ===== [Case 3.5] 듀얼 캐릭터 생성 (사진 기반 + 프롬프트 기반 병렬) =====
+        // ===== [Case 3.5] 듀얼 캐릭터 생성 (전용 API로 이전됨: /api/character/generate-dual) =====
+        // 이 로직은 이제 /api/character/generate-dual 엔드포인트에서 처리됩니다.
         if (action === 'generate-dual-characters') {
-            try {
-                const { characterPrompt: charPrompt, visualStyle: vStyle, referenceImage } = body;
-
-                console.log('[Webtoon Generate] Creating dual character sheets...');
-
-                // 1. 레퍼런스 이미지 분석 (있는 경우)
-                let referenceDescription = "";
-                if (referenceImage) {
-                    try {
-                        const base64Data = referenceImage.split(',')[1] || referenceImage;
-                        referenceDescription = await GeminiAIEngine.analyzeCharacterImage(base64Data);
-                        console.log('[Webtoon Generate] Reference analyzed:', referenceDescription.substring(0, 100));
-                    } catch (err: any) {
-                        console.error('Reference analysis failed:', err);
-                    }
-                }
-
-                // 2. 두 가지 캐릭터 병렬 생성
-                const [refBasedResult, promptBasedResult] = await Promise.all([
-                    // 사진 기반 캐릭터 (사진이 있으면 항상 시도)
-                    referenceImage ? GeminiAIEngine.generateCharacterSheet({
-                        characterPrompt: referenceDescription || 'A character based on the uploaded reference photo, maintaining the key visual features',
-                        visualStyle: vStyle || 'premium',
-                        referenceDescription: referenceDescription || 'Photo-based character'
-                    }).catch(e => {
-                        console.error('Ref-based generation failed:', e);
-                        return null;
-                    }) : Promise.resolve(null),
-
-                    // 프롬프트 기반 캐릭터
-                    charPrompt ? GeminiAIEngine.generateCharacterSheet({
-                        characterPrompt: charPrompt,
-                        visualStyle: vStyle || 'premium'
-                    }).catch(e => {
-                        console.error('Prompt-based generation failed:', e);
-                        return null;
-                    }) : Promise.resolve(null)
-                ]);
-
-                // URL 또는 Base64 형식 정규화
-                const normalizeImage = (result: string | null) => {
-                    if (!result) return null;
-                    if (result.startsWith('http')) return result;
-                    return `data:image/png;base64,${result}`;
-                };
-
-                const refBasedCharacter = normalizeImage(refBasedResult);
-                const promptBasedCharacter = normalizeImage(promptBasedResult);
-
-                // 최소 하나는 성공해야 함
-                if (!refBasedCharacter && !promptBasedCharacter) {
-                    return NextResponse.json({
-                        error: '캐릭터 생성에 실패했습니다. 다시 시도해 주세요.'
-                    }, { status: 500 });
-                }
-
-                return NextResponse.json({
-                    success: true,
-                    refBasedCharacter,      // 사진 분석 기반 캐릭터
-                    promptBasedCharacter,   // AI 프롬프트 기반 캐릭터
-                    referenceDescription    // 분석된 설명 (피드백용)
-                });
-
-            } catch (err: any) {
-                console.error('[Webtoon Generate] Dual character error:', err);
-                return NextResponse.json({
-                    error: `듀얼 캐릭터 생성 실패: ${err.message}`
-                }, { status: 500 });
-            }
+            return NextResponse.json({
+                error: '이 기능은 전용 캐릭터 생성 API(/api/character/generate-dual)로 이전되었습니다.'
+            }, { status: 410 });
         }
 
         // ===== [Case 4] 확정된 캐릭터를 바탕으로 전체 패널 생성 =====
-        if (action === 'generate-webtoon') {
-            if (!existingCharPrompt || !existingPanels) return NextResponse.json({ error: 'Panels and character prompt required' }, { status: 400 });
+        if (action === 'generate-webtoon' || action === 'generate-images') {
+            if (!existingCharPrompt || !existingPanels) {
+                console.error('[Webtoon Generate] Missing requirements:', { hasPrompt: !!existingCharPrompt, hasPanels: !!existingPanels });
+                return NextResponse.json({ error: 'Panels and character prompt required' }, { status: 400 });
+            }
 
-            console.log('[Webtoon Generate] Generating all panel images...');
-            const panelsWithImages = await Promise.all(
-                existingPanels.map(async (panel: { panelNumber: number; prompt: string; script: string }) => {
+            console.log('[Webtoon Generate] Generating all panel images started...');
+            try {
+                const panelsWithImages = [];
+
+                for (const panel of existingPanels) {
+                    console.log(`[Webtoon Generate] Generating panel ${panel.panelNumber}...`);
                     const cleanImageBase64 = await GeminiAIEngine.generateWebtoonPanelImage({
                         panelPrompt: panel.prompt,
                         characterPrompt: existingCharPrompt,
@@ -249,20 +191,28 @@ export async function POST(req: NextRequest) {
                         genre: genre || 'slice-of-life'
                     });
 
+                    console.log(`[Webtoon Generate] Drawing text for panel ${panel.panelNumber}...`);
                     const finalImageBase64 = await drawTextOnImage(cleanImageBase64, panel.script);
 
-                    return {
+                    panelsWithImages.push({
                         ...panel,
                         cleanImageUrl: `data:image/png;base64,${cleanImageBase64}`,
                         imageUrl: `data:image/png;base64,${finalImageBase64}`
-                    };
-                })
-            );
+                    });
+                }
 
-            return NextResponse.json({
-                success: true,
-                panels: panelsWithImages
-            });
+                console.log('[Webtoon Generate] All panels generated successfully!');
+                return NextResponse.json({
+                    success: true,
+                    panels: panelsWithImages
+                });
+            } catch (genError: any) {
+                console.error('[Webtoon Generate] Generation process failed:', genError);
+                return NextResponse.json({ 
+                    error: `이미지 생성 프로세스 실패: ${genError.message}`,
+                    details: genError.stack
+                }, { status: 500 });
+            }
         }
 
         // ===== [Case 5] 레퍼런스 이미지 분석 (신규) =====

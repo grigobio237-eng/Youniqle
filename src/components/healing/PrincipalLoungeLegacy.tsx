@@ -55,7 +55,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
         <div className="w-full bg-white space-y-40 py-40">
             {/* 1. Principal Profile Section */}
             <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-                <div className="relative aspect-[4/5] rounded-[60px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.12)] group">
+                <div className="relative w-2/3 mx-auto md:w-full aspect-[4/5] rounded-[32px] md:rounded-[60px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.12)] group">
                     <Image 
                         src={data.image} 
                         alt={data.name} 
@@ -63,9 +63,9 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-12 left-12 right-12 text-white space-y-2">
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Master Architect</p>
-                        <h2 className="text-3xl md:text-4xl font-black tracking-tighter italic">{data.name}</h2>
+                    <div className="absolute bottom-8 left-8 right-8 md:bottom-12 md:left-12 md:right-12 text-white space-y-1 md:space-y-2">
+                        <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Master Architect</p>
+                        <h2 className="text-xl md:text-4xl font-black tracking-tighter italic">{data.name}</h2>
                     </div>
                 </div>
 

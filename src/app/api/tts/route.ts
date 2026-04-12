@@ -1,15 +1,32 @@
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getVoiceConfig, UserGender, VoiceMood } from '@/lib/audio/voice-strategy';
 
 export async function POST(req: NextRequest) {
     try {
-        const { text, voiceId = "ko-KR-Neural2-c" } = await req.json(); // Default to Neural2 Female-C (Calm)
+        const { text, voiceId, gender, mood } = await req.json();
 
         if (!text) {
             return NextResponse.json({ error: 'Text is required' }, { status: 400 });
         }
 
-        const apiKey = process.env.GOOGLE_TTS_API_KEY || process.env.GEMINI_API_KEY; // Using the new dedicated key with fallback
+        // Determine voice config based on specific voiceId or (gender + mood)
+        let finalVoiceId = voiceId;
+        let speakingRate = 0.95;
+        let pitch = 0.0;
+
+        if (!finalVoiceId && (gender || mood)) {
+            const config = getVoiceConfig(gender as UserGender, mood as VoiceMood);
+            finalVoiceId = config.voiceId;
+            speakingRate = config.speakingRate;
+            pitch = config.pitch;
+        } else if (!finalVoiceId) {
+            finalVoiceId = "ko-KR-Neural2-c";
+            speakingRate = 0.9;
+            pitch = -1.0;
+        }
+
+        const apiKey = process.env.GOOGLE_TTS_API_KEY || process.env.GEMINI_API_KEY;
         if (!apiKey) {
             return NextResponse.json({ error: 'API configuration error' }, { status: 500 });
         }
@@ -21,20 +38,16 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
                 input: { text },
-                voice: { languageCode: 'ko-KR', name: voiceId },
-                audioConfig: { audioEncoding: 'MP3', speakingRate: 0.9, pitch: -1.0 }, // Slightly slower and lower pitch for calmness
+                voice: { languageCode: 'ko-KR', name: finalVoiceId },
+                audioConfig: { audioEncoding: 'MP3', speakingRate, pitch },
             }),
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('--- Google TTS API Detailed Error ---');
-            console.error('Status:', response.status);
-            console.error('Error Body:', JSON.stringify(errorData, null, 2));
-            console.error('-------------------------------------');
+            console.error('TTS API error:', errorData);
             return NextResponse.json({
                 error: errorData.error?.message || 'TTS API failed',
-                details: errorData.error
             }, { status: response.status });
         }
 
@@ -46,3 +59,4 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+

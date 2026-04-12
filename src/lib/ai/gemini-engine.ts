@@ -1128,26 +1128,31 @@ JSON 형식으로 응답:
         episodeNumber: number;
         genre: string;
         userName: string;
-        panelCount: number; // 새로 추가
+        panelCount: number;
+        topic?: string;
     }): Promise<any> {
-        const { recoveryData, prevSummary, episodeNumber, genre, userName, panelCount } = input;
+        const { recoveryData, prevSummary, episodeNumber, genre, userName, panelCount, topic } = input;
 
         const prompt = `
-당신은 인기 웹툰 작가이자 회복 코치입니다.
-사용자(${userName})의 오늘 회복 데이터를 바탕으로 공감을 자극하는 ${panelCount}컷 웹툰 대본을 작성해주세요.
+당신은 사용자의 일상을 관찰하고 공감하는 '비주얼 스토리텔러'이자 회복 조력자입니다.
+사용자(${userName})가 입력한 주제를 바탕으로 ${panelCount}컷 웹툰 대본을 작성해주세요.
+
+## 핵심 지침 (CRITICAL)
+1. **주제 중심 서사**: 사용자의 자유 주제 [ ${topic || '일상의 회복'} ]가 이야기의 **절대적인 주인공이자 소재**가 되어야 합니다. 
+2. **페르소나 편향 금지**: 이야기의 배경을 '웹툰 작가의 마감', '번아웃', '그림 그리기' 등 뻔한 설정으로 잡지 마세요. 사용자의 실제 상황(예: 가족회의, 직장 갈등, 운동 등)에 100% 몰입하세요.
+3. **삼자적 거울(Mirroring)**: 주인공 캐릭터(사피에넷)가 사용자의 주제와 동일한 상황을 겪거나 관찰하며, 사용자가 느꼈을 답답함에 위트 있게 공감해주세요.
+4. **회복 통찰**: 사용자의 오늘 회복 데이터(점수: ${recoveryData.totalScore})는 이야기의 결말부에서 사피에넷이 건네는 '따뜻한 통찰'이나 '회복을 위한 조언'의 근거로만 활용하세요. 대사로 점수를 직접 노출하지 마세요.
 
 ## 데이터
-- 회복 점수: ${recoveryData.totalScore}
 - 장르: ${genre}
-- 에피소드: ${episodeNumber}화
-- 목표 분량: **정확히 ${panelCount}개**의 컷(Panel)
+- 목표 분량: 정확히 ${panelCount}개의 컷(Panel)
 ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
 
-## 요청
+## 요청 사항
 1. **정확히 ${panelCount}개**의 컷(Panel)에 들어갈 대본과 이미지 생성용 프롬프트를 작성하세요.
-2. 주인공 캐릭터의 외형 묘사(characterPrompt)를 상세하게 작성하세요. (영어 권장)
-3. 전체 줄거리를 나타내는 **한국어 제목(title)**과 **한국어 요약(summary)**을 반드시 포함하세요. (절대 영어를 섞지 마세요)
-4. 각 컷의 script는 반드시 **한국어**로 작성하세요.
+2. 주인공 캐릭터(사피에넷)의 외형 묘사(characterPrompt)를 상세하게 작성하세요. (영어 권장)
+3. 전체 줄거리의 한국어 제목(title)과 요약(summary)을 포함하세요.
+4. 모든 대사(script)는 반드시 **한국어**로 작성하세요.
 
 ## 응답 형식 (JSON)
 {
@@ -1202,12 +1207,16 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
         referenceDescription?: string;
     }): Promise<string> {
         const stylePrompt = this.getStylePrompt(input.visualStyle);
-        const refSubject = input.referenceDescription ? `based on these features: ${input.referenceDescription}` : '';
-        const prompt = `Generate a character reference sheet.
-1. Subject: A full body reference sheet of a character, ${input.characterPrompt}. ${refSubject}
-2. Art Style: ${stylePrompt}
-3. Requirements: Front view, neutral pose, white background, consistent character design
-4. Quality Boosters: Masterpiece, High Quality, Highly Detailed, 8k resolution`;
+        const refSubject = input.referenceDescription 
+            ? `[CRITICAL IDENTITY: Use the following as the SOLE SOURCE for the character's species and form: ${input.referenceDescription}. IGNORE any conflicting human descriptions.]` 
+            : '';
+            
+        const prompt = `Generate a professional character reference sheet.
+        1. Subject Identity: ${refSubject || input.characterPrompt}
+        2. Complementary Details: ${input.characterPrompt}
+        3. Art Style: ${stylePrompt}
+        4. Layout: Full body reference sheet, front view, neutral pose, white background.
+        5. Quality: Masterpiece, High consistency with the reference subject's original form and species.`;
 
         try {
             const result = await this.generateDetailImage({
@@ -1270,10 +1279,23 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
      * 기존 analyzeCharacterImage를 확장하여 전문적인 분석 제공
      */
     static async analyzeVisionImage(imageBase64: string, customInstruction?: string): Promise<string> {
-        const defaultPrompt = `Analyze this image in detail for an AI image generator to replicate its subject EXACTLY.
-        - If it's a PRODUCT: Describe the container shape (bottle, tube, box), specific material/texture (matte, glossy, glass), brand colors, brand name/logo placement, and exact text labels visible.
-        - If it's a PERSON/MODEL: Describe facial features, exact hair style/color, skin tone, estimated age, and clothing style.
-        - Output a concise English prompt snippet that captures these immutable characteristics.`;
+        const defaultPrompt = `[IDENTITY ANALYSIS MODE]
+        Analyze the provided image in extreme detail for a high-fidelity AI image generator. 
+        Your goal is to extract the UNIQUE IDENTITY of the subject so it can be replicated 1:1.
+
+        1. CATEGORIZE THE SUBJECT:
+           - Is it a HUMAN? Describe facial features, hair, skin, age, expression.
+           - Is it a MASCOT/CHARACTER? (e.g., non-human, cartoonish, creature). Describe its base species (blob, animal, robot), body shape (round, slim, tall), and unique proportions.
+           - Is it a PRODUCT? Describe shape, material, labels, and branding.
+
+        2. CORE FEATURES:
+           - Color palette (primary/secondary).
+           - Key accessories/clothing (e.g., sunglasses, ties, hats).
+           - Art style of the reference (3D render, 2D illustration, photorealistic).
+
+        3. OUTPUT:
+           - Provide a concise English prompt snippet. 
+           - CRITICAL: Prioritize the BASE FORM (e.g. "A white round mascot character") over accessories.`;
 
         const prompt = customInstruction || defaultPrompt;
 
@@ -1283,24 +1305,41 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
                 throw new Error('API key is not configured');
             }
 
-            const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
-            const result = await model.generateContent([
-                prompt,
-                {
-                    inlineData: {
-                        data: imageBase64,
-                        mimeType: "image/png"
-                    }
-                }
-            ]);
-            const response = await result.response;
-            const text = response.text();
+        const modelNames = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
+        let lastError: any;
 
-            if (!text) throw new Error('Empty response from AI');
-            return text.trim();
+        for (const modelName of modelNames) {
+            try {
+                process.stdout.write(`[Gemini Vision] Analyzing with ${modelName}... `);
+                const model = getGenAI().getGenerativeModel({ model: modelName });
+                const result = await model.generateContent([
+                    prompt,
+                    {
+                        inlineData: {
+                            data: imageBase64.split(',')[1] || imageBase64,
+                            mimeType: imageBase64.startsWith('data:image/png') ? "image/png" : "image/jpeg"
+                        }
+                    }
+                ]);
+                const response = await result.response;
+                const text = response.text();
+
+                if (text) {
+                    process.stdout.write(`Success!\n`);
+                    return text.trim();
+                }
+            } catch (error: any) {
+                process.stdout.write(`Failed (${error.message || 'Unknown'})\n`);
+                lastError = error;
+                continue;
+            }
+        }
+
+            console.error('Gemini Vision analysis fully failed:', lastError);
+            throw new Error(`AI 분석 중 모든 모델 실패: ${lastError?.message || '알 수 없는 오류'}`);
         } catch (error: any) {
-            console.error('Gemini Vision analysis detail error:', error);
-            throw new Error(`AI 분석 중 오류: ${error.message}`);
+            console.error('Gemini Vision outer error:', error);
+            throw error;
         }
     }
 

@@ -142,7 +142,7 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
             setStatus('result');
         } catch (err: any) {
             console.error('Analysis Error:', err);
-            toast.error(err.message || "AI 분석 중 오류가 발생했습니다.");
+            toast.error(err.message || "유니클 분석 중 오류가 발생했습니다.");
             setStatus('idle');
         } finally {
             setLoading(false);
@@ -431,7 +431,7 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                 {status === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist">
                         <Loader2 className="w-12 h-12 animate-spin mb-4 text-chapter-accent" />
-                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">AI Analyzing...</h4>
+                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">YOUNIQLE Analyzing...</h4>
                         {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
                         <motion.div 
                             initial={{ top: "-10%" }}

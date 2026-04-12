@@ -209,6 +209,7 @@ export default function PostureScanner() {
                                     <button 
                                         onClick={captureImage}
                                         className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-chapter-accent hover:scale-110 active:scale-95 transition-all"
+                                        aria-label="사진 촬영"
                                     >
                                         <div className="w-14 h-14 bg-chapter-accent rounded-full flex items-center justify-center text-white">
                                             <Camera className="w-6 h-6" />
@@ -217,6 +218,7 @@ export default function PostureScanner() {
                                     <button 
                                         onClick={resetAnalysis}
                                         className="w-20 h-20 bg-obsidian/80 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-obsidian transition-colors"
+                                        aria-label="카메라 끄기"
                                     >
                                         <X className="w-6 h-6" />
                                     </button>

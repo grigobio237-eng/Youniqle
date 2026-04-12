@@ -78,6 +78,7 @@ export const authOptions: AuthOptions = {
             role: user.role,
             grade: user.grade,
             referredBy: user.referredBy,
+            gender: user.gender,
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -217,6 +218,7 @@ export const authOptions: AuthOptions = {
         token.tier = (user as any).tier;
         token.subscription = (user as any).subscription;
         token.referredBy = (user as any).referredBy;
+        token.gender = (user as any).gender;
         token.isNavigator = (user as any).isNavigator;
         token.recentNavigator = (user as any).recentNavigator;
       }
@@ -232,6 +234,7 @@ export const authOptions: AuthOptions = {
             token.tier = dbUser.tier;
             token.subscription = dbUser.subscription;
             token.referredBy = dbUser.referredBy;
+            token.gender = dbUser.gender;
             token.isNavigator = dbUser.isNavigator;
             token.recentNavigator = dbUser.recentNavigator;
             
@@ -271,6 +274,7 @@ export const authOptions: AuthOptions = {
         (session.user as any).tier = token.tier as string;
         (session.user as any).subscription = token.subscription;
         (session.user as any).referredBy = token.referredBy as string;
+        (session.user as any).gender = token.gender as string;
         (session.user as any).referralCode = token.referralCode as string;
         (session.user as any).isNavigator = token.isNavigator as boolean;
         (session.user as any).recentNavigator = token.recentNavigator as string;

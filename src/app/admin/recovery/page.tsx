@@ -99,7 +99,7 @@ function RecoveryAnalyticsContent() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">AI 조언 제공</p>
+                                <p className="text-sm text-gray-500">유니클 조언 제공</p>
                                 <p className="text-3xl font-bold">342회</p>
                                 <p className="text-xs text-gray-400 mt-1">이번 주 누적</p>
                             </div>
@@ -164,7 +164,7 @@ function RecoveryAnalyticsContent() {
             {/* Insights */}
             <Card className="bg-gradient-to-r from-primary/5 to-white">
                 <CardHeader>
-                    <CardTitle>🔍 AI 인사이트</CardTitle>
+                    <CardTitle>🔍 유니클 인사이트</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="p-4 bg-white rounded-lg border">

@@ -123,7 +123,7 @@ export default function FoodScanner() {
             stopCamera();
         } catch (err) {
             console.error("Analysis Error:", err);
-            toast.error("AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.");
+            toast.error("유니클 분석 중 오류가 발생했습니다. 다시 시도해주세요.");
             setStatus('idle');
         } finally {
             setLoading(false);
@@ -166,7 +166,7 @@ export default function FoodScanner() {
                 <Camera className="w-12 h-12 opacity-50" />
             </div>
             <div className="space-y-2">
-                <h3 className="text-2xl font-black italic tracking-tighter uppercase">AI Recovery Scanner</h3>
+                <h3 className="text-2xl font-black italic tracking-tighter uppercase">YOUNIQLE Recovery Scanner</h3>
                 <p className="opacity-60 font-medium">당신의 한 끼가 가져올 회복 데이터를 확인하세요.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
@@ -280,7 +280,7 @@ export default function FoodScanner() {
                     <Card className="rounded-[40px] border-none shadow-2xl bg-obsidian text-mist">
                         <CardContent className="p-8 space-y-8">
                             <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest opacity-60">
-                                <Brain className="w-5 h-5 text-reward-gold" /> AI EXPERT ANALYSIS
+                                <Brain className="w-5 h-5 text-reward-gold" /> YOUNIQLE EXPERT ANALYSIS
                             </div>
                             <p className="text-lg font-medium leading-relaxed italic">"{result.analysis}"</p>
                             <div className="space-y-4">
@@ -361,7 +361,7 @@ export default function FoodScanner() {
                                     />
                                     <div className="absolute inset-0 bg-obsidian/40 backdrop-blur-md flex flex-col items-center justify-center text-mist">
                                         <Loader2 className="w-12 h-12 animate-spin mb-4" />
-                                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">AI Analyzing...</h4>
+                                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">YOUNIQLE Analyzing...</h4>
                                     </div>
                                 </div>
                             )}

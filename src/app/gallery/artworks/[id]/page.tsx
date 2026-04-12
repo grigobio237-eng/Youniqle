@@ -5,14 +5,28 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, Share2, Heart, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Loader2, Share2, Heart, ShieldCheck, X, Maximize2 } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 
 export default function ArtworkDetailPage() {
     const params = useParams();
     const router = useRouter();
     const [artwork, setArtwork] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isZoomed, setIsZoomed] = useState(false);
     const id = params?.id;
+
+    // 전체화면 시 스크롤 방지
+    useEffect(() => {
+        if (isZoomed) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isZoomed]);
 
     useEffect(() => {
         const fetchArtwork = async () => {
@@ -72,19 +86,35 @@ export default function ArtworkDetailPage() {
                     갤러리로 돌아가기
                 </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 select-none" onContextMenu={(e) => e.preventDefault()}>
                     {/* Visual Section */}
                     <div className="flex flex-col space-y-4">
-                        <div className="relative aspect-[4/5] md:aspect-auto md:h-[700px] w-full bg-mist rounded-3xl overflow-hidden shadow-2xl">
+                        <div 
+                            className="relative aspect-[4/5] md:aspect-auto md:h-[700px] w-full bg-mist rounded-3xl overflow-hidden shadow-2xl cursor-zoom-in group"
+                            onClick={() => setIsZoomed(true)}
+                        >
                             {artwork.image ? (
-                                <Image
-                                    src={artwork.image}
-                                    alt={artwork.title}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 1024px) 100vw, 50vw"
-                                    priority
-                                />
+                                <>
+                                    <Image
+                                        src={artwork.image}
+                                        alt={artwork.title}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
+                                        priority
+                                        draggable={false}
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    />
+                                    {/* Protection Overlay */}
+                                    <div className="absolute inset-0 bg-transparent z-10" />
+                                    
+                                    {/* Zoom Hint */}
+                                    <div className="absolute inset-0 bg-obsidian/0 group-hover:bg-obsidian/5 transition-colors duration-500 flex items-center justify-center pointer-events-none">
+                                        <div className="bg-white/90 p-4 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 shadow-xl">
+                                            <Maximize2 className="w-6 h-6 text-obsidian" />
+                                        </div>
+                                    </div>
+                                </>
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center text-6xl text-slate/30 bg-slate/5">🎨</div>
                             )}
@@ -178,6 +208,60 @@ export default function ArtworkDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Zoom Overlay */}
+            <AnimatePresence>
+                {isZoomed && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[9999] bg-obsidian/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-12 cursor-zoom-out select-none"
+                        onClick={() => setIsZoomed(false)}
+                        onContextMenu={(e) => e.preventDefault()}
+                    >
+                        <motion.button 
+                            className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2"
+                            initial={{ rotate: -90, opacity: 0 }}
+                            animate={{ rotate: 0, opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsZoomed(false);
+                            }}
+                        >
+                            <X className="w-10 h-10" />
+                        </motion.button>
+
+                        <motion.div 
+                            className="relative w-full h-full flex items-center justify-center"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        >
+                            <div className="relative w-full h-full max-w-5xl max-h-[90vh]">
+                                <Image
+                                    src={artwork.image}
+                                    alt={artwork.title}
+                                    fill
+                                    className="object-contain"
+                                    draggable={false}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    sizes="100vw"
+                                    priority
+                                />
+                                {/* Protection Overlay for Zoom */}
+                                <div className="absolute inset-0 bg-transparent z-10" />
+                            </div>
+                        </motion.div>
+                        
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-black tracking-widest uppercase">
+                            Youniqle Gallery Protection Active
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

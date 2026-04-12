@@ -79,7 +79,7 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
             <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line animate-bounce max-w-[180px] hidden md:block">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-3 h-3 rounded-full bg-chapter-accent animate-ping" />
-                <span className="text-[10px] font-black text-obsidian uppercase tracking-widest">AI LIVE</span>
+                <span className="text-[10px] font-black text-obsidian uppercase tracking-widest">Youniqle LIVE</span>
               </div>
               <p className="text-[11px] font-bold text-slate leading-snug">
                 지금 먹는 음식,<br />회복에 도움이 될까요?<br />

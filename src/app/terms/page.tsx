@@ -155,9 +155,9 @@ export default function TermsPage() {
                   </div>
 
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">13. AI 상담 및 비의료 고지</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">13. 유니클 상담 및 비의료 고지</h2>
                     <p className="text-gray-700 leading-relaxed">
-                      회사가 제공하는 AI 상담/리포트는 일반적 정보 제공을 위한 것으로, 의학적 진단·치료·처방이 아닙니다. 의료적 판단·케어는 제휴 의료기관의 안내와 전문의 상담에 따릅니다.
+                      회사가 제공하는 유니클 상담/리포트는 일반적 정보 제공을 위한 것으로, 의학적 진단·치료·처방이 아닙니다. 의료적 판단·케어는 제휴 의료기관의 안내와 전문의 상담에 따릅니다.
                     </p>
                   </div>
 
