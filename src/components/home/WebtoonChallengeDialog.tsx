@@ -225,37 +225,63 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
 
   const handleFinalGenerateWebtoon = async () => {
     setIsGenerating(true);
+    setStep('IMAGE'); // 즉시 이미지 뷰로 전환
+    
+    // 초기 패널 데이터 세팅 (이미지는 아직 없음)
+    const initialPanels = editedPanels.map(p => ({
+      ...p,
+      imageUrl: '', // 로딩 표시용 빈 주소
+      cleanImageUrl: ''
+    }));
+
+    setGeneratedData(prev => ({
+      ...prev,
+      panels: initialPanels,
+      summary: freeTopic || '오늘의 회복 웹툰',
+      characterSheetImage
+    }));
+
     try {
-      const res = await fetch('/api/webtoon/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'generate-webtoon',
-          panels: editedPanels,
-          visualStyle,
-          genre,
-          characterPrompt: characterPrompt,
-          characterSheetImage: characterSheetImage
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
+      const updatedPanels = [...initialPanels];
+      
+      // 개별 패널 순차 생성 루프
+      for (let i = 0; i < editedPanels.length; i++) {
+        const panel = editedPanels[i];
         
-        // 서버에서 이미 텍스트 합성이 완료되었으므로, 그대로 사용
-        const synthesizedPanels = data.panels;
-
-        setGeneratedData({
-          ...generatedData,
-          panels: synthesizedPanels,
-          summary: data.title || data.summary || generatedData.summary,
-          characterSheetImage
+        const res = await fetch('/api/webtoon/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'regenerate-panel', // 단일 패널 생성 로직 재활용
+            panels: editedPanels,
+            panelNumber: panel.panelNumber,
+            visualStyle,
+            genre,
+            characterPrompt,
+            characterSheetImage
+          })
         });
-        setStep('IMAGE');
-        if (!instagramCaption) generateInstagramCaption();
+
+        if (res.ok) {
+          const data = await res.json();
+          updatedPanels[i] = {
+            ...panel,
+            imageUrl: data.imageUrl,
+            cleanImageUrl: data.cleanImageUrl
+          };
+
+          // 한 장 완료될 때마다 상태 업데이트 (실시간 렌더링)
+          setGeneratedData(prev => ({
+            ...prev,
+            panels: [...updatedPanels]
+          }));
+        }
       }
+
+      if (!instagramCaption) generateInstagramCaption();
     } catch (error) {
-      alert('웹툰 이미지 생성 중 오류가 발생했습니다.');
+      console.error('Incremental generation failed:', error);
+      alert('이미지 생성 중 오류가 발생했습니다.');
     } finally {
       setIsGenerating(false);
     }
@@ -759,24 +785,40 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                 </h3>
 
                 <div className="max-h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-hide">
-                  {generatedData.panels.map((panel: any, idx: number) => (
-                    <div key={idx} className="relative group rounded-[24px] overflow-hidden border border-line shadow-lg">
-                      <img src={panel.imageUrl} alt={`Panel ${panel.panelNumber}`} className="w-full h-auto" />
-                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="bg-white/90 backdrop-blur-sm hover:bg-white text-obsidian font-bold text-xs shadow-xl"
-                          onClick={() => handleRegeneratePanel(panel.panelNumber)}
-                          disabled={isGenerating}
-                        >
-                          <RefreshCcw className={`w-3 h-3 mr-1 ${isGenerating ? 'animate-spin' : ''}`} />
-                          다시 만들기
-                        </Button>
+                    {generatedData.panels.map((panel: any, idx: number) => (
+                      <div key={idx} className="relative group rounded-[24px] overflow-hidden border border-line shadow-lg bg-mist/10 aspect-video flex flex-col items-center justify-center">
+                        {panel.imageUrl ? (
+                          <>
+                            <img src={panel.imageUrl} alt={`Panel ${panel.panelNumber}`} className="w-full h-auto animate-in fade-in duration-500" />
+                            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="bg-white/90 backdrop-blur-sm hover:bg-white text-obsidian font-bold text-xs shadow-xl"
+                                onClick={() => handleRegeneratePanel(panel.panelNumber)}
+                                disabled={isGenerating}
+                              >
+                                <RefreshCcw className={`w-3 h-3 mr-1 ${isGenerating ? 'animate-spin' : ''}`} />
+                                다시 만들기
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center space-y-4">
+                            <div className="relative">
+                              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-[10px] font-black">{panel.panelNumber}</span>
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs font-black text-obsidian animate-pulse">유니클이 그리는 중...</p>
+                              <p className="text-[10px] text-slate/40 mt-1 uppercase tracking-widest leading-none">Drawing Panel {panel.panelNumber}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-
-                    </div>
-                  ))}
+                    ))}
                 </div>
                 <p className="text-[10px] text-slate/60 text-center uppercase tracking-widest font-black">Scroll to read more</p>
               </div>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const maxDuration = 120; // 120초로 확장 (Vercel Pro 이상 대응 또는 취미 요금제 기본값 보완)
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
