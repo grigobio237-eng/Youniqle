@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 
 import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
 import Hero from '@/components/home/Hero';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
@@ -89,9 +90,10 @@ function SearchParamsHandler({
 // 4. Main Component
 // ---------------------------
 export default function HomePage() {
+  const { data: session } = useSession();
   const { journey, medicalCategory } = useRecovery();
   const router = useRouter();
-  const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT' | 'DASHBOARD'>('CHECK');
+  const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT'>('CHECK');
   const [score, setScore] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);
   const [userNote, setUserNote] = React.useState('');
@@ -147,17 +149,47 @@ export default function HomePage() {
     }
   };
 
-  const handleComplete = (rawScore: number, finalAnswers: any[], note: string) => {
+  const handleComplete = async (rawScore: number, finalAnswers: any[], note: string) => {
     setScore(rawScore); // This is 0-25 raw score
     setAnswers(finalAnswers);
     setUserNote(note);
     setViewState('RESULT');
+
+    // 로그인한 경우 DB에 자동 저장
+    if (session?.user?.email) {
+      try {
+        const unifiedScore = 100 - (rawScore * 4);
+        await fetch('/api/diagnosis/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'daily',
+            result: {
+              totalScore: unifiedScore,
+              convertedScores: {
+                physical: unifiedScore, // 60초 진단은 대표 점수를 모든 카테고리에 일단 할당
+                mental: unifiedScore,
+                lifestyle: unifiedScore,
+                sleep: unifiedScore
+              }
+            },
+            answers: finalAnswers.reduce((acc, curr) => {
+              acc[curr.questionId] = curr.score;
+              return acc;
+            }, {})
+          })
+        });
+        console.log('Daily diagnosis saved to DB');
+      } catch (error) {
+        console.error('Failed to save daily diagnosis:', error);
+      }
+    }
+    
+    // 로컬 스토리지에도 항상 저장 (Dashboard 연동용)
+    localStorage.setItem('recovery_last_score', (100 - (rawScore * 4)).toString());
   };
 
   const handleEnterDashboard = () => {
-    // recalculate stored score to pass (since dashboard expects 0-100)
-    const s = 100 - (score * 4);
-    setScore(s);
     router.push('/ai-navigator');
   };
 
@@ -166,7 +198,6 @@ export default function HomePage() {
     if (viewState === 'CHECK') return <div className="min-h-screen bg-mist" />; // Loading
     if (viewState === 'QUESTION') return <DiagnosisForm questions={questions} onComplete={handleComplete} />;
     if (viewState === 'RESULT') return <ResultDisplay score={score} answers={answers} userNote={userNote} analysisData={analysisData} onEnter={handleEnterDashboard} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
-    if (viewState === 'DASHBOARD') return <DashboardPreview score={score} onOpenWebtoon={handleOpenWebtoon} />;
     
     // Default: Always show Hero + LandingContent (INTRO)
     return (

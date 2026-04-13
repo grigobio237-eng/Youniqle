@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { Button } from '@/components/ui/button';
 import { Question } from '@/types/diagnosis';
 
 const DashboardPreview = dynamic(() => import('@/components/home/DashboardPreview'), { ssr: false });
@@ -44,12 +45,31 @@ export default function DashboardPage() {
 
   // If no data (no diagnosis), show prompt
   if (!data || (!data.score?.diagnosisScore && !data.score?.scanScore)) {
+    // Check if we have a score in localStorage to prevent infinite loop for fresh diagnosers
+    const localScore = typeof window !== 'undefined' ? localStorage.getItem('recovery_last_score') : null;
+    
+    if (localScore) {
+      // Re-trigger fetch or show temporary state instead of redirecting immediately
+      return (
+        <div className="min-h-screen bg-mist flex flex-col items-center justify-center p-6 text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <h2 className="text-xl font-bold text-obsidian">회복 데이터를 동기화하는 중입니다...</h2>
+          <p className="text-sm text-slate">최근 수행하신 {localScore}점의 진단 결과를 불러오고 있습니다.</p>
+          <Button variant="ghost" onClick={() => window.location.reload()}>다시 시도</Button>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-mist flex flex-col items-center justify-center p-6 text-center space-y-6">
         <h1 className="text-3xl font-bold text-obsidian tracking-tight">회복 데이터가 아직 기록되지 않았습니다.</h1>
         <p className="text-slate/70 max-w-sm mx-auto">유니클의 정밀 진단 혹은 스캐너를 통해<br />첫 번째 회복 데이터를 생성해보세요.</p>
         <button 
-          onClick={() => window.location.href = '/?action=diagnose'}
+          onClick={() => {
+            // Clear any stale local score to allow a fresh start if they click this
+            localStorage.removeItem('recovery_last_score');
+            window.location.href = '/?action=diagnose';
+          }}
           className="px-10 py-5 bg-obsidian text-white rounded-[24px] font-black italic tracking-widest hover:scale-105 transition-transform shadow-2xl"
         >
           진단 시작하기

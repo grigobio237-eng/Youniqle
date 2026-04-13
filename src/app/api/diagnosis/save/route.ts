@@ -41,6 +41,14 @@ export async function POST(request: NextRequest) {
                 rawScores: result.rawScores,
                 lowestCategory: result.lowestCategory
             };
+        } else if (type === 'daily' || type === 'DAILY') {
+            // 60-second Landing Diagnosis
+            scores = result.convertedScores;
+            totalScore = result.totalScore;
+            metadata = {
+                source: '60s-diagnosis',
+                originalRawScore: body.rawScore
+            };
         } else if (type === 'paid' || type === 'deep' || type === 'DEEP') {
             // Deep Diagnosis
             scores = result.tScores.domains;
@@ -71,7 +79,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Diagnosis 모델에 추가 저장 (Recommendation API 연동용)
-        if ((type === 'free' || type === 'paid') && body.answers) {
+        if ((type === 'free' || type === 'paid' || type === 'daily' || type === 'DAILY') && body.answers) {
             try {
                 let categoryScores = {
                     physical: 0,
@@ -111,6 +119,9 @@ export async function POST(request: NextRequest) {
                             qData = FULL_DIAGNOSIS_QUESTIONS.find(q => q.id === Number(qId));
                         } else if (type.toUpperCase() === 'DEEP') {
                             qData = IPIP60_QUESTIONS.find(q => q.id === Number(qId));
+                        } else if (type === 'daily' || type === 'DAILY') {
+                            // Search in ALL_QUESTIONS or handle as generic
+                            qData = ALL_QUESTIONS.find(q => q.id === qId);
                         } else {
                             // Free: ID is string (M1-1 etc)
                             qData = ALL_QUESTIONS.find(q => q.id === qId);

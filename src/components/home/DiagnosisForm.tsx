@@ -158,7 +158,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
           </div>
 
           {/* Conditional Medicine Detail Input */}
-          {isMedicineQuestion && currentAnswer && currentAnswer.score > 0 && (
+          {isMedicineQuestion && currentAnswer && !currentAnswer.answer.includes('없음') && !currentAnswer.answer.includes('해당 사항 없음') && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
