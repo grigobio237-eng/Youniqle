@@ -7,12 +7,17 @@ import { Sparkles, BarChart3, Map, Lightbulb, Zap, Shield, Crown, Users, Camera,
 import { motion } from 'framer-motion';
 import { AnalysisResult } from './HeroScanner';
 
-export default function LandingContent({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
+interface LandingContentProps {
+  onStart: (data?: AnalysisResult) => void;
+  onStartTherapy?: () => void;
+}
+
+export default function LandingContent({ onStart, onStartTherapy }: LandingContentProps) {
   const router = useRouter();
   
   const utilities = [
     {
-      title: "YOUNIQLE Sensory Scanner",
+      title: "센서리 스캐너 (Sensory Scanner)",
       desc: "공간의 분위기와 식단의 영양을 한 번에 스캔하여 현재의 회복 상태를 분석합니다.",
       icon: <Camera className="w-6 h-6" />,
       color: "bg-chapter-accent",
@@ -20,7 +25,7 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
       link: "#scanner"
     },
     {
-      title: "60s Diagnosis",
+      title: "60초 정밀 진단 (Recovery Diagnosis)",
       desc: "과학적인 질문 알고리즘을 통해 당신의 신체적, 정신적 회복 필요도를 정밀 측정합니다.",
       icon: <Activity className="w-6 h-6" />,
       color: "bg-reward-gold",
@@ -28,20 +33,20 @@ export default function LandingContent({ onStart }: { onStart: (data?: AnalysisR
       onClick: onStart
     },
     {
-      title: "Video Analysis",
+      title: "자세 분석 (Posture Analysis)",
       desc: "한 장의 사진으로 거북목과 회복 자세를 유니클이 분석하여 고품격 교정 가이드를 드립니다.",
-      icon: <Video className="w-6 h-6" />,
+      icon: <Activity className="w-6 h-6" />,
       color: "bg-status-normal",
       action: "스냅샷 분석",
       link: "/analysis/video"
     },
     {
-      title: "Sound Therapy",
+      title: "사운드 테라피 (Sound Therapy)",
       desc: "회복 주파수와 사운드스케이프를 통해 깊은 이완과 명상의 시간을 제공합니다.",
       icon: <Music className="w-6 h-6" />,
       color: "bg-obsidian",
       action: "청취하기",
-      link: "/therapy/sound"
+      onClick: onStartTherapy
     }
   ];
 

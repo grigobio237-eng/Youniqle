@@ -8,6 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useRecovery } from '@/contexts/RecoveryContext';
+import { useSession } from 'next-auth/react';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
+import { Save } from 'lucide-react';
 
 export interface AnalysisResult {
     subjectName: string;
@@ -25,8 +28,12 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
     const [loading, setLoading] = useState(false);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
+    const [showUpsell, setShowUpsell] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
     
     // PC Webcam States
+    const { data: session } = useSession();
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [showWebcam, setShowWebcam] = useState(false);
     
@@ -120,6 +127,7 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
     const analyzeImage = async (imageData: string) => {
         setStatus('scanning');
         setLoading(true);
+        setHasSaved(false); // Reset save state for new scan
         stopWebcam();
 
         try {
@@ -146,6 +154,48 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
             setStatus('idle');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSaveToTimeline = async () => {
+        if (!session) {
+            toast.error("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        const pass = (session.user as any).passInfo;
+        const isActivePass = pass && pass.status === 'ACTIVE' && pass.type !== 'NONE';
+
+        if (!isActivePass) {
+            setShowUpsell(true);
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const response = await fetch('/api/scan/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: result?.type || 'OTHER',
+                    imageData: capturedImage,
+                    score: result?.matchScore,
+                    summary: result?.summary,
+                    metrics: result?.analysisTable
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || '저장에 실패했습니다.');
+            }
+            
+            toast.success('스캔 타임라인에 기록되었습니다.');
+            setHasSaved(true);
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -306,94 +356,26 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                         </div>
 
                         {/* Nudge to Diagnosis */}
-                        <div className="pt-6 border-t border-line space-y-6">
-                            <div className="text-center space-y-2">
-                                <h4 className="text-xl font-black text-obsidian tracking-tight">회복 여정을 선택하세요</h4>
-                                <p className="text-[10px] font-bold text-slate/60 uppercase tracking-widest">Select your path to get precision feedback</p>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button 
-                                        onClick={() => setJourney('CLINICAL_PRE')}
-                                        className={`p-5 rounded-[24px] text-left border-4 transition-all duration-300 ${journey?.startsWith('CLINICAL') ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line hover:border-chapter-accent'}`}
-                                    >
-                                        <div className="text-sm font-black text-obsidian uppercase mb-1 flex items-center gap-2">
-                                            Clinical {journey?.startsWith('CLINICAL') && <Check className="w-3 h-3 text-chapter-accent" />}
-                                        </div>
-                                        <div className="text-[10px] text-slate/60 font-medium">시술/수술 전문 집중 케어</div>
-                                    </button>
-                                    <button 
-                                        onClick={() => setJourney('WELLNESS')}
-                                        className={`p-5 rounded-[24px] text-left border-4 transition-all duration-300 ${journey === 'WELLNESS' ? 'border-status-normal bg-status-normal/5' : 'border-line hover:border-status-normal'}`}
-                                    >
-                                        <div className="text-sm font-black text-obsidian uppercase mb-1 flex items-center gap-2">
-                                            Wellness {journey === 'WELLNESS' && <Check className="w-3 h-3 text-status-normal" />}
-                                        </div>
-                                        <div className="text-[10px] text-slate/60 font-medium">일상 리듬 & 활력 최적화</div>
-                                    </button>
-                                </div>
-
-                                {/* Clinical Sub-selection */}
-                                <AnimatePresence>
-                                    {journey?.startsWith('CLINICAL') && (
-                                        <motion.div 
-                                            initial={{ opacity: 0, height: 0 }} 
-                                            animate={{ opacity: 1, height: 'auto' }} 
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="bg-mist/50 p-4 rounded-[24px] border border-line overflow-hidden space-y-4"
-                                        >
-                                            <div className="space-y-2">
-                                                <div className="text-[10px] font-black text-slate/60 uppercase tracking-widest text-center">여정 단계 선택</div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <button 
-                                                        onClick={() => setJourney('CLINICAL_PRE')}
-                                                        className={`py-3 px-4 rounded-xl text-xs font-bold transition-all ${journey === 'CLINICAL_PRE' ? 'bg-chapter-accent text-white shadow-lg' : 'bg-white text-slate hover:bg-white/80'}`}
-                                                    >
-                                                        시술 전 (준비)
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => {
-                                                            setJourney('CLINICAL_POST');
-                                                            setMedicalCategory(null); // Reset category if switching to POST if needed
-                                                        }}
-                                                        className={`py-3 px-4 rounded-xl text-xs font-bold transition-all ${journey === 'CLINICAL_POST' ? 'bg-chapter-accent text-white shadow-lg' : 'bg-white text-slate hover:bg-white/80'}`}
-                                                    >
-                                                        시술 후 (회복)
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Medical Category Selection (Option B) */}
-                                            {journey === 'CLINICAL_PRE' && (
-                                                <motion.div 
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    className="pt-3 border-t border-line/30 space-y-3"
-                                                >
-                                                    <div className="text-[10px] font-black text-slate/60 uppercase tracking-widest text-center">관심 진료 분야 선택</div>
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        {[
-                                                            { id: 'PLASTIC', label: '성형/피부' },
-                                                            { id: 'ORTHOPEDIC', label: '정형/재활' },
-                                                            { id: 'INTERNAL', label: '내과/검진' },
-                                                            { id: 'GENERAL', label: '기기/대형병원' }
-                                                        ].map((cat) => (
-                                                            <button 
-                                                                key={cat.id}
-                                                                onClick={() => setMedicalCategory(cat.id as any)}
-                                                                className={`py-3 px-2 rounded-xl text-[11px] font-bold border transition-all ${medicalCategory === cat.id ? 'bg-obsidian text-white border-obsidian shadow-md' : 'bg-white text-slate border-line hover:border-obsidian'}`}
-                                                            >
-                                                                {cat.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </motion.div>
+                        <div className="pt-6 border-t border-line space-y-4">
+                            {!hasSaved ? (
+                                <Button 
+                                    onClick={handleSaveToTimeline}
+                                    disabled={isSaving}
+                                    variant="outline"
+                                    className="w-full h-14 rounded-2xl border-2 border-chapter-accent/20 text-chapter-accent font-black uppercase tracking-widest hover:bg-chapter-accent/5 transition-all flex items-center justify-center gap-2"
+                                >
+                                    {isSaving ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        <Save className="w-5 h-5" />
                                     )}
-                                </AnimatePresence>
-                            </div>
+                                    스캔 타임라인에 저장하기
+                                </Button>
+                            ) : (
+                                <div className="w-full h-14 rounded-2xl bg-status-normal/10 border-2 border-status-normal/20 text-status-normal flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest">
+                                    <Check className="w-5 h-5" /> 저장 완료
+                                </div>
+                            )}
 
                             <Button 
                                 onClick={() => onStart(result || undefined)}
@@ -415,6 +397,7 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                         </Button>
                     </CardContent>
                 </Card>
+                <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
             </motion.div>
         );
     };

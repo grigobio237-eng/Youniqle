@@ -15,6 +15,7 @@ const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), {
 const DashboardPreview = dynamic(() => import('@/components/home/DashboardPreview'), { ssr: false });
 const WebtoonChallengeDialog = dynamic(() => import('@/components/home/WebtoonChallengeDialog'), { ssr: false });
 const LandingContent = dynamic(() => import('@/components/home/LandingContent'), { ssr: false });
+const SoundTherapy = dynamic(() => import('@/components/utils/SoundTherapy'), { ssr: false });
 
 // ---------------------------
 // 2. Welcome Modal Component
@@ -60,10 +61,12 @@ function WelcomeModal() {
 // ---------------------------
 function SearchParamsHandler({
   onOpenWebtoon,
-  onDiagnose
+  onDiagnose,
+  onOpenSound
 }: {
   onOpenWebtoon: () => void;
   onDiagnose: () => void;
+  onOpenSound?: () => void;
 }) {
   const searchParams = useSearchParams();
 
@@ -74,7 +77,10 @@ function SearchParamsHandler({
     if (searchParams?.get('action') === 'diagnose') {
       onDiagnose();
     }
-  }, [searchParams, onOpenWebtoon, onDiagnose]);
+    if (searchParams?.get('tool') === 'sound') {
+      onOpenSound?.();
+    }
+  }, [searchParams, onOpenWebtoon, onDiagnose, onOpenSound]);
 
   return null;
 }
@@ -93,6 +99,7 @@ export default function HomePage() {
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const [currentQuestionsKey, setCurrentQuestionsKey] = React.useState<string | null>(null);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
+  const [showSoundModal, setShowSoundModal] = useState(false);
 
   useEffect(() => {
     // welcome=true 인 경우(신규 가입) → 랜딩 그대로 보여줌
@@ -165,7 +172,7 @@ export default function HomePage() {
     return (
       <>
         <Hero onStart={handleStart} />
-        <LandingContent onStart={handleStart} />
+        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} />
       </>
     );
   }
@@ -177,6 +184,7 @@ export default function HomePage() {
         <SearchParamsHandler
           onOpenWebtoon={handleOpenWebtoon}
           onDiagnose={handleStart}
+          onOpenSound={() => setShowSoundModal(true)}
         />
       </React.Suspense>
       <WebtoonChallengeDialog
@@ -184,6 +192,11 @@ export default function HomePage() {
         onOpenChange={setShowWebtoonDialog}
         recoveryData={{ score, answers, userNote }}
       />
+      <Dialog open={showSoundModal} onOpenChange={setShowSoundModal}>
+        <DialogContent className="max-w-5xl p-0 bg-transparent border-none overflow-hidden sm:rounded-[40px]">
+          <SoundTherapy />
+        </DialogContent>
+      </Dialog>
       {renderContent()}
     </>
   );

@@ -181,6 +181,14 @@ export interface IUser extends Document {
     metadata?: any;
     createdAt: Date;
   }>;
+  scanTimeline?: Array<{
+    type: 'MEAL' | 'SPACE' | 'STATE' | 'POSTURE';
+    imageUrl: string;
+    score: number;
+    summary: string;
+    metrics: any;
+    createdAt: Date;
+  }>;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -431,6 +439,14 @@ const UserSchema = new Schema<IUser>({
     scores: { type: Map, of: Number },
     totalScore: { type: Number },
     metadata: { type: Schema.Types.Mixed },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  scanTimeline: [{
+    type: { type: String, enum: ['MEAL', 'SPACE', 'STATE', 'POSTURE'], required: true },
+    imageUrl: { type: String, required: true },
+    score: { type: Number },
+    summary: { type: String },
+    metrics: { type: Schema.Types.Mixed },
     createdAt: { type: Date, default: Date.now }
   }]
 }, {

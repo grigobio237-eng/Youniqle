@@ -6,6 +6,9 @@ import { Camera, RefreshCcw, Sparkles, Loader2, ArrowLeft, Check, X, AlertCircle
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
+import { Save, Activity } from 'lucide-react';
 
 interface PostureResult {
     subjectName: string;
@@ -23,6 +26,12 @@ export default function PostureScanner() {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<PostureResult | null>(null);
     const [loading, setLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
+    const [showUpsell, setShowUpsell] = useState(false);
+    
+    // PC Webcam States
+    const { data: session } = useSession();
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -136,7 +145,56 @@ export default function PostureScanner() {
         stopWebcam();
         setCapturedImage(null);
         setResult(null);
+        setHasSaved(false);
         setStatus('idle');
+    };
+
+    const handleSaveToTimeline = async () => {
+        if (!session) {
+            toast.error("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        if (!result || !capturedImage) return;
+
+        const pass = (session.user as any).passInfo;
+        const isActivePass = pass && pass.status === 'ACTIVE' && pass.type !== 'NONE';
+
+        if (!isActivePass) {
+            setShowUpsell(true);
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const response = await fetch('/api/scan/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'POSTURE',
+                    imageData: capturedImage,
+                    score: result.score,
+                    summary: result.summary,
+                    metrics: {
+                        turtleNeckAngle: result.turtleNeckAngle,
+                        shoulderBalance: result.shoulderBalance,
+                        analysisTable: result.analysisTable
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || '저장에 실패했습니다.');
+            }
+            
+            toast.success('스캔 타임라인에 기록되었습니다.');
+            setHasSaved(true);
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -297,25 +355,40 @@ export default function PostureScanner() {
                                     </div>
                                 </div>
 
-                                <Button 
-                                    onClick={resetAnalysis}
-                                    className="w-full h-16 rounded-[24px] border-2 border-line bg-white hover:bg-mist text-obsidian font-black italic uppercase tracking-widest"
-                                >
-                                    New Session
-                                </Button>
+                                <div className="space-y-4">
+                                    {!hasSaved ? (
+                                        <Button 
+                                            onClick={handleSaveToTimeline}
+                                            disabled={isSaving}
+                                            className="w-full h-16 rounded-[24px] bg-chapter-accent text-white font-black italic uppercase tracking-widest shadow-xl shadow-chapter-accent/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                                        >
+                                            {isSaving ? (
+                                                <Loader2 className="w-6 h-6 animate-spin" />
+                                            ) : (
+                                                <Save className="w-6 h-6" />
+                                            )}
+                                            스캔 타임라인에 저장하기
+                                        </Button>
+                                    ) : (
+                                        <div className="w-full h-16 rounded-[24px] bg-status-normal/10 border-2 border-status-normal/20 text-status-normal flex items-center justify-center gap-2 font-black italic uppercase tracking-widest">
+                                            <Check className="w-6 h-6" /> SAVE COMPLETE
+                                        </div>
+                                    )}
+
+                                    <Button 
+                                        onClick={resetAnalysis}
+                                        variant="outline"
+                                        className="w-full h-14 rounded-[20px] border-2 border-line bg-white hover:bg-mist text-slate/60 font-black italic uppercase tracking-widest text-xs"
+                                    >
+                                        New Session
+                                    </Button>
+                                </div>
                             </div>
+                            <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
         </div>
-    );
-}
-
-function Activity({ className }: { className?: string }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
     );
 }

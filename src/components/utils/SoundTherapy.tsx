@@ -12,22 +12,22 @@ import { SoundVisualizer } from '@/components/therapy/SoundVisualizer';
 import { toast } from 'sonner';
 
 const FREQUENCIES = [
-  { id: 'delta', name: '432Hz', desc: '깊은 수면과 세포 재생', freq: 432 },
-  { id: 'theta', name: '528Hz', desc: 'DNA 회복 및 기적의 주파수', freq: 528 },
-  { id: 'alpha', name: '639Hz', desc: '관계 회복 및 사랑의 파동', freq: 639 },
-  { id: 'solfeggio', name: '741Hz', desc: '직관 및 정화의 주파수', freq: 741 },
+  { id: 'delta', name: '편안한', desc: '깊은 수면과 세포 재생 (432Hz)', freq: 432 },
+  { id: 'theta', name: '상쾌한', desc: '창의력 및 에너지 회복 (528Hz)', freq: 528 },
+  { id: 'alpha', name: '차분한', desc: '마음의 안정과 조화 (639Hz)', freq: 639 },
+  { id: 'solfeggio', name: '맑은', desc: '직관력 향상 및 정화 (741Hz)', freq: 741 },
 ];
 
 const BASIC_NOISES = [
-  { id: 'white', name: 'White', icon: <Wind className="w-5 h-5" /> },
-  { id: 'pink', name: 'Pink', icon: <Waves className="w-5 h-5" /> },
-  { id: 'brown', name: 'Brown', icon: <Headphones className="w-5 h-5" /> },
+  { id: 'white', name: '백색 소음', icon: <Wind className="w-5 h-5" /> },
+  { id: 'pink', name: '핑크 노이즈', icon: <Waves className="w-5 h-5" /> },
+  { id: 'brown', name: '브라운 노이즈', icon: <Headphones className="w-5 h-5" /> },
 ];
 
 const NATURE_LAYERS = [
-  { id: 'rain', name: 'Rain', icon: <CloudRain className="w-5 h-5" />, color: 'text-blue-400' },
-  { id: 'forest', name: 'Forest', icon: <Trees className="w-5 h-5" />, color: 'text-green-400' },
-  { id: 'fire', name: 'Fire', icon: <Flame className="w-5 h-5" />, color: 'text-orange-400' },
+  { id: 'rain', name: '빗소리', icon: <CloudRain className="w-5 h-5" />, color: 'text-blue-400' },
+  { id: 'forest', name: '숲소리', icon: <Trees className="w-5 h-5" />, color: 'text-green-400' },
+  { id: 'fire', name: '모닥불', icon: <Flame className="w-5 h-5" />, color: 'text-orange-400' },
 ];
 
 export default function SoundTherapy() {
@@ -120,6 +120,14 @@ export default function SoundTherapy() {
     } else if (selectedNature.id === 'forest') {
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(800, audioCtx.current.currentTime);
+        // Wind LFO for dynamic movement
+        const lfo = audioCtx.current.createOscillator();
+        const lfoGain = audioCtx.current.createGain();
+        lfo.frequency.value = 0.12; 
+        lfoGain.gain.value = 450;
+        lfo.connect(lfoGain);
+        lfoGain.connect(filter.frequency);
+        lfo.start();
     } else if (selectedNature.id === 'fire') {
         filter.type = 'highpass';
         filter.frequency.setValueAtTime(2000, audioCtx.current.currentTime);
@@ -249,8 +257,8 @@ export default function SoundTherapy() {
                               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Moon className="w-8 h-8 text-white/20" />
                               </div>
-                              <h2 className="text-4xl font-serif italic font-light tracking-tight text-white mb-2">Deep<br/>Therapy</h2>
-                              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Ready to heal</p>
+                              <h2 className="text-4xl font-serif italic font-light tracking-tight text-white mb-2">Deep Recovery</h2>
+                              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">심층 사운드 테라피</p>
                           </motion.div>
                       )}
                   </AnimatePresence>
@@ -264,24 +272,25 @@ export default function SoundTherapy() {
                   isPlaying ? 'bg-chapter-accent text-white border-chapter-accent' : 'bg-white text-black hover:scale-[1.02]'
               }`}
           >
-              {isPlaying ? <><Pause className="mr-3 w-6 h-6" /> Stop session</> : <><Play className="mr-3 w-6 h-6" /> Start Session</>}
+              {isPlaying ? <><Pause className="mr-3 w-6 h-6" /> 세션 종료</> : <><Play className="mr-3 w-6 h-6" /> 회복 세션 시작</>}
           </Button>
         </div>
 
         <div className="lg:col-span-12 xl:col-span-7 space-y-6">
           <div className={cardStyle}>
               <div className="flex justify-between items-center">
-                  <div className={labelStyle}><Zap className="w-4 h-4 text-chapter-accent" /> Base Frequency</div>
+                  <div className={labelStyle}><Zap className="w-4 h-4 text-chapter-accent" /> 기본 치유 주파수 (Frequency)</div>
                   <span className="text-[10px] font-black text-white/40">{Math.round(freqVolume * 100)}%</span>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                   {FREQUENCIES.map(f => (
                       <button key={f.id} onClick={() => setSelectedFreq(f)}
-                          className={`py-3 rounded-xl text-center border transition-all ${
+                          className={`py-3 rounded-xl text-center border transition-all flex flex-col items-center justify-center gap-1 ${
                               selectedFreq.id === f.id ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
                           }`}
                       >
                           <p className="text-sm font-serif italic font-bold">{f.name}</p>
+                          <p className="text-[8px] opacity-40">{f.freq}Hz</p>
                       </button>
                   ))}
               </div>
@@ -291,17 +300,18 @@ export default function SoundTherapy() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className={cardStyle}>
                   <div className="flex justify-between items-center">
-                      <div className={labelStyle}><Headphones className="w-4 h-4" /> Noise</div>
+                      <div className={labelStyle}><Headphones className="w-4 h-4" /> 배경 소음 (Noise)</div>
                       <span className="text-[10px] font-black text-white/40">{Math.round(noiseVolume * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
                       {BASIC_NOISES.map(n => (
                           <button key={n.id} onClick={() => setSelectedNoise(n)}
-                              className={`flex-1 h-12 rounded-xl border transition-all flex items-center justify-center ${
+                              className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center ${
                                   selectedNoise.id === n.id ? 'bg-white/20 text-white border-white/20' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
                               }`}
                           >
                               {n.icon}
+                              <span className="text-[9px] font-bold opacity-60">{n.name}</span>
                           </button>
                       ))}
                   </div>
@@ -310,17 +320,18 @@ export default function SoundTherapy() {
 
               <div className={`${cardStyle} bg-chapter-accent/5`}>
                   <div className="flex justify-between items-center">
-                      <div className={`${labelStyle} text-chapter-accent/80`}><CloudRain className="w-4 h-4" /> Nature</div>
+                      <div className={`${labelStyle} text-chapter-accent/80`}><CloudRain className="w-4 h-4" /> 자연의 소리 (Nature)</div>
                       <span className="text-[10px] font-black text-chapter-accent/60">{Math.round(natureVolume * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
                       {NATURE_LAYERS.map(n => (
                           <button key={n.id} onClick={() => setSelectedNature(n)}
-                              className={`flex-1 h-12 rounded-xl border transition-all flex items-center justify-center ${
+                              className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center ${
                                   selectedNature.id === n.id ? 'bg-chapter-accent text-white border-chapter-accent/40' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
                               }`}
                           >
                               {n.icon}
+                              <span className="text-[9px] font-bold opacity-80">{n.name}</span>
                           </button>
                       ))}
                   </div>
@@ -330,7 +341,7 @@ export default function SoundTherapy() {
 
           <div className={`${cardStyle} bg-white/[0.08]`}>
               <div className="flex justify-between items-center">
-                  <div className={labelStyle}><Volume2 className="w-5 h-5" /> Master Volume</div>
+                  <div className={labelStyle}><Volume2 className="w-5 h-5" /> 전체 볼륨 조절</div>
                   <span className="text-sm font-black italic">{Math.round(masterVolume * 100)}%</span>
               </div>
               <Slider value={[masterVolume]} max={1} step={0.01} onValueChange={v => setMasterVolume(v[0])} className="pt-2" />

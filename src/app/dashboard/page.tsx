@@ -9,47 +9,48 @@ const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), {
 const WebtoonChallengeDialog = dynamic(() => import('@/components/home/WebtoonChallengeDialog'), { ssr: false });
 
 export default function DashboardPage() {
-  const [score, setScore] = useState(0);
-  const [answers, setAnswers] = useState<any[]>([]);
-  const [userNote, setUserNote] = useState('');
+  const [data, setData] = useState<any>(null);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedScore = localStorage.getItem('recovery_last_score');
-    const storedAnswers = localStorage.getItem('recovery_last_answers');
-    const storedNote = localStorage.getItem('recovery_last_note');
-
-    if (storedScore) {
-      setScore(parseInt(storedScore));
-    }
-    if (storedAnswers) {
+    async function fetchDashboardData() {
       try {
-        setAnswers(JSON.parse(storedAnswers));
-      } catch (e) {
-        console.error('Failed to parse answers:', e);
+        const response = await fetch('/api/user/status');
+        if (response.ok) {
+          const result = await response.json();
+          setData(result);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
       }
     }
-    if (storedNote) {
-      setUserNote(storedNote);
-    }
-    setLoading(false);
+    fetchDashboardData();
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen bg-mist flex items-center justify-center">데이터를 불러오는 중...</div>;
+    return (
+      <div className="min-h-screen bg-mist flex flex-col items-center justify-center space-y-4">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-chapter-accent/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-chapter-accent border-t-transparent rounded-full animate-spin" />
+        </div>
+        <p className="text-obsidian font-bold tracking-widest uppercase text-xs">Syncing Recovery Data...</p>
+      </div>
+    );
   }
 
-  // If no score, we could redirect to home/diagnose, 
-  // but for now let's just show a prompt or a default preview
-  if (!score) {
+  // If no data (no diagnosis), show prompt
+  if (!data || (!data.score?.diagnosisScore && !data.score?.scanScore)) {
     return (
       <div className="min-h-screen bg-mist flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <h1 className="text-3xl font-bold text-obsidian">진단 데이터가 없습니다.</h1>
-        <p className="text-slate/70">먼저 60초 회복 진단을 통해 당신의 상태를 확인해보세요.</p>
+        <h1 className="text-3xl font-bold text-obsidian tracking-tight">회복 데이터가 아직 기록되지 않았습니다.</h1>
+        <p className="text-slate/70 max-w-sm mx-auto">유니클의 정밀 진단 혹은 스캐너를 통해<br />첫 번째 회복 데이터를 생성해보세요.</p>
         <button 
           onClick={() => window.location.href = '/?action=diagnose'}
-          className="px-8 py-4 bg-chapter-accent text-white rounded-full font-bold hover:scale-105 transition-transform"
+          className="px-10 py-5 bg-obsidian text-white rounded-[24px] font-black italic tracking-widest hover:scale-105 transition-transform shadow-2xl"
         >
           진단 시작하기
         </button>
@@ -60,13 +61,16 @@ export default function DashboardPage() {
   return (
     <>
       <DashboardPreview 
-        score={score} 
+        unifiedData={data} 
         onOpenWebtoon={() => setShowWebtoonDialog(true)} 
       />
       <WebtoonChallengeDialog
         open={showWebtoonDialog}
         onOpenChange={setShowWebtoonDialog}
-        recoveryData={{ score, answers, userNote }}
+        recoveryData={{ 
+          score: data.score.totalScore, 
+          recentActivity: data.recentActivity 
+        }}
       />
     </>
   );

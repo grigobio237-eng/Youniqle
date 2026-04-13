@@ -221,10 +221,11 @@ export const authOptions: AuthOptions = {
         token.gender = (user as any).gender;
         token.isNavigator = (user as any).isNavigator;
         token.recentNavigator = (user as any).recentNavigator;
+        token.passInfo = (user as any).passInfo;
       }
 
       // 사용자 정보 로드 및 추천 코드 동기화
-      if (token.email && (!token.role || !token.subscription || token.referralCode === undefined)) {
+      if (token.email && (!token.role || !token.subscription || !token.passInfo || token.referralCode === undefined)) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });
@@ -233,6 +234,7 @@ export const authOptions: AuthOptions = {
             token.grade = dbUser.grade;
             token.tier = dbUser.tier;
             token.subscription = dbUser.subscription;
+            token.passInfo = dbUser.passInfo;
             token.referredBy = dbUser.referredBy;
             token.gender = dbUser.gender;
             token.isNavigator = dbUser.isNavigator;
@@ -278,6 +280,7 @@ export const authOptions: AuthOptions = {
         (session.user as any).referralCode = token.referralCode as string;
         (session.user as any).isNavigator = token.isNavigator as boolean;
         (session.user as any).recentNavigator = token.recentNavigator as string;
+        (session.user as any).passInfo = token.passInfo;
       }
       return session;
     },

@@ -35,12 +35,12 @@ interface UtilityCard {
 const utilities: UtilityCard[] = [
     {
         id: 'food-scanner',
-        title: '유니클 회복 식단 스캐너',
-        description: '카메라로 식단을 분석하고 현재 내 몸의 회복 데이터를 진단',
+        title: 'YOUNIQLE Sensory Scanner',
+        description: '카메라로 식단과 공간을 분석하고 현재 내 몸의 회복 데이터를 진단',
         icon: '🍱',
         category: ['건강', '회복', '이미지'],
         href: '/utils/food-scanner',
-        badge: 'Youniqle NEW',
+        badge: 'Youniqle CORE',
         stats: { users: '10k+', rating: 5.0 },
     },
     {
@@ -155,13 +155,13 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'mbti',
-        title: '나만의 진단',
-        description: '피부 타입 및 성향 정밀 분석',
+        title: '60s Recovery Diagnosis',
+        description: '과학적 알고리즘으로 당신의 신체적, 정신적 회복도를 정밀하게 진단',
         icon: '🧬',
-        category: ['건강', '생산성'],
+        category: ['건강', '회복'],
         href: '/utils/mbti',
-        badge: 'NEW',
-        stats: { users: 'Hot', rating: 4.9 },
+        badge: 'Youniqle CORE',
+        stats: { users: 'Hot', rating: 5.0 },
     },
     {
         id: 'stretch',
@@ -195,8 +195,8 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'posture',
-        title: '유니클 자세 분석',
-        description: '사진 한 장으로 거북목과 체형 밸런스를 정밀 분석',
+        title: 'YOUNIQLE Posture Analysis',
+        description: '사진 한 장으로 거북목과 체형 밸런스를 정밀하게 분석합니다.',
         icon: '🧘',
         category: ['건강', '회복', '이미지'],
         href: '/utils?tool=posture',
@@ -205,8 +205,8 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'sound',
-        title: '딥 사운드 테라피',
-        description: '회복 주파수와 사운드스케이프로 깊은 이완 경험',
+        title: 'YOUNIQLE Sound Therapy',
+        description: '회복 주파수와 사운드스케이프로 깊은 이완과 치유의 경험',
         icon: '🎧',
         category: ['회복', '건강'],
         href: '/utils?tool=sound',
