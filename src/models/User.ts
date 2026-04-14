@@ -36,7 +36,7 @@ export interface IUser extends Document {
   // 파트너 관련 필드
   partnerStatus: 'none' | 'pending' | 'approved' | 'rejected' | 'suspended';
   partnerApplication?: {
-    partnerType?: 'medical' | 'commerce' | 'trainer';
+    partnerType?: 'medical' | 'commerce' | 'trainer' | 'business';
     businessName: string;
     businessNumber: string;
     businessAddress: string;
@@ -175,7 +175,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   diagnosisResults?: Array<{
-    type: 'free' | 'deep';
+    type: 'free' | 'deep' | 'daily';
     scores: Record<string, number>;
     totalScore: number;
     metadata?: any;
@@ -298,7 +298,7 @@ const UserSchema = new Schema<IUser>({
   partnerApplication: {
     partnerType: {
       type: String,
-      enum: ['medical', 'commerce', 'trainer'],
+      enum: ['medical', 'commerce', 'trainer', 'business'],
       default: 'commerce'
     },
     businessName: { type: String, trim: true },
@@ -435,7 +435,7 @@ const UserSchema = new Schema<IUser>({
     isActive: { type: Boolean, default: true }
   },
   diagnosisResults: [{
-    type: { type: String, enum: ['free', 'deep'], required: true },
+    type: { type: String, enum: ['free', 'deep', 'daily'], required: true },
     scores: { type: Map, of: Number },
     totalScore: { type: Number },
     metadata: { type: Schema.Types.Mixed },

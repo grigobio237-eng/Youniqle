@@ -63,6 +63,7 @@ export default function MyPage() {
     zipCode: '',
     address1: '',
     address2: '',
+    avatar: '',
   });
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -136,6 +137,7 @@ export default function MyPage() {
         zipCode: '',
         address1: '',
         address2: '',
+        avatar: session.user.image || '',
       });
       fetchUserData();
     }
@@ -161,12 +163,14 @@ export default function MyPage() {
             zipCode: defaultAddress.zip || '',
             address1: defaultAddress.addr1 || '',
             address2: defaultAddress.addr2 || '',
+            avatar: u.avatar || session?.user?.image || '',
           }));
         } else {
           setFormData(prev => ({
             ...prev,
             phone: u.phone || '',
             marketingConsent: u.marketingConsent || false,
+            avatar: u.avatar || session?.user?.image || '',
           }));
         }
       }
@@ -233,6 +237,7 @@ export default function MyPage() {
       const updateData: any = {
         phone: formData.phone,
         marketingConsent: formData.marketingConsent,
+        avatar: formData.avatar,
       };
 
       if (formData.zipCode && formData.address1) {
@@ -259,6 +264,36 @@ export default function MyPage() {
     } catch (error) {
       console.error('저장 오류:', error);
       alert('저장 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    try {
+      const webpFile = await convertToWebP(file);
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', webpFile);
+      uploadFormData.append('folder', 'avatars');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData(prev => ({ ...prev, avatar: data.url }));
+      } else {
+        alert('이미지 업로드에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      alert('이미지 처리 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -635,8 +670,14 @@ export default function MyPage() {
                 </CardHeader>
                 <CardContent className="p-6 md:p-10 space-y-8 md:space-y-10">
                   <div className="bg-mist/30 p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-line/30 flex items-center gap-4 md:gap-6">
-                    <div className="relative w-24 h-24 rounded-[32px] overflow-hidden bg-white shadow-md border-4 border-white">
-                      <Image src={session.user?.image || '/placeholder-user.jpg'} alt="" fill className="object-cover" />
+                    <div className="relative w-24 h-24 rounded-[32px] overflow-hidden bg-white shadow-md border-4 border-white group/avatar">
+                      <Image src={formData.avatar || session.user?.image || '/placeholder-user.jpg'} alt="" fill className="object-cover" />
+                      {isEditing && (
+                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                          <Upload className="text-white h-6 w-6" />
+                          <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} aria-label="프로필 이미지 변경" />
+                        </label>
+                      )}
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-obsidian">{session.user?.name}</h3>

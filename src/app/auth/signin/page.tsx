@@ -38,7 +38,7 @@ function SigninContent() {
 
   const handleSocialLogin = async (provider: string) => {
     if (provider === 'google') {
-      const handled = await handleWebViewOAuth(provider, '/');
+      const handled = await handleWebViewOAuth(provider, callbackUrl);
       if (handled) return;
     }
     signIn(provider, { callbackUrl: callbackUrl });

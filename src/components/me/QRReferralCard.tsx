@@ -15,6 +15,7 @@ interface QRReferralCardProps {
 export default function QRReferralCard({ userName, referralCode }: QRReferralCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!referralCode) {
     return (
@@ -52,6 +53,32 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
       console.error('Download failed:', err);
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    // 1. Mobile Native Share
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Youniqle 초대',
+          text: `${userName}님이 당신을 Youniqle에 초대했습니다.`,
+          url: referralLink,
+        });
+        return;
+      } catch (err) {
+        console.log('Share canceled or failed', err);
+      }
+    }
+
+    // 2. Clipboard Fallback
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Clipboard failed', err);
+      alert('자동 복사에 실패했습니다. QR 코드를 이용해 주세요.');
     }
   };
 
@@ -147,8 +174,24 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
             </>
           )}
         </Button>
+        <Button 
+          onClick={handleShare}
+          className="h-16 rounded-2xl bg-white border-2 border-obsidian text-obsidian font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all group hover:bg-slate-50"
+        >
+          {copied ? (
+            <>
+              <ShieldCheck className="w-4 h-4 mr-3 text-emerald-500" />
+              링크 복사 완료
+            </>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />
+              초대 링크 공유하기
+            </>
+          )}
+        </Button>
         <p className="text-[10px] text-center text-slate font-medium leading-relaxed opacity-60">
-          이미지를 저장하여 친구에게 전달하거나 <br /> 병원 카운터에 제시해 주세요.
+          이미지를 저장하거나 링크를 전달하여 <br /> 친구를 초대해 주세요.
         </p>
       </div>
     </div>

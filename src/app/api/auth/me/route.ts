@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
 
     await connectDB();
 
-    const { phone, marketingConsent, zipCode, address1, address2, referralCode } = await request.json();
+    const { avatar, phone, marketingConsent, zipCode, address1, address2, referralCode } = await request.json();
 
     const user = await User.findOne({ email: session.user.email });
     // 추천 코드 최초 등록 (본인 referralCode 생성은 회원가입 시 가능, 여기서는 referredBy 설정을 허용)
@@ -95,6 +95,7 @@ export async function PUT(request: NextRequest) {
     // 사용자 정보 업데이트
     if (phone !== undefined) user.phone = phone;
     if (marketingConsent !== undefined) user.marketingConsent = marketingConsent;
+    if (avatar !== undefined) user.avatar = avatar;
 
     // 주소 정보 업데이트
     if (zipCode && address1) {
