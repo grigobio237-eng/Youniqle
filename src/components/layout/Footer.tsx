@@ -4,6 +4,7 @@ import Link from 'next/link';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface PublicSettings {
   siteName: string;
@@ -41,6 +42,7 @@ interface PublicSettings {
 
 export default function Footer() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [settings, setSettings] = useState<PublicSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,6 +61,13 @@ export default function Footer() {
       console.error('설정 로드 실패:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleProtectedLink = (e: React.MouseEvent) => {
+    if ((session?.user as any)?.role !== 'admin') {
+      e.preventDefault();
+      alert('해당 등급 이외에 접근권한이 없습니다.');
     }
   };
 
@@ -141,13 +150,13 @@ export default function Footer() {
 
         {/* Top Section: Navigation Links */}
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3 py-8 border-b border-line/5 text-[13px]">
-          <Link href="/about" className="text-gray-400 hover:text-white transition-colors">유니클 소개</Link>
-          <Link href="/healing-center" className="text-gray-400 hover:text-white transition-colors">힐링센터</Link>
-          <Link href="/trainer" className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
-          <Link href="/gallery/artworks" className="text-gray-400 hover:text-white transition-colors">갤러리</Link>
-          <Link href="/products/shop" className="text-gray-400 hover:text-white transition-colors">유니클 스토어</Link>
-          <Link href="/community" className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
-          <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} className="text-gray-400 hover:text-white transition-colors">제휴 및 입점문의</a>
+          <Link href="/about" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">유니클 소개</Link>
+          <Link href="/healing-center" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">힐링센터</Link>
+          <Link href="/trainer" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
+          <Link href="/gallery/artworks" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">갤러리</Link>
+          <Link href="/products/shop" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">유니클 스토어</Link>
+          <Link href="/community" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
+          <a href={`mailto:${currentSettings.contactInfo.customerServiceEmail}`} onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">제휴 및 입점문의</a>
         </div>
 
         {/* Middle Section: Legal Links & Copyright */}
@@ -155,7 +164,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium">
             <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-white transition-colors">이용약관</Link>
             <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:underline underline-offset-4">개인정보처리방침</Link>
-            <Link href="/support" className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
+            <Link href="/support" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
           <div className="text-gray-600 text-[11px] tracking-tight">
             © {new Date().getFullYear()} {currentSettings.siteName}. All rights reserved.

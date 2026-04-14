@@ -8,8 +8,10 @@ import Link from 'next/link';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 export default function RecoveryPortalPage() {
+  const { data: session } = useSession();
   const [userScore, setUserScore] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -22,6 +24,13 @@ export default function RecoveryPortalPage() {
       }
     }
   }, []);
+
+  const handleProtectedClick = (e: React.MouseEvent) => {
+    if ((session?.user as any)?.role !== 'admin') {
+      e.preventDefault();
+      alert('해당 등급 이외에 접근권한이 없습니다.');
+    }
+  };
 
   const portalSections = [
     {
@@ -103,7 +112,11 @@ export default function RecoveryPortalPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.3 + idx * 0.1 }}
             >
-              <Link href={section.link} className="group block h-full">
+              <Link 
+                href={section.link} 
+                className="group block h-full"
+                onClick={section.title === '치유의 여정' ? handleProtectedClick : undefined}
+              >
                 <Card className="h-full bg-surface border-line overflow-hidden transition-all duration-500 hover:border-primary/50 group-hover:shadow-[0_0_50px_-12px_rgba(var(--primary-rgb),0.3)]">
                   <div className="aspect-[4/5] relative overflow-hidden">
                     <Image 
