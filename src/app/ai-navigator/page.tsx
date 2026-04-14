@@ -15,6 +15,8 @@ import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
+import { useActivityTracker } from '@/hooks/useActivityTracker';
+
 
 // 카테고리별 상태 메시지
 const CATEGORY_STATUS_MESSAGES: Record<string, Record<string, { message: string; action: string; actionLink: string }>> = {
@@ -63,7 +65,9 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
 
 export default function AiNavigatorPage() {
     const { data: session } = useSession();
+    const { trackEvent } = useActivityTracker();
     const router = useRouter();
+
     const [scoreHistory, setScoreHistory] = useState<any[]>([]);
     const [todayScore, setTodayScore] = useState(0);
     const [categoryScores, setCategoryScores] = useState<any>(null);
@@ -142,6 +146,14 @@ export default function AiNavigatorPage() {
                 setTomorrowForecast(adviceData.tomorrowForecast);
             }
 
+            // 트래킹: 추천 결과 노출
+            trackEvent('recommendation_view', {
+                itemType: 'content',
+                behaviorData: { score: scoreVal },
+                metadata: { context: 'ai-navigator-main' }
+            });
+
+
             // 외부 상품 API 호출
             await fetchExternalProducts();
 
@@ -186,11 +198,17 @@ export default function AiNavigatorPage() {
     };
 
     const handleExternalClick = (product: any) => {
+        trackEvent('recommendation_click', {
+            itemId: product.id,
+            itemType: 'product',
+            metadata: { source: 'external', mall: product.mallName }
+        });
         if (product.isExternal) {
             setSelectedProduct(product);
             setBridgeDialogOpen(true);
         }
     };
+
 
     const handleConfirmNavigation = () => {
         if (selectedProduct?.link) {
@@ -475,8 +493,18 @@ export default function AiNavigatorPage() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {externalProducts.map((product) => (
                                             product.isInternal ? (
-                                                <Link key={product.id} href={product.link} className="block group">
+                                                <Link 
+                                                    key={product.id} 
+                                                    href={product.link} 
+                                                    className="block group"
+                                                    onClick={() => trackEvent('recommendation_click', {
+                                                        itemId: product.id,
+                                                        itemType: 'product',
+                                                        metadata: { source: 'internal' }
+                                                    })}
+                                                >
                                                     <Card className="h-full border-line rounded-[24px] overflow-hidden shadow-sm hover:shadow-lg transition-all bg-white hover:border-primary">
+
                                                         <div className="aspect-square bg-mist relative overflow-hidden">
                                                             <Badge className="absolute top-3 left-3 bg-primary text-mist text-[9px] font-black z-10">YOUNIQLE</Badge>
                                                             {product.image ? (

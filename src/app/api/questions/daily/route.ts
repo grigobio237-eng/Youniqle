@@ -3,6 +3,11 @@ import dbConnect from '@/lib/db';
 import DailyQuestion from '@/models/DailyQuestion';
 import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 import { DAILY_THEMES } from '@/constants/dailyThemes';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import User from '@/models/User';
+import { calculateUnifiedScore } from '@/lib/score-engine';
+
 
 export async function GET(req: NextRequest) {
     try {
@@ -12,6 +17,29 @@ export async function GET(req: NextRequest) {
         const journey = (searchParams.get('journey') || 'WELLNESS') as 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST';
         const medicalCategory = searchParams.get('medicalCategory') || null;
 
+        // AUTH & PERSONALIZATION CONTEXT
+        const session = await getServerSession(authOptions);
+        let personalContext = '';
+        let userId = null;
+
+        if (session?.user?.email) {
+            const user = await User.findOne({ email: session.user.email });
+            if (user) {
+                userId = user._id;
+                const scoreData = calculateUnifiedScore(user);
+                if (scoreData.categories) {
+                    const lowCategories = Object.entries(scoreData.categories)
+                        .filter(([_, score]) => (score as number) < 70)
+                        .map(([cat, _]) => cat);
+                    
+                    if (lowCategories.length > 0) {
+                        personalContext = `User has low scores in: ${lowCategories.join(', ')}. Focus questions on improving these areas.`;
+                    }
+                }
+            }
+        }
+
+
         // 1. Get Today's Date (YYYY-MM-DD)
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0];
@@ -19,25 +47,28 @@ export async function GET(req: NextRequest) {
 
         console.log(`[DailyQ] Request for journey: ${journey}, Category: ${medicalCategory} on ${todayStr}`);
 
-        // 2. Check DB
+        // 2. Check DB (Personalized first, then global)
         let dailyQ = await DailyQuestion.findOne({ 
             date: todayStr, 
             journey: journey,
-            medicalCategory: medicalCategory 
+            medicalCategory: medicalCategory,
+            userId: userId
         });
+
 
         if (!dailyQ) {
             console.log(`[DailyQ] No existing questions for ${journey}(${medicalCategory}). Generating via AI...`);
 
             const themeData = DAILY_THEMES[dayOfWeek] || DAILY_THEMES[1];
             
-            // Call AI with journey and medical context
+            // Call AI with journey, medical context AND personal context
             const questions = await GeminiAIEngine.generateDailyQuestions(
                 themeData.theme, 
-                themeData.keywords, 
+                `${themeData.keywords}, ${personalContext}`, 
                 journey,
                 medicalCategory
             );
+
 
             if (!questions || !Array.isArray(questions) || questions.length === 0) {
                 console.error(`[DailyQ] AI Generation failed or returned empty.`);
@@ -51,11 +82,13 @@ export async function GET(req: NextRequest) {
                 dailyQ = await DailyQuestion.create({
                     date: todayStr,
                     dayOfWeek,
-                    theme: `${themeData.theme} (${journey}${medicalCategory ? ` - ${medicalCategory}` : ''})`,
+                    theme: `${themeData.theme} (${journey}${medicalCategory ? ` - ${medicalCategory}` : ''})${userId ? ' (Personalized)' : ''}`,
                     questions,
                     journey: journey,
-                    medicalCategory: medicalCategory
+                    medicalCategory: medicalCategory,
+                    userId: userId
                 });
+
                 console.log(`[DailyQ] Created successfully. ID: ${dailyQ._id}`);
             } catch (createError: any) {
                 if (createError.code === 11000) {

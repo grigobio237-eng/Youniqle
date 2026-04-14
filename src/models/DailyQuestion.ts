@@ -4,6 +4,8 @@ export interface IDailyQuestion extends Document {
     date: string; // YYYY-MM-DD format
     journey: string; // 'WELLNESS', 'CLINICAL_PRE', 'CLINICAL_POST'
     medicalCategory?: string; // 'PLASTIC', 'ORTHOPEDIC', 'INTERNAL', 'GENERAL'
+    userId?: string; // Optional for personalization
+
     dayOfWeek: number; // 0-6
     theme: string;
     questions: Array<{
@@ -34,6 +36,12 @@ const DailyQuestionSchema = new Schema<IDailyQuestion>({
         required: false,
         default: null
     },
+    userId: {
+        type: String,
+        required: false,
+        default: null
+    },
+
     dayOfWeek: {
         type: Number,
         required: true,
@@ -58,7 +66,8 @@ const DailyQuestionSchema = new Schema<IDailyQuestion>({
     }
 });
 
-// Create a composite unique index for date, journey, and medicalCategory
-DailyQuestionSchema.index({ date: 1, journey: 1, medicalCategory: 1 }, { unique: true });
+// Create a composite unique index for date, journey, medicalCategory AND userId
+DailyQuestionSchema.index({ date: 1, journey: 1, medicalCategory: 1, userId: 1 }, { unique: true });
+
 
 export default mongoose.models.DailyQuestion || mongoose.model<IDailyQuestion>('DailyQuestion', DailyQuestionSchema);

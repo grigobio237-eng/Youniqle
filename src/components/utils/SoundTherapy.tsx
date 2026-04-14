@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { SoundVisualizer } from '@/components/therapy/SoundVisualizer';
 import { toast } from 'sonner';
+import { useActivityTracker } from '@/hooks/useActivityTracker';
+
 
 const FREQUENCIES = [
   { id: 'delta', name: '편안한', desc: '깊은 수면과 세포 재생 (432Hz)', freq: 432 },
@@ -33,6 +35,9 @@ const NATURE_LAYERS = [
 export default function SoundTherapy() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [masterVolume, setMasterVolume] = useState(0.5);
+  const { trackEvent } = useActivityTracker();
+  const startTimeRef = useRef<number | null>(null);
+
   
   // Mixer State
   const [selectedFreq, setSelectedFreq] = useState(FREQUENCIES[0]);
@@ -176,7 +181,21 @@ export default function SoundTherapy() {
     natureGain.current?.gain.setValueAtTime(0, now);
     natureGain.current?.gain.linearRampToValueAtTime(natureVolume, now + 1);
     setIsPlaying(true);
+    startTimeRef.current = Date.now();
+
+    // 트래킹: 치유 세션 시작
+    trackEvent('sound_therapy_start', {
+      itemType: 'content',
+      itemData: {
+        frequency: selectedFreq.name,
+        frequencyValue: selectedFreq.freq,
+        noiseType: selectedNoise.name,
+        natureType: selectedNature.name,
+        volumes: { master: masterVolume, freq: freqVolume, noise: noiseVolume, nature: natureVolume }
+      }
+    });
   };
+
 
   const stopTherapy = () => {
     if (!audioCtx.current || !masterGainNode.current) return;
@@ -187,9 +206,29 @@ export default function SoundTherapy() {
       noiseSource.current?.stop();
       natureSource.current?.stop();
       setIsPlaying(false);
+      
+      // 트래킹: 세션 종료 및 소요 시간 기록
+      if (startTimeRef.current) {
+        const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        trackEvent('sound_therapy_stop', {
+          itemType: 'content',
+          behaviorData: {
+            duration: durationSeconds,
+            completionRate: Math.min(100, (durationSeconds / 1200) * 100)
+          },
+          itemData: {
+            frequency: selectedFreq.id,
+            noise: selectedNoise.id,
+            nature: selectedNature.id
+          }
+        });
+        startTimeRef.current = null;
+      }
+
       masterGainNode.current?.gain.setValueAtTime(masterVolume, audioCtx.current.currentTime);
     }, 1100);
   };
+
 
   useEffect(() => {
     if (isPlaying) startFrequency();

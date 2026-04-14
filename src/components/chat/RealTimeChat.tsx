@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageCircle, Send, Bot, User } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface Message {
   id: string;
@@ -14,127 +15,84 @@ interface Message {
 }
 
 export default function RealTimeChat() {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 1. Fetch Chat History
   useEffect(() => {
-    // 프로덕션 환경에서는 WebSocket 연결 비활성화
-    if (process.env.NODE_ENV === 'production') {
-      console.log('Real-time chat disabled in production environment');
-      setIsConnected(false);
-      return;
-    }
-
-    // WebSocket 연결 (개발 환경에서만)
-    const connectWebSocket = () => {
+    const fetchHistory = async () => {
+      if (!session?.user) return;
       try {
-        const ws = new WebSocket('ws://localhost:3001/api/chat/websocket');
-        
-        ws.onopen = () => {
-          console.log('WebSocket 연결됨');
-          setIsConnected(true);
-        };
-
-        ws.onmessage = (event) => {
-          console.log('메시지 수신:', event.data);
-          
-          try {
-            const data = JSON.parse(event.data);
-            
-            if (data.type === 'connection') {
-              setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'system',
-                content: data.content,
-                timestamp: data.timestamp
-              }]);
-            } else if (data.type === 'ai_response') {
-              setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'ai',
-                content: data.content,
-                timestamp: data.timestamp
-              }]);
-              setIsLoading(false);
-            } else if (data.type === 'error') {
-              setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'error',
-                content: data.content,
-                timestamp: data.timestamp
-              }]);
-              setIsLoading(false);
-            }
-          } catch (error) {
-            console.error('JSON 파싱 오류:', error);
-            // JSON 파싱 실패 시 단순 문자열로 처리
-            setMessages(prev => [...prev, {
-              id: Date.now().toString(),
-              type: 'ai',
-              content: event.data.toString(),
-              timestamp: new Date().toISOString()
-            }]);
-            setIsLoading(false);
-          }
-        };
-
-        ws.onclose = () => {
-          console.log('WebSocket 연결 해제됨');
-          setIsConnected(false);
-          // 3초 후 재연결 시도
-          setTimeout(connectWebSocket, 3000);
-        };
-
-        ws.onerror = (error) => {
-          console.error('WebSocket 오류:', error);
-          setIsConnected(false);
-        };
-
-        wsRef.current = ws;
+        const res = await fetch('/api/chat');
+        if (res.ok) {
+          const data = await res.json();
+          const history = data.messages.map((m: any) => ({
+            id: m._id,
+            type: m.senderId === session.user?.id || m.senderId === session.user?.email ? 'user' : 'ai',
+            content: m.content,
+            timestamp: m.createdAt
+          }));
+          setMessages(history);
+        }
       } catch (error) {
-        console.error('WebSocket 연결 실패:', error);
-        setIsConnected(false);
+        console.error('Failed to fetch history:', error);
       }
     };
-
-    connectWebSocket();
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
-  }, []);
+    fetchHistory();
+  }, [session]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = () => {
-    if (!inputMessage.trim() || !wsRef.current || !isConnected) return;
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading || !session?.user) return;
 
-    const userMessage: Message = {
+    const userMsg: Message = {
       id: Date.now().toString(),
       type: 'user',
       content: inputMessage,
       timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
-
-    // WebSocket으로 메시지 전송
-    wsRef.current.send(JSON.stringify({
-      content: inputMessage,
-      userName: '사용자',
-      userEmail: 'user@example.com'
-    }));
-
     setInputMessage('');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: inputMessage })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.aiMessage) {
+          setMessages(prev => [...prev, {
+            id: data.aiMessage._id,
+            type: 'ai',
+            content: data.aiMessage.content,
+            timestamp: data.aiMessage.createdAt
+          }]);
+        }
+      } else {
+        throw new Error('Failed to send');
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, {
+        id: 'error-' + Date.now(),
+        type: 'error',
+        content: '메시지 전송에 실패했습니다. 다시 시도해주세요.',
+        timestamp: new Date().toISOString()
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -144,44 +102,56 @@ export default function RealTimeChat() {
     }
   };
 
+  if (!session) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto p-12 text-center">
+            <p className="text-slate-500 font-bold">채팅을 이용하시려면 로그인이 필요합니다.</p>
+        </Card>
+    );
+  }
+
   return (
-    <Card className="w-full max-w-2xl mx-auto h-[600px] flex flex-col">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          실시간 AI 채팅
-          <div className={`ml-auto w-3 h-3 rounded-full ${
-            isConnected ? 'bg-green-500' : 'bg-red-500'
-          }`} />
+    <Card className="w-full max-w-2xl mx-auto h-[600px] flex flex-col border-none shadow-2xl rounded-[40px] overflow-hidden bg-white/80 backdrop-blur-xl">
+      <CardHeader className="bg-obsidian text-white p-6">
+        <CardTitle className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <MessageCircle className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="text-lg font-black tracking-tight">Director Kim</div>
+            <div className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                AI Recovery Guide
+            </div>
+          </div>
         </CardTitle>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
-        {/* 메시지 영역 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-mist/20 to-transparent">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg p-3 ${
+                className={`max-w-[85%] rounded-[24px] p-4 ${
                   message.type === 'user'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-obsidian text-white shadow-lg rounded-tr-none'
                     : message.type === 'ai'
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-white text-obsidian shadow-md border border-line rounded-tl-none'
+                    : 'bg-status-danger/10 text-status-danger text-xs'
                 }`}
               >
-                <div className="flex items-start gap-2">
-                  {message.type === 'ai' && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-                  {message.type === 'user' && <User className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-                  <div>
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </p>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    {message.type === 'ai' && <span className="text-[10px] font-black uppercase text-primary tracking-widest">Director</span>}
+                    {message.type === 'user' && <span className="text-[10px] font-black uppercase text-white/50 tracking-widest">{session.user?.name}</span>}
                   </div>
+                  <p className="text-sm font-medium leading-relaxed">{message.content}</p>
+                  <p className="text-[9px] opacity-40 mt-2 text-right">
+                    {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
               </div>
             </div>
@@ -189,14 +159,14 @@ export default function RealTimeChat() {
           
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-                <div className="flex items-center gap-2">
-                  <Bot className="h-4 w-4" />
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="bg-white border border-line rounded-[24px] rounded-tl-none p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex space-x-1.5">
+                    <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+                    <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.1s]" />
+                    <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.2s]" />
                   </div>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">분석 중...</span>
                 </div>
               </div>
             </div>
@@ -205,28 +175,24 @@ export default function RealTimeChat() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* 입력 영역 */}
-        <div className="flex-shrink-0 p-4 border-t">
-          <div className="flex gap-2">
+        <div className="p-6 border-t border-line bg-white">
+          <div className="flex gap-3 bg-mist/30 p-2 rounded-[24px] border border-line focus-within:border-primary transition-colors">
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="메시지를 입력하세요..."
-              disabled={!isConnected || isLoading}
-              className="flex-1"
+              placeholder="회복에 관해 무엇이든 물어보세요..."
+              disabled={isLoading}
+              className="flex-1 border-none bg-transparent focus-visible:ring-0 text-sm font-medium"
             />
             <Button
               onClick={sendMessage}
-              disabled={!inputMessage.trim() || !isConnected || isLoading}
-              size="icon"
+              disabled={!inputMessage.trim() || isLoading}
+              className="rounded-full w-10 h-10 p-0 bg-obsidian hover:bg-primary transition-colors"
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            {isConnected ? '연결됨' : '연결 중...'} • Enter로 전송
-          </p>
         </div>
       </CardContent>
     </Card>

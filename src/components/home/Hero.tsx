@@ -5,10 +5,80 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, CheckCircle, ArrowRight, Activity, ShieldCheck } from 'lucide-react';
 import HeroScanner, { AnalysisResult } from './HeroScanner';
 import { useRecovery } from '@/contexts/RecoveryContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useActivityTracker } from '@/hooks/useActivityTracker';
+
 
 export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
   const { journey, resetJourney } = useRecovery();
+  const { data: session } = useSession();
+  const { trackEvent } = useActivityTracker();
+  
+  const [personalMsg, setPersonalMsg] = useState({
+    title: <>당신이 머무는 공간,<br />보는 것과 듣는 것,<br />그리고 먹는 모든 것이<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 조각</span>입니다.</>,
+    desc: "식단, 사운드, 시각 데이터를 통합한 유니클만의 맞춤형 회복 큐레이션",
+    nudge: "지금 먹는 음식, 회복에 도움이 될까요? 사진으로 바로 확인!"
+  });
+
+  useEffect(() => {
+    const fetchPersonalization = async () => {
+      // 1. Check Session first
+      if (session?.user) {
+        try {
+          const res = await fetch('/api/user/status');
+          if (res.ok) {
+            const data = await res.json();
+            const { score } = data;
+            
+            if (score && score.categories) {
+              const categories = Object.entries(score.categories) as [string, number][];
+              const weakest = categories.reduce((prev, curr) => prev[1] < curr[1] ? prev : curr);
+              
+              if (weakest[1] < 70) {
+                updateMessage(session.user.name || '회원', weakest[0]);
+                return;
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Personalization failed", e);
+        }
+      }
+
+      // 2. Fallback to LocalStorage for Guest
+      const localScore = localStorage.getItem('recovery_last_score');
+      if (localScore) {
+        const scoreVal = parseInt(localScore);
+        if (scoreVal < 80) {
+          // If score is low, show a nudge for guest
+          updateMessage('방문자', '신체적 활력'); // Default for guest or analyze based on local data if available
+        }
+      }
+    };
+
+    const updateMessage = (name: string, categoryId: string) => {
+      const categoryMap: Record<string, string> = {
+        mental: '마음의 안정',
+        physical: '신체적 활력',
+        sleep: '숙면 에너지',
+        lifestyle: '생활 리듬'
+      };
+      
+      const weakName = categoryMap[categoryId] || categoryId;
+      
+      setPersonalMsg({
+        title: <>{name}님, 오늘 가장 필요한 건<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">{weakName}</span>의 회복입니다.</>,
+        desc: `${name}님의 최근 분석 데이터에 따르면, 현재 ${weakName} 케어가 우선적으로 권장됩니다.`,
+        nudge: `${weakName} 점수가 낮아요. 맞춤 솔루션을 확인해보세요!`
+      });
+    };
+    
+    fetchPersonalization();
+    trackEvent('view', { itemType: 'category', itemData: { name: 'HomeHero' } });
+  }, [session, trackEvent]);
+
 
   return (
     <div id="scanner" className="hero-cinematic noise-texture bg-mist relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
@@ -34,15 +104,12 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
                 )}
               </div>
               <h1 className="text-[1.75rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
-                당신이 머무는 공간,<br />
-                보는 것과 듣는 것,<br />
-                그리고 먹는 모든 것이<br />
-                <span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 조각</span>입니다.
+                {personalMsg.title}
               </h1>
               <p className="text-base md:text-xl text-slate/70 font-medium leading-relaxed">
-                식단, 사운드, 시각 데이터를 통합한 <br className="hidden md:block" />
-                유니클만의 맞춤형 회복 큐레이션
+                {personalMsg.desc}
               </p>
+
               
               <div className="pt-4 space-y-6">
                 <div className="flex flex-wrap gap-4">
@@ -82,9 +149,9 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
                 <span className="text-[10px] font-black text-obsidian uppercase tracking-widest">Youniqle LIVE</span>
               </div>
               <p className="text-[11px] font-bold text-slate leading-snug">
-                지금 먹는 음식,<br />회복에 도움이 될까요?<br />
-                <span className="text-chapter-accent">사진으로 바로 확인!</span>
+                {personalMsg.nudge}
               </p>
+
             </div>
           </div>
 
