@@ -24,8 +24,11 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
 
   useEffect(() => {
     const fetchPersonalization = async () => {
+      const defaultCategory = 'physical'; // Default: 신체적 활력
+      
       // 1. Check Session first
       if (session?.user) {
+        const userName = session.user.name || '회원';
         try {
           const res = await fetch('/api/user/status');
           if (res.ok) {
@@ -36,8 +39,9 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
               const categories = Object.entries(score.categories) as [string, number][];
               const weakest = categories.reduce((prev, curr) => prev[1] < curr[1] ? prev : curr);
               
-              if (weakest[1] < 70) {
-                updateMessage(session.user.name || '회원', weakest[0]);
+              // If there's a specific weakness, show it
+              if (weakest[1] < 90) {
+                updateMessage(userName, weakest[0]);
                 return;
               }
             }
@@ -45,16 +49,21 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
         } catch (e) {
           console.error("Personalization failed", e);
         }
+        
+        // Logged in but no specific low score or fetch failed - use general greeting
+        updateMessage(userName, defaultCategory);
+        return;
       }
 
-      // 2. Fallback to LocalStorage for Guest
+      // 2. Guest Logic
       const localScore = localStorage.getItem('recovery_last_score');
       if (localScore) {
-        const scoreVal = parseInt(localScore);
-        if (scoreVal < 80) {
-          // If score is low, show a nudge for guest
-          updateMessage('방문자', '신체적 활력'); // Default for guest or analyze based on local data if available
-        }
+        // If they have a previous score (even as guest), acknowledge it
+        updateMessage('방문자', defaultCategory);
+      } else {
+        // Pure unknown guest - update to "방문자님" but maybe keep original default title for clean start?
+        // User wants "방문자님" to be shown for non-logged in users.
+        updateMessage('방문자', defaultCategory);
       }
     };
 
@@ -77,7 +86,7 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
     
     fetchPersonalization();
     trackEvent('view', { itemType: 'category', itemData: { name: 'HomeHero' } });
-  }, [session, trackEvent]);
+  }, [session, trackEvent, session?.user?.name]);
 
 
   return (
