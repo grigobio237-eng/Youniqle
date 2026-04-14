@@ -31,8 +31,8 @@ export default function NavigatorPassDetailPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { addToast } = useToast();
-  const id = params.id as string;
-  const spec = PASS_SPECS[id];
+  const id = params?.id as string;
+  const spec = id ? PASS_SPECS[id] : null;
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -85,7 +85,10 @@ export default function NavigatorPassDetailPage() {
 
           <div className="relative z-10 space-y-8">
             <div className="space-y-4 text-center md:text-left">
-              <Badge variant="outline" className={`rounded-full px-4 py-1 text-[10px] font-black tracking-widest uppercase border-current/20`}>
+              <Badge 
+                variant="outline" 
+                className={`rounded-full px-4 py-1 text-[10px] font-black tracking-widest uppercase ${id === 'black' ? 'border-chapter-accent/40 !text-white bg-chapter-accent/10' : 'border-current/20 text-current opacity-70'}`}
+              >
                 {spec.name}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight break-keep">
@@ -140,9 +143,21 @@ export default function NavigatorPassDetailPage() {
                   <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all flex-shrink-0">
                     <Check className="w-7 h-7" />
                   </div>
-                  <div className="space-y-1">
+                  <div className="flex-1 space-y-2">
                     <h3 className="text-xl font-black text-obsidian">{benefit.title}</h3>
                     <p className="text-slate/90 text-sm font-bold leading-relaxed break-keep">{benefit.desc}</p>
+                    
+                    {benefit.navigatorNote && (
+                      <div className="mt-4 p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-3">
+                        <div className="mt-0.5 p-1 bg-amber-200 text-amber-900 rounded-lg">
+                          <Percent className="w-3 h-3" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black text-amber-900 uppercase tracking-widest">Navigator Operational Tip</p>
+                          <p className="text-sm font-black text-amber-900/80 leading-snug">{benefit.navigatorNote}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
