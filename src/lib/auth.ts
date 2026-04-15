@@ -229,7 +229,14 @@ export const authOptions: AuthOptions = {
       }
 
       // 사용자 정보 로드 및 추천 코드 동기화
-      if (token.email && (!token.role || !token.subscription || !token.passInfo || token.referralCode === undefined)) {
+      // 약관 동의 데이터가 토큰에 없는 경우에도 DB 조회를 수행하도록 조건을 확장합니다.
+      if (token.email && (
+        !token.role || 
+        !token.subscription || 
+        !token.passInfo || 
+        token.referralCode === undefined ||
+        token.termsAcceptedAt === undefined
+      )) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });

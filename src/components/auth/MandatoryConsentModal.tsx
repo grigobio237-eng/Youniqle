@@ -8,7 +8,8 @@ import {
   DialogHeader, 
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
+  DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -74,9 +75,15 @@ export default function MandatoryConsentModal() {
       });
 
       if (response.ok) {
-        // 세션 업데이트 (브라우저 사이드에서 세션 정보를 최신화하여 모달을 닫음)
-        await updateSession();
+        // 세션 업데이트
+        const updated = await updateSession();
+        console.log('Session updated:', updated);
+        
+        // 동의가 완료되면 모달 닫기
         setIsOpen(false);
+        
+        // 강제 새로고침이 필요한 경우 (세션 정보가 즉시 반영 안 될 때를 대비)
+        window.location.reload();
       } else {
         const error = await response.json();
         alert(error.error || '동의 처리 중 오류가 발생했습니다.');
@@ -94,7 +101,8 @@ export default function MandatoryConsentModal() {
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent 
-        className="max-w-md rounded-[32px] p-0 overflow-hidden border-none bg-surface shadow-2xl"
+        // 모바일(S24 등)에서 긴 내용이 잘리지 않도록 flex-col, max-h-[90vh], overflow-y-auto를 적용합니다.
+        className="max-w-md w-[92%] sm:w-full rounded-[32px] p-0 border-none bg-surface shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5 scrollbar-hide"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -199,6 +207,8 @@ export default function MandatoryConsentModal() {
 }
 
 function ConsentRow({ id, label, checked, onChange, content }: any) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="flex items-center justify-between py-1">
       <div className="flex items-center space-x-2">
@@ -214,11 +224,14 @@ function ConsentRow({ id, label, checked, onChange, content }: any) {
           {label}
         </Label>
       </div>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="text-xs font-bold text-primary hover:underline">상세보기</button>
         </DialogTrigger>
-        <DialogContent className="max-w-lg rounded-3xl p-0 overflow-hidden bg-surface max-h-[70vh] flex flex-col border-none">
+        <DialogContent 
+          // 상세 약관 모달에서도 동일하게 X 버튼 시인성을 확보합니다.
+          className="max-w-lg rounded-3xl p-0 overflow-hidden bg-surface max-h-[70vh] flex flex-col border-none [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5"
+        >
           <DialogHeader className="p-6 bg-primary text-white">
             <DialogTitle className="text-xl font-black">{label}</DialogTitle>
           </DialogHeader>
@@ -226,15 +239,16 @@ function ConsentRow({ id, label, checked, onChange, content }: any) {
             {content}
           </div>
           <div className="p-6 border-t border-line bg-background/50">
-            <Button className="w-full h-12 bg-primary rounded-xl font-bold" onClick={(e: any) => {
-              // Trigger the outer checkbox
-              onChange();
-              // Close this details dialog
-              const closeButton = e.currentTarget.closest('[role="dialog"]')?.querySelector('button[aria-label="Close"]');
-              if (closeButton instanceof HTMLElement) closeButton.click();
-            }}>
-              확인
-            </Button>
+            <DialogClose asChild>
+              <Button 
+                className="w-full h-12 bg-primary rounded-xl font-bold" 
+                onClick={() => {
+                  if (!checked) onChange();
+                }}
+              >
+                확인
+              </Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>

@@ -18,7 +18,8 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
+  DialogClose
 } from '@/components/ui/dialog';
 
 
@@ -411,7 +412,7 @@ function ConsentItem({
             상세보기
           </button>
         </DialogTrigger>
-        <DialogContent className="max-w-lg rounded-3xl p-0 overflow-hidden border-none bg-surface max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-lg rounded-3xl p-0 overflow-hidden border-none bg-surface max-h-[80vh] flex flex-col [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5">
           <DialogHeader className="p-6 bg-primary text-white">
             <DialogTitle className="text-xl font-black tracking-tight">{label}</DialogTitle>
           </DialogHeader>
@@ -423,24 +424,24 @@ function ConsentItem({
             </div>
           </div>
           <DialogFooter className="p-6 bg-background/50 border-t border-line">
-            <Button
-              type="button"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-background font-bold rounded-2xl"
-              onClick={() => {
-                const event = {
-                  target: {
-                    name: id,
-                    type: 'checkbox',
-                    checked: true
-                  }
-                } as any;
-                onChange(event);
-                // 모달 닫기 처리는 Dialog 라이브러리에서 기본적으로 다뤄짐 (Esc, Outside click)
-                // 명시적으로 닫으려면 DialogContext 등을 사용해야 함.
-              }}
-            >
-              확인 및 동의하기
-            </Button>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                className="w-full h-12 bg-primary hover:bg-primary/90 text-background font-bold rounded-2xl"
+                onClick={() => {
+                  const event = {
+                    target: {
+                      name: id,
+                      type: 'checkbox',
+                      checked: true
+                    }
+                  } as any;
+                  onChange(event);
+                }}
+              >
+                확인 및 동의하기
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
