@@ -10,7 +10,17 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon, KakaoIcon } from '@/components/ui/social-icons';
 import CharacterImage from '@/components/ui/CharacterImage';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, ChevronLeft, Check, ChevronRight } from 'lucide-react';
+import { CONSENT_TEXTS } from '@/constants/consents';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from '@/components/ui/dialog';
+
 
 import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
 import ReferralTracker from '@/components/auth/ReferralTracker';
@@ -27,8 +37,29 @@ function SignupContent() {
     email: '',
     password: '',
     confirmPassword: '',
+    termsAccepted: false,
+    privacyAccepted: false,
+    sensitiveInfoAccepted: false,
+    thirdPartyAccepted: false,
     marketingConsent: false,
   });
+
+  const allMandatoryAccepted = 
+    formData.termsAccepted && 
+    formData.privacyAccepted && 
+    formData.sensitiveInfoAccepted && 
+    formData.thirdPartyAccepted;
+
+  const handleAgreeAll = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      termsAccepted: checked,
+      privacyAccepted: checked,
+      sensitiveInfoAccepted: checked,
+      thirdPartyAccepted: checked,
+      marketingConsent: checked,
+    }));
+  };
 
   useEffect(() => {
     setIsInWebView(isWebView());
@@ -60,6 +91,10 @@ function SignupContent() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          termsAccepted: formData.termsAccepted,
+          privacyAccepted: formData.privacyAccepted,
+          sensitiveInfoAccepted: formData.sensitiveInfoAccepted,
+          thirdPartyAccepted: formData.thirdPartyAccepted,
           marketingConsent: formData.marketingConsent,
           referralCode,
         }),
@@ -245,24 +280,76 @@ function SignupContent() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 px-1">
-                <input
-                  id="marketingConsent"
-                  name="marketingConsent"
-                  type="checkbox"
-                  checked={formData.marketingConsent}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 bg-background border-line rounded text-primary focus:ring-primary"
-                  aria-label="마케팅 정보 수신 동의"
-                />
-                <Label htmlFor="marketingConsent" className="text-sm text-text-secondary font-medium cursor-pointer">
-                  마케팅 정보 수신에 동의합니다 (선택사항)
-                </Label>
+              {/* 약관 동의 섹션 */}
+              <div className="space-y-4 pt-4 border-t border-line">
+                <div className="flex items-center justify-between px-1 bg-primary/5 p-3 rounded-xl border border-primary/20">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      id="agreeAll"
+                      type="checkbox"
+                      aria-label="전체 동의"
+                      checked={allMandatoryAccepted && formData.marketingConsent}
+                      onChange={(e) => handleAgreeAll(e.target.checked)}
+                      className="h-5 w-5 rounded-md border-primary text-primary focus:ring-primary cursor-pointer"
+                    />
+                    <Label htmlFor="agreeAll" className="text-sm font-bold text-text-primary cursor-pointer">
+                      전체 동의하기
+                    </Label>
+                  </div>
+                </div>
+
+                <div className="space-y-3 px-1">
+                  <ConsentItem 
+                    id="termsAccepted" 
+                    label="서비스 이용약관 동의 (필수)" 
+                    checked={formData.termsAccepted}
+                    onChange={handleInputChange}
+                    content={CONSENT_TEXTS.terms}
+                  />
+                  <ConsentItem 
+                    id="privacyAccepted" 
+                    label="개인정보 처리방침 동의 (필수)" 
+                    checked={formData.privacyAccepted}
+                    onChange={handleInputChange}
+                    content={CONSENT_TEXTS.privacy}
+                  />
+                  <ConsentItem 
+                    id="sensitiveInfoAccepted" 
+                    label="민감정보 수집 및 이용 동의 (필수)" 
+                    checked={formData.sensitiveInfoAccepted}
+                    onChange={handleInputChange}
+                    content={CONSENT_TEXTS.sensitive}
+                  />
+                  <ConsentItem 
+                    id="thirdPartyAccepted" 
+                    label="개인정보 제3자 제공 동의 (필수)" 
+                    checked={formData.thirdPartyAccepted}
+                    onChange={handleInputChange}
+                    content={CONSENT_TEXTS.thirdParty}
+                  />
+                  <div className="flex items-center justify-between py-1">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        id="marketingConsent"
+                        name="marketingConsent"
+                        type="checkbox"
+                        aria-label="마케팅 정보 수신 동의"
+                        checked={formData.marketingConsent}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 rounded border-line text-primary focus:ring-primary cursor-pointer"
+                      />
+                      <Label htmlFor="marketingConsent" className="text-xs font-medium text-text-secondary cursor-pointer">
+                        마케팅 정보 수신 동의 (선택)
+                      </Label>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-16 bg-primary hover:bg-primary/90 text-background font-black text-lg rounded-2xl shadow-xl transition-all hover:scale-[1.02]"
+                disabled={!allMandatoryAccepted}
+                className={`w-full h-16 bg-primary hover:bg-primary/90 text-background font-black text-lg rounded-2xl shadow-xl transition-all hover:scale-[1.02] ${!allMandatoryAccepted ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
               >
                 가입하기
               </Button>
@@ -282,6 +369,81 @@ function SignupContent() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+
+
+function ConsentItem({ 
+  id, 
+  label, 
+  checked, 
+  onChange, 
+  content 
+}: { 
+  id: string, 
+  label: string, 
+  checked: boolean, 
+  onChange: (e: any) => void, 
+  content: string 
+}) {
+  return (
+    <div className="flex items-center justify-between py-1 group">
+      <div className="flex items-center space-x-2">
+        <input
+          id={id}
+          name={id}
+          type="checkbox"
+          aria-label={label}
+          checked={checked}
+          onChange={onChange}
+          className="h-4 w-4 rounded border-line text-primary focus:ring-primary cursor-pointer"
+        />
+        <Label htmlFor={id} className="text-sm font-medium text-text-secondary cursor-pointer hover:text-text-primary transition-colors">
+          {label}
+        </Label>
+      </div>
+      
+      <Dialog>
+        <DialogTrigger asChild>
+          <button type="button" className="text-xs font-bold text-primary hover:underline px-2 py-1">
+            상세보기
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-lg rounded-3xl p-0 overflow-hidden border-none bg-surface max-h-[80vh] flex flex-col">
+          <DialogHeader className="p-6 bg-primary text-white">
+            <DialogTitle className="text-xl font-black tracking-tight">{label}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+            <div className="prose prose-sm max-w-none">
+              <p className="text-text-primary font-medium leading-relaxed whitespace-pre-wrap">
+                {content}
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="p-6 bg-background/50 border-t border-line">
+            <Button
+              type="button"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-background font-bold rounded-2xl"
+              onClick={() => {
+                const event = {
+                  target: {
+                    name: id,
+                    type: 'checkbox',
+                    checked: true
+                  }
+                } as any;
+                onChange(event);
+                // 모달 닫기 처리는 Dialog 라이브러리에서 기본적으로 다뤄짐 (Esc, Outside click)
+                // 명시적으로 닫으려면 DialogContext 등을 사용해야 함.
+              }}
+            >
+              확인 및 동의하기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

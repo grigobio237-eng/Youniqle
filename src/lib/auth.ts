@@ -222,6 +222,10 @@ export const authOptions: AuthOptions = {
         token.isNavigator = (user as any).isNavigator;
         token.recentNavigator = (user as any).recentNavigator;
         token.passInfo = (user as any).passInfo;
+        token.termsAcceptedAt = (user as any).termsAcceptedAt;
+        token.privacyAcceptedAt = (user as any).privacyAcceptedAt;
+        token.sensitiveInfoAcceptedAt = (user as any).sensitiveInfoAcceptedAt;
+        token.thirdPartyAcceptedAt = (user as any).thirdPartyAcceptedAt;
       }
 
       // 사용자 정보 로드 및 추천 코드 동기화
@@ -239,6 +243,10 @@ export const authOptions: AuthOptions = {
             token.gender = dbUser.gender;
             token.isNavigator = dbUser.isNavigator;
             token.recentNavigator = dbUser.recentNavigator;
+            token.termsAcceptedAt = dbUser.termsAcceptedAt;
+            token.privacyAcceptedAt = dbUser.privacyAcceptedAt;
+            token.sensitiveInfoAcceptedAt = dbUser.sensitiveInfoAcceptedAt;
+            token.thirdPartyAcceptedAt = dbUser.thirdPartyAcceptedAt;
             
             // 추천 코드가 없는 경우 자동 생성 (ID 기반)
             if (!dbUser.referralCode) {
@@ -281,6 +289,10 @@ export const authOptions: AuthOptions = {
         (session.user as any).isNavigator = token.isNavigator as boolean;
         (session.user as any).recentNavigator = token.recentNavigator as string;
         (session.user as any).passInfo = token.passInfo;
+        (session.user as any).termsAcceptedAt = token.termsAcceptedAt as string;
+        (session.user as any).privacyAcceptedAt = token.privacyAcceptedAt as string;
+        (session.user as any).sensitiveInfoAcceptedAt = token.sensitiveInfoAcceptedAt as string;
+        (session.user as any).thirdPartyAcceptedAt = token.thirdPartyAcceptedAt as string;
       }
       return session;
     },

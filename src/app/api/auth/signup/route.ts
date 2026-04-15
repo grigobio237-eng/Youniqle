@@ -9,7 +9,25 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const { name, email, password, marketingConsent, referralCode } = await request.json();
+    const { 
+      name, 
+      email, 
+      password, 
+      marketingConsent, 
+      termsAccepted,
+      privacyAccepted,
+      sensitiveInfoAccepted,
+      thirdPartyAccepted,
+      referralCode 
+    } = await request.json();
+
+    // 입력값 검증 (필수 동의 확인)
+    if (!termsAccepted || !privacyAccepted || !sensitiveInfoAccepted || !thirdPartyAccepted) {
+      return NextResponse.json(
+        { error: '모든 필수 약관에 동의해야 합니다.' },
+        { status: 400 }
+      );
+    }
 
     // ... (Validation logic remains same)
 
@@ -74,6 +92,10 @@ export async function POST(request: NextRequest) {
       email,
       passwordHash,
       provider: 'local',
+      termsAcceptedAt: new Date(),
+      privacyAcceptedAt: new Date(),
+      sensitiveInfoAcceptedAt: new Date(),
+      thirdPartyAcceptedAt: new Date(),
       marketingConsent: marketingConsent || false,
       emailVerified: false,
       emailVerificationToken: verificationToken,

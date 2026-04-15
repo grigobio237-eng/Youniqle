@@ -18,6 +18,10 @@ export interface IUser extends Document {
   provider?: 'local' | 'google' | 'kakao' | 'naver';
   providerId?: string;
   marketingConsent: boolean;
+  termsAcceptedAt?: Date;
+  privacyAcceptedAt?: Date;
+  sensitiveInfoAcceptedAt?: Date;
+  thirdPartyAcceptedAt?: Date;
   emailVerified: boolean;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
@@ -266,6 +270,18 @@ const UserSchema = new Schema<IUser>({
   marketingConsent: {
     type: Boolean,
     default: false,
+  },
+  termsAcceptedAt: {
+    type: Date,
+  },
+  privacyAcceptedAt: {
+    type: Date,
+  },
+  sensitiveInfoAcceptedAt: {
+    type: Date,
+  },
+  thirdPartyAcceptedAt: {
+    type: Date,
   },
   emailVerified: {
     type: Boolean,

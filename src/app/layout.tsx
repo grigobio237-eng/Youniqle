@@ -8,6 +8,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import NudgeFeaturesProvider from '@/components/providers/NudgeFeaturesProvider';
 import { ToastProvider } from '@/components/ui/toast';
 import AiManagerChat from '@/components/chat/AiManagerChat';
+import MandatoryConsentModal from '@/components/auth/MandatoryConsentModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -46,6 +47,12 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/character/youniqle-1.png',
+    shortcut: '/character/youniqle-1.png',
+    apple: '/character/youniqle-1.png',
+  },
 };
 
 import { RecoveryProvider } from '@/contexts/RecoveryContext';
@@ -59,7 +66,6 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
       <body className={`${inter.className} min-h-screen flex flex-col`} suppressHydrationWarning>
@@ -74,6 +80,7 @@ export default function RootLayout({
                   </main>
                   <Footer />
                   <AiManagerChat />
+                  <MandatoryConsentModal />
                 </RecoveryProvider>
               </ToastProvider>
             </NudgeFeaturesProvider>
