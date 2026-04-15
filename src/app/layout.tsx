@@ -48,10 +48,25 @@ export const metadata: Metadata = {
     google: 'your-google-verification-code',
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Youniqle',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
-    icon: '/character/youniqle-1.png',
+    icon: [
+      { url: '/character/youniqle-1.png' },
+      { url: '/character/youniqle-1.png', sizes: '192x192', type: 'image/png' },
+      { url: '/character/youniqle-1.png', sizes: '512x512', type: 'image/png' },
+    ],
     shortcut: '/character/youniqle-1.png',
-    apple: '/character/youniqle-1.png',
+    apple: [
+      { url: '/character/youniqle-1.png' },
+      { url: '/character/youniqle-1.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 
