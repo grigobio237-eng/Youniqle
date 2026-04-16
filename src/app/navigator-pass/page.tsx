@@ -24,71 +24,71 @@ import Link from 'next/link';
 // Tier Data
 const tiers = [
     {
-        id: 'essence',
-        name: 'ESSENCE',
-        subtitle: 'Digital Starter',
-        price: 390000,
-        color: 'from-emerald-500 to-teal-600',
-        bgColor: 'bg-emerald-50',
-        borderColor: 'border-emerald-200',
-        iconBg: 'bg-emerald-100',
-        textColor: 'text-emerald-700',
-        description: '디지털 회복 루틴을 가볍게 시작하고 싶은 분',
+        id: 'start',
+        name: 'START PASS',
+        subtitle: 'Digital & Care Starter',
+        price: 3300000,
+        color: 'from-blue-500 to-indigo-600',
+        bgColor: 'bg-blue-50',
+        borderColor: 'border-blue-200',
+        iconBg: 'bg-blue-100',
+        textColor: 'text-blue-700',
+        description: '처음 시작하는 사람을 위한 입문형 회복 패스',
         coreFeatures: [
-            { icon: BarChart3, text: 'Digital Bio-Check: 온라인 자가 생체 나이 진단' },
-            { icon: Brain, text: '유니클 루틴 베이직: 기초 주간 회복 리포트' },
-            { icon: Gift, text: '스타터 키트: 체험 샘플러 1회 제공' },
+            { icon: BarChart3, text: '개인별 맞춤형 회복 방향 안내 리포트 (1회)' },
+            { icon: Brain, text: "파트너사 '멤버십 전용 프로그램' 우대" },
+            { icon: Zap, text: '전담 네비게이터 예약 관리 & 우선 배정' },
         ],
         economicBenefits: [
-            '전 제품 5% 상시 할인',
-            '활동 포인트 적립률 1.1배',
+            '제휴사 비급여 항목 최대 30% 멤버십 전용가',
+            '활동 포인트 적립률 5% 보장',
         ],
     },
     {
-        id: 'balance',
-        name: 'BALANCE',
-        subtitle: 'Tech Enthusiast',
-        price: 690000,
-        color: 'from-violet-500 to-purple-600',
-        bgColor: 'bg-violet-50',
-        borderColor: 'border-violet-200',
-        iconBg: 'bg-violet-100',
-        textColor: 'text-violet-700',
-        description: '유니클 기술과 전문가 지식을 깊이 있게 경험하고 싶은 분',
+        id: 'signature',
+        name: 'SIGNATURE PASS',
+        subtitle: 'Main Strategic Product',
+        price: 11000000,
+        color: 'from-chapter-accent to-chapter-accent/80',
+        bgColor: 'bg-chapter-accent/5',
+        borderColor: 'border-chapter-accent/20',
+        iconBg: 'bg-chapter-accent/10',
+        textColor: 'text-chapter-accent',
+        description: '유니클의 정수, 5년의 완벽한 회복 설계',
         popular: true,
         coreFeatures: [
-            { icon: Star, text: 'ESSENCE 혜택 전체 포함' },
-            { icon: Brain, text: '전문가 디지털 가이드: 8대 무형 자산 VOD 강좌' },
-            { icon: BarChart3, text: '3D 갤러리: 회복 데이터 시각화 공간' },
-            { icon: Zap, text: '유니클 내비게이터 플러스: 일일 맞춤 푸시 알림' },
+            { icon: Star, text: 'START PASS 혜택 전체 포함' },
+            { icon: Brain, text: '멤버십 전용 전략 프로그램 운영' },
+            { icon: RefreshCw, text: '회복 키트 제공 (연 2회)' },
+            { icon: Zap, text: '스마트 알림 및 신규 솔루션 선공개' },
         ],
         economicBenefits: [
-            '전 제품 10% 상시 할인',
-            '활동 포인트 적립률 1.3배',
-            '신규 디지털 도구 베타 테스트 우선권',
+            '제휴사 비급여 항목 최대 30% 멤버십 전용가',
+            '활동 포인트 적립률 10% 보장',
+            '멤버십 우선순위 예약 권한',
         ],
     },
     {
-        id: 'miracle',
-        name: 'MIRACLE',
-        subtitle: 'Power User',
-        price: 990000,
-        color: 'from-amber-500 to-orange-600',
-        bgColor: 'bg-amber-50',
-        borderColor: 'border-amber-200',
-        iconBg: 'bg-amber-100',
-        textColor: 'text-amber-700',
-        description: '모든 기능을 활용하여 생체 데이터를 자산화하려는 분',
+        id: 'black',
+        name: 'BLACK PASS',
+        subtitle: 'Private Concierge VIP',
+        price: 33000000,
+        color: 'from-slate-700 to-obsidian',
+        bgColor: 'bg-slate-50',
+        borderColor: 'border-slate-300',
+        iconBg: 'bg-slate-200',
+        textColor: 'text-obsidian',
+        description: 'VIP 고객을 위한 프라이빗 운영형 패스',
         coreFeatures: [
-            { icon: Crown, text: 'BALANCE 혜택 전체 포함' },
-            { icon: Sparkles, text: '유니클 웹툰 제네레이터: 월 1회 자동 생성' },
-            { icon: Brain, text: '그룹 멘탈 큐레이팅: 분기별 라이브 웹세미나' },
-            { icon: Shield, text: '디지털 금고(Vault): 보안 대시보드 강화 버전' },
+            { icon: Crown, text: 'SIGNATURE PASS 혜택 전체 포함' },
+            { icon: Sparkles, text: '프리미엄 리포트 상시 제공' },
+            { icon: Brain, text: '지정인 1인 혜택 공유 (연 3회)' },
+            { icon: Shield, text: '유니클 독점 프로그램 평생 이용권' },
         ],
         economicBenefits: [
-            '전 제품 15% 상시 할인',
-            '활동 포인트 적립률 1.5배',
-            'Founders Flash Sale 전용 상점 이용',
+            '제휴사 비급여 항목 최대 30% 멤버십 전용가',
+            '활동 포인트 적립률 15% 보장',
+            '최상위 우선 예약 및 전담 응대 라인',
         ],
     },
 ];
@@ -96,16 +96,16 @@ const tiers = [
 // FAQ Data
 const faqs = [
     {
-        q: 'Founder Pass는 의료 서비스인가요?',
+        q: 'Navigator Pass는 의료 서비스인가요?',
         a: '아닙니다. Youniqle은 의료 행위를 제공하지 않는 "정보·연결·설계 플랫폼"입니다. 건강 관련 정보와 유니클 기반 인사이트를 제공하지만, 이는 의료적 진단이나 치료를 대체하지 않습니다.'
     },
     {
         q: '다단계 구조인가요?',
-        a: '아닙니다. Founder Pass는 순수한 멤버십 구독 서비스입니다. 다른 사람을 모집하는 것과 관계없이, 구매하신 티어의 혜택을 온전히 누리실 수 있습니다.'
+        a: '아닙니다. Navigator Pass는 순수한 멤버십 서비스입니다. 다른 사람을 모집하는 것과 관계없이, 구매하신 티어의 혜택을 온전히 누리실 수 있습니다.'
     },
     {
         q: '투자 상품인가요?',
-        a: '아닙니다. Founder Pass는 투자 상품이 아닌 서비스 이용권입니다. 금전적 수익을 보장하지 않으며, 플랫폼의 기능과 혜택을 이용하기 위한 멤버십입니다.'
+        a: '아닙니다. Navigator Pass는 투자 상품이 아닌 서비스 이용권입니다. 금전적 수익을 보장하지 않으며, 플랫폼의 기능과 혜택을 이용하기 위한 멤버십입니다.'
     },
     {
         q: '환불이 가능한가요?',
@@ -113,11 +113,11 @@ const faqs = [
     },
     {
         q: '기존 멤버십과의 차이점은?',
-        a: 'Founder Pass는 기존 멤버십의 상위 등급으로, 모든 기존 멤버십 혜택을 포함합니다. Founder Pass 가입 시 별도의 월 구독료 없이 모든 서비스를 이용하실 수 있습니다.'
+        a: 'Navigator Pass는 기존 멤버십의 상위 등급으로, 모든 기존 멤버십 혜택을 포함합니다. Navigator Pass 가입 시 별도의 월 구독료 없이 모든 서비스를 이용하실 수 있습니다.'
     },
 ];
 
-export default function FounderPassPage() {
+export default function NavigatorPassPage() {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
     const formatPrice = (price: number) => {
@@ -138,7 +138,7 @@ export default function FounderPassPage() {
                     className="max-w-4xl mx-auto text-center relative z-10"
                 >
                     <Badge className="mb-6 bg-obsidian text-white px-4 py-1.5 text-sm font-bold">
-                        FOUNDER PASS 2026
+                        NAVIGATOR PASS 2026
                     </Badge>
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-obsidian leading-tight tracking-tight mb-6">
                         유니클 생태계에 들어오는<br />
@@ -148,7 +148,7 @@ export default function FounderPassPage() {
                     </h1>
                     <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
                         회복을 '관리'가 아닌 '시스템'으로.<br />
-                        Founder Pass와 함께 당신만의 회복 OS를 구축하세요.
+                        Navigator Pass와 함께 당신만의 회복 OS를 구축하세요.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
                         <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export default function FounderPassPage() {
                                             className={`w-full h-12 mt-auto text-base font-bold bg-gradient-to-r ${tier.color} hover:opacity-90 text-white rounded-xl`}
                                             asChild
                                         >
-                                            <Link href={`/checkout?product=founder-${tier.id}&name=${tier.name}&price=${tier.price}&quantity=1`}>
+                                            <Link href={`/checkout?product=navigator-${tier.id}&name=${tier.name}&price=${tier.price}&quantity=1`}>
                                                 {tier.name} 시작하기
                                                 <ArrowRight className="w-4 h-4 ml-2" />
                                             </Link>
@@ -260,7 +260,7 @@ export default function FounderPassPage() {
                         <span className="text-sm font-bold text-slate-700">멤버십 관계 안내</span>
                     </div>
                     <p className="text-slate-600 leading-relaxed">
-                        Founder Pass는 기존 멤버십의 <strong className="text-obsidian">상위 등급</strong>입니다.<br />
+                        Navigator Pass는 기존 멤버십의 <strong className="text-obsidian">상위 등급</strong>입니다.<br />
                         가입 시 모든 멤버십 혜택이 자동으로 포함되며, 별도 구독료가 필요 없습니다.
                     </p>
                 </div>

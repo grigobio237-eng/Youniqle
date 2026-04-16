@@ -9,9 +9,9 @@ export const POINT_EARN_RATES = {
   bloomer: 0.02,  // 2%
   glower: 0.025,  // 2.5%
   ecosoul: 0.03,  // 3%
-  essence: 0.05,  // 5% (Founder Pass Tier 1)
-  balance: 0.10,  // 10% (Founder Pass Tier 2)
-  miracle: 0.15   // 15% (Founder Pass Tier 3)
+  start: 0.05,    // 5% (Navigator Pass Tier 1)
+  signature: 0.10, // 10% (Navigator Pass Tier 2)
+  black: 0.15      // 15% (Navigator Pass Tier 3)
 } as const;
 
 // 포인트 만료 기간 (일)

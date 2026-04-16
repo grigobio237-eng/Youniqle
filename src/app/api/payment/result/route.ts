@@ -146,11 +146,11 @@ export async function POST(request: NextRequest) {
                 const buyer = await User.findById(order.userId);
 
                 if (buyer) {
-                  // Founder Pass 등급 상향
-                  const founderItem = order.items.find((item: any) => typeof item.productId === 'string' && item.productId.startsWith('founder-'));
-                  if (founderItem) {
-                    const gradeType = founderItem.productId.split('-')[1];
-                    if (['essence', 'balance', 'miracle'].includes(gradeType)) {
+                  // Navigator Pass 등급 상향
+                  const navigatorItem = order.items.find((item: any) => typeof item.productId === 'string' && item.productId.startsWith('navigator-'));
+                  if (navigatorItem) {
+                    const gradeType = navigatorItem.productId.split('-')[1];
+                    if (['start', 'signature', 'black'].includes(gradeType)) {
                       buyer.grade = gradeType;
                       await buyer.save(mongoSession ? { session: mongoSession } : {});
                       console.log(`🎊 등급 상향 완료: ${buyer.email} -> ${gradeType}`);

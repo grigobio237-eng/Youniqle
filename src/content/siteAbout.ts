@@ -22,10 +22,10 @@ export interface AboutContent {
   payment: string;
   hero: string;
   short: string;
-  founderPass?: {
-    essence: string;
-    balance: string;
-    miracle: string;
+  navigatorPass?: {
+    start: string;
+    signature: string;
+    black: string;
   };
   standard: string[];
   extended: string[];
@@ -40,14 +40,14 @@ export const ABOUT_CONTENT: AboutContent = {
   payment: "Safety Secured",
   hero: "Recovery by Data, not Feeling.",
   short: "Youniqle(유니클)은 주식회사 사피에넷이 운영하는 프리미엄 회복 큐레이션 브랜드입니다. 우리는 감각이 아닌 '데이터'에 기반하여 당신의 삶을 다시 세팅하는 가장 과학적이고 프라이빗한 솔루션을 제안합니다. 사피에넷의 기술력과 파트너 네트워크가 엄선한 회복 프로토콜을 만나보세요.",
-  founderPass: {
-    essence: "ESSENCE PASS: 디지털 회복 루틴 스타터",
-    balance: "BALANCE PASS: 전문가 지식 및 데이터 시각화",
-    miracle: "MIRACLE PASS: 유니클 웹툰 및 데이터 자산화 프리미엄"
+  navigatorPass: {
+    start: "START PASS: 입문형 회복 시스템 (330만원)",
+    signature: "SIGNATURE PASS: 5년의 완벽한 회복 설계 (1,100만원)",
+    black: "BLACK PASS: VIP 프라이빗 컨시어지 (3,300만원)"
   },
   standard: [
     "우리는 회복의 본질을 데이터로 증명합니다.",
-    "Founder Pass(파운더스 패스)를 통해 유니클만의 정밀한 회복 시스템에 합류할 수 있습니다.",
+    "Navigator Pass(네비게이터 패스)를 통해 유니클만의 정밀한 회복 시스템에 합류할 수 있습니다.",
     "심리 진단, MBTI, 배경 제거 등 13종의 회복 유틸리티 도구를 통해 일상의 편의를 제공합니다.",
     "5개 층으로 구성된 '파빌리온'은 갤러리부터 실시간 코칭, 라운지까지 아우르는 온라인 복합 공간입니다.",
     "유니클 내비게이터와 유니클 웹툰 제네레이터가 당신의 회복 데이터를 매일 분석하고 자산화합니다.",
@@ -62,7 +62,7 @@ export const ABOUT_CONTENT: AboutContent = {
     { title: "데이터 기반", desc: "감각이 아닌 수치로 증명하는 회복", icon: Activity },
     { title: "엄선 큐레이션", desc: "사피에넷 연구진의 엄격한 검증", icon: Sparkles },
     { title: "전문가 코칭", desc: "유니클과 원장님이 제안하는 개인 맞춤형 프로토콜", icon: Zap },
-    { title: "프라이빗 권한", desc: "Founder Pass 등급별 차원 다른 컨시어지", icon: Lock },
+    { title: "프라이빗 권한", desc: "Navigator Pass 등급별 차원 다른 컨시어지", icon: Lock },
     { title: "신뢰 프로세스", desc: "주식회사 사피에넷의 책임 운영", icon: Shield }
   ],
   partnerOneLiner: "회복의 가치를 함께 실현할 글로벌 파트너를 찾습니다. 브랜드, 연구소, 전문가 그룹과의 혁신적인 협업을 환영합니다. (제휴 문의: partner@youniqle.co.kr)",

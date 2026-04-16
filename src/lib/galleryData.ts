@@ -69,11 +69,13 @@ export async function fetchGalleryData() {
 
             if (!ownersMap.has(artistId)) {
                 ownersMap.set(artistId, {
-                    id: artistId, // Use simpler ID for matching
-                    name: artist.username || artist.name || 'Unknown Artist',
-                    role: 'Artist', // Default role
-                    bio: artist.artist_bio || artist.introduction || artist.bio || 'No biography available.',
-                    image: getFirebaseUrl(artist.profile_image || artist.avatar_url),
+                    id: artistId, 
+                    name: artist.name || 'Unknown Artist',
+                    role: 'Artist',
+                    bio: artist.artist_bio || artist.bio || 'No biography available.',
+                    image: getFirebaseUrl(artist.avatar_url || artist.profile_image),
+                    isSpotlight: artist.isSpotlight || false,
+                    specialty: artist.artist_specialty || '',
                     items: []
                 });
             }
@@ -86,17 +88,24 @@ export async function fetchGalleryData() {
                 description: art.description || '',
                 price: art.price ? `${art.price.toLocaleString()}` : 'Price on Request',
                 rental: (art.rental_price !== undefined && art.rental_price !== null) ? `${art.rental_price.toLocaleString()}` : undefined,
-                image: getFirebaseUrl(art.firebase_storage_path || art.image_url),
+                image: getFirebaseUrl(art.firebase_image_url || art.image_url),
+                isCurated: art.isCurated || false,
+                category: art.category || '회화',
+                style: art.style || 'None',
+                subject: art.subject || 'None',
+                space: art.space || 'None',
+                season: art.season || 'None',
                 specs: {
                     material: art.material || art.category || 'Mixed Media',
-                    year: art.year || (art.createdAt ? new Date(art.createdAt).getFullYear().toString() : '2025')
+                    year: art.year || (art.createdAt ? new Date(art.createdAt).getFullYear().toString() : '2025'),
+                    size: art.size || '',
+                    ho: art.ho || 0
                 },
                 canvasSize: art.width && art.height ? `${art.width} x ${art.height} cm` : (art.size ? `${art.size}호` : 'Various Sizes'),
-                hoSize: art.ho || art.size,
                 width: art.width,
                 height: art.height,
                 rentalStatus: (art.rental_status && art.rental_status !== 'undefined') ? art.rental_status : 'available',
-                artistId: artistId // Ensure artistId is set for inquiries
+                artistId: artistId
             });
         });
 

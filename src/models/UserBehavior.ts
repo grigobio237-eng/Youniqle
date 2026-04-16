@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUserBehavior extends Document {
-  userId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
   sessionId: string;
   eventType: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'purchase' | 'like' | 'dislike' | 'share' | 'comment' | 'search' | 'filter' | 'sort' | 'scroll' | 'time_on_page';
   itemId?: mongoose.Types.ObjectId;
@@ -42,7 +42,7 @@ export interface IUserBehavior extends Document {
 }
 
 const UserBehaviorSchema: Schema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
   sessionId: { type: String, required: true },
   eventType: {
     type: String,

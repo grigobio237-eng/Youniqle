@@ -7,7 +7,7 @@ export interface IUser extends Document {
   phone?: string;
   avatar?: string;
   role: 'member' | 'partner' | 'admin';
-  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
+  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
   tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급 (파빌리온 5층 등)
   points: number;
   gender?: 'male' | 'female' | 'other';
@@ -228,7 +228,7 @@ const UserSchema = new Schema<IUser>({
   },
   grade: {
     type: String,
-    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'essence', 'balance', 'miracle'],
+    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'start', 'signature', 'black'],
     default: 'cedar',
   },
   tier: {

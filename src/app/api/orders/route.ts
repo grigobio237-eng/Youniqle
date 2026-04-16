@@ -95,8 +95,8 @@ export async function POST(request: NextRequest) {
     const Product = (await import('@/models/Product')).default;
 
     for (const item of items) {
-      // Founder Pass 등 가상 상품은 예외 처리
-      if (typeof item.productId === 'string' && item.productId.startsWith('founder-')) {
+      // Navigator Pass 등 가상 상품은 예외 처리
+      if (typeof item.productId === 'string' && item.productId.startsWith('navigator-')) {
         validatedItems.push(item);
         continue;
       }

@@ -32,7 +32,7 @@ async function connectDB() {
       maxPoolSize: 20, // 개발 환경에서의 데드락 방지를 위해 풀 크기 증가
       minPoolSize: 1, // 최소 1개의 연결 유지로 초기 지연 방지
       maxIdleTimeMS: 10000, // 10초로 단축
-      serverSelectionTimeoutMS: 5000, // 5초로 단축 (빠른 실패 유도)
+      serverSelectionTimeoutMS: 10000, // 10초로 연장 (콜드 스타트 대비)
       socketTimeoutMS: 30000, // 30초로 유지
       connectTimeoutMS: 5000, // 5초로 단축
       retryWrites: true,

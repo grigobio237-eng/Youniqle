@@ -17,9 +17,9 @@ const gradeInfo = {
     bloomer: { name: 'BLOOMER', emoji: '🌺', color: 'from-green-400 to-emerald-500', next: 'GLOWER', nextPoints: 50000 },
     glower: { name: 'GLOWER', emoji: '🌸', color: 'from-pink-400 to-rose-500', next: 'ECOSOUL', nextPoints: 100000 },
     ecosoul: { name: 'ECOSOUL', emoji: '🌿', color: 'from-purple-400 to-violet-600', next: null, nextPoints: null },
-    essence: { name: 'ESSENCE', emoji: '✨', color: 'from-emerald-400 to-teal-500', next: 'BALANCE', nextPoints: 0 },
-    balance: { name: 'BALANCE', emoji: '⚖️', color: 'from-blue-400 to-cyan-500', next: 'MIRACLE', nextPoints: 0 },
-    miracle: { name: 'MIRACLE', emoji: '💫', color: 'from-amber-400 to-yellow-500', next: null, nextPoints: null },
+    start: { name: 'START', emoji: '🎯', color: 'from-blue-400 to-indigo-500', next: 'SIGNATURE', nextPoints: 0 },
+    signature: { name: 'SIGNATURE', emoji: '💎', color: 'from-chapter-accent to-chapter-accent/80', next: 'BLACK', nextPoints: 0 },
+    black: { name: 'BLACK', emoji: '👑', color: 'from-slate-700 to-obsidian', next: null, nextPoints: null },
 };
 
 const gradeColors = {
@@ -28,9 +28,9 @@ const gradeColors = {
     bloomer: 'bg-green-100 text-green-600 border-green-200',
     glower: 'bg-pink-100 text-pink-600 border-pink-200',
     ecosoul: 'bg-purple-100 text-purple-600 border-purple-200',
-    essence: 'bg-emerald-100 text-emerald-600 border-emerald-200',
-    balance: 'bg-blue-100 text-blue-600 border-blue-200',
-    miracle: 'bg-amber-100 text-amber-600 border-amber-200',
+    start: 'bg-blue-100 text-blue-600 border-blue-200',
+    signature: 'bg-chapter-accent/10 text-chapter-accent border-chapter-accent/20',
+    black: 'bg-obsidian text-mist border-slate-700',
 };
 
 export default function MembershipProgress({ currentGrade, currentPoints }: MembershipProgressProps) {

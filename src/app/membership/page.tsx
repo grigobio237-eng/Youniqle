@@ -13,10 +13,10 @@ import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { PASS_SPECS } from '@/lib/constants/passes';
 
 // 구매/활동 기반 회원등급 타입
-type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'essence' | 'balance' | 'miracle';
+type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
 
 // 등급 순서 정의 (비교용)
-const GRADE_ORDER: GradeType[] = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'essence', 'balance', 'miracle'];
+const GRADE_ORDER: GradeType[] = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'start', 'signature', 'black'];
 
 // 등급별 혜택 정의
 const GRADE_BENEFITS: Record<GradeType, { title: string; desc: string; benefits: string[] }> = {
@@ -175,7 +175,7 @@ export default function MembershipPage() {
                     <div className="flex flex-col items-center gap-2">
                         <div className="flex items-center gap-2 px-6 py-2 bg-obsidian text-white rounded-full shadow-xl">
                             <Sparkles className="w-5 h-5 text-amber-400" />
-                            <span className="font-black tracking-widest text-xs uppercase">Youniqle Pass Series</span>
+                            <span className="font-black tracking-widest text-xs uppercase">Navigator Pass Series</span>
                         </div>
                     </div>
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-chapter-accent/20" />
