@@ -3,6 +3,8 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
 import Review from '@/models/Review';
+import PointTransaction from '@/models/PointTransaction';
+import Diagnosis from '@/models/Diagnosis';
 import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
 
@@ -40,7 +42,7 @@ export async function GET(
     }
 
     // 사용자 활동 통계 조회
-    const [orders, reviews] = await Promise.all([
+    const [orders, reviews, pointTransactions, diagnosisHistories] = await Promise.all([
       Order.find({ userId: user._id })
         .sort({ createdAt: -1 })
         .limit(10)
@@ -48,7 +50,13 @@ export async function GET(
       Review.find({ userId: user._id })
         .sort({ createdAt: -1 })
         .limit(5)
-        .populate('productId', 'name images')
+        .populate('productId', 'name images'),
+      PointTransaction.find({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .limit(20),
+      Diagnosis.find({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .limit(10)
     ]);
 
     const totalOrders = await Order.countDocuments({ userId: user._id });
@@ -102,6 +110,22 @@ export async function GET(
           name: review.productId.name,
           image: review.productId.images[0]?.url
         }
+      })),
+      pointHistories: pointTransactions.map(tx => ({
+        id: tx._id.toString(),
+        type: tx.type,
+        amount: tx.amount,
+        balance: tx.balance,
+        description: tx.description,
+        createdAt: tx.createdAt
+      })),
+      diagnosisHistories: diagnosisHistories.map(diag => ({
+        id: diag._id.toString(),
+        type: diag.type,
+        totalScore: diag.totalScore,
+        categoryScores: diag.categoryScores,
+        resultTitle: diag.resultTitle,
+        createdAt: diag.createdAt
       }))
     };
 
@@ -149,10 +173,7 @@ export async function PATCH(
 
     switch (action) {
       case 'update':
-        // 사용자 정보 업데이트
-        if (data.name) user.name = data.name;
-        if (data.email) user.email = data.email;
-        if (data.phone) user.phone = data.phone;
+        // 사용자 정보 업데이트 (개인정보 제외, 오퍼레이션 필드만 허용)
         if (data.role) user.role = data.role;
         if (data.grade) user.grade = data.grade;
         if (data.tier) user.tier = data.tier; // tier 직접 업데이트

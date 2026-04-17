@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
+    if (user.addresses && user.addresses.length >= 5) {
+      return NextResponse.json({ error: '배송지는 최대 5개까지만 등록할 수 있습니다.' }, { status: 400 });
+    }
+
     const newAddress = {
       label,
       recipient,

@@ -26,12 +26,14 @@ export interface IUser extends Document {
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
   addresses: Array<{
+    _id?: mongoose.Types.ObjectId;
     label: string;
     recipient: string;
     phone: string;
     zip: string;
     addr1: string;
     addr2?: string;
+    isDefault: boolean;
   }>;
   wishlist: Array<{
     productId: mongoose.Types.ObjectId;
@@ -300,6 +302,7 @@ const UserSchema = new Schema<IUser>({
     zip: { type: String, required: true },
     addr1: { type: String, required: true },
     addr2: { type: String },
+    isDefault: { type: Boolean, default: false }
   }],
   wishlist: [{
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },

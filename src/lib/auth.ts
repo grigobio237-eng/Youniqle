@@ -228,15 +228,8 @@ export const authOptions: AuthOptions = {
         token.thirdPartyAcceptedAt = (user as any).thirdPartyAcceptedAt;
       }
 
-      // 사용자 정보 로드 및 추천 코드 동기화
-      // 약관 동의 데이터가 토큰에 없는 경우에도 DB 조회를 수행하도록 조건을 확장합니다.
-      if (token.email && (
-        !token.role || 
-        !token.subscription || 
-        !token.passInfo || 
-        token.referralCode === undefined ||
-        token.termsAcceptedAt === undefined
-      )) {
+      // 사용자 권한 및 최신 정보 동기화 (실시간 반영을 위해 항상 DB 조회)
+      if (token.email) {
         try {
           await connectDB();
           const dbUser = await User.findOne({ email: token.email });

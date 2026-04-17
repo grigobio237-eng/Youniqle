@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -88,6 +89,7 @@ const gradeIcons = {
 };
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,9 +153,7 @@ export default function AdminUsersPage() {
   };
 
   const handleViewDetail = (user: User) => {
-    setSelectedUser(user);
-    setPointAdjustAmount(0);
-    setShowDetailModal(true);
+    router.push(`/admin/users/${user.id}`);
   };
 
   const handleAdjustPoints = async (type: 'add' | 'subtract') => {
@@ -535,119 +535,6 @@ export default function AdminUsersPage() {
         </Card>
       </div>
 
-      {/* User Detail Modal */}
-      {showDetailModal && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <CardHeader className="flex flex-row items-center justify-between border-b p-6">
-              <div>
-                <CardTitle className="text-2xl font-bold">{selectedUser.name}</CardTitle>
-                <CardDescription>{selectedUser.email}</CardDescription>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setShowDetailModal(false)}>
-                <XCircle className="h-5 w-5" />
-              </Button>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              {/* 기본 정보 */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">역할</p>
-                  <p className="font-medium">{selectedUser.role === 'admin' ? '관리자' : selectedUser.role === 'partner' ? '파트너' : '회원'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">회원 등급</p>
-                  <p className="font-medium">{(selectedUser.grade || 'CEDAR').toUpperCase()}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">접근 등급</p>
-                  <Badge className={`${selectedUser.tier === 'RESTART' ? 'bg-purple-100 text-purple-800' :
-                    selectedUser.tier === 'REBORN' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                    {selectedUser.tier || 'RESET'}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">가입일</p>
-                  <p className="font-medium">{new Date(selectedUser.createdAt).toLocaleDateString('ko-KR')}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">마지막 로그인</p>
-                  <p className="font-medium">{selectedUser.lastLoginAt ? new Date(selectedUser.lastLoginAt).toLocaleString('ko-KR') : '없음'}</p>
-                </div>
-                {selectedUser.phone && (
-                  <div>
-                    <p className="text-sm text-gray-500">전화번호</p>
-                    <p className="font-medium">{selectedUser.phone}</p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm text-gray-500">인증상태</p>
-                  <Badge variant={selectedUser.emailVerified ? 'default' : 'secondary'}>{selectedUser.emailVerified ? '인증완료' : '미인증'}</Badge>
-                </div>
-              </div>
-
-              {/* 활동 통계 */}
-              <div className="border-t pt-4">
-                <h4 className="font-bold mb-3">활동 통계</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{selectedUser.points.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">보유 포인트</p>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{selectedUser.totalOrders}</p>
-                    <p className="text-xs text-gray-500">총 주문</p>
-                  </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">₩{selectedUser.totalSpent.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">총 구매액</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 포인트 조정 */}
-              <div className="border-t pt-4">
-                <h4 className="font-bold mb-3">포인트 조정</h4>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="조정할 포인트"
-                    value={pointAdjustAmount || ''}
-                    onChange={(e) => setPointAdjustAmount(Number(e.target.value))}
-                    className="w-32"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-green-600 border-green-200 hover:bg-green-50"
-                    onClick={() => handleAdjustPoints('add')}
-                    disabled={adjustingPoints || pointAdjustAmount <= 0}
-                  >
-                    지급
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => handleAdjustPoints('subtract')}
-                    disabled={adjustingPoints || pointAdjustAmount <= 0}
-                  >
-                    차감
-                  </Button>
-                </div>
-              </div>
-
-              {/* 닫기 버튼 */}
-              <div className="flex justify-end pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowDetailModal(false)}>닫기</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </>
   );
 }

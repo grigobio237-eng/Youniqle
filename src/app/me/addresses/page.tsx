@@ -229,10 +229,15 @@ export default function AddressesPage() {
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">물류 터미널 관리</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원의 활성 배송 거점 목록입니다.</p>
           </div>
-          {!isAdding && (
+          {!isAdding && addresses.length < 5 && (
             <Button onClick={() => setIsAdding(true)} className="h-14 px-8 rounded-2xl bg-obsidian text-mist font-black flex gap-2 shadow-xl shadow-obsidian/10">
               <Plus className="h-5 w-5" /> 배송 프로토콜 추가
             </Button>
+          )}
+          {!isAdding && addresses.length >= 5 && (
+            <div className="text-right">
+              <p className="text-sm font-bold text-status-danger mt-4">최대 5개의 물류 터미널까지만 등록할 수 있습니다.</p>
+            </div>
           )}
         </div>
 
