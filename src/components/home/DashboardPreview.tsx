@@ -162,7 +162,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <section className="container mx-auto px-4 pt-16 max-w-5xl space-y-8">
           <div className="flex items-end justify-between">
             <h2 className="text-3xl font-black text-obsidian tracking-tight">🎯 지능형 회복 가이드</h2>
-            <Badge variant="outline" className="border-chapter-accent text-chapter-accent font-black">AI 개인화</Badge>
+            <Badge variant="outline" className="border-chapter-accent text-chapter-accent font-black">유니클 개인화</Badge>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -289,7 +289,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
                 <h3 className="font-black text-3xl text-obsidian tracking-tight">유니클 매니저 리포트</h3>
-                <Badge className="bg-chapter-accent text-mist border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">Integrated AI Analysis</Badge>
+                <Badge className="bg-chapter-accent text-mist border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">Integrated Youniqle Analysis</Badge>
               </div>
               <p className="text-xl text-slate font-medium leading-relaxed italic opacity-80">
                 "{displayScore >= 70 ? '당신의 회복 패턴은 안정적입니다. 근육의 미세 이완을 위해 사운드 테라피의 비중을 높여보세요.' : '회복 지수가 임계점에 근접했습니다. 자세 교정 프로토콜과 단백질 섭취를 강력히 권장합니다.'}"
@@ -310,7 +310,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { label: '사운드 테라피 (Sound)', desc: '바이오 뇌파 동기화 및 심층 회복', icon: '🎧', href: '/?tool=sound', color: 'blue' },
-            { label: '자세 분석 (Posture)', desc: 'AI 기반 실시간 신체 밸런스 측정', icon: '🧘', href: '/utils?tool=posture', color: 'emerald' },
+            { label: '자세 분석 (Posture)', desc: '유니클 기반 실시간 신체 밸런스 측정', icon: '🧘', href: '/utils?tool=posture', color: 'emerald' },
             { label: '센서리 스캐너 (Scan)', desc: '공간 분위기 및 식단 영양 분석', icon: '🍱', href: '/utils/food-scanner', color: 'reward-gold' }
           ].map((tool) => (
              <Link key={tool.href} href={tool.href} className="group">

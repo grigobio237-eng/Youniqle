@@ -4,7 +4,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2 } from 'lucide-react';
+
 import PassCatalog from '@/components/navigator/PassCatalog';
 import SquareBoard from '@/components/navigator/SquareBoard';
 import SquarePostForm from '@/components/navigator/SquarePostForm';
@@ -12,16 +13,20 @@ import SquarePostDetail from '@/components/navigator/SquarePostDetail';
 import HotlineChat from '@/components/navigator/HotlineChat';
 import ArchiveContent from '@/components/navigator/ArchiveContent';
 import PassOperationGuide from '@/components/navigator/PassOperationGuide';
+import ShopManagement from '@/components/navigator/ShopManagement';
+
 
 function NavigatorLoungeContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline' | 'catalog'>('archive');
+  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline' | 'catalog' | 'shops'>('archive');
+
   
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['archive', 'policy', 'square', 'hotline', 'catalog'].includes(tab)) {
+    if (tab && ['archive', 'policy', 'square', 'hotline', 'catalog', 'shops'].includes(tab)) {
+
       setActiveTab(tab as any);
     }
   }, [searchParams]);
@@ -87,7 +92,14 @@ function NavigatorLoungeContent() {
       icon: Presentation,
       desc: '고객에게 패스 상품을 제안하고 설명하는 공간',
     },
+    {
+      id: 'shops',
+      label: '업소 및 리드 관리',
+      icon: Building2,
+      desc: '등록한 업체별 설문 리드 현황 및 마케팅 관리',
+    },
   ] as const;
+
 
   const handleRefresh = () => setRefreshKey(prev => prev + 1);
 
@@ -170,7 +182,10 @@ function NavigatorLoungeContent() {
                 <ArchiveContent />
               ) : activeTab === 'catalog' ? (
                 <PassCatalog />
+              ) : activeTab === 'shops' ? (
+                <ShopManagement />
               ) : (
+
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
                   <div className="w-24 h-24 bg-mist rounded-full flex items-center justify-center">
                     {/* Placeholder for future tabs */}

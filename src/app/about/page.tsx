@@ -121,7 +121,7 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-chapter-accent hover:shadow-xl transition-all duration-500">
                   <Brain className="w-10 h-10 text-chapter-accent mb-6 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">AI Analysis</h4>
+                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Youniqle Analysis</h4>
                   <p className="text-sm text-slate/60 leading-relaxed font-bold">생체 리듬과 생활 패턴의 <br /> 정밀한 상관관계 분석</p>
                 </div>
                 <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-reward-gold hover:shadow-xl transition-all duration-500">
@@ -336,7 +336,7 @@ export default function AboutPage() {
                   <ArrowRight className="w-6 h-6 md:w-10 md:h-10 text-white" />
                 </div>
               </Button>
-              <p className="text-[10px] md:text-sm font-black text-slate/30 uppercase tracking-[1em]">Integrated AI Diagnosis © Youniqle</p>
+              <p className="text-[10px] md:text-sm font-black text-slate/30 uppercase tracking-[1em]">Integrated Youniqle Diagnosis © Youniqle</p>
             </motion.div>
         </div>
       </section>

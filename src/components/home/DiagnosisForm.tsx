@@ -8,22 +8,24 @@ import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 
 export default function DiagnosisForm({ questions, onComplete }: { questions: Question[]; onComplete: (score: number, answers: any[], userNote: string) => void }) {
-  const { journey } = useRecovery();
+  const { journey, treatmentType } = useRecovery();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<any[]>(new Array(questions.length).fill(null));
   const [userNote, setUserNote] = useState('');
 
   // Context-aware Header
   const getHeaderInfo = () => {
+    const typeLabel = treatmentType === 'SURGERY' ? '수술' : '시술';
+    
     switch (journey) {
       case 'CLINICAL_PRE':
         return {
-          title: "성공적인 시술을 위한 컨디션 체크",
+          title: `성공적인 ${typeLabel}을 위한 컨디션 체크`,
           sub: "안전하고 확실한 결과를 위한 준비 단계를 점검합니다"
         };
       case 'CLINICAL_POST':
         return {
-          title: "회복의 골든타임, 72시간 집중 케어",
+          title: `${typeLabel} 후 회복의 골든타임, 72시간 집중 케어`,
           sub: "이상 증상을 예방하고 회복 속도를 극대화하는 시간입니다"
         };
       default:

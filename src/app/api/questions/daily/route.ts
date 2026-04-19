@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const journey = (searchParams.get('journey') || 'WELLNESS') as 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST';
         const medicalCategory = searchParams.get('medicalCategory') || null;
+        const treatmentType = searchParams.get('treatmentType') || null;
 
         // AUTH & PERSONALIZATION CONTEXT
         const session = await getServerSession(authOptions);
@@ -66,7 +67,8 @@ export async function GET(req: NextRequest) {
                 themeData.theme, 
                 `${themeData.keywords}, ${personalContext}`, 
                 journey,
-                medicalCategory
+                medicalCategory,
+                treatmentType
             );
 
 

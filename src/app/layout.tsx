@@ -38,11 +38,20 @@ export const metadata: Metadata = {
     title: 'Youniqle - 번아웃 극복을 위한 유니클 맞춤 회복 솔루션',
     description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
     siteName: 'Youniqle',
+    images: [
+      {
+        url: '/images/og-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Youniqle - 맞춤 회복 솔루션',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Youniqle - 번아웃 극복을 위한 유니클 맞춤 회복 솔루션',
     description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
+    images: ['/images/og-banner.png'],
   },
   verification: {
     google: 'your-google-verification-code',

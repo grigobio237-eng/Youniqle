@@ -473,7 +473,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         theme: string, 
         keywords: string, 
         journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS',
-        medicalCategory: string | null = null
+        medicalCategory: string | null = null,
+        treatmentType: string | null = null
     ): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY is missing');
@@ -485,12 +486,14 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             let categorySpecificInstruction = "";
 
             // 1. Basic Journey Instruction
+            const typeLabel = treatmentType === 'SURGERY' ? '수술' : '시술';
+
             if (journey === 'CLINICAL_PRE') {
-                contextInstruction = `사용자는 현재 '시술/수술 전' 단계입니다. 
-중요 목표: 시술 성공을 위한 최상의 컨디션 유지 및 의사 상담 준비.`;
+                contextInstruction = `사용자는 현재 '${typeLabel} 전' 단계입니다. 
+중요 목표: ${typeLabel} 성공을 위한 최상의 컨디션 유지 및 의사 상담 준비.`;
             } else if (journey === 'CLINICAL_POST') {
-                contextInstruction = `사용자는 현재 '시술/수술 후' 관리 단계입니다. 
-중요 목표: 이상 증상 조기 발견 및 안정적 회복 가이드.`;
+                contextInstruction = `사용자는 현재 '${typeLabel} 후' 관리 단계입니다. 
+중요 목표: 이상 증상 조기 발견 및 안정적 회복 가이드. ${typeLabel} 부위의 안정이 최우선입니다.`;
             } else {
                 contextInstruction = `사용자는 '일상 회복(Wellness)' 단계입니다. 
 중요 목표: 일상의 리듬 회복 및 에너지 최적화.`;

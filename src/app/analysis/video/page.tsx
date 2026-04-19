@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface PostureResult {
     subjectName: string;
@@ -20,6 +21,7 @@ interface PostureResult {
 
 export default function PostureAnalysisPage() {
     const router = useRouter();
+    const { data: session } = useSession();
     const [status, setStatus] = useState<'idle' | 'webcam' | 'scanning' | 'result'>('idle');
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export default function PostureAnalysisPage() {
     const [loading, setLoading] = useState(false);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -170,7 +173,7 @@ export default function PostureAnalysisPage() {
                     </Button>
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-chapter-accent" />
-                        <span className="text-xs font-black uppercase tracking-widest text-chapter-accent">AI Posture Tracker</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-chapter-accent">Youniqle Posture Tracker</span>
                     </div>
                 </header>
 
@@ -192,6 +195,8 @@ export default function PostureAnalysisPage() {
                     accept="image/*" 
                     className="hidden" 
                     {...({ capture: 'environment' } as any)}
+                    aria-label="자세 사진 업로드"
+                    title="자세 사진 업로드"
                 />
 
                 <main>
@@ -304,7 +309,7 @@ export default function PostureAnalysisPage() {
                                     </div>
                                 </div>
                                 <div className="text-center space-y-4">
-                                    <h3 className="text-3xl font-black text-obsidian tracking-tight uppercase">AI Posture Synthesis</h3>
+                                    <h3 className="text-3xl font-black text-obsidian tracking-tight uppercase">Youniqle Posture Synthesis</h3>
                                     <p className="text-slate/60 font-bold animate-pulse text-lg">이미지 데이터로부터 골격 구조를 추적하고 있습니다...</p>
                                 </div>
                             </motion.div>
@@ -334,7 +339,7 @@ export default function PostureAnalysisPage() {
                                         <div className="aspect-square rounded-3xl overflow-hidden bg-mist border border-line relative">
                                             {capturedImage && <img src={capturedImage} className="w-full h-full object-cover" alt="Posture" />}
                                             <div className="absolute top-4 left-4 bg-obsidian/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-xs font-bold border border-white/20">
-                                                <Activity className="w-4 h-4 inline-block mr-2 text-chapter-accent" /> AI Skeleton Scan Active
+                                                <Activity className="w-4 h-4 inline-block mr-2 text-chapter-accent" /> 유니클 스켈레톤 스캔 활성화
                                             </div>
                                         </div>
 

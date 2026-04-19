@@ -22,7 +22,8 @@ export interface AnalysisResult {
 }
 
 export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
-    const { journey, setJourney, medicalCategory, setMedicalCategory } = useRecovery();
+    const { journey, setJourney, medicalCategory, setMedicalCategory, treatmentType, setTreatmentType } = useRecovery();
+    const [selectionStep, setSelectionStep] = useState<'JOURNEY' | 'CATEGORY' | 'STAGE' | 'TYPE' | 'READY'>('JOURNEY');
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'idle' | 'scanning' | 'result'>('idle');
     const [loading, setLoading] = useState(false);
@@ -148,6 +149,11 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
             const data = await response.json();
             setResult(data);
             setStatus('result');
+
+            // --- 자동 저장 로직 추가 ---
+            if (session?.user) {
+                autoSaveResult(data, compressedData);
+            }
         } catch (err: any) {
             console.error('Analysis Error:', err);
             toast.error(err.message || "유니클 분석 중 오류가 발생했습니다.");
@@ -157,17 +163,40 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
         }
     };
 
+    const autoSaveResult = async (analysisResult: AnalysisResult, imageData: string) => {
+        setIsSaving(true);
+        try {
+            const response = await fetch('/api/scan/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: analysisResult.type || 'OTHER',
+                    imageData: imageData,
+                    score: analysisResult.matchScore,
+                    summary: analysisResult.summary,
+                    metrics: analysisResult.analysisTable
+                })
+            });
+
+            if (response.ok) {
+                setHasSaved(true);
+                toast.success('분석 결과가 타임라인에 자동으로 기록되었습니다.');
+            }
+        } catch (err) {
+            console.error("Auto-save failed:", err);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleSaveToTimeline = async () => {
         if (!session) {
             toast.error("로그인이 필요한 기능입니다.");
             return;
         }
 
-        const pass = (session.user as any).passInfo;
-        const isActivePass = pass && pass.status === 'ACTIVE' && pass.type !== 'NONE';
-
-        if (!isActivePass) {
-            setShowUpsell(true);
+        if (hasSaved) {
+            toast.info("이미 저장된 결과입니다.");
             return;
         }
 
@@ -280,9 +309,113 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
 
     const renderResultView = () => {
         if (!result) return null;
-        
+
         // CLINICAL_PRE requires a medical category to start
-        const canStartDiagnosis = journey === 'WELLNESS' || journey === 'CLINICAL_POST' || (journey === 'CLINICAL_PRE' && medicalCategory !== null);
+        const canStartDiagnosis = journey === 'WELLNESS' || (journey && medicalCategory && treatmentType);
+
+        const renderJourneySelector = () => (
+            <div className="space-y-4 pt-4 border-t border-line">
+                <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest text-center mb-6 px-10">당신의 현재 회복 상황을 선택해주세요</p>
+                <div className="grid grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => { setJourney('WELLNESS'); setSelectionStep('READY'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'WELLNESS' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white hover:border-chapter-accent/20'}`}
+                    >
+                        <div className="w-12 h-12 rounded-2xl bg-mist flex items-center justify-center text-2xl">🌿</div>
+                        <div className="text-center">
+                            <p className="text-sm font-black text-obsidian">웰니스</p>
+                            <p className="text-[9px] font-bold text-slate/50 mt-1">일상 회복</p>
+                        </div>
+                    </button>
+                    <button 
+                        onClick={() => { setSelectionStep('CATEGORY'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey?.startsWith('CLINICAL') ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white hover:border-chapter-accent/20'}`}
+                    >
+                        <div className="w-12 h-12 rounded-2xl bg-mist flex items-center justify-center text-2xl">🏥</div>
+                        <div className="text-center">
+                            <p className="text-sm font-black text-obsidian">클리닉</p>
+                            <p className="text-[9px] font-bold text-slate/50 mt-1">병원/시술/수술</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        );
+
+        const renderCategorySelector = () => (
+            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
+                <div className="flex justify-between items-center mb-4">
+                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">상담/진료 분야를 선택하세요</p>
+                    <button onClick={() => setSelectionStep('JOURNEY')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                    {[
+                        { id: 'PLASTIC', label: '성형/피부', emoji: '✨' },
+                        { id: 'ORTHOPEDIC', label: '정형/재활', emoji: '🦴' },
+                        { id: 'INTERNAL', label: '내과/건강검진', emoji: '🩺' },
+                        { id: 'GENERAL', label: '일반/외과', emoji: '🏥' }
+                    ].map(cat => (
+                        <button 
+                            key={cat.id}
+                            onClick={() => { setMedicalCategory(cat.id as any); setSelectionStep('STAGE'); }}
+                            className={`p-4 rounded-2xl border transition-all flex items-center gap-3 ${medicalCategory === cat.id ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
+                        >
+                            <span className="text-xl">{cat.emoji}</span>
+                            <span className="text-xs font-black text-obsidian">{cat.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const renderStageSelector = () => (
+            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
+                <div className="flex justify-between items-center mb-4">
+                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">시기 선택 (전/후)</p>
+                    <button onClick={() => setSelectionStep('CATEGORY')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => { setJourney('CLINICAL_PRE'); setSelectionStep('TYPE'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'CLINICAL_PRE' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
+                    >
+                        <div className="text-2xl">⏳</div>
+                        <p className="text-sm font-black text-obsidian">시술/수술 전</p>
+                    </button>
+                    <button 
+                        onClick={() => { setJourney('CLINICAL_POST'); setSelectionStep('TYPE'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'CLINICAL_POST' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
+                    >
+                        <div className="text-2xl">🚀</div>
+                        <p className="text-sm font-black text-obsidian">시술/수술 후</p>
+                    </button>
+                </div>
+            </div>
+        );
+
+        const renderTypeSelector = () => (
+            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
+                <div className="flex justify-between items-center mb-4">
+                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">시술 vs 수술 구분</p>
+                    <button onClick={() => setSelectionStep('STAGE')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => { setTreatmentType('PROCEDURE'); setSelectionStep('READY'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${treatmentType === 'PROCEDURE' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
+                    >
+                        <div className="text-2xl">💉</div>
+                        <p className="text-sm font-black text-obsidian">시술</p>
+                    </button>
+                    <button 
+                        onClick={() => { setTreatmentType('SURGERY'); setSelectionStep('READY'); }}
+                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${treatmentType === 'SURGERY' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
+                    >
+                        <div className="text-2xl">🔪</div>
+                        <p className="text-sm font-black text-obsidian">수술</p>
+                    </button>
+                </div>
+            </div>
+        );
 
         return (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -377,19 +510,33 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                                 </div>
                             )}
 
-                            <Button 
-                                onClick={() => onStart(result || undefined)}
-                                size="lg" 
-                                disabled={!canStartDiagnosis}
-                                className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${
-                                    !canStartDiagnosis ? 'bg-mist text-slate/50' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'
-                                }`}
-                            >
-                                {canStartDiagnosis && <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />}
-                                <Sparkles className={`w-6 h-6 mr-3 transition-transform ${canStartDiagnosis ? 'group-hover:rotate-12' : ''}`} />
-                                60초 정밀 진단 시작하기
-                                <ArrowRight className={`ml-3 w-6 h-6 transition-transform ${canStartDiagnosis ? 'group-hover:translate-x-1' : ''}`} />
-                            </Button>
+                            {/* Journey Stepper UI */}
+                            {selectionStep === 'JOURNEY' && renderJourneySelector()}
+                            {selectionStep === 'CATEGORY' && renderCategorySelector()}
+                            {selectionStep === 'STAGE' && renderStageSelector()}
+                            {selectionStep === 'TYPE' && renderTypeSelector()}
+
+                            {(selectionStep === 'READY' || canStartDiagnosis) && (
+                                <Button 
+                                    onClick={() => onStart(result || undefined)}
+                                    size="lg" 
+                                    className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20`}
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                    <Sparkles className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
+                                    60초 정밀 진단 시작하기
+                                    <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                </Button>
+                            )}
+                            
+                            {selectionStep === 'READY' && (
+                                <button 
+                                    onClick={() => setSelectionStep('JOURNEY')} 
+                                    className="w-full text-[10px] font-black text-slate/40 uppercase tracking-widest hover:text-chapter-accent transition-colors"
+                                >
+                                    설정 다시 선택하기
+                                </button>
+                            )}
                         </div>
                         
                         <Button variant="ghost" onClick={() => setStatus('idle')} className="w-full h-14 rounded-2xl text-slate/60 font-bold hover:bg-mist transition-all">

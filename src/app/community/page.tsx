@@ -24,8 +24,8 @@ export default function CommunityPortalPage() {
       badge: 'Coming Soon',
     },
     {
-      title: 'AI 소통 채널',
-      desc: '김미정 원장님(AI)과 함께하는 1:1 회복 상담 및 소통',
+      title: '유니클 소통 채널',
+      desc: '김미정 원장님(유니클)과 함께하는 1:1 회복 상담 및 소통',
       href: '/chat',
       icon: Sparkles,
       color: 'bg-indigo-500',

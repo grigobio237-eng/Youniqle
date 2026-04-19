@@ -54,7 +54,7 @@ export default function RecoveryPortalPage() {
     {
       title: '회복의 도구',
       subtitle: '스마트 데이터 진단 툴',
-      description: 'AI 비디오 자세 분석부터 호흡 가이드까지, 과학적인 회복을 위한 최신 도구를 활용하세요.',
+      description: '유니클 비디오 자세 분석부터 호흡 가이드까지, 과학적인 회복을 위한 최신 도구를 활용하세요.',
       icon: <Wrench className="w-6 h-6" />,
       image: '/images/portal/tools.png',
       link: '/utils',

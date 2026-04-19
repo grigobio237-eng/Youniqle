@@ -57,7 +57,7 @@ export default function RecoveryStartPage() {
                         <StepRow
                             step="01"
                             title="매일의 상태 체크"
-                            desc="하루 1분, 간단한 질문으로 당신의 몸 상태를 확인하세요. AI 네비게이터가 당신의 컨디션을 실시간으로 분석합니다."
+                            desc="하루 1분, 간단한 질문으로 당신의 몸 상태를 확인하세요. 유니클 네비게이터가 당신의 컨디션을 실시간으로 분석합니다."
                         />
                         <StepRow
                             step="02"
@@ -67,7 +67,7 @@ export default function RecoveryStartPage() {
                         <StepRow
                             step="03"
                             title="전문가와 함께하는 심화 과정"
-                            desc="혼자서 어렵다면 '회복 체험관 5층 라운지'의 AI 컨시어지를 통해 전문가의 도움을 받을 수 있습니다."
+                            desc="혼자서 어렵다면 '회복 체험관 5층 라운지'의 유니클 컨시어지를 통해 전문가의 도움을 받을 수 있습니다."
                         />
                     </div>
                 </div>

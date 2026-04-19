@@ -17,42 +17,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '사용자 ID를 찾을 수 없습니다.' }, { status: 400 });
     }
 
-    // 1. Pass 정보 확인 (서버에서 다시 한 번 DB 조회하여 정확성 확보)
+    // 1. Pass 정보 확인 (기존에는 저장을 막았으나, 이제 이력 저장 자체는 허용하고 멤버십 여부는 메타데이터로만 활용할 수 있음)
     await dbConnect();
     const user = await User.findById(userId);
     if (!user) {
         return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    const pass = user.passInfo;
-    const isActivePass = pass && pass.status === 'ACTIVE' && pass.type !== 'NONE';
-
-    if (!isActivePass) {
-      return NextResponse.json({ 
-        error: '스캔 타임라인 저장 권한이 없습니다. 유니클 Pass 회원이 되어보세요!',
-        code: 'REQUIRE_MEMBERSHIP' 
-      }, { status: 403 });
-    }
-
     // 2. 데이터 추출
     const body = await req.json();
     const { type, imageData, score, summary, metrics } = body;
 
-    if (!type || !imageData) {
+    if (!type) {
       return NextResponse.json({ error: '필수 데이터가 누락되었습니다.' }, { status: 400 });
     }
 
-    // 3. 이미지 Firebase Storage 업로드 (WebP 변환 로직 포함)
-    const timestamp = Date.now();
-    const storagePath = `scans/${userId}/${type.toLowerCase()}_${timestamp}.webp`;
-    
-    console.log(`[Scan Save] Uploading image for user ${userId}, type: ${type}`);
-    const imageUrl = await uploadImageToFirebase(imageData, storagePath);
+    // 3. 이미지 업로드 (데이터가 있을 경우에만 실행)
+    let imageUrl = '';
+    if (imageData && imageData.startsWith('data:image')) {
+        const timestamp = Date.now();
+        const storagePath = `scans/${userId}/${type.toLowerCase()}_${timestamp}.webp`;
+        console.log(`[Scan Save] Uploading image for user ${userId}, type: ${type}`);
+        imageUrl = await uploadImageToFirebase(imageData, storagePath);
+    }
 
     // 4. 스캔 타임라인에 데이터 추가
     const newEntry = {
       type,
-      imageUrl,
+      imageUrl: imageUrl || (type === 'POST_OP' ? '' : undefined), // POST_OP는 사진 없어도 됨
       score: score || 0,
       summary: summary || '',
       metrics: metrics || {},

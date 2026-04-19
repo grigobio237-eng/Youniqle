@@ -251,9 +251,9 @@ export default function MyInquiriesPage() {
                                             {selectedInquiry.aiAnswer && (
                                                 <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">
                                                     <span className="flex items-center gap-1.5 mb-1 font-bold text-slate-500">
-                                                        <Sparkles className="w-3 h-3 text-purple-400" /> AI Reference
+                                                        <Sparkles className="w-3 h-3 text-purple-400" /> 유니클 분석 참고
                                                     </span>
-                                                    이 답변은 AI 분석을 참고하여 작성되었습니다.
+                                                    이 답변은 유니클 분석을 참고하여 작성되었습니다.
                                                 </div>
                                             )}
                                         </div>

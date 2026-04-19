@@ -91,7 +91,7 @@ function SearchParamsHandler({
 // ---------------------------
 export default function HomePage() {
   const { data: session } = useSession();
-  const { journey, medicalCategory } = useRecovery();
+  const { journey, medicalCategory, treatmentType } = useRecovery();
   const router = useRouter();
   const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT'>('CHECK');
   const [score, setScore] = React.useState(0);
@@ -124,7 +124,7 @@ export default function HomePage() {
 
   const handleStart = async (data?: AnalysisResult) => {
     if (data) setAnalysisData(data);
-    const cacheKey = `${journey}-${medicalCategory}`;
+    const cacheKey = `${journey}-${medicalCategory}-${treatmentType}`;
     // If we already have questions for the CURRENT journey and medical category, just show them
     if (questions.length > 0 && currentQuestionsKey === cacheKey) {
       setViewState('QUESTION');
@@ -133,7 +133,7 @@ export default function HomePage() {
 
     // Otherwise, fetch context-specific questions
     try {
-      const url = `/api/questions/daily?journey=${journey || 'WELLNESS'}${medicalCategory ? `&medicalCategory=${medicalCategory}` : ''}`;
+      const url = `/api/questions/daily?journey=${journey || 'WELLNESS'}${medicalCategory ? `&medicalCategory=${medicalCategory}` : ''}${treatmentType ? `&treatmentType=${treatmentType}` : ''}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();

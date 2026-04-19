@@ -20,6 +20,8 @@ export default function MandatoryConsentModal() {
   const { data: session, update: updateSession } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [policyData, setPolicyData] = useState<{ [key: string]: any } | null>(null);
+  
   const [formData, setFormData] = useState({
     termsAccepted: false,
     privacyAccepted: false,
@@ -27,6 +29,17 @@ export default function MandatoryConsentModal() {
     thirdPartyAccepted: false,
     marketingConsent: false,
   });
+
+  useEffect(() => {
+    fetch('/api/policies/active')
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.data.policyMap) {
+          setPolicyData(json.data.policyMap);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (session?.user) {
@@ -148,47 +161,44 @@ export default function MandatoryConsentModal() {
           <div className="space-y-3">
             <ConsentRow 
               id="m-terms" 
-              label="서비스 이용약관 동의 (필수)" 
+              label={policyData?.TERMS?.title || "서비스 이용약관 동의 (필수)"} 
               checked={formData.termsAccepted}
               onChange={() => setFormData(p => ({ ...p, termsAccepted: !p.termsAccepted }))}
-              content={CONSENT_TEXTS.terms}
+              content={policyData?.TERMS?.content || CONSENT_TEXTS.terms}
+              isHtml={!!policyData?.TERMS}
             />
             <ConsentRow 
               id="m-privacy" 
-              label="개인정보 처리방침 동의 (필수)" 
+              label={policyData?.PRIVACY?.title || "개인정보 처리방침 동의 (필수)"} 
               checked={formData.privacyAccepted}
               onChange={() => setFormData(p => ({ ...p, privacyAccepted: !p.privacyAccepted }))}
-              content={CONSENT_TEXTS.privacy}
+              content={policyData?.PRIVACY?.content || CONSENT_TEXTS.privacy}
+              isHtml={!!policyData?.PRIVACY}
             />
             <ConsentRow 
               id="m-sensitive" 
-              label="민감정보 수집 및 이용 동의 (필수)" 
+              label={policyData?.SENSITIVE?.title || "민감정보 수집 및 이용 동의 (필수)"} 
               checked={formData.sensitiveInfoAccepted}
               onChange={() => setFormData(p => ({ ...p, sensitiveInfoAccepted: !p.sensitiveInfoAccepted }))}
-              content={CONSENT_TEXTS.sensitive}
+              content={policyData?.SENSITIVE?.content || CONSENT_TEXTS.sensitive}
+              isHtml={!!policyData?.SENSITIVE}
             />
             <ConsentRow 
               id="m-thirdParty" 
-              label="개인정보 제3자 제공 동의 (필수)" 
+              label={policyData?.THIRD_PARTY?.title || "개인정보 제3자 제공 동의 (필수)"} 
               checked={formData.thirdPartyAccepted}
               onChange={() => setFormData(p => ({ ...p, thirdPartyAccepted: !p.thirdPartyAccepted }))}
-              content={CONSENT_TEXTS.thirdParty}
+              content={policyData?.THIRD_PARTY?.content || CONSENT_TEXTS.thirdParty}
+              isHtml={!!policyData?.THIRD_PARTY}
             />
-            <div className="flex justify-start px-1">
-              <div className="flex items-center space-x-2">
-                <input
-                  id="m-marketing"
-                  type="checkbox"
-                  aria-label="마케팅 정보 수신 동의"
-                  checked={formData.marketingConsent}
-                  onChange={() => setFormData(p => ({ ...p, marketingConsent: !p.marketingConsent }))}
-                  className="h-4 w-4 rounded border-line text-primary focus:ring-primary cursor-pointer"
-                />
-                <Label htmlFor="m-marketing" className="text-xs font-medium text-text-secondary cursor-pointer">
-                  마케팅 정보 수신 동의 (선택)
-                </Label>
-              </div>
-            </div>
+            <ConsentRow 
+              id="m-marketing" 
+              label={policyData?.MARKETING?.title || "광고성 정보 수신 동의 (선택)"} 
+              checked={formData.marketingConsent}
+              onChange={() => setFormData(p => ({ ...p, marketingConsent: !p.marketingConsent }))}
+              content={policyData?.MARKETING?.content || CONSENT_TEXTS.marketing}
+              isHtml={!!policyData?.MARKETING}
+            />
           </div>
 
           <DialogFooter className="pt-4">
@@ -206,7 +216,7 @@ export default function MandatoryConsentModal() {
   );
 }
 
-function ConsentRow({ id, label, checked, onChange, content }: any) {
+export function ConsentRow({ id, label, checked, onChange, content, isHtml }: any) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -229,14 +239,17 @@ function ConsentRow({ id, label, checked, onChange, content }: any) {
           <button className="text-xs font-bold text-primary hover:underline">상세보기</button>
         </DialogTrigger>
         <DialogContent 
-          // 상세 약관 모달에서도 동일하게 X 버튼 시인성을 확보합니다.
           className="max-w-lg rounded-3xl p-0 overflow-hidden bg-surface max-h-[70vh] flex flex-col border-none [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5"
         >
           <DialogHeader className="p-6 bg-primary text-white">
             <DialogTitle className="text-xl font-black">{label}</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto p-6 text-sm text-text-primary whitespace-pre-wrap leading-relaxed">
-            {content}
+          <div className="flex-1 overflow-y-auto p-6 text-base text-text-primary whitespace-pre-wrap leading-relaxed">
+            {isHtml ? (
+               <div dangerouslySetInnerHTML={{ __html: content }} className="prose prose-sm max-w-none text-gray-800" />
+            ) : (
+               <>{content}</>
+            )}
           </div>
           <div className="p-6 border-t border-line bg-background/50">
             <DialogClose asChild>

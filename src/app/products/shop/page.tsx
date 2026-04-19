@@ -111,7 +111,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
           {userScore && (
             <div className="mb-10 p-6 bg-primary/5 border border-primary/10 rounded-3xl flex items-center justify-between">
               <div>
-                <p className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-1">AI Recommendation Based on Your {userScore} Score</p>
+                <p className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-1">Youniqle Recommendation Based on Your {userScore} Score</p>
                 <h3 className="text-xl font-black text-text-primary">{recommendationLabel}</h3>
               </div>
               <Sparkles className="w-8 h-8 text-primary/40" />

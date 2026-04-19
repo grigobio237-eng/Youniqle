@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle, Activity, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosis
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
+import { useRecovery } from '@/contexts/RecoveryContext';
 
 
 // 카테고리별 상태 메시지
@@ -66,6 +67,7 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
 export default function AiNavigatorPage() {
     const { data: session } = useSession();
     const { trackEvent } = useActivityTracker();
+    const { journey } = useRecovery();
     const router = useRouter();
 
     const [scoreHistory, setScoreHistory] = useState<any[]>([]);
@@ -88,8 +90,8 @@ export default function AiNavigatorPage() {
     const [diagnosisModalStep, setDiagnosisModalStep] = useState<'intro' | 'result'>('intro');
     const [deepDiagnosisModalOpen, setDeepDiagnosisModalOpen] = useState(false);
 
-    // 프로토콜 관련 상태
     const [protocols, setProtocols] = useState<any[]>([]);
+    const [timelineItems, setTimelineItems] = useState<any[]>([]);
 
     useEffect(() => {
         fetchData();
@@ -98,25 +100,35 @@ export default function AiNavigatorPage() {
     const fetchData = async () => {
         setLoading(true);
 
-        // localStorage에서 점수 불러오기
-        const storedScore = localStorage.getItem('recovery_last_score');
-        const scoreVal = storedScore ? parseInt(storedScore) : 40;
-        setTodayScore(scoreVal);
-
-        // 목데이터 히스토리 (나중에 실제 API로 대체)
-        const mockHistory = [
-            { date: '12/09', score: 65 },
-            { date: '12/10', score: 70 },
-            { date: '12/11', score: 60 },
-            { date: '12/12', score: 75 },
-            { date: '12/13', score: 55 },
-            { date: '12/14', score: 45 },
-            { date: '오늘', score: scoreVal }
-        ];
-        setScoreHistory(mockHistory);
-
         try {
-            // 진단 기반 추천 API 호출
+            // 1. 타임라인 데이터 가져오기 (실제 DB 데이터)
+            const timelineRes = await fetch('/api/user/timeline');
+            let latestScore = 0;
+            if (timelineRes.ok) {
+                const timelineData = await timelineRes.json();
+                setTimelineItems(timelineData.timeline || []);
+                if (timelineData.timeline?.length > 0) {
+                    latestScore = timelineData.timeline[0].score || 0;
+                }
+            }
+
+            // localStorage에서 점수 불러오기 (백업용)
+            const scoreVal = latestScore || (localStorage.getItem('recovery_last_score') ? parseInt(localStorage.getItem('recovery_last_score')!) : 40);
+            setTodayScore(scoreVal);
+
+            // 목데이터 히스토리 + 실제 오늘 데이터 조합
+            const mockHistory = [
+                { date: '12/09', score: 65 },
+                { date: '12/10', score: 70 },
+                { date: '12/11', score: 60 },
+                { date: '12/12', score: 75 },
+                { date: '12/13', score: 55 },
+                { date: '12/14', score: 45 },
+                { date: '오늘', score: scoreVal }
+            ];
+            setScoreHistory(mockHistory);
+
+            // 2. 진단 기반 추천 API 호출
             const diagResponse = await fetch('/api/recommendations/diagnosis?limit=4&protocols=true&content=true');
             if (diagResponse.ok) {
                 const diagData = await diagResponse.json();
@@ -130,7 +142,7 @@ export default function AiNavigatorPage() {
                 }
             }
 
-            // AI 조언 API 호출
+            // 3. AI 조언 API 호출
             const adviceResponse = await fetch('/api/ai/navigator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -146,15 +158,6 @@ export default function AiNavigatorPage() {
                 setTomorrowForecast(adviceData.tomorrowForecast);
             }
 
-            // 트래킹: 추천 결과 노출
-            trackEvent('recommendation_view', {
-                itemType: 'content',
-                behaviorData: { score: scoreVal },
-                metadata: { context: 'ai-navigator-main' }
-            });
-
-
-            // 외부 상품 API 호출
             await fetchExternalProducts();
 
         } catch (e) {
@@ -571,6 +574,64 @@ export default function AiNavigatorPage() {
                                         </Button>
                                     </CardContent>
                                 </Card>
+                            </div>
+
+                            {/* Step 5: 실시간 리커버리 로그 (신규) */}
+                            <div className="space-y-8 relative">
+                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">05</div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-chapter-accent/20 rounded-full flex items-center justify-center text-chapter-accent">
+                                            <Activity className="w-5 h-5" />
+                                        </div>
+                                        <h2 className="text-2xl font-black tracking-tight">리커버리 타임라인</h2>
+                                    </div>
+                                    <Button variant="ghost" size="sm" asChild>
+                                        <Link href="/timeline" className="text-xs font-bold opacity-60">전체보기</Link>
+                                    </Button>
+                                </div>
+
+                                {timelineItems.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {timelineItems.slice(0, 3).map((item, idx) => (
+                                            <Card key={idx} className="rounded-[24px] overflow-hidden border-line group hover:border-chapter-accent transition-all bg-white">
+                                                <div className="aspect-square relative bg-mist">
+                                                    {item.imageUrl ? (
+                                                        <Image src={item.imageUrl} alt={item.type} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate/20">
+                                                            <ImageIcon className="w-8 h-8" />
+                                                        </div>
+                                                    )}
+                                                    <Badge className="absolute top-3 left-3 bg-obsidian text-white text-[8px] font-black px-2">
+                                                        {item.type}
+                                                    </Badge>
+                                                    <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] font-black text-obsidian shadow-sm">
+                                                        SCORE {item.score}
+                                                    </div>
+                                                </div>
+                                                <CardContent className="p-4">
+                                                    <p className="text-[11px] font-bold text-slate/60 mb-1">
+                                                        {new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                                                    </p>
+                                                    <p className="text-xs font-black text-obsidian line-clamp-1 truncate">{item.summary || '상세 데이터 없음'}</p>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-12 text-center rounded-[32px] bg-mist/30 border-2 border-dashed border-line">
+                                        <p className="text-sm font-bold text-slate/40">아직 기록된 타임라인이 없습니다.<br />스캐너나 자세 분석을 시작해 보세요.</p>
+                                    </div>
+                                )}
+                                
+                                {journey === 'CLINICAL_POST' && (
+                                    <Button asChild className="w-full h-16 rounded-2xl bg-chapter-accent text-white font-black text-lg shadow-xl shadow-chapter-accent/20">
+                                        <Link href="/diagnosis/post-op">
+                                            <Sparkles className="w-5 h-5 mr-2" /> 전문 사후 케어 기록 남기기
+                                        </Link>
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>

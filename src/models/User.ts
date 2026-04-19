@@ -188,7 +188,7 @@ export interface IUser extends Document {
     createdAt: Date;
   }>;
   scanTimeline?: Array<{
-    type: 'MEAL' | 'SPACE' | 'STATE' | 'POSTURE';
+    type: 'MEAL' | 'SPACE' | 'STATE' | 'POSTURE' | 'POST_OP';
     imageUrl: string;
     score: number;
     summary: string;
@@ -461,7 +461,7 @@ const UserSchema = new Schema<IUser>({
     createdAt: { type: Date, default: Date.now }
   }],
   scanTimeline: [{
-    type: { type: String, enum: ['MEAL', 'SPACE', 'STATE', 'POSTURE'], required: true },
+    type: { type: String, enum: ['MEAL', 'SPACE', 'STATE', 'POSTURE', 'POST_OP'], required: true },
     imageUrl: { type: String, required: true },
     score: { type: Number },
     summary: { type: String },

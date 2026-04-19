@@ -249,7 +249,15 @@ const navigationItems = [
     name: '설정',
     href: '/admin/settings',
     icon: Settings,
-    description: '시스템 설정'
+    description: '시스템 설정',
+    subItems: [
+      {
+        name: '약관 및 보안 관리',
+        href: '/admin/settings/policies',
+        icon: Shield,
+        description: '동의서 및 약관 버전 관리'
+      }
+    ]
   }
 ];
 
