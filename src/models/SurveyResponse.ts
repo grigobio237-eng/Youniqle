@@ -15,16 +15,24 @@ export interface ISurveyResponse extends Document {
   // 10가지 핵심 문항 (상품 만들기.docx 기반)
   answers: {
     stressPoint: string; // 1. 가장 스트레스 받는 변화
+    stressPointNote?: string;
     priority: string; // 2. 가장 먼저 바꾸고 싶은 것
+    priorityNote?: string;
     interestArea: string; // 3. 가장 관심 가는 방향
+    interestAreaNote?: string;
     disappointment: string; // 4. 기존 관리의 아쉬운 이유
+    disappointmentNote?: string;
     startMethod: string; // 5. 가장 끌리는 시작 방식
     benefitPreference: string; // 6. 가장 선호하는 혜택
+    benefitPreferenceNote?: string;
     budget: string; // 7. 실제 결제 가능 가격대
+    budgetNote?: string;
     highEndCondition: string; // 8. 고가 프로그램 고려 조건
+    highEndConditionNote?: string;
     desiredCombination: string; // 9. 가장 받아보고 싶은 조합
+    desiredCombinationNote?: string;
     entryCondition: string; // 10. 바로 시작해볼 수 있는 요소 (주관식/장문)
-    additionalInfo?: string; // 추가 의견
+    additionalInfo?: string; // 기타 추가 의견
   };
 
   status: 'new' | 'analyzed' | 'proposed' | 'converted' | 'closed';
@@ -59,14 +67,22 @@ const SurveyResponseSchema = new Schema<ISurveyResponse>({
   },
   answers: {
     stressPoint: { type: String, required: true },
+    stressPointNote: String,
     priority: { type: String, required: true },
+    priorityNote: String,
     interestArea: { type: String, required: true },
+    interestAreaNote: String,
     disappointment: { type: String, required: true },
+    disappointmentNote: String,
     startMethod: { type: String, required: true },
     benefitPreference: { type: String, required: true },
+    benefitPreferenceNote: String,
     budget: { type: String, required: true },
+    budgetNote: String,
     highEndCondition: { type: String, required: true },
+    highEndConditionNote: String,
     desiredCombination: { type: String, required: true },
+    desiredCombinationNote: String,
     entryCondition: { type: String },
     additionalInfo: String,
   },

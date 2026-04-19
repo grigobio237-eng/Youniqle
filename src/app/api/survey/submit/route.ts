@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { cookies } from 'next/headers';
 import dbConnect from '@/lib/db';
 import Shop from '@/models/Shop';
 import SurveyResponse from '@/models/SurveyResponse';
@@ -8,7 +9,7 @@ import { authOptions } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { shopCode, answers, entryCondition, partnerCode, version } = body;
+    const { shopCode, answers, entryCondition, questionNotes, partnerCode, version } = body;
 
     if (!shopCode || !answers) {
       return NextResponse.json({ success: false, error: 'Required fields missing' }, { status: 400 });
@@ -37,6 +38,14 @@ export async function POST(request: Request) {
       userId: userId || undefined,
       answers: {
         ...answers,
+        stressPointNote: questionNotes?.stressPoint || '',
+        priorityNote: questionNotes?.priority || '',
+        interestAreaNote: questionNotes?.interestArea || '',
+        disappointmentNote: questionNotes?.disappointment || '',
+        benefitPreferenceNote: questionNotes?.benefitPreference || '',
+        budgetNote: questionNotes?.budget || '',
+        highEndConditionNote: questionNotes?.highEndCondition || '',
+        desiredCombinationNote: questionNotes?.desiredCombination || '',
         entryCondition: entryCondition || ''
       },
       status: 'new'
@@ -44,11 +53,24 @@ export async function POST(request: Request) {
 
     await newResponse.save();
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
         success: true, 
         message: 'Survey response submitted successfully',
         responseId: newResponse._id
     });
+
+    // 게스트 유입이면서 신규 설문인 경우 쿠키에 ID 저장 (가입 시 연동용)
+    if (!userId) {
+        response.cookies.set('pending_survey_id', newResponse._id.toString(), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600, // 1시간 동안 유효
+            sameSite: 'lax',
+            path: '/',
+        });
+    }
+
+    return response;
   } catch (error: any) {
     console.error("Survey Submission Error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

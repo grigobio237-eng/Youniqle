@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
+import SurveyResponse from '@/models/SurveyResponse';
 import { calculateUnifiedScore } from '@/lib/score-engine';
 import { POSTURE_RECOMMENDATIONS, MEAL_INSIGHTS } from '@/constants/scan-recommendations';
 
@@ -60,6 +61,12 @@ export async function GET(req: NextRequest) {
       };
     }
 
+    // 3. Fetch latest Survey/Analysis Report
+    const latestSurvey = await SurveyResponse.findOne({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .select('status answers createdAt')
+      .lean();
+
     return NextResponse.json({
       success: true,
       score: scoreData,
@@ -67,6 +74,7 @@ export async function GET(req: NextRequest) {
         posture: postureInsight,
         meal: mealInsight
       },
+      surveyReport: latestSurvey || null,
       recentActivity: user.scanTimeline?.slice(-5).reverse() || [],
       user: {
         name: user.name,

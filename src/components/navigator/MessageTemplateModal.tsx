@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Copy, CheckCircle2, X, Send, Sparkles } from 'lucide-react';
+import { MessageSquare, Copy, CheckCircle2, X, Send, Sparkles, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -41,12 +41,16 @@ interface Props {
 }
 
 export default function MessageTemplateModal({ shopCode, shopName, onClose }: Props) {
-  const copyToClipboard = (template: MessageTemplate) => {
-    const surveyLink = `${window.location.origin}/survey/${shopCode}?v=${template.id}`;
-    const fullMessage = `${template.content}\n\n[간단 체크 링크]\n${surveyLink}`;
+  const copyToClipboard = (template: MessageTemplate | null) => {
+    const surveyLink = `${window.location.origin}/survey/${shopCode}${template ? `?v=${template.id}` : ''}`;
+    const fullMessage = template 
+      ? `${template.content}\n\n[간단 체크 링크]\n${surveyLink}`
+      : surveyLink;
     
     navigator.clipboard.writeText(fullMessage);
-    toast.success(`${template.id}번 메시지가 복사되었습니다. 카카오톡 등에서 바로 사용하세요!`);
+    toast.success(template 
+      ? `${template.id}번 메시지가 복사되었습니다.` 
+      : '기본 설문 링크가 복사되었습니다.');
   };
 
   return (
@@ -70,6 +74,7 @@ export default function MessageTemplateModal({ shopCode, shopName, onClose }: Pr
           </div>
           <button 
             onClick={onClose}
+            aria-label="닫기"
             className="w-10 h-10 bg-mist rounded-full flex items-center justify-center text-slate hover:text-obsidian transition-colors"
           >
             <X className="w-5 h-5" />
@@ -78,6 +83,29 @@ export default function MessageTemplateModal({ shopCode, shopName, onClose }: Pr
 
         {/* Content */}
         <div className="p-10 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          {/* Quick Link Copy Section */}
+          <div className="p-6 bg-chapter-accent/5 border border-chapter-accent/20 rounded-[32px] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-chapter-accent shadow-sm">
+                    <LinkIcon className="w-6 h-6" />
+                </div>
+                <div>
+                    <h4 className="font-black text-obsidian">기본 링크만 복사</h4>
+                    <p className="text-xs text-slate/50 font-medium">안내 문구 없이 설문 주소만 복사합니다.</p>
+                </div>
+            </div>
+            <Button 
+                onClick={() => copyToClipboard(null)}
+                className="w-full sm:w-auto h-12 px-6 bg-chapter-accent text-white rounded-xl font-bold shadow-md shadow-chapter-accent/20 hover:bg-chapter-accent/90"
+            >
+                링크만 복사
+            </Button>
+          </div>
+
+          <div className="pt-4 pb-2">
+            <h4 className="text-xs font-black text-slate/30 uppercase tracking-[0.2em] px-2">준비된 마케팅 메시지</h4>
+          </div>
+
           {TEMPLATES.map((template) => (
             <Card key={template.id} template={template} onCopy={() => copyToClipboard(template)} />
           ))}

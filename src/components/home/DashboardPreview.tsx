@@ -36,7 +36,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
     setChecklistProgress(getChecklistProgress());
   };
 
-  const { score, insights, recentActivity, user } = unifiedData;
+  const { score, insights, recentActivity, user, surveyReport } = unifiedData;
   const displayScore = score.totalScore;
   const levelInfo = getLevelInfo(displayScore);
 
@@ -69,6 +69,45 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
               <Link href="/event/monitoring">상태 체크하기</Link>
             </Button>
           </div>
+        </section>
+      )}
+
+      {/* 📊 Survey Analysis Report Status - NEW */}
+      {surveyReport && (
+        <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="bg-white border-2 border-primary/20 rounded-[40px] p-10 shadow-2xl shadow-primary/5 relative overflow-hidden group hover:border-primary transition-all">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-primary/10 transition-colors" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="flex items-center gap-8">
+                        <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                            {surveyReport.status === 'proposed' ? '🎁' : '📈'}
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <Badge className="bg-primary text-white border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">Analysis Report</Badge>
+                                <span className="text-[10px] text-slate font-black uppercase tracking-widest opacity-60">Update: {new Date(surveyReport.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <h3 className="text-3xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">
+                                {surveyReport.status === 'new' && '나의 회복 솔루션 설계 중...'}
+                                {surveyReport.status === 'analyzed' && '네비게이터 리포트 분석 완료'}
+                                {surveyReport.status === 'proposed' && '맞춤 제안 상품이 도착했습니다!'}
+                                {surveyReport.status === 'converted' && '회복 플랜 진행 중'}
+                            </h3>
+                            <p className="text-slate font-medium text-base leading-relaxed max-w-xl">
+                                {surveyReport.status === 'new' && '네비게이터가 고객님의 설문 데이터를 바탕으로 정밀 솔루션을 설계하고 있습니다. 잠시만 기다려 주세요.'}
+                                {surveyReport.status === 'analyzed' && '분석이 완료되었습니다. 조만간 가장 적합한 프로그램을 제안해 드릴 예정입니다.'}
+                                {surveyReport.status === 'proposed' && '고객님께만 드리는 특별 구성 상품이 도착했습니다. 지금 바로 상세 내용을 확인해 보세요.'}
+                                {surveyReport.status === 'converted' && '유니클 전문가와 함께 건강한 회복 여정을 이어가고 있습니다.'}
+                            </p>
+                        </div>
+                    </div>
+                    <Button asChild className="h-16 px-10 bg-obsidian text-white rounded-2xl font-black text-lg shadow-xl hover:bg-obsidian/90 hover:scale-105 transition-all shrink-0">
+                        <Link href="/ai-navigator">
+                           {surveyReport.status === 'proposed' ? '제안 확인하기' : '상세 보기'}
+                        </Link>
+                    </Button>
+                </div>
+            </div>
         </section>
       )}
 
@@ -129,12 +168,12 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             <div className="lg:col-span-4 bg-obsidian text-mist rounded-[48px] p-10 flex flex-col justify-between shadow-3xl relative overflow-hidden">
                <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-reward-gold/10 rounded-full blur-2xl" />
               <div>
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-8 opacity-40 flex items-center gap-2">
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-8 opacity-60 flex items-center gap-2">
                    <Sparkles className="w-3 h-3 text-reward-gold" /> Reward Pool
                 </h3>
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <span className="text-4xl font-black tracking-tighter">{totalPoints} <span className="text-sm font-bold opacity-30 tracking-normal">RECOVERY PT</span></span>
+                    <span className="text-4xl font-black tracking-tighter">{totalPoints} <span className="text-sm font-bold opacity-60 tracking-normal">RECOVERY PT</span></span>
                   </div>
                   <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden p-1 border border-white/10">
                     <motion.div
@@ -350,7 +389,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
           ].map((link) => (
             <Link key={link.href} href={link.href} className="group">
               <div className="bg-white border border-line rounded-[24px] p-6 flex items-center gap-5 hover:border-chapter-accent hover:shadow-md transition-all">
-                <div className="text-2xl group-hover:scale-125 transition-transform">
+                <div className="text-2xl group-hover:scale-125 transition-transform text-slate">
                     {link.icon === 'Timeline' ? <Activity className="w-6 h-6 text-chapter-accent" /> : link.icon}
                 </div>
                 <span className="font-bold text-obsidian group-hover:text-chapter-accent transition-colors">{link.label}</span>
@@ -358,6 +397,59 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* 🚀 System Finalization Guide - New Building Blocks Check */}
+      <section className="container mx-auto px-4 pb-24 max-w-5xl">
+          <div className="bg-obsidian/5 border-2 border-line rounded-[48px] p-12 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-10 opacity-5">
+              <Logos.YouniqleSymbol className="w-64 h-64" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <Badge className="bg-chapter-accent text-white border-none font-black text-[10px] px-3 py-1 uppercase tracking-[0.2em]">Build Complete</Badge>
+                  <h2 className="text-4xl font-black text-obsidian tracking-tighter italic font-serif">Navigator Survey <br /> Ecosystem Ready.</h2>
+                </div>
+                <p className="text-slate font-bold text-lg leading-relaxed">
+                  10가지 고도화된 질문과 개별 주관식 입력을 통해 <br /> 
+                  고객의 깊은 니즈를 파악할 준비를 마쳤습니다. <br />
+                  설문 제출 후 가입하는 모든 유저의 데이터는 <br />
+                  자동으로 본인의 대시보드에 연동됩니다.
+                </p>
+                <div className="flex gap-4">
+                  <Button asChild size="lg" className="bg-obsidian text-white rounded-2xl h-16 px-10 font-black shadow-2xl hover:scale-105 transition-transform">
+                    <Link href="/survey/7HXR8" target="_blank">설문 페이지 테스트</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="bg-white border-line text-obsidian rounded-2xl h-16 px-10 font-bold hover:bg-mist transition-all focus:ring-0">
+                    <Link href="/dashboard">연동 결과 확인</Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="p-8 bg-white border border-line rounded-[40px] space-y-6 shadow-xl shadow-obsidian/5">
+                <h3 className="text-2xl font-black text-obsidian tracking-tight pb-4 border-b border-mist">Update Log</h3>
+                <ul className="space-y-5">
+                  <li className="flex gap-4">
+                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
+                    <p className="text-sm text-slate font-bold">1~10번 전문 문항 및 개별 주관식 입력 필드 완성</p>
+                  </li>
+                  <li className="flex gap-4">
+                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
+                    <p className="text-sm text-slate font-bold">하단 [이전] 버튼 추가 및 [다음] 중심 UI 흐름 최적화</p>
+                  </li>
+                  <li className="flex gap-4">
+                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
+                    <p className="text-sm text-slate font-bold">게스트 설문 → 가입 계정 자동 연동 (Cookie Bridge)</p>
+                  </li>
+                  <li className="flex gap-4">
+                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
+                    <p className="text-sm text-slate font-bold">실시간 분석 상태 카드 및 전반적인 가독성 상향</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
       </section>
     </div>
   );

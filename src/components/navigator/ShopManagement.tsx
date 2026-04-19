@@ -5,8 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Building2, Plus, Users, LayoutGrid, 
-  ChevronRight, Copy, ExternalLink, Activity,
-  LineChart, Search, Filter, MoreHorizontal, Send
+  ChevronRight, Copy, ExternalLink, Activity, Link as LinkIcon,
+  LineChart, Search, Filter, MoreHorizontal, Send, MessageSquare
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -191,17 +191,17 @@ export default function ShopManagement() {
                     <div className="flex items-center gap-2">
                         <Button 
                             onClick={() => openMessageModal(shop)}
-                            variant="secondary" 
-                            className="rounded-xl h-12 px-5 font-bold flex items-center gap-2"
+                            className="bg-chapter-accent text-white hover:bg-chapter-accent/90 rounded-xl h-12 px-6 font-black flex items-center gap-2 shadow-lg shadow-chapter-accent/20"
                         >
-                            <Send className="w-4 h-4" /> 메시지 발송
+                            <Send className="w-4 h-4" /> 상담 링크 발송
                         </Button>
 
                         <Button 
                             onClick={() => router.push(`/navigator/shops/${shop._id}`)}
+                            variant="secondary"
                             className="bg-obsidian text-white hover:bg-obsidian/90 rounded-xl h-12 px-5 font-bold flex items-center gap-2"
                         >
-                            <Activity className="w-4 h-4" /> 리드 분석 <ChevronRight className="w-4 h-4" />
+                            <Activity className="w-4 h-4" /> 분석 <ChevronRight className="w-4 h-4" />
                         </Button>
 
                         <Button variant="ghost" size="sm" className="h-12 w-12 rounded-xl text-slate/30">

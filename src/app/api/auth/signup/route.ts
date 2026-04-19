@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
+import SurveyResponse from '@/models/SurveyResponse';
 import { generateVerificationToken, generateVerificationExpiry } from '@/lib/verification';
 import { sendVerificationEmail } from '@/lib/email';
 
@@ -110,6 +111,20 @@ export async function POST(request: NextRequest) {
     }
     await user.save();
 
+    // 4. 대기 중인 설문(pending_survey_id)이 있다면 유저와 연동
+    const signupCookieStore = request.cookies;
+    const pendingSurveyId = signupCookieStore.get('pending_survey_id')?.value;
+    if (pendingSurveyId) {
+      try {
+        await SurveyResponse.findByIdAndUpdate(pendingSurveyId, {
+          userId: user._id
+        });
+        console.log(`Survey linked to new user: ${user.email} (Survey: ${pendingSurveyId})`);
+      } catch (linkError) {
+        console.error('Failed to link pending survey:', linkError);
+      }
+    }
+
     // 인증 이메일 발송
     const emailResult = await sendVerificationEmail(email, verificationToken, name);
 
@@ -122,7 +137,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
+    const signupCompleteResponse = NextResponse.json(
       {
         message: '회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.',
         user: {
@@ -134,6 +149,13 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
+
+    // 연동 완료 후 쿠키 삭제
+    if (pendingSurveyId) {
+      signupCompleteResponse.cookies.delete('pending_survey_id');
+    }
+
+    return signupCompleteResponse;
 
   } catch (error) {
     console.error('Signup error:', error);

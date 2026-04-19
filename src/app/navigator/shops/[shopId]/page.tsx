@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { 
     ChevronLeft, BarChart3, Users, Target, CheckCircle2, 
-    ArrowRight, Info, Plus, Save, Activity, Sparkles
+    ArrowRight, Info, Plus, Save, Activity, Sparkles, Heart, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +28,8 @@ interface AnalyticsStats {
 }
 
 export default function ShopAnalyticsPage() {
-  const { shopId } = useParams();
+  const params = useParams();
+  const shopId = params?.shopId as string;
   const router = useRouter();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
