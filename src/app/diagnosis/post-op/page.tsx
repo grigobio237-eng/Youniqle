@@ -38,37 +38,17 @@ export default function PostOpSurveyPage() {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Initial Load: Fetch Dynamic Questions
+  // 1. Redirect to the new premium flow for better experience
   useEffect(() => {
     if (!session) {
-      router.push('/login?callbackUrl=/diagnosis/post-op');
+      router.push('/login?callbackUrl=/event/post-care');
       return;
     }
-
-    const loadQuestions = async () => {
-      try {
-        const res = await fetch('/api/ai/post-op/questions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userName: session.user?.name || '고객',
-            daysSinceSurgery: 3, // 실제로는 DB에서 계산 필요 (임시로 3일차)
-            surgeryType: '성형외과 시술' // 실제로는 DB/Context에서 가져옴
-          })
-        });
-        const data = await res.json();
-        if (data.questions) {
-          setQuestions(data.questions);
-          setStep('intro');
-        }
-      } catch (error) {
-        toast.error("문진 내용을 불러오지 못했습니다.");
-        console.error(error);
-      }
-    };
-
-    loadQuestions();
+    
+    // Redirect to the newly implemented premium post-care flow
+    router.replace('/event/post-care');
   }, [session, router]);
+
 
   const handleAnswer = (score: number) => {
     const q = questions[currentQuestionIdx];

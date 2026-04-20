@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
     `;
 
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    let responseText = result.response.text();
     
-    // JSON 추출
+    // JSON 추출 최적화: Markdown 코드 블록 제거 및 순수 JSON 추출
+    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const questionsData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
 

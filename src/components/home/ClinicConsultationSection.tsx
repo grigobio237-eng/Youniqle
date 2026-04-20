@@ -77,7 +77,7 @@ export default function ClinicConsultationSection() {
             </Link>
 
             {/* Option 2: Post-op */}
-            <Link href="/diagnosis/post-op" className="block">
+            <Link href="/event/post-care" className="block">
               <Button 
                 className="w-full h-16 md:h-20 bg-chapter-accent hover:bg-white text-white hover:text-obsidian rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all shadow-xl shadow-chapter-accent/20"
               >
