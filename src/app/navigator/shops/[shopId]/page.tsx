@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 interface StatItem {
   label: string;
@@ -28,11 +29,14 @@ interface AnalyticsStats {
 }
 
 export default function ShopAnalyticsPage() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
   const params = useParams();
   const shopId = params?.shopId as string;
   const router = useRouter();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // 상품 제안 상태 (Lite, Signature, Black)
   const [proposal, setProposal] = useState({
@@ -42,7 +46,9 @@ export default function ShopAnalyticsPage() {
   });
 
   useEffect(() => {
-    fetchAnalytics();
+    if (shopId) {
+      Promise.all([fetchAnalytics(), fetchProposal()]);
+    }
   }, [shopId]);
 
   const fetchAnalytics = async () => {
@@ -53,14 +59,43 @@ export default function ShopAnalyticsPage() {
         setStats(data.stats);
       }
     } catch (err) {
-      toast.error('데이터를 불러오는데 실패했습니다.');
+      console.error('Analytics fetch error:', err);
+    }
+  };
+
+  const fetchProposal = async () => {
+    try {
+      const res = await fetch(`/api/navigator/shops/${shopId}/proposal`);
+      const data = await res.json();
+      if (data.success && data.proposal) {
+        setProposal(data.proposal);
+      }
+    } catch (err) {
+      console.error('Proposal fetch error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSaveProposal = () => {
-    toast.success('맞춤 상품 설계가 저장되었습니다. 고객 대상 제안이 가능합니다.');
+  const handleSaveProposal = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/navigator/shops/${shopId}/proposal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proposal })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(isAdmin ? '관리자 권한으로 상품 설계가 저장되었습니다.' : '맞춤 상품 설계가 저장되었습니다.');
+      } else {
+        toast.error(data.error || '저장에 실패했습니다.');
+      }
+    } catch (err) {
+      toast.error('오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -87,6 +122,9 @@ export default function ShopAnalyticsPage() {
                     <div className="flex items-center gap-3">
                         <h1 className="text-4xl font-black text-obsidian tracking-tighter italic font-serif">Deep Analytics</h1>
                         <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[10px] tracking-widest uppercase">Lead Analysis</Badge>
+                        {isAdmin && (
+                            <Badge className="bg-amber-500 text-white border-none font-black text-[10px] tracking-widest uppercase">Admin Monitor Mode</Badge>
+                        )}
                     </div>
                     <p className="text-slate/60 text-lg font-medium">수집된 사용자 응답을 바탕으로 정밀한 제안 상품을 설계하세요.</p>
                 </div>
@@ -96,9 +134,10 @@ export default function ShopAnalyticsPage() {
                 <Button variant="outline" className="rounded-2xl h-14 px-8 border-line font-black">데이터 내보내기</Button>
                 <Button 
                     onClick={handleSaveProposal}
-                    className="bg-obsidian text-white rounded-2xl h-14 px-8 font-black shadow-xl"
+                    disabled={saving}
+                    className="bg-obsidian text-white rounded-2xl h-14 px-8 font-black shadow-xl disabled:opacity-50"
                 >
-                    <Save className="w-5 h-5 mr-2" /> 설계 저장 및 확정
+                    <Save className="w-5 h-5 mr-2" /> {saving ? '저장 중...' : (isAdmin ? '관리자 설계 확정' : '설계 저장 및 확정')}
                 </Button>
             </div>
         </div>
@@ -230,10 +269,14 @@ export default function ShopAnalyticsPage() {
                                     <div className="space-y-3">
                                         <input 
                                             placeholder="상품명을 입력하세요"
+                                            value={proposal.lite.title}
+                                            onChange={(e) => setProposal(p => ({ ...p, lite: { ...p.lite, title: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/10 py-1 outline-none font-black text-lg placeholder:text-mist/20"
                                         />
                                         <input 
                                             placeholder="가격 (예: 10만원 미만)"
+                                            value={proposal.lite.price}
+                                            onChange={(e) => setProposal(p => ({ ...p, lite: { ...p.lite, price: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/10 py-1 outline-none text-sm font-bold placeholder:text-mist/20"
                                         />
                                     </div>
@@ -248,10 +291,14 @@ export default function ShopAnalyticsPage() {
                                     <div className="space-y-3">
                                         <input 
                                             placeholder="메인 추천 상품명"
+                                            value={proposal.signature.title}
+                                            onChange={(e) => setProposal(p => ({ ...p, signature: { ...p.signature, title: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/20 py-1 outline-none font-black text-lg text-white placeholder:text-mist/20"
                                         />
                                         <input 
                                             placeholder="가격 (예: 30~70만원)"
+                                            value={proposal.signature.price}
+                                            onChange={(e) => setProposal(p => ({ ...p, signature: { ...p.signature, price: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/20 py-1 outline-none text-sm font-bold text-white/70 placeholder:text-mist/20"
                                         />
                                     </div>
@@ -266,10 +313,14 @@ export default function ShopAnalyticsPage() {
                                     <div className="space-y-3">
                                         <input 
                                             placeholder="최상급 프리미엄 상품명"
+                                            value={proposal.black.title}
+                                            onChange={(e) => setProposal(p => ({ ...p, black: { ...p.black, title: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/10 py-1 outline-none font-black text-lg placeholder:text-mist/20"
                                         />
                                         <input 
                                             placeholder="가격 (예: 150만원 이상)"
+                                            value={proposal.black.price}
+                                            onChange={(e) => setProposal(p => ({ ...p, black: { ...p.black, price: e.target.value } }))}
                                             className="w-full bg-transparent border-b border-white/10 py-1 outline-none text-sm font-bold placeholder:text-mist/20"
                                         />
                                     </div>
@@ -278,9 +329,10 @@ export default function ShopAnalyticsPage() {
 
                             <Button 
                                 onClick={handleSaveProposal}
-                                className="w-full h-16 bg-chapter-accent hover:bg-chapter-accent/90 text-white rounded-2xl font-black text-lg shadow-xl shadow-chapter-accent/20"
+                                disabled={saving}
+                                className="w-full h-16 bg-chapter-accent hover:bg-chapter-accent/90 text-white rounded-2xl font-black text-lg shadow-xl shadow-chapter-accent/20 disabled:opacity-50"
                             >
-                                구성 완료 및 전송 준비
+                                {saving ? '저장 중...' : (isAdmin ? '관리자 구성 확정' : '구성 완료 및 전송 준비')}
                             </Button>
                         </div>
                         

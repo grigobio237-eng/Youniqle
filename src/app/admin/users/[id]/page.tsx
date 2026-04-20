@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Users, Mail, Phone, Calendar, Copy, MapPin, Activity, HeartPulse, ShoppingBag, SwitchCamera, Sparkles, Shield, Star, TrendingUp, Crown, Zap } from 'lucide-react';
+import { ArrowLeft, Users, Mail, Phone, Calendar, Copy, MapPin, Activity, HeartPulse, ShoppingBag, SwitchCamera, Sparkles, Shield, Star, TrendingUp, Crown, Zap, BarChart3, Building } from 'lucide-react';
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
   const [user, setUser] = useState<any>(null);
   const [behaviors, setBehaviors] = useState<any[]>([]);
+  const [shops, setShops] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [behaviorSkip, setBehaviorSkip] = useState(0);
   const [behaviorHasMore, setBehaviorHasMore] = useState(true);
@@ -47,6 +48,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           grade: data.grade || 'cedar',
           tier: data.tier || 'RESET',
         });
+        if (data.shops) setShops(data.shops);
       }
     } catch (e) {
       console.error('Failed to fetch user:', e);
@@ -314,6 +316,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               <TabsTrigger value="orders" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
                 구매 및 포인트 이력
               </TabsTrigger>
+              {user.isNavigator && (
+                <TabsTrigger value="shops" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-amber-600 font-bold">
+                  네비게이터 관리 업소
+                </TabsTrigger>
+              )}
             </TabsList>
             
             <TabsContent value="behaviors" className="mt-4">
@@ -401,6 +408,42 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                    )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            <TabsContent value="shops" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {shops.length > 0 ? (
+                  shops.map((shop: any, idx: number) => (
+                    <Card key={idx} className="overflow-hidden border-amber-100 hover:shadow-md transition-shadow">
+                      <div className="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+                        <Badge className="bg-white text-amber-600 border-amber-200">Shop ID: {shop.shopCode}</Badge>
+                        <Badge variant={shop.isActive ? "default" : "secondary"}>{shop.isActive ? '운영중' : '중지'}</Badge>
+                      </div>
+                      <CardContent className="p-5 space-y-4">
+                        <div>
+                          <h4 className="text-lg font-black text-obsidian">{shop.name}</h4>
+                          <p className="text-sm text-slate/60">{shop.category || '업종 미지정'}</p>
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                          <Button 
+                            variant="outline" 
+                            className="flex-1 rounded-xl h-10 text-xs font-bold"
+                            onClick={() => router.push(`/navigator/shops/${shop.id}`)}
+                          >
+                            <BarChart3 className="w-3.5 h-3.5 mr-1.5" /> 분석 리포트 확인
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <Card className="col-span-full border-dashed border-2 py-10 bg-transparent">
+                    <div className="text-center space-y-2">
+                       <Building className="w-10 h-10 text-slate/20 mx-auto" />
+                       <p className="text-slate/40 font-bold">등록된 업소가 없습니다.</p>
+                    </div>
+                  </Card>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
 

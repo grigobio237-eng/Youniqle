@@ -5,6 +5,7 @@ import Order from '@/models/Order';
 import Review from '@/models/Review';
 import PointTransaction from '@/models/PointTransaction';
 import Diagnosis from '@/models/Diagnosis';
+import Shop from '@/models/Shop';
 import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
 
@@ -41,8 +42,8 @@ export async function GET(
       );
     }
 
-    // 사용자 활동 통계 조회
-    const [orders, reviews, pointTransactions, diagnosisHistories] = await Promise.all([
+    // 사용자 활동 통계 조회 (shops 포함)
+    const [orders, reviews, pointTransactions, diagnosisHistories, shops] = await Promise.all([
       Order.find({ userId: user._id })
         .sort({ createdAt: -1 })
         .limit(10)
@@ -56,7 +57,8 @@ export async function GET(
         .limit(20),
       Diagnosis.find({ userId: user._id })
         .sort({ createdAt: -1 })
-        .limit(10)
+        .limit(10),
+      user.isNavigator ? Shop.find({ navigatorId: user._id }).lean() : Promise.resolve([])
     ]);
 
     const totalOrders = await Order.countDocuments({ userId: user._id });
@@ -126,7 +128,15 @@ export async function GET(
         categoryScores: diag.categoryScores,
         resultTitle: diag.resultTitle,
         createdAt: diag.createdAt
-      }))
+      })),
+      shops: user.isNavigator ? (shops as any[] || []).map(shop => ({
+        id: shop._id.toString(),
+        name: shop.name,
+        shopCode: shop.shopCode,
+        category: shop.category,
+        isActive: shop.isActive,
+        createdAt: shop.createdAt
+      })) : []
     };
 
     return NextResponse.json(userDetail);

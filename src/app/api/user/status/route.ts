@@ -47,11 +47,11 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    const mealInsight = scoreData.scanMetrics.mealMetric ? {
+    const mealInsight = latestMealScan ? {
       title: '영양 균형 분석',
-      description: MEAL_INSIGHTS[scoreData.scanMetrics.mealMetric.recommendationKey]?.description || '분석 중...',
-      suggestion: MEAL_INSIGHTS[scoreData.scanMetrics.mealMetric.recommendationKey]?.advice || '단백질 섭취를 늘려보세요.',
-      nutrients: scoreData.scanMetrics.mealMetric.nutrition,
+      description: MEAL_INSIGHTS[latestMealScan.metrics?.recommendationKey as keyof typeof MEAL_INSIGHTS]?.advice || '분석 중...',
+      suggestion: MEAL_INSIGHTS[latestMealScan.metrics?.recommendationKey as keyof typeof MEAL_INSIGHTS]?.suggestion || '단백질 섭취를 늘려보세요.',
+      nutrients: latestMealScan.metrics?.nutrition,
       habits: [
         '식전 물 한 잔 마시기',
         '식이섬유(채소) 먼저 섭취하기',
