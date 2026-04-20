@@ -1,4 +1,5 @@
 'use client';
+// Force redeploy to resolve potential propagation delay or routing issues.
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
