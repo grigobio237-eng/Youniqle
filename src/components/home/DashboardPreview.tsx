@@ -11,6 +11,7 @@ import HabitAlertBanner from '@/components/home/HabitAlertBanner';
 import MealNutrientChart from '@/components/dashboard/MealNutrientChart';
 import ActionableInsightCard from '@/components/dashboard/ActionableInsightCard';
 import { getUserProgress, getChecklistProgress, updateChecklist } from '@/lib/progress';
+import { ClipboardList, Stethoscope, HeartPulse, MessageSquare } from 'lucide-react';
 
 interface DashboardPreviewProps {
   unifiedData: any;
@@ -36,7 +37,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
     setChecklistProgress(getChecklistProgress());
   };
 
-  const { score, insights, recentActivity, user, surveyReport } = unifiedData;
+  const { score, insights, recentActivity, user, surveyReport, activeMedicalGuide, activeRecoveryPlan } = unifiedData;
   const displayScore = score.totalScore;
   const levelInfo = getLevelInfo(displayScore);
 
@@ -72,7 +73,73 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         </section>
       )}
 
-      {/* 📊 Survey Analysis Report Status - NEW */}
+      {/* 🏥 Medical Consultation Guide Section - NEW */}
+      {activeMedicalGuide && (
+        <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="bg-white border-2 border-chapter-accent/30 rounded-[40px] p-10 shadow-2xl shadow-chapter-accent/5 relative overflow-hidden group hover:border-chapter-accent transition-all">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-chapter-accent/5 rounded-full blur-3xl -mr-24 -mt-24" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="flex items-center gap-8">
+                        <div className="w-20 h-20 bg-chapter-accent/10 rounded-3xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 transition-transform">
+                            🏥
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <Badge className="bg-chapter-accent text-white border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">Pre-Procedure Guide</Badge>
+                                <span className="text-[10px] text-slate font-black uppercase tracking-widest opacity-60">Status: Intelligence Ready</span>
+                            </div>
+                            <h3 className="text-3xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">
+                                병원 방문 필수 가이드가 도착했습니다
+                            </h3>
+                            <p className="text-slate font-medium text-base leading-relaxed max-w-xl">
+                                AI가 설계한 {activeMedicalGuide.medicalCategory === 'PLASTIC' ? '성형/피부' : '전문의'} 상담 전용 리포트입니다. 의료진에게 질문해야 할 최적의 목록을 확인하세요.
+                            </p>
+                        </div>
+                    </div>
+                    <Button asChild className="h-16 px-10 bg-chapter-accent text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all shrink-0">
+                        <Link href={`/event/consultation/report/${activeMedicalGuide._id}`}>
+                           가이드 보기
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+        </section>
+      )}
+
+      {/* 🚀 Post-Care Recovery Plan Section - NEW */}
+      {activeRecoveryPlan && (
+        <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="bg-obsidian border-2 border-primary/30 rounded-[40px] p-10 shadow-2xl relative overflow-hidden group hover:border-primary transition-all">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-3xl -mr-24 -mt-24" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="flex items-center gap-8">
+                        <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 transition-transform">
+                            🩹
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <Badge className="bg-primary text-obsidian border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">Recovery Roadmap</Badge>
+                                <span className="text-[10px] text-mist font-black uppercase tracking-widest opacity-60">Tracking: Active Phase</span>
+                            </div>
+                            <h3 className="text-3xl font-black text-mist tracking-tighter italic font-serif leading-tight">
+                                1:1 개인화 회복 로드맵
+                            </h3>
+                            <p className="text-mist/70 font-medium text-base leading-relaxed max-w-xl">
+                                {activeRecoveryPlan.procedureType} 후 집중 관리가 필요한 단계입니다. AI 리커버리 전문가가 제안하는 일자별 회복 가이드를 따라보세요.
+                            </p>
+                        </div>
+                    </div>
+                    <Button asChild className="h-16 px-10 bg-primary text-obsidian rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all shrink-0">
+                        <Link href={`/event/post-care/report/${activeRecoveryPlan._id}`}>
+                           로드맵 열기
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+        </section>
+      )}
+
+      {/* Existing Survey Report */}
       {surveyReport && (
         <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="bg-white border-2 border-primary/20 rounded-[40px] p-10 shadow-2xl shadow-primary/5 relative overflow-hidden group hover:border-primary transition-all">
@@ -382,74 +449,21 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <h2 className="text-2xl font-black text-obsidian mb-10 tracking-tight">System Navigation</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: '네비게이터', href: '/ai-navigator', icon: '🤖' },
-            { label: '스캔 타임라인', href: '/utils', icon: 'Timeline' },
-            { label: '멤버십', href: '/membership', icon: '🎖️' },
-            { label: '프로필 설정', href: '/profile', icon: '⚙️' },
+            { label: 'AI 네비게이터', href: '/ai-navigator', icon: <MessageSquare className="w-6 h-6" /> },
+            { label: '면담 가이드', href: activeMedicalGuide ? `/event/consultation/report/${activeMedicalGuide._id}` : '/ai-navigator', icon: <ClipboardList className="w-6 h-6" /> },
+            { label: '회복 로드맵', href: activeRecoveryPlan ? `/event/post-care/report/${activeRecoveryPlan._id}` : '/ai-navigator', icon: <HeartPulse className="w-6 h-6" /> },
+            { label: '스캔 타임라인', href: '/utils', icon: <Activity className="w-6 h-6" /> },
           ].map((link) => (
-            <Link key={link.href} href={link.href} className="group">
+            <Link key={link.label} href={link.href} className="group">
               <div className="bg-white border border-line rounded-[24px] p-6 flex items-center gap-5 hover:border-chapter-accent hover:shadow-md transition-all">
                 <div className="text-2xl group-hover:scale-125 transition-transform text-slate">
-                    {link.icon === 'Timeline' ? <Activity className="w-6 h-6 text-chapter-accent" /> : link.icon}
+                    {link.icon}
                 </div>
                 <span className="font-bold text-obsidian group-hover:text-chapter-accent transition-colors">{link.label}</span>
               </div>
             </Link>
           ))}
         </div>
-      </section>
-
-      {/* 🚀 System Finalization Guide - New Building Blocks Check */}
-      <section className="container mx-auto px-4 pb-24 max-w-5xl">
-          <div className="bg-obsidian/5 border-2 border-line rounded-[48px] p-12 overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-10 opacity-5">
-              <Logos.YouniqleSymbol className="w-64 h-64" />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <Badge className="bg-chapter-accent text-white border-none font-black text-[10px] px-3 py-1 uppercase tracking-[0.2em]">Build Complete</Badge>
-                  <h2 className="text-4xl font-black text-obsidian tracking-tighter italic font-serif">Navigator Survey <br /> Ecosystem Ready.</h2>
-                </div>
-                <p className="text-slate font-bold text-lg leading-relaxed">
-                  10가지 고도화된 질문과 개별 주관식 입력을 통해 <br /> 
-                  고객의 깊은 니즈를 파악할 준비를 마쳤습니다. <br />
-                  설문 제출 후 가입하는 모든 유저의 데이터는 <br />
-                  자동으로 본인의 대시보드에 연동됩니다.
-                </p>
-                <div className="flex gap-4">
-                  <Button asChild size="lg" className="bg-obsidian text-white rounded-2xl h-16 px-10 font-black shadow-2xl hover:scale-105 transition-transform">
-                    <Link href="/survey/7HXR8" target="_blank">설문 페이지 테스트</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="bg-white border-line text-obsidian rounded-2xl h-16 px-10 font-bold hover:bg-mist transition-all focus:ring-0">
-                    <Link href="/dashboard">연동 결과 확인</Link>
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="p-8 bg-white border border-line rounded-[40px] space-y-6 shadow-xl shadow-obsidian/5">
-                <h3 className="text-2xl font-black text-obsidian tracking-tight pb-4 border-b border-mist">Update Log</h3>
-                <ul className="space-y-5">
-                  <li className="flex gap-4">
-                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
-                    <p className="text-sm text-slate font-bold">1~10번 전문 문항 및 개별 주관식 입력 필드 완성</p>
-                  </li>
-                  <li className="flex gap-4">
-                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
-                    <p className="text-sm text-slate font-bold">하단 [이전] 버튼 추가 및 [다음] 중심 UI 흐름 최적화</p>
-                  </li>
-                  <li className="flex gap-4">
-                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
-                    <p className="text-sm text-slate font-bold">게스트 설문 → 가입 계정 자동 연동 (Cookie Bridge)</p>
-                  </li>
-                  <li className="flex gap-4">
-                    <div className="w-8 h-8 bg-chapter-accent/10 text-chapter-accent rounded-full flex items-center justify-center shrink-0 text-sm">✓</div>
-                    <p className="text-sm text-slate font-bold">실시간 분석 상태 카드 및 전반적인 가독성 상향</p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
       </section>
     </div>
   );

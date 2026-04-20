@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import SurveyResponse from '@/models/SurveyResponse';
+import PreConsultation from '@/models/PreConsultation';
+import PostCareSurvey from '@/models/PostCareSurvey';
 import { calculateUnifiedScore } from '@/lib/score-engine';
 import { POSTURE_RECOMMENDATIONS, MEAL_INSIGHTS } from '@/constants/scan-recommendations';
 
@@ -67,6 +69,17 @@ export async function GET(req: NextRequest) {
       .select('status answers createdAt')
       .lean();
 
+    // 4. Fetch latest Specialized AI Reports
+    const latestPreConsultation = await PreConsultation.findOne({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .select('medicalCategory aiGuide createdAt')
+      .lean();
+
+    const latestPostCare = await PostCareSurvey.findOne({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .select('procedureType lastStatus aiRoadmap createdAt')
+      .lean();
+
     return NextResponse.json({
       success: true,
       score: scoreData,
@@ -75,6 +88,8 @@ export async function GET(req: NextRequest) {
         meal: mealInsight
       },
       surveyReport: latestSurvey || null,
+      activeMedicalGuide: latestPreConsultation || null,
+      activeRecoveryPlan: latestPostCare || null,
       recentActivity: user.scanTimeline?.slice(-5).reverse() || [],
       user: {
         name: user.name,
