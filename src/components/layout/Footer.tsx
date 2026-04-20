@@ -5,6 +5,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import ClientOnly from '@/components/common/ClientOnly';
 
 interface PublicSettings {
   siteName: string;
@@ -167,7 +168,9 @@ export default function Footer() {
             <Link href="/support/inquiry" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
           <div className="text-gray-600 text-[11px] tracking-tight">
-            © {new Date().getFullYear()} {currentSettings.siteName}. All rights reserved.
+            <span className="flex items-center gap-1">
+              © <ClientOnly fallback={<span>2026</span>}>{new Date().getFullYear()}</ClientOnly> {currentSettings.siteName}. All rights reserved.
+            </span>
           </div>
         </div>
 

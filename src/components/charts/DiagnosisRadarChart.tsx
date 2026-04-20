@@ -14,8 +14,15 @@ interface DiagnosisRadarChartProps {
 }
 
 export function DiagnosisRadarChart({ data, color = '#2563eb', className }: DiagnosisRadarChartProps) {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return <div className={`w-full h-full ${className}`} />;
+
     // Normalize data if needed, or trust strict props.
-    // We assume data is prepared with correct 'subject' labels.
 
     return (
         <div className={`w-full h-full ${className}`}>

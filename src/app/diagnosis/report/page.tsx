@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/toast';
 import { AISolutionSection } from '@/components/diagnosis/AISolutionSection';
 import { GoldenTimeOffer } from '@/components/diagnosis/GoldenTimeOffer';
 import { determineMood } from '@/lib/audio/voice-strategy';
+import ClientOnly from '@/components/common/ClientOnly';
 
 // Type definition for Diagnosis Result
 interface DeepDiagnosisResult {
@@ -68,8 +69,13 @@ export default function DeepDiagnosisReportPage() {
     const { data: session, update: updateSession } = useSession();
     const [showGenderModal, setShowGenderModal] = useState(false);
     const [isUpdatingGender, setIsUpdatingGender] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     const reportRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleUnlockClick = () => {
         setPaymentOpen(true);
@@ -381,9 +387,11 @@ export default function DeepDiagnosisReportPage() {
                                     `}>
                                         {isPaid ? 'Premium Analysis' : 'Basic Analysis'}
                                     </Badge>
-                                    <span className="text-xs font-medium text-slate-400">
-                                        {new Date(result?.createdAt || Date.now()).toLocaleDateString()}
-                                    </span>
+                                    <ClientOnly>
+                                        <span className="text-xs font-medium text-slate-400">
+                                            {new Date(result?.createdAt || Date.now()).toLocaleDateString()}
+                                        </span>
+                                    </ClientOnly>
                                 </div>
                                 <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-obsidian tracking-tighter break-keep">
                                     {result?.title}
@@ -424,10 +432,12 @@ export default function DeepDiagnosisReportPage() {
                                     {/* Graph Area */}
                                     <div className="p-8 md:p-12 relative flex items-center justify-center bg-gradient-to-b from-white to-slate-50/50">
                                         <div className="w-full h-[320px]">
-                                            <DiagnosisRadarChart
-                                                data={chartData}
-                                                color="#0F172A" // Obsidian
-                                            />
+                                            {isMounted && (
+                                                <DiagnosisRadarChart
+                                                    data={chartData}
+                                                    color="#0F172A" // Obsidian
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                     {/* Insight Text Area */}

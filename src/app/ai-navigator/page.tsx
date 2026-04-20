@@ -92,8 +92,10 @@ export default function AiNavigatorPage() {
 
     const [protocols, setProtocols] = useState<any[]>([]);
     const [timelineItems, setTimelineItems] = useState<any[]>([]);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         fetchData();
     }, []);
 
@@ -278,7 +280,7 @@ export default function AiNavigatorPage() {
                                 </div>
 
                                 {/* 오른쪽: 레이더 차트 */}
-                                {radarData.length > 0 && (
+                                {isMounted && radarData.length > 0 && (
                                     <div className="w-full md:w-80 h-64 bg-surface/30 rounded-[32px] border border-line p-4">
                                         <DiagnosisRadarChart
                                             data={radarData.map(d => ({
@@ -296,22 +298,24 @@ export default function AiNavigatorPage() {
 
                             {/* Score Graph */}
                             <div className="h-32 w-full opacity-80">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={scoreHistory}>
-                                        <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--color-text-secondary)' }} />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#1A1D21', borderRadius: '16px', border: '1px solid rgba(233,226,214,0.1)', color: '#E9E2D6' }}
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="score"
-                                            stroke="var(--chapter-accent)"
-                                            strokeWidth={3}
-                                            dot={{ r: 4, fill: 'var(--chapter-accent)', strokeWidth: 0 }}
-                                            activeDot={{ r: 6, strokeWidth: 0 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
+                                {isMounted && (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={scoreHistory}>
+                                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--color-text-secondary)' }} />
+                                            <Tooltip
+                                                contentStyle={{ backgroundColor: '#1A1D21', borderRadius: '16px', border: '1px solid rgba(233,226,214,0.1)', color: '#E9E2D6' }}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="score"
+                                                stroke="var(--chapter-accent)"
+                                                strokeWidth={3}
+                                                dot={{ r: 4, fill: 'var(--chapter-accent)', strokeWidth: 0 }}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -405,7 +409,7 @@ export default function AiNavigatorPage() {
                                         <div className="flex-1 space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <Badge className="bg-chapter-accent text-mist text-[10px] font-black uppercase tracking-widest">Premium Report</Badge>
-                                                <span className="text-xs font-bold text-slate-400">최근 업데이트: {new Date().toLocaleDateString()}</span>
+                                                {isMounted && <span className="text-xs font-bold text-slate-400">최근 업데이트: {new Date().toLocaleDateString()}</span>}
                                             </div>
                                             <h3 className="text-2xl font-black text-obsidian leading-tight group-hover:text-primary transition-colors">
                                                 {userName} 님의 심리 상태를<br />
@@ -612,7 +616,7 @@ export default function AiNavigatorPage() {
                                                 </div>
                                                 <CardContent className="p-4">
                                                     <p className="text-[11px] font-bold text-slate/60 mb-1">
-                                                        {new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                                                        {isMounted && new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                                                     </p>
                                                     <p className="text-xs font-black text-obsidian line-clamp-1 truncate">{item.summary || '상세 데이터 없음'}</p>
                                                 </CardContent>
