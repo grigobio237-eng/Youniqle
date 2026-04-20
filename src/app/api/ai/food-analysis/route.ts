@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '유효한 이미지 데이터가 없습니다. 다시 캡처해주세요.' }, { status: 400 });
         }
 
-        // 3. Prepare Gemini Prompt
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Prepare Gemini Model
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         let contextInstruction = "";
         
