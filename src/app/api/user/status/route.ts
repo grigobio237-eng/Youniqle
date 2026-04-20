@@ -47,21 +47,17 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    let mealInsight = null;
-    if (latestMealScan) {
-      // Simplified logic for meal insights based on metrics
-      // Expected metrics: { carbs: number, protein: number, fat: number }
-      const nutrientData = latestMealScan.metrics || { carbs: 50, protein: 15, fat: 35 };
-      let recKey = 'BALANCED';
-      if (nutrientData.protein < 20) recKey = 'LOW_PROTEIN';
-      else if (nutrientData.carbs > 60) recKey = 'HIGH_CARB';
-      
-      mealInsight = {
-        ...MEAL_INSIGHTS[recKey as keyof typeof MEAL_INSIGHTS],
-        nutrients: nutrientData,
-        scanDate: latestMealScan.createdAt
-      };
-    }
+    const mealInsight = scoreData.scanMetrics.mealMetric ? {
+      title: '영양 균형 분석',
+      description: MEAL_INSIGHTS[scoreData.scanMetrics.mealMetric.recommendationKey]?.description || '분석 중...',
+      suggestion: MEAL_INSIGHTS[scoreData.scanMetrics.mealMetric.recommendationKey]?.advice || '단백질 섭취를 늘려보세요.',
+      nutrients: scoreData.scanMetrics.mealMetric.nutrition,
+      habits: [
+        '식전 물 한 잔 마시기',
+        '식이섬유(채소) 먼저 섭취하기',
+        '천천히 20분 이상 식사하기'
+      ]
+    } : null;
 
     // 3. Fetch latest Survey/Analysis Report
     const latestSurvey = await SurveyResponse.findOne({ userId: user._id })

@@ -48,7 +48,7 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                                 <BookOpen className="w-3 h-3" /> Core Habits
                             </h4>
                             <div className="space-y-2">
-                                {insight.habits.map((habit, idx) => (
+                                {insight.habits?.map((habit, idx) => (
                                     <div key={idx} className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
                                         <div className="w-2 h-2 rounded-full bg-chapter-accent" />
                                         <span className="text-sm font-bold">{habit}</span>
@@ -67,7 +67,7 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
 
                 {isPosture && insight.exercises && (
                     <div className="pt-4 border-t border-white/10 flex flex-wrap gap-3">
-                        {insight.exercises.map((ex, idx) => (
+                        {insight.exercises?.map((ex, idx) => (
                             <Button 
                                 key={idx}
                                 asChild

@@ -65,7 +65,7 @@ export default function HabitAlertBanner({ insight }: HabitAlertBannerProps) {
               
               <h3 className="text-xl font-black tracking-tight">{insight.title}</h3>
               <p className="text-sm text-mist/60 font-medium leading-relaxed">
-                {insight.habits[0] || '오늘의 의식적인 습관 교정을 시작해보세요.'}
+                {insight.habits?.[0] || '오늘의 의식적인 습관 교정을 시작해보세요.'}
               </p>
               
               <div className="pt-2 flex items-center gap-3">
