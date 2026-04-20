@@ -5,6 +5,49 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
+// Helper: retry with exponential backoff for rate-limited requests
+async function generateWithRetry(model: any, content: any[], maxRetries = 2) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await model.generateContent(content);
+        } catch (error: any) {
+            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+            if (isRateLimit && attempt < maxRetries) {
+                const waitMs = attempt * 2000; 
+                console.log(`Post-Op: Rate limited. Attempt ${attempt}/${maxRetries}. Retrying in ${waitMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+                continue;
+            }
+            throw error; 
+        }
+    }
+}
+
+// Fallback logic: try 2.5-pro first, then 2.0-flash
+async function generateWithFallback(content: any[]) {
+    const modelsToTry = ["gemini-2.5-pro", "gemini-2.0-flash"];
+    let lastError: any = null;
+
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`Post-Op: Starting generation with model: ${modelName}`);
+            const model = genAI.getGenerativeModel({ model: modelName });
+            return await generateWithRetry(model, content);
+        } catch (error: any) {
+            lastError = error;
+            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+            const isNotFound = error?.message?.includes('404') || error?.status === 404;
+
+            if (isRateLimit || isNotFound) {
+                console.warn(`Post-Op: Model ${modelName} failed (${isRateLimit ? '429' : '404'}). Trying next model...`);
+                continue; 
+            }
+            throw error; 
+        }
+    }
+    throw lastError;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,8 +57,6 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { image, answers, surgeryType, userName } = body;
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // 1. 이미지 데이터 처리 (있는 경우)
     const mediaPart = image && image.startsWith('data:image') ? {
@@ -56,7 +97,7 @@ export async function POST(req: NextRequest) {
       }
     `;
 
-    const result = await model.generateContent(mediaPart ? [prompt, mediaPart] : [prompt]);
+    const result = await generateWithFallback(mediaPart ? [prompt, mediaPart] : [prompt]);
     const responseText = result.response.text();
     
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
@@ -66,6 +107,12 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error('[AI Post-Op Analysis API Error]:', error);
+    const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+    if (isRateLimit) {
+        return NextResponse.json({ 
+            error: 'AI 서버가 잠시 바쁩니다. 잠시 후 다시 시도해주세요.' 
+        }, { status: 503 });
+    }
     return NextResponse.json({ error: '분석 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }

@@ -17,59 +17,47 @@ export const config = {
     },
 };
 
-// 모델 우선순위: 1순위 → 2순위 순으로 자동 Fallback
-const MODEL_PRIORITY = [
-    'gemini-2.5-pro',     // 1순위: 최신 고성능 모델
-    'gemini-2.0-flash',   // 2순위: 예비 모델 (Fallback)
-];
-
-/**
- * 우선순위 모델을 순서대로 시도합니다.
- * 429(할당량 초과) 발생 시 다음 모델로 자동 전환합니다.
- */
-async function generateWithFallback(content: any[]) {
-    let lastError: any = null;
-
-    for (const modelName of MODEL_PRIORITY) {
-        for (let attempt = 1; attempt <= 2; attempt++) {
-            try {
-                console.log(`[AI] 모델 시도: ${modelName} (attempt ${attempt})`);
-                const model = genAI.getGenerativeModel({ model: modelName });
-                const result = await model.generateContent(content);
-                console.log(`[AI] 성공: ${modelName}`);
-                return result;
-            } catch (error: any) {
-                lastError = error;
-                const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
-                const isNotFound = error?.message?.includes('404') || error?.message?.includes('not found');
-
-                if (isNotFound) {
-                    // 모델을 찾을 수 없으면 바로 다음 모델로
-                    console.warn(`[AI] ${modelName} 없음 (404). 다음 모델로 전환합니다.`);
-                    break;
-                }
-
-                if (isRateLimit && attempt < 2) {
-                    // 같은 모델로 1회 재시도 (3초 대기)
-                    console.warn(`[AI] ${modelName} 할당량 초과. 3초 후 재시도...`);
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                    continue;
-                }
-
-                if (isRateLimit) {
-                    // 재시도도 실패 → 다음 모델로 전환
-                    console.warn(`[AI] ${modelName} 재시도 실패. 다음 모델로 전환합니다.`);
-                    break;
-                }
-
-                // 그 외 에러는 즉시 throw
-                throw error;
+// Helper: retry with exponential backoff for rate-limited requests
+async function generateWithRetry(model: any, content: any[], maxRetries = 2) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await model.generateContent(content);
+        } catch (error: any) {
+            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+            if (isRateLimit && attempt < maxRetries) {
+                const waitMs = attempt * 2000; 
+                console.log(`Rate limited. Attempt ${attempt}/${maxRetries}. Retrying in ${waitMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+                continue;
             }
+            throw error; 
         }
     }
+}
 
-    // 모든 모델 실패 시
-    throw lastError || new Error('모든 AI 모델이 응답하지 않습니다.');
+// Fallback logic: try 2.5-pro first, then 2.0-flash
+async function generateWithFallback(content: any[]) {
+    const modelsToTry = ["gemini-2.5-pro", "gemini-2.0-flash"];
+    let lastError: any = null;
+
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`Starting generation with model: ${modelName}`);
+            const model = genAI.getGenerativeModel({ model: modelName });
+            return await generateWithRetry(model, content);
+        } catch (error: any) {
+            lastError = error;
+            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+            const isNotFound = error?.message?.includes('404') || error?.status === 404;
+
+            if (isRateLimit || isNotFound) {
+                console.warn(`Model ${modelName} failed (${isRateLimit ? '429' : '404'}). Trying next model...`);
+                continue; 
+            }
+            throw error; 
+        }
+    }
+    throw lastError;
 }
 
 export async function POST(request: NextRequest) {
@@ -100,7 +88,7 @@ export async function POST(request: NextRequest) {
         const { image, journey } = await request.json();
         
         let base64Data = "";
-        let mimeType = "image/png";
+        let mimeType = "image/png"; // Default
 
         if (image) {
             const match = image.match(/^data:([^;]+);base64,(.+)$/);
@@ -116,7 +104,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '유효한 이미지 데이터가 없습니다. 다시 캡처해주세요.' }, { status: 400 });
         }
 
-        // 3. Build Prompt
         let contextInstruction = "";
         
         if (journey === 'CLINICAL') {
@@ -186,7 +173,6 @@ export async function POST(request: NextRequest) {
         4. 반드시 유효한 JSON 형식으로만 답변하세요.
 `;
 
-        // 4. Call AI with automatic model fallback
         const result = await generateWithFallback([
             prompt,
             {
@@ -212,11 +198,11 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('Food Analysis Error:', error);
+        console.error('Food Analysis Final Failure:', error);
         const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
         if (isRateLimit) {
             return NextResponse.json({ 
-                error: 'AI 서버가 현재 바쁩니다. 잠시 후 다시 시도해주세요.' 
+                error: 'AI 서버가 잠시 바쁩니다. 잠시 후 다시 시도해주세요.' 
             }, { status: 503 });
         }
         return NextResponse.json({ error: 'AI 분석 중 오류가 발생했습니다.' }, { status: 500 });
