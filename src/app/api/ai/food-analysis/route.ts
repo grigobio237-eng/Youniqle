@@ -17,6 +17,24 @@ export const config = {
     },
 };
 
+// Helper: retry with exponential backoff for rate-limited requests
+async function generateWithRetry(model: any, content: any[], maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await model.generateContent(content);
+        } catch (error: any) {
+            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+            if (isRateLimit && attempt < maxRetries) {
+                const waitMs = attempt * 2000; // 2s, 4s on each retry
+                console.log(`Rate limited. Attempt ${attempt}/${maxRetries}. Retrying in ${waitMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+                continue;
+            }
+            throw error; // Re-throw if not rate limit or exhausted retries
+        }
+    }
+}
+
 export async function POST(request: NextRequest) {
     try {
         await connectDB();
@@ -67,7 +85,6 @@ export async function POST(request: NextRequest) {
 
         let contextInstruction = "";
         
-        // ... (생략된 기존 코드 유지) ...
         // Journey-based specific instructions
         if (journey === 'CLINICAL') {
             contextInstruction += `[USER JOURNEY: CLINICAL CARE] 
@@ -138,7 +155,7 @@ export async function POST(request: NextRequest) {
         4. 반드시 유효한 JSON 형식으로만 답변하세요.
 `;
 
-        const result = await model.generateContent([
+        const result = await generateWithRetry(model, [
             prompt,
             {
                 inlineData: {
@@ -165,6 +182,12 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error('Food Analysis Error:', error);
+        const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+        if (isRateLimit) {
+            return NextResponse.json({ 
+                error: 'AI 서버가 잠시 바쁩니다. 잠시 후 다시 시도해주세요.' 
+            }, { status: 503 });
+        }
         return NextResponse.json({ error: 'AI 분석 중 오류가 발생했습니다.' }, { status: 500 });
     }
 }
