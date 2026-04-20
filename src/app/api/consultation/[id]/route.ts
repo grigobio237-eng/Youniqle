@@ -47,6 +47,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // AI 면담 가이드가 없으면 생성 (Lazy Generation)
+    if (!consultation.aiGuide) {
+      const { GeminiAIEngine } = await import('@/lib/ai/gemini-engine');
+      const aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(consultation);
+      
+      // DB 업데이트
+      await connectDB();
+      const { default: PreConsultationModel } = await import('@/models/PreConsultation');
+      await PreConsultationModel.findByIdAndUpdate(id, { aiGuide });
+      consultation.aiGuide = aiGuide;
+    }
+
     return NextResponse.json({ consultation });
 
   } catch (error) {

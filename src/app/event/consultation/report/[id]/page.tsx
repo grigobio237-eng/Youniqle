@@ -1,10 +1,4 @@
-'use client';
-
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Download, ChevronLeft, CalendarClock, ShieldCheck, HeartPulse, UserCircle, Target } from 'lucide-react';
+import { Loader2, Download, ChevronLeft, CalendarClock, ShieldCheck, HeartPulse, UserCircle, Target, CheckCircle2, Sparkles, MessageSquare, ClipboardCheck, Stethoscope } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 
 export default function ReportPage({ params: originalParams }: { params: { id: string } }) {
@@ -97,8 +91,9 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mist">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-mist">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+        <p className="text-slate font-bold animate-pulse text-sm">AI 가이드 리포트를 분석하고 있습니다...</p>
       </div>
     );
   }
@@ -168,7 +163,7 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
             </div>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-12">
             
             {/* 1. Expectation */}
             <section>
@@ -265,7 +260,6 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                 <CalendarClock className="text-reward-gold w-6 h-6" /> 4. VIP 방문 및 동선 설계
               </h2>
                <div className="grid grid-cols-1 gap-4">
-                  {/* Companion */}
                   <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-line">
                     <div className="flex-1">
                       <p className="text-sm text-slate font-medium">동반자 유무</p>
@@ -278,7 +272,6 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                     )}
                   </div>
                   
-                  {/* Transportation */}
                   <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-line">
                     <div className="flex-1">
                       <p className="text-sm text-slate font-medium">교통/숙소 편의 서비스</p>
@@ -291,7 +284,6 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                     )}
                   </div>
 
-                  {/* Route */}
                   <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-line">
                     <div className="flex-1">
                       <p className="text-sm text-slate font-medium">프라이버시 동선 요청</p>
@@ -338,12 +330,101 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                  </div>
                </div>
              </section>
+
+             {/* 6. AI Smart Guide (NEW) */}
+             {data.aiGuide && (
+               <section className="animate-in fade-in slide-in-from-bottom-5 duration-1000">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-obsidian rounded-xl flex items-center justify-center text-primary">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-black text-obsidian tracking-tight">AI 리커버리 매니저 면담 가이드</h2>
+                      <p className="text-xs text-slate font-bold uppercase tracking-widest">Tailored consultation strategy</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-obsidian text-white p-8 rounded-[32px] shadow-xl relative overflow-hidden group mb-8">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+                     <p className="text-lg font-medium leading-relaxed italic opacity-90 relative z-10">
+                       "{data.aiGuide.analysis}"
+                     </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-black flex items-center gap-2 px-2">
+                       <ClipboardCheck className="text-primary w-5 h-5" /> 의료진에게 반드시 질문하세요
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                       {data.aiGuide.mustAskQuestions.map((item: any, idx: number) => (
+                         <div key={idx} className="p-6 bg-mist/30 border border-line rounded-2xl hover:border-primary transition-all group">
+                           <div className="flex gap-4">
+                             <div className="w-8 h-8 bg-white border border-line rounded-lg flex items-center justify-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                               {idx + 1}
+                             </div>
+                             <div className="flex-1">
+                               <p className="text-lg font-black text-obsidian mb-2">{item.question}</p>
+                               <div className="flex gap-2 items-start opacity-70">
+                                 <span className="inline-block mt-1 min-w-[3rem] text-[10px] font-black uppercase text-primary tracking-widest bg-primary/10 px-2 py-0.5 rounded">Rationale</span>
+                                 <p className="text-sm font-medium">{item.rationale}</p>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-10 p-8 bg-primary/5 border-2 border-primary/20 rounded-[32px]">
+                    <h3 className="text-lg font-black flex items-center gap-2 mb-6">
+                      <Stethoscope className="text-primary w-5 h-5" /> 전문가 상담 팁
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {data.aiGuide.hospitalTips.map((tip: string, idx: number) => (
+                        <div key={idx} className="flex gap-3 items-start">
+                           <CheckCircle2 className="w-5 h-5 text-status-good shrink-0 mt-0.5" />
+                           <p className="text-sm font-medium leading-relaxed">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+               </section>
+             )}
           </div>
 
           <div className="mt-16 pt-8 border-t border-line text-center text-slate text-sm font-medium">
              본 보고서는 Youniqle의 최상위 VIP 회복 설계 프레임워크에 기반하여 작성되었습니다.<br/>
              정교한 설계를 통해 부작용을 최소화하고 완벽한 시술 여정을 돕습니다.
           </div>
+        </div>
+
+        {/* Action Buttons Section (NEW) */}
+        <div className="py-12 flex flex-col items-center gap-8">
+           <div className="text-center space-y-2">
+             <h3 className="text-xl font-black">상담 준비가 끝나셨나요?</h3>
+             <p className="text-slate font-medium italic opacity-70">병원 방문 후의 여정도 유니클이 함께합니다.</p>
+           </div>
+           
+           <div className="flex flex-wrap gap-4 justify-center">
+             <Button 
+               size="lg" 
+               className="h-16 px-8 bg-obsidian text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all group"
+               onClick={() => router.push('/ai-navigator')}
+             >
+               <MessageSquare className="w-5 h-5 mr-3 group-hover:animate-bounce" />
+               네비게이터와 대화하기
+             </Button>
+             <Button 
+               size="lg" 
+               variant="outline"
+               className="h-16 px-8 bg-white border-2 border-line text-obsidian rounded-2xl font-black text-lg shadow-xl hover:bg-mist transition-all"
+               onClick={() => addToast({ title: '안내', description: '상담 후기 예약 시스템을 준비 중입니다.', variant: 'info' })}
+             >
+               상담 후기 예약하기
+             </Button>
+           </div>
+           
+           <p className="text-[10px] text-slate font-black uppercase tracking-[0.3em] opacity-40">Security Protocol Locked | Confidential Report</p>
         </div>
       </div>
     </div>

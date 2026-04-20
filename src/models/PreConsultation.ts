@@ -63,6 +63,16 @@ export interface IPreConsultation extends Document {
     };
   };
 
+  medicalCategory?: string; // PLASTIC, ORTHOPEDIC, INTERNAL, GENERAL
+  aiGuide?: {
+    analysis: string;
+    mustAskQuestions: {
+      question: string;
+      rationale: string;
+    }[];
+    hospitalTips: string[];
+  };
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -124,6 +134,16 @@ const PreConsultationSchema = new Schema(
         needsDedicatedManager: { type: Boolean, required: true, default: false },
         needsPremiumKit: { type: Boolean, required: true, default: false },
       },
+    },
+
+    medicalCategory: { type: String },
+    aiGuide: {
+      analysis: { type: String },
+      mustAskQuestions: [{
+        question: { type: String },
+        rationale: { type: String }
+      }],
+      hospitalTips: [{ type: String }]
     },
   },
   { timestamps: true }

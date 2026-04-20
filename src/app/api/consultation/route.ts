@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       anxiety: data.anxiety,
       visitPlan: data.visitPlan,
       investment: data.investment,
+      medicalCategory: data.medicalCategory,
     });
 
     await newConsultation.save();

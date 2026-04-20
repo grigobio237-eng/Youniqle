@@ -1696,4 +1696,157 @@ JSON 형식:
 `;
         return await this.generateWithFallback(prompt, "AI 회복 어드바이저 모드", 0.6);
     }
+
+    /**
+     * Medical Interview Guide: Generates tailored questions and tips for hospital visits
+     * based on pre-consultation survey data.
+     */
+    static async generateMedicalInterviewGuide(data: any): Promise<any> {
+        try {
+            const categoryMap: Record<string, string> = {
+                'PLASTIC': '성형외과/피부과',
+                'ORTHOPEDIC': '정형외과/재활의학과',
+                'INTERNAL': '내과/건강검진',
+                'GENERAL': '일반외과/대학병원'
+            };
+            const categoryName = categoryMap[data.medicalCategory] || '전문 의료 상담';
+
+            const prompt = `당신은 유니클(Youniqle)의 수석 메디컬 코디네이터입니다. 
+사용자가 작성한 사전 문진 데이터를 정밀 분석하여, 실제 병원 방문 시 의료진과 상담할 때 활용할 수 있는 **[초개인화 면담 가이드]**를 작성해주세요.
+
+## 환자 사전 문진 데이터
+- 진료 분야: ${categoryName}
+- 기대 결과: ${data.expectation?.changeScale} (허용 다운타임: ${data.expectation?.downtime})
+- 주요 일정: ${data.expectation?.importantEvent?.hasEvent ? data.expectation.importantEvent.details : '없음'}
+- 과거 병력 및 특이사항: ${data.medicalHistory?.pastExperience?.hasExperience ? data.medicalHistory.pastExperience.details : '없음'}
+- 복용 약물/영양제: ${data.medicalHistory?.currentMedication?.taking ? data.medicalHistory.currentMedication.details : '없음'}
+- 최근 건강 이슈: ${data.medicalHistory?.healthStatus?.isIssue ? data.medicalHistory.healthStatus.details : '없음'}
+- 핵심 불안 요소: ${data.anxiety?.points?.join(', ')} / 상세: ${data.anxiety?.privacyDetails || '없음'}
+- 방문 환경 요청: ${data.visitPlan?.privacyRoute?.wantsPrivacy ? 'VIP 전용 프라이버시 동선 선호' : '일반'}
+
+## 작성 원칙
+1. **전문성(Professionalism)**: 의료진에게 신뢰를 줄 수 있는 명확하고 전문적인 용어를 사용하되, 환자가 말하기 편한 문장으로 다듬어주세요.
+2. **개인화(Hyper-Personalization)**: 환자가 언급한 '불안 요소'와 '과거 병력'을 반드시 질문에 반영하여 잠재적 위험을 최소화하세요.
+3. **톤앤매너**: 격조 있고 차분하며 지적인 '수석 코디네이터'의 어조를 유지하세요.
+
+## 응답 형식 (JSON Only)
+{
+  "analysis": "사용자의 상태와 이번 시술/수술 여정의 핵심 목표에 대한 수석 코디네이터의 1-2문장 분석",
+  "mustAskQuestions": [
+    {
+      "question": "의사에게 던질 핵심 질문 문장",
+      "rationale": "이 질문이 왜 중요한지에 대한 전문가적 근거 (유저의 데이터와 연관 지어 설명)"
+    }
+  ],
+  "hospitalTips": ["방문 시 유의할 점 또는 효과적인 상담을 위한 전문가 팁 3가지"]
+}
+
+질문은 총 5개를 생성해주세요.`;
+
+            const text = await this.generateWithFallback(prompt, "유니클 수석 코디네이터 모드", 0.7);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse medical guide JSON');
+
+        } catch (error) {
+            console.error('Gemini Medical Guide Error:', error);
+            // Fallback content if AI fails
+            return {
+                analysis: "고객님의 안전한 회복을 위해 필수적인 면담 항목을 정리해 드립니다.",
+                mustAskQuestions: [
+                    { question: "시술 후 예상되는 통증의 정도와 관리 방법은 무엇인가요?", rationale: "안전한 통증 관리를 위해 필수적인 질문입니다." },
+                    { question: "현재 복용 중인 약물이 시술 결과에 영향을 주나요?", rationale: "기존 병력 및 약물과의 상호작용 확인이 필요합니다." },
+                    { question: "정상적인 일상 복귀까지 소요되는 정확한 기간은 얼마인가요?", rationale: "허용하신 다운타임 내 회복 가능한지 확인이 필요합니다." },
+                    { question: "부작용 발생 시 야간이나 주말에도 대응 가능한 시스템이 있나요?", rationale: "응급 상황에 대비한 병원의 시스템 확인은 필수입니다." },
+                    { question: "시술 결과가 기대에 미치지 못할 경우의 보정 정책은 어떻게 되나요?", rationale: "만족도 극대화를 위해 사전에 확인해야 할 항목입니다." }
+                ],
+                hospitalTips: [
+                    "과거 병력과 알레르기 반응은 사소한 것이라도 반드시 말씀하세요.",
+                    "상담 중 이해가 가지 않는 부분은 즉시 다시 질문하여 명확히 하세요.",
+                    "시술 전 금식 여부와 중단해야 할 영양제를 다시 한 번 확인하세요."
+                ]
+            };
+        }
+    }
+
+    /**
+     * Post-Care Recovery Roadmap: Generates a 14-30 day plan after a procedure
+     */
+    static async generatePostCareRoadmap(data: any): Promise<any> {
+        try {
+            const prompt = `당신은 유니클(Youniqle)의 수석 리커버리 전문가입니다. 
+시술/수술을 받은 유저의 현재 상태를 분석하여, 완벽한 회복을 위한 **[개인화 리커버리 로드맵]**을 작성해주세요.
+
+## 유저 시술 후 상태 데이터
+- 시술/수술명: ${data.procedureInfo?.name}
+- 경과 날짜: 시술 후 ${data.procedureInfo?.daysSince}일차
+- 통증: ${data.symptoms?.pain}/5, 붓기: ${data.symptoms?.swelling}/5, 멍: ${data.symptoms?.bruising}/5, 열감: ${data.symptoms?.fever}/5
+- 현재 고민: ${data.concerns?.join(', ') || '없음'}
+- 특이사항: ${data.symptoms?.otherDetails || '없음'}
+- 생활 습관: ${data.lifestyle?.smoking ? '흡연 중' : '비흡연'}, ${data.lifestyle?.drinking ? '음주 중' : '금주'}, 활동량(${data.lifestyle?.activityLevel})
+
+## 작성 원칙
+1. **위험성 감지**: 통증이나 열감이 4점 이상이거나 특이사항에 출혈/화농성 분비물이 언급되면 'isEmergency'를 true로 설정하세요.
+2. **단계별 로드맵**: 시술 후 2주(또는 상황에 따라 1개월) 동안의 타임라인을 3단계로 나누어 제시하세요. 
+3. **지침 구체성**: '찜질 방법', '세안/샤워 지침', '운동 가능 여부' 등을 명확히 포함하세요.
+
+## 응답 형식 (JSON Only)
+{
+  "statusAnalysis": "현재 유저의 회복 상태에 대한 전문가적 진단 (1-2문장)",
+  "isEmergency": boolean,
+  "recoveryPhase": "현재 속한 단계 (예: 급성 염증 관리기, 안정적 회복기, 최종 유착 관리기 등)",
+  "timeline": [
+    {
+      "period": "시기 (예: 오늘~3일차)",
+      "goal": "이 시기의 핵심 목표",
+      "instructions": ["구체적인 지침 문장 3-4개"]
+    }
+  ],
+  "expertAdvice": ["유저에게 꼭 해주고 싶은 전문가적 조언 및 주의사항 3가지"]
+}
+
+전문가다운 차분하고 확신 있는 어조를 사용하세요.`;
+
+            const text = await this.generateWithFallback(prompt, "유니클 리커버리 전문가 모드", 0.7);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse post-care roadmap JSON');
+
+        } catch (error) {
+            console.error('Gemini Post-Care Roadmap Error:', error);
+            return {
+                statusAnalysis: "현재 시술 후 초기 회복 단계에 계신 것으로 파악됩니다. 안전한 회복을 위해 표준 가이드를 제공해 드립니다.",
+                isEmergency: (data.symptoms?.pain >= 4 || data.symptoms?.fever >= 4),
+                recoveryPhase: "초기 집중 관리기",
+                timeline: [
+                    {
+                        period: "현재 ~ 시술 후 3일차",
+                        goal: "초기 붓기 억제 및 감염 예방",
+                        instructions: ["시술 부위를 차갑게 유지하세요 (아이싱)", "자극적인 세안이나 마찰을 피하세요", "처방된 약을 시간에 맞춰 복용하세요"]
+                    },
+                    {
+                        period: "4일차 ~ 1주일",
+                        goal: "혈액 순환 증진 및 멍 관리",
+                        instructions: ["가벼운 실내 산책을 시작하세요", "따뜻한 찜질로 전환하여 순환을 돕습니다", "충분한 수분과 고단백 식단을 챙기세요"]
+                    },
+                    {
+                        period: "1주일 이후",
+                        goal: "일상 복귀 및 결과 안착",
+                        instructions: ["시술 부위의 보습에 신경을 써주세요", "흡연과 음주는 최소 2주간 더 금하는 것이 좋습니다", "격한 운동은 2주 후부터 점진적으로 시작하세요"]
+                    }
+                ],
+                expertAdvice: [
+                    "갑작스러운 고열이나 참기 힘든 통증이 발생하면 즉시 병원에 연락하세요.",
+                    "잠을 잘 때는 머리를 심장보다 높게 두는 것이 부기 완화에 도움이 됩니다.",
+                    "시술 부위가 가렵더라도 손으로 만지지 않도록 주의가 필요합니다."
+                ]
+            };
+        }
+    }
 }
