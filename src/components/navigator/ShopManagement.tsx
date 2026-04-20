@@ -182,16 +182,16 @@ export default function ShopManagement() {
                   </div>
 
                   {/* Stats & Actions */}
-                  <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                    <div className="bg-mist/50 px-6 py-3 rounded-2xl border border-line text-center min-w-[100px]">
+                  <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto mt-4 lg:mt-0">
+                    <div className="bg-mist/50 px-6 py-3 rounded-2xl border border-line text-center min-w-[100px] flex-1 sm:flex-none">
                       <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-0.5">Leads</p>
                       <p className="text-lg font-black text-obsidian">{shop.leadCount}</p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
                         <Button 
                             onClick={() => openMessageModal(shop)}
-                            className="bg-chapter-accent text-white hover:bg-chapter-accent/90 rounded-xl h-12 px-6 font-black flex items-center gap-2 shadow-lg shadow-chapter-accent/20"
+                            className="bg-chapter-accent text-white hover:bg-chapter-accent/90 rounded-xl h-12 px-6 font-black flex items-center justify-center gap-2 shadow-lg shadow-chapter-accent/20 flex-1 sm:flex-none"
                         >
                             <Send className="w-4 h-4" /> 상담 링크 발송
                         </Button>
@@ -199,12 +199,12 @@ export default function ShopManagement() {
                         <Button 
                             onClick={() => router.push(`/navigator/shops/${shop._id}`)}
                             variant="secondary"
-                            className="bg-obsidian text-white hover:bg-obsidian/90 rounded-xl h-12 px-5 font-bold flex items-center gap-2"
+                            className="bg-obsidian text-white hover:bg-obsidian/90 rounded-xl h-12 px-5 font-bold flex items-center justify-center gap-2 flex-1 sm:flex-none"
                         >
                             <Activity className="w-4 h-4" /> 분석 <ChevronRight className="w-4 h-4" />
                         </Button>
 
-                        <Button variant="ghost" size="sm" className="h-12 w-12 rounded-xl text-slate/30">
+                        <Button variant="ghost" size="sm" className="h-12 w-12 rounded-xl text-slate/30 shrink-0">
                             <MoreHorizontal className="w-5 h-5" />
                         </Button>
                     </div>
