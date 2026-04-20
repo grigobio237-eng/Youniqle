@@ -42,9 +42,7 @@ interface Props {
 
 export default function MessageTemplateModal({ shopCode, shopName, onClose }: Props) {
   const copyToClipboard = (template: MessageTemplate | null) => {
-    // 캐릭터 로테이션을 위해 1~6 사이의 랜덤 번호 생성
-    const charIndex = Math.floor(Math.random() * 6) + 1;
-    const surveyLink = `${window.location.origin}/survey/${shopCode}${template ? `?v=${template.id}&c=${charIndex}` : `?c=${charIndex}`}`;
+    const surveyLink = `${window.location.origin}/survey/${shopCode}${template ? `?v=${template.id}` : ''}`;
     
     const fullMessage = template 
       ? `${template.content}\n\n[간단 체크 링크]\n${surveyLink}`
