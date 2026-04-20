@@ -164,7 +164,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium">
             <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-white transition-colors">이용약관</Link>
             <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:underline underline-offset-4">개인정보처리방침</Link>
-            <Link href="/support" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
+            <Link href="/support/inquiry" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
           <div className="text-gray-600 text-[11px] tracking-tight">
             © {new Date().getFullYear()} {currentSettings.siteName}. All rights reserved.

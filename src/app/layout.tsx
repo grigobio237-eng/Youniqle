@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
-  manifest: '/manifest.json',
+
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -87,7 +87,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log('--- RootLayout Rendering ---');
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
