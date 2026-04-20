@@ -17,22 +17,59 @@ export const config = {
     },
 };
 
-// Helper: retry with exponential backoff for rate-limited requests
-async function generateWithRetry(model: any, content: any[], maxRetries = 3) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            return await model.generateContent(content);
-        } catch (error: any) {
-            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
-            if (isRateLimit && attempt < maxRetries) {
-                const waitMs = attempt * 2000; // 2s, 4s on each retry
-                console.log(`Rate limited. Attempt ${attempt}/${maxRetries}. Retrying in ${waitMs}ms...`);
-                await new Promise(resolve => setTimeout(resolve, waitMs));
-                continue;
+// 모델 우선순위: 1순위 → 2순위 순으로 자동 Fallback
+const MODEL_PRIORITY = [
+    'gemini-2.5-pro',     // 1순위: 최신 고성능 모델
+    'gemini-2.0-flash',   // 2순위: 예비 모델 (Fallback)
+];
+
+/**
+ * 우선순위 모델을 순서대로 시도합니다.
+ * 429(할당량 초과) 발생 시 다음 모델로 자동 전환합니다.
+ */
+async function generateWithFallback(content: any[]) {
+    let lastError: any = null;
+
+    for (const modelName of MODEL_PRIORITY) {
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                console.log(`[AI] 모델 시도: ${modelName} (attempt ${attempt})`);
+                const model = genAI.getGenerativeModel({ model: modelName });
+                const result = await model.generateContent(content);
+                console.log(`[AI] 성공: ${modelName}`);
+                return result;
+            } catch (error: any) {
+                lastError = error;
+                const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
+                const isNotFound = error?.message?.includes('404') || error?.message?.includes('not found');
+
+                if (isNotFound) {
+                    // 모델을 찾을 수 없으면 바로 다음 모델로
+                    console.warn(`[AI] ${modelName} 없음 (404). 다음 모델로 전환합니다.`);
+                    break;
+                }
+
+                if (isRateLimit && attempt < 2) {
+                    // 같은 모델로 1회 재시도 (3초 대기)
+                    console.warn(`[AI] ${modelName} 할당량 초과. 3초 후 재시도...`);
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    continue;
+                }
+
+                if (isRateLimit) {
+                    // 재시도도 실패 → 다음 모델로 전환
+                    console.warn(`[AI] ${modelName} 재시도 실패. 다음 모델로 전환합니다.`);
+                    break;
+                }
+
+                // 그 외 에러는 즉시 throw
+                throw error;
             }
-            throw error; // Re-throw if not rate limit or exhausted retries
         }
     }
+
+    // 모든 모델 실패 시
+    throw lastError || new Error('모든 AI 모델이 응답하지 않습니다.');
 }
 
 export async function POST(request: NextRequest) {
@@ -63,10 +100,9 @@ export async function POST(request: NextRequest) {
         const { image, journey } = await request.json();
         
         let base64Data = "";
-        let mimeType = "image/png"; // Default
+        let mimeType = "image/png";
 
         if (image) {
-            // "data:image/png;base64,..." 형식을 처리하고 순수 Base64와 MIME 타입 추출
             const match = image.match(/^data:([^;]+);base64,(.+)$/);
             if (match) {
                 mimeType = match[1];
@@ -80,12 +116,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '유효한 이미지 데이터가 없습니다. 다시 캡처해주세요.' }, { status: 400 });
         }
 
-        // Prepare Gemini Model
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-
+        // 3. Build Prompt
         let contextInstruction = "";
         
-        // Journey-based specific instructions
         if (journey === 'CLINICAL') {
             contextInstruction += `[USER JOURNEY: CLINICAL CARE] 
             사용자는 현재 시술이나 수술을 앞두고 있거나 회복 중인 환자 모드입니다. 
@@ -100,7 +133,6 @@ export async function POST(request: NextRequest) {
             이 음식이 가진 일반적인 회복 효능을 친절하게 설명하고, 더 깊은 관리를 위해 여정을 선택하도록 유도하는 뉘앙스를 담으세요. \n`;
         }
 
-        // Add Diagnosis context if available
         if (!isMissing) {
             contextInstruction += `[USER DATA] 
             사용자 이름: ${userName}님,
@@ -112,7 +144,6 @@ export async function POST(request: NextRequest) {
             contextInstruction += `[USER DATA] 진단 데이터 없음. 보편적인 건강 지표를 기준으로 설명하세요. \n`;
         }
 
-        // Persona & Tone Instruction
         let personaInstruction = "";
         if (!userName) {
             personaInstruction = `사용자는 현재 익명 상태입니다. '고객님'과 같은 딱딱한 호칭을 절대 사용하지 말고, 바로 친근한 말투(~해요)로 정보를 전달하세요. 
@@ -155,7 +186,8 @@ export async function POST(request: NextRequest) {
         4. 반드시 유효한 JSON 형식으로만 답변하세요.
 `;
 
-        const result = await generateWithRetry(model, [
+        // 4. Call AI with automatic model fallback
+        const result = await generateWithFallback([
             prompt,
             {
                 inlineData: {
@@ -166,7 +198,6 @@ export async function POST(request: NextRequest) {
         ]);
 
         let responseText = result.response.text();
-        // Extract JSON from potential Markdown blocks
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         const analysisData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
@@ -185,7 +216,7 @@ export async function POST(request: NextRequest) {
         const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
         if (isRateLimit) {
             return NextResponse.json({ 
-                error: 'AI 서버가 잠시 바쁩니다. 잠시 후 다시 시도해주세요.' 
+                error: 'AI 서버가 현재 바쁩니다. 잠시 후 다시 시도해주세요.' 
             }, { status: 503 });
         }
         return NextResponse.json({ error: 'AI 분석 중 오류가 발생했습니다.' }, { status: 500 });
