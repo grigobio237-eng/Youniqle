@@ -16,11 +16,14 @@ interface MealNutrientChartProps {
 }
 
 export default function MealNutrientChart({ nutrients, advice }: MealNutrientChartProps) {
+    if (!nutrients) return null;
+
     const data = [
-        { name: '탄수화물', value: nutrients.carbs, color: '#0E3A3A' }, // chapter-accent
-        { name: '단백질', value: nutrients.protein, color: '#D4AF37' }, // reward-gold
-        { name: '지방', value: nutrients.fat, color: '#E5E7EB' }       // line
+        { name: '탄수화물', value: nutrients.carbs || 0, color: '#0E3A3A' }, // chapter-accent
+        { name: '단백질', value: nutrients.protein || 0, color: '#D4AF37' }, // reward-gold
+        { name: '지방', value: nutrients.fat || 0, color: '#E5E7EB' }       // line
     ];
+
 
     return (
         <div className="bg-white p-8 rounded-[32px] border border-line shadow-sm space-y-6">
