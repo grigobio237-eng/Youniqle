@@ -17,6 +17,14 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       description: '60초 진단으로 나만의 회복 점수를 확인하세요',
       url: `https://grigobio.co.kr/survey/${shopCode}`,
       siteName: 'Youniqle',
+      images: [
+        {
+          url: '/og-banner.png',
+          width: 1200,
+          height: 630,
+          alt: 'Youniqle Recovery Solution',
+        },
+      ],
       locale: 'ko_KR',
       type: 'website',
     },
@@ -24,6 +32,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       card: 'summary_large_image',
       title: 'Youniqle - 유니클 맞춤 회복 솔루션',
       description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
+      images: ['/og-banner.png'],
     },
   };
 }

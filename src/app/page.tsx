@@ -93,7 +93,7 @@ export default function HomePage() {
   const { data: session } = useSession();
   const { journey, medicalCategory, treatmentType } = useRecovery();
   const router = useRouter();
-  const [viewState, setViewState] = React.useState<'CHECK' | 'INTRO' | 'QUESTION' | 'RESULT'>('CHECK');
+  const [viewState, setViewState] = React.useState<'INTRO' | 'QUESTION' | 'RESULT'>('INTRO');
   const [score, setScore] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);
   const [userNote, setUserNote] = React.useState('');
@@ -112,10 +112,8 @@ export default function HomePage() {
 
     if (storedScore && !isWelcome) {
       setScore(parseInt(storedScore));
-      setViewState('INTRO'); 
     } else {
       setScore(75); // Default score for preview
-      setViewState('INTRO');
     }
   }, []); // Only run once on mount
 
@@ -195,7 +193,6 @@ export default function HomePage() {
 
   // Render appropriate view
   const renderContent = () => {
-    if (viewState === 'CHECK') return <div className="min-h-screen bg-mist" />; // Loading
     if (viewState === 'QUESTION') return <DiagnosisForm questions={questions} onComplete={handleComplete} />;
     if (viewState === 'RESULT') return <ResultDisplay score={score} answers={answers} userNote={userNote} analysisData={analysisData} onEnter={handleEnterDashboard} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
     
