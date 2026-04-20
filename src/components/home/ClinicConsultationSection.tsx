@@ -2,92 +2,102 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight, ShieldCheck, Heart, Activity } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Heart, Activity, ClipboardCheck, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 /**
- * ClinicConsultationSection
- * 클리닉 시술 전 정밀 회복 설계를 독려하는 프리미엄 전용 섹션입니다.
+ * ClinicConsultationSection (Compact 1/3 Size)
+ * 클리닉 시술 전/후를 선택할 수 있는 콤팩트한 전용 섹션입니다.
  */
 export default function ClinicConsultationSection() {
   return (
-    <section className="container mx-auto px-6 py-20">
-      <div className="relative group overflow-hidden rounded-[64px] border border-white/10 shadow-2xl">
+    <section className="container mx-auto px-6 py-10">
+      <div className="relative group overflow-hidden rounded-[40px] border border-white/10 shadow-2xl">
         {/* Animated Background Layers */}
         <div className="absolute inset-0 bg-obsidian" />
         <div className="absolute inset-0 bg-gradient-to-br from-chapter-accent/20 via-transparent to-reward-gold/10 opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
         
-        {/* Interactive Light Spot (Desktop) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-chapter-accent/20 rounded-full blur-[120px] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
+        {/* Interactive Light Spot (Small) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-chapter-accent/20 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="relative z-10 p-12 md:p-24 flex flex-col items-center text-center space-y-10">
-          {/* Header Badge */}
-          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-            <Heart className="w-4 h-4 text-chapter-accent fill-chapter-accent" />
-            <span className="text-[10px] font-black uppercase text-mist tracking-widest">Clinic Professional Care</span>
+        <div className="relative z-10 p-8 md:p-14 flex flex-col items-center text-center space-y-8">
+          {/* Header Badge (Compact) */}
+          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+            <Heart className="w-3 h-3 text-chapter-accent fill-chapter-accent" />
+            <span className="text-[9px] font-black uppercase text-mist tracking-widest">Clinic Care</span>
           </div>
 
-          {/* Main Title & Description */}
-          <div className="space-y-6 max-w-3xl">
+          {/* Main Title & Description (Smaller) */}
+          <div className="space-y-4 max-w-2xl">
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-7xl font-black text-white leading-[1.1] tracking-tight italic"
+              className="text-2xl md:text-5xl font-black text-white leading-tight tracking-tight italic"
             >
-              The Final Design for <br />
-              <span className="text-chapter-accent">Perfect Recovery</span>
+              The Design for <span className="text-chapter-accent">Perfect Recovery</span>
             </motion.h2>
-            <p className="text-mist/70 text-lg md:text-2xl font-medium break-keep">
+            <p className="text-mist/70 text-sm md:text-lg font-medium break-keep">
               시술은 결과만 보는 것이 아니라 과정을 설계하는 것입니다.<br />
-              유니클 클리닉 전용 문진으로 당신만의 완벽한 회복 여정을 시작하세요.
+              현재 당신의 상황에 맞는 정밀 케어를 선택하세요.
             </p>
           </div>
 
-          {/* Features Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl pt-8">
-            <div className="bg-white/5 backdrop-blur-xl p-8 rounded-[40px] border border-white/5 space-y-4 hover:border-chapter-accent transition-colors">
-              <ShieldCheck className="w-8 h-8 text-chapter-accent" />
-              <h4 className="text-lg font-black text-white">정밀한 문진</h4>
-              <p className="text-mist/50 text-xs leading-relaxed">개인의 체성분과 생활 습관을 고려한 <br/>과학적인 설계</p>
+          {/* Features Row (Mini Version) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-2xl">
+            <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5 flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-chapter-accent" />
+              <span className="text-xs font-black text-white">정밀 문진</span>
             </div>
-            <div className="bg-white/5 backdrop-blur-xl p-8 rounded-[40px] border border-white/5 space-y-4 hover:border-chapter-accent transition-colors">
-              <Activity className="w-8 h-8 text-chapter-accent" />
-              <h4 className="text-lg font-black text-white">데이터 기반 가이드</h4>
-              <p className="text-mist/50 text-xs leading-relaxed">수만 개의 데이터를 매칭하여 <br/>도출되는 최적의 회복 가이드</p>
+            <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5 flex items-center gap-3">
+              <Activity className="w-5 h-5 text-chapter-accent" />
+              <span className="text-xs font-black text-white">AI 데이터 분석</span>
             </div>
-            <div className="bg-white/5 backdrop-blur-xl p-8 rounded-[40px] border border-white/5 space-y-4 hover:border-chapter-accent transition-colors">
-              <Sparkles className="w-8 h-8 text-chapter-accent" />
-              <h4 className="text-lg font-black text-white">결과의 완성</h4>
-              <p className="text-mist/50 text-xs leading-relaxed">시술의 효과를 극대화하는 <br/>프리미엄 사후 관리 전용 서비스</p>
+            <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5 flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-chapter-accent" />
+              <span className="text-xs font-black text-white">시술 결과 완성</span>
             </div>
           </div>
 
-          {/* Luxury CTA Button */}
-          <div className="pt-8 w-full md:w-auto">
-            <Link href="/event/consultation">
+          {/* Dual Choice Buttons (Responsive) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl pt-4">
+            {/* Option 1: Pre-hospital */}
+            <Link href="/event/consultation" className="block">
               <Button 
-                size="lg" 
-                className="group relative h-20 md:h-24 px-12 md:px-20 bg-mist text-obsidian rounded-[32px] md:rounded-[40px] shadow-2xl hover:bg-white hover:scale-[1.02] transition-all overflow-hidden"
+                variant="outline"
+                className="w-full h-16 md:h-20 bg-white/5 hover:bg-white text-mist hover:text-obsidian border-white/10 rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all"
               >
-                {/* Shine Animation */}
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-obsidian/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                
-                <span className="relative z-10 flex items-center gap-4 text-xl md:text-3xl font-black italic">
-                  클리닉 회복 설계 시작 <ArrowRight className="w-6 h-6 md:w-10 md:h-10 transition-transform group-hover:translate-x-2" />
-                </span>
+                <div className="flex items-center gap-2">
+                  <ClipboardCheck className="w-5 h-5" />
+                  <span className="text-base md:text-lg font-black">병원 방문 전 정밀 문진</span>
+                </div>
+                <span className="text-[10px] opacity-60 font-medium">최적의 시술 결과 설계</span>
               </Button>
             </Link>
-            <p className="mt-6 text-[11px] font-black uppercase tracking-[0.2em] text-mist/30">
-              Personalized Clinic-Only Experience
-            </p>
+
+            {/* Option 2: Post-op */}
+            <Link href="/diagnosis/post-op" className="block">
+              <Button 
+                className="w-full h-16 md:h-20 bg-chapter-accent hover:bg-white text-white hover:text-obsidian rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all shadow-xl shadow-chapter-accent/20"
+              >
+                <div className="flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  <span className="text-base md:text-lg font-black">시술/수술 후 맞춤 케어</span>
+                </div>
+                <span className="text-[10px] opacity-80 group-hover:opacity-60 font-medium">부기 및 회복 실시간 분석</span>
+              </Button>
+            </Link>
           </div>
+          
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-mist/20">
+            Professional Clinic-Only Experience
+          </p>
         </div>
 
-        {/* Decorative Particles (Static in JSX, CSS for anim) */}
-        <div className="absolute bottom-10 right-10 w-24 h-24 bg-chapter-accent/20 rounded-full blur-2xl animate-pulse" />
-        <div className="absolute top-20 left-10 w-16 h-16 bg-reward-gold/10 rounded-full blur-xl animate-[bounce_4s_infinite]" />
+        {/* Decorative Particles (Smaller) */}
+        <div className="absolute bottom-5 right-5 w-16 h-16 bg-chapter-accent/10 rounded-full blur-xl animate-pulse" />
+        <div className="absolute top-10 left-5 w-10 h-10 bg-reward-gold/5 rounded-full blur-lg animate-bounce" />
       </div>
     </section>
   );

@@ -52,7 +52,7 @@ export default function LandingContent({ onStart, onStartTherapy }: LandingConte
   ];
 
   return (
-    <div className="bg-mist space-y-32 pb-32 pt-20">
+    <div className="bg-mist space-y-20 pb-16 pt-10">
       {/* 1. Utility Hub */}
       <section className="container mx-auto px-6 space-y-16">
         <div className="text-center space-y-4 max-w-2xl mx-auto">
