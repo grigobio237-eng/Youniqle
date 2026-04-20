@@ -45,10 +45,17 @@ export async function POST(request: NextRequest) {
         const { image, journey } = await request.json();
         
         let base64Data = "";
+        let mimeType = "image/png"; // Default
+
         if (image) {
-            // "data:image/png;base64,..." 형식을 처리하고 순수 Base64만 추출
-            const parts = image.split(',');
-            base64Data = parts.length > 1 ? parts[1] : parts[0];
+            // "data:image/png;base64,..." 형식을 처리하고 순수 Base64와 MIME 타입 추출
+            const match = image.match(/^data:([^;]+);base64,(.+)$/);
+            if (match) {
+                mimeType = match[1];
+                base64Data = match[2];
+            } else {
+                base64Data = image;
+            }
         }
 
         if (!base64Data || base64Data.length < 10) {
@@ -56,10 +63,11 @@ export async function POST(request: NextRequest) {
         }
 
         // 3. Prepare Gemini Prompt
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let contextInstruction = "";
         
+        // ... (생략된 기존 코드 유지) ...
         // Journey-based specific instructions
         if (journey === 'CLINICAL') {
             contextInstruction += `[USER JOURNEY: CLINICAL CARE] 
@@ -135,13 +143,14 @@ export async function POST(request: NextRequest) {
             {
                 inlineData: {
                     data: base64Data,
-                    mimeType: "image/png"
+                    mimeType: mimeType
                 }
             }
         ]);
 
-        const responseText = result.response.text();
+        let responseText = result.response.text();
         // Extract JSON from potential Markdown blocks
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         const analysisData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
 

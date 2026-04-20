@@ -23,9 +23,16 @@ export async function POST(request: NextRequest) {
         const { image } = await request.json();
         
         let base64Data = "";
+        let mimeType = "image/png"; // Default
+
         if (image) {
-            const parts = image.split(',');
-            base64Data = parts.length > 1 ? parts[1] : parts[0];
+            const match = image.match(/^data:([^;]+);base64,(.+)$/);
+            if (match) {
+                mimeType = match[1];
+                base64Data = match[2];
+            } else {
+                base64Data = image;
+            }
         }
 
         if (!base64Data || base64Data.length < 10) {
@@ -33,8 +40,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Prepare Gemini Model
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+        // ... (생략된 기존 프롬프트/페르소나 로직 유지) ...
         // 1. Get User Data
         const session = await getServerSession(authOptions);
         let userName = "";
@@ -90,12 +98,13 @@ export async function POST(request: NextRequest) {
             {
                 inlineData: {
                     data: base64Data,
-                    mimeType: "image/png"
+                    mimeType: mimeType
                 }
             }
         ]);
 
-        const responseText = result.response.text();
+        let responseText = result.response.text();
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         const analysisData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
 
