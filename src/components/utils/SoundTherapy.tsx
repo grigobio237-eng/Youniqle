@@ -278,7 +278,7 @@ export default function SoundTherapy() {
   const cardStyle = "space-y-4 bg-white/[0.05] p-6 rounded-[32px] border border-white/10 backdrop-blur-sm";
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-black text-white p-6 md:p-10 rounded-[40px] overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto bg-black text-white p-6 md:p-10 rounded-[40px]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         
         <div className="lg:col-span-12 xl:col-span-5 space-y-8">

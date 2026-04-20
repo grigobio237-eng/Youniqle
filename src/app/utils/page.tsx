@@ -440,7 +440,7 @@ function UtilsContent() {
             
             {/* Youniqle Posture Analysis Modal */}
             <Dialog open={showPostureModal} onOpenChange={setShowPostureModal}>
-                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-white">
+                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-white max-h-[95vh] overflow-y-auto">
                     <DialogHeader className="sr-only">
                         <DialogTitle>유니클 자세 분석</DialogTitle>
                         <DialogDescription>사진 한 장으로 거북목과 체형 밸런스를 정밀 분석합니다.</DialogDescription>
@@ -449,7 +449,14 @@ function UtilsContent() {
                         <PostureScanner />
                         <button 
                             onClick={() => setShowPostureModal(false)}
-                            className="absolute top-6 right-6 w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-obsidian transition-colors z-50"
+                            className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-2 bg-black/10 hover:bg-black/20 rounded-full flex items-center gap-2 text-obsidian font-black text-xs transition-all z-50 backdrop-blur-md"
+                            aria-label="돌아가기"
+                        >
+                            <ChevronLeft className="w-4 h-4" /> 돌아가기
+                        </button>
+                        <button 
+                            onClick={() => setShowPostureModal(false)}
+                            className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-obsidian transition-colors z-50"
                             aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
@@ -460,7 +467,7 @@ function UtilsContent() {
 
             {/* Deep Sound Therapy Modal */}
             <Dialog open={showSoundModal} onOpenChange={setShowSoundModal}>
-                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-black">
+                <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-black max-h-[95vh] overflow-y-auto">
                     <DialogHeader className="sr-only">
                         <DialogTitle>딥 사운드 테라피</DialogTitle>
                         <DialogDescription>회복 주파수와 사운드스케이트로 깊은 이완 경험을 제공합니다.</DialogDescription>
@@ -469,7 +476,14 @@ function UtilsContent() {
                         <SoundTherapy />
                         <button 
                             onClick={() => setShowSoundModal(false)}
-                            className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50"
+                            className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full flex items-center gap-2 text-white font-black text-xs transition-all z-50 backdrop-blur-md"
+                            aria-label="돌아가기"
+                        >
+                            <ChevronLeft className="w-4 h-4" /> 돌아가기
+                        </button>
+                        <button 
+                            onClick={() => setShowSoundModal(false)}
+                            className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50"
                             aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
@@ -592,12 +606,12 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                         </div>
                     </div>
 
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 md:p-6 space-y-6">
                         {/* 시간 선택 */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate uppercase tracking-widest">취침 시간</label>
-                                <div className="flex items-center gap-1 bg-mist rounded-xl p-3">
+                                <label className="text-[10px] md:text-xs font-black text-slate uppercase tracking-widest">취침 시간</label>
+                                <div className="flex items-center gap-1 bg-mist rounded-xl p-2 md:p-3">
                                     <select
                                         value={bedtimeHour}
                                         onChange={(e) => setBedtimeHour(parseInt(e.target.value))}
@@ -622,8 +636,8 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate uppercase tracking-widest">기상 시간</label>
-                                <div className="flex items-center gap-1 bg-mist rounded-xl p-3">
+                                <label className="text-[10px] md:text-xs font-black text-slate uppercase tracking-widest">기상 시간</label>
+                                <div className="flex items-center gap-1 bg-mist rounded-xl p-2 md:p-3">
                                     <select
                                         value={wakeHour}
                                         onChange={(e) => setWakeHour(parseInt(e.target.value))}
@@ -660,7 +674,7 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 
                         {/* 수면 품질 */}
                         <div className="space-y-3">
-                            <label className="text-xs font-black text-slate uppercase tracking-widest">수면 품질</label>
+                            <label className="text-[10px] md:text-xs font-black text-slate uppercase tracking-widest">수면 품질</label>
                             <div className="grid grid-cols-4 gap-2">
                                 {qualityOptions.map((q) => (
                                     <button
@@ -680,8 +694,8 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 
                         {/* 방해 요소 */}
                         <div className="space-y-3">
-                            <label className="text-xs font-black text-slate uppercase tracking-widest">방해 요소 (선택)</label>
-                            <div className="flex flex-wrap gap-2">
+                            <label className="text-[10px] md:text-xs font-black text-slate uppercase tracking-widest">방해 요소 (선택)</label>
+                            <div className="flex flex-wrap gap-1.5 md:gap-2">
                                 {disturbanceOptions.map((d) => (
                                     <button
                                         key={d.id}
@@ -807,7 +821,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                         </div>
                     </div>
 
-                    <div className="p-6 space-y-5">
+                    <div className="p-4 md:p-6 space-y-5">
                         {/* 상태 메시지 */}
                         <div className="text-center">
                             <p className={`font-bold text-lg ${status.color}`}>{status.text}</p>
@@ -847,17 +861,17 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
 
                         {/* 빠른 추가 버튼 */}
                         <div className="space-y-3">
-                            <h4 className="text-xs font-black text-slate uppercase tracking-widest">빠른 추가</h4>
-                            <div className="grid grid-cols-4 gap-2">
+                            <h4 className="text-[10px] md:text-xs font-black text-slate uppercase tracking-widest">빠른 추가</h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 {drinkOptions.map((drink) => (
                                     <button
                                         key={drink.id}
                                         onClick={() => handleAdd(drink.amount, drink.label)}
-                                        className="p-3 rounded-2xl border-2 border-line hover:border-blue-400 bg-white transition-all flex flex-col items-center gap-1 group active:scale-95"
+                                        className="p-2 md:p-3 rounded-2xl border-2 border-line hover:border-blue-400 bg-white transition-all flex flex-col items-center gap-0.5 md:gap-1 group active:scale-95"
                                     >
-                                        <span className="text-2xl group-hover:scale-110 transition-transform">{drink.icon}</span>
-                                        <span className="text-[10px] font-bold text-slate">{drink.label}</span>
-                                        <span className="text-[9px] text-slate/60">{drink.amount}ml</span>
+                                        <span className="text-xl md:text-2xl group-hover:scale-110 transition-transform">{drink.icon}</span>
+                                        <span className="text-[9px] md:text-[10px] font-bold text-slate">{drink.label}</span>
+                                        <span className="text-[8px] md:text-[9px] text-slate/60">{drink.amount}ml</span>
                                     </button>
                                 ))}
                             </div>
@@ -1116,7 +1130,13 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
 
                     {/* 헤더 */}
                     <div className="h-48 bg-gradient-to-br from-chapter-accent/90 to-chapter-accent flex flex-col items-center justify-center relative overflow-hidden p-6">
-                        <div className="absolute top-3 left-4 text-xs font-black text-white/60 uppercase tracking-widest">
+                        <button 
+                            onClick={handleClose}
+                            className="absolute top-4 left-4 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full flex items-center gap-1.5 text-white font-black text-[10px] transition-all z-20 backdrop-blur-sm"
+                        >
+                            <ChevronLeft className="w-3.5 h-3.5" /> 돌아가기
+                        </button>
+                        <div className="absolute top-4 right-16 text-[10px] font-black text-white/40 uppercase tracking-widest hidden md:block">
                             Step {step + 1} of {steps.length}
                         </div>
 
@@ -1149,7 +1169,7 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                         <p className="text-sm text-white/70 font-medium">{currentStep.shortDesc}</p>
                     </div>
 
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 md:p-6 space-y-6">
                         {/* 타이머 */}
                         <div className="text-center">
                             <div className="text-5xl font-black text-obsidian tabular-nums">
@@ -1180,28 +1200,28 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                         </div>
 
                         {/* 컨트롤 */}
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 md:gap-3">
                             <Button
                                 variant="outline"
-                                className="w-14 h-14 rounded-xl border-2 border-line"
+                                className="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-line"
                                 onClick={handlePrev}
                                 disabled={step === 0}
                             >
-                                <ChevronLeft className="w-6 h-6" />
+                                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                             </Button>
                             <Button
                                 variant="outline"
-                                className={`w-16 h-16 rounded-2xl border-2 ${isPlaying ? 'border-chapter-accent bg-chapter-accent/10' : 'border-obsidian text-obsidian hover:bg-obsidian hover:text-white'}`}
+                                className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl border-2 ${isPlaying ? 'border-chapter-accent bg-chapter-accent/10' : 'border-obsidian text-obsidian hover:bg-obsidian hover:text-white'}`}
                                 onClick={togglePlay}
                             >
-                                {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
+                                {isPlaying ? <Pause className="w-6 h-6 md:w-8 md:h-8 fill-current" /> : <Play className="w-6 h-6 md:w-8 md:h-8 fill-current ml-1" />}
                             </Button>
                             <Button
-                                className="flex-1 h-14 rounded-xl bg-obsidian text-mist font-black shadow-lg group"
+                                className="flex-1 h-12 md:h-14 rounded-xl bg-obsidian text-mist font-black shadow-lg group text-xs md:text-sm"
                                 onClick={handleNext}
                             >
                                 {step === steps.length - 1 ? '완료하기 🎉' : '다음 동작'}
-                                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </div>
 

@@ -242,7 +242,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
       cleanImageUrl: ''
     }));
 
-    setGeneratedData(prev => ({
+    setGeneratedData((prev: any) => ({
       ...prev,
       panels: initialPanels,
       summary: freeTopic || '오늘의 회복 웹툰',
@@ -284,7 +284,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
           };
 
           // 한 장 완료될 때마다 상태 업데이트 (실시간 렌더링)
-          setGeneratedData(prev => ({
+          setGeneratedData((prev: any) => ({
             ...prev,
             panels: [...updatedPanels]
           }));
@@ -421,13 +421,13 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 rounded-[32px] border-none shadow-3xl bg-white focus:outline-none max-h-[90vh] flex flex-col [&>button]:text-white [&>button]:opacity-100 [&>button]:z-50">
+      <DialogContent className="w-[95vw] sm:max-w-2xl p-0 rounded-[32px] border-none shadow-3xl bg-white focus:outline-none max-h-[90vh] flex flex-col [&>button]:text-white [&>button]:opacity-100 [&>button]:z-50">
         <DialogHeader className="sr-only">
           <DialogTitle>웹툰 챌린지</DialogTitle>
           <DialogDescription>오늘의 회복 데이터를 웹툰으로 생성합니다.</DialogDescription>
         </DialogHeader>
         {/* Header - 고정 */}
-        <div className="bg-obsidian p-8 text-mist relative rounded-t-[32px] flex-shrink-0">
+        <div className="bg-obsidian p-6 md:p-8 text-mist relative rounded-t-[32px] flex-shrink-0">
           <div className="absolute top-0 right-0 w-32 h-32 bg-chapter-accent/20 rounded-full blur-3xl -mr-16 -mt-16" />
           <h2 className="text-2xl font-black tracking-tight flex items-center gap-3 relative z-10">
             <Sparkles className="text-reward-gold" /> 일일 웹툰 챌린지
@@ -436,9 +436,9 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
         </div>
 
         {/* 스크롤 가능한 콘텐츠 영역 */}
-        <div className="p-8 overflow-y-auto flex-1">
+        <div className="p-6 md:p-8 overflow-y-auto flex-1">
           {step === 'STYLE' && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 pb-40">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 pb-12">
               {/* 1. 장르 선택 (Select) */}
               <div className="space-y-4">
                 <h3 className="text-lg font-black text-obsidian flex items-center gap-2">
@@ -453,10 +453,10 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     {genres.map(g => (
                       <SelectItem key={g.id} value={g.id} className="focus:bg-primary/5 rounded-xl py-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl">{g.icon}</span>
-                          <div>
-                            <div className="font-bold text-obsidian">{g.label}</div>
-                            <div className="text-[10px] text-slate font-medium">{g.desc}</div>
+                          <span className="text-xl shrink-0">{g.icon}</span>
+                          <div className="min-w-0">
+                            <div className="font-bold text-obsidian text-sm md:text-base">{g.label}</div>
+                            <div className="text-[9px] md:text-[10px] text-slate font-medium truncate">{g.desc}</div>
                           </div>
                         </div>
                       </SelectItem>
@@ -479,10 +479,10 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     {styles.map(s => (
                       <SelectItem key={s.id} value={s.id} className="focus:bg-primary/5 rounded-xl py-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl">{s.icon}</span>
-                          <div>
-                            <div className="font-bold text-obsidian">{s.label}</div>
-                            <div className="text-[10px] text-slate font-medium">{s.desc}</div>
+                          <span className="text-xl shrink-0">{s.icon}</span>
+                          <div className="min-w-0">
+                            <div className="font-bold text-obsidian text-sm md:text-base">{s.label}</div>
+                            <div className="text-[9px] md:text-[10px] text-slate font-medium truncate">{s.desc}</div>
                           </div>
                         </div>
                       </SelectItem>
@@ -521,14 +521,14 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                   <Button
                     variant={topicMode === 'recovery' ? 'default' : 'outline'}
                     onClick={() => setTopicMode('recovery')}
-                    className={`flex-1 h-12 rounded-xl font-bold transition-all ${topicMode === 'recovery' ? 'bg-primary' : ''}`}
+                    className={`flex-1 h-12 rounded-xl font-bold transition-all text-xs md:text-sm ${topicMode === 'recovery' ? 'bg-primary' : ''}`}
                   >
                     회복 데이터 사용
                   </Button>
                   <Button
                     variant={topicMode === 'free' ? 'default' : 'outline'}
                     onClick={() => setTopicMode('free')}
-                    className={`flex-1 h-12 rounded-xl font-bold transition-all ${topicMode === 'free' ? 'bg-primary' : ''}`}
+                    className={`flex-1 h-12 rounded-xl font-bold transition-all text-xs md:text-sm ${topicMode === 'free' ? 'bg-primary' : ''}`}
                   >
                     자유 주제 입력
                   </Button>
@@ -634,10 +634,10 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                 </p>
               </div>
 
-              <div className="flex gap-3">
-                <Button variant="ghost" className="flex-1 h-14 font-bold" onClick={() => setStep('STYLE')}>뒤로</Button>
-                <Button className="flex-2 h-14 px-8 font-black rounded-xl bg-primary" onClick={handleConfirmScript}>
-                  캐릭터 설정하기 <ArrowRight className="ml-2 h-4 w-4" />
+              <div className="flex gap-2">
+                <Button variant="ghost" className="flex-1 h-14 font-bold text-sm md:text-base" onClick={() => setStep('STYLE')}>뒤로</Button>
+                <Button className="flex-[2] h-14 px-4 md:px-8 font-black rounded-xl bg-primary text-sm md:text-base whitespace-nowrap" onClick={handleConfirmScript}>
+                  캐릭터 설정하기 <ArrowRight className="ml-1 md:ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
