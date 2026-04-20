@@ -35,7 +35,7 @@ async function generateWithRetry(model: any, content: any[], maxRetries = 2) {
 
 // Fallback logic: try 2.5-pro first, then 2.0-flash
 async function generateWithFallback(content: any[]) {
-    const modelsToTry = ["gemini-2.5-pro", "gemini-2.0-flash"];
+    const modelsToTry = ["gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.0-flash"];
     let lastError: any = null;
 
     for (const modelName of modelsToTry) {
