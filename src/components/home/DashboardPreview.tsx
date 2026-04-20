@@ -452,7 +452,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             { label: 'AI 네비게이터', href: '/ai-navigator', icon: <MessageSquare className="w-6 h-6" /> },
             { label: '면담 가이드', href: activeMedicalGuide ? `/event/consultation/report/${activeMedicalGuide._id}` : '/ai-navigator', icon: <ClipboardList className="w-6 h-6" /> },
             { label: '회복 로드맵', href: activeRecoveryPlan ? `/event/post-care/report/${activeRecoveryPlan._id}` : '/ai-navigator', icon: <HeartPulse className="w-6 h-6" /> },
-            { label: '스캔 타임라인', href: '/utils', icon: <Activity className="w-6 h-6" /> },
+            { label: '스캔 타임라인', href: '/timeline', icon: <Activity className="w-6 h-6" /> },
           ].map((link) => (
             <Link key={link.label} href={link.href} className="group">
               <div className="bg-white border border-line rounded-[24px] p-6 flex items-center gap-5 hover:border-chapter-accent hover:shadow-md transition-all">

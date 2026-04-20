@@ -225,7 +225,9 @@ export default function SoundTherapy() {
         startTimeRef.current = null;
       }
 
-      masterGainNode.current?.gain.setValueAtTime(masterVolume, audioCtx.current.currentTime);
+      if (audioCtx.current) {
+        masterGainNode.current?.gain.setValueAtTime(masterVolume, audioCtx.current.currentTime);
+      }
     }, 1100);
   };
 

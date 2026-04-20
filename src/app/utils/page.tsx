@@ -14,7 +14,7 @@ import SoundTherapy from '@/components/utils/SoundTherapy';
 import { useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowRight, Box, Compass, Play, Pause, Wrench, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowRight, Box, Compass, Play, Pause, Wrench, ChevronLeft, ChevronRight, X, ClipboardList } from 'lucide-react';
 
 type Category = '전체' | '검색' | '이미지' | '계산' | '학습' | '생산성' | '건강' | '회복';
 
@@ -1128,105 +1128,107 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                         <DialogDescription>1분 만에 신체 밸런스를 회복하세요.</DialogDescription>
                     </DialogHeader>
 
-                    {/* 헤더 */}
-                    <div className="h-48 bg-gradient-to-br from-chapter-accent/90 to-chapter-accent flex flex-col items-center justify-center relative overflow-hidden p-6">
+                    {/* 헤더 - 시인성 강화를 위해 bg-obsidian 사용 */}
+                    <div className="h-56 bg-gradient-to-br from-obsidian to-slate-900 flex flex-col items-center justify-center relative overflow-hidden p-6">
                         <button 
                             onClick={handleClose}
-                            className="absolute top-4 left-4 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full flex items-center gap-1.5 text-white font-black text-[10px] transition-all z-20 backdrop-blur-sm"
+                            className="absolute top-4 left-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full flex items-center gap-2 text-white font-black text-[11px] transition-all z-50 backdrop-blur-md border border-white/10"
                         >
-                            <ChevronLeft className="w-3.5 h-3.5" /> 돌아가기
+                            <ChevronLeft className="w-4 h-4" /> 돌아가기
                         </button>
-                        <div className="absolute top-4 right-16 text-[10px] font-black text-white/40 uppercase tracking-widest hidden md:block">
+                        <div className="absolute top-6 right-16 text-[10px] font-black text-white/50 uppercase tracking-widest hidden md:block">
                             Step {step + 1} of {steps.length}
                         </div>
 
                         {/* 원형 타이머 */}
-                        <div className="relative w-28 h-28">
+                        <div className="relative w-32 h-32">
                             <svg className="w-full h-full transform -rotate-90">
                                 <circle
-                                    cx="56" cy="56" r="50"
-                                    stroke="rgba(255,255,255,0.2)"
+                                    cx="64" cy="64" r="58"
+                                    stroke="rgba(255,255,255,0.1)"
                                     strokeWidth="8"
                                     fill="none"
                                 />
                                 <circle
-                                    cx="56" cy="56" r="50"
-                                    stroke="white"
+                                    cx="64" cy="64" r="58"
+                                    stroke="#C7A76A" /* reward-gold for better contrast */
                                     strokeWidth="8"
                                     fill="none"
                                     strokeLinecap="round"
-                                    strokeDasharray={`${2 * Math.PI * 50}`}
-                                    strokeDashoffset={`${2 * Math.PI * 50 * (1 - progress / 100)}`}
+                                    strokeDasharray={`${2 * Math.PI * 58}`}
+                                    strokeDashoffset={`${2 * Math.PI * 58 * (1 - progress / 100)}`}
                                     className="transition-all duration-1000 ease-linear"
                                 />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                                <span className="text-3xl">{currentStep.icon}</span>
+                                <span className="text-4xl">{currentStep.icon}</span>
                             </div>
                         </div>
 
-                        <h2 className="text-xl font-black text-white mt-3 tracking-tight">{currentStep.title}</h2>
-                        <p className="text-sm text-white/70 font-medium">{currentStep.shortDesc}</p>
+                        <h2 className="text-2xl font-black text-white mt-4 tracking-tight uppercase italic">{currentStep.title}</h2>
+                        <p className="text-sm text-white/60 font-medium px-4 text-center">{currentStep.shortDesc}</p>
                     </div>
 
-                    <div className="p-4 md:p-6 space-y-6">
+                    <div className="p-6 md:p-10 space-y-8">
                         {/* 타이머 */}
                         <div className="text-center">
-                            <div className="text-5xl font-black text-obsidian tabular-nums">
+                            <div className="text-6xl font-black text-obsidian tabular-nums tracking-tighter">
                                 {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                             </div>
-                            <p className="text-xs text-slate mt-1 uppercase tracking-widest">남은 시간</p>
+                            <p className="text-[10px] font-black text-slate mt-1 uppercase tracking-[0.3em] opacity-40">Time Remaining</p>
                         </div>
 
                         {/* 상세 가이드 */}
-                        <div className="bg-mist/50 rounded-2xl p-5 space-y-3">
-                            <h4 className="font-black text-obsidian text-sm flex items-center gap-2">
-                                📋 따라해 보세요!
+                        <div className="bg-mist/50 rounded-[32px] p-8 space-y-4 border border-line">
+                            <h4 className="font-black text-obsidian text-sm flex items-center gap-2 uppercase tracking-widest text-[#C7A76A]">
+                                <ClipboardList className="w-4 h-4" /> Instructions
                             </h4>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 {currentStep.instructions.map((instruction, idx) => (
-                                    <p key={idx} className="text-sm text-obsidian/80 leading-relaxed pl-1">
-                                        {instruction}
+                                    <p key={idx} className="text-sm md:text-base text-obsidian font-medium leading-relaxed flex gap-3">
+                                        <span className="shrink-0">{instruction.startsWith('👉') ? '👉' : '•'}</span>
+                                        <span className="flex-1">{instruction.replace('👉 ', '')}</span>
                                     </p>
                                 ))}
                             </div>
                         </div>
 
                         {/* 팁 */}
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                            <p className="text-sm text-yellow-800 font-medium">
-                                {currentStep.tip}
+                        <div className="bg-yellow-50/50 border border-yellow-200/50 rounded-2xl p-5">
+                            <p className="text-sm text-yellow-800 font-bold leading-relaxed flex gap-2">
+                                <span className="shrink-0">💡</span>
+                                <span>{currentStep.tip}</span>
                             </p>
                         </div>
 
                         {/* 컨트롤 */}
-                        <div className="flex gap-2 md:gap-3">
+                        <div className="flex gap-3 md:gap-4 lg:px-4">
                             <Button
                                 variant="outline"
-                                className="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-line"
+                                className="w-14 h-14 md:w-16 md:h-16 rounded-[20px] border-2 border-line hover:border-obsidian transition-all"
                                 onClick={handlePrev}
                                 disabled={step === 0}
                             >
-                                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                                <ChevronLeft className="w-6 h-6" />
                             </Button>
                             <Button
                                 variant="outline"
-                                className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl border-2 ${isPlaying ? 'border-chapter-accent bg-chapter-accent/10' : 'border-obsidian text-obsidian hover:bg-obsidian hover:text-white'}`}
+                                className={`w-14 h-14 md:w-16 md:h-16 rounded-[20px] border-2 transition-all ${isPlaying ? 'border-chapter-accent bg-chapter-accent/5' : 'border-obsidian text-obsidian hover:bg-obsidian hover:text-white'}`}
                                 onClick={togglePlay}
                             >
-                                {isPlaying ? <Pause className="w-6 h-6 md:w-8 md:h-8 fill-current" /> : <Play className="w-6 h-6 md:w-8 md:h-8 fill-current ml-1" />}
+                                {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
                             </Button>
                             <Button
-                                className="flex-1 h-12 md:h-14 rounded-xl bg-obsidian text-mist font-black shadow-lg group text-xs md:text-sm"
+                                className="flex-1 h-14 md:h-16 rounded-[20px] bg-obsidian text-white font-black shadow-2xl group text-sm md:text-base uppercase tracking-widest italic"
                                 onClick={handleNext}
                             >
-                                {step === steps.length - 1 ? '완료하기 🎉' : '다음 동작'}
-                                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2 group-hover:translate-x-1 transition-transform" />
+                                {step === steps.length - 1 ? 'Finish 🎉' : 'Next Move'}
+                                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </div>
 
                         {/* 단계 표시 */}
-                        <div className="flex justify-center gap-2 pt-2">
+                        <div className="flex justify-center gap-3 pt-2 pb-4">
                             {steps.map((s, i) => (
                                 <button
                                     key={i}
@@ -1235,10 +1237,10 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                                         setTimeLeft(steps[i].time);
                                         setIsPlaying(false);
                                     }}
-                                    className={`h-2 rounded-full transition-all duration-300 ${i === step
-                                        ? 'w-8 bg-chapter-accent'
+                                    className={`h-2 rounded-full transition-all duration-500 ${i === step
+                                        ? 'w-10 bg-obsidian'
                                         : i < step
-                                            ? 'w-2 bg-green-500'
+                                            ? 'w-2 bg-status-good'
                                             : 'w-2 bg-line'
                                         }`}
                                     aria-label={`${i + 1}단계로 이동`}
@@ -1249,11 +1251,12 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
 
                     <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors z-20"
+                        className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 transition-all z-50 shadow-lg"
                         aria-label="모달 닫기"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-6 h-6" />
                     </button>
+
                 </div>
             </DialogContent>
         </Dialog>

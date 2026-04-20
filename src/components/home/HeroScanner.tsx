@@ -149,11 +149,6 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
             const data = await response.json();
             setResult(data);
             setStatus('result');
-
-            // --- 자동 저장 로직 추가 ---
-            if (session?.user) {
-                autoSaveResult(data, compressedData);
-            }
         } catch (err: any) {
             console.error('Analysis Error:', err);
             toast.error(err.message || "유니클 분석 중 오류가 발생했습니다.");
