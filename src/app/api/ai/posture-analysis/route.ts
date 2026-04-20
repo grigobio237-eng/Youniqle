@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Prepare Gemini Model
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
         // ... (생략된 기존 프롬프트/페르소나 로직 유지) ...
         // 1. Get User Data

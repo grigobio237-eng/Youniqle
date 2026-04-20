@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Prepare Gemini Model
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
         let contextInstruction = "";
         
