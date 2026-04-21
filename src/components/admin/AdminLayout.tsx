@@ -499,10 +499,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const safePathname = pathname || '';
               const isActive = safePathname === item.href || (item.subItems && item.subItems.some(sub => safePathname === sub.href));
               const isPartnersMenu = item.href === '/admin/partners';
-              const isPavilionMenu = item.href === '/admin/pavilion';
               const isInquiriesMenu = item.href === '/admin/inquiries';
-
-              // Remove pavilion total calculations
 
               const showNotification =
                 (isPartnersMenu && notifications.pendingPartners > 0) ||

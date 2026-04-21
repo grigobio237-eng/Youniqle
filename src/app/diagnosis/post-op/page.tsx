@@ -167,7 +167,7 @@ export default function PostOpSurveyPage() {
                   {questions[currentQuestionIdx].category} check
                 </Badge>
                 <h2 className="text-2xl md:text-3xl font-black text-obsidian leading-tight break-keep italic">
-                  "{questions[currentQuestionIdx].question}"
+                  {'"'}{questions[currentQuestionIdx].question}{'"'}
                 </h2>
               </div>
               <div className="grid grid-cols-1 gap-3">
@@ -274,7 +274,7 @@ export default function PostOpSurveyPage() {
                   </div>
                   <h3 className="text-4xl font-black text-white italic">Recovery Score: {analysisResult.recoveryScore}</h3>
                   <p className="text-white/60 font-medium px-8 break-keep italic">
-                    "{analysisResult.summary}"
+                    &quot;{analysisResult.summary}&quot;
                   </p>
                 </div>
                 <CardContent className="p-10 space-y-8">

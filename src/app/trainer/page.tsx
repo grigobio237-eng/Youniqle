@@ -251,7 +251,7 @@ export default function TrainerPage() {
                         <ShieldCheck className="w-4 h-4 text-emerald-500" /> 코치 철학
                       </h3>
                       <p className="text-slate/80 leading-relaxed font-medium italic text-sm">
-                        "{selectedTrainer.description || 'The philosophy of this curator is being synthesized.'}"
+                        &quot;{selectedTrainer.description || 'The philosophy of this curator is being synthesized.'}&quot;
                       </p>
                     </div>
 
@@ -307,7 +307,7 @@ export default function TrainerPage() {
                 <div className="space-y-8 pt-6 border-t border-line/5">
                   <div className="space-y-2">
                     <h3 className="text-[10px] font-black text-obsidian uppercase tracking-widest flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4 text-chapter-accent" /> Curator's Digital Feed
+                      <ExternalLink className="w-4 h-4 text-chapter-accent" /> Curator&apos;s Digital Feed
                     </h3>
                     <p className="text-xs font-bold text-slate/40">마스터의 최신 소셜 활동과 회복 큐레이션 영상입니다.</p>
                   </div>

@@ -758,7 +758,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   </h3>
                   <div className="text-sm text-purple-800 space-y-3 font-medium">
                     <p>• 본 프로그램은 개인의 피부 상태에 따른 1:1 맞춤형 정밀 진단 후 진행됩니다.</p>
-                    <p>• '상담하기'를 통해 희망하시는 케어 부위와 고민을 남겨주시면 담당 메디컬 마케터가 24시간 내에 연락드립니다.</p>
+                    <p>• {"'"}상담하기{"'"}를 통해 희망하시는 케어 부위와 고민을 남겨주시면 담당 메디컬 마케터가 24시간 내에 연락드립니다.</p>
                     <p>• 프라이빗 라운지 예약은 확정 알림 후 최종 완료됩니다.</p>
                   </div>
                 </div>

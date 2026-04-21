@@ -44,9 +44,6 @@ export default function NewProductPage() {
     isFunding: false,
     fundingGoal: '',
     fundingEndDate: '',
-    isPavilion: false, // 파빌리온 전시 여부
-    pavilionFloorId: 'floor-2', // 기본값 2층
-    pavilionPosition: '', // 전시 순서
     images: [] as Array<{
       url: string;
       w?: number;
@@ -79,7 +76,6 @@ export default function NewProductPage() {
     },
   });
 
-  // 카테고리 목록 (전체 프로젝트 공통 사용)
   const categories = PRODUCT_CATEGORIES;
 
   const handleChange = (field: string, value: any) => {
@@ -99,7 +95,6 @@ export default function NewProductPage() {
     }));
   };
 
-  // 카테고리별 특화 필드 렌더링
   const getCategorySpecificFields = (category: string) => {
     switch (category) {
       case 'fresh-food':
@@ -276,13 +271,11 @@ export default function NewProductPage() {
     }
   };
 
-  // 천단위 구분기호 추가 함수
   const formatNumber = (value: string): string => {
     const num = value.replace(/[^0-9]/g, '');
     return num ? parseInt(num).toLocaleString() : '';
   };
 
-  // 할인율 계산 함수
   const calculateDiscountRate = (price: string, originalPrice: string): number => {
     const p = parseInt(price.replace(/[^0-9]/g, '') || '0');
     const op = parseInt(originalPrice.replace(/[^0-9]/g, '') || '0');
@@ -292,9 +285,7 @@ export default function NewProductPage() {
     return 0;
   };
 
-  // 슬러그 자동 생성 함수 (한글 지원)
   const generateSlug = (name: string): string => {
-    // 한글을 로마자로 변환하는 간단한 매핑
     const koreanToRoman: { [key: string]: string } = {
       '가': 'ga', '나': 'na', '다': 'da', '라': 'ra', '마': 'ma', '바': 'ba', '사': 'sa', '아': 'a', '자': 'ja', '차': 'cha', '카': 'ka', '타': 'ta', '파': 'pa', '하': 'ha',
       '거': 'geo', '너': 'neo', '더': 'deo', '러': 'reo', '머': 'meo', '버': 'beo', '서': 'seo', '어': 'eo', '저': 'jeo', '처': 'cheo', '커': 'keo', '터': 'teo', '퍼': 'peo', '허': 'heo',
@@ -308,7 +299,6 @@ export default function NewProductPage() {
     return name
       .split('')
       .map(char => {
-        // 한글인 경우 매핑 테이블에서 찾기
         if (/[가-힣]/.test(char)) {
           return koreanToRoman[char] || char;
         }
@@ -316,10 +306,10 @@ export default function NewProductPage() {
       })
       .join('')
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // 특수문자 제거
-      .replace(/\s+/g, '-')         // 공백을 하이픈으로
-      .replace(/-+/g, '-')          // 연속 하이픈 제거
-      .replace(/^-|-$/g, '')        // 앞뒤 하이픈 제거
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
       .trim();
   };
 
@@ -329,24 +319,19 @@ export default function NewProductPage() {
     setError(null);
 
     try {
-      // 상품 데이터 준비
       const productData = {
         ...formData,
-        price: parseFloat(formData.price.replace(/[^0-9]/g, '')), // 천단위 구분기호 제거
+        price: parseFloat(formData.price.replace(/[^0-9]/g, '')),
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice.replace(/[^0-9]/g, '')) : undefined,
         stock: parseInt(formData.stock),
         isFunding: formData.isFunding,
         fundingGoal: formData.isFunding && formData.fundingGoal ? parseInt(formData.fundingGoal) : undefined,
         fundingEndDate: formData.isFunding && formData.fundingEndDate ? new Date(formData.fundingEndDate) : undefined,
-        // 카테고리별 특화 정보 (빈 값이 아닌 경우만 저장)
         nutritionInfo: formData.nutritionInfo && Object.values(formData.nutritionInfo).some(v => v) ? formData.nutritionInfo : undefined,
         originInfo: formData.originInfo && Object.values(formData.originInfo).some(v => v) ? formData.originInfo : undefined,
         clothingInfo: formData.clothingInfo && Object.values(formData.clothingInfo).some(v => v) ? formData.clothingInfo : undefined,
         electronicsInfo: formData.electronicsInfo && Object.values(formData.electronicsInfo).some(v => v) ? formData.electronicsInfo : undefined,
         descriptionIsHtml: formData.descriptionIsHtml,
-        // 파빌리온 전시 정보
-        pavilionFloorId: formData.isPavilion ? formData.pavilionFloorId : undefined,
-        pavilionPosition: formData.isPavilion && formData.pavilionPosition ? parseInt(formData.pavilionPosition) : undefined,
       };
 
       const response = await fetch('/api/admin/products', {
@@ -513,53 +498,7 @@ export default function NewProductPage() {
           )
         }
 
-        {/* Pavilion Exhibition Fields */}
-        <div className="flex items-center space-x-2 border p-4 rounded-lg bg-blue-50">
-          <Checkbox
-            id="isPavilion"
-            checked={formData.isPavilion}
-            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPavilion: checked as boolean }))}
-          />
-          <div className="space-y-1">
-            <Label htmlFor="isPavilion" className="font-semibold">파빌리온 전시</Label>
-            <p className="text-sm text-gray-500">
-              이 상품을 파빌리온 2층 상점에 전시합니다. 회복 상점에도 동시에 게시됩니다.
-            </p>
-          </div>
-        </div>
 
-        {
-          formData.isPavilion && (
-            <div className="grid grid-cols-2 gap-4 border-l-2 border-blue-500 pl-4 ml-2">
-              <div>
-                <Label htmlFor="pavilionFloorId">전시 층</Label>
-                <Input
-                  id="pavilionFloorId"
-                  value="2층 - 상점"
-                  disabled
-                  className="bg-gray-100"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  현재는 2층만 지원됩니다.
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="pavilionPosition">전시 순서</Label>
-                <Input
-                  id="pavilionPosition"
-                  type="number"
-                  value={formData.pavilionPosition}
-                  onChange={(e) => setFormData(prev => ({ ...prev, pavilionPosition: e.target.value }))}
-                  placeholder="예: 1"
-                  min="0"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  숫자가 작을수록 먼저 전시됩니다.
-                </p>
-              </div>
-            </div>
-          )
-        }
 
         <div>
           <Label htmlFor="category">카테고리 *</Label>

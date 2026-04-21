@@ -58,9 +58,6 @@ export interface IProduct extends Document {
   partnerId?: mongoose.Types.ObjectId; // 파트너 ID
   partnerName?: string; // 파트너 이름
   partnerEmail?: string; // 파트너 이메일 (알림용)
-  // 파빌리온 전시 관련 필드
-  pavilionFloorId?: string; // 파빌리온 전시 층 ID (예: "floor-2")
-  pavilionPosition?: number; // 파빌리온 내 전시 순서
   createdAt: Date;
   updatedAt: Date;
 }
@@ -211,15 +208,6 @@ const ProductSchema = new Schema<IProduct>({
   partnerEmail: {
     type: String,
     trim: true
-  },
-  // 파빌리온 전시 관련 필드
-  pavilionFloorId: {
-    type: String,
-    trim: true
-  },
-  pavilionPosition: {
-    type: Number,
-    min: 0
   }
 }, {
   timestamps: true,
@@ -230,7 +218,6 @@ ProductSchema.index({ name: 'text', summary: 'text', description: 'text' });
 ProductSchema.index({ category: 1, status: 1, approvalStatus: 1 });
 ProductSchema.index({ price: 1 });
 ProductSchema.index({ partnerId: 1 });
-ProductSchema.index({ pavilionFloorId: 1, pavilionPosition: 1 }); // 파빌리온 전시 인덱스
 
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 

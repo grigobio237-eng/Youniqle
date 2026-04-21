@@ -1,5 +1,10 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Loader2, Download, ChevronLeft, CalendarClock, ShieldCheck, HeartPulse, UserCircle, Target, CheckCircle2, Sparkles, MessageSquare, ClipboardCheck, Stethoscope } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
 
 export default function ReportPage({ params: originalParams }: { params: { id: string } }) {
   const params = useParams() || originalParams;
@@ -347,7 +352,7 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                   <div className="bg-obsidian text-white p-8 rounded-[32px] shadow-xl relative overflow-hidden group mb-8">
                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
                      <p className="text-lg font-medium leading-relaxed italic opacity-90 relative z-10">
-                       "{data.aiGuide.analysis}"
+                         &quot;{data.aiGuide.analysis}&quot;
                      </p>
                   </div>
 

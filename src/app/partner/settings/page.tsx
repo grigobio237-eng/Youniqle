@@ -783,7 +783,7 @@ export default function PartnerSettingsPage() {
                     <Image className="h-5 w-5" />
                     상점 로고 & 배너
                   </CardTitle>
-                  <CardDescription>파빌리온에 표시될 상점 이미지를 업로드하세요</CardDescription>
+                  <CardDescription>유니클 플랫폼에 표시될 상점 이미지를 업로드하세요</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* 로고 업로드 */}

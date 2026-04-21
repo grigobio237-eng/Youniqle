@@ -6,7 +6,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const { shopCode } = params;
+  const { shopCode } = await params;
   
   return {
     metadataBase: new URL('https://www.grigobio.co.kr'),

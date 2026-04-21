@@ -45,33 +45,8 @@ const PRINCIPAL_DATA = {
 };
 
 export default function HealingCenterPage() {
-    const [loading, setLoading] = useState(true);
-    const [products, setProducts] = useState<any[]>([]);
-    
     // UI States
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
-
-    // Fetch Data
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            // Fetch Products for Floor 5 (Signature Floor)
-            const productRes = await fetch(`/api/products?pavilionFloorId=floor-5`);
-            const productData = await productRes.json();
-            const floorProducts = productData.products || [];
-
-            setProducts(floorProducts);
-        } catch (error) {
-            console.error('Failed to fetch data:', error);
-            toast.error('데이터를 불러오는 중 오류가 발생했습니다.');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
 
     return (
         <div className="relative w-full h-screen overflow-hidden bg-[#F9F7F2]">

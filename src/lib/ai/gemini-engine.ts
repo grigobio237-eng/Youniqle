@@ -1,6 +1,9 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { NavigatorInput, NavigatorOutput, OmakaseInput, OmakaseOutput } from './types';
 
+import dbConnect from '../db';
+import AdminSettings from '@/models/AdminSettings';
+
 // Initialize Gemini AI (Lazy initialization to avoid env loading issues)
 let _genAI: GoogleGenerativeAI | null = null;
 let _studioGenAI: GoogleGenerativeAI | null = null;
@@ -20,6 +23,106 @@ const getStudioGenAI = () => {
 
 // Real Gemini AI Engine for Recovery OS
 export class GeminiAIEngine {
+  private static availableTextModels: string[] = [];
+  private static availableImageModels: string[] = [];
+  private static isInitialized = false;
+
+  /**
+   * Automatically discovers available models from the Google API and categorizes them into tiers.
+   */
+  public static async initializeDynamicModels(forceRefresh = false): Promise<void> {
+    if (this.isInitialized && !forceRefresh) return;
+
+    try {
+      await dbConnect();
+      const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
+      
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
+
+      if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
+        this.availableTextModels = settings.ai.availableTextModels;
+        this.availableImageModels = settings.ai.availableImageModels || [];
+        this.isInitialized = true;
+        console.log(`[Gemini] Loaded cached models: ${this.availableTextModels.length} text, ${this.availableImageModels.length} image`);
+        return;
+      }
+
+      console.log('[Gemini] Refreshing available models list from Google API...');
+      const apiKey = process.env.GEMINI_API_KEY;
+      const studioKey = process.env.GEMINI_STUDIO_API_KEY;
+
+      if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
+
+      // Security Check: Verify if keys are reported as leaked
+      if (studioKey) {
+        const studioCheck = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${studioKey}`);
+        const studioData = await studioCheck.json();
+        if (studioData.error?.message?.toLowerCase().includes('leaked')) {
+          console.error('⚠️ [SECURITY WARNING] GEMINI_STUDIO_API_KEY is reported as LEAKED by Google. Please rotate your keys immediately.');
+        }
+      }
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
+      const data = await response.json();
+
+      if (data.error) {
+        console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
+        // Use hardcoded defaults if discovery fails
+        this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+        this.availableImageModels = ['imagen-3.0-generate-001'];
+      } else if (data.models) {
+        const allModels: any[] = data.models;
+        
+        // Filter and sort text models
+        const textModels = allModels
+          .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
+          .map(m => m.name.replace('models/', ''))
+          .sort((a, b) => {
+            // Priority: pro > flash > lite
+            const getPriority = (name: string) => {
+              if (name.includes('pro')) return 1;
+              if (name.includes('flash')) return 2;
+              return 3;
+            };
+            return getPriority(a) - getPriority(b);
+          });
+
+        // Filter image models
+        const imageModels = allModels
+          .filter(m => m.name.includes('imagen'))
+          .map(m => m.name.replace('models/', ''));
+
+        this.availableTextModels = textModels;
+        this.availableImageModels = imageModels;
+
+        // Save to DB
+        await AdminSettings.findOneAndUpdate(
+          {},
+          { 
+            $set: { 
+              'ai.availableTextModels': textModels,
+              'ai.availableImageModels': imageModels,
+              'ai.lastModelRefresh': new Date()
+            } 
+          },
+          { upsert: true }
+        );
+      }
+
+      this.isInitialized = true;
+      console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
+    } catch (err: any) {
+      console.error('[Gemini] Failed to initialize dynamic models:', err.message);
+      // Final fallback
+      this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    }
+  }
+
+  private static async getTieredModels(type: 'text' | 'image' = 'text'): Promise<string[]> {
+    if (!this.isInitialized) await this.initializeDynamicModels();
+    return type === 'text' ? this.availableTextModels : this.availableImageModels;
+  }
 
     // AI Model Configuration
     // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
@@ -40,13 +143,10 @@ export class GeminiAIEngine {
 
         // 1. Try Gemini Native Image Generation (Multimodal if referenceImages provided)
         try {
-            const models = [
-                'nano-banana-pro-preview',
-                'gemini-2.5-flash-image',
-                'gemini-3-pro-image-preview',
-                'gemini-2.0-flash',
-                'gemini-flash-latest'
-            ];
+            const models = await this.getTieredModels('image');
+            if (models.length === 0) {
+              models.push('imagen-3.0-generate-001', 'imagen-3.0-fast-generate-001', 'imagen-2.0-generate-001');
+            }
 
             for (const modelName of models) {
                 try {
@@ -166,17 +266,15 @@ export class GeminiAIEngine {
     // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
     // Secondary: gemini-1.5-flash (Stable, Reliable fallback)
     public static async generateWithFallback(
-        prompt: string,
+        prompt: string | any[],
         systemInstruction?: string,
         temperature: number = 0.7
     ): Promise<string> {
         // Optimized model list for stability and availability
-        const models = [
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
-            'gemini-2.0-flash-exp',
-            'gemini-1.5-pro'
-        ];
+        const models = await this.getTieredModels('text');
+        if (models.length === 0) {
+          models.push('gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro');
+        }
         let lastError: any;
 
         for (const modelName of models) {
@@ -1511,7 +1609,7 @@ JSON 형식:
 ### 🏠 메인 페이지 (/)
 - 유니클의 핵심 서비스인 **"번아웃 극복을 위한 AI 맞춤 회복 솔루션"**을 소개하는 첫 페이지
 - **60초 무료 진단 시작** 버튼으로 바로 회복 점수 측정 가능
-- 회복 사례, 파빌리온 소개, 추천 상품 등을 한눈에 볼 수 있음
+- 회복 사례, 서비스 안내, 추천 상품 등을 한눈에 볼 수 있음
 
 ### 🔐 회원가입 및 로그인 (/auth)
 - **소셜 로그인**: 카카오, 네이버, 구글 계정으로 간편 가입/로그인
@@ -1548,13 +1646,7 @@ JSON 형식:
 - **비즈니스/편의**: [배경 제거(Remove-BG)], [이미지 압축], [단위 변환], [환율 계산], [QR 코드 생성], [디데이 계산]
 - **마인드 리셋(미니게임)**: 2048, 빙고, 틀린그림찾기, 이모지 퀴즈, 사다리타기, 기억력 게임, 룰렛, 타이핑 게임 등
 
-### 🏛️ 파빌리온 (Pavilion) - 온라인 복합 공간
-유니클의 핵심 공간! 5개 층으로 구성된 온라인 복합 공간: (/pavilion)
-- **1층 - 갤러리**: 작가들의 디지털 작품, AI 웹툰, NFT 전시 및 판매
-- **2층 - 비즈니스**: 파트너 사업자들의 프리미엄 건강/회복 상품 브랜드 관
-- **3층 - 코칭 샵**: 전문 코치들의 1:1 라이브 또는 그룹 세션 예약 및 참여
-- **4층 - 메디컬 아카이브**: 전문적인 회복 상담 및 데이터 분석 리포트 확인
-- **5층 - 프라이빗 라운지 (/lounge)**: 김미정 원장과의 1:1 AI 심층 상담 (Navigator Pass 또는 구독 회원 전용)
+
 
 ### 🎨 AI 웹툰 챌린지
 - 사용자의 회복 데이터를 기반으로 AI가 4컷 웹툰을 생성해주는 서비스
@@ -1596,9 +1688,9 @@ JSON 형식:
 ### 🤝 파트너 프로그램 (/partner)
 유니클에서 판매자로 활동하고 수익 창출:
 - **쇼퍼(Shopper)**: 사업자등록 없이 일반 상품 판매
-- **사업장(Business)**: 사업자 등록 기반, 파빌리온 2층 입점
-- **코치(Coach)**: 자격증 기반, 파빌리온 3층 샵 운영
-- **작가(Artist)**: 디지털 콘텐츠 제작, 1층 갤러리 운영
+- **사업장(Business)**: 사업자 등록 기반, 전문 회복 상품 입점
+- **코치(Coach)**: 자격증 기반, 전문 회복 코칭 세션 운영
+- **작가(Artist)**: 디지털 콘텐츠 제작 및 갤러리 운영
 - 수수료: 판매 금액의 ${input.siteSettings?.commissionRate ?? 5}%
 
 ### ❓ 고객센터 (/support, /faq, /contact)

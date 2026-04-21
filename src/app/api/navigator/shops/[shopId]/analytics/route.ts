@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { shopId } = params;
+    const { shopId } = await params;
     await dbConnect();
 
     const responses = await SurveyResponse.find({ shopId });

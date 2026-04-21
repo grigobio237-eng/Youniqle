@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CharacterImage from '@/components/ui/CharacterImage';
-import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
+import UnifiedAddressSearch from '@/components/ui/UnifiedAddressSearch';
 import {
   CreditCard,
   Truck,
@@ -311,7 +311,7 @@ function CheckoutPageContent() {
 
     try {
       setValidatingCoupon(true);
-      const response = await fetch('/api/coupon/validate', {
+      const response = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -346,7 +346,7 @@ function CheckoutPageContent() {
     setCouponCode(couponCode);
     setValidatingCoupon(true);
     try {
-      const response = await fetch('/api/coupon/validate', {
+      const response = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -627,7 +627,8 @@ function CheckoutPageContent() {
 
                 <div className="space-y-4">
                   <Label className="font-bold text-slate">주소 *</Label>
-                  <GoogleAddressSearch
+                  <UnifiedAddressSearch
+                    provider="google"
                     onAddressSelect={(address) => {
                       setShippingAddress(prev => ({
                         ...prev,

@@ -128,24 +128,17 @@ export async function POST(request: NextRequest) {
     // 인증 이메일 발송
     const emailResult = await sendVerificationEmail(email, verificationToken, name);
 
-    if (!emailResult.success) {
-      // 이메일 발송 실패 시 사용자 삭제
-      await User.findByIdAndDelete(user._id);
-      return NextResponse.json(
-        { error: emailResult.error },
-        { status: 500 }
-      );
-    }
-
     const signupCompleteResponse = NextResponse.json(
       {
-        message: '회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.',
+        message: emailResult.success 
+          ? '회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.'
+          : '회원가입은 완료되었으나, 인증 이메일 발송 중 문제가 발생했습니다. 로그인 후 인증 메일 재발송을 요청해 주세요.',
         user: {
           id: user._id,
           name: user.name,
           email: user.email,
         },
-        emailSent: true
+        emailSent: emailResult.success
       },
       { status: 201 }
     );

@@ -20,7 +20,7 @@ export default function AiManagerChat() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: '안녕하세요! 저는 유니클의 매니저 유니(Uni)예요. 🌿\n사이트 이용 방법, 등급 및 포인트, 파빌리온 운영 등 궁금한 점이 있으시면 무엇이든 물어봐 주세요!',
+            content: '안녕하세요! 저는 유니클의 매니저 유니(Uni)예요. 🌿\n사이트 이용 방법, 등급 및 포인트, 서비스 혜택 등 궁금한 점이 있으시면 무엇이든 물어봐 주세요!',
             timestamp: new Date(),
         }
     ]);
@@ -91,7 +91,7 @@ export default function AiManagerChat() {
     const quickActions = [
         '포인트 적립 방법',
         '등급 혜택 안내',
-        '파빌리온 이용법',
+        '멤버십 혜택 안내',
     ];
 
     const handleQuickAction = (action: string) => {

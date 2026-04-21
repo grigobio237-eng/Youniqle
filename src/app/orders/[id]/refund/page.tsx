@@ -12,7 +12,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import CharacterImage from '@/components/ui/CharacterImage';
-import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
+import UnifiedAddressSearch from '@/components/ui/UnifiedAddressSearch';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -586,6 +586,7 @@ export default function RefundRequestPage() {
                     accept="image/*"
                     onChange={handleImageUpload}
                     className="hidden"
+                    title="이미지 업로드"
                     disabled={uploadingImage || uploadedImages.length >= 5}
                   />
                 </div>
@@ -628,7 +629,8 @@ export default function RefundRequestPage() {
                 <div>
                   <Label>주소 *</Label>
                   <div className="mb-3 mt-2">
-                    <GoogleAddressSearch
+                    <UnifiedAddressSearch
+                      provider="google"
                       onAddressSelect={(address) => {
                         setPickupAddress(prev => ({
                           ...prev,

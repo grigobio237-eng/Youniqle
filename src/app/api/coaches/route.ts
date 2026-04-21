@@ -11,12 +11,11 @@ export async function GET(request: NextRequest) {
       partnerStatus: 'approved',
       'partnerApplication.partnerType': 'coach'
     })
-    .select('name email coachProfile pavilionInfo partnerApplication.businessName')
+    .select('name email coachProfile partnerApplication.businessName')
     .lean();
 
     const formattedCoaches = coaches.map(coach => {
       const profile = coach.coachProfile || {};
-      const pavilion = coach.pavilionInfo || {};
       
       return {
         id: coach._id,
@@ -24,10 +23,9 @@ export async function GET(request: NextRequest) {
         // Top level fields for card compatibility
         title: profile.title || 'Recovery Curator',
         specialty: profile.specialty || '',
-        description: profile.description || pavilion.roomDescription || '',
+        description: profile.description || '',
         philosophy: profile.philosophy || '',
-        image: pavilion.characterImage || profile.profileImage || '/images/trainers/master_1.png',
-        pavilionInfo: pavilion,
+        image: profile.profileImage || '/images/trainers/master_1.png',
         // Nested coachProfile for the detail modal
         coachProfile: {
           ...profile,

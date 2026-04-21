@@ -1,17 +1,14 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtps.hiworks.com',
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '465'),
   secure: true, // 465 포트는 SSL 사용
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  tls: {
-    // 하이웍스 메일 서버 인증서 설정
-    rejectUnauthorized: false
-  }
+  // Gmail 등 표준 SMTP 서버는 아래 tls 설정 없이도 잘 작동합니다.
 });
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {

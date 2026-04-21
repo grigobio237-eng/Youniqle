@@ -3,9 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 
 export const config = {
     api: {
@@ -15,48 +13,6 @@ export const config = {
     },
 };
 
-// Helper: retry with exponential backoff for rate-limited requests
-async function generateWithRetry(model: any, content: any[], maxRetries = 2) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            return await model.generateContent(content);
-        } catch (error: any) {
-            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
-            if (isRateLimit && attempt < maxRetries) {
-                const waitMs = attempt * 2000; 
-                console.log(`Posture: Rate limited. Attempt ${attempt}/${maxRetries}. Retrying in ${waitMs}ms...`);
-                await new Promise(resolve => setTimeout(resolve, waitMs));
-                continue;
-            }
-            throw error; 
-        }
-    }
-}
-
-// Fallback logic: try 2.5-pro first, then 2.0-flash
-async function generateWithFallback(content: any[]) {
-    const modelsToTry = ["gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.0-flash"];
-    let lastError: any = null;
-
-    for (const modelName of modelsToTry) {
-        try {
-            console.log(`Posture: Starting generation with model: ${modelName}`);
-            const model = genAI.getGenerativeModel({ model: modelName });
-            return await generateWithRetry(model, content);
-        } catch (error: any) {
-            lastError = error;
-            const isRateLimit = error?.message?.includes('429') || error?.message?.includes('Resource exhausted');
-            const isNotFound = error?.message?.includes('404') || error?.status === 404;
-
-            if (isRateLimit || isNotFound) {
-                console.warn(`Posture: Model ${modelName} failed (${isRateLimit ? '429' : '404'}). Trying next model...`);
-                continue; 
-            }
-            throw error; 
-        }
-    }
-    throw lastError;
-}
 
 export async function POST(request: NextRequest) {
     try {
@@ -132,7 +88,7 @@ export async function POST(request: NextRequest) {
         3. 반드시 유효한 JSON 형식으로만 답변하세요.
         `;
 
-        const result = await generateWithFallback([
+        const resultText = await GeminiAIEngine.generateWithFallback([
             prompt,
             {
                 inlineData: {
@@ -142,7 +98,7 @@ export async function POST(request: NextRequest) {
             }
         ]);
 
-        let responseText = result.response.text();
+        let responseText = resultText;
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         const analysisData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);

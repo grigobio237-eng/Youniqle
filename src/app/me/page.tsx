@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
+import UnifiedAddressSearch from '@/components/ui/UnifiedAddressSearch';
 import MembershipInfo from '@/components/ui/MembershipInfo';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -731,7 +731,11 @@ export default function MyPage() {
                   <div className="space-y-4">
                     <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
                     <div className="space-y-3">
-                      <GoogleAddressSearch onAddressSelect={handleAddressSelect} disabled={!isEditing} />
+                      <UnifiedAddressSearch
+                        provider="google"
+                        onAddressSelect={handleAddressSelect}
+                        disabled={!isEditing}
+                      />
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
                         <Input value={formData.address1} readOnly placeholder="주소" className="h-14 md:col-span-3 rounded-2xl bg-mist/50 border-line" />

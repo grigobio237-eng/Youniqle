@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
             BuyerEmail: user.email,
             BuyerTel: buyerTel || '',
             ReturnURL: returnUrl,
-            CancelURL: `${process.env.NEXTAUTH_URL}/pavilion`,
+            CancelURL: `${process.env.NEXTAUTH_URL}/trainer`,
             PayMethod: payMethod || 'CARD',
             GoodsCl: '0', // 컨텐츠/서비스
             TransType: '0',

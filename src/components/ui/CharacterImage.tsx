@@ -29,6 +29,10 @@ export default function CharacterImage({
 }: CharacterImageProps) {
   const [hasError, setHasError] = useState(false);
 
+  // Safety check for known invalid or stale URLs
+  const effectiveSrc = src?.includes('your_info-1') ? '/character/youniqle-1.png' : src;
+
+
   if (hasError) {
     return (
       <div className={`${className} bg-primary/10 rounded-lg flex items-center justify-center`}>
@@ -39,7 +43,7 @@ export default function CharacterImage({
 
   return (
     <Image
-      src={src}
+      src={effectiveSrc}
       alt={alt}
       fill={fill}
       width={width}

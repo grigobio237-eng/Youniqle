@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InputValidator, commonSchemas } from '@/lib/validators';
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import cache, { CacheKeys } from '@/lib/cache';
+import { productQuerySchema } from '@/lib/schemas';
+import { createErrorResponse } from '@/lib/serverErrorHandler';
 import { withRateLimit, rateLimiters } from '@/lib/rateLimiter';
 
 async function getProductsHandler(request: NextRequest) {
@@ -10,15 +11,15 @@ async function getProductsHandler(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = Object.fromEntries(searchParams);
 
-    const validator = new InputValidator(commonSchemas.productQuery);
-    const validationResult = validator.validate(query);
+    // Zod 검증 적용
+    const validation = productQuerySchema.safeParse(query);
 
-    if (!validationResult.isValid) {
+    if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid query parameters',
-          details: validationResult.errors.map(err => ({
-            field: err.field,
+          error: '검색 조건이 유효하지 않습니다.',
+          details: validation.error.errors.map(err => ({
+            field: err.path.join('.'),
             message: err.message
           }))
         },
@@ -26,16 +27,13 @@ async function getProductsHandler(request: NextRequest) {
       );
     }
 
-    const validatedQuery = validationResult.sanitizedData;
+    const validatedQuery = validation.data;
 
     // 캐시 키 생성
     const cacheKey = CacheKeys.products(
       validatedQuery.page || 1,
       validatedQuery.limit || 20,
-      {
-        ...validatedQuery,
-        pavilionFloorId: validatedQuery.pavilionFloorId || 'none'
-      }
+      { ...validatedQuery }
     );
 
     // 캐시에서 데이터 조회
@@ -52,13 +50,12 @@ async function getProductsHandler(request: NextRequest) {
     const { authOptions } = await import('@/lib/auth');
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user?.role === 'admin';
-    const isPreview = isAdmin && searchParams.get('preview') === 'true';
+    const isPreview = isAdmin && validatedQuery.preview;
 
     // Build filter object
     const filter: any = {};
 
     // 일반 사용자: 승인된 활성 상품만 노출
-    // 관리자 프리뷰 모드가 아닌 경우 필터 적용
     if (!isPreview) {
       filter.status = 'active';
       filter.approvalStatus = 'approved';
@@ -77,36 +74,17 @@ async function getProductsHandler(request: NextRequest) {
     if (validatedQuery.isFunding !== undefined) {
       filter.isFunding = validatedQuery.isFunding;
     } else {
-      // 기본값: 일반 상점에서는 펀딩 상품 제외 (isFunding이 true가 아닌 것들)
       filter.isFunding = { $ne: true };
     }
 
-    // Pavilion Filter (Exclusivity)
-    if (validatedQuery.pavilionFloorId) {
-      filter.pavilionFloorId = validatedQuery.pavilionFloorId;
-    } else {
-      // 중요: pavilionFloorId가 명시되지 않은 일반 요청에서는 파빌리온 전용 상품을 제외함
-      filter.pavilionFloorId = { $exists: false };
-    }
-
     // Build sort object
-    let sort: any = { createdAt: -1 }; // default: newest first
-
+    let sort: any = { createdAt: -1 };
     switch (validatedQuery.sort) {
-      case 'price_asc':
-        sort = { price: 1 };
-        break;
-      case 'price_desc':
-        sort = { price: -1 };
-        break;
-      case 'popular':
-        // For now, sort by createdAt. Later can be enhanced with view counts
-        sort = { createdAt: -1 };
-        break;
+      case 'price_asc': sort = { price: 1 }; break;
+      case 'price_desc': sort = { price: -1 }; break;
+      case 'popular': sort = { createdAt: -1 }; break;
       case 'newest':
-      default:
-        sort = { createdAt: -1 };
-        break;
+      default: sort = { createdAt: -1 }; break;
     }
 
     // Pagination
@@ -124,7 +102,7 @@ async function getProductsHandler(request: NextRequest) {
       Product.countDocuments(filter),
     ]);
 
-    // Transform _id to id for frontend compatibility
+    // Transform _id to id
     const transformedProducts = products.map((product: any) => ({
       ...product,
       id: product._id,
@@ -146,19 +124,7 @@ async function getProductsHandler(request: NextRequest) {
 
     return NextResponse.json(responseData);
   } catch (error) {
-    console.error('Get products error:', error);
-
-    if (error instanceof Error && error.name === 'ValidationError') {
-      return NextResponse.json(
-        { error: '검색 조건을 확인해주세요.' },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    return createErrorResponse(error as Error, 500, request);
   }
 }
 

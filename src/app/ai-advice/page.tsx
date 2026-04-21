@@ -170,7 +170,7 @@ export default function AiAdvicePage() {
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-obsidian">오늘의 맞춤 행동 조언</h1>
                         <p className="text-lg text-slate font-medium max-w-md mx-auto leading-relaxed">
-                            "{advice?.aiComment}"
+                            &quot;{advice?.aiComment}&quot;
                         </p>
                     </header>
 

@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
     const { daysSinceSurgery, surgeryType, userName } = body;
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       [ROLE: Youniqle Recovery specialist]
@@ -49,11 +45,10 @@ export async function POST(req: NextRequest) {
       - "오늘은 수술 부위의 욱신거림이 어제보다 조금 더 편안해지셨을까요?"와 같이 매일 변화를 체크하는 느낌을 줍니다.
     `;
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text();
+    const responseTextRaw = await GeminiAIEngine.generateWithFallback(prompt);
     
     // JSON 추출 최적화: Markdown 코드 블록 제거 및 순수 JSON 추출
-    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const responseText = responseTextRaw.replace(/```json/g, '').replace(/```/g, '').trim();
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const questionsData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
 

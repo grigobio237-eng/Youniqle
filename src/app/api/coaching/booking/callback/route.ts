@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
                     await booking.save();
 
                     // 4. 코치 스케줄 업데이트 (해당 슬롯 점유)
-                    // TODO: 파빌리온 삭제에 따라 코치 모델 분리 및 업데이트 별도 구현 필요
+                    // TODO: 코치 모델 분리 및 업데이트 별도 구현 필요
                 }
 
                 return renderSuccessPage(moid, amt, txTid);
@@ -102,7 +102,7 @@ function renderSuccessPage(moid: string, amt: string, tid: string) {
         <head><meta charset="utf-8"><title>결제 완료</title></head>
         <body style="text-align:center; padding:50px; font-family:sans-serif;">
             <h2 style="color:#10b981;">✓ 코칭 예약 및 결제가 완료되었습니다!</h2>
-            <p>잠시 후 파빌리온으로 이동합니다...</p>
+            <p>잠시 후 코칭 룸으로 이동합니다...</p>
             <script>setTimeout(function(){ window.location.href = '${redirectUrl}'; }, 2000);</script>
         </body>
         </html>
@@ -118,7 +118,7 @@ function renderErrorPage(msg: string) {
         <body style="text-align:center; padding:50px; font-family:sans-serif;">
             <h2 style="color:#ef4444;">✗ 결제 중 오류가 발생했습니다</h2>
             <p>${msg}</p>
-            <p>잠시 후 파빌리온으로 돌아갑니다...</p>
+            <p>잠시 후 코칭 룸으로 돌아갑니다...</p>
             <script>setTimeout(function(){ window.location.href = '${redirectUrl}'; }, 2000);</script>
         </body>
         </html>

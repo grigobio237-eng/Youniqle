@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import GoogleAddressSearch from '@/components/ui/GoogleAddressSearch';
+import UnifiedAddressSearch from '@/components/ui/UnifiedAddressSearch';
 import {
   MapPin,
   Plus,
@@ -317,7 +317,12 @@ export default function AddressesPage() {
                 </div>
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">물류 좌표 설정</Label>
-                  <GoogleAddressSearch onAddressSelect={(a) => { setFormData(prev => ({ ...prev, zip: a.zonecode, addr1: a.address })); }} />
+                  <UnifiedAddressSearch
+                    provider="google"
+                    onAddressSelect={(a) => {
+                      setFormData(prev => ({ ...prev, zip: a.zonecode, addr1: a.address }));
+                    }}
+                  />
                 </div>
               </div>
 

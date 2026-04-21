@@ -20,8 +20,17 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     const percentage = ((value[0] - min) / (max - min)) * 100;
     const boundedPercentage = Math.max(0, Math.min(100, percentage));
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.style.setProperty('--slider-percentage', `${boundedPercentage}%`);
+        }
+    }, [boundedPercentage]);
+
     return (
       <div 
+        ref={containerRef}
         className={cn(
           "relative flex w-full touch-none select-none items-center py-4", 
           className
@@ -29,8 +38,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
       >
         <div className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-white/10">
           <div 
-            className="slider-fill absolute h-full bg-chapter-accent transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.3)] left-0" 
-            style={{ width: `${boundedPercentage}%` }}
+            className="slider-fill absolute h-full bg-chapter-accent transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.3)] left-0 w-[var(--slider-percentage)]"
           />
         </div>
         <input
@@ -50,11 +58,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         />
         {/* Mirror Thumb for styling */}
         <div 
-          className="slider-thumb absolute h-5 w-5 rounded-full border-2 border-white bg-chapter-accent shadow-xl transition-all duration-75 pointer-events-none z-0"
-          style={{ 
-            left: `${boundedPercentage}%`,
-            transform: 'translateX(-50%)' 
-          }}
+          className="slider-thumb absolute h-5 w-5 rounded-full border-2 border-white bg-chapter-accent shadow-xl transition-all duration-75 pointer-events-none z-0 left-[var(--slider-percentage)] -translate-x-1/2"
         />
       </div>
     );

@@ -151,8 +151,6 @@ export async function POST(request: NextRequest) {
       originInfo,
       clothingInfo,
       electronicsInfo,
-      pavilionFloorId,
-      pavilionPosition,
       status,
       approvalStatus
     } = await request.json();
@@ -197,9 +195,7 @@ export async function POST(request: NextRequest) {
       nutritionInfo: nutritionInfo && Object.values(nutritionInfo).some(v => v) ? nutritionInfo : undefined,
       originInfo: originInfo && Object.values(originInfo).some(v => v) ? originInfo : undefined,
       clothingInfo: clothingInfo && Object.values(clothingInfo).some(v => v) ? clothingInfo : undefined,
-      electronicsInfo: electronicsInfo && Object.values(electronicsInfo).some(v => v) ? electronicsInfo : undefined,
-      pavilionFloorId,
-      pavilionPosition
+      electronicsInfo: electronicsInfo && Object.values(electronicsInfo).some(v => v) ? electronicsInfo : undefined
     });
 
     await product.save();

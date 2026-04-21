@@ -80,7 +80,7 @@ export default function WeeklyReportPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="p-4 bg-gray-50 rounded-xl border border-blue-100">
-                            <h3 className="font-bold text-gray-900 mb-1">"{userName} 님, 주말 관리가 핵심이에요"</h3>
+                            <h3 className="font-bold text-gray-900 mb-1">&quot;{userName} 님, 주말 관리가 핵심이에요&quot;</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
                                 평일 평균 점수는 양호하지만, 금요일부터 회복 점수가 급격히 떨어지는 패턴이 반복되고 있습니다.
                                 이번 주말에는 고강도 활동보다는 정적인 휴식을 취해보는 것이 어떨까요?

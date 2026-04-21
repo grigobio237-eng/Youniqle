@@ -8,7 +8,7 @@ export interface IUser extends Document {
   avatar?: string;
   role: 'member' | 'partner' | 'admin';
   grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
-  tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급 (파빌리온 5층 등)
+  tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
   points: number;
   gender?: 'male' | 'female' | 'other';
   referralCode?: string; // 추천인 아이디
@@ -170,13 +170,6 @@ export interface IUser extends Document {
     endDate?: Date;
     purchaseDate?: Date;
     navigatorId?: string;
-  };
-  pavilionInfo?: {
-    characterImage?: string;
-    roomDescription?: string;
-    roomMusic?: string;
-    roomTheme?: string;
-    isActive: boolean;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -445,13 +438,6 @@ const UserSchema = new Schema<IUser>({
     endDate: { type: Date },
     purchaseDate: { type: Date },
     navigatorId: { type: String }
-  },
-  pavilionInfo: {
-    characterImage: { type: String, trim: true },
-    roomDescription: { type: String, trim: true },
-    roomMusic: { type: String, trim: true },
-    roomTheme: { type: String, trim: true },
-    isActive: { type: Boolean, default: true }
   },
   diagnosisResults: [{
     type: { type: String, enum: ['free', 'deep', 'daily'], required: true },

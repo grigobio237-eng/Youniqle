@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loginSchema } from '@/lib/validators';
 import { verifyPassword, generateToken, createAuthCookie } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import { createSecurityMiddleware, SecurityLogger } from '@/lib/security';
 import { rateLimiters } from '@/lib/rateLimiter';
-import { InputValidator, commonSchemas } from '@/lib/validators';
+import { loginSchema } from '@/lib/schemas';
+import { createErrorResponse } from '@/lib/serverErrorHandler';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,11 +34,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     
-    // 입력 검증 및 정리
-    const validator = new InputValidator(loginSchema);
-    const validationResult = validator.validate(body);
+    // Zod 검증 적용
+    const validation = loginSchema.safeParse(body);
     
-    if (!validationResult.isValid) {
+    if (!validation.success) {
       const securityLogger = SecurityLogger.getInstance();
       const clientIP = request.headers.get('x-forwarded-for') || 
                       request.headers.get('x-real-ip') || 
@@ -46,14 +45,14 @@ export async function POST(request: NextRequest) {
       securityLogger.log('security_violation', 
         clientIP, 
         request.headers.get('user-agent') || 'unknown',
-        { type: 'validation_failed', errors: validationResult.errors }
+        { type: 'validation_failed', errors: validation.error.errors }
       );
       
       return NextResponse.json(
         { 
           error: '입력 데이터를 확인해주세요.',
-          details: validationResult.errors.map(err => ({
-            field: err.field,
+          details: validation.error.errors.map(err => ({
+            field: err.path.join('.'),
             message: err.message
           }))
         },
@@ -61,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validatedData = validationResult.sanitizedData;
+    const validatedData = validation.data;
 
     await connectDB();
 
@@ -142,19 +141,7 @@ export async function POST(request: NextRequest) {
     const securityManager = new SecurityManager();
     return securityManager.applySecurityHeaders(response);
   } catch (error) {
-    console.error('Login error:', error);
-    
-    if (error instanceof Error && error.name === 'ValidationError') {
-      return NextResponse.json(
-        { error: '입력 데이터를 확인해주세요.' },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    return createErrorResponse(error as Error, 500, request);
   }
 }
 

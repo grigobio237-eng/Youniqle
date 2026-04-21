@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
   Brain, 
   TrendingUp, 
@@ -510,12 +511,11 @@ export default function PredictiveAnalyticsDashboard() {
                     <div className="flex items-center justify-between text-xs">
                       <span>정확도</span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${model.performance.accuracy * 100}%` }}
-                          ></div>
-                        </div>
+                        <Progress 
+                          value={model.performance.accuracy * 100} 
+                          className="w-20 h-2 bg-gray-200" 
+                          indicatorClassName="bg-green-500" 
+                        />
                         <span className="text-gray-600 w-12 text-right">
                           {formatPercentage(model.performance.accuracy)}
                         </span>
@@ -524,12 +524,11 @@ export default function PredictiveAnalyticsDashboard() {
                     <div className="flex items-center justify-between text-xs">
                       <span>정밀도</span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${model.performance.precision * 100}%` }}
-                          ></div>
-                        </div>
+                        <Progress 
+                          value={model.performance.precision * 100} 
+                          className="w-20 h-2 bg-gray-200" 
+                          indicatorClassName="bg-blue-500" 
+                        />
                         <span className="text-gray-600 w-12 text-right">
                           {formatPercentage(model.performance.precision)}
                         </span>
@@ -538,12 +537,11 @@ export default function PredictiveAnalyticsDashboard() {
                     <div className="flex items-center justify-between text-xs">
                       <span>재현율</span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${model.performance.recall * 100}%` }}
-                          ></div>
-                        </div>
+                        <Progress 
+                          value={model.performance.recall * 100} 
+                          className="w-20 h-2 bg-gray-200" 
+                          indicatorClassName="bg-purple-500" 
+                        />
                         <span className="text-gray-600 w-12 text-right">
                           {formatPercentage(model.performance.recall)}
                         </span>

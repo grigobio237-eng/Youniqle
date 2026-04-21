@@ -107,6 +107,14 @@ export interface IAdminSettings extends Document {
     enableFileBackup: boolean;
     backupNotifications: boolean;
   };
+  ai: {
+    availableTextModels: string[];
+    availableImageModels: string[];
+    lastModelRefresh?: Date;
+    activeTextTier1?: string;
+    activeTextTier2?: string;
+    activeTextTier3?: string;
+  };
   lastUpdated: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -539,6 +547,17 @@ const AdminSettingsSchema = new Schema<IAdminSettings>({
       type: Boolean,
       default: true
     }
+  },
+  ai: {
+    availableTextModels: [String],
+    availableImageModels: [String],
+    lastModelRefresh: {
+      type: Date,
+      default: Date.now
+    },
+    activeTextTier1: String,
+    activeTextTier2: String,
+    activeTextTier3: String
   },
   lastUpdated: {
     type: Date,

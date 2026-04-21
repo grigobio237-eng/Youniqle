@@ -519,7 +519,7 @@ const ArchiveContent = () => {
           Navigator Core Philosophy
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-obsidian tracking-tighter leading-[1.1]">
-          "우리는 주사를 파는 게 <span className="italic text-slate">아닙니다</span>"
+          &quot;우리는 주사를 파는 게 <span className="italic text-slate">아닙니다</span>&quot;
         </h2>
         <p className="text-slate/60 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
           여러분들이 가장 먼저 알아야 할 것은 유니클의 정체성입니다.<br />
@@ -565,7 +565,7 @@ const ArchiveContent = () => {
                      <Quote className="w-3 h-3" /> Quick Summary
                    </p>
                    <p className="text-mist text-lg font-serif italic leading-relaxed">
-                     "{card.summary}"
+                     &quot;{card.summary}&quot;
                    </p>
                    <div className="mt-6 flex items-center gap-2 text-mist/80 text-[10px] font-black uppercase tracking-widest">
                      Double Click for Full Details <Activity className="w-3 h-3 animate-pulse" />
@@ -622,7 +622,7 @@ const ArchiveContent = () => {
               {/* Modal Content */}
               <div className="flex-1 overflow-y-auto p-12 custom-scrollbar space-y-12">
                 <p className="text-xl md:text-2xl font-serif text-slate/80 leading-relaxed italic border-l-4 border-chapter-accent pl-8">
-                  "{activeTopic.details.intro}"
+                  &quot;{activeTopic.details.intro}&quot;
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-8">
@@ -656,7 +656,7 @@ const ArchiveContent = () => {
                     <Lightbulb className="w-4 h-4" /> 💡 네비게이터들을 위한 한마디
                   </div>
                   <p className="text-2xl font-serif leading-relaxed italic relative z-10">
-                    "{activeTopic.details.summaryText}"
+                    &quot;{activeTopic.details.summaryText}&quot;
                   </p>
                 </div>
               </div>
@@ -777,7 +777,7 @@ const ArchiveContent = () => {
                       <pitch.icon className="w-5 h-5" />
                     </div>
                     <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">{pitch.type}</p>
-                    <p className="text-sm text-obsidian/80 font-bold leading-relaxed italic">"{pitch.text}"</p>
+                    <p className="text-sm text-obsidian/80 font-bold leading-relaxed italic">&quot;{pitch.text}&quot;</p>
                   </div>
                 ))}
              </div>

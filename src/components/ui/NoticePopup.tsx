@@ -193,10 +193,7 @@ export default function NoticePopup() {
         </DialogHeader>
 
         <div className="space-y-4">
-          <div 
-            className="prose max-w-none"
-            style={{ whiteSpace: 'pre-wrap' }}
-          >
+          <div className="prose max-w-none whitespace-pre-wrap">
             {currentNotice.content}
           </div>
 
