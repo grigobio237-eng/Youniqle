@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ShoppingCart, User, Menu, X, ShoppingBag } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, ShoppingBag, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -70,6 +70,7 @@ export default function Header() {
     { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
     { label: '힐링 라운지', href: '/products', desc: '프리미엄 회복 공간 및 프로그램' },
     { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
+    // @ts-ignore
     ...(session?.user?.isNavigator ? [{ label: '네비게이터', href: '/navigator', desc: '네비게이터 전용 공간' }] : []),
   ];
 
@@ -144,6 +145,16 @@ export default function Header() {
 
           {/* Right Side */}
           <div className="flex items-center space-x-1 md:space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative hover:bg-slate-100/50"
+              onClick={() => window.dispatchEvent(new Event('open-unni-chat'))}
+              title="매니저 유니 상담"
+            >
+              <HelpCircle className="h-5 w-5 md:h-6 md:w-6 text-text-primary" />
+            </Button>
+
             <Link href="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />

@@ -23,106 +23,106 @@ const getStudioGenAI = () => {
 
 // Real Gemini AI Engine for Recovery OS
 export class GeminiAIEngine {
-  private static availableTextModels: string[] = [];
-  private static availableImageModels: string[] = [];
-  private static isInitialized = false;
+    private static availableTextModels: string[] = [];
+    private static availableImageModels: string[] = [];
+    private static isInitialized = false;
 
-  /**
-   * Automatically discovers available models from the Google API and categorizes them into tiers.
-   */
-  public static async initializeDynamicModels(forceRefresh = false): Promise<void> {
-    if (this.isInitialized && !forceRefresh) return;
+    /**
+     * Automatically discovers available models from the Google API and categorizes them into tiers.
+     */
+    public static async initializeDynamicModels(forceRefresh = false): Promise<void> {
+        if (this.isInitialized && !forceRefresh) return;
 
-    try {
-      await dbConnect();
-      const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
-      
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
+        try {
+            await dbConnect();
+            const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
 
-      if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
-        this.availableTextModels = settings.ai.availableTextModels;
-        this.availableImageModels = settings.ai.availableImageModels || [];
-        this.isInitialized = true;
-        console.log(`[Gemini] Loaded cached models: ${this.availableTextModels.length} text, ${this.availableImageModels.length} image`);
-        return;
-      }
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
 
-      console.log('[Gemini] Refreshing available models list from Google API...');
-      const apiKey = process.env.GEMINI_API_KEY;
-      const studioKey = process.env.GEMINI_STUDIO_API_KEY;
+            if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
+                this.availableTextModels = settings.ai.availableTextModels;
+                this.availableImageModels = settings.ai.availableImageModels || [];
+                this.isInitialized = true;
+                console.log(`[Gemini] Loaded cached models: ${this.availableTextModels.length} text, ${this.availableImageModels.length} image`);
+                return;
+            }
 
-      if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
+            console.log('[Gemini] Refreshing available models list from Google API...');
+            const apiKey = process.env.GEMINI_API_KEY;
+            const studioKey = process.env.GEMINI_STUDIO_API_KEY;
 
-      // Security Check: Verify if keys are reported as leaked
-      if (studioKey) {
-        const studioCheck = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${studioKey}`);
-        const studioData = await studioCheck.json();
-        if (studioData.error?.message?.toLowerCase().includes('leaked')) {
-          console.error('⚠️ [SECURITY WARNING] GEMINI_STUDIO_API_KEY is reported as LEAKED by Google. Please rotate your keys immediately.');
+            if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
+
+            // Security Check: Verify if keys are reported as leaked
+            if (studioKey) {
+                const studioCheck = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${studioKey}`);
+                const studioData = await studioCheck.json();
+                if (studioData.error?.message?.toLowerCase().includes('leaked')) {
+                    console.error('⚠️ [SECURITY WARNING] GEMINI_STUDIO_API_KEY is reported as LEAKED by Google. Please rotate your keys immediately.');
+                }
+            }
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
+            const data = await response.json();
+
+            if (data.error) {
+                console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
+                // Use hardcoded defaults if discovery fails
+                this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                this.availableImageModels = ['imagen-3.0-generate-001'];
+            } else if (data.models) {
+                const allModels: any[] = data.models;
+
+                // Filter and sort text models
+                const textModels = allModels
+                    .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
+                    .map(m => m.name.replace('models/', ''))
+                    .sort((a, b) => {
+                        // Priority: pro > flash > lite
+                        const getPriority = (name: string) => {
+                            if (name.includes('pro')) return 1;
+                            if (name.includes('flash')) return 2;
+                            return 3;
+                        };
+                        return getPriority(a) - getPriority(b);
+                    });
+
+                // Filter image models
+                const imageModels = allModels
+                    .filter(m => m.name.includes('imagen'))
+                    .map(m => m.name.replace('models/', ''));
+
+                this.availableTextModels = textModels;
+                this.availableImageModels = imageModels;
+
+                // Save to DB
+                await AdminSettings.findOneAndUpdate(
+                    {},
+                    {
+                        $set: {
+                            'ai.availableTextModels': textModels,
+                            'ai.availableImageModels': imageModels,
+                            'ai.lastModelRefresh': new Date()
+                        }
+                    },
+                    { upsert: true }
+                );
+            }
+
+            this.isInitialized = true;
+            console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
+        } catch (err: any) {
+            console.error('[Gemini] Failed to initialize dynamic models:', err.message);
+            // Final fallback
+            this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
         }
-      }
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
-      const data = await response.json();
-
-      if (data.error) {
-        console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
-        // Use hardcoded defaults if discovery fails
-        this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
-        this.availableImageModels = ['imagen-3.0-generate-001'];
-      } else if (data.models) {
-        const allModels: any[] = data.models;
-        
-        // Filter and sort text models
-        const textModels = allModels
-          .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
-          .map(m => m.name.replace('models/', ''))
-          .sort((a, b) => {
-            // Priority: pro > flash > lite
-            const getPriority = (name: string) => {
-              if (name.includes('pro')) return 1;
-              if (name.includes('flash')) return 2;
-              return 3;
-            };
-            return getPriority(a) - getPriority(b);
-          });
-
-        // Filter image models
-        const imageModels = allModels
-          .filter(m => m.name.includes('imagen'))
-          .map(m => m.name.replace('models/', ''));
-
-        this.availableTextModels = textModels;
-        this.availableImageModels = imageModels;
-
-        // Save to DB
-        await AdminSettings.findOneAndUpdate(
-          {},
-          { 
-            $set: { 
-              'ai.availableTextModels': textModels,
-              'ai.availableImageModels': imageModels,
-              'ai.lastModelRefresh': new Date()
-            } 
-          },
-          { upsert: true }
-        );
-      }
-
-      this.isInitialized = true;
-      console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
-    } catch (err: any) {
-      console.error('[Gemini] Failed to initialize dynamic models:', err.message);
-      // Final fallback
-      this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
     }
-  }
 
-  private static async getTieredModels(type: 'text' | 'image' = 'text'): Promise<string[]> {
-    if (!this.isInitialized) await this.initializeDynamicModels();
-    return type === 'text' ? this.availableTextModels : this.availableImageModels;
-  }
+    private static async getTieredModels(type: 'text' | 'image' = 'text'): Promise<string[]> {
+        if (!this.isInitialized) await this.initializeDynamicModels();
+        return type === 'text' ? this.availableTextModels : this.availableImageModels;
+    }
 
     // AI Model Configuration
     // Primary: gemini-2.0-flash-exp (Smartest, Experimental)
@@ -145,7 +145,7 @@ export class GeminiAIEngine {
         try {
             const models = await this.getTieredModels('image');
             if (models.length === 0) {
-              models.push('imagen-3.0-generate-001', 'imagen-3.0-fast-generate-001', 'imagen-2.0-generate-001');
+                models.push('imagen-3.0-generate-001', 'imagen-3.0-fast-generate-001', 'imagen-2.0-generate-001');
             }
 
             for (const modelName of models) {
@@ -273,7 +273,7 @@ export class GeminiAIEngine {
         // Optimized model list for stability and availability
         const models = await this.getTieredModels('text');
         if (models.length === 0) {
-          models.push('gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro');
+            models.push('gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro');
         }
         let lastError: any;
 
@@ -295,7 +295,7 @@ export class GeminiAIEngine {
                             systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
                         });
 
-                        const promptParts = Array.isArray(prompt) 
+                        const promptParts = Array.isArray(prompt)
                             ? prompt.map(p => typeof p === 'string' ? { text: p } : p)
                             : [{ text: prompt }];
 
@@ -572,8 +572,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 
     // Daily Question Generator
     static async generateDailyQuestions(
-        theme: string, 
-        keywords: string, 
+        theme: string,
+        keywords: string,
         journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS',
         medicalCategory: string | null = null,
         treatmentType: string | null = null
@@ -663,7 +663,7 @@ ${categorySpecificInstruction}
             throw new Error('Failed to parse questions');
         } catch (error) {
             console.error('Gemini Question Error:', error);
-            throw error; 
+            throw error;
         }
     }
     // AI Chat Persona: Director Kim Mi-jeong
@@ -1078,7 +1078,7 @@ ${input.isStemCellSolution ? `
             : `High quality e-commerce product photography. Use the provided product/model images as the absolute visual standard.`;
 
         // 한글 가독성 강화를 위한 텍스트 오버레이 프롬프트 개선
-        const textOverlayInstruction = input.keyMessage 
+        const textOverlayInstruction = input.keyMessage
             ? `Explicitly render the following Korean text (Hangul characters) as a clean, modern, and readable graphic overlay: "${input.keyMessage}". Use professional Korean typography, ensuring all characters are clear and correctly spelled in Hangul script. High quality graphic design layout.`
             : '';
 
@@ -1313,10 +1313,10 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
         referenceDescription?: string;
     }): Promise<string> {
         const stylePrompt = this.getStylePrompt(input.visualStyle);
-        const refSubject = input.referenceDescription 
-            ? `[CRITICAL IDENTITY: Use the following as the SOLE SOURCE for the character's species and form: ${input.referenceDescription}. IGNORE any conflicting human descriptions.]` 
+        const refSubject = input.referenceDescription
+            ? `[CRITICAL IDENTITY: Use the following as the SOLE SOURCE for the character's species and form: ${input.referenceDescription}. IGNORE any conflicting human descriptions.]`
             : '';
-            
+
         const prompt = `Generate a professional character reference sheet.
         1. Subject Identity: ${refSubject || input.characterPrompt}
         2. Complementary Details: ${input.characterPrompt}
@@ -1411,35 +1411,35 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
                 throw new Error('API key is not configured');
             }
 
-        const modelNames = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
-        let lastError: any;
+            const modelNames = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
+            let lastError: any;
 
-        for (const modelName of modelNames) {
-            try {
-                process.stdout.write(`[Gemini Vision] Analyzing with ${modelName}... `);
-                const model = getGenAI().getGenerativeModel({ model: modelName });
-                const result = await model.generateContent([
-                    prompt,
-                    {
-                        inlineData: {
-                            data: imageBase64.split(',')[1] || imageBase64,
-                            mimeType: imageBase64.startsWith('data:image/png') ? "image/png" : "image/jpeg"
+            for (const modelName of modelNames) {
+                try {
+                    process.stdout.write(`[Gemini Vision] Analyzing with ${modelName}... `);
+                    const model = getGenAI().getGenerativeModel({ model: modelName });
+                    const result = await model.generateContent([
+                        prompt,
+                        {
+                            inlineData: {
+                                data: imageBase64.split(',')[1] || imageBase64,
+                                mimeType: imageBase64.startsWith('data:image/png') ? "image/png" : "image/jpeg"
+                            }
                         }
-                    }
-                ]);
-                const response = await result.response;
-                const text = response.text();
+                    ]);
+                    const response = await result.response;
+                    const text = response.text();
 
-                if (text) {
-                    process.stdout.write(`Success!\n`);
-                    return text.trim();
+                    if (text) {
+                        process.stdout.write(`Success!\n`);
+                        return text.trim();
+                    }
+                } catch (error: any) {
+                    process.stdout.write(`Failed (${error.message || 'Unknown'})\n`);
+                    lastError = error;
+                    continue;
                 }
-            } catch (error: any) {
-                process.stdout.write(`Failed (${error.message || 'Unknown'})\n`);
-                lastError = error;
-                continue;
             }
-        }
 
             console.error('Gemini Vision analysis fully failed:', lastError);
             throw new Error(`AI 분석 중 모든 모델 실패: ${lastError?.message || '알 수 없는 오류'}`);
@@ -1631,7 +1631,7 @@ JSON 형식:
 
 ### 🔬 AI 진단 시스템
 - **무료 진단 (/diagnosis)**: 20문항, 5분 소요, 일일 회복 점수 및 맞춤 루틴 제공
-- **AI 내비게이터 (/ai-navigator)**: 진단 결과를 바탕으로 오늘 실천할 행동 추천
+- **AI 네게이터 (/ai-navigator)**: 진단 결과를 바탕으로 오늘 실천할 행동 추천
 - **심층 진단 (마이페이지 내)**: 60문항 IPIP-NEO-60 Big5 성격 분석, 유료 보고서 제공
 - **오마카세 진단 (/omakase)**: 맞춤형 회복 플랜 3가지 제안 (Basic/Standard/Premium)
 
@@ -1738,10 +1738,10 @@ JSON 형식:
             return { response: "죄송해요, 잠시 연결이 원활하지 않네요. 🙏 잠시 후 다시 질문해 주시겠어요?" };
         }
     }
-    
+
     // Recovery OS: Generate specialized chat response for post-procedure care
-    static async generateRecoveryChatResponse(message: string, context: { 
-        userName: string; 
+    static async generateRecoveryChatResponse(message: string, context: {
+        userName: string;
         day: number;
         symptoms: Record<string, string>;
     }): Promise<string> {

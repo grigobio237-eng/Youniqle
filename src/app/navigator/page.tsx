@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2 } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2, ChevronDown } from 'lucide-react';
 
 import PassCatalog from '@/components/navigator/PassCatalog';
 import SquareBoard from '@/components/navigator/SquareBoard';
@@ -14,20 +14,28 @@ import HotlineChat from '@/components/navigator/HotlineChat';
 import ArchiveContent from '@/components/navigator/ArchiveContent';
 import PassOperationGuide from '@/components/navigator/PassOperationGuide';
 import ShopManagement from '@/components/navigator/ShopManagement';
+import ConsultationList from '@/components/navigator/ConsultationList';
 
 
 function NavigatorLoungeContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'archive' | 'policy' | 'square' | 'hotline' | 'catalog' | 'shops'>('archive');
-
+  const [activeTab, setActiveTab] = useState<string | null>('archive');
+  const [isMobile, setIsMobile] = useState(false);
+  const contentRef = React.useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab && ['archive', 'policy', 'square', 'hotline', 'catalog', 'shops'].includes(tab)) {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-      setActiveTab(tab as any);
+  useEffect(() => {
+    const tab = searchParams?.get('tab');
+    if (tab && ['archive', 'policy', 'square', 'hotline', 'catalog', 'shops', 'consultations'].includes(tab)) {
+      setActiveTab(tab);
     }
   }, [searchParams]);
   
@@ -98,10 +106,29 @@ function NavigatorLoungeContent() {
       icon: Building2,
       desc: '등록한 업체별 설문 리드 현황 및 마케팅 관리',
     },
+    {
+      id: 'consultations',
+      label: '상담 요청 현황',
+      icon: MessageCircle,
+      desc: '고객들이 직접 보낸 상담 티켓 및 응대 관리',
+    },
   ] as const;
 
 
   const handleRefresh = () => setRefreshKey(prev => prev + 1);
+
+  const renderTabContent = (tabId: string) => {
+    switch (tabId) {
+      case 'square': return <SquareBoard key={`board-${refreshKey}`} onPostSelect={setSelectedPostId} onPostCreate={() => { setEditingPostId(undefined); setIsFormOpen(true); }} />;
+      case 'policy': return <PassOperationGuide />;
+      case 'hotline': return <HotlineChat />;
+      case 'archive': return <ArchiveContent />;
+      case 'catalog': return <PassCatalog />;
+      case 'shops': return <ShopManagement />;
+      case 'consultations': return <ConsultationList />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pt-32 pb-20">
@@ -121,80 +148,90 @@ function NavigatorLoungeContent() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`text-left p-6 rounded-3xl border transition-all relative overflow-hidden group ${
-                  isActive
-                    ? 'bg-obsidian border-obsidian text-mist shadow-xl'
-                    : 'bg-white border-line hover:border-chapter-accent/50 text-obsidian shadow-sm'
-                }`}
-              >
-                {isActive && (
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-mist/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                )}
-                <div className="relative z-10">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
-                    isActive ? 'bg-white/10 text-mist' : 'bg-mist text-slate group-hover:text-chapter-accent'
-                  }`}>
-                    <Icon className="w-6 h-6" />
+              <div key={tab.id} className="flex flex-col gap-4">
+                <button
+                  onClick={() => {
+                    if (activeTab === tab.id) {
+                      setActiveTab(null);
+                    } else {
+                      setActiveTab(tab.id);
+                      if (isMobile) {
+                        setTimeout(() => {
+                          const el = document.getElementById(`tab-${tab.id}`);
+                          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                      }
+                    }
+                  }}
+                  id={`tab-${tab.id}`}
+                  className={`text-left p-6 rounded-3xl border transition-all relative overflow-hidden group ${
+                    isActive
+                      ? 'bg-obsidian border-obsidian text-mist shadow-xl scale-[1.02]'
+                      : 'bg-white border-line hover:border-chapter-accent/50 text-obsidian shadow-sm'
+                  }`}
+                >
+                  {isActive && (
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-mist/5 rounded-full blur-3xl -mr-16 -mt-16" />
+                  )}
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${
+                        isActive ? 'bg-white/10 text-mist' : 'bg-mist text-slate group-hover:text-chapter-accent'
+                      }`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      {isMobile && (
+                        <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'rotate-180 text-chapter-accent' : 'text-slate/30'}`} />
+                      )}
+                    </div>
+                    <h3 className="font-black text-xl mb-1">{tab.label}</h3>
+                    <p className={`text-[11px] leading-relaxed ${isActive ? 'text-mist/60' : 'text-slate/60'}`}>
+                      {tab.desc}
+                    </p>
                   </div>
-                  <h3 className="font-black text-xl mb-1">{tab.label}</h3>
-                  <p className={`text-[11px] leading-relaxed ${isActive ? 'text-mist/60' : 'text-slate/60'}`}>
-                    {tab.desc}
-                  </p>
-                </div>
-              </button>
+                </button>
+
+                {/* Mobile Accordion Content */}
+                <AnimatePresence>
+                  {isMobile && isActive && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden bg-white border border-line rounded-[32px] p-6 shadow-lg mb-4"
+                    >
+                      {renderTabContent(tab.id)}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             );
           })}
         </div>
 
-        {/* Tab Content Area */}
-        <div className="bg-white border border-line rounded-[40px] p-8 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="h-full"
-            >
-              {activeTab === 'square' ? (
-                <SquareBoard 
-                  key={`board-${refreshKey}`}
-                  onPostSelect={setSelectedPostId} 
-                  onPostCreate={() => {
-                    setEditingPostId(undefined);
-                    setIsFormOpen(true);
-                  }} 
-                />
-              ) : activeTab === 'policy' ? (
-                <PassOperationGuide />
-              ) : activeTab === 'hotline' ? (
-                <HotlineChat />
-              ) : activeTab === 'archive' ? (
-                <ArchiveContent />
-              ) : activeTab === 'catalog' ? (
-                <PassCatalog />
-              ) : activeTab === 'shops' ? (
-                <ShopManagement />
-              ) : (
-
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-                  <div className="w-24 h-24 bg-mist rounded-full flex items-center justify-center">
-                    {/* Placeholder for future tabs */}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        {/* Desktop Tab Content Area */}
+        {!isMobile && (
+          <div ref={contentRef} className="bg-white border border-line rounded-[40px] p-8 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
+              >
+                {activeTab && renderTabContent(activeTab)}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
       </div>
 
       {/* Overlays */}

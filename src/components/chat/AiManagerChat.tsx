@@ -39,6 +39,12 @@ export default function AiManagerChat() {
         scrollToBottom();
     }, [messages]);
 
+    useEffect(() => {
+        const handleOpen = () => setIsOpen(true);
+        window.addEventListener('open-unni-chat', handleOpen);
+        return () => window.removeEventListener('open-unni-chat', handleOpen);
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim() || isLoading) return;
@@ -106,24 +112,6 @@ export default function AiManagerChat() {
 
     return (
         <>
-            {/* Floating Button */}
-            <AnimatePresence>
-                {!isOpen && (
-                    <motion.button
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        onClick={() => setIsOpen(true)}
-                        className="fixed bottom-[160px] md:bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
-                        aria-label="유니클 매니저 열기"
-                    >
-                        <MessageCircle className="w-7 h-7" />
-                        {/* Pulse Animation */}
-                        <span className="absolute w-full h-full rounded-full bg-emerald-400 animate-ping opacity-30" />
-                    </motion.button>
-                )}
-            </AnimatePresence>
-
             {/* Chat Window */}
             <AnimatePresence>
                 {isOpen && (
@@ -132,10 +120,10 @@ export default function AiManagerChat() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 50, scale: 0.9 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] h-[550px] max-h-[80vh] bg-white rounded-[28px] shadow-2xl flex flex-col overflow-hidden border border-slate-200"
+                        className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-[60] w-full md:w-[380px] h-[100dvh] md:h-[600px] md:max-h-[80vh] bg-white md:rounded-[28px] shadow-2xl flex flex-col overflow-hidden border-t md:border border-slate-200"
                     >
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-5 flex items-center justify-between">
+                        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 md:p-5 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
                                     <Image
