@@ -51,6 +51,7 @@ import AILatestBrief from '@/components/me/AILatestBrief';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import QRReferralCard from '@/components/me/QRReferralCard';
 import MedicalPassCard from '@/components/me/MedicalPassCard';
+import ReferralNetwork from '@/components/shared/ReferralNetwork';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -858,6 +859,23 @@ export default function MyPage() {
                       />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* 나의 회복 조직도 (신규) */}
+              <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden group">
+                <CardHeader className="p-8 md:p-10 pb-4">
+                  <div>
+                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">My Recovery Network</p>
+                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                      나의 회복 조직도
+                      <Badge className="bg-indigo-50 text-indigo-600 border-none text-[10px] font-black uppercase">Level 2</Badge>
+                    </CardTitle>
+                    <p className="text-sm font-medium text-slate mt-1">내가 소개한 친구와 친구가 소개한 사람들의 활동 현황입니다.</p>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 md:p-10 pt-2">
+                  <ReferralNetwork mode="accordion" />
                 </CardContent>
               </Card>
             </div>

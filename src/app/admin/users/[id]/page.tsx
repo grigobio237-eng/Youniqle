@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Users, Mail, Phone, Calendar, Copy, MapPin, Activity, HeartPulse, ShoppingBag, SwitchCamera, Sparkles, Shield, Star, TrendingUp, Crown, Zap, BarChart3, Building } from 'lucide-react';
+import { ArrowLeft, Users, Mail, Phone, Calendar, Copy, MapPin, Activity, HeartPulse, ShoppingBag, SwitchCamera, Sparkles, Shield, Star, TrendingUp, Crown, Zap, BarChart3, Building, Network } from 'lucide-react';
+import ReferralNetwork from '@/components/shared/ReferralNetwork';
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -321,6 +322,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   네비게이터 관리 업소
                 </TabsTrigger>
               )}
+              <TabsTrigger value="referral" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                조직도
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="behaviors" className="mt-4">
@@ -444,6 +448,13 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   </Card>
                 )}
               </div>
+            </TabsContent>
+            <TabsContent value="referral" className="mt-4">
+              <Card>
+                <CardContent className="p-6">
+                  <ReferralNetwork userId={userId} mode="tree" />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
 
