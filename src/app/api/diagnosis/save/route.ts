@@ -104,6 +104,16 @@ export async function POST(request: NextRequest) {
                     totalScoreVal = Math.round((t.N + t.E + t.O + t.A + t.C) / 5); // Average T-score
                     resultTitle = type.toUpperCase() === 'DEEP' ? `심층 심리 진단 (IPIP-60)` : `심층 심리 진단 (Premium)`;
                     resultDescription = `5대 요인 및 30개 국면 정밀 분석 완료`;
+                } else if (type === 'daily' || type === 'DAILY') {
+                    totalScoreVal = result.totalScore;
+                    resultTitle = `60초 진단 결과: ${totalScoreVal}점`;
+                    resultDescription = `오늘의 상태를 기반으로 한 맞춤 케어 분석 완료`;
+                    categoryScores = result.convertedScores || {
+                        physical: totalScoreVal,
+                        mental: totalScoreVal,
+                        lifestyle: totalScoreVal,
+                        sleep: totalScoreVal
+                    };
                 }
 
                 await Diagnosis.create({
