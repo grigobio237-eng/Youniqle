@@ -78,9 +78,10 @@ export default function AdminNoticesPage() {
     tags: '',
     isPinned: false,
     isImportant: false,
-    isPopup: false,
     targetAudience: 'all',
     status: 'draft',
+    startDate: '',
+    endDate: '',
   });
   const [previewNotice, setPreviewNotice] = useState<INotice | null>(null);
 
@@ -125,6 +126,17 @@ export default function AdminNoticesPage() {
   };
 
   const handleCreate = async () => {
+    // 날짜 유효성 검사
+    if ((formData.startDate && !formData.endDate) || (!formData.startDate && formData.endDate)) {
+      toast.error('시작일과 종료일을 모두 입력하거나, 상시 게시를 위해 모두 비워두세요.');
+      return;
+    }
+
+    if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
+      toast.error('종료일은 시작일보다 빠를 수 없습니다.');
+      return;
+    }
+
     try {
       const response = await fetch('/api/admin/notices', {
         method: 'POST',
@@ -152,6 +164,17 @@ export default function AdminNoticesPage() {
 
   const handleEdit = async () => {
     if (!selectedNotice) return;
+
+    // 날짜 유효성 검사
+    if ((formData.startDate && !formData.endDate) || (!formData.startDate && formData.endDate)) {
+      toast.error('시작일과 종료일을 모두 입력하거나, 상시 게시를 위해 모두 비워두세요.');
+      return;
+    }
+
+    if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
+      toast.error('종료일은 시작일보다 빠를 수 없습니다.');
+      return;
+    }
 
     try {
       const response = await fetch(`/api/admin/notices/${selectedNotice._id}`, {
@@ -216,9 +239,10 @@ export default function AdminNoticesPage() {
       tags: '',
       isPinned: notice.isPinned,
       isImportant: notice.isImportant,
-      isPopup: notice.isPopup,
       targetAudience: notice.targetAudience || 'all',
       status: notice.status,
+      startDate: notice.startDate ? new Date(notice.startDate).toISOString().split('T')[0] : '',
+      endDate: notice.endDate ? new Date(notice.endDate).toISOString().split('T')[0] : '',
     });
     setShowEditDialog(true);
   };
@@ -233,9 +257,10 @@ export default function AdminNoticesPage() {
       tags: '',
       isPinned: false,
       isImportant: false,
-      isPopup: false,
       targetAudience: 'all',
       status: 'draft',
+      startDate: '',
+      endDate: '',
     });
   };
 
@@ -615,6 +640,35 @@ export default function AdminNoticesPage() {
               />
             </div>
 
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+              <Label className="text-slate-900 font-bold flex items-center gap-2">
+                📅 게시 기간 설정
+                <span className="text-[10px] font-normal text-slate-400">(미입력 시 상시 게시)</span>
+              </Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-startDate" className="text-xs text-slate-500">시작일</Label>
+                  <Input
+                    id="create-startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="bg-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-endDate" className="text-xs text-slate-500">종료일</Label>
+                  <Input
+                    id="create-endDate"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    className="bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -749,6 +803,35 @@ export default function AdminNoticesPage() {
               <p className="text-sm text-gray-500 mt-1">
                 팝업 공지의 경우 선택한 대상에게만 표시됩니다
               </p>
+            </div>
+
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+              <Label className="text-slate-900 font-bold flex items-center gap-2">
+                📅 게시 기간 설정
+                <span className="text-[10px] font-normal text-slate-400">(미입력 시 상시 게시)</span>
+              </Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-startDate" className="text-xs text-slate-500">시작일</Label>
+                  <Input
+                    id="edit-startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="bg-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-endDate" className="text-xs text-slate-500">종료일</Label>
+                  <Input
+                    id="edit-endDate"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    className="bg-white"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">

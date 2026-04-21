@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
     const pinnedNotices = await Notice.find({ ...filter, isPinned: true })
       .sort({ createdAt: -1 })
       .limit(3)
-      .select('-content') // 목록에서는 내용 제외
       .lean();
 
     // 일반 공지사항 조회
@@ -52,7 +51,6 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .select('-content')
       .lean();
 
     const [total, typeCounts] = await Promise.all([

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CharacterImage from '@/components/ui/CharacterImage';
 import { motion } from 'framer-motion';
+import NoticeTicker from './NoticeTicker';
 
 export default function Header() {
   const pathname = usePathname();
@@ -218,6 +219,7 @@ export default function Header() {
           </div>
         )}
       </div>
+      <NoticeTicker />
     </header>
   );
 }
