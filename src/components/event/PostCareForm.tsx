@@ -11,12 +11,15 @@ import { useToast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { Loader2, Calendar, Activity, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useAIProgress } from "@/hooks/use-ai-progress";
+import { AIProgressOverlay } from "@/components/shared/AIProgressOverlay";
 
 export default function PostCareForm() {
   const router = useRouter();
   const { addToast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { progress, statusMessage, finish: finishProgress } = useAIProgress(isSubmitting);
 
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
@@ -80,6 +83,10 @@ export default function PostCareForm() {
       if (!res.ok) throw new Error("로드맵 생성에 실패했습니다.");
       
       const data = await res.json();
+      finishProgress();
+
+      // 시각적 피드백을 위해 약간 대기
+      await new Promise(r => setTimeout(r, 1000));
 
       addToast({
         title: "리커버리 로드맵 생성 완료",
@@ -108,8 +115,8 @@ export default function PostCareForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4">
-      <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-xl rounded-[40px] overflow-hidden border border-line/10">
+    <div className="max-w-2xl mx-auto py-6 sm:py-10 px-4">
+      <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-xl rounded-[32px] sm:rounded-[40px] overflow-hidden border border-line/10">
         <div className={`h-2 bg-obsidian transition-all duration-700 ease-out ${getProgressWidth()}`} />
         
         <CardHeader className="pt-12 pb-8 text-center space-y-2">
@@ -124,7 +131,7 @@ export default function PostCareForm() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="pb-16 px-8 md:px-14">
+        <CardContent className="pb-12 sm:pb-16 px-5 sm:px-8 md:px-14">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-10">
             
             {/* STEP 1: 시술 정보 */}
@@ -158,7 +165,7 @@ export default function PostCareForm() {
                   type="button" 
                   onClick={() => setStep(2)} 
                   disabled={!formData.procedureName || !formData.procedureDate}
-                  className="w-full h-18 rounded-[24px] text-xl font-black bg-obsidian text-white shadow-xl hover:scale-105 transition-all active:scale-95"
+                  className="w-full h-16 sm:h-18 rounded-[20px] sm:rounded-[24px] text-lg sm:text-xl font-black bg-obsidian text-white shadow-xl hover:scale-105 transition-all active:scale-95"
                 >
                   다음 단계로 (1/3)
                 </Button>
@@ -216,12 +223,12 @@ export default function PostCareForm() {
                   />
                 </div>
 
-                <div className="flex gap-4">
-                  <Button type="button" variant="ghost" onClick={() => setStep(1)} className="flex-1 h-16 rounded-[24px] font-bold text-slate text-lg">이전</Button>
+                <div className="flex gap-3 sm:gap-4">
+                  <Button type="button" variant="ghost" onClick={() => setStep(1)} className="flex-none sm:flex-1 h-14 sm:h-16 px-6 sm:px-0 rounded-[20px] sm:rounded-[24px] font-bold text-slate text-base sm:text-lg">이전</Button>
                   <Button 
                     type="button" 
                     onClick={() => setStep(3)} 
-                    className="flex-[2] h-16 rounded-[24px] text-xl font-black bg-obsidian text-white shadow-xl"
+                    className="flex-1 sm:flex-[2] h-14 sm:h-16 rounded-[20px] sm:rounded-[24px] text-base sm:text-xl font-black bg-obsidian text-white shadow-xl"
                   >
                     다음 단계로 (2/3)
                   </Button>
@@ -284,21 +291,23 @@ export default function PostCareForm() {
                    </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button type="button" variant="ghost" onClick={() => setStep(2)} className="flex-1 h-18 rounded-[24px] font-bold text-slate text-lg">이전</Button>
+                <div className="flex gap-3 sm:gap-4">
+                  <Button type="button" variant="ghost" onClick={() => setStep(2)} className="flex-none sm:flex-1 h-16 sm:h-18 px-6 sm:px-0 rounded-[20px] sm:rounded-[24px] font-bold text-slate text-base sm:text-lg">이전</Button>
                   <Button 
                     type="button" 
                     onClick={handleSubmit} 
                     disabled={isSubmitting}
-                    className="flex-[3] h-18 rounded-[24px] text-2xl font-black bg-obsidian text-white shadow-2xl hover:scale-105 active:scale-95 transition-all group overflow-hidden relative"
+                    className="flex-1 sm:flex-[3] h-16 sm:h-18 rounded-[20px] sm:rounded-[24px] text-base sm:text-xl md:text-2xl font-black bg-obsidian text-white shadow-2xl hover:scale-105 active:scale-95 transition-all group overflow-hidden relative"
                   >
                     {isSubmitting ? (
-                      <div className="flex items-center gap-3">
-                        <Loader2 className="w-6 h-6 animate-spin" /> 리커버리 엔진 분석 중...
+                      <div className="flex items-center justify-center gap-2 sm:gap-3">
+                        <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" /> 
+                        <span className="whitespace-nowrap">분석 중...</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-3">
-                         맞춤형 로드맵 생성 <CheckCircle2 className="w-6 h-6 group-hover:animate-bounce" />
+                      <div className="flex items-center justify-center gap-2 sm:gap-3">
+                         <span className="whitespace-nowrap">로드맵 생성</span>
+                         <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 group-hover:animate-bounce" />
                       </div>
                     )}
                   </Button>
@@ -313,6 +322,12 @@ export default function PostCareForm() {
       <p className="mt-8 text-center text-slate/50 text-xs font-black uppercase tracking-[0.4em] animate-pulse">
          Clinical Data Protection Protocol Active
       </p>
+
+      <AIProgressOverlay 
+        active={isSubmitting} 
+        progress={progress} 
+        message={statusMessage} 
+      />
     </div>
   );
 }

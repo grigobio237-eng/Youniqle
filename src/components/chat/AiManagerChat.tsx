@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { useAIProgress } from '@/hooks/use-ai-progress';
+import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
@@ -26,6 +28,7 @@ export default function AiManagerChat() {
     ]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const { progress, statusMessage, finish: finishProgress } = useAIProgress(isLoading);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -61,6 +64,9 @@ export default function AiManagerChat() {
             if (!response.ok) {
                 throw new Error('API Error');
             }
+
+            finishProgress();
+            await new Promise(r => setTimeout(r, 600));
 
             const data = await response.json();
 
@@ -173,8 +179,19 @@ export default function AiManagerChat() {
                             ))}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-slate-100">
-                                        <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
+                                    <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-slate-100 flex flex-col gap-2 min-w-[200px]">
+                                        <div className="flex justify-between items-center text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                            <span>Uni is Thinking</span>
+                                            <span>{Math.round(progress)}%</span>
+                                        </div>
+                                        <div className="h-1 bg-emerald-100 rounded-full overflow-hidden">
+                                            <motion.div 
+                                                className="h-full bg-emerald-500"
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${progress}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">{statusMessage}</p>
                                     </div>
                                 </div>
                             )}

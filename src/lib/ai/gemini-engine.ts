@@ -295,8 +295,12 @@ export class GeminiAIEngine {
                             systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
                         });
 
+                        const promptParts = Array.isArray(prompt) 
+                            ? prompt.map(p => typeof p === 'string' ? { text: p } : p)
+                            : [{ text: prompt }];
+
                         const result = await model.generateContent({
-                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                            contents: [{ role: 'user', parts: promptParts }],
                             generationConfig: {
                                 temperature: temperature
                             }

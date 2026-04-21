@@ -6,6 +6,8 @@ import {
     Camera, RefreshCw, Sparkles, ChevronRight, Loader2, ArrowRight, 
     X, ChefHat, Activity, Brain, Clock, PlusCircle, Upload 
 } from 'lucide-react';
+import { useAIProgress } from '@/hooks/use-ai-progress';
+import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,6 +37,7 @@ export default function FoodScanner() {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [loading, setLoading] = useState(false);
+    const { progress, statusMessage, finish: finishProgress } = useAIProgress(loading);
 
     // --- Refs ---
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -116,6 +119,10 @@ export default function FoodScanner() {
             });
 
             if (!response.ok) throw new Error('Analysis failed');
+            
+            finishProgress();
+            // 시각적 피드백
+            await new Promise(r => setTimeout(r, 800));
 
             const data = await response.json();
             setResult(data);
@@ -351,20 +358,12 @@ export default function FoodScanner() {
                             {!isCameraActive ? renderIdleView() : renderActiveCameraView()}
                             
                             {/* Scanning Overlay */}
-                            {status === 'scanning' && (
-                                <div className="absolute inset-0 z-20 overflow-hidden">
-                                    <motion.div 
-                                        initial={{ top: "-10%" }}
-                                        animate={{ top: "110%" }}
-                                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                        className="absolute left-0 right-0 h-1 bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)]"
-                                    />
-                                    <div className="absolute inset-0 bg-obsidian/40 backdrop-blur-md flex flex-col items-center justify-center text-mist">
-                                        <Loader2 className="w-12 h-12 animate-spin mb-4" />
-                                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">YOUNIQLE Analyzing...</h4>
-                                    </div>
-                                </div>
-                            )}
+                            <AIProgressOverlay 
+                                active={loading} 
+                                progress={progress} 
+                                message={statusMessage} 
+                                variant="compact"
+                            />
                         </div>
                     </motion.div>
                 ) : (

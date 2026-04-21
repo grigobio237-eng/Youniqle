@@ -11,6 +11,8 @@ import { useRecovery } from '@/contexts/RecoveryContext';
 import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import { Save } from 'lucide-react';
+import { useAIProgress } from '@/hooks/use-ai-progress';
+import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 
 export interface AnalysisResult {
     subjectName: string;
@@ -27,6 +29,7 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'idle' | 'scanning' | 'result'>('idle');
     const [loading, setLoading] = useState(false);
+    const { progress, statusMessage, finish: finishProgress } = useAIProgress(loading);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [showUpsell, setShowUpsell] = useState(false);
@@ -145,6 +148,9 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Analysis failed');
             }
+
+            finishProgress();
+            await new Promise(r => setTimeout(r, 800));
 
             const data = await response.json();
             setResult(data);
@@ -554,15 +560,13 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                 )}
                 
                 {status === 'scanning' && (
-                    <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist">
-                        <Loader2 className="w-12 h-12 animate-spin mb-4 text-chapter-accent" />
-                        <h4 className="text-xl font-black italic tracking-widest animate-pulse uppercase">YOUNIQLE Analyzing...</h4>
+                    <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
-                        <motion.div 
-                            initial={{ top: "-10%" }}
-                            animate={{ top: "110%" }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            className="absolute left-0 right-0 h-1 bg-chapter-accent shadow-[0_0_15px_rgba(var(--chapter-accent-rgb),0.8)] z-10"
+                        <AIProgressOverlay 
+                            active={loading} 
+                            progress={progress} 
+                            message={statusMessage} 
+                            variant="compact"
                         />
                     </motion.div>
                 )}
