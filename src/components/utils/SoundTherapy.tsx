@@ -174,10 +174,21 @@ export default function SoundTherapy() {
     startNoiseSound();
     startNatureSound();
     const now = audioCtx.current.currentTime;
+    
+    // Reset master gain to current volume immediately
+    masterGainNode.current?.gain.cancelScheduledValues(now);
+    masterGainNode.current?.gain.setValueAtTime(masterVolume, now);
+
+    // Fade in tracks
+    freqGain.current?.gain.cancelScheduledValues(now);
     freqGain.current?.gain.setValueAtTime(0, now);
     freqGain.current?.gain.linearRampToValueAtTime(freqVolume, now + 1);
+    
+    noiseGain.current?.gain.cancelScheduledValues(now);
     noiseGain.current?.gain.setValueAtTime(0, now);
     noiseGain.current?.gain.linearRampToValueAtTime(noiseVolume, now + 1);
+    
+    natureGain.current?.gain.cancelScheduledValues(now);
     natureGain.current?.gain.setValueAtTime(0, now);
     natureGain.current?.gain.linearRampToValueAtTime(natureVolume, now + 1);
     setIsPlaying(true);
@@ -245,11 +256,24 @@ export default function SoundTherapy() {
   }, [selectedNature]);
 
   useEffect(() => {
-    if (isPlaying && audioCtx.current) {
+    if (isPlaying && audioCtx.current && masterGainNode.current) {
         const now = audioCtx.current.currentTime;
-        masterGainNode.current?.gain.linearRampToValueAtTime(masterVolume, now + 0.1);
+        
+        // Use a small ramp for smooth changes without clicks
+        masterGainNode.current.gain.cancelScheduledValues(now);
+        masterGainNode.current.gain.setValueAtTime(masterGainNode.current.gain.value, now);
+        masterGainNode.current.gain.linearRampToValueAtTime(masterVolume, now + 0.1);
+
+        freqGain.current?.gain.cancelScheduledValues(now);
+        freqGain.current?.gain.setValueAtTime(freqGain.current.gain.value, now);
         freqGain.current?.gain.linearRampToValueAtTime(freqVolume, now + 0.1);
+
+        noiseGain.current?.gain.cancelScheduledValues(now);
+        noiseGain.current?.gain.setValueAtTime(noiseGain.current.gain.value, now);
         noiseGain.current?.gain.linearRampToValueAtTime(noiseVolume, now + 0.1);
+
+        natureGain.current?.gain.cancelScheduledValues(now);
+        natureGain.current?.gain.setValueAtTime(natureGain.current.gain.value, now);
         natureGain.current?.gain.linearRampToValueAtTime(natureVolume, now + 0.1);
     }
   }, [masterVolume, freqVolume, noiseVolume, natureVolume, isPlaying]);
