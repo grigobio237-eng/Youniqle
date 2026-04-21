@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft, X } from 'lucide-react';
 
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
@@ -221,8 +222,28 @@ export default function HomePage() {
         recoveryData={{ score, answers, userNote }}
       />
       <Dialog open={showSoundModal} onOpenChange={setShowSoundModal}>
-        <DialogContent className="max-w-5xl p-0 bg-transparent border-none overflow-hidden sm:rounded-[40px]">
-          <SoundTherapy />
+        <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-black max-h-[95vh] overflow-y-auto">
+          <DialogHeader className="sr-only">
+            <DialogTitle>딥 사운드 테라피</DialogTitle>
+            <DialogDescription>회복 주파수와 사운드스케이트로 깊은 이완 경험을 제공합니다.</DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <SoundTherapy />
+            <button 
+              onClick={() => setShowSoundModal(false)}
+              className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full flex items-center gap-2 text-white font-black text-xs transition-all z-50 backdrop-blur-md"
+              aria-label="돌아가기"
+            >
+              <ChevronLeft className="w-4 h-4" /> 돌아가기
+            </button>
+            <button 
+              onClick={() => setShowSoundModal(false)}
+              className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50"
+              aria-label="닫기"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
       {renderContent()}
