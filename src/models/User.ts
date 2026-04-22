@@ -6,7 +6,7 @@ export interface IUser extends Document {
   name: string;
   phone?: string;
   avatar?: string;
-  role: 'member' | 'partner' | 'admin';
+  role: 'member' | 'partner' | 'admin' | 'superadmin';
   grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
   tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
   points: number;

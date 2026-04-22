@@ -434,7 +434,7 @@ export async function verifyAdminToken(request: NextRequest) {
     await connectDB();
     const user = await User.findById(decoded.id);
 
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
       return { success: false, error: '관리자 권한이 없습니다.' };
     }
 

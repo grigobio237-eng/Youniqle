@@ -8,6 +8,7 @@ import Diagnosis from '@/models/Diagnosis';
 import Shop from '@/models/Shop';
 import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
+import { logAdminAction } from '@/lib/admin-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -181,17 +182,26 @@ export async function PATCH(
 
     const adjustAmount = amount || (data && data.amount) || (data && data.points) || 0;
 
+    const prevUser = JSON.parse(JSON.stringify(user));
+    const ip = request.headers.get('x-forwarded-for') || '';
+    const userAgent = request.headers.get('user-agent') || '';
+
     switch (action) {
       case 'update':
         // 사용자 정보 업데이트 (개인정보 제외, 오퍼레이션 필드만 허용)
-        if (data.role) user.role = data.role;
+        if (data.role) {
+          // 권한 변경은 오직 superadmin만 가능
+          if (auth.user.role !== 'superadmin') {
+            return NextResponse.json({ error: '권한 변경은 최상위 관리자만 가능합니다.' }, { status: 403 });
+          }
+          user.role = data.role;
+        }
         if (data.grade) user.grade = data.grade;
-        if (data.tier) user.tier = data.tier; // tier 직접 업데이트
+        if (data.tier) user.tier = data.tier;
         if (data.points !== undefined) user.points = data.points;
         break;
 
       case 'suspend':
-        // 계정 정지 (임시 구현: 이메일 인증 해제)
         user.emailVerified = false;
         break;
 
@@ -200,7 +210,6 @@ export async function PATCH(
         break;
 
       case 'promote':
-        // 등급 상승
         const grades = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul'];
         const currentIndex = grades.indexOf(user.grade);
         if (currentIndex < grades.length - 1) {
@@ -209,7 +218,6 @@ export async function PATCH(
         break;
 
       case 'promoteTier':
-        // 접근 권한 등급 상승 (RESET → REBORN → RESTART)
         const tiers = ['RESET', 'REBORN', 'RESTART'];
         const currentTierIndex = tiers.indexOf(user.tier || 'RESET');
         if (currentTierIndex < tiers.length - 1) {
@@ -219,24 +227,36 @@ export async function PATCH(
 
       case 'addPoints':
       case 'grantPoints':
-        // 포인트 추가
         user.points += adjustAmount;
         break;
 
       case 'deductPoints':
-        // 포인트 차감
         user.points = Math.max(0, user.points - adjustAmount);
         break;
 
       default:
-        return NextResponse.json(
-          { error: '알 수 없는 작업입니다.' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: '알 수 없는 작업입니다.' }, { status: 400 });
     }
 
-    // 기존 데이터의 스키마 오류(passwordHash 누락 등) 무시를 위해 전체 검증 우회
+    // 기존 데이터의 스키마 오류 무시를 위해 전체 검증 우회
     await user.save({ validateBeforeSave: false });
+
+    // 활동 로그 기록
+    await logAdminAction({
+      admin: {
+        id: auth.user.id,
+        email: auth.user.email,
+        name: auth.user.name
+      },
+      action: action === 'update' ? (data.role ? 'ROLE_CHANGE' : 'USER_UPDATE') : action.toUpperCase(),
+      targetId: user._id,
+      targetModel: 'User',
+      details: `${user.email} 사용자의 정보를 수정함 (${action})`,
+      prevData: prevUser,
+      newData: JSON.parse(JSON.stringify(user)),
+      ip,
+      userAgent
+    });
 
     return NextResponse.json({
       message: '사용자 정보가 업데이트되었습니다.',
@@ -290,12 +310,16 @@ export async function DELETE(
       );
     }
 
-    if (user.role === 'admin') {
+    if (user.role === 'admin' || user.role === 'superadmin') {
       return NextResponse.json(
         { error: '관리자 계정은 삭제할 수 없습니다.' },
         { status: 403 }
       );
     }
+
+    const prevUser = JSON.parse(JSON.stringify(user));
+    const ip = request.headers.get('x-forwarded-for') || '';
+    const userAgent = request.headers.get('user-agent') || '';
 
     // 관련 데이터도 함께 삭제 (실제로는 soft delete 권장)
     await Promise.all([
@@ -303,6 +327,22 @@ export async function DELETE(
       Order.deleteMany({ userId }),
       Review.deleteMany({ userId })
     ]);
+
+    // 활동 로그 기록
+    await logAdminAction({
+      admin: {
+        id: auth.user.id,
+        email: auth.user.email,
+        name: auth.user.name
+      },
+      action: 'USER_DELETE',
+      targetId: userId,
+      targetModel: 'User',
+      details: `${prevUser.email} 사용자를 삭제함`,
+      prevData: prevUser,
+      ip,
+      userAgent
+    });
 
     return NextResponse.json({
       message: '사용자가 삭제되었습니다.'
