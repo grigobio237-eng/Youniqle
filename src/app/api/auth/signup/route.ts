@@ -43,13 +43,19 @@ export async function POST(request: NextRequest) {
 
     // ... (Password validation remains same)
 
-    // 중복 이메일 확인
+    // 중복 이메일 확인 (탈퇴한 계정은 재가입 허용)
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (existingUser && !existingUser.isDeleted) {
       return NextResponse.json(
         { error: '이미 사용 중인 이메일입니다.' },
         { status: 400 }
       );
+    }
+
+    // 만약 탈퇴한 계정이 있다면 기존 정보를 초기화하기 위해 삭제 처리
+    if (existingUser && existingUser.isDeleted) {
+      await User.deleteOne({ _id: existingUser._id });
+      console.log(`[Signup] Removed deleted user account for re-registration: ${email}`);
     }
 
     // 추천인 코드 검증 (쿠키 또는 직접 입력)

@@ -121,7 +121,12 @@ export const authOptions: AuthOptions = {
                 provider: account.provider,
                 providerId: account.providerAccountId,
                 emailVerified: true,
+                isDeleted: false, // 재가입 시 삭제 상태 해제
                 updatedAt: new Date()
+              },
+              $unset: {
+                deletedAt: "",
+                deleteReason: ""
               },
               $setOnInsert: {
                 role: 'member',
