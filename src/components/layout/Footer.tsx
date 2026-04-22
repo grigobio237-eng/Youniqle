@@ -154,6 +154,7 @@ export default function Footer() {
           <Link href="/trainer" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
           <Link href="/products/shop" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">유니클 스토어</Link>
           <Link href="/community" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
+          <Link href="/sitemap" className="text-gray-400 hover:text-white transition-colors">사이트맵</Link>
         </div>
 
         {/* Middle Section: Legal Links & Copyright */}
