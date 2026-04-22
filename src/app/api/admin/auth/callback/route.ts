@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     // 관리자 권한 확인 (admin@youniqle.com 또는 grigobio237@gmail.com)
     const allowedAdminEmails = ['admin@youniqle.com', 'grigobio237@gmail.com'];
-    const isAdmin = user.role === 'admin' || allowedAdminEmails.includes(user.email);
+    const isAdmin = user.role === 'admin' || user.role === 'superadmin' || allowedAdminEmails.includes(user.email);
     
     if (!isAdmin) {
       console.log('관리자 권한 없음, 관리자 로그인 페이지로 리다이렉트');

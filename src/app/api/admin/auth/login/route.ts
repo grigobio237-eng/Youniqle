@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // 관리자 권한 확인
     const admin = await User.findOne({ 
       email: email.toLowerCase(),
-      role: 'admin'
+      role: { $in: ['admin', 'superadmin'] }
     });
 
     console.log('👤 관리자 계정 조회 결과:', {
