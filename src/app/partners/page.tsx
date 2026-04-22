@@ -1,11 +1,18 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Users, BarChart, Zap, ShieldCheck, ChevronRight, MessageSquare } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import PartnerInquiryModal from '@/components/partners/PartnerInquiryModal';
 
 export default function PartnerPage() {
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+
+  const handleOpenInquiry = () => setIsInquiryModalOpen(true);
+
   return (
     <ChapterWrapper chapter="partner" className="bg-white min-h-screen">
       {/* 1. Hero Section */}
@@ -25,8 +32,12 @@ export default function PartnerPage() {
               '준비된 고객'을 유니클의 정밀 진단 데이터로 연결해 드립니다.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <Button asChild size="lg" className="h-16 px-10 rounded-[20px] bg-obsidian text-mist font-black shadow-xl hover:-translate-y-1 transition-transform">
-                <Link href="/partner/apply">파트너 제휴 문의</Link>
+              <Button 
+                onClick={handleOpenInquiry}
+                size="lg" 
+                className="h-16 px-10 rounded-[20px] bg-obsidian text-mist font-black shadow-xl hover:-translate-y-1 transition-transform"
+              >
+                파트너 제휴 문의
               </Button>
               <Button asChild variant="outline" size="lg" className="h-16 px-10 rounded-[20px] border-line font-black hover:bg-mist">
                 <Link href="/partner/login">파트너 로그인</Link>
@@ -36,6 +47,8 @@ export default function PartnerPage() {
         </div>
       </section>
 
+      {/* ... (생략된 중간 섹션들은 그대로 유지) ... */}
+      
       {/* 2. Key Values */}
       <section className="py-32 bg-mist/20">
         <div className="container mx-auto px-6">
@@ -117,7 +130,11 @@ export default function PartnerPage() {
             <p className="text-xl text-slate/60">당신의 전문성이 더 빛날 수 있도록, 유니클이 가장 좋은 무대와 관객을 설계하겠습니다.</p>
           </div>
           <div className="flex justify-center gap-6">
-            <Button size="lg" className="h-20 px-12 rounded-[24px] bg-chapter-accent font-black text-xl hover:scale-105 transition-all gap-4">
+            <Button 
+              onClick={handleOpenInquiry}
+              size="lg" 
+              className="h-20 px-12 rounded-[24px] bg-chapter-accent font-black text-xl hover:scale-105 transition-all gap-4 shadow-xl shadow-chapter-accent/20"
+            >
               <MessageSquare className="w-6 h-6" />
               지금 제휴 문의하기
               <ChevronRight className="w-6 h-6" />
@@ -126,6 +143,12 @@ export default function PartnerPage() {
           <p className="text-slate/40 font-medium">현재 120+ 전문가 및 40+ 센터가 유니클과 함께하고 있습니다.</p>
         </div>
       </section>
+
+      {/* Inquiry Modal */}
+      <PartnerInquiryModal 
+        isOpen={isInquiryModalOpen} 
+        onClose={() => setIsInquiryModalOpen(false)} 
+      />
     </ChapterWrapper>
   );
 }
