@@ -22,8 +22,17 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // Fetch all diagnoses for this user, sorted by date (newest first)
-        const history = await Diagnosis.find({ userId: user._id })
+        const { AccessControl } = await import('@/lib/logic/access-control');
+        const limits = AccessControl.getLimits(user);
+        
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - limits.dataRetentionDays);
+
+        // Fetch diagnoses for this user with date filter, sorted by date (newest first)
+        const history = await Diagnosis.find({ 
+            userId: user._id,
+            createdAt: { $gte: cutoffDate }
+        })
             .select('type totalScore categoryScores resultTitle aiSolution createdAt')
             .sort({ createdAt: -1 });
 

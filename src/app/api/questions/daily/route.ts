@@ -62,13 +62,29 @@ export async function GET(req: NextRequest) {
 
             const themeData = DAILY_THEMES[dayOfWeek] || DAILY_THEMES[1];
             
-            // Call AI with journey, medical context AND personal context
+            // 3. Get User Tier & Context
+            const { AccessControl } = await import('@/lib/logic/access-control');
+            const user = userId ? await User.findById(userId) : null;
+            const userTier = user ? AccessControl.getUserGroup(user) : 'NORMAL';
+            
+            // Premium 유저인 경우 최근 3일간의 스캔/진단 데이터를 추가 컨텍스트로 수집
+            let recentData = null;
+            if (userTier === 'PREMIUM' && user) {
+                recentData = {
+                    scans: user.scanTimeline?.slice(-3),
+                    diagnosis: user.diagnosisResults?.slice(-3)
+                };
+            }
+
+            // Call AI with journey, medical context AND personal context + Tier
             const questions = await GeminiAIEngine.generateDailyQuestions(
                 themeData.theme, 
                 `${themeData.keywords}, ${personalContext}`, 
                 journey,
                 medicalCategory,
-                treatmentType
+                treatmentType,
+                userTier,
+                recentData
             );
 
 

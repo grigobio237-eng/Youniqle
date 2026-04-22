@@ -576,7 +576,9 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         keywords: string,
         journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS',
         medicalCategory: string | null = null,
-        treatmentType: string | null = null
+        treatmentType: string | null = null,
+        userTier: string = 'NORMAL',
+        recentData?: any
     ): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY is missing');
@@ -619,6 +621,11 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             const prompt = `[메디컬 회복 전문가 모드]
 테마: "${theme}", 키워드: "${keywords}"
 지침: ${contextInstruction} / ${categorySpecificInstruction}
+
+## 등급별 특화 지침
+${userTier === 'PREMIUM' ? `[PREMIUM 전용] 사용자의 최근 회복 데이터(${JSON.stringify(recentData || '기본 정보')})를 기반으로, 어제와 비교하여 상태의 변화를 묻는 유기적이고 초개인화된 문항을 구성하세요.` : 
+  userTier === 'START' ? `[START 전용] 임상적 정밀도를 높여 수술/시술 후 발생 가능한 부작용 징후나 필수 회복 지표를 집중적으로 점검하세요.` :
+  `[NORMAL 전용] 일상적인 웰니스와 보편적인 회복 가이드에 집중한 표준 문항을 생성하세요.`}
 
 위 정보를 바탕으로 사용자의 상태를 점검하는 **5개의 객관식 질문**을 JSON 배열로 생성하세요.
 

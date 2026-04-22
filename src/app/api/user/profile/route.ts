@@ -18,10 +18,24 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
+        const { AccessControl } = await import('@/lib/logic/access-control');
+        const userTier = AccessControl.getUserGroup(user);
+        const limits = AccessControl.getLimits(user);
+
+        // 데이터 보존 기간 필터링 (7일, 90일 등)
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - limits.dataRetentionDays);
+
+        const filteredResults = (user.diagnosisResults || []).filter((res: any) => 
+            new Date(res.createdAt) >= cutoffDate
+        );
+
         return NextResponse.json({
             email: user.email,
             name: user.name,
-            diagnosisResults: user.diagnosisResults || []
+            diagnosisResults: filteredResults,
+            tier: userTier,
+            limits // UI 제어용으로 전달
         });
 
     } catch (error) {

@@ -188,6 +188,12 @@ export interface IUser extends Document {
     metrics: any;
     createdAt: Date;
   }>;
+  dailyStats?: {
+    scannerCount: number;
+    diagnosisCount: number;
+    webtoonCount: number;
+    lastResetDate: Date;
+  };
 }
 
 const UserSchema = new Schema<IUser>({
@@ -453,7 +459,13 @@ const UserSchema = new Schema<IUser>({
     summary: { type: String },
     metrics: { type: Schema.Types.Mixed },
     createdAt: { type: Date, default: Date.now }
-  }]
+  }],
+  dailyStats: {
+    scannerCount: { type: Number, default: 0 },
+    diagnosisCount: { type: Number, default: 0 },
+    webtoonCount: { type: Number, default: 0 },
+    lastResetDate: { type: Date, default: Date.now }
+  }
 }, {
   timestamps: true,
 });

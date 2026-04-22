@@ -24,9 +24,36 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 2. 데이터 추출
+    // 2. 사용량 체크 및 포인트 소진 로직
+    const { AccessControl, FEATURE_COSTS } = await import('@/lib/logic/access-control');
+    await AccessControl.checkAndResetDailyStats(user);
+
     const body = await req.json();
-    const { type, imageData, score, summary, metrics } = body;
+    const { type, imageData, score, summary, metrics, usePoints } = body;
+
+    const canUse = AccessControl.canUseFeature(user, 'scanner');
+    const cost = FEATURE_COSTS.scanner;
+
+    if (!canUse) {
+        if (usePoints && user.points >= cost) {
+            user.points -= cost;
+            console.log(`[Scan Save] User ${userId} used ${cost} points for extra scan.`);
+        } else {
+            return NextResponse.json({ 
+                error: '일일 무료 사용량을 초과했습니다.',
+                code: 'LIMIT_EXCEEDED',
+                pointsRequired: cost,
+                currentPoints: user.points
+            }, { status: 403 });
+        }
+    } else {
+        if (!user.dailyStats) {
+            user.dailyStats = { scannerCount: 0, diagnosisCount: 0, webtoonCount: 0, lastResetDate: new Date() };
+        }
+        user.dailyStats.scannerCount += 1;
+    }
+
+    // 3. 데이터 추출 (이미 body에서 추출함)
 
     if (!type) {
       return NextResponse.json({ error: '필수 데이터가 누락되었습니다.' }, { status: 400 });

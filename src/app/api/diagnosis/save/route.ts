@@ -28,6 +28,39 @@ export async function POST(request: NextRequest) {
         }
 
         await connectDB();
+        const user = await User.findOne({ email: userEmail });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // 2. 사용량 체크 및 포인트 소진 (60초 진단 전용)
+        const { AccessControl, FEATURE_COSTS } = await import('@/lib/logic/access-control');
+        await AccessControl.checkAndResetDailyStats(user);
+
+        if (type === 'daily' || type === 'DAILY') {
+            const canUse = AccessControl.canUseFeature(user, 'diagnosis');
+            const { usePoints } = body;
+            const cost = FEATURE_COSTS.diagnosis;
+
+            if (!canUse) {
+                if (usePoints && user.points >= cost) {
+                    user.points -= cost;
+                    console.log(`[Diagnosis Save] User ${user._id} used ${cost} points for extra diagnosis.`);
+                } else {
+                    return NextResponse.json({ 
+                        error: '일일 무료 사용량을 초과했습니다.',
+                        code: 'LIMIT_EXCEEDED',
+                        pointsRequired: cost,
+                        currentPoints: user.points
+                    }, { status: 403 });
+                }
+            } else {
+                if (!user.dailyStats) {
+                    user.dailyStats = { scannerCount: 0, diagnosisCount: 0, webtoonCount: 0, lastResetDate: new Date() };
+                }
+                user.dailyStats.diagnosisCount += 1;
+            }
+        }
 
         let scores = {};
         let totalScore = 0;
@@ -68,11 +101,8 @@ export async function POST(request: NextRequest) {
             createdAt: new Date()
         };
 
-        const user = await User.findOneAndUpdate(
-            { email: userEmail },
-            { $push: { diagnosisResults: diagnosisEntry } },
-            { new: true }
-        );
+        user.diagnosisResults.push(diagnosisEntry);
+        await user.save({ validateBeforeSave: false });
 
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
