@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       const User = (await import('@/models/User')).default;
       const user = await User.findById(decoded.id);
       
-      if (!user || user.role !== 'admin') {
+      if (user.role !== 'admin' && user.role !== 'superadmin') {
         return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
       }
     } catch (error) {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       const User = (await import('@/models/User')).default;
       user = await User.findById(decoded.id);
       
-      if (!user || user.role !== 'admin') {
+      if (user.role !== 'admin' && user.role !== 'superadmin') {
         return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
       }
     } catch (error) {

@@ -9,7 +9,7 @@ import { TrendAnalysisNode } from '@/lib/video-workflow/nodes/TrendAnalysisNode'
 export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user || (session.user as any).role !== 'admin') {
+        if (!session || !session.user || ((session.user as any).role !== 'admin' && (session.user as any).role !== 'superadmin')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 

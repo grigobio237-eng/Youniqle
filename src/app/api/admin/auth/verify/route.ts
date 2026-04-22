@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     // 사용자 정보 확인
     const admin = await User.findById(decoded.id).select('-passwordHash').maxTimeMS(5000);
     
-    if (!admin || (admin.role !== 'admin' && admin.role !== 'superadmin')) {
+    if (admin.role !== 'admin' && admin.role !== 'superadmin') {
       console.log('❌ 관리자 사용자를 찾을 수 없음:', decoded.id);
       return NextResponse.json(
         { error: '관리자 권한이 없습니다.' },

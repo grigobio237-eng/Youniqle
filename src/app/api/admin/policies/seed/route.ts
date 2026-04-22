@@ -7,7 +7,7 @@ import { verifyAuth } from '@/lib/auth';
 export async function POST(request: NextRequest) {
   try {
     const user = await verifyAuth(request);
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json({ success: false }, { status: 403 });
     }
 

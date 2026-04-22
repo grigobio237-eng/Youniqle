@@ -46,7 +46,7 @@ export async function GET(
     // 관리자 권한 확인
     const user = await User.findById(decoded.id).maxTimeMS(5000);
 
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       console.log('User not found or not admin:', user?.role);
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
@@ -129,7 +129,7 @@ export async function PUT(
     // 관리자 권한 확인
     const user = await User.findById(decoded.id);
 
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
@@ -305,7 +305,7 @@ export async function DELETE(
     // 관리자 권한 확인
     const user = await User.findById(decoded.id);
 
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 

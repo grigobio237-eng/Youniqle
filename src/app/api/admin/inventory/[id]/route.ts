@@ -22,7 +22,7 @@ export async function GET(
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
     
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
@@ -62,7 +62,7 @@ export async function PATCH(
     const User = (await import('@/models/User')).default;
     const user = await User.findOne({ email: session.user.email });
     
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 

@@ -11,7 +11,7 @@ export async function POST(
     const params = await props.params;
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user || (session.user as any).role !== 'admin') {
+        if (!session || !session.user || ((session.user as any).role !== 'admin' && (session.user as any).role !== 'superadmin')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 

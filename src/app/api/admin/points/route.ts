@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const admin = await User.findOne({ email: session.user.email });
-    if (!admin || admin.role !== 'admin') {
+    if (admin.role !== 'admin' && admin.role !== 'superadmin') {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 

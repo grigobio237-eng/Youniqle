@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || (session.user as any).role !== 'admin') {
+    if (!session || !session.user || ((session.user as any).role !== 'admin' && (session.user as any).role !== 'superadmin')) {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 

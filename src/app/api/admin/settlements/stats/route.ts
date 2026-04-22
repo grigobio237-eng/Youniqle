@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     // 관리자 인증 확인
     const user = await verifyAuth(request);
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
       return NextResponse.json(
         { success: false, error: { code: 'AUTH_INSUFFICIENT_PERMISSIONS', message: '권한이 없습니다.' } },
         { status: 403 }
