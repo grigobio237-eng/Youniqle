@@ -15,6 +15,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import { isWebView, handleWebViewOAuth } from '@/utils/webViewDetection';
 
 export default function AdminLoginPage() {
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,19 +27,22 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    setMounted(true);
     setIsInWebView(isWebView());
   }, []);
 
   // URL 파라미터에서 오류 확인
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
+  useEffect(() => {
+    if (!mounted) return;
     
-    if (error) {
-      console.log('관리자 로그인 오류:', error);
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    
+    if (errorParam) {
+      console.log('관리자 로그인 오류:', errorParam);
       let errorMessage = '관리자 로그인 중 오류가 발생했습니다.';
       
-      switch (error) {
+      switch (errorParam) {
         case 'no-session':
           errorMessage = '세션을 찾을 수 없습니다. 다시 로그인해주세요.';
           break;
@@ -52,7 +56,7 @@ export default function AdminLoginPage() {
           errorMessage = '로그인 처리 중 오류가 발생했습니다.';
           break;
         default:
-          errorMessage = `관리자 로그인 오류: ${error}`;
+          errorMessage = `관리자 로그인 오류: ${errorParam}`;
       }
       
       setError(errorMessage);
@@ -60,7 +64,7 @@ export default function AdminLoginPage() {
       // URL에서 오류 파라미터 제거
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []);
+  }, [mounted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +134,13 @@ export default function AdminLoginPage() {
       setLoadingStep('');
     }
   };
+
+  // 초기 서버 렌더링 시에는 레이아웃만 유지
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4" />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
@@ -210,13 +221,15 @@ export default function AdminLoginPage() {
               </Alert>
             )}
 
-            {/* 소셜 로그인 안내 */}
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800 text-center">
-                <strong>소셜 로그인 사용법:</strong><br />
-                구글/카카오로 가입한 후 관리자 권한이 부여된 계정만 이용 가능합니다.<br />
-                <span className="text-xs text-blue-600">※ 소셜 로그인 시 자동으로 관리자 토큰이 발급됩니다.</span>
-              </p>
+            {/* 소셜 로그인 안내 - 구조 개선 (하이드레이션 방지) */}
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center flex flex-col gap-1">
+              <div className="text-sm text-blue-800 font-bold">소셜 로그인 사용법</div>
+              <div className="text-sm text-blue-800">
+                구글/카카오로 가입한 후 관리자 권한이 부여된 계정만 이용 가능합니다.
+              </div>
+              <div className="text-xs text-blue-600">
+                ※ 소셜 로그인 시 자동으로 관리자 토큰이 발급됩니다.
+              </div>
             </div>
 
             {/* WebView 경고 메시지 */}
@@ -235,12 +248,12 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            {/* 소셜 로그인 안내 문구 */}
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-700 text-center">
-                <span className="font-medium">네이버 로그인은 준비 중입니다.</span><br />
+            {/* 소셜 로그인 안내 문구 - 구조 개선 (하이드레이션 방지) */}
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-center flex flex-col gap-1">
+              <div className="text-sm text-red-700 font-medium">네이버 로그인은 준비 중입니다.</div>
+              <div className="text-sm text-red-700">
                 현재는 구글/카카오 로그인과 이메일 로그인만 이용 가능합니다.
-              </p>
+              </div>
             </div>
 
             {/* 소셜 로그인 버튼들 */}
@@ -251,7 +264,7 @@ export default function AdminLoginPage() {
                 disabled={loading}
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
-                {loading ? (loadingStep || '구글 로그인 중...') : '구글로 관리자 로그인'}
+                {loading && loadingStep.includes('google') ? loadingStep : '구글로 관리자 로그인'}
               </Button>
 
               <Button
@@ -260,7 +273,7 @@ export default function AdminLoginPage() {
                 disabled={loading}
               >
                 <KakaoIcon className="w-5 h-5 mr-3" />
-                {loading && loadingStep.includes('kakao') ? (loadingStep || '카카오 로그인 중...') : '카카오로 관리자 로그인'}
+                {loading && loadingStep.includes('kakao') ? loadingStep : '카카오로 관리자 로그인'}
               </Button>
 
               <Button
@@ -286,28 +299,28 @@ export default function AdminLoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email">이메일</Label>
-                <Input
+                <input
                   id="email"
                   type="email"
                   placeholder="이메일을 입력하세요"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12"
+                  className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password">비밀번호</Label>
                 <div className="relative">
-                  <Input
+                  <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="비밀번호를 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 pr-12"
+                    className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-12"
                   />
                   <Button
                     type="button"
@@ -335,11 +348,12 @@ export default function AdminLoginPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-text-secondary">
+              <div className="text-sm text-text-secondary">
                 관리자 권한이 필요합니다.
-                <br />
+              </div>
+              <div className="text-sm text-text-secondary">
                 문의: suchwawa@sapienet.com
-              </p>
+              </div>
             </div>
           </CardContent>
         </Card>
