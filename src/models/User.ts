@@ -471,7 +471,7 @@ const UserSchema = new Schema<IUser>({
 });
 
 // 저장 전 추천 코드 자동 생성 (누락 방지)
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function(this: any, next) {
   if (!this.referralCode) {
     const idStr = this._id.toString();
     const base = idStr.slice(-6).toUpperCase();

@@ -160,8 +160,8 @@ export async function PATCH(
 
     // 관리자 권한 검증
     const auth = await verifyAdminToken(request);
-    if (!auth.success) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || '관리자 권한이 없습니다.' }, { status: 401 });
     }
 
     if (!isValidObjectId(userId)) {
@@ -290,8 +290,8 @@ export async function DELETE(
 
     // 관리자 권한 검증
     const auth = await verifyAdminToken(request);
-    if (!auth.success) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || '관리자 권한이 없습니다.' }, { status: 401 });
     }
 
     // 유효한 ID 형식인지 확인
