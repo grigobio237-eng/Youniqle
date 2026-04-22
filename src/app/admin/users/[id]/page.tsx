@@ -496,10 +496,33 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                         <Badge variant={shop.isActive ? "default" : "secondary"}>{shop.isActive ? '운영중' : '중지'}</Badge>
                       </div>
                       <CardContent className="p-5 space-y-4">
-                        <div>
-                          <h4 className="text-lg font-black text-obsidian">{shop.name}</h4>
-                          <p className="text-sm text-slate/60">{shop.category || '업종 미지정'}</p>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="text-lg font-black text-obsidian">{shop.name}</h4>
+                            <p className="text-sm text-slate/60">{shop.category || '업종 미지정'}</p>
+                          </div>
+                          {shop.stats && (
+                            <div className="text-right">
+                              <p className="text-[10px] text-slate/40 font-bold uppercase tracking-wider">Recent Activity</p>
+                              <p className="text-xs font-bold text-slate/60">
+                                {shop.stats.lastActivity ? new Date(shop.stats.lastActivity).toLocaleDateString() : '활동 없음'}
+                              </p>
+                            </div>
+                          )}
                         </div>
+                        
+                        {shop.stats && (
+                          <div className="grid grid-cols-2 gap-2 py-2">
+                            <div className="bg-slate/5 rounded-lg p-2 text-center border border-slate/5">
+                              <p className="text-[10px] text-slate/40 font-bold">총 리포트</p>
+                              <p className="text-sm font-black text-obsidian">{shop.stats.totalReports}건</p>
+                            </div>
+                            <div className="bg-primary/5 rounded-lg p-2 text-center border border-primary/10">
+                              <p className="text-[10px] text-primary/60 font-bold">분석 완료</p>
+                              <p className="text-sm font-black text-primary">{shop.stats.analyzedReports}건</p>
+                            </div>
+                          </div>
+                        )}
                         <div className="flex gap-2 pt-2">
                           <Button 
                             variant="outline" 

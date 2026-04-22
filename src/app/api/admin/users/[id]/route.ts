@@ -10,6 +10,7 @@ import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
 import { logAdminAction } from '@/lib/admin-logger';
 import { calculateUserTier } from '@/lib/user-utils';
+import SurveyResponse from '@/models/SurveyResponse';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,13 +132,27 @@ export async function GET(
         resultTitle: diag.resultTitle,
         createdAt: diag.createdAt
       })),
-      shops: user.isNavigator ? (shops as any[] || []).map(shop => ({
-        id: shop._id.toString(),
-        name: shop.name,
-        shopCode: shop.shopCode,
-        category: shop.category,
-        isActive: shop.isActive,
-        createdAt: shop.createdAt
+      shops: user.isNavigator ? await Promise.all((shops as any[] || []).map(async (shop) => {
+        // 해당 업소의 리포트 통계 집계
+        const [totalReports, analyzedReports, lastReport] = await Promise.all([
+          SurveyResponse.countDocuments({ shopId: shop._id }),
+          SurveyResponse.countDocuments({ shopId: shop._id, status: { $ne: 'new' } }),
+          SurveyResponse.findOne({ shopId: shop._id }).sort({ createdAt: -1 }).select('createdAt')
+        ]);
+
+        return {
+          id: shop._id.toString(),
+          name: shop.name,
+          shopCode: shop.shopCode,
+          category: shop.category,
+          isActive: shop.isActive,
+          createdAt: shop.createdAt,
+          stats: {
+            totalReports,
+            analyzedReports,
+            lastActivity: lastReport?.createdAt || null
+          }
+        };
       })) : []
     };
 
