@@ -44,7 +44,7 @@ interface User {
   name: string;
   email: string;
   phone?: string;
-  role: 'member' | 'partner' | 'admin' | 'user';
+  role: 'member' | 'partner' | 'admin' | 'superadmin' | 'user';
   grade?: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul';
   tier?: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
   isNavigator?: boolean; // 영업사원(네비게이터) 지정 여부
@@ -442,6 +442,9 @@ export default function AdminUsersPage() {
                           </Badge>
                           {user.role === 'admin' && (
                             <Badge variant="default" className="text-[9px] px-1.5 py-0 h-4">관리자</Badge>
+                          )}
+                          {user.role === 'superadmin' && (
+                            <Badge className="bg-red-600 text-white text-[9px] px-1.5 py-0 h-4">최고 관리자</Badge>
                           )}
                           {user.isNavigator && (
                             <Badge className="bg-amber-500 text-white border-none text-[9px] px-1.5 py-0 h-4 flex items-center gap-0.5">

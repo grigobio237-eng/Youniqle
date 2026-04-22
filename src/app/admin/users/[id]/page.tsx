@@ -162,6 +162,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 {user.name}
                 {user.role === 'admin' && <Badge variant="default">관리자</Badge>}
+                {user.role === 'superadmin' && <Badge className="bg-red-600 text-white">최고 관리자</Badge>}
               </h2>
               <p className="text-gray-500">{user.email}</p>
             </div>
@@ -199,6 +200,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     <SelectItem value="member">일반 회원</SelectItem>
                     <SelectItem value="partner">파트너</SelectItem>
                     <SelectItem value="admin">관리자</SelectItem>
+                    <SelectItem value="superadmin">최고 관리자</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
