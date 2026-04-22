@@ -41,8 +41,25 @@ export async function GET(
       if (viewer) {
         if (viewer.referralCode === code) {
           viewerRole = 'self';
+        } else if (viewer.role === 'admin') {
+          // 관리자는 파트너와 동일하게 모든 정보를 볼 수 있도록 허용
+          viewerRole = 'partner';
         } else if (viewer.role === 'partner' && viewer.partnerStatus === 'approved') {
           viewerRole = 'partner';
+        }
+
+        // --- 네비게이터 바인딩 로직 추가 ---
+        // 스캔한 대상이 네비게이터인 경우, 현재 뷰어의 recentNavigator 업데이트
+        const targetMember = await User.findOne({ 
+          referralCode: { $regex: new RegExp(`^${code}$`, 'i') },
+          isNavigator: true 
+        }).select('_id').lean();
+
+        if (targetMember && viewer._id.toString() !== targetMember._id.toString()) {
+          await User.findByIdAndUpdate(viewer._id, {
+            recentNavigator: code.toUpperCase()
+          });
+          console.log(`[API/Member] Updated recentNavigator for ${viewer.email} to ${code}`);
         }
       }
     }
