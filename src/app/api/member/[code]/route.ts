@@ -7,13 +7,20 @@ import Diagnosis from '@/models/Diagnosis';
 import MedicalPassPin from '@/models/MedicalPassPin';
 import PreConsultation from '@/models/PreConsultation';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
     await dbConnect();
-    const { code } = await params;
+    const resolvedParams = await params;
+    const code = resolvedParams.code?.trim();
+
+    if (!code) {
+      return NextResponse.json({ error: '코드가 제공되지 않았습니다.' }, { status: 400 });
+    }
 
     // referralCode로 회원 조회 (대소문자 구분 없이 검색)
     const member = await User.findOne({ 
