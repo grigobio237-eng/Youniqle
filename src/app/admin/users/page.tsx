@@ -193,10 +193,12 @@ export default function AdminUsersPage() {
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    const matchesRole = roleFilter === 'all' || 
+      (roleFilter === 'navigator' ? user.isNavigator : user.role === roleFilter);
     const matchesGrade = gradeFilter === 'all' || (user.grade || 'cedar') === gradeFilter;
+    const matchesTier = tierFilter === 'all' || (user.tier || 'RESET') === tierFilter;
 
-    return matchesSearch && matchesRole && matchesGrade;
+    return matchesSearch && matchesRole && matchesGrade && matchesTier;
   });
 
   const getGradeDisplay = (grade: string) => {
