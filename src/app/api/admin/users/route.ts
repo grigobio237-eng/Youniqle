@@ -36,7 +36,11 @@ async function getUsersHandler(request: NextRequest) {
     }
 
     if (role !== 'all') {
-      filter.role = role;
+      if (role === 'navigator') {
+        filter.isNavigator = true;
+      } else {
+        filter.role = role;
+      }
     }
 
     if (grade !== 'all') {
