@@ -256,7 +256,7 @@ export default function ShopAnalyticsPage() {
                         <div className="relative z-10 space-y-8">
                             <div className="space-y-2">
                                 <h3 className="text-3xl font-black italic font-serif tracking-tight">Proposal Builder</h3>
-                                <p className="text-mist/40 text-sm font-medium">분석 결과를 토대로 업소 전용 3단계 상품을 설계하세요.</p>
+                                <p className="text-mist/70 text-sm font-medium">분석 결과를 토대로 업소 전용 3단계 상품을 설계하세요.</p>
                             </div>
 
                             <div className="space-y-6">
@@ -271,13 +271,13 @@ export default function ShopAnalyticsPage() {
                                             placeholder="상품명을 입력하세요"
                                             value={proposal.lite.title}
                                             onChange={(e) => setProposal(p => ({ ...p, lite: { ...p.lite, title: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/10 py-1 outline-none font-black text-lg placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none font-black text-lg placeholder:text-mist/50"
                                         />
                                         <input 
                                             placeholder="가격 (예: 10만원 미만)"
                                             value={proposal.lite.price}
                                             onChange={(e) => setProposal(p => ({ ...p, lite: { ...p.lite, price: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/10 py-1 outline-none text-sm font-bold placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none text-sm font-bold placeholder:text-mist/50"
                                         />
                                     </div>
                                 </div>
@@ -293,13 +293,13 @@ export default function ShopAnalyticsPage() {
                                             placeholder="메인 추천 상품명"
                                             value={proposal.signature.title}
                                             onChange={(e) => setProposal(p => ({ ...p, signature: { ...p.signature, title: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none font-black text-lg text-white placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/30 py-1 outline-none font-black text-lg text-white placeholder:text-mist/50"
                                         />
                                         <input 
                                             placeholder="가격 (예: 30~70만원)"
                                             value={proposal.signature.price}
                                             onChange={(e) => setProposal(p => ({ ...p, signature: { ...p.signature, price: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none text-sm font-bold text-white/70 placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/30 py-1 outline-none text-sm font-bold text-white/70 placeholder:text-mist/50"
                                         />
                                     </div>
                                 </div>
@@ -315,13 +315,13 @@ export default function ShopAnalyticsPage() {
                                             placeholder="최상급 프리미엄 상품명"
                                             value={proposal.black.title}
                                             onChange={(e) => setProposal(p => ({ ...p, black: { ...p.black, title: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/10 py-1 outline-none font-black text-lg placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none font-black text-lg placeholder:text-mist/50"
                                         />
                                         <input 
                                             placeholder="가격 (예: 150만원 이상)"
                                             value={proposal.black.price}
                                             onChange={(e) => setProposal(p => ({ ...p, black: { ...p.black, price: e.target.value } }))}
-                                            className="w-full bg-transparent border-b border-white/10 py-1 outline-none text-sm font-bold placeholder:text-mist/20"
+                                            className="w-full bg-transparent border-b border-white/20 py-1 outline-none text-sm font-bold placeholder:text-mist/50"
                                         />
                                     </div>
                                 </div>
