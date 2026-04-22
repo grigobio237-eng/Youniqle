@@ -470,5 +470,16 @@ const UserSchema = new Schema<IUser>({
   timestamps: true,
 });
 
+// 저장 전 추천 코드 자동 생성 (누락 방지)
+UserSchema.pre('save', function(next) {
+  if (!this.referralCode) {
+    const idStr = this._id.toString();
+    const base = idStr.slice(-6).toUpperCase();
+    this.referralCode = `RF${base}`;
+    console.log(`[Model/User] Generated missing referralCode: ${this.referralCode} for ${this.email}`);
+  }
+  next();
+});
+
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
