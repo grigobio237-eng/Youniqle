@@ -9,6 +9,7 @@ import Shop from '@/models/Shop';
 import { verifyAdminToken } from '@/lib/auth';
 import { isValidObjectId } from 'mongoose';
 import { logAdminAction } from '@/lib/admin-logger';
+import { calculateUserTier } from '@/lib/user-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -215,6 +216,22 @@ export async function PATCH(
         if (currentIndex < grades.length - 1) {
           user.grade = grades[currentIndex + 1];
         }
+        break;
+
+      case 'grantPass':
+        if (!data.passType) {
+          return NextResponse.json({ error: '지급할 패스 종류가 필요합니다.' }, { status: 400 });
+        }
+        user.passInfo = {
+          type: data.passType,
+          status: 'ACTIVE',
+          startDate: new Date(),
+          purchaseDate: new Date(),
+          navigatorId: auth.user.id // 지급한 관리자 ID 기록
+        };
+        // 등급 및 티어 자동 계산 및 동기화
+        user.grade = data.passType.toLowerCase(); // START -> start, SIGNATURE -> signature 등
+        user.tier = calculateUserTier(user);
         break;
 
       case 'promoteTier':

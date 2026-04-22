@@ -138,6 +138,30 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     }
   };
 
+  const handleGrantPass = async (passType: string) => {
+    if (!confirm(`${passType} 패스를 해당 회원에게 지급하시겠습니까?`)) return;
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'grantPass',
+          data: { passType }
+        }),
+      });
+      if (response.ok) {
+        alert(`${passType} 패스가 성공적으로 지급되었습니다.`);
+        fetchUserDetail();
+      } else {
+        const err = await response.json();
+        alert(err.error || '패스 지급에 실패했습니다.');
+      }
+    } catch (error) {
+       console.error('Failed to grant pass:', error);
+       alert('오류가 발생했습니다.');
+    }
+  };
+
   if (loading) return <div className="p-8 text-center">데이터를 불러오는 중입니다...</div>;
   if (!user) return <div className="p-8 text-center text-red-500">유저 정보를 찾을 수 없습니다.</div>;
 
@@ -233,6 +257,53 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 <Button variant={user.isNavigator ? "destructive" : "outline"} className="w-full" onClick={handleToggleNavigator}>
                   {user.isNavigator ? '네비게이터 권한 해제' : '네비게이터 승격'}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3 border-b border-gray-100">
+              <CardTitle className="text-lg flex items-center gap-2">
+                 <Zap className="h-5 w-5 text-amber-500" />
+                 패스 및 멤버십 관리
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-gray-500">현재 보유 패스: 
+                  <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-700">
+                    {user.passInfo?.type || 'NONE'}
+                  </Badge>
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button 
+                    variant={user.passInfo?.type === 'START' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="w-full justify-start h-9"
+                    onClick={() => handleGrantPass('START')}
+                  >
+                    <Badge className="bg-blue-600 mr-2">REBORN</Badge>
+                    START PASS 지급
+                  </Button>
+                  <Button 
+                    variant={user.passInfo?.type === 'SIGNATURE' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="w-full justify-start h-9"
+                    onClick={() => handleGrantPass('SIGNATURE')}
+                  >
+                    <Badge className="bg-chapter-accent text-white mr-2">RESTART</Badge>
+                    SIGNATURE PASS 지급
+                  </Button>
+                  <Button 
+                    variant={user.passInfo?.type === 'BLACK' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="w-full justify-start h-9"
+                    onClick={() => handleGrantPass('BLACK')}
+                  >
+                    <Badge className="bg-obsidian text-chapter-accent border border-chapter-accent/30 mr-2">RESTART</Badge>
+                    BLACK PASS 지급
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
