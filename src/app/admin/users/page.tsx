@@ -493,10 +493,6 @@ export default function AdminUsersPage() {
                       <Eye className="h-4 w-4 mr-1 sm:mr-0" />
                       <span className="sm:hidden text-xs">상세</span>
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetail(user)} className="h-8 px-2 flex-1 sm:flex-none">
-                      <Edit className="h-4 w-4 mr-1 sm:mr-0" />
-                      <span className="sm:hidden text-xs">수정</span>
-                    </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" className="h-8 px-2">
