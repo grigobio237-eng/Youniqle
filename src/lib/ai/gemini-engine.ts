@@ -270,66 +270,98 @@ export class GeminiAIEngine {
         systemInstruction?: string,
         temperature: number = 0.7
     ): Promise<string> {
-        // Optimized model list for stability and availability
-        const models = await this.getTieredModels('text');
+        // [다이내믹 우선순위 전략] 실시간으로 발견된 모델 중 가장 성능이 좋은 모델을 즉시 선택
+        let models = await this.getTieredModels('text');
+        
+        // 리스트가 비어있거나 문제가 있다면 즉시 최신화
         if (models.length === 0) {
-            models.push('gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro');
+            await this.initializeDynamicModels(true);
+            models = await this.getTieredModels('text');
         }
+
+        // 기본 안전장치: 검색된 모델이 전혀 없을 경우에만 하드코딩된 최신 리스트 사용
+        const effectiveModels = models.length > 0 ? models : ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        
         let lastError: any;
 
-        for (const modelName of models) {
+        // 리스트의 첫 번째 모델부터 순차적으로 시도 (첫 번째가 가장 성능이 좋은 모델임)
+        for (let i = 0; i < effectiveModels.length; i++) {
+            const modelName = effectiveModels[i];
             try {
-                // Try with both genAI and studioGenAI
-                const engines = [getGenAI(), getStudioGenAI()];
+                const text = await this.executeModelRequest(modelName, prompt, systemInstruction, temperature);
+                if (text) {
+                    // 첫 번째 모델이 성공하면 즉시 반환 (가장 빠른 경로)
+                    if (i === 0) console.log(`[Gemini] Primary success with dynamic model: ${modelName}`);
+                    return text;
+                }
+            } catch (error: any) {
+                console.warn(`[Gemini] Model ${modelName} failed, trying next fallback...`);
+                lastError = error;
 
-                for (const engine of engines) {
+                // 만약 모든 캐시된 모델이 실패하고 있다면, 마지막 수단으로 강제 갱신 시도 (마지막 루프 직전)
+                if (i === effectiveModels.length - 1 && models.length > 0) {
+                    console.log('[Gemini] Emergency: All tiered models failed. Refreshing list and retrying once more...');
+                    await this.initializeDynamicModels(true);
+                    const freshModels = await this.getTieredModels('text');
+                    const backupModel = freshModels[0] || 'gemini-1.5-flash';
                     try {
-                        const model = engine.getGenerativeModel({
-                            model: modelName,
-                            safetySettings: [
-                                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                            ],
-                            systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
-                        });
-
-                        const promptParts = Array.isArray(prompt)
-                            ? prompt.map(p => typeof p === 'string' ? { text: p } : p)
-                            : [{ text: prompt }];
-
-                        const result = await model.generateContent({
-                            contents: [{ role: 'user', parts: promptParts }],
-                            generationConfig: {
-                                temperature: temperature
-                            }
-                        });
-                        const response = await result.response;
-                        const text = response.text();
-
-                        if (text) return text;
-                    } catch (innerError: any) {
-                        // If specific engine fails, try next engine for same model
-                        lastError = innerError;
-                        continue;
+                        return await this.executeModelRequest(backupModel, prompt, systemInstruction, temperature);
+                    } catch (e) {
+                        lastError = e;
                     }
                 }
+            }
+        }
 
+        throw lastError || new Error('All AI models failed after dynamic selection attempts');
+    }
+
+
+    /**
+     * core logic for executing a single model request across multiple API engines
+     */
+    private static async executeModelRequest(
+        modelName: string,
+        prompt: string | any[],
+        systemInstruction?: string,
+        temperature: number = 0.7
+    ): Promise<string | null> {
+        const engines = [getGenAI(), getStudioGenAI()];
+        let lastError: any;
+
+        for (const engine of engines) {
+            try {
+                const model = engine.getGenerativeModel({
+                    model: modelName,
+                    safetySettings: [
+                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    ],
+                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }], role: "system" } : undefined
+                });
+
+                const promptParts = Array.isArray(prompt)
+                    ? prompt.map(p => typeof p === 'string' ? { text: p } : p)
+                    : [{ text: prompt }];
+
+                const result = await model.generateContent({
+                    contents: [{ role: 'user', parts: promptParts }],
+                    generationConfig: {
+                        temperature: temperature
+                    }
+                });
+                const response = await result.response;
+                const text = response.text();
+
+                if (text) return text;
             } catch (error: any) {
-                // Only log non-404 errors as warnings to reduce noise
-                const isNotFoundError = error.message?.includes('404') || error.message?.includes('not found');
-                if (!isNotFoundError) {
-                    console.warn(`[Gemini] Model ${modelName} failed:`, error.message);
-                } else {
-                    console.log(`[Gemini] Model ${modelName} not available, trying next...`);
-                }
                 lastError = error;
                 continue;
             }
         }
-
-        throw lastError || new Error('All AI models failed');
+        throw lastError || new Error(`Execution failed for ${modelName}`);
     }
 
     // AI Navigator: Generate daily advice based on recovery scores
