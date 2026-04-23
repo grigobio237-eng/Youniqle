@@ -305,7 +305,9 @@ export class GeminiAIEngine {
                     const freshModels = await this.getTieredModels('text');
                     const backupModel = freshModels[0] || 'gemini-1.5-flash';
                     try {
-                        return await this.executeModelRequest(backupModel, prompt, systemInstruction, temperature);
+                        const emergencyText = await GeminiAIEngine.executeModelRequest(backupModel, prompt, systemInstruction, temperature);
+                        if (emergencyText) return emergencyText;
+                        throw new Error(`Emergency retry returned empty for ${backupModel}`);
                     } catch (e) {
                         lastError = e;
                     }

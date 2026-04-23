@@ -11,6 +11,7 @@ import ClinicConsultationSection from './ClinicConsultationSection';
 interface LandingContentProps {
   onStart: (data?: AnalysisResult) => void;
   onStartTherapy?: () => void;
+  isDiagnosing?: boolean;
 }
 
 export default function LandingContent({ onStart, onStartTherapy, isDiagnosing = false }: LandingContentProps) {
@@ -98,7 +99,7 @@ export default function LandingContent({ onStart, onStartTherapy, isDiagnosing =
                   className="p-0 h-auto text-chapter-accent font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-transparent group-hover:translate-x-1 transition-transform"
                 >
                   {isDiagnosing && util.action === "진단 시작" ? (
-                    <>분석 중 <RefreshCw className="w-4 h-4 animate-spin" /></>
+                    <>분석 중 <Sparkles className="w-4 h-4 animate-spin" /></>
                   ) : (
                     <>{util.action} <ArrowRight className="w-4 h-4" /></>
                   )}
