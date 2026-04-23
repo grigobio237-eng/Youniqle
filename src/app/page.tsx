@@ -103,6 +103,7 @@ export default function HomePage() {
   const [currentQuestionsKey, setCurrentQuestionsKey] = React.useState<string | null>(null);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
   const [showSoundModal, setShowSoundModal] = useState(false);
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
 
   useEffect(() => {
     // welcome=true 인 경우(신규 가입) → 랜딩 그대로 보여줌
@@ -122,11 +123,13 @@ export default function HomePage() {
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
   const handleStart = async (data?: AnalysisResult) => {
+    setIsDiagnosing(true);
     if (data) setAnalysisData(data);
     const cacheKey = `${journey}-${medicalCategory}-${treatmentType}`;
     // If we already have questions for the CURRENT journey and medical category, just show them
     if (questions.length > 0 && currentQuestionsKey === cacheKey) {
       setViewState('QUESTION');
+      setIsDiagnosing(false);
       return;
     }
 
@@ -145,6 +148,8 @@ export default function HomePage() {
     } catch (error) {
       console.error('Failed to fetch questions:', error);
       alert('네트워크 오류가 발생했습니다.');
+    } finally {
+      setIsDiagnosing(false);
     }
   };
 
@@ -200,8 +205,8 @@ export default function HomePage() {
     // Default: Always show Hero + LandingContent (INTRO)
     return (
       <>
-        <Hero onStart={handleStart} />
-        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} />
+        <Hero onStart={handleStart} isDiagnosing={isDiagnosing} />
+        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} isDiagnosing={isDiagnosing} />
       </>
     );
   }

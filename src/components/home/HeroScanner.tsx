@@ -23,13 +23,46 @@ export interface AnalysisResult {
     matchScore: number;
 }
 
-export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
+export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult) => void, isDiagnosing?: boolean }) {
     const { journey, setJourney, medicalCategory, setMedicalCategory, treatmentType, setTreatmentType } = useRecovery();
     const [selectionStep, setSelectionStep] = useState<'JOURNEY' | 'CATEGORY' | 'STAGE' | 'TYPE' | 'READY'>('JOURNEY');
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'idle' | 'scanning' | 'result'>('idle');
     const [loading, setLoading] = useState(false);
-    const { progress, statusMessage, finish: finishProgress } = useAIProgress(loading);
+    
+    const [progress, setProgress] = useState(0);
+    const [loadingText, setLoadingText] = useState('60초 정밀 진단 시작하기');
+
+    // Sync with AI progress
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isDiagnosing) {
+            setProgress(0);
+            const startTime = Date.now();
+            interval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                let newProgress = 0;
+                if (elapsed < 10000) newProgress = (elapsed / 10000) * 80;
+                else if (elapsed < 30000) newProgress = 80 + ((elapsed - 10000) / 20000) * 18;
+                else newProgress = 98;
+                
+                setProgress(newProgress);
+                if (newProgress < 30) setLoadingText('AI가 상태를 분석 중입니다...');
+                else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
+                else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
+                else setLoadingText('거의 다 되었습니다. 마지막 정리 중...');
+            }, 100);
+        } else {
+            if (progress > 0) {
+                setProgress(100);
+                setTimeout(() => setProgress(0), 500);
+            }
+            setLoadingText('60초 정밀 진단 시작하기');
+        }
+        return () => clearInterval(interval);
+    }, [isDiagnosing]);
+
+    const { progress: scanProgress, statusMessage, finish: finishProgress } = useAIProgress(loading);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [showUpsell, setShowUpsell] = useState(false);
@@ -520,13 +553,34 @@ export default function HeroScanner({ onStart }: { onStart: (data?: AnalysisResu
                             {(selectionStep === 'READY' || canStartDiagnosis) && (
                                 <Button 
                                     onClick={() => onStart(result || undefined)}
+                                    disabled={isDiagnosing}
                                     size="lg" 
                                     className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20`}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                    <Sparkles className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
-                                    60초 정밀 진단 시작하기
-                                    <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                    {/* Progress Bar Background */}
+                                    {isDiagnosing && (
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progress}%` }}
+                                            className="absolute inset-0 bg-white/20 z-0"
+                                        />
+                                    )}
+
+                                    <div className="relative z-10 flex items-center justify-center">
+                                        <Sparkles className={`w-6 h-6 mr-3 ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'} transition-transform`} />
+                                        <AnimatePresence mode="wait">
+                                            <motion.span
+                                                key={loadingText}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                {loadingText}
+                                            </motion.span>
+                                        </AnimatePresence>
+                                        {!isDiagnosing && <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />}
+                                    </div>
                                 </Button>
                             )}
                             

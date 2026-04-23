@@ -82,6 +82,7 @@ export default function LandingContent({ onStart, onStartTherapy }: LandingConte
               <div className="mt-10 pt-6 border-t border-line/50">
                 <Button 
                   variant="ghost" 
+                  disabled={isDiagnosing && util.action === "진단 시작"}
                   onClick={() => {
                     if (util.onClick) {
                         util.onClick();
@@ -96,7 +97,11 @@ export default function LandingContent({ onStart, onStartTherapy }: LandingConte
                   }}
                   className="p-0 h-auto text-chapter-accent font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-transparent group-hover:translate-x-1 transition-transform"
                 >
-                  {util.action} <ArrowRight className="w-4 h-4" />
+                  {isDiagnosing && util.action === "진단 시작" ? (
+                    <>분석 중 <RefreshCw className="w-4 h-4 animate-spin" /></>
+                  ) : (
+                    <>{util.action} <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </Button>
               </div>
             </motion.div>

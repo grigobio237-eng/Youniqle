@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
 
 
-export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => void }) {
+export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult) => void, isDiagnosing?: boolean }) {
   const { journey, resetJourney } = useRecovery();
   const { data: session } = useSession();
   const { trackEvent } = useActivityTracker();
@@ -21,6 +21,52 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
     desc: "식단, 사운드, 시각 데이터를 통합한 유니클만의 맞춤형 회복 큐레이션",
     nudge: "지금 먹는 음식, 회복에 도움이 될까요? 사진으로 바로 확인!"
   });
+
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState('60초 정밀 진단 시작');
+
+  // Advanced Progress animation logic
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isDiagnosing) {
+      setProgress(0);
+      const startTime = Date.now();
+
+      interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        
+        let newProgress = 0;
+        if (elapsed < 10000) {
+          // Phase 1: 0 to 80% in 10 seconds
+          newProgress = (elapsed / 10000) * 80;
+        } else if (elapsed < 30000) {
+          // Phase 2: 80 to 98% in next 20 seconds (Very slow)
+          newProgress = 80 + ((elapsed - 10000) / 20000) * 18;
+        } else {
+          // Phase 3: Hold at 98%
+          newProgress = 98;
+        }
+        
+        setProgress(newProgress);
+        
+        // Dynamic text based on progress
+        if (newProgress < 30) setLoadingText('AI가 상태를 분석 중입니다...');
+        else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
+        else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
+        else setLoadingText('거의 다 되었습니다. 마지막 정리 중입니다...');
+
+      }, 100);
+    } else {
+      if (progress > 0) {
+        setProgress(100);
+        setTimeout(() => setProgress(0), 500);
+      }
+      setLoadingText('60초 정밀 진단 시작');
+    }
+
+    return () => clearInterval(interval);
+  }, [isDiagnosing]);
 
   useEffect(() => {
     const fetchPersonalization = async () => {
@@ -122,10 +168,36 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
               
               <div className="pt-4 space-y-6">
                 <div className="flex flex-wrap gap-4">
-                  <Button onClick={onStart} size="lg" className="btn-primary h-12 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group">
-                    <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                    60초 정밀 진단 시작
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <Button 
+                    onClick={() => onStart()} 
+                    disabled={isDiagnosing}
+                    size="lg" 
+                    className="btn-primary h-12 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300"
+                  >
+                    {/* Progress Bar Background */}
+                    {isDiagnosing && (
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        className="absolute inset-0 bg-white/20 z-0"
+                      />
+                    )}
+                    
+                    <div className="relative z-10 flex items-center">
+                      <Sparkles className={`w-5 h-5 mr-2 transition-transform ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'}`} />
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={loadingText}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {loadingText}
+                        </motion.span>
+                      </AnimatePresence>
+                      {!isDiagnosing && <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                    </div>
                   </Button>
                 </div>
                 <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">
@@ -148,7 +220,7 @@ export default function Hero({ onStart }: { onStart: (data?: AnalysisResult) => 
             <div className="relative w-full">
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-chapter-accent/5 rounded-full blur-2xl animate-pulse" />
               <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-reward-gold/5 rounded-full blur-3xl animate-pulse delay-1000" />
-              <HeroScanner onStart={onStart} />
+              <HeroScanner onStart={onStart} isDiagnosing={isDiagnosing} />
             </div>
             
             {/* Contextual Nudge Bubble */}
