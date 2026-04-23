@@ -183,11 +183,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                <Users className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold flex items-center gap-2">
+              <div className="text-2xl font-bold flex items-center gap-2">
                 {user.name}
                 {user.role === 'admin' && <Badge variant="default">관리자</Badge>}
                 {user.role === 'superadmin' && <Badge className="bg-red-600 text-white">최고 관리자</Badge>}
-              </h2>
+              </div>
               <p className="text-gray-500">{user.email}</p>
             </div>
           </div>
@@ -270,11 +270,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
             </CardHeader>
             <CardContent className="p-5 space-y-4">
               <div className="space-y-3">
-                <p className="text-xs font-bold text-gray-500">현재 보유 패스: 
+                <div className="text-xs font-bold text-gray-500">현재 보유 패스: 
                   <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-700">
                     {user.passInfo?.type || 'NONE'}
                   </Badge>
-                </p>
+                </div>
                 <div className="grid grid-cols-1 gap-2">
                   <Button 
                     variant={user.passInfo?.type === 'START' ? 'default' : 'outline'} 
@@ -362,10 +362,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                       user.addresses.map((addr: any, idx: number) => (
                         <div key={idx} className="bg-white border rounded-lg p-3 text-sm flex justify-between items-center">
                            <div>
-                             <p className="font-bold flex items-center gap-2">
+                             <div className="font-bold flex items-center gap-2">
                                {addr.label}
                                {addr.isDefault && <Badge variant="secondary" className="text-[10px]">기본</Badge>}
-                             </p>
+                             </div>
                              <p className="text-gray-600 mt-1">{addr.recipient} ({addr.phone})</p>
                              <p className="text-gray-500 text-xs mt-0.5">[{addr.zip}] {addr.addr1} {addr.addr2}</p>
                            </div>

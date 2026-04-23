@@ -30,7 +30,9 @@ import {
   TrendingUp,
   Zap,
   Sparkles,
-  XCircle
+  XCircle,
+  Brain,
+  Activity
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -59,6 +61,14 @@ interface User {
   lastLoginAt?: string;
   totalOrders: number;
   totalSpent: number;
+  recoveryStats?: {
+    lastScore: number;
+    lastDiagnosisDate?: string;
+    diagnosisCount: number;
+    latestActivityType: string;
+    lastActivityDate?: string;
+    scannerCount: number;
+  };
   passInfo?: {
     type: 'NONE' | 'START' | 'SIGNATURE' | 'BLACK';
     status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
@@ -477,16 +487,44 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3 mt-2 text-[11px] md:text-sm border-t pt-2 sm:border-0 sm:pt-0">
-                        <span className="text-primary font-bold">
-                          {user.points.toLocaleString()}P
-                        </span>
-                        <span className="text-text-secondary">
-                          주문 {user.totalOrders}회
-                        </span>
-                        <span className="text-text-secondary font-medium">
-                          ₩{user.totalSpent.toLocaleString()}
-                        </span>
+                      <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 md:gap-4 mt-3 pt-3 border-t border-gray-50">
+                        {/* Recovery Score Badge */}
+                        <div className="flex items-center gap-2">
+                          <div className={`px-2 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 ${
+                            (user.recoveryStats?.lastScore || 0) >= 80 ? 'bg-green-100 text-green-700' :
+                            (user.recoveryStats?.lastScore || 0) >= 50 ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            <Brain className="w-3.5 h-3.5" />
+                            <span>{user.recoveryStats?.lastScore || 0}점</span>
+                          </div>
+                          <span className="text-[10px] text-text-secondary font-medium">최근 진단</span>
+                        </div>
+
+                        {/* Recent Activity Badge */}
+                        <div className="flex items-center gap-2">
+                          <div className="px-2 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs flex items-center gap-1.5">
+                            <Activity className="w-3.5 h-3.5" />
+                            <span>{user.recoveryStats?.latestActivityType || '없음'}</span>
+                          </div>
+                          <span className="text-[10px] text-text-secondary font-medium">최근 활동</span>
+                        </div>
+
+                        {/* Order & Spend Info (Compact) */}
+                        <div className="flex items-center gap-4 text-[11px] md:text-xs">
+                          <div className="flex flex-col">
+                            <span className="text-text-secondary text-[9px] uppercase font-bold">보유 포인트</span>
+                            <span className="text-primary font-black">{user.points.toLocaleString()}P</span>
+                          </div>
+                          <div className="flex flex-col border-l pl-4">
+                            <span className="text-text-secondary text-[9px] uppercase font-bold">누적 결제</span>
+                            <span className="text-text-primary font-black">₩{user.totalSpent.toLocaleString()}</span>
+                          </div>
+                          <div className="flex flex-col border-l pl-4">
+                            <span className="text-text-secondary text-[9px] uppercase font-bold">이용 횟수</span>
+                            <span className="text-text-primary font-black">진단 {user.recoveryStats?.diagnosisCount || 0} / 스캔 {user.recoveryStats?.scannerCount || 0}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

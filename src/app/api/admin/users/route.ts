@@ -76,12 +76,22 @@ async function getUsersHandler(request: NextRequest) {
       .sort(sortCondition)
       .limit(100);
 
-    // 각 사용자의 주문 통계 조회
+    // 각 사용자의 주문 통계 및 활동 데이터 조회
     const usersWithStats = await Promise.all(
       users.map(async (user) => {
         const orders = await Order.find({ userId: user._id });
         const totalOrders = orders.length;
         const totalSpent = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        // 최신 진단 결과 추출
+        const latestDiagnosis = user.diagnosisResults?.length > 0 
+          ? user.diagnosisResults[user.diagnosisResults.length - 1] 
+          : null;
+
+        // 최근 활동 유형 추출
+        const latestActivity = user.scanTimeline?.length > 0
+          ? user.scanTimeline[user.scanTimeline.length - 1]
+          : null;
 
         return {
           id: user._id.toString(),
@@ -96,13 +106,19 @@ async function getUsersHandler(request: NextRequest) {
           provider: user.provider,
           emailVerified: user.emailVerified,
           marketingConsent: user.marketingConsent,
-          addresses: user.addresses,
-          wishlist: user.wishlist,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          lastLoginAt: user.updatedAt, // 실제로는 별도 필드 필요
+          lastLoginAt: user.updatedAt,
           totalOrders,
-          totalSpent
+          totalSpent, // 누적 결제 금액
+          recoveryStats: {
+            lastScore: latestDiagnosis?.totalScore || 0,
+            lastDiagnosisDate: latestDiagnosis?.createdAt || null,
+            diagnosisCount: user.diagnosisResults?.length || 0,
+            latestActivityType: latestActivity?.type || '없음',
+            lastActivityDate: latestActivity?.createdAt || null,
+            scannerCount: user.scanTimeline?.length || 0
+          }
         };
       })
     );
