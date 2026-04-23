@@ -13,7 +13,7 @@ interface LandingContentProps {
   onStartTherapy?: () => void;
 }
 
-export default function LandingContent({ onStart, onStartTherapy }: LandingContentProps) {
+export default function LandingContent({ onStart, onStartTherapy, isDiagnosing = false }: LandingContentProps) {
   const router = useRouter();
   
   const utilities = [
