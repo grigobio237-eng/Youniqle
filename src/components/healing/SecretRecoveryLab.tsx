@@ -112,7 +112,7 @@ export default function SecretRecoveryLab() {
                         <Badge className="bg-[#D4AF37] text-black border-none px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                             Limited Access
                         </Badge>
-                        <h1 className="text-4xl md:text-8xl font-black text-[#0B0D10] tracking-tighter leading-[1.1] md:leading-none italic">
+                        <h1 className="px-4 text-[2.2rem] md:text-8xl font-black text-[#0B0D10] tracking-tight leading-[1.1] md:leading-none italic break-words">
                             Secret <br className="sm:hidden" /> <span className="text-[#D4AF37] tracking-normal">Recovery</span> Lab
                         </h1>
                         <p className="text-xl text-[#0B0D10]/60 font-medium max-w-2xl mx-auto">
@@ -132,12 +132,12 @@ export default function SecretRecoveryLab() {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: i * 0.1 }}
-                                className="bg-white p-4 md:p-8 rounded-[24px] md:rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-[#0B0D10]/5 flex flex-col items-center gap-2 md:gap-4"
+                                className="bg-white p-5 md:p-8 rounded-[24px] md:rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-[#0B0D10]/5 flex flex-col items-center gap-3 md:gap-4"
                             >
-                                <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl ${stat.color}`}>{stat.icon}</div>
+                                <div className={`p-2.5 md:p-4 rounded-xl md:rounded-2xl ${stat.color}`}>{stat.icon}</div>
                                 <div className="text-center">
                                     <p className="text-[8px] md:text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-widest mb-1">{stat.label}</p>
-                                    <p className="text-xl md:text-3xl font-black text-[#0B0D10]">{stat.value}</p>
+                                    <p className="text-lg md:text-3xl font-black text-[#0B0D10]">{stat.value}</p>
                                 </div>
                             </motion.div>
                         ))}

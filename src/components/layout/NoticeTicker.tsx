@@ -59,7 +59,7 @@ export default function NoticeTicker() {
         animate={{ height: 'auto', opacity: 1 }}
         className="relative w-full bg-background/80 backdrop-blur-md border-b border-line/50 text-text-secondary overflow-hidden z-[49]"
       >
-        <div className="container mx-auto flex items-center h-8 md:h-10 px-4">
+        <div className="flex items-center h-8 md:h-10 px-2 md:px-4">
           {/* Ticker Container */}
           <div className="relative flex-1 overflow-hidden h-full flex items-center group">
             <div className="flex whitespace-nowrap animate-marquee group-hover:[animation-play-state:paused]">
@@ -68,15 +68,15 @@ export default function NoticeTicker() {
                 <button
                   key={`${notice._id}-${idx}`}
                   onClick={() => setSelectedNotice(notice)}
-                  className="inline-flex items-center gap-2 mx-12 text-[11px] md:text-xs font-semibold hover:text-primary transition-colors cursor-pointer tracking-tight"
+                  className="inline-flex items-center gap-1.5 mx-4 md:mx-12 text-[10px] md:text-xs font-bold hover:text-primary transition-colors cursor-pointer tracking-tighter"
                 >
                   {notice.isImportant && (
-                    <AlertCircle className="w-3 h-3 text-rose-500 fill-rose-500/10 flex-shrink-0" />
+                    <AlertCircle className="w-2.5 h-2.5 text-rose-500 fill-rose-500/10 flex-shrink-0" />
                   )}
-                  <span className={notice.isImportant ? "text-text-primary font-bold" : "text-text-secondary/80"}>
+                  <span className={notice.isImportant ? "text-text-primary font-black" : "text-text-secondary/90"}>
                     {notice.title}
                   </span>
-                  <ChevronRight className="w-3 h-3 opacity-20 group-hover:opacity-100" />
+                  <ChevronRight className="w-2.5 h-2.5 opacity-20 group-hover:opacity-100 shrink-0" />
                 </button>
               ))}
             </div>

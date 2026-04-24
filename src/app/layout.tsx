@@ -100,7 +100,7 @@ export default function RootLayout({
               <ToastProvider>
                 <RecoveryProvider>
                   <ConditionalHeader />
-                  <main className="flex-1 pt-16">
+                  <main className="flex-1 pt-24 md:pt-32">
                     {children}
                   </main>
                   <Footer />
