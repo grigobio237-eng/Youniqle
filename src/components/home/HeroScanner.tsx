@@ -47,7 +47,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 else newProgress = 98;
                 
                 setProgress(newProgress);
-                if (newProgress < 30) setLoadingText('AI가 상태를 분석 중입니다...');
+                if (newProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
                 else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
                 else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
                 else setLoadingText('거의 다 되었습니다. 마지막 정리 중...');

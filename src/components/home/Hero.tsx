@@ -15,7 +15,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
   const { journey, resetJourney } = useRecovery();
   const { data: session } = useSession();
   const { trackEvent } = useActivityTracker();
-  
+
   const [personalMsg, setPersonalMsg] = useState({
     title: <>당신이 머무는 공간,<br />보는 것과 듣는 것,<br />그리고 먹는 모든 것이<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 조각</span>입니다.</>,
     desc: "식단, 사운드, 시각 데이터를 통합한 유니클만의 맞춤형 회복 큐레이션",
@@ -35,7 +35,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
       interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
-        
+
         let newProgress = 0;
         if (elapsed < 10000) {
           // Phase 1: 0 to 80% in 10 seconds
@@ -47,11 +47,11 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           // Phase 3: Hold at 98%
           newProgress = 98;
         }
-        
+
         setProgress(newProgress);
-        
+
         // Dynamic text based on progress
-        if (newProgress < 30) setLoadingText('AI가 상태를 분석 중입니다...');
+        if (newProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
         else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
         else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
         else setLoadingText('거의 다 되었습니다. 마지막 정리 중입니다...');
@@ -71,7 +71,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
   useEffect(() => {
     const fetchPersonalization = async () => {
       const defaultCategory = 'physical'; // Default: 신체적 활력
-      
+
       // 1. Check Session first
       if (session?.user) {
         const userName = session.user.name || '회원';
@@ -80,11 +80,11 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           if (res.ok) {
             const data = await res.json();
             const { score } = data;
-            
+
             if (score && score.categories) {
               const categories = Object.entries(score.categories) as [string, number][];
               const weakest = categories.reduce((prev, curr) => prev[1] < curr[1] ? prev : curr);
-              
+
               // If there's a specific weakness, show it
               if (weakest[1] < 90) {
                 updateMessage(userName, weakest[0]);
@@ -95,7 +95,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
         } catch (e) {
           console.error("Personalization failed", e);
         }
-        
+
         // Logged in but no specific low score or fetch failed - use general greeting
         updateMessage(userName, defaultCategory);
         return;
@@ -120,16 +120,16 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
         sleep: '숙면 에너지',
         lifestyle: '생활 리듬'
       };
-      
+
       const weakName = categoryMap[categoryId] || categoryId;
-      
+
       setPersonalMsg({
         title: <>{name}님, 오늘 가장 필요한 건<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">{weakName}</span>의 회복입니다.</>,
         desc: `${name}님의 최근 분석 데이터에 따르면, 현재 ${weakName} 케어가 우선적으로 권장됩니다.`,
         nudge: `${weakName} 점수가 낮아요. 맞춤 솔루션을 확인해보세요!`
       });
     };
-    
+
     fetchPersonalization();
     trackEvent('view', { itemType: 'category', itemData: { name: 'HomeHero' } });
   }, [session, trackEvent, session?.user?.name]);
@@ -145,7 +145,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
+
           {/* Left: Brand & Diagnosis */}
           <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-2 lg:order-1">
             <div className="space-y-6">
@@ -165,24 +165,24 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 {personalMsg.desc}
               </p>
 
-              
+
               <div className="pt-4 space-y-6">
                 <div className="flex flex-wrap gap-4">
-                  <Button 
-                    onClick={() => onStart()} 
+                  <Button
+                    onClick={() => onStart()}
                     disabled={isDiagnosing}
-                    size="lg" 
+                    size="lg"
                     className="btn-primary h-12 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300"
                   >
                     {/* Progress Bar Background */}
                     {isDiagnosing && (
-                      <motion.div 
+                      <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         className="absolute inset-0 bg-white/20 z-0"
                       />
                     )}
-                    
+
                     <div className="relative z-10 flex items-center">
                       <Sparkles className={`w-5 h-5 mr-2 transition-transform ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'}`} />
                       <AnimatePresence mode="wait">
@@ -222,7 +222,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
               <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-reward-gold/5 rounded-full blur-3xl animate-pulse delay-1000" />
               <HeroScanner onStart={onStart} isDiagnosing={isDiagnosing} />
             </div>
-            
+
             {/* Contextual Nudge Bubble */}
             <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line animate-bounce max-w-[180px] hidden md:block">
               <div className="flex items-center gap-3 mb-2">

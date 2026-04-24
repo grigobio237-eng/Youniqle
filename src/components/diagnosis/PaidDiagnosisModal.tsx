@@ -222,7 +222,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                     {[
                         { title: 'Big 5 Standard', desc: '과학적 표준 모델', color: 'bg-indigo-50/50 hover:bg-indigo-100/50' },
                         { title: 'Hyper Detail', desc: '30개 정밀 국면', color: 'bg-purple-50/50 hover:bg-purple-100/50' },
-                        { title: 'AI Solution', desc: '맞춤형 성장 전략', color: 'bg-emerald-50/50 hover:bg-emerald-100/50' }
+                        { title: 'Youniqle Solution', desc: '맞춤형 성장 전략', color: 'bg-emerald-50/50 hover:bg-emerald-100/50' }
                     ].map((item, i) => (
                         <div key={i} className={`${item.color} border border-white/50 rounded-2xl p-5 text-left transition-all backdrop-blur-md group hover:shadow-md`}>
                             <div className="text-obsidian text-base font-bold mb-1 group-hover:translate-x-1 transition-transform">{item.title}</div>

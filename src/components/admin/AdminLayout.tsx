@@ -144,10 +144,10 @@ const navigationItems = [
         description: '관리자 직접 상품 등록'
       },
       {
-        name: 'AI 상세페이지 빌더',
+        name: '유니클 상세페이지 빌더',
         href: '/admin/ai-builder',
         icon: Sparkles,
-        description: 'AI싱크클럽 전용 AI 빌더'
+        description: '유니클 싱크클럽 전용 빌더'
       }
     ]
   },
@@ -237,7 +237,7 @@ const navigationItems = [
     name: '자동 영상 만들기',
     href: '/admin/auto-video',
     icon: Sparkles,
-    description: 'AI 기반 유튜브 영상 자동 생성'
+    description: '유니클 기반 유튜브 영상 자동 생성'
   },
   {
     name: '분석',

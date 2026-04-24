@@ -46,9 +46,9 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
         productName: isMedical ? '서비스/진료명' : '상품명',
         namePlaceholder: isMedical ? '서비스명 입력' : '제품명 입력',
         featuresLabel: isMedical ? '핵심 특징 및 효과' : '핵심 특징 및 USP',
-        featuresPlaceholder: isMedical ? '서비스의 핵심 특징을 입력하거나 AI 추천을 받아보세요.' : '상품의 핵심 특징을 입력하거나 AI 추천을 받아보세요.',
+        featuresPlaceholder: isMedical ? '서비스의 핵심 특징을 입력하거나 유니클 추천을 받아보세요.' : '상품의 핵심 특징을 입력하거나 유니클 추천을 받아보세요.',
         fundingLabel: isMedical ? '특별 프로젝트(펀딩)로 등록' : '펀딩 프로젝트로 등록',
-        generateBtn: isMedical ? 'AI 썸네일 생성' : 'AI 썸네일 생성',
+        generateBtn: isMedical ? '유니클 썸네일 생성' : '유니클 썸네일 생성',
         nameError: isMedical ? '서비스명을 입력해 주세요.' : '상품명을 입력해 주세요.',
         suggestError: isMedical ? '서비스명을 먼저 입력해주세요.' : '상품명을 먼저 입력해주세요.',
     };
@@ -84,7 +84,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
             const data = await res.json();
             if (data.success) {
                 setOptions(prev => ({ ...prev, keywords: data.suggestion }));
-                toast.success('AI가 새로운 특징을 추천했습니다!');
+                toast.success('유니클이 새로운 특징을 추천했습니다!');
             }
         } catch (error) {
             toast.error('특징 추천 중 오류가 발생했습니다.');
@@ -201,7 +201,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                         disabled={suggestingFeatures}
                                     >
                                         {suggestingFeatures ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                                        AI 추천
+                                        유니클 추천
                                     </Button>
                                 </div>
                                 <Textarea
@@ -333,7 +333,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
             <footer className="text-center py-10 space-y-4">
                 <div className="h-px bg-slate-200 w-32 mx-auto" />
                 <div className="space-y-2">
-                    <p className="text-sm text-slate-500 font-medium italic">이 앱은 AI싱크클럽의 지침으로 만들어졌습니다.</p>
+                    <p className="text-sm text-slate-500 font-medium italic">이 앱은 유니클 싱크클럽의 지침으로 만들어졌습니다.</p>
                 </div>
             </footer>
         </div>

@@ -14,6 +14,7 @@ export interface Scene {
 export interface ScriptOutput {
     title: string;
     mainCharacter?: string; // 캐릭터 묘사 추가
+    recommendedVoice?: string; // 추천 목소리 추가
     scenes: Scene[];
 }
 
@@ -43,7 +44,7 @@ export class ScriptingNode {
             const resultText = await GeminiAIEngine.generateWithFallback(prompt);
             const output = strategy.parseResponse(resultText);
 
-            // Fail-safe: AI가 실수로 [상품명] 플레이스홀더를 남겼을 경우 실제 상품명으로 치환
+            // Fail-safe: 유니클 엔진이 실수로 [상품명] 플레이스홀더를 남겼을 경우 실제 상품명으로 치환
             const finalProductName = productName || "우리 상품";
             const processedScenes = (output.scenes || []).map((s: any, idx: number) => {
                 let script = s.audioScript || "내레이션 없음";

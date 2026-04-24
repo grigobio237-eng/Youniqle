@@ -121,10 +121,10 @@ const navigationItems = [
     description: '상세 매출 분석'
   },
   {
-    name: 'AI 상세페이지 빌더',
+    name: '유니클 상세페이지 빌더',
     href: '/partner/ai-builder',
     icon: Sparkles,
-    description: 'AI싱크클럽 전용 AI 빌더'
+    description: '유니클 싱크클럽 전용 빌더'
   },
   {
     name: '설정',
@@ -321,7 +321,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
           return { ...item, name: '상담/서비스 관리', description: '내 상담 및 진료 서비스 관리' };
         }
         if (item.href === '/partner/ai-builder') {
-          return { ...item, name: 'AI 서비스 빌더', description: 'AI로 서비스 상세페이지 만들기' };
+          return { ...item, name: '유니클 서비스 빌더', description: '유니클로 서비스 상세페이지 만들기' };
         }
         return item;
       });

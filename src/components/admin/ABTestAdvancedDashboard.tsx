@@ -284,7 +284,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
         <CardHeader>
           <CardTitle className="flex items-center">
             <Lightbulb className="h-5 w-5 mr-2" />
-            AI 추천사항
+            유니클 추천사항
           </CardTitle>
         </CardHeader>
         <CardContent>

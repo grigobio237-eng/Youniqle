@@ -80,18 +80,34 @@ export async function POST(req: Request) {
 
     await newConsultation.save();
 
-    // 네비게이터에게 알림 발송 (이메일 및 인앱)
-    const navigator = await User.findOne({ referralCode: navigatorCode });
-    if (navigator) {
-      await NotificationService.sendNotification({
-        userId: navigator._id.toString(),
-        type: 'admin',
-        category: 'urgent',
-        title: '🚩 새로운 상담 요청이 접수되었습니다',
-        message: `${user.name}고객님으로부터 신규 상담 티켓(${ticketId})이 도착했습니다.`,
-        data: { ticketId, type: 'navigator_consultation' },
-        source: 'System'
-      });
+    // 네비게이터 또는 관리자에게 알림 발송
+    if (navigatorCode === 'ADMIN') {
+      // 모든 관리자에게 알림 (본사 직접 관리 티켓)
+      const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } });
+      for (const admin of admins) {
+        await NotificationService.sendNotification({
+          userId: admin._id.toString(),
+          type: 'admin',
+          category: 'urgent',
+          title: '🚨 [본사직접] 신규 상담 요청 접수',
+          message: `담당 네비게이터가 없는 유저(${user.name})의 상담 티켓(${ticketId})이 접수되었습니다.`,
+          data: { ticketId, type: 'navigator_consultation' },
+          source: 'System'
+        });
+      }
+    } else {
+      const navigator = await User.findOne({ referralCode: navigatorCode });
+      if (navigator) {
+        await NotificationService.sendNotification({
+          userId: navigator._id.toString(),
+          type: 'admin',
+          category: 'urgent',
+          title: '🚩 새로운 상담 요청이 접수되었습니다',
+          message: `${user.name}고객님으로부터 신규 상담 티켓(${ticketId})이 도착했습니다.`,
+          data: { ticketId, type: 'navigator_consultation' },
+          source: 'System'
+        });
+      }
     }
 
     return NextResponse.json({ success: true, ticketId });

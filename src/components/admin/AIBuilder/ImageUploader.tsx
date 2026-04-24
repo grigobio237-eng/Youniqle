@@ -54,7 +54,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ label, onImageSelected, p
                             </div>
                         )}
                         <p className="text-sm text-slate-500 font-medium">
-                            {isRemovingBackground ? 'AI가 제품 배경을 제거하는 중입니다' : '클릭하거나 파일을 드래그하세요'}
+                            {isRemovingBackground ? '유니클이 제품 배경을 제거하는 중입니다' : '클릭하거나 파일을 드래그하세요'}
                         </p>
                         <p className="text-xs text-slate-400 mt-1">PNG, JPG (최대 5MB)</p>
                     </div>

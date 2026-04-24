@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Target, 
-  Users, 
-  MousePointer, 
+import {
+  BarChart3,
+  TrendingUp,
+  Target,
+  Users,
+  MousePointer,
   ShoppingCart,
   RefreshCw,
   Play,
@@ -84,7 +84,7 @@ export default function RecommendationDashboard() {
   const fetchRecommendationData = async () => {
     try {
       setLoading(true);
-      
+
       const [statsRes, abTestsRes] = await Promise.all([
         fetch('/api/recommendations/advanced'),
         fetch('/api/recommendations/ab-test')
@@ -116,7 +116,7 @@ export default function RecommendationDashboard() {
       });
 
       if (response.ok) {
-        setABTests(abTests.map(test => 
+        setABTests(abTests.map(test =>
           test.id === testId ? { ...test, status: action === 'start' ? 'running' : 'paused' } : test
         ));
       }
@@ -376,11 +376,11 @@ export default function RecommendationDashboard() {
                       <div className="flex items-center space-x-2">
                         <h4 className="font-medium">{test.name}</h4>
                         <Badge variant={
-                          test.status === 'running' ? 'default' : 
-                          test.status === 'completed' ? 'secondary' : 'outline'
+                          test.status === 'running' ? 'default' :
+                            test.status === 'completed' ? 'secondary' : 'outline'
                         }>
                           {test.status === 'running' ? '실행 중' :
-                           test.status === 'completed' ? '완료' : '일시정지'}
+                            test.status === 'completed' ? '완료' : '일시정지'}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">{test.description}</p>
@@ -413,7 +413,7 @@ export default function RecommendationDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>추천 인사이트</CardTitle>
-              <CardDescription>AI가 분석한 추천 시스템 인사이트</CardDescription>
+              <CardDescription>유니클이 분석한 추천 시스템 인사이트</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

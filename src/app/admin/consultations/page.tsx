@@ -207,9 +207,15 @@ export default function AdminConsultationsPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="font-bold text-indigo-600 bg-indigo-50 border-indigo-100 italic">
-                              {item.navigatorId}
-                            </Badge>
+                            {item.navigatorId === 'ADMIN' ? (
+                              <Badge className="font-black text-rose-600 bg-rose-50 border-rose-200 animate-pulse">
+                                본사 직접 관리
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="font-bold text-indigo-600 bg-indigo-50 border-indigo-100 italic">
+                                {item.navigatorId}
+                              </Badge>
+                            )}
                           </TableCell>
                           <TableCell className="max-w-[200px]">
                             <p className="text-sm text-slate-600 line-clamp-1 italic">"{item.question}"</p>
@@ -227,15 +233,17 @@ export default function AdminConsultationsPage() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right space-x-2">
-                             <Button 
-                               variant="ghost" 
-                               size="sm" 
-                               onClick={() => handleNudge(item._id)}
-                               className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                               title="네비게이터 독촉"
-                             >
-                               <BellRing className="w-4 h-4" />
-                             </Button>
+                             {item.navigatorId !== 'ADMIN' && item.status === 'pending' && (
+                               <Button 
+                                 variant="ghost" 
+                                 size="sm" 
+                                 onClick={() => handleNudge(item._id)}
+                                 className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                 title="네비게이터 독촉"
+                               >
+                                 <BellRing className="w-4 h-4" />
+                               </Button>
+                             )}
                              <Button 
                                variant="ghost" 
                                size="sm" 

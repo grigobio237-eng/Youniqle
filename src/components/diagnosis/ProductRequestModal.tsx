@@ -64,7 +64,7 @@ export function ProductRequestModal({ open, onOpenChange, productConcept }: Prod
                             <DialogHeader className="mb-6">
                                 <DialogTitle className="text-xl font-bold text-gray-900">상품 제작 의뢰하기</DialogTitle>
                                 <DialogDescription className="text-gray-500">
-                                    AI가 제안한 <span className="text-gray-800 font-bold">"{productConcept.name}"</span>을(를)<br />
+                                    유니클이 제안한 <span className="text-gray-800 font-bold">"{productConcept.name}"</span>을(를)<br />
                                     실제 제품으로 만나보고 싶으신가요?
                                 </DialogDescription>
                             </DialogHeader>

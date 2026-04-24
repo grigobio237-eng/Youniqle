@@ -121,7 +121,7 @@ export default function StepScript({ project, onUpdate, onNext }: { project: any
                                                 onChange={(e) => handleSceneChange(index, 'visualPrompt', e.target.value)}
                                                 className="min-h-[80px]"
                                             />
-                                            <p className="text-xs text-muted-foreground">AI가 이 설명을 보고 이미지를 그립니다. 구체적일수록 좋습니다.</p>
+                                            <p className="text-xs text-muted-foreground">유니클이 이 설명을 보고 이미지를 그립니다. 구체적일수록 좋습니다.</p>
                                         </div>
 
                                         <div className="space-y-2">

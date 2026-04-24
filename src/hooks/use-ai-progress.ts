@@ -10,7 +10,7 @@ export function useAIProgress(active: boolean, initialProgress = 5) {
   const [statusMessage, setStatusMessage] = useState('초기화 중...');
 
   const messages = [
-    'Gemini AI 엔진 연결 중...',
+    '유니클 엔진 연결 중...',
     '이미지 특징 데이터 추출 중...',
     '회복 패턴 데이터베이스 분석 중...',
     '개인 맞춤형 결과 조합 중...',

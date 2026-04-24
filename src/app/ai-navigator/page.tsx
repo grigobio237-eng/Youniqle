@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
+import QuickInquirySection from '@/components/diagnosis/QuickInquirySection';
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
@@ -636,6 +637,7 @@ export default function AiNavigatorPage() {
                                         </Link>
                                     </Button>
                                 )}
+                                <QuickInquirySection reportId="AI_NAVIGATOR_DASHBOARD" />
                             </div>
                         </div>
                     </div>

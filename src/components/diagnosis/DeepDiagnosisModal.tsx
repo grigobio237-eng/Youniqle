@@ -132,7 +132,7 @@ function DeepIntroView({ onStart, onClose }: { onStart: () => void, onClose: () 
                     <h2 className="text-4xl font-black mb-4 tracking-tight">IPIP-NEO-60 심층 진단</h2>
                     <p className="text-white/60 leading-relaxed max-w-sm mx-auto">
                         단순 성향 파악을 넘어, 30가지 세부 심리 국면과<br />
-                        요인 간 상호작용을 AI 알고리즘으로 분석합니다.
+                        요인 간 상호작용을 유니클 알고리즘으로 분석합니다.
                     </p>
                 </div>
 

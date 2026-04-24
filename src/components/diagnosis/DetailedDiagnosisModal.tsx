@@ -204,7 +204,7 @@ function IntroView({ onStart, onClose, userName }: { onStart: () => void, onClos
                 <div className="flex gap-4 text-xs font-bold text-text-secondary uppercase tracking-widest">
                     <span>• 24 문항</span>
                     <span>• 약 3분 소요</span>
-                    <span>• AI 정밀 분석</span>
+                    <span>• 유니클 정밀 분석</span>
                 </div>
             </div>
             <div className="p-8 bg-white border-t border-line">
@@ -285,7 +285,7 @@ function AnalyzingView({ userName }: { userName: string }) {
                 </div>
             </div>
             <h2 className="text-2xl font-black mb-2">분석 중입니다...</h2>
-            <p className="text-white/60">{userName} 님의 응답 패턴을 AI 모델과 대조하여<br />심층 리포트를 생성하고 있습니다.</p>
+            <p className="text-white/60">{userName} 님의 응답 패턴을 유니클 모델과 대조하여<br />심층 리포트를 생성하고 있습니다.</p>
         </motion.div>
     );
 }
@@ -348,7 +348,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                         className="bg-primary/5 border border-primary/20 rounded-2xl p-5 relative"
                     >
                         <div className="absolute -top-3 left-4 bg-white px-2 py-0.5 rounded-full border border-primary/20 text-[10px] font-bold text-primary uppercase flex items-center gap-1 shadow-sm">
-                            <span className="text-sm">🤖</span> AI Coach Whisper
+                            <span className="text-sm">🤖</span> Youniqle Coach Whisper
                         </div>
                         <p className="text-sm font-medium text-obsidian leading-relaxed mt-2">
                             &quot;{userName} 님, 전반적으로 훌륭하시지만 <span className="text-primary font-black underline decoration-2 underline-offset-2">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
@@ -412,7 +412,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                 open={paymentOpen}
                 onOpenChange={setPaymentOpen}
                 price={3900}
-                productName="심층 심리 분석 리포트 + AI 솔루션"
+                productName="심층 심리 분석 리포트 + 유니클 솔루션"
                 onSuccess={handlePaymentSuccess}
             />
         </motion.div>

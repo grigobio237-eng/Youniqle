@@ -37,7 +37,7 @@ export default function SecretRecoveryLab() {
         history: ''
     });
 
-    const aiPlans = {
+    const youniqlePlans = {
         analysis: "데이터 분석 결과, 귀하의 현재 상태는 '누적 번아웃 주의' 단계입니다. 신속한 에너지 복원과 미세 순환 정체 해소가 시급하며, 이를 위해 최적화된 하이엔드 프로토콜 3가지를 제안합니다.",
         plans: {
             planA: {
@@ -87,7 +87,7 @@ export default function SecretRecoveryLab() {
         toast.promise(
             new Promise((resolve) => setTimeout(resolve, 2000)),
             {
-                loading: 'AI 마스터가 당신의 상태를 정밀 분석 중입니다...',
+                loading: '유니클 마스터가 당신의 상태를 정밀 분석 중입니다...',
                 success: '분석이 완료되었습니다. 맞춤형 프로토콜을 확인하세요.',
                 error: '분석 중 오류가 발생했습니다.'
             }
@@ -124,7 +124,7 @@ export default function SecretRecoveryLab() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                         {[
                             { icon: <Activity className="w-6 h-6" />, label: 'Active Protocols', value: '12', color: 'bg-emerald-50 text-emerald-600' },
-                            { icon: <BrainCircuit className="w-6 h-6" />, label: 'AI Accuracy', value: '99.4%', color: 'bg-blue-50 text-blue-600' },
+                            { icon: <BrainCircuit className="w-6 h-6" />, label: 'Youniqle Accuracy', value: '99.4%', color: 'bg-blue-50 text-blue-600' },
                             { icon: <Zap className="w-6 h-6" />, label: 'Waitlist', value: 'Premium', color: 'bg-amber-50 text-amber-600' },
                         ].map((stat, i) => (
                             <motion.div 
@@ -287,7 +287,7 @@ export default function SecretRecoveryLab() {
                                 </div>
                                 <div className="flex gap-4">
                                     <Button variant="ghost" className="h-16 flex-1 rounded-[20px] font-black text-[#0B0D10]/30 border border-[#0B0D10]/5" onClick={() => setFormStep(2)}>이전</Button>
-                                    <Button className="h-16 flex-[2] bg-[#D4AF37] text-black rounded-[20px] font-black text-sm uppercase tracking-widest" onClick={handleSubmitForm}>AI 정밀 분석 시작</Button>
+                                    <Button className="h-16 flex-[2] bg-[#D4AF37] text-black rounded-[20px] font-black text-sm uppercase tracking-widest" onClick={handleSubmitForm}>유니클 정밀 분석 시작</Button>
                                 </div>
                             </motion.div>
                         )}
@@ -306,11 +306,11 @@ export default function SecretRecoveryLab() {
                         <h1 className="text-5xl md:text-7xl font-black text-[#0B0D10] tracking-tighter leading-tight italic">
                             Private <span className="text-[#D4AF37] tracking-normal">Solutions</span> for You
                         </h1>
-                        <p className="text-xl text-[#0B0D10]/60 max-w-3xl mx-auto font-medium leading-relaxed">{aiPlans.analysis}</p>
+                        <p className="text-xl text-[#0B0D10]/60 max-w-3xl mx-auto font-medium leading-relaxed">{youniqlePlans.analysis}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {Object.entries(aiPlans.plans).map(([key, plan]) => (
+                        {Object.entries(youniqlePlans.plans).map(([key, plan]) => (
                             <Card 
                                 key={plan.planId} 
                                 onClick={() => setSelectedPlan(plan.planId)}

@@ -126,7 +126,7 @@ export default function RecoveryMonitoring() {
       }
     } catch (error) {
       setAiGuideContent(
-        "AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        "유니클 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
       );
     } finally {
       setIsAiThinking(false);
@@ -159,7 +159,7 @@ export default function RecoveryMonitoring() {
         ...prev,
         {
           role: "assistant",
-          text: "죄송합니다. 현재 AI 상담 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.",
+          text: "죄송합니다. 현재 유니클 상담 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.",
         },
       ]);
     } finally {
@@ -199,15 +199,15 @@ export default function RecoveryMonitoring() {
     status === "alert"
       ? "상태가 불안정합니다. 즉시 조치가 필요해요."
       : status === "warning"
-        ? "제미나이가 정밀 회복 분석을 마쳤습니다."
+        ? "유니클이 정밀 회복 분석을 마쳤습니다."
         : "현재 회복 상태가 매우 이상적입니다!";
 
   const advisorDesc =
     status === "alert"
-      ? "현재 기록된 데이터는 즉각적인 의료진 개입이 필요한 수준입니다. 제미나이와의 상담을 통해 응급 가이드를 받거나 담당자와 연결하세요."
+      ? "현재 기록된 데이터는 즉각적인 의료진 개입이 필요한 수준입니다. 유니클과의 상담을 통해 응급 가이드를 받거나 담당자와 연결하세요."
       : status === "warning"
-        ? "붓기와 수면 방해 패턴이 감지되었습니다. 제미나이가 제안하는 맞춤형 가이드 확인이 권장됩니다."
-        : "데이터 상으로 시술 부위의 안정이 빠르게 진행되고 있습니다. 이 흥름을 유지하기 위한 정밀 유지 가이드를 확인해 보세요.";
+        ? "붓기와 수면 방해 패턴이 감지되었습니다. 유니클이 제안하는 맞춤형 가이드 확인이 권장됩니다."
+        : "데이터 상으로 시술 부위의 안정이 빠르게 진행되고 있습니다. 이 흐름을 유지하기 위한 정밀 유지 가이드를 확인해 보세요.";
 
   const symptomGroups = [
     {
@@ -405,7 +405,7 @@ export default function RecoveryMonitoring() {
                   }`}
               />
               <span className="text-xs font-black uppercase tracking-widest opacity-60">
-                AI Recovery Advisor
+                Youniqle Recovery Advisor
               </span>
             </div>
             <h4
@@ -439,7 +439,7 @@ export default function RecoveryMonitoring() {
         </CardContent>
       </Card>
 
-      {/* AI 채팅 모달 */}
+      {/* 유니클 채팅 모달 */}
       <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
         <DialogContent className="sm:max-w-[500px] h-[700px] flex flex-col p-0 overflow-hidden bg-white border-line rounded-[32px]">
           <DialogHeader className="p-6 bg-obsidian text-mist border-b border-white/10 shrink-0">
@@ -448,7 +448,7 @@ export default function RecoveryMonitoring() {
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-black">제미나이 회복 케어</DialogTitle>
+                <DialogTitle className="text-xl font-black">유니클 회복 케어</DialogTitle>
                 <DialogDescription className="text-mist/60 text-xs font-bold">
                   24시간 당신의 회복을 지원합니다
                 </DialogDescription>
@@ -487,7 +487,7 @@ export default function RecoveryMonitoring() {
                       🤖
                     </div>
                     <div className="bg-white/50 p-4 rounded-2xl rounded-tl-none border border-line text-xs font-bold text-slate">
-                      제미나이가 답변을 준비하고 있습니다...
+                      유니클이 답변을 준비하고 있습니다...
                     </div>
                   </div>
                 )}
@@ -522,7 +522,7 @@ export default function RecoveryMonitoring() {
           <DialogHeader className="mb-6">
             <div className="flex items-center gap-3 mb-2">
               <Badge className="bg-primary text-background border-none px-3 font-black">
-                AI PERSONALIZED GUIDE
+                YOUNIQLE PERSONALIZED GUIDE
               </Badge>
             </div>
             <DialogTitle className="text-3xl font-black tracking-tight">
@@ -533,7 +533,7 @@ export default function RecoveryMonitoring() {
             <div className="py-20 flex flex-col items-center justify-center space-y-6">
               <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
               <div className="text-center">
-                <p className="text-xl font-black text-obsidian">AI 회복 분석 중...</p>
+                <p className="text-xl font-black text-obsidian">유니클 회복 분석 중...</p>
                 <p className="text-sm text-text-tertiary font-medium">
                   콘디션과 프로토콜 데이터를 분석 중입니다.
                 </p>

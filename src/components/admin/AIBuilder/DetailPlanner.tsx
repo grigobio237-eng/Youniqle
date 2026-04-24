@@ -57,10 +57,10 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
         featuresPlaceholder: isMedical ? '이 서비스가 제공하는 핵심 가치와 치료 효과를 입력하세요.' : '상품이 돕는 회복 키워드와 핵심 가치를 입력하세요.',
         fundingLabel: isMedical ? '특별 프로젝트(펀딩)로 등록' : '펀딩 프로젝트로 등록',
         planningBtn: isMedical ? '🪄 서비스 기획 시작하기' : '🪄 상세페이지 기획 시작하기',
-        generatingMsg: isMedical ? 'AI가 서비스 전략 기획 중...' : 'AI가 브랜드 전략 기획 중...',
+        generatingMsg: isMedical ? '유니클이 서비스 전략 기획 중...' : '유니클이 브랜드 전략 기획 중...',
         registerSuccess: isMedical ? '서비스가 등록되었습니다 (승인 대기)' : '상품이 등록되었습니다 (승인 대기)',
         emptyMsg: isMedical ? '서비스명과 관련 사진은 필수입니다!' : '상품명과 제품 사진은 필수입니다!',
-        suggestBtn: isMedical ? 'AI 효과 추천' : 'AI 자동 추천',
+        suggestBtn: isMedical ? '유니클 효과 추천' : '유니클 자동 추천',
         thumbnailBtn: isMedical ? '썸네일 생성' : '썸네일 생성',
         registerBtn: isMedical ? '서비스 등록' : '상품 등록',
         registeringMsg: isMedical ? '서비스 등록 중...' : '상품 등록 중...',
@@ -646,7 +646,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                 step === 2 && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-slate-900">AI 기획 전략 초안</h2>
+                            <h2 className="text-2xl font-bold text-slate-900">유니클 기획 전략 초안</h2>
                             <button
                                 onClick={() => setStep(1)}
                                 className="text-sm font-bold text-slate-400 hover:text-slate-600"
@@ -727,7 +727,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                 {isGeneratingImages ? (
                                     <>
                                         <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>상세 이미지 AI 생성 중...</span>
+                                        <span>상세 이미지 생성 중...</span>
                                     </>
                                 ) : (
                                     <>
@@ -923,7 +923,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                     {isGeneratingThumbnail ? (
                                         <>
                                             <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-                                            <span>AI가 프리미엄 썸네일 생성 중...</span>
+                                            <span>유니클이 프리미엄 썸네일 생성 중...</span>
                                         </>
                                     ) : (
                                         <>
@@ -1010,7 +1010,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                         </div>
                         <div className="space-y-2">
                             <h2 className="text-4xl font-extrabold text-slate-900">상품 등록 완료!</h2>
-                            <p className="text-slate-500 text-lg">AI가 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
+                            <p className="text-slate-500 text-lg">유니클이 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
                         </div>
 
                         <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl max-w-xl mx-auto space-y-6">

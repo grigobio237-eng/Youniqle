@@ -13,18 +13,18 @@ export default function PostCarePage() {
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 mb-2 text-center space-y-4">
-           <div className="inline-block px-4 py-1 bg-obsidian text-primary rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
-             Post-Procedure Intelligence
-           </div>
+          <div className="inline-block px-4 py-1 bg-obsidian text-primary rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
+            Post-Procedure Intelligence
+          </div>
           <h1 className="text-5xl font-black mb-4 tracking-tighter text-obsidian">
             Recovery <span className="text-primary italic">Roadmap</span>
           </h1>
           <p className="text-slate font-medium max-w-xl mx-auto text-lg">
             시술은 끝났지만, 결과는 이제부터 시작입니다.<br />
-            유니클 AI가 당신의 회복 데이터를 실시간 분석하여 최적의 경로를 설계합니다.
+            유니클이 당신의 회복 데이터를 실시간 분석하여 최적의 경로를 설계합니다.
           </p>
         </div>
-        
+
         <PostCareForm />
       </main>
     </div>

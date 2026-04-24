@@ -234,7 +234,7 @@ export default function PersonalizedRecommendations({
           </Button>
         </CardTitle>
         <CardDescription>
-          AI가 분석한 당신의 취향에 맞는 상품들입니다
+          유니클이 분석한 당신의 취향에 맞는 상품들입니다
         </CardDescription>
       </CardHeader>
       <CardContent>

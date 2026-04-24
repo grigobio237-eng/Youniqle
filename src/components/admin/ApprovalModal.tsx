@@ -68,7 +68,7 @@ export default function ApprovalModal({ project, isOpen, onClose, onApprove }: A
                             <FileText className="text-blue-500" />
                             <h3 className="font-semibold">대본 검수</h3>
                         </div>
-                        <p className="text-sm text-gray-500">AI가 생성한 대본입니다. 수정이 필요하면 직접 편집하세요.</p>
+                        <p className="text-sm text-gray-500">유니클이 생성한 대본입니다. 수정이 필요하면 직접 편집하세요.</p>
                         <Textarea
                             value={scriptEdits}
                             onChange={(e) => setScriptEdits(e.target.value)}

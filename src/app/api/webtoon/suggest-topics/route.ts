@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // AI가 5가지 주제 추천
+        // 유니클의 5가지 주제 추천
         const ideas = await GeminiAIEngine.suggestWebtoonTopics({
             genre,
             userContext

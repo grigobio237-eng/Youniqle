@@ -82,7 +82,7 @@ export class AdvancedRecommendationEngine {
           userObjectId = user._id;
         }
       }
-      
+
       const orders = await Order.find({
         userId: userObjectId,
         status: { $in: ['completed', 'delivered'] }
@@ -169,7 +169,7 @@ export class AdvancedRecommendationEngine {
   }
 
   // 고급 협업 필터링
-  private static async generateAdvancedCollaborativeRecommendations(    
+  private static async generateAdvancedCollaborativeRecommendations(
     profile: any,
     behaviors: any[],
     orders: any[],
@@ -180,7 +180,7 @@ export class AdvancedRecommendationEngine {
 
     // 유사한 사용자 찾기 (고도화된 유사도 계산)
     const similarUsers = await this.findAdvancedSimilarUsers(profile, behaviors, orders);
-    
+
     // 유사한 사용자들의 행동 분석
     for (const similarUser of similarUsers.slice(0, 20)) {
       const similarProfile = await UserProfile.findOne({ userId: similarUser.userId });
@@ -193,7 +193,7 @@ export class AdvancedRecommendationEngine {
       // 유사한 사용자의 ObjectId 조회
       const similarUserObj = await User.findOne({ email: similarUser.userId });
       if (!similarUserObj) continue;
-      
+
       const similarOrders = await Order.find({
         userId: similarUserObj._id,
         status: { $in: ['completed', 'delivered'] }
@@ -206,7 +206,7 @@ export class AdvancedRecommendationEngine {
           if (!itemId) continue;
 
           // 현재 사용자가 이미 상호작용한 아이템인지 확인
-          const hasInteracted = behaviors.some(b => 
+          const hasInteracted = behaviors.some(b =>
             (b.eventType === 'product_view' || b.eventType === 'product_click') &&
             (b.eventData?.productId === itemId || b.itemId === itemId)
           );
@@ -240,7 +240,7 @@ export class AdvancedRecommendationEngine {
       // 구매 기반 추천
       for (const order of similarOrders) {
         for (const item of order.items) {
-          const hasPurchased = orders.some(o => 
+          const hasPurchased = orders.some(o =>
             o.items.some((oi: any) => oi.productId === item.productId)
           );
 
@@ -275,7 +275,7 @@ export class AdvancedRecommendationEngine {
   }
 
   // 고급 콘텐츠 기반 필터링
-  private static async generateAdvancedContentBasedRecommendations(     
+  private static async generateAdvancedContentBasedRecommendations(
     profile: any,
     behaviors: any[],
     orders: any[],
@@ -290,7 +290,7 @@ export class AdvancedRecommendationEngine {
     // 카테고리 기반 추천
     for (const category of preferences.categories.slice(0, 5)) {
       const categoryProducts = await this.getProductsByCategory(category.name);
-      
+
       for (const product of categoryProducts.slice(0, 3)) {
         const score = category.score * 0.9;
         const confidence = this.calculateContentConfidence(category.score, preferences.categories.length);
@@ -320,7 +320,7 @@ export class AdvancedRecommendationEngine {
     // 브랜드 기반 추천
     for (const brand of preferences.brands.slice(0, 3)) {
       const brandProducts = await this.getProductsByBrand(brand.name);
-      
+
       for (const product of brandProducts.slice(0, 2)) {
         const score = brand.score * 0.8;
         const confidence = this.calculateContentConfidence(brand.score, preferences.brands.length);
@@ -399,7 +399,7 @@ export class AdvancedRecommendationEngine {
     // 신경망 기반 점수 계산 (시뮬레이션)
     for (const item of itemFeatures.slice(0, limit * 2)) {
       const score = this.calculateNeuralNetworkScore(userFeatures, item.features);
-      
+
       if (score > 0.3) {
         recommendations.push({
           itemId: item.id,
@@ -438,17 +438,17 @@ export class AdvancedRecommendationEngine {
 
     // 시간대별 패턴 분석
     const timePatterns = this.analyzeTimePatterns(behaviors, orders);
-    
+
     // 계절성 패턴 분석
     const seasonalPatterns = this.analyzeSeasonalPatterns(behaviors, orders);
-    
+
     // 최근 트렌드 분석
     const recentTrends = this.analyzeRecentTrends(behaviors, orders);
 
     // 시간 기반 추천 생성
     for (const pattern of timePatterns) {
       const timeBasedProducts = await this.getProductsByTimePattern(pattern);
-      
+
       for (const product of timeBasedProducts.slice(0, 2)) {
         const score = pattern.score * 0.8;
         const confidence = this.calculateTimeConfidence(pattern);
@@ -489,10 +489,10 @@ export class AdvancedRecommendationEngine {
 
     // 사용자-아이템 그래프 구축
     const userItemGraph = this.buildUserItemGraph(profile, behaviors, orders);
-    
+
     // 아이템-아이템 그래프 구축
     const itemItemGraph = this.buildItemItemGraph(behaviors, orders);
-    
+
     // 그래프 기반 추천 생성
     const graphRecommendations = this.generateGraphRecommendations(
       userItemGraph,
@@ -536,7 +536,7 @@ export class AdvancedRecommendationEngine {
     // 카테고리별 인기 상품
     if (context.category) {
       const categoryPopular = await this.getPopularProducts(limit);
-      
+
       for (const product of categoryPopular) {
         recommendations.push({
           itemId: product.id,
@@ -562,7 +562,7 @@ export class AdvancedRecommendationEngine {
     } else {
       // 전체 인기 상품
       const popularProducts = await this.getPopularProducts(limit);
-      
+
       for (const product of popularProducts) {
         recommendations.push({
           itemId: product.id,
@@ -600,7 +600,7 @@ export class AdvancedRecommendationEngine {
 
     // 최근 트렌드 분석
     const trendingProducts = await this.getTrendingProducts(limit * 2);
-    
+
     for (const product of trendingProducts) {
       recommendations.push({
         itemId: product.id,
@@ -687,7 +687,7 @@ export class AdvancedRecommendationEngine {
   ): Promise<any[]> {
     // 고도화된 유사도 계산
     const allProfiles = await UserProfile.find({ userId: { $ne: profile.userId } });
-    
+
     return allProfiles.map(otherProfile => {
       const similarity = this.calculateAdvancedSimilarity(profile, otherProfile, behaviors, orders);
       return {
@@ -705,23 +705,23 @@ export class AdvancedRecommendationEngine {
   ): number {
     // 다차원 유사도 계산
     let similarity = 0;
-    
+
     // 기본 선호도 유사도
     const basicSimilarity = this.calculateBasicSimilarity(profile1, profile2);
     similarity += basicSimilarity * 0.3;
-    
+
     // 행동 패턴 유사도
     const behaviorSimilarity = this.calculateBehaviorSimilarity(behaviors1, behaviors2);
     similarity += behaviorSimilarity * 0.4;
-    
+
     // 시간 패턴 유사도
     const timeSimilarity = this.calculateTimeSimilarity(behaviors1, behaviors2);
     similarity += timeSimilarity * 0.2;
-    
+
     // 구매 패턴 유사도
     const purchaseSimilarity = this.calculatePurchaseSimilarity(profile1, profile2);
     similarity += purchaseSimilarity * 0.1;
-    
+
     return Math.min(1, similarity);
   }
 
@@ -732,7 +732,7 @@ export class AdvancedRecommendationEngine {
     const categoryIntersection = new Set([...categories1].filter(c => categories2.has(c)));
     const categoryUnion = new Set([...categories1, ...categories2]);
     const categorySimilarity = categoryUnion.size > 0 ? categoryIntersection.size / categoryUnion.size : 0;
-    
+
     return categorySimilarity;
   }
 
@@ -740,30 +740,30 @@ export class AdvancedRecommendationEngine {
     // 행동 패턴 유사도 계산
     const behaviorTypes1 = new Map<string, number>();
     const behaviorTypes2 = new Map<string, number>();
-    
+
     behaviors1.forEach(b => {
       behaviorTypes1.set(b.eventType, (behaviorTypes1.get(b.eventType) || 0) + 1);
     });
-    
+
     behaviors2.forEach(b => {
       behaviorTypes2.set(b.eventType, (behaviorTypes2.get(b.eventType) || 0) + 1);
     });
-    
+
     // 코사인 유사도 계산
     const allTypes = new Set([...behaviorTypes1.keys(), ...behaviorTypes2.keys()]);
     let dotProduct = 0;
     let norm1 = 0;
     let norm2 = 0;
-    
+
     for (const type of allTypes) {
       const count1 = behaviorTypes1.get(type) || 0;
       const count2 = behaviorTypes2.get(type) || 0;
-      
+
       dotProduct += count1 * count2;
       norm1 += count1 * count1;
       norm2 += count2 * count2;
     }
-    
+
     return norm1 > 0 && norm2 > 0 ? dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2)) : 0;
   }
 
@@ -771,29 +771,29 @@ export class AdvancedRecommendationEngine {
     // 시간대별 패턴 유사도
     const timeSlots1 = new Map<number, number>();
     const timeSlots2 = new Map<number, number>();
-    
+
     behaviors1.forEach(b => {
       const hour = b.timestamp.getHours();
       timeSlots1.set(hour, (timeSlots1.get(hour) || 0) + 1);
     });
-    
+
     behaviors2.forEach(b => {
       const hour = b.timestamp.getHours();
       timeSlots2.set(hour, (timeSlots2.get(hour) || 0) + 1);
     });
-    
+
     // 시간대별 유사도 계산
     let similarity = 0;
     for (let hour = 0; hour < 24; hour++) {
       const count1 = timeSlots1.get(hour) || 0;
       const count2 = timeSlots2.get(hour) || 0;
       const maxCount = Math.max(count1, count2);
-      
+
       if (maxCount > 0) {
         similarity += Math.min(count1, count2) / maxCount;
       }
     }
-    
+
     return similarity / 24;
   }
 
@@ -803,10 +803,10 @@ export class AdvancedRecommendationEngine {
     const freq2 = profile2.preferences.purchasePatterns.frequency;
     const avgValue1 = profile1.preferences.purchasePatterns.averageOrderValue;
     const avgValue2 = profile2.preferences.purchasePatterns.averageOrderValue;
-    
+
     const freqSimilarity = 1 - Math.abs(freq1 - freq2) / Math.max(freq1, freq2, 1);
     const valueSimilarity = 1 - Math.abs(avgValue1 - avgValue2) / Math.max(avgValue1, avgValue2, 1);
-    
+
     return (freqSimilarity + valueSimilarity) / 2;
   }
 
@@ -814,7 +814,7 @@ export class AdvancedRecommendationEngine {
     // 유사도와 데이터 포인트 수를 기반으로 신뢰도 계산
     const similarityWeight = similarity;
     const dataWeight = Math.min(1, dataPoints / 100); // 100개 이상이면 최대 신뢰도
-    
+
     return (similarityWeight * 0.7 + dataWeight * 0.3);
   }
 
@@ -822,7 +822,7 @@ export class AdvancedRecommendationEngine {
     // 선호도 점수와 총 선호도 수를 기반으로 신뢰도 계산
     const preferenceWeight = preferenceScore;
     const diversityWeight = Math.min(1, totalPreferences / 10); // 10개 이상이면 최대 신뢰도
-    
+
     return (preferenceWeight * 0.8 + diversityWeight * 0.2);
   }
 
@@ -830,7 +830,7 @@ export class AdvancedRecommendationEngine {
     // 시간 패턴의 강도와 일관성을 기반으로 신뢰도 계산
     const strengthWeight = pattern.score;
     const consistencyWeight = Math.min(1, pattern.interactionCount / 20); // 20개 이상이면 최대 신뢰도
-    
+
     return (strengthWeight * 0.6 + consistencyWeight * 0.4);
   }
 
@@ -887,7 +887,7 @@ export class AdvancedRecommendationEngine {
 
   private static async generateFallbackRecommendations(itemType: string, limit: number): Promise<AdvancedRecommendationResult[]> {
     const products = await this.getPopularProducts(limit);
-    
+
     return products.map((product, index) => ({
       itemId: product.id,
       itemType: 'product',

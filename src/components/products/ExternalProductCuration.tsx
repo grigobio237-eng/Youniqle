@@ -154,7 +154,7 @@ export default function ExternalProductCuration({
                         <div className="flex items-center gap-2 mb-2">
                             <Badge className="bg-gradient-to-r from-[#0E3A3A] to-[#1a5555] text-mist border-none px-3 py-1 text-[10px] font-black tracking-widest uppercase">
                                 <Sparkles className="w-3 h-3 mr-1" />
-                                AI 추천
+                                유니클 추천
                             </Badge>
                             {externalProducts.length > 0 && (
                                 <Badge variant="outline" className="text-[10px] font-bold">
@@ -163,7 +163,7 @@ export default function ExternalProductCuration({
                             )}
                         </div>
                         <h2 className="text-2xl font-black text-obsidian tracking-tight">
-                            🛒 AI 추천 외부 큐레이션
+                            🛒 유니클 추천 외부 큐레이션
                         </h2>
                         <p className="text-sm text-slate font-medium mt-1">
                             당신의 회복 상태에 맞춘 엄선된 파트너 제품

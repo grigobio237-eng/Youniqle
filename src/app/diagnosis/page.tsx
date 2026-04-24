@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+
 // ---------------------------
 // Diagnosis Questions Data
 // ---------------------------
@@ -380,6 +381,8 @@ export default function DiagnosisPage() {
                                 ))}
                             </div>
 
+
+
                             <div className="bg-obsidian text-mist p-10 rounded-[40px] shadow-2xl space-y-6">
                                 <div className="flex items-center gap-3">
                                     <Sparkles className="text-reward-gold" />
@@ -394,6 +397,7 @@ export default function DiagnosisPage() {
                                     ))}
                                 </ul>
                             </div>
+
 
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Button size="lg" asChild className="btn-primary flex-1 h-20 text-xl rounded-2xl shadow-xl shadow-chapter-accent/20">
