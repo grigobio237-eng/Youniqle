@@ -22,9 +22,46 @@ export default function PreProcedureForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [symptomText, setSymptomText] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [dynamicQuestions, setDynamicQuestions] = useState<any>(null);
+
+  interface ConsultationOption {
+    id?: string;
+    label: string;
+    value: string;
+  }
+
+  interface ConsultationContent {
+    step1Title: string;
+    step1Sub: string;
+    changeLabel: string;
+    changeOptions: ConsultationOption[];
+    eventLabel: string;
+    eventSub: string;
+    eventPlaceholder: string;
+    step2Title: string;
+    step2Sub: string;
+    pastLabel: string;
+    pastSub: string;
+    pastPlaceholder: string;
+    step3Title: string;
+    step3Sub: string;
+    anxietyLabel: string;
+    anxietyOptions: ConsultationOption[];
+    step4Title: string;
+    step4Sub: string;
+    companionSub: string;
+    companionPlaceholder: string;
+    transportSub: string;
+    step5Title: string;
+    step5Sub: string;
+    step5Label: string;
+    step5Type: 'budget' | 'text';
+    step5Placeholder: string;
+    budgetLabel?: string; // Legacy support
+  }
 
   // Adaptive Content Definition
-  const content = useMemo(() => {
+  const content = useMemo((): ConsultationContent => {
     switch (medicalCategory) {
       case 'ORTHOPEDIC':
         return {
@@ -38,35 +75,69 @@ export default function PreProcedureForm() {
           ],
           eventLabel: "3. 활동 복귀 데드라인",
           eventSub: "여행, 운동 경기 참여 등 정상적인 신체 활동이 꼭 필요한 날이 있나요?",
-          eventPlaceholder: "예: 2주 뒤 가족 여행이 있어 장거리 보행이 가능해야 합니다."
+          eventPlaceholder: "예: 2주 뒤 가족 여행이 있어 장거리 보행이 가능해야 합니다.",
+          step2Title: "과거 치료 이력과 신체 상태",
+          step2Sub: "안전하고 효과적인 재활을 위해 과거 경험을 확인합니다.",
+          pastLabel: "1. 비슷한 부위의 치료 경험 여부",
+          pastSub: "이전에 해당 부위의 수술, 시술 혹은 장기 치료를 받은 적이 있나요?",
+          pastPlaceholder: "예: 2년 전 같은 부위 인대 수술을 받았고, 최근 다시 통증이 심해졌습니다.",
+          step3Title: "치료 과정에서 가장 걱정되는 점은 무엇인가요?",
+          step3Sub: "불안한 점을 미리 파악하여 세심한 케어 플랜을 세웁니다.",
+          anxietyLabel: "현재 가장 우려되는 부분을 선택해주세요. (복수 선택)",
+          anxietyOptions: [
+            { id: "a-pain", label: "통증 지속 및 악화", value: "통증" },
+            { id: "a-motion", label: "가동 범위 저하", value: "운동제한" },
+            { id: "a-recur", label: "근본적 해결 미비(재발)", value: "재발우려" },
+            { id: "a-time", label: "일상 복귀 지연", value: "복귀지연" },
+          ],
+          step4Title: "편안한 방문을 위한 환경 설계",
+          step4Sub: "거동이 불편하시거나 특별한 케어가 필요한 경우를 대비합니다.",
+          companionSub: "이동 지원이나 휠체어 이용 등 보호자의 도움이 필요한가요?",
+          companionPlaceholder: "예: 다리가 불편하여 휠체어 이동 지원이 필요합니다.",
+          transportSub: "원거리 방문을 위한 교통편이나 근처 연계 숙소 안내가 필요하신가요?",
+          step5Title: "최종 회복 및 재활 투자 설계",
+          step5Sub: "지속적인 기능 회복과 통증 관리를 위한 예산 범위를 설정합니다.",
+          step5Label: "1. 예상 재활 투자 예산 (집중 치료 및 운동 케어 포함)",
+          step5Type: 'budget',
+          step5Placeholder: ""
         };
       case 'INTERNAL':
         return {
-          step1Title: "건강 개선 목표를 설정합니다",
-          step1Sub: "검진 결과 개선 및 수치 안정화를 위한 계획을 세웁니다.",
-          changeLabel: "1. 목표하는 수치 개선 정도",
+          step1Title: "내 몸의 균형과 회복 목표를 설정합니다",
+          step1Sub: "불편함의 근본 원인을 찾고, 안정적인 컨디션 회복을 위한 계획을 세웁니다.",
+          changeLabel: "1. 기대하는 컨디션 회복 수준",
           changeOptions: [
-            { label: "정상 범위 진입 및 유지 (기본 관리)", value: "자연스러운 변화" },
-            { label: "체감 컨디션의 뚜렷한 개선 (집중 관리)", value: "세련된 변화" },
-            { label: "만성 질환 위험 요소의 완전 배제 (완벽 관리)", value: "드라마틱한 변화" }
+            { label: "일상의 불편함이 빠르게 해소되는 수준 (기본 회복)", value: "자연스러운 변화" },
+            { label: "체감 에너지가 눈에 띄게 살아나는 수준 (집중 회복)", value: "세련된 변화" },
+            { label: "만성적 피로와 우려 요소가 완전히 관리되는 수준 (완벽 회복)", value: "드라마틱한 변화" }
           ],
-          eventLabel: "3. 건강 지표 확인 일정",
-          eventSub: "다음 정밀 검진이나 중요한 건강 리포트 확인일이 정해져 있나요?",
-          eventPlaceholder: "예: 한 달 뒤 혈액 검사 재통보가 예정되어 있습니다."
-        };
-      case 'GENERAL':
-        return {
-          step1Title: "안전한 치료와 회복을 설계합니다",
-          step1Sub: "전신 컨디션 관리와 치료 성공을 위한 준비를 시작합니다.",
-          changeLabel: "1. 원하는 회복 목표",
-          changeOptions: [
-            { label: "안정적인 컨디션 유지", value: "자연스러운 변화" },
-            { label: "빠른 기력 회복 및 증상 완화", value: "세련된 변화" },
-            { label: "근본적인 신체 자생력 강화", value: "드라마틱한 변화" }
+          eventLabel: "3. 건강 컨디션 체크 일정",
+          eventSub: "중요한 미팅, 여행 등 최상의 컨디션이 꼭 필요한 날이 있나요?",
+          eventPlaceholder: "예: 다음 주 중요한 발표가 있어 목소리와 컨디션이 완쾌되어야 합니다.",
+          step2Title: "기존 건강 지표 및 정기 관리 상태",
+          step2Sub: "현재의 전반적인 컨디션과 복용 약물을 통해 안전한 회복을 준비합니다.",
+          pastLabel: "1. 기저 질환 및 정기 관리 여부",
+          pastSub: "평소 고혈압, 당뇨 등 정기적인 관리가 필요하거나 자주 겪는 증상이 있나요?",
+          pastPlaceholder: "예: 비염 증상이 자주 있고, 평소 소화가 잘 안 되는 편입니다.",
+          step3Title: "내원 과정에서 가장 궁금하거나 우려되는 점",
+          step3Sub: "상담 시 중점적으로 확인하고 싶은 내용을 미리 파악합니다.",
+          anxietyLabel: "상담 시 확인하고 싶은 부분을 선택해주세요. (복수 선택)",
+          anxietyOptions: [
+            { id: "a-side", label: "처방 약물의 부작용/졸음", value: "부작용" },
+            { id: "a-result", label: "증상의 정확한 원인 파악", value: "원인파악" },
+            { id: "a-habit", label: "생활 습관 및 면역 개선", value: "생활습관" },
+            { id: "a-comp", label: "증상 악화 및 합병증 예방", value: "악화예방" },
           ],
-          eventLabel: "3. 중요한 일정 확인",
-          eventSub: "시술/수술 전후로 반드시 건강을 회복해야 하는 일정이 있나요?",
-          eventPlaceholder: "예: 다음 주부터 중요한 프로젝트 복귀가 예정되어 있습니다."
+          step4Title: "편안한 진료를 위한 환경 설계",
+          step4Sub: "안정적인 대기 및 상담을 위한 편의 사항을 체크합니다.",
+          companionSub: "검사나 대기 과정에서 이동 지원이나 보호자 동행이 필요하신가요?",
+          companionPlaceholder: "예: 기력이 없어 대기 시 편안한 공간 안내가 필요합니다.",
+          transportSub: "컨디션 난조로 인한 차량 지원이나 원거리 방문 안내가 필요하신가요?",
+          step5Title: "종합 회복 및 영양 투자 설계",
+          step5Sub: "일시적인 증상 완화를 넘어, 지속 가능한 활력을 위한 예산 범위를 설정합니다.",
+          step5Label: "1. 예상 건강 회복 예산 (정밀 검사 및 맞춤 영양 솔루션 포함)",
+          step5Type: 'text',
+          step5Placeholder: "회복을 위한 다짐이나 요청사항을 적어주세요."
         };
       case 'PLASTIC':
         return {
@@ -80,7 +151,31 @@ export default function PreProcedureForm() {
           ],
           eventLabel: "3. 중요한 약속 여부",
           eventSub: "시술 후 한 달 안에 결혼식이나 사진 촬영처럼 꼭 예뻐야 하는 날이 있나요?",
-          eventPlaceholder: "예: 3주 뒤 웨딩 촬영이 있습니다."
+          eventPlaceholder: "예: 3주 뒤 웨딩 촬영이 있습니다.",
+          step2Title: "몸의 소리에 귀를 기울여요",
+          step2Sub: "과거 경험과 현재 상태를 통해 안전한 과정을 준비합니다.",
+          pastLabel: "1. 비슷한 경험 여부",
+          pastSub: "이전에 줄기세포나 해당 분야의 시술/치료를 받아본 적이 있나요?",
+          pastPlaceholder: "예: 2년 전 지방 흡입 시술을 받았고, 회복까지 2주 정도 걸렸습니다.",
+          step3Title: "무엇이 가장 걱정되시나요?",
+          step3Sub: "불안한 점을 미리 파악해 세심하게 케어해 드립니다.",
+          anxietyLabel: "과정 중 가장 우려되는 부분을 선택해주세요. (복수 선택)",
+          anxietyOptions: [
+            { id: "a-pain", label: "통증/불편함", value: "통증" },
+            { id: "a-swelling", label: "부기 및 흔적", value: "붓기/멍" },
+            { id: "a-scar", label: "치료 효과 미비", value: "효과걱정" },
+            { id: "a-privacy", label: "프라이버시 노출", value: "프라이버시" },
+          ],
+          step4Title: "프리미엄 방문 환경 설계",
+          step4Sub: "VIP 맞춤 환경을 위해 이동 경로와 동반자를 파악합니다.",
+          companionSub: "방문 시 보호자 동행 유무를 알려주세요.",
+          companionPlaceholder: "예: 함께 오시는 남편이 쉴 수 있는 편안한 대기 공간이 필요합니다.",
+          transportSub: "교통편 및 숙소 지원 서비스 안내가 필요하신가요?",
+          step5Title: "최종 회복 투자 설계",
+          step5Sub: "이번 회복 여정에 생각하시는 예산 범위를 설정합니다.",
+          step5Label: "1. 예상 투자 예산 (치료 및 집중 케어 포함)",
+          step5Type: 'budget',
+          step5Placeholder: ""
         };
       default:
         return {
@@ -94,10 +189,70 @@ export default function PreProcedureForm() {
           ],
           eventLabel: "3. 일정 확인",
           eventSub: "회복 과정 중 고려해야 할 중요한 일정이 있나요?",
-          eventPlaceholder: "상세 내용을 적어주세요."
+          eventPlaceholder: "상세 내용을 적어주세요.",
+          step2Title: "건강 상태 확인",
+          step2Sub: "안전한 치료를 위해 기본적인 건강 상태를 확인합니다.",
+          pastLabel: "1. 과거 치료 경험",
+          pastSub: "이전에 비슷한 분야의 치료를 받은 적이 있나요?",
+          pastPlaceholder: "경험이 있다면 간단히 적어주세요.",
+          step3Title: "고민되는 부분 확인",
+          step3Sub: "상담 시 도움을 드리고 싶은 부분을 확인합니다.",
+          anxietyLabel: "가장 신경 쓰이는 부분은 무엇인가요? (복수 선택)",
+          anxietyOptions: [
+            { id: "a-pain", label: "통증 걱정", value: "통증" },
+            { id: "a-swelling", label: "일상 지장", value: "붓기/멍" },
+            { id: "a-scar", label: "효과 여부", value: "효과걱정" },
+            { id: "a-privacy", label: "프라이버시", value: "프라이버시" },
+          ],
+          step4Title: "방문 환경 설계",
+          step4Sub: "방문 시 필요한 편의 사항을 확인합니다.",
+          companionSub: "보호자 동행 여부 및 대기실 필요 여부를 알려주세요.",
+          companionPlaceholder: "요청사항이 있다면 적어주세요.",
+          transportSub: "기타 교통 및 이동 지원이 필요하신가요?",
+          step5Title: "예산 설계",
+          step5Sub: "회복 계획에 적절한 예산 범위를 설정합니다.",
+          step5Label: "1. 예상 투자 예산",
+          step5Type: 'budget',
+          step5Placeholder: ""
         };
     }
   }, [medicalCategory]);
+
+  // Merge AI dynamic questions with fallback content
+  const activeContent = useMemo((): ConsultationContent => {
+    if (dynamicQuestions?.steps) {
+      const s = dynamicQuestions.steps;
+      return {
+        step1Title: s.step1.title,
+        step1Sub: s.step1.sub,
+        changeLabel: s.step1.label,
+        changeOptions: s.step1.options,
+        eventLabel: s.step1.eventLabel || "3. 주요 일정 확인",
+        eventSub: s.step1.eventSub || "회복 과정 중 고려해야 할 중요한 일정이 있나요?",
+        eventPlaceholder: s.step1.eventPlaceholder || "상세 내용을 적어주세요.",
+        step2Title: s.step2.title,
+        step2Sub: s.step2.sub,
+        pastLabel: s.step2.label,
+        pastSub: s.step2.subLabel || "관련된 과거 경험이나 병력이 있나요?",
+        pastPlaceholder: s.step2.placeholder,
+        step3Title: s.step3.title,
+        step3Sub: s.step3.sub,
+        anxietyLabel: s.step3.label,
+        anxietyOptions: s.step3.options,
+        step4Title: s.step4.title,
+        step4Sub: s.step4.sub,
+        companionSub: s.step4.label,
+        companionPlaceholder: s.step4.placeholder,
+        transportSub: s.step4.transportLabel || "기타 이동 지원이 필요하신가요?",
+        step5Title: s.step5.title,
+        step5Sub: s.step5.sub,
+        step5Label: s.step5.label,
+        step5Type: s.step5.type || "budget",
+        step5Placeholder: s.step5.placeholder || "회복을 위한 다짐이나 요청사항을 적어주세요."
+      };
+    }
+    return content;
+  }, [dynamicQuestions, content]);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -219,29 +374,39 @@ export default function PreProcedureForm() {
     if (!symptomText.trim()) return;
     setIsAnalyzing(true);
     
-    // AI Analysis Simulation
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const text = symptomText.toLowerCase();
-    let recommended: any = 'GENERAL';
-    
-    if (text.includes('허리') || text.includes('어깨') || text.includes('무릎') || text.includes('관절') || text.includes('통증')) {
-      recommended = 'ORTHOPEDIC';
-    } else if (text.includes('피부') || text.includes('얼굴') || text.includes('코') || text.includes('눈') || text.includes('지방')) {
-      recommended = 'PLASTIC';
-    } else if (text.includes('배') || text.includes('속이') || text.includes('머리') || text.includes('검진') || text.includes('혈압')) {
-      recommended = 'INTERNAL';
+    try {
+      const response = await fetch('/api/ai/analyze-symptom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptom: symptomText })
+      });
+      
+      const data = await response.json();
+      
+      if (data.category) {
+        setMedicalCategory(data.category);
+        if (data.dynamicQuestions) {
+          setDynamicQuestions(data.dynamicQuestions);
+        }
+        addToast({
+          title: "유니클 증상 분석 완료",
+          description: data.reason,
+          variant: "success"
+        });
+        setStep(1);
+      }
+    } catch (error) {
+      console.error('AI Analysis Error:', error);
+      addToast({
+        title: "분석 오류",
+        description: "유니클 분석 중 문제가 발생했습니다. 일반 문진으로 안내합니다.",
+        variant: "error"
+      });
+      setMedicalCategory('GENERAL');
+      setStep(1);
+    } finally {
+      setIsAnalyzing(false);
     }
-
-    setMedicalCategory(recommended);
-    addToast({
-      title: "증상 분석 완료",
-      description: `${recommended === 'ORTHOPEDIC' ? '정형/재활' : recommended === 'PLASTIC' ? '성형/피부' : '내과/일반'} 분야 맞춤 문진으로 안내합니다.`,
-      variant: "success"
-    });
-    
-    setIsAnalyzing(false);
-    setStep(1);
   };
 
   const handleAnxietyChange = (point: string) => {
@@ -294,6 +459,27 @@ export default function PreProcedureForm() {
 
             {/* Symptom Input Area */}
             <div className="relative group">
+              <AnimatePresence>
+                {isAnalyzing && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm rounded-[24px] flex flex-col items-center justify-center space-y-4"
+                  >
+                    <div className="w-64 h-2 bg-primary/10 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                        className="h-full bg-primary"
+                      />
+                    </div>
+                    <p className="text-sm font-black text-primary animate-pulse">유니클이 증상을 정밀 분석하고 있습니다...</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="absolute inset-0 bg-primary/5 rounded-[24px] blur-xl group-focus-within:bg-primary/10 transition-all" />
               <div className="relative bg-white/50 border-2 border-line group-focus-within:border-primary/50 rounded-[24px] p-2 flex items-center gap-3 transition-all">
                 <div className="pl-4">
@@ -305,6 +491,7 @@ export default function PreProcedureForm() {
                   value={symptomText}
                   onChange={(e) => setSymptomText(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && analyzeSymptom()}
+                  disabled={isAnalyzing}
                 />
                 <Button 
                   onClick={analyzeSymptom}
@@ -385,18 +572,18 @@ export default function PreProcedureForm() {
             {step === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">{content.step1Title}</h3>
-                  <p className="text-text-secondary">{content.step1Sub}</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step1Title}</h3>
+                  <p className="text-text-secondary">{activeContent.step1Sub}</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">{content.changeLabel}</Label>
+                  <Label className="text-xl font-bold">{activeContent.changeLabel}</Label>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, changeScale: v})}
                     value={formData.changeScale}
                     className="grid grid-cols-1 gap-3"
                   >
-                    {content.changeOptions.map((opt, idx) => (
+                    {activeContent.changeOptions.map((opt: ConsultationOption, idx: number) => (
                       <div key={idx} className={`flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.changeScale === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
                         <RadioGroupItem value={opt.value} id={`v-${idx}`} />
                         <Label htmlFor={`v-${idx}`} className="flex-1 cursor-pointer font-semibold">{opt.label}</Label>
@@ -428,8 +615,8 @@ export default function PreProcedureForm() {
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">{content.eventLabel}</Label>
-                  <p className="text-sm text-text-secondary">{content.eventSub}</p>
+                  <Label className="text-xl font-bold">{activeContent.eventLabel}</Label>
+                  <p className="text-sm text-text-secondary">{activeContent.eventSub}</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasImportantEvent: v === 'true'})}
                     value={formData.hasImportantEvent ? 'true' : 'false'}
@@ -450,7 +637,7 @@ export default function PreProcedureForm() {
                       <Label htmlFor="e-details" className="text-sm font-semibold text-primary mb-2 block">상세 내용을 알려주세요</Label>
                       <Textarea 
                         id="e-details"
-                        placeholder={content.eventPlaceholder}
+                        placeholder={activeContent.eventPlaceholder}
                         className="rounded-xl min-h-[100px]"
                         value={formData.importantEventDetails}
                         onChange={(e) => setFormData({...formData, importantEventDetails: e.target.value})}
@@ -474,13 +661,13 @@ export default function PreProcedureForm() {
             {step === 2 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                  <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">몸의 소리에 귀를 기울여요</h3>
-                  <p className="text-text-secondary">과거 경험과 현재 상태를 통해 안전한 과정을 준비합니다.</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step2Title}</h3>
+                  <p className="text-text-secondary">{activeContent.step2Sub}</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">1. 비슷한 경험 여부</Label>
-                  <p className="text-sm text-text-secondary">이전에 줄기세포나 해당 분야의 시술/치료를 받아본 적이 있나요?</p>
+                  <Label className="text-xl font-bold">{activeContent.pastLabel}</Label>
+                  <p className="text-sm text-text-secondary">{activeContent.pastSub}</p>
                   <RadioGroup 
                     onValueChange={(v) => setFormData({...formData, hasPastExperience: v === 'true'})}
                     value={formData.hasPastExperience ? 'true' : 'false'}
@@ -501,7 +688,7 @@ export default function PreProcedureForm() {
                       <Label htmlFor="p-details" className="text-sm font-semibold text-primary block mb-2">당시 경험에 대해 알려주세요</Label>
                       <Textarea 
                         id="p-details"
-                        placeholder="예: 2년 전 같은 부위 치료를 받았고, 회복까지 2주 정도 걸렸습니다."
+                        placeholder={activeContent.pastPlaceholder}
                         className="rounded-xl min-h-[100px]"
                         value={formData.pastExperienceDetails}
                         onChange={(e) => setFormData({...formData, pastExperienceDetails: e.target.value})}
@@ -597,19 +784,14 @@ export default function PreProcedureForm() {
             {step === 3 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">무엇이 가장 걱정되시나요?</h3>
-                  <p className="text-text-secondary">불안한 점을 미리 파악해 세심하게 케어해 드립니다.</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step3Title}</h3>
+                  <p className="text-text-secondary">{activeContent.step3Sub}</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">과정 중 가장 우려되는 부분을 선택해주세요. (복수 선택)</Label>
+                  <Label className="text-xl font-bold">{activeContent.anxietyLabel}</Label>
                   <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { id: "a-pain", label: "통증/불편함", value: "통증" },
-                      { id: "a-swelling", label: "부기 및 흔적", value: "붓기/멍" },
-                      { id: "a-scar", label: "치료 효과 미비", value: "효과걱정" },
-                      { id: "a-privacy", label: "프라이버시 노출", value: "프라이버시" },
-                    ].map((opt) => (
+                    {activeContent.anxietyOptions.map((opt: ConsultationOption) => (
                       <div key={opt.id} className={`flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.anxietyPoints.includes(opt.value) ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
                         <Checkbox 
                           id={opt.id} 
@@ -651,11 +833,11 @@ export default function PreProcedureForm() {
 
             {/* STEP 4 & 5 Omitted for brevity in this replace, but they should include the final handleSubmit with medicalCategory */}
             {/* Keeping it simple by re-writing the whole file to ensure completeness */}
-             {step === 4 && (
+            {step === 4 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">프리미엄 방문 환경 설계</h3>
-                  <p className="text-text-secondary">VIP 맞춤 환경을 위해 이동 경로와 동반자를 파악합니다.</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step4Title}</h3>
+                  <p className="text-text-secondary">{activeContent.step4Sub}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -677,10 +859,10 @@ export default function PreProcedureForm() {
 
                   {formData.hasCompanion && (
                     <div className="animate-in fade-in pt-2">
-                      <Label htmlFor="c-details" className="text-sm font-semibold text-primary block mb-2">보호자분을 위한 특별한 요청사항이 있나요?</Label>
+                      <Label htmlFor="c-details" className="text-sm font-semibold text-primary block mb-2">{activeContent.companionSub}</Label>
                       <Textarea 
                         id="c-details"
-                        placeholder="예: 함께 오시는 남편이 쉴 수 있는 편안한 대기 공간이 필요합니다."
+                        placeholder={activeContent.companionPlaceholder}
                         className="rounded-xl min-h-[100px]"
                         value={formData.companionDetails}
                         onChange={(e) => setFormData({...formData, companionDetails: e.target.value})}
@@ -691,6 +873,7 @@ export default function PreProcedureForm() {
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">2. 교통편 및 숙소 지원</Label>
+                  <p className="text-sm text-text-secondary">{activeContent.transportSub}</p>
                   <RadioGroup 
                      onValueChange={(v) => setFormData({...formData, needsTransportation: v === 'true'})}
                      value={formData.needsTransportation ? 'true' : 'false'}
@@ -740,42 +923,57 @@ export default function PreProcedureForm() {
             {step === 5 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-black text-primary mb-2">최종 회복 투자 설계</h3>
-                  <p className="text-text-secondary">이번 회복 여정에 생각하시는 예산 범위를 설정합니다.</p>
+                  <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step5Title}</h3>
+                  <p className="text-text-secondary">{activeContent.step5Sub}</p>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xl font-bold">1. 예상 투자 예산 (치료 및 집중 케어 포함)</Label>
-                  <RadioGroup 
-                    onValueChange={(v) => {
-                      setFormData({...formData, budgetRange: v, customBudget: v === 'custom' ? formData.customBudget : ''})
-                    }}
-                    value={formData.budgetRange}
-                    className="grid grid-cols-2 gap-3"
-                  >
-                    {[
-                      { id: "b-1", label: "500만 원 이하", value: "500만 원 이하" },
-                      { id: "b-2", label: "500~1,000만 원", value: "500~1,000만 원" },
-                      { id: "b-3", label: "1,000~2,000만 원", value: "1,000~2,000만 원" },
-                      { id: "b-4", label: "2,000만 원 이상", value: "2,000만 원 이상" },
-                      { id: "b-5", label: "직접 입력", value: "custom" },
-                    ].map((opt) => (
-                      <div key={opt.id} className={`col-span-2 sm:col-span-1 flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.budgetRange === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
-                        <RadioGroupItem value={opt.value} id={opt.id} />
-                        <Label htmlFor={opt.id} className="flex-1 cursor-pointer font-semibold">{opt.label}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-
-                  {formData.budgetRange === 'custom' && (
+                  <Label className="text-xl font-bold">{activeContent.step5Label || activeContent.budgetLabel}</Label>
+                  
+                  {activeContent.step5Type === 'text' ? (
                     <div className="animate-in fade-in pt-2">
-                       <Input 
-                        placeholder="직접 입력하세요."
-                        className="h-14 rounded-2xl text-lg"
+                      <Textarea 
+                        placeholder={activeContent.step5Placeholder}
+                        className="rounded-2xl min-h-[150px] text-lg p-6 border-2 border-line focus:border-primary transition-all bg-white"
                         value={formData.customBudget}
-                        onChange={(e) => setFormData({...formData, customBudget: e.target.value})}
+                        onChange={(e) => setFormData({...formData, customBudget: e.target.value, budgetRange: 'custom'})}
                       />
+                      <p className="text-sm text-text-secondary mt-3 italic">작성해주신 정성어린 답변은 더 완벽한 회복 설계의 밑거름이 됩니다.</p>
                     </div>
+                  ) : (
+                    <>
+                      <RadioGroup 
+                        onValueChange={(v) => {
+                          setFormData({...formData, budgetRange: v, customBudget: v === 'custom' ? formData.customBudget : ''})
+                        }}
+                        value={formData.budgetRange}
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        {[
+                          { id: "b-1", label: "500만 원 이하", value: "500만 원 이하" },
+                          { id: "b-2", label: "500~1,000만 원", value: "500~1,000만 원" },
+                          { id: "b-3", label: "1,000~2,000만 원", value: "1,000~2,000만 원" },
+                          { id: "b-4", label: "2,000만 원 이상", value: "2,000만 원 이상" },
+                          { id: "b-5", label: "직접 입력", value: "custom" },
+                        ].map((opt) => (
+                          <div key={opt.id} className={`col-span-2 sm:col-span-1 flex items-center space-x-3 p-4 border rounded-2xl cursor-pointer transition-colors ${formData.budgetRange === opt.value ? 'bg-primary/10 border-primary' : 'border-line hover:bg-primary/5'}`}>
+                            <RadioGroupItem value={opt.value} id={opt.id} />
+                            <Label htmlFor={opt.id} className="flex-1 cursor-pointer font-semibold">{opt.label}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+
+                      {formData.budgetRange === 'custom' && (
+                        <div className="animate-in fade-in pt-2">
+                           <Input 
+                            placeholder="직접 입력하세요."
+                            className="h-14 rounded-2xl text-lg"
+                            value={formData.customBudget}
+                            onChange={(e) => setFormData({...formData, customBudget: e.target.value})}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 

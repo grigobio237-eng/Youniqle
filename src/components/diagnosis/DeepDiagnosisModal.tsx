@@ -11,12 +11,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, RefreshCw, X, Brain, ShieldCheck, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+import { useRouter } from 'next/navigation';
+
 interface DeepDiagnosisModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
 export function DeepDiagnosisModal({ open, onOpenChange }: DeepDiagnosisModalProps) {
+    const router = useRouter();
     const [step, setStep] = useState<'intro' | 'test' | 'analyzing' | 'result'>('intro');
     const [currentQIndex, setCurrentQIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -254,6 +257,7 @@ function DeepAnalyzingView() {
 }
 
 function DeepResultView({ result, onClose }: { result: IPIP60Result, onClose: () => void }) {
+    const router = useRouter();
     const chartData = [
         { subject: '신경증', score: result.tScores.N, fullMark: 80 },
         { subject: '외향성', score: result.tScores.E, fullMark: 80 },
@@ -323,7 +327,13 @@ function DeepResultView({ result, onClose }: { result: IPIP60Result, onClose: ()
                             각 요인별 6가지 상세 국면(불안, 주장성, 도덕성 등)에 대한<br />
                             수치화된 분석과 맞춤형 개선 가이드를 확인하세요.
                         </p>
-                        <Button className="w-full h-14 bg-white text-obsidian font-black rounded-2xl hover:bg-white/90">
+                        <Button 
+                            onClick={() => {
+                                router.push('/ai-navigator/report');
+                                onClose();
+                            }}
+                            className="w-full h-14 bg-white text-obsidian font-black rounded-2xl hover:bg-white/90"
+                        >
                             전체 분석 리포트 확인하기
                             <ChevronRight className="ml-2 w-4 h-4" />
                         </Button>

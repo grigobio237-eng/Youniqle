@@ -604,6 +604,57 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
         }
     }
 
+    // AI Action Advice Generator: Generate 3 specific action items based on daily scores
+    static async generateActionAdvice(input: { scores: any; todayScore: number }): Promise<any> {
+        try {
+            const prompt = `당신은 유니클(Youniqle)의 프리미엄 회복 코치입니다.
+사용자의 오늘의 회복 점수를 분석하여 따뜻한 격려와 함께 실천 가능한 3가지 행동 조언을 제안해주세요.
+
+## 오늘의 점수
+- 전체 평균: ${input.todayScore}점
+- 피로도: ${input.scores.q1}점
+- 수면 질: ${input.scores.q2}점
+- 붓기/부조: ${input.scores.q3}점
+- 감정 상태: ${input.scores.q4}점
+- 집중력: ${input.scores.q5}점
+
+## 요청 사항
+1. 사용자의 상태를 요약하는 따뜻한 'aiComment'를 작성하세요 (100자 이내).
+2. 가장 점수가 낮거나 관리가 필요한 항목을 중심으로 3가지 구체적인 'adviceItems'를 제안하세요.
+3. 각 아이템은 category(PHYSICAL, ENVIRONMENT, NUTRITION, PSYCHOLOGICAL 중 선택)와 content를 포함해야 합니다.
+4. 반드시 아래 JSON 형식으로만 응답하세요.
+
+## 응답 형식 (JSON Only)
+{
+  "aiComment": "조언 멘트",
+  "adviceItems": [
+    { "category": "PHYSICAL", "content": "행동 내용 1" },
+    { "category": "ENVIRONMENT", "content": "행동 내용 2" },
+    { "category": "NUTRITION", "content": "행동 내용 3" }
+  ]
+}`;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to parse action advice JSON');
+
+        } catch (error) {
+            console.error('Gemini Action Advice Error:', error);
+            return {
+                aiComment: '오늘 하루도 당신의 회복을 진심으로 응원합니다.',
+                adviceItems: [
+                    { category: 'PHYSICAL', content: '잠시 눈을 감고 5분간 명상을 즐겨보세요.' },
+                    { category: 'ENVIRONMENT', content: '실내 공기를 환기시켜 신선한 공기를 마셔보세요.' },
+                    { category: 'NUTRITION', content: '따뜻한 물 한 잔으로 몸의 순환을 도와주세요.' }
+                ]
+            };
+        }
+    }
+
     // Daily Question Generator
     static async generateDailyQuestions(
         theme: string,
@@ -702,6 +753,7 @@ ${userTier === 'PREMIUM' ? `[PREMIUM 전용] 사용자의 최근 회복 데이�
             throw error;
         }
     }
+
     // AI Chat Persona: Director Kim Mi-jeong
     static async generateChatResponse(message: string, context: { userName: string; grade: string }): Promise<string> {
         if (!process.env.GEMINI_API_KEY) {
@@ -1044,49 +1096,7 @@ ${input.isStemCellSolution ? `
         }
     }
 
-    // AI Action Advice: Generate 3 specific actionable items
-    static async generateActionAdvice(input: any): Promise<any> {
-        try {
-            const prompt = `당신은 회복(Recovery) 전문 코치입니다. 사용자의 회복 점수를 분석하고, 오늘 즉시 실천할 수 있는 **3가지 구체적인 행동 조언**을 제공해주세요.
 
-## 사용자 회복 상태
-- 회복 점수: ${input.todayScore}점
-- 상세 지표: 피로도(${input.scores.q1}), 수면(${input.scores.q2}), 붓기(${input.scores.q3}), 감정(${input.scores.q4}), 집중력(${input.scores.q5})
-
-## 요청
-사용자의 가장 취약한 지표를 개선할 수 있는 행동 위주로 추천해주세요. 
-아래 JSON 형식으로만 응답해주세요.
-
-{
-  "aiComment": "오늘의 상태에 대한 분석과 격려 (50자 이내)",
-  "adviceItems": [
-    {
-      "id": "advice-1",
-      "category": "PHYSICAL | MENTAL | LIFESTYLE | SLEEP | NUTRITION 중 택1",
-      "content": "구체적인 실천 행동 (예: 미온수 200ml 마시기)"
-    },
-    ... (총 3개)
-  ]
-}`;
-
-            const text = await this.generateWithFallback(prompt);
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                return JSON.parse(jsonMatch[0]);
-            }
-            throw new Error('JSON parsing failed');
-        } catch (error) {
-            console.error('Gemini Action Advice Error:', error);
-            return {
-                aiComment: "오늘도 당신의 회복을 응원합니다. 간단한 행동부터 시작해 보세요.",
-                adviceItems: [
-                    { id: 'def-1', category: 'PHYSICAL', content: '잠시 눈을 감고 크게 심호흡 5번 하기' },
-                    { id: 'def-2', category: 'LIFESTYLE', content: '가벼운 스트레칭으로 몸의 긴장 풀기' },
-                    { id: 'def-3', category: 'NUTRITION', content: '미온수 한 잔 천천히 들이키기' }
-                ]
-            };
-        }
-    }
 
     // AI Section Image Generation: Multimodal generation (Text + Reference Image)
     static async generateDetailImage(input: {
@@ -1979,6 +1989,117 @@ JSON 형식:
                     "시술 부위가 가렵더라도 손으로 만지지 않도록 주의가 필요합니다."
                 ]
             };
+        }
+    }
+
+    /**
+     * Dynamic Question Generator: Generates a 5-step tailored questionnaire
+     * based on the user's specific symptom and medical category.
+     */
+    static async generateDynamicQuestions(symptom: string, category: string): Promise<any> {
+        try {
+            const categoryNames: Record<string, string> = {
+                'ORTHOPEDIC': '정형/재활',
+                'INTERNAL': '내과/검진',
+                'PLASTIC': '성형/피부',
+                'GENERAL': '일반 진료'
+            };
+            const categoryName = categoryNames[category] || '정밀 진료';
+
+            const prompt = `당신은 유니클(Youniqle)의 수석 리커버리 디자이너입니다. 
+사용자의 증상을 바탕으로, 병원 방문 전 완벽한 회복 설계를 위해 필요한 **[5단계 초개인화 문진지]**를 생성해주세요.
+
+## 사용자의 상황
+- 증상: "${symptom}"
+- 분류된 분야: ${categoryName}
+
+## 문진 설계 원칙
+1. **1단계(기대치)**: 유저가 이 증상을 통해 얻고 싶은 '회복의 깊이'를 묻습니다.
+2. **2단계(안전/이력)**: 해당 증상과 관련된 과거 이력이나 안전을 위해 확인해야 할 사항을 묻습니다.
+3. **3단계(불안/우려)**: 유저가 현재 가장 걱정하고 있는 지점을 선택지로 제시합니다.
+4. **4단계(편의/환경)**: 병원 방문 시 유저의 컨디션을 고려한 특별한 배려 사항을 묻습니다.
+5. **5단계(최종 조율 - MEDICAL CRITICAL)**: 
+   - **성형, 피부, 미용, 치과, 한방 분야**: 완벽한 회복을 위한 '예산 투자 범위'를 묻습니다. (type: "budget")
+   - **정형외과, 내과, 외과 등 보험 진료 위주 분야**: 절대 예산을 묻지 마세요. 대신 **'의료진이 신뢰할 수 있는 재활 프로토콜 준수 의지'** 또는 **'진단을 위해 더 상세히 설명해야 할 신체적 징후나 통증 패턴'**을 묻는 전문적인 주관식 질문을 생성하세요. (type: "text")
+     - (예: "성공적인 회복을 위해 제시되는 재활 수칙을 엄격히 준수하실 준비가 되셨나요?", "의료진에게 전달할 현재 통증의 가장 구체적인 양상을 기록해주세요.")
+
+## 응답 형식 (JSON Only)
+{
+  "steps": {
+    "step1": { "title": "제목", "sub": "설명", "label": "질문", "options": [{ "label": "선택지1", "value": "자연스러운 변화" }, ...] },
+    "step2": { "title": "제목", "sub": "설명", "label": "질문", "placeholder": "입력 가이드" },
+    "step3": { "title": "제목", "sub": "설명", "label": "질문", "options": [{ "id": "a1", "label": "걱정거리1", "value": "v1" }, ...] },
+    "step4": { "title": "제목", "sub": "설명", "label": "질문", "placeholder": "배려 사항 가이드" },
+    "step5": { 
+      "type": "budget" | "text", 
+      "title": "의료적 최종 확인 (제목)", 
+      "sub": "전문의 상담 전 확인 사항 (설명)", 
+      "label": "전문적인 질문 내용",
+      "placeholder": "의료진에게 전달될 중요한 정보입니다."
+    }
+  }
+}
+
+* 주의: 모든 명칭은 '유니클'로 통일하며, 선택지 가치(value)는 step1에서 [자연스러운 변화, 세련된 변화, 드라마틱한 변화] 중 하나를 매칭시켜주세요.`;
+
+            const text = await this.generateWithFallback(prompt, "유니클 리커버리 디자이너 모드", 0.7);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error('Failed to generate dynamic questions');
+        } catch (error) {
+            console.error('Gemini Dynamic Questions Error:', error);
+            return null; // Fallback to static content in frontend
+        }
+    }
+
+    // AI Symptom Analyzer: Recommends medical category based on user symptoms
+    static async analyzeSymptom(symptom: string): Promise<{ category: string; reason: string }> {
+        try {
+            const prompt = `당신은 유니클(Youniqle)의 지능형 메디컬 코디네이터입니다.
+사용자의 증상을 분석하여 가장 적절한 '진료 분야(medicalCategory)'를 추천해주세요.
+
+## 사용자의 증상
+"${symptom}"
+
+## 추천 가능한 진료 분야 (medicalCategory)
+- ORTHOPEDIC: 정형외과, 재활의학과, 관절/척추 통증, 도수치료 관련
+- INTERNAL: 내과, 건강검진, 기저질환 관리, 영양 수액 관련
+- PLASTIC: 성형외과, 피부과, 미용 시술, 안티에이징 관련
+- GENERAL: 일반 외과, 대학병원 수술 전후 관리, 기타 복합 증상
+
+## 응답 지침
+1. 사용자의 증상을 의학적 상식에 기반하여 분석하세요.
+2. 위 4가지 카테고리 중 가장 적합한 하나를 'category' 필드에 넣으세요.
+3. 추천 이유를 'reason' 필드에 1-2문장으로 설명하세요.
+4. 반드시 아래 JSON 형식으로만 응답하세요. 다른 설명은 추가하지 마세요.
+
+## 응답 형식 (JSON Only)
+{
+  "category": "ORTHOPEDIC | INTERNAL | PLASTIC | GENERAL",
+  "reason": "추천 이유를 여기에 적어주세요."
+}`;
+
+            const text = await this.generateWithFallback(prompt);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                // Validate category
+                const validCategories = ['ORTHOPEDIC', 'INTERNAL', 'PLASTIC', 'GENERAL'];
+                if (!validCategories.includes(parsed.category)) {
+                    parsed.category = 'GENERAL';
+                }
+                return parsed;
+            }
+            
+            return { category: 'GENERAL', reason: '정밀 분석을 위해 일반 상담으로 연결합니다.' };
+
+        } catch (error) {
+            console.error('Gemini Symptom Analysis Error:', error);
+            return { category: 'GENERAL', reason: '서비스 일시적인 오류로 일반 상담으로 연결합니다.' };
         }
     }
 }

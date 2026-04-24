@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import PreConsultation from '@/models/PreConsultation';
+import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,10 @@ export async function POST(req: Request) {
     // 유저의 recentNavigator 값이 세션에 있다면 (네비게이터 추천으로 온 유저), 이를 기록
     const navigatorCode = (session.user as any)?.recentNavigator || '';
 
+    // 3. AI 리포트 가이드 실시간 생성
+    console.log('🤖 유니클 리커버리 리포트 생성 중...');
+    const aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(data);
+    
     const newConsultation = new PreConsultation({
       user: (session.user as any).id,
       navigator: navigatorCode,
@@ -29,9 +34,11 @@ export async function POST(req: Request) {
       visitPlan: data.visitPlan,
       investment: data.investment,
       medicalCategory: data.medicalCategory,
+      aiGuide: aiGuide // 분석 결과 저장
     });
 
     await newConsultation.save();
+    console.log('✅ 리포트 저장 완료:', newConsultation._id);
 
     return NextResponse.json({ 
       success: true, 

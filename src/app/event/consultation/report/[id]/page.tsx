@@ -98,7 +98,7 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-mist">
         <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-        <p className="text-slate font-bold animate-pulse text-sm">AI 가이드 리포트를 분석하고 있습니다...</p>
+        <p className="text-slate font-bold animate-pulse text-sm">유니클 리커버리 매니저가 리포트를 정밀 분석하고 있습니다...</p>
       </div>
     );
   }
@@ -303,17 +303,32 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                </div>
             </section>
 
-             {/* 5. Investment */}
+             {/* 5. Investment or Commitment */}
              <section>
                <h2 className="text-2xl font-black mb-4 flex items-center gap-2 text-obsidian">
-                 <span className="text-primary text-2xl font-black">₩</span> 5. 투자 예산 및 추가 서비스
+                 {data.medicalCategory === 'PLASTIC' ? (
+                   <>
+                    <span className="text-primary text-2xl font-black">₩</span> 5. 투자 예산 및 추가 서비스
+                   </>
+                 ) : (
+                   <>
+                    <ClipboardCheck className="text-primary w-7 h-7" /> 5. 회복을 위한 의료적 다짐 및 준비
+                   </>
+                 )}
                </h2>
                <div className="flex flex-col md:flex-row gap-6 p-6 border-2 border-primary/20 rounded-2xl bg-white shadow-sm">
                  <div className="flex-1">
-                   <p className="text-sm font-bold text-slate mb-1">예상 투자 비용 구간</p>
-                   <p className="text-2xl font-black text-primary">
-                     {data.investment?.budgetRange === 'custom' ? `직접 입력: ${data.investment?.customBudget}` : data.investment?.budgetRange}
+                   <p className="text-sm font-bold text-slate mb-1">
+                     {data.medicalCategory === 'PLASTIC' ? '예상 투자 비용 구간' : '의료진 전달 사항 및 다짐'}
                    </p>
+                   <div className={`${data.medicalCategory !== 'PLASTIC' ? 'bg-mist/30 p-4 rounded-xl border border-line mt-2' : ''}`}>
+                     <p className={`${data.medicalCategory === 'PLASTIC' ? 'text-2xl font-black text-primary' : 'text-lg font-bold text-obsidian leading-relaxed'}`}>
+                       {data.medicalCategory === 'PLASTIC' 
+                         ? (data.investment?.budgetRange === 'custom' ? `직접 입력: ${data.investment?.customBudget}` : data.investment?.budgetRange)
+                         : (data.investment?.customBudget || '기록된 다짐이 없습니다.')
+                       }
+                     </p>
+                   </div>
                  </div>
                  <div className="w-px bg-line hidden md:block" />
                  <div className="flex-1 space-y-3">
@@ -344,7 +359,7 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                       <Sparkles className="w-6 h-6" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black text-obsidian tracking-tight">AI 리커버리 매니저 면담 가이드</h2>
+                      <h2 className="text-2xl font-black text-obsidian tracking-tight">유니클 리커버리 매니저 면담 가이드</h2>
                       <p className="text-xs text-slate font-bold uppercase tracking-widest">Tailored consultation strategy</p>
                     </div>
                   </div>
@@ -369,9 +384,9 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                              </div>
                              <div className="flex-1">
                                <p className="text-lg font-black text-obsidian mb-2">{item.question}</p>
-                               <div className="flex gap-2 items-start opacity-70">
-                                 <span className="inline-block mt-1 min-w-[3rem] text-[10px] font-black uppercase text-primary tracking-widest bg-primary/10 px-2 py-0.5 rounded">Rationale</span>
-                                 <p className="text-sm font-medium">{item.rationale}</p>
+                               <div className="flex flex-col sm:flex-row gap-3 items-start opacity-80 mt-3 bg-primary/5 p-3 rounded-lg border border-primary/10">
+                                 <span className="inline-block shrink-0 text-[10px] font-black uppercase text-primary tracking-widest bg-primary/20 px-2 py-1 rounded">Rationale</span>
+                                 <p className="text-sm font-semibold leading-relaxed text-slate">{item.rationale}</p>
                                </div>
                              </div>
                            </div>
@@ -403,33 +418,23 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
           </div>
         </div>
 
-        {/* Action Buttons Section (NEW) */}
-        <div className="py-12 flex flex-col items-center gap-8">
-           <div className="text-center space-y-2">
-             <h3 className="text-xl font-black">상담 준비가 끝나셨나요?</h3>
-             <p className="text-slate font-medium italic opacity-70">병원 방문 후의 여정도 유니클이 함께합니다.</p>
+        {/* Action Buttons Section (Optimized) */}
+        <div className="py-16 flex flex-col items-center gap-10">
+           <div className="text-center space-y-3">
+             <h3 className="text-2xl font-black tracking-tight">회복을 위한 다음 단계를 확인하세요</h3>
+             <p className="text-slate font-medium italic opacity-70">분석된 데이터를 바탕으로 정밀한 회복 여정이 설계되었습니다.</p>
            </div>
            
-           <div className="flex flex-wrap gap-4 justify-center">
-             <Button 
-               size="lg" 
-               className="h-16 px-8 bg-obsidian text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all group"
-               onClick={() => router.push('/ai-navigator')}
-             >
-               <MessageSquare className="w-5 h-5 mr-3 group-hover:animate-bounce" />
-               네비게이터와 대화하기
-             </Button>
-             <Button 
-               size="lg" 
-               variant="outline"
-               className="h-16 px-8 bg-white border-2 border-line text-obsidian rounded-2xl font-black text-lg shadow-xl hover:bg-mist transition-all"
-               onClick={() => addToast({ title: '안내', description: '상담 후기 예약 시스템을 준비 중입니다.', variant: 'info' })}
-             >
-               상담 후기 예약하기
-             </Button>
-           </div>
+           <Button 
+             size="lg" 
+             className="h-20 px-12 bg-obsidian text-white rounded-[24px] font-black text-xl shadow-2xl hover:scale-105 transition-all group flex items-center gap-4"
+             onClick={() => router.push('/ai-navigator')}
+           >
+             <Sparkles className="w-6 h-6 text-primary group-hover:animate-spin" />
+             나의 리커버리 지표 확인하기
+           </Button>
            
-           <p className="text-[10px] text-slate font-black uppercase tracking-[0.3em] opacity-40">Security Protocol Locked | Confidential Report</p>
+           <p className="text-[10px] text-slate font-black uppercase tracking-[0.4em] opacity-30">Security Protocol Locked | Confidential Report</p>
         </div>
       </div>
     </div>
