@@ -1,16 +1,52 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, ShieldCheck, Heart, Activity, ClipboardCheck, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 /**
  * ClinicConsultationSection (Compact 1/3 Size)
  * 클리닉 시술 전/후를 선택할 수 있는 콤팩트한 전용 섹션입니다.
  */
 export default function ClinicConsultationSection() {
+  const router = useRouter();
+  const [loadingType, setLoadingType] = useState<'pre' | 'post' | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState('');
+
+  const handleStart = (type: 'pre' | 'post', href: string) => {
+    setLoadingType(type);
+    setProgress(0);
+    
+    // Initial text
+    setLoadingText(type === 'pre' ? '정밀 문진 설계 중...' : '맞춤 케어 분석 중...');
+
+    const startTime = Date.now();
+    const duration = 2000; // 2 seconds for a snappier feel than 60s diagnosis
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min((elapsed / duration) * 100, 99);
+      setProgress(newProgress);
+
+      if (newProgress > 40 && newProgress < 80) {
+        setLoadingText(type === 'pre' ? '클리닉 데이터 동기화...' : '회복 데이터 수집 중...');
+      } else if (newProgress >= 80) {
+        setLoadingText('준비가 완료되었습니다!');
+      }
+
+      if (elapsed >= duration) {
+        clearInterval(interval);
+        setProgress(100);
+        setTimeout(() => {
+          router.push(href);
+        }, 300);
+      }
+    }, 50);
+  };
+
   return (
     <section className="container mx-auto px-6 py-10">
       <div className="relative group overflow-hidden rounded-[40px] border border-white/10 shadow-2xl">
@@ -52,7 +88,7 @@ export default function ClinicConsultationSection() {
             </div>
             <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5 flex items-center gap-3">
               <Activity className="w-5 h-5 text-chapter-accent" />
-              <span className="text-xs font-black text-white">AI 데이터 분석</span>
+              <span className="text-xs font-black text-white">유니클 데이터 분석</span>
             </div>
             <div className="bg-white/5 backdrop-blur-xl p-4 rounded-3xl border border-white/5 flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-chapter-accent" />
@@ -63,31 +99,95 @@ export default function ClinicConsultationSection() {
           {/* Dual Choice Buttons (Responsive) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl pt-4">
             {/* Option 1: Pre-hospital */}
-            <Link href="/event/consultation" className="block">
+            <div className="block">
               <Button 
+                onClick={() => handleStart('pre', '/event/consultation')}
+                disabled={loadingType !== null}
                 variant="outline"
-                className="w-full h-16 md:h-20 bg-white/5 hover:bg-white text-mist hover:text-obsidian border-white/10 rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all"
+                className="w-full h-16 md:h-20 bg-white/5 hover:bg-white text-mist hover:text-obsidian border-white/10 rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all relative overflow-hidden"
               >
-                <div className="flex items-center gap-2">
-                  <ClipboardCheck className="w-5 h-5" />
-                  <span className="text-base md:text-lg font-black">병원 방문 전 정밀 문진</span>
+                {/* Progress Bar Background */}
+                {loadingType === 'pre' && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    className="absolute inset-0 bg-chapter-accent/20 z-0"
+                  />
+                )}
+
+                <div className="relative z-10 flex flex-col items-center justify-center gap-1">
+                  <div className="flex items-center gap-2">
+                    {loadingType === 'pre' ? (
+                      <Sparkles className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <ClipboardCheck className="w-5 h-5" />
+                    )}
+                    <span className="text-base md:text-lg font-black">
+                      <AnimatePresence mode="wait">
+                        {loadingType === 'pre' ? (
+                          <motion.span
+                            key={loadingText}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                          >
+                            {loadingText}
+                          </motion.span>
+                        ) : (
+                          <span>병원 방문 전 정밀 문진</span>
+                        )}
+                      </AnimatePresence>
+                    </span>
+                  </div>
+                  <span className="text-[10px] opacity-60 font-medium">최적의 시술 결과 설계</span>
                 </div>
-                <span className="text-[10px] opacity-60 font-medium">최적의 시술 결과 설계</span>
               </Button>
-            </Link>
+            </div>
 
             {/* Option 2: Post-op */}
-            <Link href="/event/post-care" className="block">
+            <div className="block">
               <Button 
-                className="w-full h-16 md:h-20 bg-chapter-accent hover:bg-white text-white hover:text-obsidian rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all shadow-xl shadow-chapter-accent/20"
+                onClick={() => handleStart('post', '/event/post-care')}
+                disabled={loadingType !== null}
+                className="w-full h-16 md:h-20 bg-chapter-accent hover:bg-white text-white hover:text-obsidian rounded-[24px] flex flex-col items-center justify-center gap-1 group transition-all shadow-xl shadow-chapter-accent/20 relative overflow-hidden"
               >
-                <div className="flex items-center gap-2">
-                  <History className="w-5 h-5" />
-                  <span className="text-base md:text-lg font-black">시술/수술 후 맞춤 케어</span>
+                {/* Progress Bar Background */}
+                {loadingType === 'post' && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    className="absolute inset-0 bg-white/30 z-0"
+                  />
+                )}
+
+                <div className="relative z-10 flex flex-col items-center justify-center gap-1">
+                  <div className="flex items-center gap-2">
+                    {loadingType === 'post' ? (
+                      <Sparkles className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <History className="w-5 h-5" />
+                    )}
+                    <span className="text-base md:text-lg font-black">
+                      <AnimatePresence mode="wait">
+                        {loadingType === 'post' ? (
+                          <motion.span
+                            key={loadingText}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                          >
+                            {loadingText}
+                          </motion.span>
+                        ) : (
+                          <span>시술/수술 후 맞춤 케어</span>
+                        )}
+                      </AnimatePresence>
+                    </span>
+                  </div>
+                  <span className="text-[10px] opacity-80 group-hover:opacity-60 font-medium">부기 및 회복 실시간 분석</span>
                 </div>
-                <span className="text-[10px] opacity-80 group-hover:opacity-60 font-medium">부기 및 회복 실시간 분석</span>
               </Button>
-            </Link>
+            </div>
           </div>
           
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-mist/20">

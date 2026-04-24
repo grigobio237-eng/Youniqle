@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,15 +10,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search, Stethoscope, Activity, Heart, ShieldCheck, Sparkles } from "lucide-react";
 import { useRecovery } from "@/contexts/RecoveryContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PreProcedureForm() {
   const router = useRouter();
   const { addToast } = useToast();
-  const { medicalCategory } = useRecovery();
-  const [step, setStep] = useState(1);
+  const { medicalCategory, setMedicalCategory } = useRecovery();
+  const [step, setStep] = useState(medicalCategory ? 1 : 0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [symptomText, setSymptomText] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Adaptive Content Definition
   const content = useMemo(() => {
@@ -65,7 +68,7 @@ export default function PreProcedureForm() {
           eventSub: "시술/수술 전후로 반드시 건강을 회복해야 하는 일정이 있나요?",
           eventPlaceholder: "예: 다음 주부터 중요한 프로젝트 복귀가 예정되어 있습니다."
         };
-      default: // PLASTIC or Default
+      case 'PLASTIC':
         return {
           step1Title: "당신은 어떤 회복을 꿈꾸나요?",
           step1Sub: "기대하는 변화와 미적 목표를 알려주세요.",
@@ -79,59 +82,48 @@ export default function PreProcedureForm() {
           eventSub: "시술 후 한 달 안에 결혼식이나 사진 촬영처럼 꼭 예뻐야 하는 날이 있나요?",
           eventPlaceholder: "예: 3주 뒤 웨딩 촬영이 있습니다."
         };
+      default:
+        return {
+          step1Title: "전문적인 회복 설계를 시작합니다",
+          step1Sub: "최적의 결과를 위한 개인별 맞춤 질문을 구성합니다.",
+          changeLabel: "1. 목표하는 회복의 깊이",
+          changeOptions: [
+            { label: "일상적인 기본 회복", value: "자연스러운 변화" },
+            { label: "적극적인 컨디션 개선", value: "세련된 변화" },
+            { label: "근본적인 건강력 강화", value: "드라마틱한 변화" }
+          ],
+          eventLabel: "3. 일정 확인",
+          eventSub: "회복 과정 중 고려해야 할 중요한 일정이 있나요?",
+          eventPlaceholder: "상세 내용을 적어주세요."
+        };
     }
   }, [medicalCategory]);
 
   // Form State
   const [formData, setFormData] = useState({
-    // Step 1
     changeScale: "",
     downtime: "",
     hasImportantEvent: false,
     importantEventDetails: "",
-
-    // Step 2
     hasPastExperience: false,
     pastExperienceDetails: "",
     isTakingMedication: false,
     medicationDetails: "",
     hasHealthIssue: false,
     healthIssueDetails: "",
-
-    // Step 3
     anxietyPoints: [] as string[],
     privacyDetails: "",
-
-    // Step 4
     hasCompanion: false,
     companionDetails: "",
     needsTransportation: false,
     transportationDetails: "",
     wantsPrivacyRoute: false,
     privacyRouteDetails: "",
-
-    // Step 5
     budgetRange: "",
     customBudget: "",
     needsDedicatedManager: false,
     needsPremiumKit: false,
   });
-
-  const handleAnxietyChange = (point: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      anxietyPoints: prev.anxietyPoints.includes(point)
-        ? prev.anxietyPoints.filter((p) => p !== point)
-        : [...prev.anxietyPoints, point],
-    }));
-  };
-
-  const calculateType = () => {
-    if (formData.wantsPrivacyRoute || formData.anxietyPoints.includes('프라이버시')) return '프라이버시 보호형';
-    if (formData.downtime === '1일' || formData.downtime === '3일') return '빠른 복귀형';
-    if (formData.budgetRange === 'large' || formData.needsDedicatedManager) return '프리미엄 집중케어형';
-    return '스탠다드 맞춤형';
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +131,7 @@ export default function PreProcedureForm() {
 
     try {
       const payload = {
-        medicalCategory, // Include the selected category
+        medicalCategory,
         expectation: {
           changeScale: formData.changeScale,
           downtime: formData.downtime,
@@ -218,8 +210,59 @@ export default function PreProcedureForm() {
     }
   };
 
+  const handleCategorySelect = (category: any) => {
+    setMedicalCategory(category);
+    setStep(1);
+  };
+
+  const analyzeSymptom = async () => {
+    if (!symptomText.trim()) return;
+    setIsAnalyzing(true);
+    
+    // AI Analysis Simulation
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const text = symptomText.toLowerCase();
+    let recommended: any = 'GENERAL';
+    
+    if (text.includes('허리') || text.includes('어깨') || text.includes('무릎') || text.includes('관절') || text.includes('통증')) {
+      recommended = 'ORTHOPEDIC';
+    } else if (text.includes('피부') || text.includes('얼굴') || text.includes('코') || text.includes('눈') || text.includes('지방')) {
+      recommended = 'PLASTIC';
+    } else if (text.includes('배') || text.includes('속이') || text.includes('머리') || text.includes('검진') || text.includes('혈압')) {
+      recommended = 'INTERNAL';
+    }
+
+    setMedicalCategory(recommended);
+    addToast({
+      title: "증상 분석 완료",
+      description: `${recommended === 'ORTHOPEDIC' ? '정형/재활' : recommended === 'PLASTIC' ? '성형/피부' : '내과/일반'} 분야 맞춤 문진으로 안내합니다.`,
+      variant: "success"
+    });
+    
+    setIsAnalyzing(false);
+    setStep(1);
+  };
+
+  const handleAnxietyChange = (point: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      anxietyPoints: prev.anxietyPoints.includes(point)
+        ? prev.anxietyPoints.filter((p) => p !== point)
+        : [...prev.anxietyPoints, point],
+    }));
+  };
+
+  const calculateType = () => {
+    if (formData.wantsPrivacyRoute || formData.anxietyPoints.includes('프라이버시')) return '프라이버시 보호형';
+    if (formData.downtime === '1일' || formData.downtime === '3일') return '빠른 복귀형';
+    if (formData.budgetRange === 'large' || formData.needsDedicatedManager) return '프리미엄 집중케어형';
+    return '스탠다드 맞춤형';
+  };
+
   const getProgressWidth = () => {
     switch (step) {
+      case 0: return "w-0";
       case 1: return "w-1/5";
       case 2: return "w-2/5";
       case 3: return "w-3/5";
@@ -233,15 +276,109 @@ export default function PreProcedureForm() {
     <div className="max-w-3xl mx-auto py-10 px-4">
       <Card className="border-none shadow-2xl bg-surface/80 backdrop-blur-xl rounded-[32px] overflow-hidden">
         <div className={`h-2 bg-primary transition-all duration-500 ${getProgressWidth()}`} />
-        <CardHeader className="pt-10 pb-6 text-center">
-          <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery Design</CardTitle>
-          <CardDescription className="text-lg font-medium text-text-secondary">
-            {medicalCategory === 'PLASTIC' ? '성형/피부' : 
-             medicalCategory === 'ORTHOPEDIC' ? '정형/재활' : 
-             medicalCategory === 'INTERNAL' ? '내과/검진' : '정밀'} 회복 설계를 시작합니다.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pb-10">
+        {step === 0 ? (
+          <div className="p-8 md:p-12 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20 mb-2">
+                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                <span className="text-xs font-black text-primary uppercase tracking-widest">Intelligent Trigger</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight italic">
+                어디가 <span className="text-primary">불편</span>하신가요?
+              </h2>
+              <p className="text-text-secondary font-medium">
+                증상을 알려주시거나 방문하시려는 분야를 선택하시면<br />
+                유니클이 당신을 위한 맞춤 문진표를 구성합니다.
+              </p>
+            </div>
+
+            {/* Symptom Input Area */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary/5 rounded-[24px] blur-xl group-focus-within:bg-primary/10 transition-all" />
+              <div className="relative bg-white/50 border-2 border-line group-focus-within:border-primary/50 rounded-[24px] p-2 flex items-center gap-3 transition-all">
+                <div className="pl-4">
+                  <Search className="w-6 h-6 text-text-secondary" />
+                </div>
+                <Input 
+                  placeholder="예: 어깨가 결리고 통증이 있어요 / 점 빼고 싶어요"
+                  className="border-none bg-transparent h-14 text-lg focus-visible:ring-0 placeholder:text-text-secondary/50"
+                  value={symptomText}
+                  onChange={(e) => setSymptomText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && analyzeSymptom()}
+                />
+                <Button 
+                  onClick={analyzeSymptom}
+                  disabled={isAnalyzing || !symptomText.trim()}
+                  className="h-12 px-6 rounded-2xl bg-primary text-white font-bold"
+                >
+                  {isAnalyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : "분석 시작"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Category Selection */}
+            <div className="space-y-4">
+              <p className="text-xs font-black text-text-secondary uppercase tracking-widest text-center">직접 분야 선택하기</p>
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => handleCategorySelect('ORTHOPEDIC')}
+                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
+                >
+                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Activity className="w-6 h-6 text-blue-500" />
+                  </div>
+                  <h4 className="font-black text-lg mb-1">정형/재활</h4>
+                  <p className="text-xs text-text-secondary font-medium">통증 관리 및 관절 회복</p>
+                </button>
+                <button 
+                  onClick={() => handleCategorySelect('PLASTIC')}
+                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
+                >
+                  <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Heart className="w-6 h-6 text-pink-500" />
+                  </div>
+                  <h4 className="font-black text-lg mb-1">성형/피부</h4>
+                  <p className="text-xs text-text-secondary font-medium">미적 개선 및 시술 케어</p>
+                </button>
+                <button 
+                  onClick={() => handleCategorySelect('INTERNAL')}
+                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
+                >
+                  <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Stethoscope className="w-6 h-6 text-green-500" />
+                  </div>
+                  <h4 className="font-black text-lg mb-1">내과/검진</h4>
+                  <p className="text-xs text-text-secondary font-medium">건강 지표 및 질환 관리</p>
+                </button>
+                <button 
+                  onClick={() => handleCategorySelect('GENERAL')}
+                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
+                >
+                  <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <ShieldCheck className="w-6 h-6 text-slate-500" />
+                  </div>
+                  <h4 className="font-black text-lg mb-1">일반 진료</h4>
+                  <p className="text-xs text-text-secondary font-medium">기타 신체 회복 및 상담</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <CardHeader className="pt-10 pb-6 text-center">
+              <div className="flex justify-center mb-2">
+                 <Button variant="ghost" size="sm" onClick={() => setStep(0)} className="text-xs font-bold text-text-secondary hover:text-primary">
+                   ← 방문 분야 다시 선택
+                 </Button>
+              </div>
+              <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery Design</CardTitle>
+              <CardDescription className="text-lg font-medium text-text-secondary">
+                {medicalCategory === 'PLASTIC' ? '성형/피부' : 
+                 medicalCategory === 'ORTHOPEDIC' ? '정형/재활' : 
+                 medicalCategory === 'INTERNAL' ? '내과/검진' : '정밀'} 회복 설계를 시작합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pb-10">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 sm:px-6">
             
             {/* STEP 1: 기대치 (Adaptive Content applied here) */}
@@ -684,7 +821,9 @@ export default function PreProcedureForm() {
             )}
           </form>
         </CardContent>
-      </Card>
-    </div>
-  );
+      </>
+    )}
+  </Card>
+</div>
+);
 }
