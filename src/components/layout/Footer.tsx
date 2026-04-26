@@ -66,9 +66,9 @@ export default function Footer() {
   };
 
   const handleProtectedLink = (e: React.MouseEvent) => {
-    if ((session?.user as any)?.role !== 'admin') {
+    if (!['admin', 'superadmin'].includes((session?.user as any)?.role)) {
       e.preventDefault();
-      alert('해당 등급 이외에 접근권한이 없습니다.');
+      alert('관리자 권한이 없습니다.');
     }
   };
 

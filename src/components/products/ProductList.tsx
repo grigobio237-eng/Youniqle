@@ -61,7 +61,7 @@ export default function ProductList({ searchParams }: ProductListProps) {
         if (searchParams.isFunding) params.append('isFunding', searchParams.isFunding);
 
         // 관리자용 프리뷰 모드 추가
-        if ((session?.user as any)?.role === 'admin') {
+        if (['admin', 'superadmin'].includes((session?.user as any)?.role)) {
           params.append('preview', 'true');
         }
 

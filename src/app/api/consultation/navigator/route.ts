@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
@@ -9,7 +9,7 @@ import { NotificationService } from '@/lib/notificationService';
 export const dynamic = 'force-dynamic';
 
 // GET: 상담 목록 조회
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -20,18 +20,32 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const mode = url.searchParams.get('mode'); // 'admin', 'navigator', 'user'
 
-    let query: any = {};
-    const userRole = (session.user as any).role;
-    const isNavigator = (session.user as any).isNavigator;
+    let user = session?.user;
+    if (!user) {
+      const { verifyAdminToken } = await import('@/lib/auth');
+      const adminAuth = await verifyAdminToken(req as any);
+      if (adminAuth.success) {
+        user = adminAuth.user as any;
+      }
+    }
 
-    if (mode === 'admin' && userRole === 'admin') {
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let query: any = {};
+    const userRole = (user as any).role;
+    const isNavigator = (user as any).isNavigator;
+
+    if (mode === 'admin' && (userRole === 'admin' || userRole === 'superadmin')) {
       // 모든 상담 조회
-    } else if (mode === 'navigator' && (isNavigator || userRole === 'admin')) {
-      const me = await User.findById((session.user as any).id);
+    } else if (mode === 'navigator' && (isNavigator || userRole === 'admin' || userRole === 'superadmin')) {
+      const { default: User } = await import('@/models/User');
+      const me = await User.findById((user as any).id);
       query = { navigatorId: me.referralCode };
     } else {
       // 본인 상담만 조회
-      query = { userId: (session.user as any).id };
+      query = { userId: (user as any).id };
     }
 
     const consultations = await NavigatorConsultation.find(query)

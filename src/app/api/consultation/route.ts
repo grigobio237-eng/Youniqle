@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -63,20 +63,31 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const mode = url.searchParams.get('mode'); // 'admin' 혹은 'navigator'
 
+    let user = session?.user;
+
+    // NextAuth 세션이 없으면 admin-token 쿠키 확인
+    if (!user) {
+      const { verifyAdminToken } = await import('@/lib/auth');
+      const adminAuth = await verifyAdminToken(req as any);
+      if (adminAuth.success) {
+        user = adminAuth.user as any;
+      }
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     let query = {};
 
     // 1. 관리자인 경우 모든 데이터를 볼 수 있음
-    if ((session.user as any).role === 'admin') {
+    if ((user as any).role === 'admin' || (user as any).role === 'superadmin') {
       // no filter needed
     } 
     // 2. 네비게이터 권한인 경우 본인을 거쳐간 유저의 데이터만 볼 수 있게 제한
-    else if ((session.user as any).isNavigator || mode === 'navigator') {
-      // session.user.email 이나 고유 추천 코드로 검색해야 함. 
-      // (auth.ts 기준 네비게이터의 추천 코드가 recentNavigator 에 들어감. 추천 코드는 referralCode 이거나 email 앞단)
-      // 정확한 조회를 위해 토큰의 email로 User.findOne 을 해 referralCode 조회
-      // 편의상 이 API 호출 전 클라이언트에서 navigatorCode를 넘기거나 여기서 조회
+    else if ((user as any).isNavigator || mode === 'navigator') {
       const { default: User } = await import('@/models/User');
-      const me = await User.findById((session.user as any).id);
+      const me = await User.findById((user as any).id);
       if (!me || (!me.isNavigator && me.role !== 'admin')) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }

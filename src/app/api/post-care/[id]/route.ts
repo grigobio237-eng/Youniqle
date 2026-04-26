@@ -28,7 +28,7 @@ export async function GET(
 
     // 권한 확인: 본인의 리포트거나 관리자/네비게이터인 경우만 허용
     const isOwner = (survey.user as any)._id.toString() === (session.user as any).id;
-    const isStaff = (session.user as any).role === 'admin' || (session.user as any).isNavigator;
+    const isStaff = ['admin', 'superadmin'].includes((session.user as any).role) || (session.user as any).isNavigator;
 
     if (!isOwner && !isStaff) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

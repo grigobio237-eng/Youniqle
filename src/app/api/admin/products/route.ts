@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import Product from '@/models/Product';
 import Order from '@/models/Order';
 import Review from '@/models/Review';
+import { verifyAdminToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,6 +13,12 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'all';
     const approvalStatus = searchParams.get('approvalStatus') || 'all';
     const sort = searchParams.get('sort') || 'newest';
+
+    // 관리자 권한 검증
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
 
     await connectDB();
 
@@ -161,6 +168,12 @@ export async function POST(request: NextRequest) {
         { error: '필수 필드를 모두 입력해주세요.' },
         { status: 400 }
       );
+    }
+
+    // 관리자 권한 검증
+    const auth = await verifyAdminToken(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
 
     await connectDB();

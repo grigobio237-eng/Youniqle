@@ -82,7 +82,7 @@ export async function authenticateAdmin(request: NextRequest): Promise<{ user: a
     return authResult;
   }
 
-  if (authResult.user.role !== 'admin') {
+  if (!['admin', 'superadmin'].includes(authResult.user.role)) {
     return { user: null, error: '관리자 권한이 필요합니다.' };
   }
 
@@ -97,7 +97,7 @@ export async function authenticatePartner(request: NextRequest): Promise<{ user:
     return authResult;
   }
 
-  if (!['admin', 'partner'].includes(authResult.user.role)) {
+  if (!['admin', 'superadmin', 'partner'].includes(authResult.user.role)) {
     return { user: null, error: '파트너 또는 관리자 권한이 필요합니다.' };
   }
 

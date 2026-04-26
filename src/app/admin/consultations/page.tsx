@@ -46,27 +46,38 @@ export default function AdminConsultationsPage() {
     setLoading(true);
     try {
       const [consultationRes, omakaseRes, navigatorRes] = await Promise.all([
-        fetch('/api/consultation?mode=admin'),
-        fetch('/api/admin/concierge/requests'),
-        fetch('/api/consultation/navigator?mode=admin')
+        fetch('/api/consultation?mode=admin', { credentials: 'include' }),
+        fetch('/api/admin/concierge/requests', { credentials: 'include' }),
+        fetch('/api/consultation/navigator?mode=admin', { credentials: 'include' })
       ]);
+
+      console.log('📡 Fetching Consultation Data...');
 
       if (consultationRes.ok) {
         const data = await consultationRes.json();
+        console.log('✅ Consultations loaded:', data.consultations?.length || 0);
         setConsultations(data.consultations || []);
+      } else {
+        console.error('❌ Consultations failed:', consultationRes.status);
       }
 
       if (omakaseRes.ok) {
         const data = await omakaseRes.json();
+        console.log('✅ Omakase loaded:', data?.length || 0);
         setOmakaseRequests(data || []);
+      } else {
+        console.error('❌ Omakase failed:', omakaseRes.status);
       }
 
       if (navigatorRes.ok) {
         const data = await navigatorRes.json();
+        console.log('✅ Navigator consults loaded:', data.consultations?.length || 0);
         setNavigatorConsults(data.consultations || []);
+      } else {
+        console.error('❌ Navigator consults failed:', navigatorRes.status);
       }
     } catch (err) {
-      console.error(err);
+      console.error('❌ Fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -114,24 +125,36 @@ export default function AdminConsultationsPage() {
     }
   };
 
-  const filteredConsultations = consultations.filter(c => 
-    c.user?.name?.includes(searchTerm) || 
-    c.user?.email?.includes(searchTerm) ||
-    c.navigator?.includes(searchTerm)
-  );
+  const filteredConsultations = consultations.filter(c => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      c.user?.name?.toLowerCase().includes(searchLower) || 
+      c.user?.email?.toLowerCase().includes(searchLower) ||
+      c.navigator?.toLowerCase().includes(searchLower)
+    );
+  });
 
-  const filteredOmakase = omakaseRequests.filter(r => 
-    r.userName?.includes(searchTerm) || 
-    r.userEmail?.includes(searchTerm) ||
-    r.painPoint?.includes(searchTerm)
-  );
+  const filteredOmakase = omakaseRequests.filter(r => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      r.userName?.toLowerCase().includes(searchLower) || 
+      r.userEmail?.toLowerCase().includes(searchLower) ||
+      r.painPoint?.toLowerCase().includes(searchLower)
+    );
+  });
 
-  const filteredNavConsults = navigatorConsults.filter(c => 
-    c.userName?.includes(searchTerm) || 
-    c.userEmail?.includes(searchTerm) ||
-    c.navigatorId?.includes(searchTerm) ||
-    c.ticketId?.includes(searchTerm)
-  );
+  const filteredNavConsults = navigatorConsults.filter(c => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      c.userName?.toLowerCase().includes(searchLower) || 
+      c.userEmail?.toLowerCase().includes(searchLower) ||
+      c.navigatorId?.toLowerCase().includes(searchLower) ||
+      c.ticketId?.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="space-y-6">

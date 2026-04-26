@@ -30,7 +30,7 @@ interface AnalyticsStats {
 
 export default function ShopAnalyticsPage() {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === 'admin';
+  const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin';
   const params = useParams();
   const shopId = params?.shopId as string;
   const router = useRouter();

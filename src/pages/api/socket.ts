@@ -133,7 +133,7 @@ class WebSocketServer {
           let finalReceiverId = receiverId;
           if (!finalReceiverId) {
             const User = (await import('@/models/User')).default;
-            const director = await User.findOne({ role: 'admin' });
+            const director = await User.findOne({ role: { $in: ['admin', 'superadmin'] } });
             finalReceiverId = director ? director._id : socket.userId;
           }
 
@@ -158,7 +158,7 @@ class WebSocketServer {
 
           // --- AI Auto-Response (Director Persona) ---
           // If the message is sent TO the Director (admin/null receiver) AND the sender is NOT an admin
-          if (socket.userType !== 'admin' && (!receiverId || receiverId === finalReceiverId)) {
+          if (!['admin', 'superadmin'].includes(socket.userType as string) && (!receiverId || receiverId === finalReceiverId)) {
             // Determine user context (simple for now)
             const userName = '회원님'; // Ideally fetch user name from socket.decoded or DB
             const userGrade = 'Premium';
@@ -216,7 +216,7 @@ class WebSocketServer {
 
     socket.join('all_users');
 
-    if (socket.userType === 'admin') {
+    if (socket.userType === 'admin' || socket.userType === 'superadmin') {
       socket.join('admin');
     }
 

@@ -49,7 +49,7 @@ async function getProductsHandler(request: NextRequest) {
     const { getServerSession } = await import('next-auth/next');
     const { authOptions } = await import('@/lib/auth');
     const session = await getServerSession(authOptions);
-    const isAdmin = session?.user?.role === 'admin';
+    const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin';
     const isPreview = isAdmin && validatedQuery.preview;
 
     // Build filter object

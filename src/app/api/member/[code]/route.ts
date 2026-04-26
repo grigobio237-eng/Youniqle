@@ -48,7 +48,7 @@ export async function GET(
       if (viewer) {
         if (viewer.referralCode === code) {
           viewerRole = 'self';
-        } else if (viewer.role === 'admin') {
+        } else if (['admin', 'superadmin'].includes(viewer.role)) {
           // 관리자는 파트너와 동일하게 모든 정보를 볼 수 있도록 허용
           viewerRole = 'partner';
         } else if (viewer.role === 'partner' && viewer.partnerStatus === 'approved') {
@@ -60,7 +60,7 @@ export async function GET(
         const targetMember = await User.findOne({ 
           referralCode: { $regex: new RegExp(`^${code}$`, 'i') },
           isNavigator: true 
-        }).select('_id').lean();
+        }).select('_id').lean() as any;
 
         if (targetMember && viewer._id.toString() !== targetMember._id.toString()) {
           await User.findByIdAndUpdate(viewer._id, {

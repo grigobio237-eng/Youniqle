@@ -11,7 +11,7 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
     // @ts-ignore
-    if (!session?.user?.isNavigator && session?.user?.role !== 'admin') {
+    if (!session?.user?.isNavigator && !['admin', 'superadmin'].includes(session?.user?.role as string)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

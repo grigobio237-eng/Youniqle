@@ -12,7 +12,7 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
     // @ts-ignore
-    if (!session?.user?.isNavigator && session?.user?.role !== 'admin') {
+    if (!session?.user?.isNavigator && !['admin', 'superadmin'].includes(session?.user?.role as string)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -45,7 +45,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions);
     // @ts-ignore
-    if (!session?.user?.isNavigator && session?.user?.role !== 'admin') {
+    if (!session?.user?.isNavigator && !['admin', 'superadmin'].includes(session?.user?.role as string)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -61,7 +61,7 @@ export async function POST(
 
     // 권한 체크: 어드민이거나 해당 업소의 담당 네비게이터여야 함
     // @ts-ignore
-    if (session?.user?.role !== 'admin' && shop.navigatorId.toString() !== session?.user?.id) {
+    if (!['admin', 'superadmin'].includes(session?.user?.role as string) && shop.navigatorId.toString() !== session?.user?.id) {
        return NextResponse.json({ error: '작성 권한이 없습니다.' }, { status: 403 });
     }
 

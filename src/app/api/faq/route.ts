@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20', 10), 1), 100);
 
     const session = await getServerSession(authOptions);
-    const isAdmin = session?.user && (session.user as any).role === 'admin';
+    const isAdmin = session?.user && ((session.user as any).role === 'admin' || (session.user as any).role === 'superadmin');
 
     const query: Record<string, any> = {};
 
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || (session.user as any).role !== 'admin') {
+    if (!session || !session.user || !['admin', 'superadmin'].includes((session.user as any).role)) {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 

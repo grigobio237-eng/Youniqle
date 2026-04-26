@@ -351,7 +351,7 @@ export async function verifyAuth(request: NextRequest) {
         if (decoded && decoded.type === 'admin') {
           await connectDB();
           const user = await User.findById(decoded.id);
-          if (user && user.role === 'admin') {
+          if (user && (user.role === 'admin' || user.role === 'superadmin')) {
             return {
               id: user._id.toString(),
               email: user.email,
