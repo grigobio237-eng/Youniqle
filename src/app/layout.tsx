@@ -9,6 +9,7 @@ import NudgeFeaturesProvider from '@/components/providers/NudgeFeaturesProvider'
 import { ToastProvider } from '@/components/ui/toast';
 import AiManagerChat from '@/components/chat/AiManagerChat';
 import MandatoryConsentModal from '@/components/auth/MandatoryConsentModal';
+import PWARegistration from '@/components/providers/PWARegistration';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -78,6 +79,15 @@ export const metadata: Metadata = {
       { url: '/character/youniqle-1.png', sizes: '180x180', type: 'image/png' },
     ],
   },
+  manifest: '/manifest.json',
+};
+
+export const viewport = {
+  themeColor: '#0B0D10',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 import { RecoveryProvider } from '@/contexts/RecoveryContext';
@@ -106,6 +116,7 @@ export default function RootLayout({
                   <Footer />
                   <AiManagerChat />
                   <MandatoryConsentModal />
+                  <PWARegistration />
                 </RecoveryProvider>
               </ToastProvider>
             </NudgeFeaturesProvider>
