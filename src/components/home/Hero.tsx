@@ -136,20 +136,20 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
 
   return (
-    <div id="scanner" className="hero-cinematic noise-texture bg-mist relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
+    <div id="scanner" className="hero-cinematic noise-texture bg-mist relative overflow-hidden pt-12 pb-12 md:pt-32 md:pb-32">
       {/* Decorative Blur Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-20">
         <div className="absolute -top-[15%] -left-[10%] w-[50%] h-[50%] bg-chapter-accent/10 rounded-full blur-[150px]" />
         <div className="absolute -bottom-[15%] -right-[10%] w-[50%] h-[50%] bg-reward-gold/10 rounded-full blur-[150px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
           {/* 1. Texts (Top on Mobile, Top-Left on Desktop) */}
           <div className="space-y-6 animate-in fade-in slide-in-from-left-8 duration-700 order-1 lg:order-1">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.8em] opacity-70">Scientific Recovery</span>
+              <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.3em] md:tracking-[0.8em] opacity-70">Scientific Recovery</span>
               {journey && (
                 <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-chapter-accent/10 text-chapter-accent px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">
                   <Activity className="w-3 h-3" /> {journey} MODE
@@ -157,7 +157,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 </motion.div>
               )}
             </div>
-            <h1 className="text-[1.75rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
+            <h1 className="text-[1.4rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
               {personalMsg.title}
             </h1>
             <p className="text-base md:text-xl text-slate/70 font-medium leading-relaxed">
@@ -187,7 +187,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           </div>
 
           {/* 3. Button & checkmarks (Bottom on Mobile, Bottom-Left on Desktop) */}
-          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-3 lg:order-3 lg:col-start-1">
+          <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-3 lg:order-3 lg:col-start-1">
             <div className="pt-2 space-y-6">
               <div className="flex flex-wrap gap-4">
                 <Button
@@ -210,7 +210,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 text-[10px] md:text-xs text-slate/60 font-black uppercase tracking-widest">
+            <div className="flex flex-wrap items-center gap-6 text-[10px] md:text-xs text-slate/60 font-black uppercase tracking-wider md:tracking-widest">
               <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 회복 점수 리포트</span>
               <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 시술/수술 케어</span>
               <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 일상 리듬 설계</span>

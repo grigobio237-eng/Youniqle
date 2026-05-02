@@ -97,9 +97,18 @@ export class AccessControl {
   }
 
   /**
+   * 관리자 여부 확인
+   */
+  static isAdmin(user: any): boolean {
+    if (!user) return false;
+    return ['admin', 'superadmin'].includes(user.role);
+  }
+
+  /**
    * 특정 기능 사용 가능 여부 확인
    */
   static canUseFeature(user: IUser, feature: 'scanner' | 'diagnosis' | 'webtoon'): boolean {
+    if (this.isAdmin(user)) return true;
     const limits = this.getLimits(user);
     const stats = user.dailyStats || { scannerCount: 0, diagnosisCount: 0, webtoonCount: 0 };
 
@@ -123,6 +132,7 @@ export class AccessControl {
    * Restart/Black: 전체 (식단, 자세, 공간(SPACE), 시술전후(POST_OP))
    */
   static canUseScanType(user: any, type: string): boolean {
+    if (this.isAdmin(user)) return true;
     const group = this.getUserGroup(user);
     const normalizedType = type.toUpperCase();
     
@@ -139,6 +149,7 @@ export class AccessControl {
    * Restart/Black: daily, free, deep/paid
    */
   static canUseDiagnosisType(user: any, type: string): boolean {
+    if (this.isAdmin(user)) return true;
     const group = this.getUserGroup(user);
     const lowerType = type.toLowerCase();
     

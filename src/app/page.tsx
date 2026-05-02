@@ -127,7 +127,7 @@ export default function HomePage() {
     try {
       // 스캔 결과가 있다면 해당 내용을 키워드로 사용, 없으면 기본 키워드 사용
       const keywords = analysisData 
-        ? `${analysisData.summary}, ${analysisData.highlights.join(', ')}`
+        ? `${analysisData.summary}, ${analysisData.analysisTable?.map(t => t.label).join(', ')}`
         : "일상 회복, 에너지 레벨, 신체 컨디션";
 
       const res = await fetch('/api/ai/diagnosis/generate', {
@@ -187,7 +187,8 @@ export default function HomePage() {
             answers={answers} 
             userNote={userNote}
             analysisData={analysisData}
-            onReset={() => setViewState('INTRO')}
+            onEnter={() => setViewState('INTRO')}
+            onOpenWebtoon={handleOpenWebtoon}
           />
         </div>
       );
@@ -195,8 +196,8 @@ export default function HomePage() {
 
     return (
       <>
-        <Hero onStart={handleStart} />
-        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} />
+        <Hero onStart={handleStart} isDiagnosing={isDiagnosing} />
+        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} isDiagnosing={isDiagnosing} />
       </>
     );
   };

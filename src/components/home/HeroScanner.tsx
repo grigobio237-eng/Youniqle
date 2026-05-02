@@ -528,8 +528,18 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         );
 
         return (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                <Card className="rounded-[40px] border-none shadow-2xl overflow-hidden bg-white">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 relative">
+                <Card className="rounded-[40px] border-none shadow-2xl overflow-hidden bg-white relative">
+                    {isDiagnosing && (
+                        <div className="absolute top-0 left-0 right-0 h-1.5 z-50 bg-mist overflow-hidden">
+                            <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                className="h-full bg-chapter-accent"
+                                transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
+                            />
+                        </div>
+                    )}
                     <div className="relative h-64 overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -604,31 +614,48 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                                 onClick={() => onStart(result || undefined)}
                                 disabled={isDiagnosing}
                                 size="lg" 
-                                className="w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20"
+                                className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-mist' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'}`}
                             >
-                                {isDiagnosing && (
-                                    <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${progress}%` }}
-                                        className="absolute inset-0 bg-white/20 z-0"
-                                    />
-                                )}
+                                {isDiagnosing ? (
+                                    <>
+                                        {/* Progress Bar Layer */}
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progress}%` }}
+                                            className="absolute inset-y-0 left-0 bg-chapter-accent z-0"
+                                            transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
+                                        />
+                                        
+                                        {/* Base Text (Black, shown on light background) */}
+                                        <div className="absolute inset-0 flex items-center justify-center z-10 text-slate/40">
+                                            <div className="flex items-center gap-3">
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <span>{loadingText}</span>
+                                                <span className="tabular-nums opacity-60">{Math.round(progress)}%</span>
+                                            </div>
+                                        </div>
 
-                                <div className="relative z-10 flex items-center justify-center">
-                                    <Sparkles className={`w-6 h-6 mr-3 ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'} transition-transform`} />
-                                    <AnimatePresence mode="wait">
-                                        <motion.span
-                                            key={loadingText}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            transition={{ duration: 0.3 }}
+                                        {/* Inverted Text (White, shown over the chapter-accent progress bar) */}
+                                        <motion.div 
+                                            className="absolute inset-y-0 left-0 overflow-hidden z-20 flex items-center bg-chapter-accent"
+                                            style={{ width: `${progress}%` }}
                                         >
-                                            {loadingText}
-                                        </motion.span>
-                                    </AnimatePresence>
-                                    {!isDiagnosing && <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />}
-                                </div>
+                                            <div className="w-[500px] flex items-center justify-center text-white px-8">
+                                                <div className="flex items-center gap-3 w-full justify-center">
+                                                    <Sparkles className="w-6 h-6 animate-pulse" />
+                                                    <span className="whitespace-nowrap">{loadingText}</span>
+                                                    <span className="tabular-nums font-black">{Math.round(progress)}%</span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    </>
+                                ) : (
+                                    <div className="relative z-10 flex items-center justify-center text-white">
+                                        <Sparkles className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
+                                        <span>{loadingText}</span>
+                                        <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                )}
                             </Button>
                         </div>
                         

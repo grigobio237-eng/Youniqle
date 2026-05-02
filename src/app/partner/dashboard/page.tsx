@@ -351,18 +351,18 @@ function PartnerDashboardContent() {
       </div>
 
       {/* Quick Actions - Enhanced (최상단으로 이동) */}
-      <Card className="border-0 shadow-lg overflow-hidden bg-white rounded-[32px]">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 p-8">
-          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+      <Card className="border-0 shadow-lg overflow-hidden bg-white rounded-[20px] md:rounded-[32px]">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 p-4 md:p-8">
+          <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
             <Sparkles className="h-5 w-5 text-primary" />
             빠른 작업
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs md:text-sm">
             자주 사용하는 파트너 기능들입니다. 상점 운영을 위해 필요한 도구를 선택하세요.
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <CardContent className="p-4 md:p-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
             <Link href="/partner/products?action=new" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-blue-50 hover:shadow-md transition-all text-center">
               <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 mb-3 group-hover:scale-110 transition-transform">
                 <Package className="h-6 w-6" />

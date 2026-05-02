@@ -58,11 +58,22 @@ export function AIProgressOverlay({
                 <span className="text-2xl font-black italic font-mono">{Math.round(progress)}%</span>
               </div>
               
-              <Progress 
-                value={progress} 
-                className="h-3 bg-white/10 border border-white/5 rounded-full overflow-hidden" 
-                indicatorClassName="bg-gradient-to-r from-chapter-accent via-cyan-400 to-chapter-accent animate-shimmer"
-              />
+              {/* Progress Bar Container */}
+              <div className="h-3 w-full bg-white/10 border border-white/5 rounded-full overflow-hidden relative">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  className="h-full bg-gradient-to-r from-chapter-accent via-cyan-400 to-chapter-accent relative"
+                  transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
+                >
+                  {/* Shimmer Effect */}
+                  <motion.div 
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-1/2"
+                  />
+                </motion.div>
+              </div>
               
               <div className="h-6 flex items-center justify-center gap-2 overflow-hidden">
                 <AnimatePresence mode="wait">

@@ -25,7 +25,6 @@ export default function ResultDisplay({
   onOpenWebtoon: () => void 
 }) {
   const { journey } = useRecovery();
-  const [showNextStepsDialog, setShowNextStepsDialog] = useState(false);
   const [isDesigning, setIsDesigning] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
@@ -133,21 +132,7 @@ export default function ResultDisplay({
     saveData();
   }, [recoveryScore, score, metaphor, answers, userNote]);
 
-  const handleNextSteps = () => {
-    if (journey === 'WELLNESS') {
-      setIsDesigning(true);
-      // Auto-navigate after 2.5 seconds of "designing"
-      setTimeout(() => {
-        router.push('/ai-navigator');
-      }, 2500);
-    } else {
-      setShowNextStepsDialog(true);
-    }
-  };
-
   const navigateTo = (path: string) => {
-    setShowNextStepsDialog(false);
-    // 대시보드 레이아웃을 임시로 띄우는 onEnter() 호출을 제거하여 화면 깜빡임/중복 라우팅 방지
     router.push(path);
   };
 
@@ -197,69 +182,46 @@ export default function ResultDisplay({
           </div>
         )}
 
-        <div className="flex flex-col gap-4 w-full">
-          <Button size="lg" onClick={handleNextSteps} className="btn-primary w-full h-20 text-xl rounded-[24px] shadow-xl shadow-chapter-accent/20 group">
-            {info.cta} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={onOpenWebtoon}
-            className="w-full h-16 text-lg rounded-[24px] border-line font-bold text-slate hover:text-obsidian hover:border-chapter-accent group"
-          >
-            <span className="mr-2 group-hover:rotate-12 transition-transform">🎨</span>
-            회복 기록을 웹툰으로 남기기
-          </Button>
-          <Button variant="ghost" onClick={onEnter} className="text-slate/60 hover:text-obsidian underline underline-offset-4 text-sm mt-2">
-            전체 분석 데이터 보기
-          </Button>
-        </div>
-      </div>
-
-      {/* Next Steps Dialog (Enhanced Design) */}
-      {showNextStepsDialog && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-obsidian/40 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white w-full sm:max-w-md rounded-t-[40px] sm:rounded-[40px] p-10 space-y-8 shadow-2xl animate-in slide-in-from-bottom-12 duration-500 overflow-hidden relative">
-            {/* 배경 장식 */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-chapter-accent/5 rounded-full blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-reward-gold/5 rounded-full blur-3xl" />
-
-            <div className="space-y-3 relative">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
-                Action Items
-              </div>
-              <h3 className="text-3xl font-black text-obsidian tracking-tight leading-tight">
-                {info.nextActionTitle}
-              </h3>
-              <p className="text-sm text-slate font-medium leading-relaxed">
-                {info.nextActionDesc}
-              </p>
+        <div className="space-y-6 w-full pt-8">
+          <div className="text-left space-y-2">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest">
+              Action Items
             </div>
+            <h3 className="text-3xl font-black text-obsidian tracking-tight">
+              {info.nextActionTitle}
+            </h3>
+          </div>
 
-            <div className="space-y-4 relative">
-              {/* 일일 루틴 설계 받기 / 시술 전 심층 문진 */}
+          <div className="grid grid-cols-1 gap-4">
+              {/* Primary Action */}
               <button 
-                onClick={() => navigateTo(journey === 'CLINICAL_PRE' ? '/event/consultation' : '/ai-navigator')} 
-                className="w-full p-6 text-left rounded-[28px] border-2 border-line hover:border-chapter-accent hover:bg-chapter-accent/[0.02] transition-all group relative overflow-hidden active:scale-[0.98]"
+                onClick={() => {
+                  if (journey === 'WELLNESS') {
+                    setIsDesigning(true);
+                    setTimeout(() => router.push('/dashboard'), 2500);
+                  } else {
+                    navigateTo(journey === 'CLINICAL_PRE' ? '/event/consultation' : '/dashboard');
+                  }
+                }} 
+                className="w-full p-6 text-left rounded-[28px] border-2 border-chapter-accent bg-chapter-accent/[0.02] hover:bg-chapter-accent/[0.05] transition-all group relative overflow-hidden active:scale-[0.98] shadow-lg shadow-chapter-accent/5"
               >
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-2xl bg-chapter-accent/10 text-chapter-accent group-hover:scale-110 transition-transform">
+                    <div className="p-3 rounded-2xl bg-chapter-accent text-white group-hover:scale-110 transition-transform shadow-lg shadow-chapter-accent/20">
                       {journey === 'CLINICAL_PRE' ? <FileText className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
                     </div>
-                    <span className="text-lg font-black text-obsidian">
+                    <span className="text-xl font-black text-obsidian">
                       {journey === 'CLINICAL_PRE' ? '의사 상담용 리포트 출력' : '맞춤 회복 루틴 시작하기'}
                     </span>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-line group-hover:text-chapter-accent group-hover:translate-x-1 transition-all" />
+                  <ArrowRight className="w-6 h-6 text-chapter-accent group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-sm text-slate font-medium pl-14">
                   {journey === 'CLINICAL_PRE' ? '상담 시 활용 가능한 정밀 데이터를 문두로 정리합니다' : '실시간 데이터를 분석한 나만의 활력 행동 가이드'}
                 </p>
               </button>
               
-              {/* 회복 갤러리 / 시술 집중 모니터링 */}
+              {/* Secondary Action */}
               <button 
                 onClick={() => navigateTo(journey === 'CLINICAL_POST' ? '/event/monitoring' : '/gallery/artworks')} 
                 className="w-full p-6 text-left rounded-[28px] border-2 border-line hover:border-reward-gold hover:bg-reward-gold/[0.02] transition-all group relative overflow-hidden active:scale-[0.98]"
@@ -279,20 +241,24 @@ export default function ResultDisplay({
                   {journey === 'CLINICAL_POST' ? '골든타임 동안 발생할 수 있는 신체 변화를 밀착 추적합니다' : '나만의 회복 여정을 시각적인 예술 기록으로 확인하세요'}
                 </p>
               </button>
-            </div>
 
-            <div className="pt-4 relative">
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowNextStepsDialog(false)} 
-                className="w-full h-14 rounded-2xl text-slate font-bold hover:bg-mist transition-colors"
+              <Button
+                variant="outline"
+                onClick={onOpenWebtoon}
+                className="w-full h-16 text-lg rounded-[24px] border-line font-bold text-slate hover:text-obsidian hover:border-chapter-accent group mt-4"
               >
-                나중에 하기
+                <span className="mr-2 group-hover:rotate-12 transition-transform">🎨</span>
+                회복 기록을 웹툰으로 남기기
               </Button>
-            </div>
           </div>
+
+          <Button variant="ghost" onClick={onEnter} className="text-slate/60 hover:text-obsidian underline underline-offset-4 text-sm">
+            전체 분석 데이터 보기
+          </Button>
         </div>
-      )}
+      </div>
+
+
 
       {/* AI Routine Designer Overlay */}
       <AnimatePresence>
