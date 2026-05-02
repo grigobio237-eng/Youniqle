@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youniqle 멤버십 4-Tier 차등 적용 설계안</title>
+    <style>
+        :root {
+            --primary-color: #0F172A;
+            --accent-color: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            letter-spacing: -0.025em;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            color: var(--primary-color);
+        }
+
+        p, li {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            text-align: left;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border-left: 5px solid;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-warning strong {
+            color: #78350f;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.9em;
+            color: #e11d48;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border-color);
+            margin: 3rem 0;
+        }
+
+        blockquote {
+            margin: 1.5rem 0;
+            padding-left: 20px;
+            border-left: 4px solid var(--accent-color);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Youniqle 멤버십 4-Tier 차등 적용 설계안</h1>
+
+        <h2>현재 시스템 분석 결과</h2>
+        <h3>기존 구조의 문제점</h3>
+        <p>현재 프로젝트에는 <strong>두 가지 등급 체계가 혼재</strong>되어 있습니다:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>기존 passInfo.type (DB)</th>
+                    <th>멤버십 페이지 표시</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>구매 패스</td>
+                    <td><code>NONE</code>, <code>START</code>, <code>SIGNATURE</code>, <code>BLACK</code></td>
+                    <td>❌ 불일치</td>
+                    <td>DB 스키마 기준</td>
+                </tr>
+                <tr>
+                    <td>멤버십 카드</td>
+                    <td><code>RESET</code>, <code>REBORN</code>, <code>RESTART</code>, <code>BLACK</code></td>
+                    <td>✅ 표시됨</td>
+                    <td>사용자에게 노출</td>
+                </tr>
+                <tr>
+                    <td>접근 제어</td>
+                    <td><code>NORMAL</code>, <code>START</code>, <code>PREMIUM</code></td>
+                    <td>-</td>
+                    <td>access-control.ts</td>
+                </tr>
+                <tr>
+                    <td>유저 유틸</td>
+                    <td><code>RESET</code>, <code>REBORN</code>, <code>RESTART</code></td>
+                    <td>-</td>
+                    <td>user-utils.ts</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <strong>⚠️ 핵심 문제:</strong> DB의 <code>passInfo.type</code>은 <code>NONE/START/SIGNATURE/BLACK</code>인데, 멤버십 UI는 <code>RESET/REBORN/RESTART/BLACK</code>으로 표시되어 있어 <strong>매핑이 일관적이지 않습니다.</strong> 접근 제어도 <code>NORMAL/START/PREMIUM</code> 3단계로만 구분하고 있어, 새로운 4-Tier와 정확히 맞지 않습니다.
+        </div>
+
+        <hr>
+
+        <h2>제안: 통합 4-Tier 멤버십 설계</h2>
+        <h3>Tier 정의</h3>
+        <pre><code>RESET (무료) → REBORN (월 19,900원) → RESTART (월 49,900원) → BLACK (개별 상담)</code></pre>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tier</th>
+                    <th>포지션</th>
+                    <th>핵심 가치</th>
+                    <th>기간</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Reset</strong></td>
+                    <td>멈추기·돌아보기</td>
+                    <td>나의 유형 확인, 첫 효능감</td>
+                    <td>무료</td>
+                </tr>
+                <tr>
+                    <td><strong>Reborn</strong></td>
+                    <td>기본기 채우기</td>
+                    <td>기록 저장, 주간 루틴, 데이터 축적</td>
+                    <td>월 19,900원</td>
+                </tr>
+                <tr>
+                    <td><strong>Restart</strong></td>
+                    <td>습관 굳히기</td>
+                    <td>정밀 분석, 리포트 정리, 가이드</td>
+                    <td>월 49,900원</td>
+                </tr>
+                <tr>
+                    <td><strong>Black</strong></td>
+                    <td>프라이빗 컨시어지</td>
+                    <td>맞춤 루틴, 비공개 상담, 전문 연계</td>
+                    <td>개별 안내</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h2>기능별 차등 적용 매트릭스</h2>
+        <h3>1. 📸 스캐너 (자세/식단/공간 분석)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>일일 스캔 횟수</td>
+                    <td>1회</td>
+                    <td>5회</td>
+                    <td>무제한</td>
+                    <td>무제한</td>
+                </tr>
+                <tr>
+                    <td>스캔 카테고리</td>
+                    <td>식단만</td>
+                    <td>식단 + 자세</td>
+                    <td>전체(식단/자세/공간/POST_OP)</td>
+                    <td>전체</td>
+                </tr>
+                <tr>
+                    <td>분석 리포트 수준</td>
+                    <td>기본 점수만</td>
+                    <td>점수 + 요약 코멘트</td>
+                    <td>점수 + AI 심층 분석 + 개선 제안</td>
+                    <td>전담팀 분석 리포트</td>
+                </tr>
+                <tr>
+                    <td>스캔 히스토리 보관</td>
+                    <td>7일</td>
+                    <td>90일</td>
+                    <td>전체 기간</td>
+                    <td>전체 기간</td>
+                </tr>
+            </tbody>
+        </table>
+        <blockquote><strong>현재 코드 위치:</strong> <code>access-control.ts</code> - <code>TIER_LIMITS</code> 수정 완료</blockquote>
+
+        <hr>
+
+        <h3>2. 🩺 진단 (1일 회복 / 24문항 / 60문항)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1일 회복진단 (16문항)</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                </tr>
+                <tr>
+                    <td>24문항 약식 진단</td>
+                    <td>✅ 1회 체험</td>
+                    <td>✅ 무제한</td>
+                    <td>✅ 무제한</td>
+                    <td>✅ 무제한</td>
+                </tr>
+                <tr>
+                    <td>60문항 정밀 진단</td>
+                    <td>🔒 잠금</td>
+                    <td>🔒 잠금</td>
+                    <td>✅ 무제한</td>
+                    <td>✅ 무제한</td>
+                </tr>
+                <tr>
+                    <td>진단 리포트 깊이</td>
+                    <td>Basic (4영역 점수)</td>
+                    <td>Basic + AI 요약</td>
+                    <td>Premium (Big5 + 30 facets)</td>
+                    <td>Premium + 전문가 해석</td>
+                </tr>
+                <tr>
+                    <td>진단 히스토리 비교</td>
+                    <td>❌</td>
+                    <td>✅ 최근 3회</td>
+                    <td>✅ 전체 추이 그래프</td>
+                    <td>✅ 전체 + 전담 분석</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h3>3. 🧭 AI 네비게이터 (Youniqle 진단 페이지)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>개인화 탭 접근</td>
+                    <td>✅ 기본</td>
+                    <td>✅ 전체</td>
+                    <td>✅ 전체</td>
+                    <td>✅ 전체</td>
+                </tr>
+                <tr>
+                    <td>클리닉 탭 접근</td>
+                    <td>🔒 잠금</td>
+                    <td>🔒 잠금</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                </tr>
+                <tr>
+                    <td>내일 예보</td>
+                    <td>❌</td>
+                    <td>✅ 기본</td>
+                    <td>✅ AI 정밀 예보</td>
+                    <td>✅ 전담 브리핑</td>
+                </tr>
+                <tr>
+                    <td>추천 회복 도구</td>
+                    <td>일부 무료</td>
+                    <td>전체 열람</td>
+                    <td>전체 + 맞춤 큐레이션</td>
+                    <td>전체 + 독점 프로그램</td>
+                </tr>
+                <tr>
+                    <td>1:1 상담 요청</td>
+                    <td>❌</td>
+                    <td>월 1회</td>
+                    <td>월 3회</td>
+                    <td>무제한</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h3>4. 📋 면담 가이드 & 회복 로드맵</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>면담 가이드 작성</td>
+                    <td>🔒 잠금</td>
+                    <td>🔒 잠금</td>
+                    <td>✅ 무제한</td>
+                    <td>✅ 무제한</td>
+                </tr>
+                <tr>
+                    <td>회복 로드맵 생성</td>
+                    <td>🔒 잠금</td>
+                    <td>🔒 잠금</td>
+                    <td>✅ 무제한</td>
+                    <td>✅ 무제한</td>
+                </tr>
+                <tr>
+                    <td>PDF 다운로드</td>
+                    <td>🔒 잠금</td>
+                    <td>🔒 잠금</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                </tr>
+                <tr>
+                    <td>네비게이터 상담 연동</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 전담</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h3>5. 📊 대시보드</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>회복 지수 표시</td>
+                    <td>✅ 기본</td>
+                    <td>✅ 상세</td>
+                    <td>✅ 상세 + 추이</td>
+                    <td>✅ 전체</td>
+                </tr>
+                <tr>
+                    <td>매니저 리포트</td>
+                    <td>고정 메시지</td>
+                    <td>AI 기본 코멘트</td>
+                    <td>AI 정밀 분석 코멘트</td>
+                    <td>전담 매니저 코멘트</td>
+                </tr>
+                <tr>
+                    <td>일일 체크리스트</td>
+                    <td>4개 고정</td>
+                    <td>4개 고정</td>
+                    <td>맞춤형 항목 추가 가능</td>
+                    <td>전담팀 설계 루틴</td>
+                </tr>
+                <tr>
+                    <td>맞춤 솔루션 리포트</td>
+                    <td>기본</td>
+                    <td>기본 + 상품 추천</td>
+                    <td>정밀 + 프로토콜</td>
+                    <td>VIP 컨시어지</td>
+                </tr>
+                <tr>
+                    <td>Recommended Tools</td>
+                    <td>일부</td>
+                    <td>전체</td>
+                    <td>전체 + 프리미엄</td>
+                    <td>전체 + 독점</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h3>6. 🎧 사운드 테라피 & 유틸리티</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>바이노럴 비트</td>
+                    <td>기본 2곡</td>
+                    <td>전체 라이브러리</td>
+                    <td>전체 + 맞춤 주파수</td>
+                    <td>전체 + 독점</td>
+                </tr>
+                <tr>
+                    <td>자세 분석</td>
+                    <td>❌</td>
+                    <td>✅ 기본</td>
+                    <td>✅ 정밀</td>
+                    <td>✅ 정밀 + 추적</td>
+                </tr>
+                <tr>
+                    <td>호흡 가이드</td>
+                    <td>✅ 기본</td>
+                    <td>✅ 전체</td>
+                    <td>✅ 전체</td>
+                    <td>✅ 전체</td>
+                </tr>
+                <tr>
+                    <td>비디오 분석</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅ 가능</td>
+                    <td>✅ 가능</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h3>7. 🛒 상품 & 리워드</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기능</th>
+                    <th>Reset</th>
+                    <th>Reborn</th>
+                    <th>Restart</th>
+                    <th>Black</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>상점 접근</td>
+                    <td>✅ 열람</td>
+                    <td>✅ 구매 가능</td>
+                    <td>✅ 전용 할인</td>
+                    <td>✅ 최상위 우대</td>
+                </tr>
+                <tr>
+                    <td>포인트 적립률</td>
+                    <td>기본 1%</td>
+                    <td>3%</td>
+                    <td>5%</td>
+                    <td>10%</td>
+                </tr>
+                <tr>
+                    <td>회복 키트</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>연 1회</td>
+                    <td>연 2회</td>
+                </tr>
+                <tr>
+                    <td>파트너사 우대</td>
+                    <td>❌</td>
+                    <td>기본</td>
+                    <td>프리미엄</td>
+                    <td>VIP 전용</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h2>구현 단계</h2>
+        <p>Phase 1: 데이터 모델 통합 (완료)<br>
+        Phase 2: 핵심 게이팅 적용 (완료)<br>
+        Phase 3: UX 차등화 (진행 중)<br>
+        Phase 4: 프리미엄 경험 (예정)</p>
+
+        <hr>
+
+        <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+            &copy; 2026 Youniqle. All rights reserved.
+        </p>
+    </div>
+</body>
+</html>
