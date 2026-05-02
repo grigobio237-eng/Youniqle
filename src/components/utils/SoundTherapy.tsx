@@ -4,13 +4,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Pause, RotateCcw, Volume2, Moon, Sun, Wind, Waves, 
-  Headphones, Sparkles, CloudRain, Trees, Flame, Zap, X
+  Headphones, Sparkles, CloudRain, Trees, Flame, Zap, X, Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { SoundVisualizer } from '@/components/therapy/SoundVisualizer';
 import { toast } from 'sonner';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
+import { useSession } from 'next-auth/react';
+import { AccessControl } from '@/lib/logic/access-control';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 
 
 const FREQUENCIES = [
@@ -33,8 +36,17 @@ const NATURE_LAYERS = [
 ];
 
 export default function SoundTherapy() {
+  const { data: session } = useSession();
+  const userTier = AccessControl.getUserGroup(session?.user);
+  const isFreeUser = userTier === 'RESET' || userTier === 'NONE';
+
+  // 맛보기 모드: 432Hz(delta)와 백색소음(white)만 무료, 나머지 잠금
+  const isFreqLocked = (freqId: string) => isFreeUser && freqId !== 'delta';
+  const isNatureLocked = (natureId: string) => isFreeUser; // 자연음은 전부 프리미엄
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [masterVolume, setMasterVolume] = useState(0.5);
+  const [showUpsell, setShowUpsell] = useState(false);
   const { trackEvent } = useActivityTracker();
   const startTimeRef = useRef<number | null>(null);
 
@@ -348,16 +360,24 @@ export default function SoundTherapy() {
                   <span className="text-[10px] font-black text-white/40">{Math.round(freqVolume * 100)}%</span>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                  {FREQUENCIES.map(f => (
-                      <button key={f.id} onClick={() => setSelectedFreq(f)}
-                          className={`py-3 rounded-xl text-center border transition-all flex flex-col items-center justify-center gap-1 ${
-                              selectedFreq.id === f.id ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
-                          }`}
-                      >
-                          <p className="text-sm font-serif italic font-bold">{f.name}</p>
-                          <p className="text-[8px] opacity-40">{f.freq}Hz</p>
-                      </button>
-                  ))}
+                  {FREQUENCIES.map(f => {
+                      const locked = isFreqLocked(f.id);
+                      return (
+                          <button key={f.id} onClick={() => {
+                              if (locked) { setShowUpsell(true); return; }
+                              setSelectedFreq(f);
+                          }}
+                              className={`py-3 rounded-xl text-center border transition-all flex flex-col items-center justify-center gap-1 relative ${
+                                  locked ? 'bg-white/[0.02] text-white/20 border-white/5 cursor-not-allowed' :
+                                  selectedFreq.id === f.id ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                              }`}
+                          >
+                              {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-white/30" />}
+                              <p className="text-sm font-serif italic font-bold">{f.name}</p>
+                              <p className="text-[8px] opacity-40">{f.freq}Hz</p>
+                          </button>
+                      );
+                  })}
               </div>
               <Slider value={[freqVolume]} max={1} step={0.01} onValueChange={v => setFreqVolume(v[0])} className="pt-2" />
           </div>
@@ -389,16 +409,24 @@ export default function SoundTherapy() {
                       <span className="text-[10px] font-black text-chapter-accent/60">{Math.round(natureVolume * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
-                      {NATURE_LAYERS.map(n => (
-                          <button key={n.id} onClick={() => setSelectedNature(n)}
-                              className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center ${
-                                  selectedNature.id === n.id ? 'bg-chapter-accent text-white border-chapter-accent/40' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
-                              }`}
-                          >
-                              {n.icon}
-                              <span className="text-[9px] font-bold opacity-80">{n.name}</span>
-                          </button>
-                      ))}
+                      {NATURE_LAYERS.map(n => {
+                          const locked = isNatureLocked(n.id);
+                          return (
+                              <button key={n.id} onClick={() => {
+                                  if (locked) { setShowUpsell(true); return; }
+                                  setSelectedNature(n);
+                              }}
+                                  className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center relative ${
+                                      locked ? 'bg-white/[0.02] text-white/20 border-white/5 cursor-not-allowed' :
+                                      selectedNature.id === n.id ? 'bg-chapter-accent text-white border-chapter-accent/40' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
+                                  }`}
+                              >
+                                  {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-white/30" />}
+                                  {n.icon}
+                                  <span className="text-[9px] font-bold opacity-80">{n.name}</span>
+                              </button>
+                          );
+                      })}
                   </div>
                   <Slider value={[natureVolume]} max={1} step={0.01} onValueChange={v => setNatureVolume(v[0])} className="pt-2" />
               </div>
@@ -421,6 +449,13 @@ export default function SoundTherapy() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
         .font-serif { font-family: 'Cormorant Garamond', serif; }
       `}</style>
+
+      <MembershipUpsellDialog 
+        open={showUpsell} 
+        onOpenChange={setShowUpsell} 
+        title="사운드 테라피는 리본 등급 전용입니다"
+        description="회복 주파수와 심층 명상 사운드 스케이프를 이용하시려면 멤버십을 업그레이드하세요."
+      />
     </div>
   );
 }

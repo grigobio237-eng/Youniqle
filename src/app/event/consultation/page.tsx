@@ -8,12 +8,18 @@ import { Button } from "@/components/ui/button";
 import { ClipboardList, Sparkles, ArrowRight, FileText, Loader2, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { AccessControl } from "@/lib/logic/access-control";
+import MembershipUpsellDialog from "@/components/auth/MembershipUpsellDialog";
 
 export default function ConsultationPage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [recentReport, setRecentReport] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showUpsell, setShowUpsell] = useState(false);
+
+  const userTier = AccessControl.getUserGroup(session?.user);
+  const isLocked = userTier !== 'RESTART' && userTier !== 'BLACK';
 
   useEffect(() => {
     const checkExisting = async () => {
@@ -93,7 +99,16 @@ export default function ConsultationPage() {
                       </Link>
                     </Button>
                   ) : (
-                    <Button onClick={() => setShowForm(true)} className="w-full h-16 rounded-2xl bg-obsidian text-white font-black text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    <Button 
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowUpsell(true);
+                        } else {
+                          setShowForm(true);
+                        }
+                      }} 
+                      className="w-full h-16 rounded-2xl bg-obsidian text-white font-black text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
                       지금 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   )}
@@ -121,7 +136,17 @@ export default function ConsultationPage() {
                   </div>
 
                   {recentReport && (
-                    <Button variant="ghost" onClick={() => setShowForm(true)} className="mt-4 text-primary font-black flex items-center gap-2 hover:bg-primary/5 rounded-xl self-start">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowUpsell(true);
+                        } else {
+                          setShowForm(true);
+                        }
+                      }} 
+                      className="mt-4 text-primary font-black flex items-center gap-2 hover:bg-primary/5 rounded-xl self-start"
+                    >
                       <FileText className="w-4 h-4" /> 새로 작성하기
                     </Button>
                   )}
@@ -159,6 +184,13 @@ export default function ConsultationPage() {
           )}
         </AnimatePresence>
       </main>
+
+      <MembershipUpsellDialog 
+        open={showUpsell} 
+        onOpenChange={setShowUpsell} 
+        title="정밀 회복 설계는 리스타트 등급 전용입니다"
+        description="시술 전 정밀 문진과 VIP 맞춤 회복 설계 분석을 이용하시려면 멤버십을 업그레이드하세요."
+      />
     </div>
   );
 }

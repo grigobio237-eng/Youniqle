@@ -20,6 +20,9 @@ import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
 import { useRecovery } from '@/contexts/RecoveryContext';
+import { AccessControl } from '@/lib/logic/access-control';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
+import { Lock } from 'lucide-react';
 
 
 // 카테고리별 상태 메시지
@@ -96,6 +99,11 @@ export default function AiNavigatorPage() {
     const [protocols, setProtocols] = useState<any[]>([]);
     const [timelineItems, setTimelineItems] = useState<any[]>([]);
     const [isMounted, setIsMounted] = useState(false);
+    const [activeTab, setActiveTab] = useState('personalization');
+    const [showUpsell, setShowUpsell] = useState(false);
+
+    const userTier = AccessControl.getUserGroup(session?.user);
+    const isClinicLocked = userTier === 'RESET' || userTier === 'NONE';
 
     useEffect(() => {
         setIsMounted(true);
@@ -329,13 +337,26 @@ export default function AiNavigatorPage() {
                     <div className="container mx-auto px-4">
                         <div className="max-w-3xl mx-auto">
                             
-                            <Tabs defaultValue="personalization" className="w-full">
+                            <Tabs 
+                                value={activeTab} 
+                                onValueChange={(val) => {
+                                    if (val === 'clinic' && isClinicLocked) {
+                                        setShowUpsell(true);
+                                    } else {
+                                        setActiveTab(val);
+                                    }
+                                }} 
+                                className="w-full"
+                            >
                                 <TabsList className="grid w-full grid-cols-2 h-16 rounded-2xl bg-surface/50 border border-line p-1.5 mb-16">
                                     <TabsTrigger value="personalization" className="rounded-xl text-base md:text-lg font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
                                         개인화 분석
                                     </TabsTrigger>
                                     <TabsTrigger value="clinic" className="rounded-xl text-base md:text-lg font-black data-[state=active]:bg-[#0E3A3A] data-[state=active]:text-mist data-[state=active]:shadow-sm">
-                                        클리닉 케어
+                                        <div className="flex items-center gap-2">
+                                            클리닉 케어
+                                            {isClinicLocked && <Lock className="w-4 h-4 opacity-50" />}
+                                        </div>
                                     </TabsTrigger>
                                 </TabsList>
 
@@ -734,6 +755,13 @@ export default function AiNavigatorPage() {
                 <DeepDiagnosisModal
                     open={deepDiagnosisModalOpen}
                     onOpenChange={setDeepDiagnosisModalOpen}
+                />
+
+                <MembershipUpsellDialog 
+                    open={showUpsell} 
+                    onOpenChange={setShowUpsell} 
+                    title="클리닉 케어는 리본 등급 이상 전용입니다"
+                    description="전문적인 회복 설계와 클리닉 연계 서비스를 이용하시려면 멤버십을 업그레이드하세요."
                 />
             </div>
         </ChapterWrapper>

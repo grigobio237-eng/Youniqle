@@ -20,6 +20,8 @@ import { AISolutionSection } from '@/components/diagnosis/AISolutionSection';
 import { GoldenTimeOffer } from '@/components/diagnosis/GoldenTimeOffer';
 import { determineMood } from '@/lib/audio/voice-strategy';
 import ClientOnly from '@/components/common/ClientOnly';
+import { AccessControl } from '@/lib/logic/access-control';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 
 // Type definition for Diagnosis Result
 interface DeepDiagnosisResult {
@@ -70,6 +72,7 @@ export default function DeepDiagnosisReportPage() {
     const [showGenderModal, setShowGenderModal] = useState(false);
     const [isUpdatingGender, setIsUpdatingGender] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [showUpsell, setShowUpsell] = useState(false);
 
     const reportRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +81,7 @@ export default function DeepDiagnosisReportPage() {
     }, []);
 
     const handleUnlockClick = () => {
-        setPaymentOpen(true);
+        setShowUpsell(true);
     };
 
     const handlePaymentSuccess = () => {
@@ -285,6 +288,9 @@ export default function DeepDiagnosisReportPage() {
         'C': '성실성 (Conscientiousness)',
     };
 
+    const userTier = AccessControl.getUserGroup(session?.user);
+    const canSeePremium = userTier === 'RESTART' || userTier === 'BLACK';
+
     if (result && (result.type?.toUpperCase() === 'PAID' || result.type?.toUpperCase() === 'DEEP')) {
         isPaid = true;
         const domains = (result.metadata?.tScores?.domains as any) || tScores;
@@ -320,9 +326,6 @@ export default function DeepDiagnosisReportPage() {
     } else if (result && result.type?.toUpperCase() === 'FREE') {
         isPaid = false;
         // The DB result.categoryScores is already PMSS standardized (from save route update)
-        // ideally, but to be safe we use the mapFreeToStandard if the type is FreeDiagnosisResult-like
-        // Actually, if we pull from DB, it already has the 'categoryScores' field populated with PMSS.
-        // Let's use that directly for consistency.
         const scores = result.categoryScores || { physical: 50, mental: 50, lifestyle: 50, sleep: 50 };
         chartData = [
             { subject: '신체', score: scores.physical, fullMark: 100, color: '#f43f5e' },
@@ -704,6 +707,13 @@ export default function DeepDiagnosisReportPage() {
                 <DeepDiagnosisModal
                     open={deepDiagnosisModalOpen}
                     onOpenChange={setDeepDiagnosisModalOpen}
+                />
+
+                <MembershipUpsellDialog 
+                    open={showUpsell} 
+                    onOpenChange={setShowUpsell} 
+                    title="심층 분석 리포트는 리스타트 등급 전용입니다"
+                    description="5대 성격 요인과 30개 세부 지표, 그리고 AI 맞춤 솔루션을 확인하시려면 멤버십을 업그레이드하세요."
                 />
             </div>
         </ChapterWrapper>

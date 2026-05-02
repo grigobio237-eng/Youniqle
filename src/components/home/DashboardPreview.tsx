@@ -14,8 +14,9 @@ import DiagnosisBasedRecommendations from '@/components/personalization/Diagnosi
 import HabitAlertBanner from '@/components/home/HabitAlertBanner';
 import MealNutrientChart from '@/components/dashboard/MealNutrientChart';
 import ActionableInsightCard from '@/components/dashboard/ActionableInsightCard';
-import { getUserProgress, getChecklistProgress, updateChecklist } from '@/lib/progress';
-import { ClipboardList, Stethoscope, HeartPulse, MessageSquare } from 'lucide-react';
+import { getUserProgress, getChecklistProgress, updateChecklist, getTierChecklist } from '@/lib/progress';
+import { AccessControl } from '@/lib/logic/access-control';
+import { ClipboardList, Stethoscope, HeartPulse, MessageSquare, Lock } from 'lucide-react';
 
 interface DashboardPreviewProps {
   unifiedData: any;
@@ -119,6 +120,18 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
   const totalPoints = user?.points || 0;
   const membershipLevel = user?.passInfo?.type && user?.passInfo?.type !== 'NONE' ? user.passInfo.type : 'GATE';
   const pointsToNext = 100 - (totalPoints % 100);
+  const userTier = AccessControl.getUserGroup(user || {});
+  const tierChecklist = getTierChecklist(userTier);
+
+  // 티어별 환영 메시지 및 색상
+  const tierConfig: Record<string, { color: string; bg: string; message: string; emoji: string }> = {
+    NONE: { color: 'text-slate-500', bg: 'bg-slate-100', message: '회복의 여정을 시작해 보세요', emoji: '🌱' },
+    RESET: { color: 'text-blue-600', bg: 'bg-blue-50', message: '회복의 시작을 응원합니다', emoji: '💧' },
+    REBORN: { color: 'text-emerald-600', bg: 'bg-emerald-50', message: '꾸준한 회복이 성과로 나타나고 있어요', emoji: '🌿' },
+    RESTART: { color: 'text-amber-600', bg: 'bg-amber-50', message: '전문가 수준의 회복 여정을 진행 중입니다', emoji: '⚡' },
+    BLACK: { color: 'text-obsidian', bg: 'bg-obsidian/5', message: '전담 매니저가 당신의 회복을 모니터링 중입니다', emoji: '👑' },
+  };
+  const currentTierConfig = tierConfig[userTier] || tierConfig['NONE'];
 
   return (
     <div className="min-h-screen pb-20 bg-mist text-obsidian relative">
@@ -297,10 +310,10 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                 <div className="premium-card p-8 bg-mist/30 rounded-[32px] border border-line">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-[10px] font-black text-slate uppercase tracking-widest">Membership Tier</span>
-                    <span className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">🎖️</span>
+                    <span className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">{currentTierConfig.emoji}</span>
                   </div>
-                  <p className="text-3xl font-black text-obsidian uppercase tracking-tighter">{membershipLevel}</p>
-                  <p className="text-xs text-slate font-medium mt-1">다음 회복 보상까지 {pointsToNext}pt</p>
+                  <p className={`text-3xl font-black uppercase tracking-tighter ${currentTierConfig.color}`}>{membershipLevel}</p>
+                  <p className="text-xs text-slate font-medium mt-1">{currentTierConfig.message}</p>
                 </div>
               </div>
             </div>
@@ -404,57 +417,39 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link href="/?action=diagnose" className={`flex items-center justify-between p-8 rounded-[32px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.diagnosis ? 'bg-status-good/5 border-status-good/20' : 'bg-mist/30 border-line hover:border-status-good'}`}>
-              <div className="flex items-center gap-5">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm text-lg font-black ${progress?.todayChecklist?.diagnosis ? 'bg-status-good text-mist' : 'bg-white text-slate border border-line'}`}>
-                  {progress?.todayChecklist?.diagnosis ? '✓' : '01'}
-                </div>
-                <div>
-                  <h3 className="font-black text-obsidian">1일 회복진단</h3>
-                  <p className="text-xs text-slate font-medium">데이터 기반 상태 체크</p>
-                </div>
-              </div>
-              <span className="text-sm font-black text-status-good">+5pt</span>
-            </Link>
+            {tierChecklist.map((item, idx) => {
+                const isChecked = progress?.todayChecklist?.[item.id as keyof typeof progress.todayChecklist];
+                const accentColors = ['text-status-good', 'text-chapter-accent', 'text-blue-500', 'text-reward-gold', 'text-emerald-500', 'text-purple-500', 'text-pink-500', 'text-cyan-500'];
+                const bgColors = ['bg-status-good', 'bg-chapter-accent', 'bg-blue-500', 'bg-reward-gold', 'bg-emerald-500', 'bg-purple-500', 'bg-pink-500', 'bg-cyan-500'];
+                const borderColors = ['border-status-good/20', 'border-chapter-accent/20', 'border-blue-500/20', 'border-reward-gold/20', 'border-emerald-500/20', 'border-purple-500/20', 'border-pink-500/20', 'border-cyan-500/20'];
+                const hoverBorderColors = ['hover:border-status-good', 'hover:border-chapter-accent', 'hover:border-blue-500', 'hover:border-reward-gold', 'hover:border-emerald-500', 'hover:border-purple-500', 'hover:border-pink-500', 'hover:border-cyan-500'];
+                const colorIdx = idx % accentColors.length;
 
-            <Link href="/ai-navigator" onClick={() => !progress?.todayChecklist?.aiAdvice && handleChecklistItem('aiAdvice', 3)} className={`flex items-center justify-between p-8 rounded-[32px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent/5 border-chapter-accent/20' : 'bg-mist/30 border-line hover:border-chapter-accent'}`}>
-              <div className="flex items-center gap-5">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm text-lg font-black ${progress?.todayChecklist?.aiAdvice ? 'bg-chapter-accent text-mist' : 'bg-white text-slate border border-line'}`}>
-                  {progress?.todayChecklist?.aiAdvice ? '✓' : '02'}
-                </div>
-                <div>
-                  <h3 className="font-black text-obsidian">루틴 확인</h3>
-                  <p className="text-xs text-slate font-medium">네비게이터 추천 루틴</p>
-                </div>
-              </div>
-              <span className="text-sm font-black text-chapter-accent">+3pt</span>
-            </Link>
-
-            <Link href="/therapy/sound" onClick={() => !progress?.todayChecklist?.content && handleChecklistItem('content', 2)} className={`flex items-center justify-between p-8 rounded-[32px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.content ? 'bg-blue-500/5 border-blue-500/20' : 'bg-mist/30 border-line hover:border-blue-500'}`}>
-              <div className="flex items-center gap-5">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm text-lg font-black ${progress?.todayChecklist?.content ? 'bg-blue-500 text-mist' : 'bg-white text-slate border border-line text-blue-500'}`}>
-                  {progress?.todayChecklist?.content ? '✓' : '03'}
-                </div>
-                <div>
-                  <h3 className="font-black text-obsidian">사운드 명상</h3>
-                  <p className="text-xs text-slate font-medium">바이오 주파수 테라피</p>
-                </div>
-              </div>
-              <span className="text-sm font-black text-blue-500">+2pt</span>
-            </Link>
-
-            <Link href="/utils" onClick={() => !progress?.todayChecklist?.utility && handleChecklistItem('utility', 3)} className={`flex items-center justify-between p-8 rounded-[32px] border transition-all hover:shadow-lg ${progress?.todayChecklist?.utility ? 'bg-reward-gold/5 border-reward-gold/20' : 'bg-mist/30 border-line hover:border-reward-gold'}`}>
-              <div className="flex items-center gap-5">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm text-lg font-black ${progress?.todayChecklist?.utility ? 'bg-reward-gold text-white' : 'bg-white text-slate border border-line'}`}>
-                  {progress?.todayChecklist?.utility ? '✓' : '04'}
-                </div>
-                <div>
-                  <h3 className="font-black text-obsidian">툴 활성화</h3>
-                  <p className="text-xs text-slate font-medium">호흡 및 바이오 가이드</p>
-                </div>
-              </div>
-              <span className="text-sm font-black text-reward-gold">+3pt</span>
-            </Link>
+                return (
+                    <div
+                        key={item.id}
+                        className={`flex items-center justify-between p-8 rounded-[32px] border transition-all hover:shadow-lg cursor-pointer ${
+                            isChecked 
+                                ? `${bgColors[colorIdx]}/5 ${borderColors[colorIdx]}` 
+                                : `bg-mist/30 border-line ${hoverBorderColors[colorIdx]}`
+                        }`}
+                        onClick={() => !isChecked && handleChecklistItem(item.id as any, item.points)}
+                    >
+                        <div className="flex items-center gap-5">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm text-lg font-black ${
+                                isChecked ? `${bgColors[colorIdx]} text-mist` : 'bg-white text-slate border border-line'
+                            }`}>
+                                {isChecked ? '✓' : item.emoji}
+                            </div>
+                            <div>
+                                <h3 className="font-black text-obsidian">{item.label}</h3>
+                                <p className="text-xs text-slate font-medium">미션 완료 시 포인트 적립</p>
+                            </div>
+                        </div>
+                        <span className={`text-sm font-black ${accentColors[colorIdx]}`}>+{item.points}pt</span>
+                    </div>
+                );
+            })}
           </div>
         </div>
       </section>
@@ -469,11 +464,26 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
                 <h3 className="font-black text-3xl text-obsidian tracking-tight">유니클 매니저 리포트</h3>
-                <Badge className="bg-chapter-accent text-mist border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">Integrated Youniqle Analysis</Badge>
+                <Badge className="bg-chapter-accent text-mist border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">
+                  {userTier === 'BLACK' ? 'Black Exclusive' : userTier === 'RESTART' ? 'Premium Intelligence' : 'Basic Analysis'}
+                </Badge>
               </div>
               <p className="text-xl text-slate font-medium leading-relaxed italic opacity-80">
-                "{displayScore >= 70 ? '당신의 회복 패턴은 안정적입니다. 근육의 미세 이완을 위해 사운드 테라피의 비중을 높여보세요.' : '회복 지수가 임계점에 근접했습니다. 자세 교정 프로토콜과 단백질 섭취를 강력히 권장합니다.'}"
+                {userTier === 'BLACK' || userTier === 'RESTART'
+                  ? `"${displayScore >= 70 
+                      ? '회복 패턴이 매우 안정적입니다. 근육 미세 이완을 위해 사운드 테라피 비중을 20% 높이고, 수면 전 호흡 프로토콜을 추가해 보세요. 현재 추세라면 2주 내 최적 컨디션 도달이 예상됩니다.' 
+                      : '회복 지수가 임계점에 근접했습니다. 자세 교정 프로토콜(주 3회)과 단백질 섭취(체중 1kg당 1.2g)를 강력히 권장합니다. 수면 패턴 분석 결과, 취침 시간을 30분 앞당기면 회복 효율이 15% 향상됩니다.'}"` 
+                  : `"${displayScore >= 70 
+                      ? '당신의 회복 패턴은 안정적입니다. 사운드 테라피의 비중을 높여보세요.' 
+                      : '회복 지수가 임계점에 근접했습니다. 자세 교정과 단백질 섭취를 권장합니다.'}"` 
+                }
               </p>
+              {(userTier === 'RESET' || userTier === 'REBORN' || userTier === 'NONE') && (
+                <p className="mt-4 text-xs text-chapter-accent font-bold flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  리스타트 등급 이상에서 상세 수치 기반 리포트를 확인할 수 있습니다.
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

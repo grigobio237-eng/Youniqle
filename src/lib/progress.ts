@@ -107,3 +107,47 @@ function getDefaultProgress(): UserProgress {
         }
     };
 }
+
+// ── 티어별 맞춤 체크리스트 ──────────────────────────
+export interface TierChecklistItem {
+    id: string;
+    label: string;
+    emoji: string;
+    points: number;
+}
+
+type TierType = 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
+
+const BASE_CHECKLIST: TierChecklistItem[] = [
+    { id: 'diagnosis', label: '오늘의 회복 진단', emoji: '🩺', points: 2 },
+    { id: 'aiAdvice', label: 'AI 조언 확인', emoji: '💡', points: 1 },
+    { id: 'content', label: '회복 콘텐츠 읽기', emoji: '📖', points: 1 },
+    { id: 'utility', label: '유틸리티 1회 사용', emoji: '🔧', points: 1 },
+];
+
+const EXTENDED_CHECKLIST: TierChecklistItem[] = [
+    ...BASE_CHECKLIST,
+    { id: 'mealScan', label: '식단 스캔 기록', emoji: '🥗', points: 2 },
+    { id: 'soundTherapy', label: '사운드 테라피 10분', emoji: '🎧', points: 3 },
+];
+
+const PREMIUM_CHECKLIST: TierChecklistItem[] = [
+    ...EXTENDED_CHECKLIST,
+    { id: 'postureScan', label: '자세 교정 분석', emoji: '🧍', points: 3 },
+    { id: 'meditation', label: '마음 챙김 호흡', emoji: '🧘', points: 2 },
+];
+
+export function getTierChecklist(tier: TierType): TierChecklistItem[] {
+    switch (tier) {
+        case 'BLACK':
+            return PREMIUM_CHECKLIST;
+        case 'RESTART':
+            return EXTENDED_CHECKLIST;
+        case 'REBORN':
+        case 'RESET':
+        case 'NONE':
+        default:
+            return BASE_CHECKLIST;
+    }
+}
+

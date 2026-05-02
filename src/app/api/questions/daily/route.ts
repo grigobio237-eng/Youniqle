@@ -65,11 +65,11 @@ export async function GET(req: NextRequest) {
             // 3. Get User Tier & Context
             const { AccessControl } = await import('@/lib/logic/access-control');
             const user = userId ? await User.findById(userId) : null;
-            const userTier = user ? AccessControl.getUserGroup(user) : 'NORMAL';
+            const userTier = user ? AccessControl.getUserGroup(user) : 'RESET';
             
-            // Premium 유저인 경우 최근 3일간의 스캔/진단 데이터를 추가 컨텍스트로 수집
+            // 프리미엄/블랙 유저인 경우 최근 3일간의 스캔/진단 데이터를 추가 컨텍스트로 수집
             let recentData = null;
-            if (userTier === 'PREMIUM' && user) {
+            if ((userTier === 'RESTART' || userTier === 'BLACK') && user) {
                 recentData = {
                     scans: user.scanTimeline?.slice(-3),
                     diagnosis: user.diagnosisResults?.slice(-3)

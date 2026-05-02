@@ -8,12 +8,18 @@ import { Button } from "@/components/ui/button";
 import { HeartPulse, Sparkles, ArrowRight, FileText, Loader2, Activity, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { AccessControl } from "@/lib/logic/access-control";
+import MembershipUpsellDialog from "@/components/auth/MembershipUpsellDialog";
 
 export default function PostCarePage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [recentRoadmap, setRecentRoadmap] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showUpsell, setShowUpsell] = useState(false);
+
+  const userTier = AccessControl.getUserGroup(session?.user);
+  const isLocked = userTier !== 'RESTART' && userTier !== 'BLACK';
 
   useEffect(() => {
     const checkExisting = async () => {
@@ -93,7 +99,16 @@ export default function PostCarePage() {
                       </Link>
                     </Button>
                   ) : (
-                    <Button onClick={() => setShowForm(true)} className="w-full h-16 rounded-2xl bg-obsidian text-white font-black text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    <Button 
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowUpsell(true);
+                        } else {
+                          setShowForm(true);
+                        }
+                      }} 
+                      className="w-full h-16 rounded-2xl bg-obsidian text-white font-black text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
                       지금 상태 기록하기 <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   )}
@@ -121,7 +136,17 @@ export default function PostCarePage() {
                   </div>
 
                   {recentRoadmap && (
-                    <Button variant="ghost" onClick={() => setShowForm(true)} className="mt-4 text-chapter-accent font-black flex items-center gap-2 hover:bg-chapter-accent/5 rounded-xl self-start">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowUpsell(true);
+                        } else {
+                          setShowForm(true);
+                        }
+                      }} 
+                      className="mt-4 text-chapter-accent font-black flex items-center gap-2 hover:bg-chapter-accent/5 rounded-xl self-start"
+                    >
                       <FileText className="w-4 h-4" /> 새로운 경과 기록하기
                     </Button>
                   )}
@@ -159,6 +184,13 @@ export default function PostCarePage() {
           )}
         </AnimatePresence>
       </main>
+
+      <MembershipUpsellDialog 
+        open={showUpsell} 
+        onOpenChange={setShowUpsell} 
+        title="회복 로드맵 설계는 리스타트 등급 전용입니다"
+        description="시술 후 경과 모니터링과 AI 맞춤 회복 로드맵 생성을 이용하시려면 멤버십을 업그레이드하세요."
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import { Save } from 'lucide-react';
 import { useAIProgress } from '@/hooks/use-ai-progress';
+import { AccessControl } from '@/lib/logic/access-control';
 import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 import { useRouter } from 'next/navigation';
 
@@ -200,6 +201,10 @@ export default function FoodScanner({ onStart, isDiagnosing = false }: { onStart
     };
 
     const autoSaveResult = async (analysisResult: AnalysisResult, imageData: string) => {
+        if (!AccessControl.canUseScanType(session?.user, analysisResult.type)) {
+            // Don't auto-save if not allowed, but don't show toast to avoid annoyance during initial scan
+            return;
+        }
         setIsSaving(true);
         try {
             const response = await fetch('/api/scan/save', {
@@ -228,6 +233,11 @@ export default function FoodScanner({ onStart, isDiagnosing = false }: { onStart
     const handleSaveToTimeline = async () => {
         if (!session) {
             toast.error("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        if (!AccessControl.canUseScanType(session.user, result?.type || 'OTHER')) {
+            setShowUpsell(true);
             return;
         }
 
@@ -607,7 +617,14 @@ export default function FoodScanner({ onStart, isDiagnosing = false }: { onStart
                         </Button>
                     </CardContent>
                 </Card>
-                <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
+                 <MembershipUpsellDialog 
+                    open={showUpsell} 
+                    onOpenChange={setShowUpsell} 
+                    title={result?.type === 'MEAL' ? "식단 기록은 멤버십 전용입니다" : "환경/상태 분석은 리본 등급 이상 전용입니다"}
+                    description={result?.type === 'MEAL' 
+                        ? "식단 데이터 기반의 정밀 회복 리포트를 기록하시려면 로그인 및 멤버십이 필요합니다." 
+                        : "공간 환경 분석 및 시술 부위 상태 기록은 프리미엄 멤버십 전용 기능입니다."}
+                />
             </motion.div>
         );
     };

@@ -59,6 +59,7 @@ export class AccessControl {
    * 유저의 패스 타입에 따른 그룹 반환
    */
   static getUserGroup(user: any): UserGroup {
+    if (!user) return 'NONE';
     const passType = user.passInfo?.type || 'NONE';
     if (passType === 'BLACK') return 'BLACK';
     if (passType === 'RESTART') return 'RESTART';
@@ -113,5 +114,68 @@ export class AccessControl {
       default:
         return false;
     }
+  }
+
+  /**
+   * 스캔 카테고리별 사용 가능 여부 확인
+   * Reset: 식단(MEAL), 상태(STATE)
+   * Reborn: 식단, 상태 + 자세(POSTURE)
+   * Restart/Black: 전체 (식단, 자세, 공간(SPACE), 시술전후(POST_OP))
+   */
+  static canUseScanType(user: any, type: string): boolean {
+    const group = this.getUserGroup(user);
+    const normalizedType = type.toUpperCase();
+    
+    if (group === 'BLACK' || group === 'RESTART') return true;
+    if (group === 'REBORN') return ['MEAL', 'POSTURE', 'STATE'].includes(normalizedType);
+    if (group === 'RESET' || group === 'NONE') return ['MEAL', 'STATE'].includes(normalizedType);
+    return false;
+  }
+
+  /**
+   * 진단 타입별 사용 가능 여부 확인
+   * Reset: daily, free (1회 체험 로직은 API에서 처리)
+   * Reborn: daily, free
+   * Restart/Black: daily, free, deep/paid
+   */
+  static canUseDiagnosisType(user: any, type: string): boolean {
+    const group = this.getUserGroup(user);
+    const lowerType = type.toLowerCase();
+    
+    if (group === 'BLACK' || group === 'RESTART') return true;
+    if (group === 'REBORN') return ['daily', 'free'].includes(lowerType);
+    if (group === 'RESET' || group === 'NONE') return ['daily', 'free'].includes(lowerType);
+    return false;
+  }
+
+  /**
+   * 티어별 포인트 적립 배수 반환
+   * RESET: 1x (기본), REBORN: 1.1x, RESTART: 1.3x, BLACK: 1.5x
+   */
+  static getPointMultiplier(user: any): number {
+    const group = this.getUserGroup(user);
+    const multipliers: Record<UserGroup, number> = {
+      NONE: 1,
+      RESET: 1,
+      REBORN: 1.1,
+      RESTART: 1.3,
+      BLACK: 1.5,
+    };
+    return multipliers[group] ?? 1;
+  }
+
+  /**
+   * 티어별 포인트 적립 배수 라벨 (UI 표시용)
+   */
+  static getPointMultiplierLabel(user: any): string {
+    const group = this.getUserGroup(user);
+    const labels: Record<UserGroup, string> = {
+      NONE: '',
+      RESET: '',
+      REBORN: '🔥 리본 보너스 x1.1',
+      RESTART: '⚡ 리스타트 보너스 x1.3',
+      BLACK: '👑 블랙 보너스 x1.5',
+    };
+    return labels[group] ?? '';
   }
 }

@@ -33,8 +33,28 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // 2. 사용량 체크 및 포인트 소진 (60초 진단 전용)
+        // 진단 타입별 권한 체크
         const { AccessControl, FEATURE_COSTS } = await import('@/lib/logic/access-control');
+        
+        if (!AccessControl.canUseDiagnosisType(user, type)) {
+            return NextResponse.json({ 
+                error: '현재 멤버십 등급에서는 사용할 수 없는 진단 타입입니다.',
+                code: 'TIER_RESTRICTED'
+            }, { status: 403 });
+        }
+
+        // RESET 유저의 24문항(free) 1회 체험 체크
+        if (type === 'free' && AccessControl.getUserGroup(user) === 'RESET') {
+            const freeCount = user.diagnosisResults?.filter((r: any) => r.type === 'free').length || 0;
+            if (freeCount >= 1) {
+                return NextResponse.json({ 
+                    error: '무료 체험 횟수를 초과했습니다. 리본 등급으로 업그레이드 후 무제한으로 이용하세요.',
+                    code: 'TRIAL_EXCEEDED'
+                }, { status: 403 });
+            }
+        }
+
+        // 2. 사용량 체크 및 포인트 소진 (60초 진단 전용)
         await AccessControl.checkAndResetDailyStats(user);
 
         if (type === 'daily' || type === 'DAILY') {

@@ -31,6 +31,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { type, imageData, score, summary, metrics, usePoints } = body;
 
+    // 카테고리별 권한 체크
+    if (!AccessControl.canUseScanType(user, type)) {
+        return NextResponse.json({ 
+            error: '현재 멤버십 등급에서는 사용할 수 없는 스캔 타입입니다.',
+            code: 'TIER_RESTRICTED'
+        }, { status: 403 });
+    }
+
     const canUse = AccessControl.canUseFeature(user, 'scanner');
     const cost = FEATURE_COSTS.scanner;
 
@@ -143,19 +151,26 @@ export async function POST(req: NextRequest) {
         if (!user.gamification.todayCategories.includes(snapCategory)) {
             user.gamification.todayCategories.push(snapCategory);
             
-            // 포인트 차등 지급 (병원서류 10P, 일반 1P)
-            rewardPoints = snapCategory === 'MEDICAL_DOC' ? 10 : 1;
+            // 티어별 포인트 배수 적용
+            const multiplier = AccessControl.getPointMultiplier(user);
+            const multiplierLabel = AccessControl.getPointMultiplierLabel(user);
+            
+            // 포인트 차등 지급 (병원서류 10P, 일반 1P) × 티어 배수
+            const basePoints = snapCategory === 'MEDICAL_DOC' ? 10 : 1;
+            rewardPoints = Math.round(basePoints * multiplier);
             user.points += rewardPoints;
-            gamificationMessage = snapCategory === 'MEDICAL_DOC' ? '🏥 병원서류 특별 보상 10P 적립!' : `✅ 기록 인증 1P 적립!`;
+            gamificationMessage = snapCategory === 'MEDICAL_DOC' 
+                ? `🏥 병원서류 특별 보상 ${rewardPoints}P 적립!${multiplierLabel ? ` (${multiplierLabel})` : ''}`
+                : `✅ 기록 인증 ${rewardPoints}P 적립!${multiplierLabel ? ` (${multiplierLabel})` : ''}`;
             
             // 스트릭 보너스 로직 (오늘 첫 적립일 때만 계산)
             if (user.gamification.todayCategories.length === 1) {
                  if (currentStreak > 0 && currentStreak % 30 === 0) {
-                     streakBonusPoints = 100;
-                     gamificationMessage = `🎉 30일 연속 달성! 보너스 100P 지급!`;
+                     streakBonusPoints = Math.round(100 * multiplier);
+                     gamificationMessage = `🎉 30일 연속 달성! 보너스 ${streakBonusPoints}P 지급!${multiplierLabel ? ` (${multiplierLabel})` : ''}`;
                  } else if (currentStreak > 0 && currentStreak % 7 === 0) {
-                     streakBonusPoints = 10;
-                     gamificationMessage = `🎉 7일 연속 달성! 보너스 10P 지급!`;
+                     streakBonusPoints = Math.round(10 * multiplier);
+                     gamificationMessage = `🎉 7일 연속 달성! 보너스 ${streakBonusPoints}P 지급!${multiplierLabel ? ` (${multiplierLabel})` : ''}`;
                  }
                  user.points += streakBonusPoints;
             }
@@ -168,7 +183,7 @@ export async function POST(req: NextRequest) {
                     userId: user._id,
                     type: 'earned',
                     amount: totalEarned,
-                    description: `라이프 스냅 보상 (${snapCategory}) ${streakBonusPoints > 0 ? '+ 연속 기록 보너스' : ''}`,
+                    description: `라이프 스냅 보상 (${snapCategory})${streakBonusPoints > 0 ? ' + 연속 기록 보너스' : ''}${multiplier > 1 ? ` [x${multiplier} 멤버십 보너스]` : ''}`,
                     balance: user.points
                 });
             }

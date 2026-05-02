@@ -14,7 +14,10 @@ import SoundTherapy from '@/components/utils/SoundTherapy';
 import { useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowRight, Box, Compass, Play, Pause, Wrench, ChevronLeft, ChevronRight, X, ClipboardList } from 'lucide-react';
+import { ArrowRight, Box, Compass, Play, Pause, Wrench, ChevronLeft, ChevronRight, X, ClipboardList, Lock } from 'lucide-react';
+import { AccessControl } from '@/lib/logic/access-control';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
+import { useSession } from 'next-auth/react';
 
 type Category = '전체' | '검색' | '이미지' | '계산' | '학습' | '생산성' | '건강' | '회복';
 
@@ -230,6 +233,18 @@ export default function UtilityPage() {
 function UtilsContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { data: session } = useSession();
+    const [showUpsell, setShowUpsell] = useState(false);
+    const [upsellConfig, setUpsellConfig] = useState({ title: '', description: '' });
+
+    const userTier = AccessControl.getUserGroup(session?.user);
+
+    const isToolLocked = (toolId: string) => {
+        if (toolId === 'posture' || toolId === 'sound' || toolId === 'sleep') {
+            return userTier === 'RESET' || userTier === 'NONE';
+        }
+        return false;
+    };
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<Category>('전체');
@@ -255,6 +270,31 @@ function UtilsContent() {
         }
     }, [searchParams]);
 
+    const handleToolClick = (tool: typeof utilities[0]) => {
+        if (isToolLocked(tool.id)) {
+            setUpsellConfig({
+                title: `${tool.title}는 멤버십 전용입니다`,
+                description: `정밀 회복 분석과 프리미엄 유틸리티를 이용하시려면 멤버십을 업그레이드하세요.`
+            });
+            setShowUpsell(true);
+            return;
+        }
+
+        if (tool.id === 'sleep') {
+            setShowRecoveryModal(true);
+        } else if (tool.id === 'water') {
+            setShowWaterModal(true);
+        } else if (tool.id === 'stretch') {
+            setShowStretchModal(true);
+        } else if (tool.id === 'posture') {
+            setShowPostureModal(true);
+        } else if (tool.id === 'sound') {
+            setShowSoundModal(true);
+        } else if (tool.href.startsWith('/')) {
+            router.push(tool.href);
+        }
+    };
+
     const categories: Category[] = ['전체', '계산', '학습', '생산성', '이미지', '검색', '건강', '회복'];
 
     const filteredUtilities = utilities.filter(util => {
@@ -263,25 +303,6 @@ function UtilsContent() {
         const matchesCategory = selectedCategory === '전체' || util.category.includes(selectedCategory);
         return matchesSearch && matchesCategory;
     });
-
-    const handleToolClick = (id: string, href: string) => {
-        if (id === 'sleep') {
-            setShowRecoveryModal(true);
-            router.push('/utils?tool=sleep');
-        } else if (id === 'water') {
-            setShowWaterModal(true);
-            router.push('/utils?tool=water');
-        } else if (id === 'stretch') {
-            setShowStretchModal(true);
-            router.push('/utils?tool=stretch');
-        } else if (id === 'posture') {
-            setShowPostureModal(true);
-            router.push('/utils?tool=posture');
-        } else if (id === 'sound') {
-            setShowSoundModal(true);
-            router.push('/utils?tool=sound');
-        }
-    };
 
     return (
         <ChapterWrapper chapter="utils">
@@ -353,15 +374,10 @@ function UtilsContent() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredUtilities.map((util) => (
-                            <Link
+                            <div
                                 key={util.id}
-                                href={util.href}
-                                onClick={(e) => {
-                                    if (util.href.startsWith('/utils?tool=')) {
-                                        e.preventDefault();
-                                        handleToolClick(util.id, util.href);
-                                    }
-                                }}
+                                onClick={() => handleToolClick(util)}
+                                className="cursor-pointer"
                             >
                                 <Card className="group h-full border-2 border-line hover:border-obsidian rounded-[40px] transition-all hover:shadow-2xl overflow-hidden bg-white">
                                     <CardContent className="p-8 space-y-6">
@@ -380,7 +396,10 @@ function UtilsContent() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <h3 className="text-2xl font-black italic tracking-tighter text-obsidian line-clamp-1">{util.title}</h3>
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-2xl font-black italic tracking-tighter text-obsidian line-clamp-1">{util.title}</h3>
+                                                {isToolLocked(util.id) && <Lock className="w-4 h-4 text-slate-400" />}
+                                            </div>
                                             <p className="text-sm font-medium text-slate opacity-60 line-clamp-2 leading-relaxed">
                                                 {util.description}
                                             </p>
@@ -403,7 +422,7 @@ function UtilsContent() {
                                         </div>
                                     </CardContent>
                                 </Card>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 </div>

@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
-import { Save, Activity } from 'lucide-react';
+import { Save, Activity, Lock } from 'lucide-react';
+import { AccessControl } from '@/lib/logic/access-control';
 
 interface PostureResult {
     subjectName: string;
@@ -32,6 +33,9 @@ export default function PostureScanner() {
     
     // PC Webcam States
     const { data: session } = useSession();
+    const userTier = AccessControl.getUserGroup(session?.user);
+    const isLocked = userTier === 'RESET' || userTier === 'NONE';
+
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -58,6 +62,11 @@ export default function PostureScanner() {
     }, [stream]);
 
     const startWebcam = async () => {
+        if (isLocked) {
+            setShowUpsell(true);
+            return;
+        }
+
         if (isMobile) {
             fileInputRef.current?.click();
             return;
@@ -157,10 +166,7 @@ export default function PostureScanner() {
 
         if (!result || !capturedImage) return;
 
-        const pass = (session.user as any).passInfo;
-        const isActivePass = pass && pass.status === 'ACTIVE' && pass.type !== 'NONE';
-
-        if (!isActivePass) {
+        if (!AccessControl.canUseScanType(session.user, 'POSTURE')) {
             setShowUpsell(true);
             return;
         }
@@ -203,6 +209,10 @@ export default function PostureScanner() {
                 type="file" 
                 ref={fileInputRef} 
                 onChange={(e) => {
+                    if (isLocked) {
+                        setShowUpsell(true);
+                        return;
+                    }
                     const file = e.target.files?.[0];
                     if (file) {
                         const reader = new FileReader();
@@ -239,8 +249,9 @@ export default function PostureScanner() {
                             </div>
                             <Button 
                                 onClick={startWebcam}
-                                className="bg-obsidian text-white h-14 px-8 rounded-2xl font-black italic tracking-widest uppercase hover:scale-105 transition-transform"
+                                className="bg-obsidian text-white h-14 px-8 rounded-2xl font-black italic tracking-widest uppercase hover:scale-105 transition-transform flex items-center gap-2"
                             >
+                                {isLocked && <Lock className="w-4 h-4" />}
                                 Start Posture Scan
                             </Button>
                         </motion.div>
@@ -384,7 +395,12 @@ export default function PostureScanner() {
                                     </Button>
                                 </div>
                             </div>
-                            <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
+                            <MembershipUpsellDialog 
+                                open={showUpsell} 
+                                onOpenChange={setShowUpsell} 
+                                title="자세 분석은 리본 등급 이상 전용입니다"
+                                description="거북목, 어깨 불균형 등 정밀 자세 분석과 데이터 기록을 이용하시려면 멤버십을 업그레이드하세요."
+                             />
                         </motion.div>
                     )}
                 </AnimatePresence>
