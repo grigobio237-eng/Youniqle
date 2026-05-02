@@ -27,11 +27,12 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const { journey, setJourney, medicalCategory, setMedicalCategory, treatmentType, setTreatmentType } = useRecovery();
     const [selectionStep, setSelectionStep] = useState<'JOURNEY' | 'CATEGORY' | 'STAGE' | 'TYPE' | 'READY'>('JOURNEY');
     const [isMobile, setIsMobile] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'scanning' | 'result'>('idle');
+    const [status, setStatus] = useState<'idle' | 'select_type' | 'scanning' | 'result'>('idle');
+    const [snapType, setSnapType] = useState<string>('');
     const [loading, setLoading] = useState(false);
     
     const [progress, setProgress] = useState(0);
-    const [loadingText, setLoadingText] = useState('60초 정밀 진단 시작하기');
+    const [loadingText, setLoadingText] = useState('60초 간편 진단 시작하기');
 
     // Sync with AI progress
     useEffect(() => {
@@ -102,6 +103,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const startWebcam = async () => {
         if (isMobile) return;
+        setShowWebcam(true); // 권한 요청 전 즉시 활성화하여 화면 깜빡임 방지
         try {
             const constraints: MediaStreamConstraints = {
                 video: true 
@@ -109,14 +111,13 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
             
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             setStream(newStream);
-            setShowWebcam(true);
         } catch (err: any) {
+            setShowWebcam(false);
             console.error("Webcam Error:", err);
-            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                toast.error("카메라 권한이 거부되었습니다. 주소창의 카메라 아이콘을 눌러 권한을 허용해주세요.");
-            } else {
-                toast.error("카메라를 시작할 수 없습니다. 다른 프로그램에서 카메라를 사용 중인지 확인해주세요.");
-            }
+            toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
+            setTimeout(() => {
+                fileInputRef.current?.click();
+            }, 300);
         }
     };
 
@@ -155,7 +156,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                resolve(canvas.toDataURL('image/webp', 0.8));
             };
         });
     };
@@ -171,10 +172,10 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
             const compressedData = await compressImage(imageData);
             setCapturedImage(compressedData);
 
-            const response = await fetch('/api/ai/food-analysis', {
+            const response = await fetch('/api/ai/life-snap', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: compressedData, journey })
+                body: JSON.stringify({ image: compressedData, journey, snapType })
             });
 
             if (!response.ok) {
@@ -182,12 +183,24 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 throw new Error(errorData.error || 'Analysis failed');
             }
 
+            const data = await response.json();
+
+            if (data.isMismatch) {
+                toast.error(data.mismatchReason || "선택하신 카테고리와 맞지 않는 사진입니다. 정확한 사진을 다시 올려주세요.");
+                setStatus('idle');
+                return;
+            }
+
             finishProgress();
             await new Promise(r => setTimeout(r, 800));
 
-            const data = await response.json();
             setResult(data);
             setStatus('result');
+
+            // 로그인한 경우 타임라인에 자동 저장 (WebP)
+            if (session?.user?.email) {
+                autoSaveResult(data, compressedData);
+            }
         } catch (err: any) {
             console.error('Analysis Error:', err);
             toast.error(err.message || "유니클 분석 중 오류가 발생했습니다.");
@@ -213,8 +226,19 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
             });
 
             if (response.ok) {
+                const resData = await response.json();
                 setHasSaved(true);
                 toast.success('분석 결과가 타임라인에 자동으로 기록되었습니다.');
+
+                // 게이미피케이션 보상 알림
+                const gf = resData.data?.gamification;
+                if (gf && gf.rewardPoints > 0) {
+                    setTimeout(() => {
+                        toast.success(gf.gamificationMessage, {
+                            style: { background: '#D4AF37', color: '#1A1A1A', fontWeight: 'bold' }
+                        });
+                    }, 500); // 이전 토스트와 겹치지 않게 딜레이
+                }
             }
         } catch (err) {
             console.error("Auto-save failed:", err);
@@ -253,8 +277,19 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 throw new Error(err.error || '저장에 실패했습니다.');
             }
             
-            toast.success('스캔 타임라인에 기록되었습니다.');
+            const resData = await response.json();
             setHasSaved(true);
+            toast.success('스캔 타임라인에 기록되었습니다.');
+
+            // 게이미피케이션 보상 알림
+            const gf = resData.data?.gamification;
+            if (gf && gf.rewardPoints > 0) {
+                setTimeout(() => {
+                    toast.success(gf.gamificationMessage, {
+                        style: { background: '#D4AF37', color: '#1A1A1A', fontWeight: 'bold' }
+                    });
+                }, 500);
+            }
         } catch (err: any) {
             toast.error(err.message);
         } finally {
@@ -274,7 +309,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d')?.drawImage(video, 0, 0);
-        analyzeImage(canvas.toDataURL('image/png'));
+        analyzeImage(canvas.toDataURL('image/webp'));
     };
 
     const handleMobileCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,7 +322,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const renderIdleView = () => (
         <div 
-            onClick={() => isMobile ? fileInputRef.current?.click() : startWebcam()}
+            onClick={() => setStatus('select_type')}
             className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-obsidian group cursor-pointer border-4 border-white/5 shadow-2xl"
         >
             <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700" />
@@ -297,31 +332,72 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-all duration-500">
                     <Camera className="w-8 h-8 text-white/50" />
                 </div>
-                <div className="space-y-1">
-                    <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Ready to Scan</h3>
-                    <p className="text-white/60 text-xs font-bold leading-relaxed break-keep px-4">
-                        당신이 머무는 공간, 보는 것과 듣는 것,<br />
-                        그리고 먹는 모든 것이 회복의 조각입니다.
+                <div className="space-y-2">
+                    <h3 className="text-xs font-black text-chapter-accent tracking-widest uppercase bg-chapter-accent/10 px-3 py-1 rounded-full inline-block">Life Snap</h3>
+                    <p className="text-white font-black text-2xl md:text-3xl leading-snug break-keep px-4">
+                        사진 한 장으로<br />오늘의 회복 상태를<br />기록하세요
                     </p>
-                </div>
-                <div className="flex gap-2">
-                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">MEAL</Badge>
-                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">SPACE</Badge>
-                    <Badge variant="outline" className="border-white/20 text-white/70 font-black text-[9px] uppercase tracking-widest bg-white/5">STATE</Badge>
                 </div>
             </div>
 
             <Sparkles className="absolute top-8 right-8 w-6 h-6 text-chapter-accent animate-pulse" />
+        </div>
+    );
+
+    const renderSelectTypeView = () => (
+        <div className="w-full h-full md:relative md:aspect-[4/3] md:rounded-[40px] overflow-hidden bg-white group cursor-pointer md:border md:border-line md:shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-line bg-mist">
+                <div>
+                    <h3 className="text-lg font-black text-obsidian tracking-tight">어떤 스냅을 기록할까요?</h3>
+                    <p className="text-xs font-bold text-slate/60">당신의 일상을 카테고리에 맞게 선택해주세요.</p>
+                </div>
+                <button 
+                    onClick={() => setStatus('idle')} 
+                    className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate/50 hover:text-obsidian hover:bg-line transition-colors"
+                    aria-label="닫기"
+                    title="닫기"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+            </div>
             
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/*" 
-                onChange={handleMobileCapture} 
-                aria-label="회복 데이터 스캔을 위한 이미지 업로드"
-                {...({ capture: 'environment' } as any)}
-            />
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div className="grid grid-cols-1 gap-2">
+                    {[
+                        { id: 'MEAL', emoji: '🍱', title: '음식 사진', desc: '식사 패턴 기록' },
+                        { id: 'HYDRATION', emoji: '💧', title: '물/음료 사진', desc: '수분·카페인·음주 습관 기록' },
+                        { id: 'SKIN', emoji: '✨', title: '얼굴/피부 사진', desc: '외형 컨디션 변화 기록' },
+                        { id: 'SLEEP', emoji: '🛏️', title: '침실/수면환경 사진', desc: '수면 루틴 기록' },
+                        { id: 'ACTIVITY', emoji: '🏃', title: '운동/산책 사진', desc: '활동량 기록' },
+                        { id: 'ROUTINE', emoji: '💊', title: '영양제/관리제품 사진', desc: '자기관리 루틴 기록' },
+                        { id: 'BODY', emoji: '🤕', title: '몸 상태 메모 사진', desc: '피로·붓기·통증 느낌 기록' },
+                        { id: 'MEDICAL_DOC', emoji: '📄', title: '병원 서류 사진', desc: '얼굴, 민감 정보는 가리고 등록해주세요' },
+                        { id: 'OTHER', emoji: '📸', title: '기타 사진', desc: '기타 일상 기록' },
+                    ].map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => {
+                                if (cat.id === 'MEDICAL_DOC') {
+                                    toast.warning("얼굴이나 민감한 정보가 포함된 경우, 원하지 않는 부분은 가리고 등록해주세요.", { duration: 6000 });
+                                }
+                                setSnapType(cat.id);
+                                setStatus('idle');
+                                if (isMobile) fileInputRef.current?.click();
+                                else startWebcam();
+                            }}
+                            className="flex items-center text-left gap-4 p-4 rounded-2xl border border-transparent hover:border-chapter-accent/20 hover:bg-chapter-accent/5 transition-all bg-mist/30"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-white flex flex-shrink-0 items-center justify-center text-2xl shadow-sm">
+                                {cat.emoji}
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="text-sm font-black text-obsidian">{cat.title}</h4>
+                                <p className="text-[11px] font-bold text-slate/60 mt-0.5 break-keep">{cat.desc}</p>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 
@@ -523,75 +599,37 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                         </div>
 
                         {/* Nudge to Diagnosis */}
-                        <div className="pt-6 border-t border-line space-y-4">
-                            {!hasSaved ? (
-                                <Button 
-                                    onClick={handleSaveToTimeline}
-                                    disabled={isSaving}
-                                    variant="outline"
-                                    className="w-full h-14 rounded-2xl border-2 border-chapter-accent/20 text-chapter-accent font-black uppercase tracking-widest hover:bg-chapter-accent/5 transition-all flex items-center justify-center gap-2"
-                                >
-                                    {isSaving ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                    ) : (
-                                        <Save className="w-5 h-5" />
-                                    )}
-                                    스캔 타임라인에 저장하기
-                                </Button>
-                            ) : (
-                                <div className="w-full h-14 rounded-2xl bg-status-normal/10 border-2 border-status-normal/20 text-status-normal flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest">
-                                    <Check className="w-5 h-5" /> 저장 완료
+                        <div className="pt-6 border-t border-line">
+                            <Button 
+                                onClick={() => onStart(result || undefined)}
+                                disabled={isDiagnosing}
+                                size="lg" 
+                                className="w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20"
+                            >
+                                {isDiagnosing && (
+                                    <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progress}%` }}
+                                        className="absolute inset-0 bg-white/20 z-0"
+                                    />
+                                )}
+
+                                <div className="relative z-10 flex items-center justify-center">
+                                    <Sparkles className={`w-6 h-6 mr-3 ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'} transition-transform`} />
+                                    <AnimatePresence mode="wait">
+                                        <motion.span
+                                            key={loadingText}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            {loadingText}
+                                        </motion.span>
+                                    </AnimatePresence>
+                                    {!isDiagnosing && <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />}
                                 </div>
-                            )}
-
-                            {/* Journey Stepper UI */}
-                            {selectionStep === 'JOURNEY' && renderJourneySelector()}
-                            {selectionStep === 'CATEGORY' && renderCategorySelector()}
-                            {selectionStep === 'STAGE' && renderStageSelector()}
-                            {selectionStep === 'TYPE' && renderTypeSelector()}
-
-                            {(selectionStep === 'READY' || canStartDiagnosis) && (
-                                <Button 
-                                    onClick={() => onStart(result || undefined)}
-                                    disabled={isDiagnosing}
-                                    size="lg" 
-                                    className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20`}
-                                >
-                                    {/* Progress Bar Background */}
-                                    {isDiagnosing && (
-                                        <motion.div 
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${progress}%` }}
-                                            className="absolute inset-0 bg-white/20 z-0"
-                                        />
-                                    )}
-
-                                    <div className="relative z-10 flex items-center justify-center">
-                                        <Sparkles className={`w-6 h-6 mr-3 ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'} transition-transform`} />
-                                        <AnimatePresence mode="wait">
-                                            <motion.span
-                                                key={loadingText}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                {loadingText}
-                                            </motion.span>
-                                        </AnimatePresence>
-                                        {!isDiagnosing && <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />}
-                                    </div>
-                                </Button>
-                            )}
-                            
-                            {selectionStep === 'READY' && (
-                                <button 
-                                    onClick={() => setSelectionStep('JOURNEY')} 
-                                    className="w-full text-[10px] font-black text-slate/40 uppercase tracking-widest hover:text-chapter-accent transition-colors"
-                                >
-                                    설정 다시 선택하기
-                                </button>
-                            )}
+                            </Button>
                         </div>
                         
                         <Button variant="ghost" onClick={() => setStatus('idle')} className="w-full h-14 rounded-2xl text-slate/60 font-bold hover:bg-mist transition-all">
@@ -612,13 +650,25 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                         {showWebcam ? renderWebcamView() : renderIdleView()}
                     </motion.div>
                 )}
+
+                {status === 'select_type' && (
+                    <motion.div 
+                        key="select_type" 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        exit={{ opacity: 0, y: 20 }}
+                        className="fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto"
+                    >
+                        {renderSelectTypeView()}
+                    </motion.div>
+                )}
                 
                 {status === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
                         <AIProgressOverlay 
                             active={loading} 
-                            progress={progress} 
+                            progress={scanProgress} 
                             message={statusMessage} 
                             variant="compact"
                         />
@@ -628,6 +678,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 {status === 'result' && renderResultView()}
             </AnimatePresence>
             <canvas ref={canvasRef} className="hidden" />
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/*" 
+                onChange={handleMobileCapture} 
+                aria-label="회복 데이터 스캔을 위한 이미지 업로드"
+                {...({ capture: 'environment' } as any)}
+            />
         </div>
     );
 }

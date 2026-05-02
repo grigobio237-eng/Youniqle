@@ -621,7 +621,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 ## 요청 사항
 1. 사용자의 상태를 요약하는 따뜻한 'aiComment'를 작성하세요 (100자 이내).
 2. 가장 점수가 낮거나 관리가 필요한 항목을 중심으로 3가지 구체적인 'adviceItems'를 제안하세요.
-3. 각 아이템은 category(PHYSICAL, ENVIRONMENT, NUTRITION, PSYCHOLOGICAL 중 선택)와 content를 포함해야 합니다.
+3. 각 아이템은 category(PHYSICAL, MENTAL, LIFESTYLE, SLEEP, NUTRITION 중 선택)와 content를 포함해야 합니다.
 4. 반드시 아래 JSON 형식으로만 응답하세요.
 
 ## 응답 형식 (JSON Only)
@@ -629,7 +629,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
   "aiComment": "조언 멘트",
   "adviceItems": [
     { "category": "PHYSICAL", "content": "행동 내용 1" },
-    { "category": "ENVIRONMENT", "content": "행동 내용 2" },
+    { "category": "LIFESTYLE", "content": "행동 내용 2" },
     { "category": "NUTRITION", "content": "행동 내용 3" }
   ]
 }`;
@@ -638,7 +638,19 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             
             if (jsonMatch) {
-                return JSON.parse(jsonMatch[0]);
+                const parsed = JSON.parse(jsonMatch[0]);
+                // Validate categories
+                const validCategories = ['PHYSICAL', 'MENTAL', 'LIFESTYLE', 'SLEEP', 'NUTRITION'];
+                if (parsed.adviceItems) {
+                    parsed.adviceItems = parsed.adviceItems.map((item: any) => {
+                        if (!validCategories.includes(item.category)) {
+                            // Fallback to LIFESTYLE if model hallucinated a category
+                            item.category = 'LIFESTYLE';
+                        }
+                        return item;
+                    });
+                }
+                return parsed;
             }
             throw new Error('Failed to parse action advice JSON');
 
@@ -648,7 +660,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
                 aiComment: '오늘 하루도 당신의 회복을 진심으로 응원합니다.',
                 adviceItems: [
                     { category: 'PHYSICAL', content: '잠시 눈을 감고 5분간 명상을 즐겨보세요.' },
-                    { category: 'ENVIRONMENT', content: '실내 공기를 환기시켜 신선한 공기를 마셔보세요.' },
+                    { category: 'LIFESTYLE', content: '실내 공기를 환기시켜 신선한 공기를 마셔보세요.' },
                     { category: 'NUTRITION', content: '따뜻한 물 한 잔으로 몸의 순환을 도와주세요.' }
                 ]
             };
@@ -2100,6 +2112,42 @@ JSON 형식:
         } catch (error) {
             console.error('Gemini Symptom Analysis Error:', error);
             return { category: 'GENERAL', reason: '서비스 일시적인 오류로 일반 상담으로 연결합니다.' };
+        }
+    }
+
+    /**
+     * 16개 정밀 문항을 요일/테마/유저 상황에 맞춰 AI가 재구성합니다.
+     */
+    static async paraphrasePrecisionQuestions(
+        baseQuestions: any[],
+        dayOfWeek: string,
+        theme: string,
+        userName: string = "사용자"
+    ): Promise<any[]> {
+        const prompt = `
+당신은 유니클(Youniqle)의 전문 회복 네비게이터입니다.
+사용자(${userName})의 오늘의 진단 테마는 [${dayOfWeek}: ${theme}] 입니다.
+
+제공된 16개의 정밀 진단 문항(JSON)을 다음 지침에 따라 재구성하세요:
+1. 질문의 핵심 의도와 ID, 카테고리는 절대 변경하지 마세요.
+2. 질문 문구를 오늘의 테마에 맞춰 더 자연스럽고 공감 가도록 패러프레이징하세요.
+3. 응답 옵션(options)의 문구도 테마에 맞춰 변경하되, 점수(score)가 높은 순서대로 긍정->부정의 의미적 흐름을 엄격히 유지하세요.
+4. 사용자에게 직접 말을 거는 듯한 친근하고 전문적인 톤을 유지하세요.
+5. 출력 형식은 반드시 입력받은 JSON 구조와 동일한 배열이어야 합니다.
+
+[Base Questions JSON]:
+${JSON.stringify(baseQuestions)}
+
+JSON 배열만 반환하세요.
+`;
+
+        try {
+            const response = await this.generateWithFallback(prompt);
+            const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
+            return JSON.parse(cleaned);
+        } catch (error) {
+            console.error("AI Paraphrasing failed, returning base questions:", error);
+            return baseQuestions;
         }
     }
 }

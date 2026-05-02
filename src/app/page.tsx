@@ -122,94 +122,84 @@ export default function HomePage() {
 
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
-  const handleStart = async (data?: AnalysisResult) => {
+  const handleStart = async () => {
     setIsDiagnosing(true);
-    if (data) setAnalysisData(data);
-    const cacheKey = `${journey}-${medicalCategory}-${treatmentType}`;
-    // If we already have questions for the CURRENT journey and medical category, just show them
-    if (questions.length > 0 && currentQuestionsKey === cacheKey) {
-      setViewState('QUESTION');
-      setIsDiagnosing(false);
-      return;
-    }
-
-    // Otherwise, fetch context-specific questions
     try {
-      const url = `/api/questions/daily?journey=${journey || 'WELLNESS'}${medicalCategory ? `&medicalCategory=${medicalCategory}` : ''}${treatmentType ? `&treatmentType=${treatmentType}` : ''}`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setQuestions(data.questions);
-        setCurrentQuestionsKey(cacheKey);
+      // 스캔 결과가 있다면 해당 내용을 키워드로 사용, 없으면 기본 키워드 사용
+      const keywords = analysisData 
+        ? `${analysisData.summary}, ${analysisData.highlights.join(', ')}`
+        : "일상 회복, 에너지 레벨, 신체 컨디션";
+
+      const res = await fetch('/api/ai/diagnosis/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme: analysisData ? "스캔 데이터 기반 정밀 회복 점검" : "60초 초간편 간편 진단",
+          keywords: keywords,
+          journey: journey,
+          medicalCategory: medicalCategory,
+          treatmentType: treatmentType
+        })
+      });
+      
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setQuestions(data);
         setViewState('QUESTION');
       } else {
-        alert('맞춤 문항을 생성할 수 없습니다. 잠시 후 다시 시도해주세요.');
+        throw new Error("질문을 불러오지 못했습니다.");
       }
     } catch (error) {
-      console.error('Failed to fetch questions:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      console.error("Diagnosis start error:", error);
+      router.push('/dashboard'); // 오류 발생 시에만 대시보드로 이동
     } finally {
       setIsDiagnosing(false);
     }
   };
 
-  const handleComplete = async (rawScore: number, finalAnswers: any[], note: string) => {
-    setScore(rawScore); // This is 0-25 raw score
+  const onDiagnosisComplete = async (totalScore: number, finalAnswers: any[], note: string) => {
+    setScore(totalScore);
     setAnswers(finalAnswers);
     setUserNote(note);
     setViewState('RESULT');
-
-    // 로그인한 경우 DB에 자동 저장
-    if (session?.user?.email) {
-      try {
-        const unifiedScore = 100 - (rawScore * 4);
-        await fetch('/api/diagnosis/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'daily',
-            result: {
-              totalScore: unifiedScore,
-              convertedScores: {
-                physical: unifiedScore, // 60초 진단은 대표 점수를 모든 카테고리에 일단 할당
-                mental: unifiedScore,
-                lifestyle: unifiedScore,
-                sleep: unifiedScore
-              }
-            },
-            answers: finalAnswers.reduce((acc, curr) => {
-              acc[curr.questionId] = curr.score;
-              return acc;
-            }, {})
-          })
-        });
-        console.log('Daily diagnosis saved to DB');
-      } catch (error) {
-        console.error('Failed to save daily diagnosis:', error);
-      }
-    }
     
-    // 로컬 스토리지에도 항상 저장 (Dashboard 연동용)
-    localStorage.setItem('recovery_last_score', (100 - (rawScore * 4)).toString());
+    // 결과 저장 (옵션)
+    localStorage.setItem('recovery_last_score', totalScore.toString());
   };
 
-  const handleEnterDashboard = () => {
-    router.push('/ai-navigator');
-  };
-
-  // Render appropriate view
   const renderContent = () => {
-    if (viewState === 'QUESTION') return <DiagnosisForm questions={questions} onComplete={handleComplete} />;
-    if (viewState === 'RESULT') return <ResultDisplay score={score} answers={answers} userNote={userNote} analysisData={analysisData} onEnter={handleEnterDashboard} onOpenWebtoon={() => setShowWebtoonDialog(true)} />;
-    
-    // Default: Always show Hero + LandingContent (INTRO)
+    if (viewState === 'QUESTION') {
+      return (
+        <div className="min-h-screen bg-mist animate-fade-in">
+          <DiagnosisForm 
+            questions={questions} 
+            onComplete={onDiagnosisComplete} 
+          />
+        </div>
+      );
+    }
+
+    if (viewState === 'RESULT') {
+      return (
+        <div className="min-h-screen bg-mist animate-fade-in">
+          <ResultDisplay 
+            score={score} 
+            answers={answers} 
+            userNote={userNote}
+            analysisData={analysisData}
+            onReset={() => setViewState('INTRO')}
+          />
+        </div>
+      );
+    }
+
     return (
       <>
-        <Hero onStart={handleStart} isDiagnosing={isDiagnosing} />
-        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} isDiagnosing={isDiagnosing} />
+        <Hero onStart={handleStart} />
+        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} />
       </>
     );
-  }
+  };
 
   return (
     <>

@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
             const user = await User.findOne({ email: session.user.email });
             if (user) {
                 userId = user._id;
-                const scoreData = calculateUnifiedScore(user);
-                if (scoreData.categories) {
+                const scoreData = calculateUnifiedScore(user) as any;
+                if (scoreData && scoreData.categories) {
                     const lowCategories = Object.entries(scoreData.categories)
                         .filter(([_, score]) => (score as number) < 70)
                         .map(([cat, _]) => cat);
@@ -144,10 +144,92 @@ export async function GET(req: NextRequest) {
     } catch (error: any) {
         console.error('[DailyQ] API Router Error:', error);
         return NextResponse.json({
-            questions: [], // Return empty array to prevent client crash
+            questions: [],
             error: error.message || 'Internal Server Error',
-            details: error.toString(),
             theme: '에러 발생 (기본 문항로드)'
-        }, { status: 200 }); // Return 200 with empty data to allow safe parsing on client
+        }, { status: 200 });
+    }
+}
+
+export async function POST(req: NextRequest) {
+    try {
+        await dbConnect();
+        const body = await req.json();
+        const { journey, medicalCategory, treatmentType, analysisResult } = body;
+
+        if (!analysisResult) {
+            return NextResponse.json({ error: 'Analysis result is required' }, { status: 400 });
+        }
+
+        console.log(`[DailyQ] Generating dynamic questions for journey: ${journey}, Category: ${medicalCategory}`);
+
+        const typeLabel = treatmentType === 'SURGERY' ? '수술' : '시술';
+        let contextInstruction = "";
+        if (journey === 'CLINICAL_PRE') {
+            contextInstruction = `사용자는 현재 '${typeLabel} 전' 단계입니다.`;
+        } else if (journey === 'CLINICAL_POST') {
+            contextInstruction = `사용자는 현재 '${typeLabel} 후' 관리 단계입니다.`;
+        } else {
+            contextInstruction = `사용자는 '일상 회복(Wellness)' 단계입니다.`;
+        }
+
+        const prompt = `[메디컬/라이프케어 회복 전문가 모드]
+지침: ${contextInstruction}
+진료 분야: ${medicalCategory || '일반'}
+
+사용자가 방금 촬영한 사진의 분석 결과입니다:
+- 분석 대상: ${analysisResult.subjectName}
+- 매칭 점수: ${analysisResult.matchScore}/100
+- 분석 요약: "${analysisResult.summary}"
+- 세부 지표: ${JSON.stringify(analysisResult.analysisTable || [])}
+
+위 사진 분석 결과를 바탕으로, 사용자의 상태를 점검하고 맞춤형 회복을 돕는 **5개의 객관식 질문**을 JSON 배열로 생성하세요.
+반드시 사진 속 내용(예: 먹은 음식, 피부 상태, 공간 환경 등)의 맥락을 적극적으로 반영한 질문이어야 합니다.
+
+## 제약조건
+1. 어조: 전문적이면서도 따뜻함.
+2. 질문당 3~4개 선택지 (0=최상/해당없음, 3=보통/주의, 5=나쁨/불안정).
+3. 카테고리: [신체, 환경, 심리, 영양, 행동] 중 선택.
+
+## 응답 형식 (JSON Array Only, 마크다운 코드블록 제외)
+[
+  {
+    "id": 1,
+    "category": "카테고리",
+    "text": "사진 맥락을 반영한 질문 내용",
+    "options": [
+      { "label": "최상 (또는 해당 없음)", "score": 0 },
+      { "label": "보통 (주의 필요)", "score": 3 },
+      { "label": "나쁨 (불안정)", "score": 5 }
+    ]
+  }
+]`;
+
+        const text = await GeminiAIEngine.generateWithFallback(prompt, "You are a professional recovery concierge AI.");
+        
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        let questions = [];
+        
+        if (jsonMatch) {
+            questions = JSON.parse(jsonMatch[0]);
+        } else {
+            throw new Error('AI response parsing failed');
+        }
+
+        return NextResponse.json({
+            questions,
+            theme: `${analysisResult.subjectName} 기반 맞춤 문진`,
+            date: new Date().toISOString().split('T')[0],
+            journey,
+            medicalCategory
+        });
+
+    } catch (error: any) {
+        console.error('[DailyQ POST] API Router Error:', error);
+        return NextResponse.json({
+            questions: [],
+            error: error.message || 'Internal Server Error',
+            theme: '기본 문항 로드 실패'
+        }, { status: 500 });
     }
 }

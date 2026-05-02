@@ -7,7 +7,7 @@ import SurveyResponse from '@/models/SurveyResponse';
 import PreConsultation from '@/models/PreConsultation';
 import PostCareSurvey from '@/models/PostCareSurvey';
 import { calculateUnifiedScore } from '@/lib/score-engine';
-import { POSTURE_RECOMMENDATIONS, MEAL_INSIGHTS } from '@/constants/scan-recommendations';
+import { generateUnifiedInsight } from '@/lib/ai/ai-insight';
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,46 +26,13 @@ export async function GET(req: NextRequest) {
     // 1. Calculate Unified Score
     const scoreData = calculateUnifiedScore(user);
 
-    // 2. Generate Actionable Insights based on latest scans
-    const latestPostureScan = user.scanTimeline
-      ?.filter((s: any) => s.type === 'POSTURE')
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-
-    const latestMealScan = user.scanTimeline
-      ?.filter((s: any) => s.type === 'MEAL')
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-
-    let postureInsight = null;
-    if (latestPostureScan) {
-      // Logic to determine recommendation key
-      // Simplified: if score < 60, high turtleneck
-      const recKey = latestPostureScan.score < 70 ? 'TURTLE_NECK_HIGH' : 'NORMAL';
-      postureInsight = {
-        ...POSTURE_RECOMMENDATIONS[recKey],
-        metrics: latestPostureScan.metrics,
-        scanDate: latestPostureScan.createdAt
-      };
-    }
-
-    const mealInsight = latestMealScan ? {
-      title: '영양 균형 분석',
-      description: MEAL_INSIGHTS[latestMealScan.metrics?.recommendationKey as keyof typeof MEAL_INSIGHTS]?.advice || '분석 중...',
-      suggestion: MEAL_INSIGHTS[latestMealScan.metrics?.recommendationKey as keyof typeof MEAL_INSIGHTS]?.suggestion || '단백질 섭취를 늘려보세요.',
-      nutrients: latestMealScan.metrics?.nutrition,
-      habits: [
-        '식전 물 한 잔 마시기',
-        '식이섬유(채소) 먼저 섭취하기',
-        '천천히 20분 이상 식사하기'
-      ]
-    } : null;
-
-    // 3. Fetch latest Survey/Analysis Report
+    // 2. Fetch latest Survey/Analysis Report
     const latestSurvey = await SurveyResponse.findOne({ userId: user._id })
       .sort({ createdAt: -1 })
       .select('status answers createdAt')
       .lean();
 
-    // 4. Fetch latest Specialized AI Reports
+    // 3. Fetch latest Specialized AI Reports
     const latestPreConsultation = await PreConsultation.findOne({ userId: user._id })
       .sort({ createdAt: -1 })
       .select('medicalCategory aiGuide createdAt')
@@ -76,12 +43,54 @@ export async function GET(req: NextRequest) {
       .select('procedureType lastStatus aiRoadmap createdAt')
       .lean();
 
+    // 4. Conditional Caching for Unified Actionable Insight
+    const scans = user.scanTimeline?.slice(-5) || [];
+    
+    const latestScanDate = scans.length > 0 ? Math.max(...scans.map((s: any) => new Date(s.createdAt).getTime())) : 0;
+    const latestSurveyDate = latestSurvey ? new Date((latestSurvey as any).createdAt).getTime() : 0;
+    const latestPreDate = latestPreConsultation ? new Date((latestPreConsultation as any).createdAt).getTime() : 0;
+    const latestPostDate = latestPostCare ? new Date((latestPostCare as any).createdAt).getTime() : 0;
+
+    const latestUpdateTimestamp = Math.max(latestScanDate, latestSurveyDate, latestPreDate, latestPostDate);
+    const cache = user.cachedUnifiedInsight;
+    let unifiedInsight = cache;
+
+    console.log(`[Cache Diagnostic] User: ${user.email} | Latest Data Time: ${latestUpdateTimestamp ? new Date(latestUpdateTimestamp).toISOString() : 'No Data'} | Cache Time: ${cache?.updatedAt ? new Date(cache.updatedAt).toISOString() : 'Empty Cache'}`);
+
+    if (!cache || !cache.updatedAt || new Date(cache.updatedAt).getTime() < latestUpdateTimestamp) {
+      console.log(`[Cache Miss] Regenerating unified insight for ${user.email}`);
+      const freshInsight = await generateUnifiedInsight({
+        scans,
+        survey: latestSurvey,
+        preConsultation: latestPreConsultation,
+        postCare: latestPostCare
+      });
+      
+      // Cache back onto User document via direct update to bypass legacy validation errors
+      const cachedData = {
+        title: freshInsight.title,
+        description: freshInsight.description,
+        suggestion: freshInsight.suggestion,
+        habits: freshInsight.habits,
+        updatedAt: new Date()
+      };
+
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { cachedUnifiedInsight: cachedData } }
+      );
+      
+      unifiedInsight = cachedData;
+    } else {
+      console.log(`[Cache Hit] Using stored unified insight for ${user.email}`);
+    }
+
     return NextResponse.json({
       success: true,
       score: scoreData,
       insights: {
-        posture: postureInsight,
-        meal: mealInsight
+        posture: unifiedInsight, 
+        meal: null
       },
       surveyReport: latestSurvey || null,
       activeMedicalGuide: latestPreConsultation || null,

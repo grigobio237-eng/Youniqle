@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle, Activity, Image as ImageIcon } from 'lucide-react';
@@ -14,6 +15,7 @@ import { useSession } from 'next-auth/react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { DetailedDiagnosisModal } from '@/components/diagnosis/DetailedDiagnosisModal';
 import QuickInquirySection from '@/components/diagnosis/QuickInquirySection';
+import ClinicConsultationSection from '@/components/home/ClinicConsultationSection';
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
@@ -322,23 +324,33 @@ export default function AiNavigatorPage() {
                     </div>
                 </section>
 
-                {/* 2. 유니클 맞춤 분석 리포트 */}
+                {/* 2. 유니클 맞춤 분석 리포트 (탭 구조 도입) */}
                 <section className="py-16">
                     <div className="container mx-auto px-4">
-                        <div className="max-w-3xl mx-auto space-y-20">
+                        <div className="max-w-3xl mx-auto">
+                            
+                            <Tabs defaultValue="personalization" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2 h-16 rounded-2xl bg-surface/50 border border-line p-1.5 mb-16">
+                                    <TabsTrigger value="personalization" className="rounded-xl text-base md:text-lg font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
+                                        개인화 분석
+                                    </TabsTrigger>
+                                    <TabsTrigger value="clinic" className="rounded-xl text-base md:text-lg font-black data-[state=active]:bg-[#0E3A3A] data-[state=active]:text-mist data-[state=active]:shadow-sm">
+                                        클리닉 케어
+                                    </TabsTrigger>
+                                </TabsList>
 
-                            {/* Step 1: 카테고리별 상태 분석 */}
-                            <div className="space-y-8 relative">
-                                <div className="absolute -left-4 md:-left-20 -top-8 md:-top-14 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">01</div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                        <Zap className="w-5 h-5 fill-current" />
-                                    </div>
-                                    <h2 className="text-2xl font-black tracking-tight">{userName} 님을 위한 맞춤 분석 리포트</h2>
-                                </div>
-
-                                {weakestInfo?.statusInfo ? (
-                                    <Card className={`bg-surface border-l-4 ${weakestInfo.level === 'critical' ? 'border-l-status-danger' : 'border-l-primary'} overflow-hidden`}>
+                                <TabsContent value="personalization" className="space-y-20">
+                                    {/* Step 1: 카테고리별 상태 분석 */}
+                                    <div className="space-y-8 relative">
+                                        <div className="absolute -left-4 md:-left-20 -top-8 md:-top-14 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">01</div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                                <Zap className="w-5 h-5 fill-current" />
+                                            </div>
+                                            <h2 className="text-2xl font-black tracking-tight">{userName} 님을 위한 맞춤 분석 리포트</h2>
+                                        </div>
+                                        {weakestInfo?.statusInfo ? (
+                                    <Card className={`bg-surface border-l-4 ${weakestInfo.level === 'critical' ? 'border-l-status-danger' : 'border-l-primary'} overflow-hidden shadow-xl`}>
                                         <CardContent className="p-8 space-y-6">
                                             <div className="flex items-center gap-3">
                                                 <Badge className={`${getLevelBadgeColor(weakestInfo.level)} text-[10px] font-black uppercase tracking-widest px-3 py-1`}>
@@ -347,8 +359,8 @@ export default function AiNavigatorPage() {
                                                 </Badge>
                                                 <span className="text-sm font-bold text-text-secondary">{weakestInfo.score}/40점</span>
                                             </div>
-
-                                            <h3 className="text-xl md:text-2xl font-black text-text-primary">
+                                            
+                                            <h3 className="text-2xl font-black text-text-primary leading-tight">
                                                 {userName} 님, {weakestInfo.statusInfo.message}
                                             </h3>
 
@@ -356,46 +368,46 @@ export default function AiNavigatorPage() {
                                                 {aiAdvice || '오늘의 분석 결과를 바탕으로 아래 추천 프로토콜을 확인하세요.'}
                                             </p>
 
-                                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                                {weakestInfo.statusInfo.actionLink === '/utils' ? (
-                                                    <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 w-full sm:w-auto bg-primary text-background font-black rounded-xl px-6">
-                                                        {weakestInfo.statusInfo.action} <ArrowRight className="w-4 h-4 ml-2" />
-                                                    </Button>
-                                                ) : (
-                                                    <Button asChild className="h-12 w-full sm:w-auto bg-primary text-background font-black rounded-xl px-6">
-                                                        <Link href={weakestInfo.statusInfo.actionLink}>
-                                                            {weakestInfo.statusInfo.action} <ArrowRight className="w-4 h-4 ml-2" />
-                                                        </Link>
-                                                    </Button>
-                                                )}
-                                                <Button asChild variant="outline" className="h-12 w-full sm:w-auto rounded-xl px-6 font-bold">
-                                                    <Link href="/ai-advice">1일 추천 루틴</Link>
+                                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                                <Button asChild size="lg" className="h-16 w-full sm:w-auto bg-primary text-background font-black rounded-2xl px-8 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                                    <Link href="/diagnosis?type=free">
+                                                        24문항 약식 진단 <ArrowRight className="w-5 h-5 ml-2" />
+                                                    </Link>
                                                 </Button>
-                                                <Button variant="outline" className="h-12 w-full sm:w-auto rounded-xl px-6 font-bold text-slate-500 border-slate-300" onClick={() => { setDiagnosisModalStep('result'); setDiagnosisModalOpen(true); }}>
-                                                    진단 결과 다시보기
+                                                <Button asChild variant="outline" size="lg" className="h-16 w-full sm:w-auto rounded-2xl px-8 font-black border-2 border-primary/20 text-primary hover:bg-primary/5">
+                                                    <Link href="/diagnosis?type=personality">
+                                                        60문항 정밀 진단 <Zap className="w-4 h-4 ml-2 fill-current" />
+                                                    </Link>
                                                 </Button>
                                             </div>
                                         </CardContent>
                                     </Card>
                                 ) : (
-                                    <Card className="bg-surface border-l-4 border-l-primary overflow-hidden">
-                                        <CardContent className="p-8 space-y-6">
-                                            <div className="text-xs font-bold text-primary tracking-widest uppercase">Analysis Report</div>
-                                            <h3 className="text-2xl font-black text-text-primary">
-                                                {userName} 님, 아직 심층 진단을<br />완료하지 않았습니다.
-                                            </h3>
-                                            <p className="text-sm font-medium text-slate opacity-80">
-                                                60초 만에 끝나는 회복 진단으로<br />나의 회복 유형을 알아보세요.
-                                            </p>
-                                            <Button onClick={() => { setDiagnosisModalStep('intro'); setDiagnosisModalOpen(true); }} className="h-12 bg-primary text-background font-black rounded-xl px-6">
-                                                지금 진단 시작하기 <ArrowRight className="w-4 h-4 ml-2" />
-                                            </Button>
+                                    <Card className="bg-surface border-2 border-dashed border-primary/20 overflow-hidden rounded-[40px]">
+                                        <CardContent className="p-12 text-center space-y-8">
+                                            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-4xl">🧘</div>
+                                            <div className="space-y-3">
+                                                <h3 className="text-3xl font-black text-text-primary">
+                                                    아직 심층 진단을<br />완료하지 않았습니다
+                                                </h3>
+                                                <p className="text-slate font-medium text-lg opacity-60">
+                                                    회복 기질 분석을 통해 나에게 딱 맞는<br />라이프 프로토콜을 제안받으세요.
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row justify-center gap-4">
+                                                <Button asChild size="lg" className="h-16 bg-primary text-background font-black rounded-2xl px-10">
+                                                    <Link href="/diagnosis?type=free">약식 진단 시작 (60초)</Link>
+                                                </Button>
+                                                <Button asChild variant="outline" size="lg" className="h-16 border-2 border-line rounded-2xl px-10 font-black">
+                                                    <Link href="/diagnosis?type=personality">정밀 진단 시작 (60문항)</Link>
+                                                </Button>
+                                            </div>
                                         </CardContent>
                                     </Card>
-                                )}
-                            </div>
+                                        )}
+                                    </div>
 
-                            {/* Step 2: 심층 분석 리포트 */}
+                                    {/* Step 2: 심층 분석 리포트 */}
                             <div className="space-y-8 relative">
                                 <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">02</div>
                                 <div className="flex items-center gap-3">
@@ -430,8 +442,11 @@ export default function AiNavigatorPage() {
                                 </Card>
                             </div>
 
-                            {/* Step 3: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
-                            <div className="space-y-8 relative mt-12 md:mt-20 pt-16 md:pt-24">
+                                </TabsContent>
+
+                                <TabsContent value="clinic" className="space-y-20 pt-8">
+                                    {/* Step 1: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
+                                    <div className="space-y-8 relative">
                                 <div className="absolute left-0 md:left-4 top-0 md:top-4 text-5xl md:text-[100px] font-black text-slate-900/[0.03] leading-none select-none pointer-events-none italic z-0 uppercase tracking-tighter">Event</div>
                                 <div className="flex items-center gap-3 relative z-10">
                                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
@@ -468,9 +483,107 @@ export default function AiNavigatorPage() {
                                 </Card>
                             </div>
 
-                            {/* Step 3: 유니클 추천 파트너 상품 */}
-                            <div className="space-y-8 relative">
-                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
+                                    {/* Step 2: 전문 회복 설계 */}
+                                    <div className="space-y-8 relative mb-16">
+                                        <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none z-0">02</div>
+                                        <div className="relative z-10 -mx-6 md:-mx-12">
+                                            <ClinicConsultationSection />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+
+                            {/* 공통 컴포넌트: 하단에 유지 */}
+                            <div className="space-y-20 mt-20 pt-10 border-t border-line/50">
+                                {/* Step 3: 내일의 예보 (개인화 분석과 연동되지만 전역으로 표시) */}
+                                <div className="space-y-8 relative">
+                                    <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                        <Calendar className="w-5 h-5" />
+                                    </div>
+                                    <h2 className="text-2xl font-black tracking-tight">{userName} 님의 내일 예보</h2>
+                                </div>
+
+                                <Card className="bg-surface/30 border-dashed border-2 border-line rounded-[32px] hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => setIsForecastOpen(true)}>
+                                    <CardContent className="p-10 flex items-center justify-between">
+                                        <div className="space-y-2">
+                                            <div className="text-xs font-bold text-text-secondary opacity-50 uppercase tracking-widest">Next Schedule</div>
+                                            <h4 className="text-xl font-black text-text-primary/70 group-hover:text-primary transition-colors">내일 오전 08:30 분석 업데이트</h4>
+                                            <p className="text-sm text-text-secondary font-medium">숙면 데이터를 바탕으로 내일의 회복 전략이 수립됩니다.</p>
+                                            <Link href="/utils?tool=sleep" className="inline-block pt-2 text-xs font-black text-primary hover:underline underline-offset-4">
+                                                지금 숙면 데이터 입력하기 →
+                                            </Link>
+                                        </div>
+                                        <Button size="icon" variant="outline" className="rounded-full w-12 h-12 border-line text-text-secondary opacity-40 group-hover:opacity-100 group-hover:bg-primary group-hover:text-background transition-all">
+                                            <ChevronRight />
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                                {/* Step 4: 실시간 리커버리 로그 */}
+                                <div className="space-y-8 relative">
+                                    <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">04</div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-chapter-accent/20 rounded-full flex items-center justify-center text-chapter-accent">
+                                            <Activity className="w-5 h-5" />
+                                        </div>
+                                        <h2 className="text-2xl font-black tracking-tight">리커버리 타임라인</h2>
+                                    </div>
+                                    <Button variant="ghost" size="sm" asChild>
+                                        <Link href="/timeline" className="text-xs font-bold opacity-60">전체보기</Link>
+                                    </Button>
+                                </div>
+
+                                {timelineItems.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {timelineItems.slice(0, 3).map((item, idx) => (
+                                            <Card key={idx} className="rounded-[24px] overflow-hidden border-line group hover:border-chapter-accent transition-all bg-white">
+                                                <div className="aspect-square relative bg-mist">
+                                                    {item.imageUrl ? (
+                                                        <Image src={item.imageUrl} alt={item.type} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate/20">
+                                                            <ImageIcon className="w-8 h-8" />
+                                                        </div>
+                                                    )}
+                                                    <Badge className="absolute top-3 left-3 bg-obsidian text-white text-[8px] font-black px-2">
+                                                        {item.type}
+                                                    </Badge>
+                                                    <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] font-black text-obsidian shadow-sm">
+                                                        SCORE {item.score}
+                                                    </div>
+                                                </div>
+                                                <CardContent className="p-4">
+                                                    <p className="text-[11px] font-bold text-slate/60 mb-1">
+                                                        {isMounted && new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                                                    </p>
+                                                    <p className="text-xs font-black text-obsidian line-clamp-1 truncate">{item.summary || '상세 데이터 없음'}</p>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-12 text-center rounded-[32px] bg-mist/30 border-2 border-dashed border-line">
+                                        <p className="text-sm font-bold text-slate/40">아직 기록된 타임라인이 없습니다.<br />스캐너나 자세 분석을 시작해 보세요.</p>
+                                    </div>
+                                )}
+                                
+                                {journey === 'CLINICAL_POST' && (
+                                    <Button asChild className="w-full h-16 rounded-2xl bg-chapter-accent text-white font-black text-lg shadow-xl shadow-chapter-accent/20">
+                                        <Link href="/diagnosis/post-op">
+                                            <Sparkles className="w-5 h-5 mr-2" /> 전문 사후 케어 기록 남기기
+                                        </Link>
+                                    </Button>
+                                )}
+                                <QuickInquirySection reportId="AI_NAVIGATOR_DASHBOARD" />
+                            </div>
+
+                                {/* Step 5: 유니클 추천 파트너 상품 */}
+                                <div className="space-y-8 relative">
+                                    <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">05</div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
@@ -552,92 +665,7 @@ export default function AiNavigatorPage() {
                                         ))}
                                     </div>
                                 )}
-                            </div>
-
-                            {/* Step 4: 내일의 예보 */}
-                            <div className="space-y-8 relative">
-                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">04</div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                        <Calendar className="w-5 h-5" />
-                                    </div>
-                                    <h2 className="text-2xl font-black tracking-tight">{userName} 님의 내일 예보</h2>
                                 </div>
-
-                                <Card className="bg-surface/30 border-dashed border-2 border-line rounded-[32px] hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => setIsForecastOpen(true)}>
-                                    <CardContent className="p-10 flex items-center justify-between">
-                                        <div className="space-y-2">
-                                            <div className="text-xs font-bold text-text-secondary opacity-50 uppercase tracking-widest">Next Schedule</div>
-                                            <h4 className="text-xl font-black text-text-primary/70 group-hover:text-primary transition-colors">내일 오전 08:30 분석 업데이트</h4>
-                                            <p className="text-sm text-text-secondary font-medium">숙면 데이터를 바탕으로 내일의 회복 전략이 수립됩니다.</p>
-                                            <Link href="/utils?tool=sleep" className="inline-block pt-2 text-xs font-black text-primary hover:underline underline-offset-4">
-                                                지금 숙면 데이터 입력하기 →
-                                            </Link>
-                                        </div>
-                                        <Button size="icon" variant="outline" className="rounded-full w-12 h-12 border-line text-text-secondary opacity-40 group-hover:opacity-100 group-hover:bg-primary group-hover:text-background transition-all">
-                                            <ChevronRight />
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            </div>
-
-                            {/* Step 5: 실시간 리커버리 로그 (신규) */}
-                            <div className="space-y-8 relative">
-                                <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">05</div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-chapter-accent/20 rounded-full flex items-center justify-center text-chapter-accent">
-                                            <Activity className="w-5 h-5" />
-                                        </div>
-                                        <h2 className="text-2xl font-black tracking-tight">리커버리 타임라인</h2>
-                                    </div>
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href="/timeline" className="text-xs font-bold opacity-60">전체보기</Link>
-                                    </Button>
-                                </div>
-
-                                {timelineItems.length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {timelineItems.slice(0, 3).map((item, idx) => (
-                                            <Card key={idx} className="rounded-[24px] overflow-hidden border-line group hover:border-chapter-accent transition-all bg-white">
-                                                <div className="aspect-square relative bg-mist">
-                                                    {item.imageUrl ? (
-                                                        <Image src={item.imageUrl} alt={item.type} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-slate/20">
-                                                            <ImageIcon className="w-8 h-8" />
-                                                        </div>
-                                                    )}
-                                                    <Badge className="absolute top-3 left-3 bg-obsidian text-white text-[8px] font-black px-2">
-                                                        {item.type}
-                                                    </Badge>
-                                                    <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] font-black text-obsidian shadow-sm">
-                                                        SCORE {item.score}
-                                                    </div>
-                                                </div>
-                                                <CardContent className="p-4">
-                                                    <p className="text-[11px] font-bold text-slate/60 mb-1">
-                                                        {isMounted && new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                                                    </p>
-                                                    <p className="text-xs font-black text-obsidian line-clamp-1 truncate">{item.summary || '상세 데이터 없음'}</p>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="p-12 text-center rounded-[32px] bg-mist/30 border-2 border-dashed border-line">
-                                        <p className="text-sm font-bold text-slate/40">아직 기록된 타임라인이 없습니다.<br />스캐너나 자세 분석을 시작해 보세요.</p>
-                                    </div>
-                                )}
-                                
-                                {journey === 'CLINICAL_POST' && (
-                                    <Button asChild className="w-full h-16 rounded-2xl bg-chapter-accent text-white font-black text-lg shadow-xl shadow-chapter-accent/20">
-                                        <Link href="/diagnosis/post-op">
-                                            <Sparkles className="w-5 h-5 mr-2" /> 전문 사후 케어 기록 남기기
-                                        </Link>
-                                    </Button>
-                                )}
-                                <QuickInquirySection reportId="AI_NAVIGATOR_DASHBOARD" />
                             </div>
                         </div>
                     </div>

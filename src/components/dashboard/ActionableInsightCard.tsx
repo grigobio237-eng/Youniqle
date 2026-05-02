@@ -58,7 +58,7 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                         </div>
                     )}
 
-                    {!isPosture && insight.suggestion && (
+                    {insight.suggestion && (
                         <div className="p-6 bg-reward-gold/10 rounded-3xl border border-reward-gold/20 italic text-reward-gold font-bold">
                             "{insight.suggestion}"
                         </div>

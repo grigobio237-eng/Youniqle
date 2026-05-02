@@ -16,12 +16,16 @@ import {
   Brain,
   Zap,
   Target,
-  ArrowRight
+  ArrowRight,
+  Compass,
+  Shield
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 export default function AboutPage() {
+  const router = useRouter();
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.98]);
@@ -159,7 +163,7 @@ export default function AboutPage() {
       </section>
 
       {/* 3. The Three Paths: Defined Cards (Light Theme) */}
-      <section className="py-32 md:py-48 bg-mist">
+      <section className="py-32 md:py-48 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-32 md:space-y-56">
           
           {/* Path 01: Rhythm */}
@@ -298,6 +302,115 @@ export default function AboutPage() {
                 <p className="text-sm font-black text-obsidian italic leading-relaxed">"현실에서 벗어나 마주하는 진정한 본질의 회복과 치유"</p>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Utility Hub & Path Preview (Moved from Hero) */}
+      <section className="py-24 md:py-32 bg-mist border-t border-line/50">
+        <div className="container mx-auto px-6 space-y-32">
+          {/* 1. Utility Hub */}
+          <div className="space-y-16">
+            <div className="text-center space-y-4 max-w-2xl mx-auto">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
+                Recovery Tools
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tight">다른 유용한 도구도 확인해 보세요</h2>
+              <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 정밀 도구들입니다.</p>
+            </div>
+
+            <div className="flex justify-center mt-10">
+              <Button 
+                onClick={() => router.push('/utils')}
+                className="group bg-white p-8 md:p-12 rounded-[40px] border border-line shadow-sm hover:shadow-2xl hover:border-chapter-accent transition-all duration-500 flex flex-col items-center justify-center space-y-6 w-full max-w-2xl h-auto"
+              >
+                <div className="w-24 h-24 bg-chapter-accent/10 rounded-full flex items-center justify-center mb-2">
+                  <Compass className="w-12 h-12 text-chapter-accent" />
+                </div>
+                <div className="text-center space-y-3">
+                  <h3 className="text-2xl md:text-3xl font-black text-obsidian tracking-tight group-hover:text-chapter-accent transition-colors">유니클 툴킷 바로가기</h3>
+                  <p className="text-slate/60 text-base md:text-lg leading-relaxed whitespace-pre-wrap">
+                    당신의 건강과 생산성을 높여줄 10가지 이상의 정밀 도구를 한 곳에서 만나보세요.
+                  </p>
+                </div>
+                <div className="pt-6 flex items-center text-chapter-accent font-black text-sm uppercase tracking-widest gap-2 group-hover:translate-x-2 transition-transform">
+                  전체 도구 보기 <ArrowRight className="w-5 h-5" />
+                </div>
+              </Button>
+            </div>
+          </div>
+
+          {/* 2. Path Preview */}
+          <div className="space-y-16">
+            <div className="text-center space-y-4">
+              <h2 className="text-xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
+              <p className="text-slate/60 font-medium">당신의 결과에 따라 활성화되는 3가지 정밀 로드맵</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Path 1 */}
+              <div className="group relative bg-white border border-line rounded-[48px] p-12 overflow-hidden hover:border-chapter-accent transition-all duration-500 shadow-sm hover:shadow-xl">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-chapter-accent/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-chapter-accent/10 transition-colors" />
+                <div className="relative z-10 space-y-8">
+                  <div className="w-16 h-16 bg-mist rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
+                    <Zap className="w-8 h-8 text-chapter-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-black text-obsidian mb-3 tracking-tight">리듬 회복</h3>
+                    <p className="text-slate/60 text-sm leading-relaxed">
+                      일상의 작은 균형이 무너졌을 때.<br />
+                      생활 패턴과 생체 리듬을 정상화합니다.
+                    </p>
+                  </div>
+                  <ul className="space-y-4 text-xs font-bold text-slate/60">
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-chapter-accent rounded-full" /> 수면 패턴 최적화</li>
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-chapter-accent rounded-full" /> 스트레스 이완 가이드</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Path 2 */}
+              <div className="group relative bg-obsidian border border-obsidian rounded-[48px] p-12 overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-reward-gold/20 rounded-full blur-3xl -mr-24 -mt-24" />
+                <div className="relative z-10 space-y-8">
+                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-white/10 text-reward-gold">
+                    <Shield className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-black text-mist mb-3 tracking-tight">집중 회복</h3>
+                    <p className="text-mist/70 text-sm leading-relaxed">
+                      확실한 변화와 관리가 필요할 때.<br />
+                      전문화된 도구와 코칭으로 집중 케어합니다.
+                    </p>
+                  </div>
+                  <ul className="space-y-4 text-xs font-bold text-mist/60">
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-reward-gold rounded-full" /> 맞춤형 영양 및 도구</li>
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-reward-gold rounded-full" /> 전문가 1:1 연결</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Path 3 */}
+              <div className="group relative bg-white border border-line rounded-[48px] p-12 overflow-hidden hover:border-status-normal transition-all duration-500 shadow-sm hover:shadow-xl">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-status-normal/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-status-normal/10 transition-colors" />
+                <div className="relative z-10 space-y-8">
+                  <div className="w-16 h-16 bg-mist rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
+                    <Crown className="w-8 h-8 text-status-normal" />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-black text-obsidian mb-3 tracking-tight">프리미엄 회복</h3>
+                    <p className="text-slate/60 text-sm leading-relaxed">
+                      몰입과 깊은 치유의 경험.<br />
+                      오프라인 힐링센터와 연계된 프라이빗 케어.
+                    </p>
+                  </div>
+                  <ul className="space-y-4 text-xs font-bold text-slate/60">
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-status-normal rounded-full" /> 힐링센터 익스클루시브</li>
+                    <li className="flex items-center gap-3"><div className="w-2 h-2 bg-status-normal rounded-full" /> 개인화된 멤버십 혜택</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

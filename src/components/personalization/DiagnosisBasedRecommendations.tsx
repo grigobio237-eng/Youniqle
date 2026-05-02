@@ -7,7 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { RefreshCw, ChevronRight, Sparkles, AlertCircle, ExternalLink, Store } from 'lucide-react';
+import { RefreshCw, ChevronRight, Sparkles, AlertCircle, ExternalLink, Store, ArrowRight } from 'lucide-react';
+
+import { useSession } from 'next-auth/react';
 
 interface RecommendationItem {
     id: string;
@@ -183,6 +185,9 @@ export default function DiagnosisBasedRecommendations({
         }
     };
 
+    const { data: session } = useSession();
+    const isPaid = !!session?.user?.pass; // 패스(Pass) 구매 여부 확인
+
     // 로딩 상태
     if (loading) {
         return (
@@ -220,6 +225,7 @@ export default function DiagnosisBasedRecommendations({
         );
     }
 
+
     // 추천이 없는 경우
     if (recommendations.length === 0) {
         return (
@@ -229,10 +235,14 @@ export default function DiagnosisBasedRecommendations({
                     맞춤 추천을 준비 중입니다
                 </h3>
                 <p className="text-slate font-medium mb-6">
-                    60초 진단을 완료하시면 더욱 정밀한 추천을 받으실 수 있습니다.
+                    {isPaid 
+                        ? '정밀 성격 분석을 통해 당신에게 완벽히 맞춤화된 회복 솔루션을 설계해 보세요.' 
+                        : 'AI 네비게이터에서 약식 또는 정밀 진단을 완료하시면 더욱 정밀한 추천을 받으실 수 있습니다.'}
                 </p>
-                <Button asChild className="btn-primary rounded-xl">
-                    <Link href="/">진단 시작하기</Link>
+                <Button asChild className="bg-obsidian text-white rounded-2xl h-16 px-10 text-lg font-black shadow-xl hover:scale-105 transition-all">
+                    <Link href="/ai-navigator">
+                        AI 네비게이터에서 분석 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
                 </Button>
             </div>
         );
@@ -454,20 +464,27 @@ export default function DiagnosisBasedRecommendations({
                     </div>
                 )}
 
-                {/* 진단 유도 (비로그인 또는 진단 없는 경우) */}
-                {!metadata?.latestDiagnosis && (
-                    <div className="bg-obsidian text-mist rounded-[32px] p-8 text-center">
+                {/* 1일 회복 진단 (매일 참여 및 포인트 획득 유도) */}
+                <div className="mt-12 bg-obsidian text-mist rounded-[32px] p-10 text-center border border-white/5 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
                         <Sparkles className="w-10 h-10 text-reward-gold mx-auto mb-4" />
-                        <h3 className="text-xl font-black mb-2">더 정확한 추천을 받아보세요</h3>
+                        <h3 className="text-2xl font-black mb-2 tracking-tight">1일 회복 진단 시작하기</h3>
                         <p className="text-mist/60 font-medium mb-6">
-                            60초 진단을 완료하면 당신의 상태에 맞는 맞춤 프로토콜을 추천해 드립니다.
+                            오늘의 에너지를 체크하고 나만의 회복 리포트를 받아보세요.<br />
+                            지금 진단을 완료하면 <span className="bg-reward-gold text-obsidian px-2 py-0.5 rounded font-black">100 PT</span>를 즉시 드립니다!
                         </p>
-                        <Button asChild className="bg-reward-gold text-obsidian font-black rounded-xl hover:bg-reward-gold/90">
-                            <Link href="/">진단 시작하기</Link>
-                        </Button>
+                        <div className="flex flex-col items-center gap-4">
+                            <Button asChild size="lg" className="bg-reward-gold text-obsidian font-black rounded-2xl px-12 h-16 shadow-xl shadow-reward-gold/20 hover:scale-105 transition-transform border-none">
+                                <Link href="/diagnosis?type=daily">
+                                    진단 시작하고 포인트 받기 <ArrowRight className="w-5 h-5 ml-2" />
+                                </Link>
+                            </Button>
+                            <p className="text-xs font-bold text-mist/30">
+                                * 정밀 성격 진단(24/60문항)은 <Link href="/ai-navigator" className="text-mist/50 underline hover:text-mist">AI 네비게이터</Link>에서 가능합니다.
+                            </p>
+                        </div>
                     </div>
-                )}
-            </div>
+                </div>
 
             {/* 브릿지 팝업 */}
             <Dialog open={bridgeDialogOpen} onOpenChange={setBridgeDialogOpen}>

@@ -7,8 +7,15 @@ export interface IUser extends Document {
   phone?: string;
   avatar?: string;
   role: 'member' | 'partner' | 'admin' | 'superadmin';
-  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
-  tier: 'RESET' | 'REBORN' | 'RESTART'; // 접근 권한 등급
+  grade: 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'reset' | 'reborn' | 'restart' | 'black';
+  cachedUnifiedInsight?: {
+    title: string;
+    description: string;
+    suggestion: string;
+    habits: string[];
+    updatedAt: Date;
+  } | null;
+  tier: 'RESET' | 'REBORN' | 'RESTART' | 'BLACK'; // 접근 권한 등급
   points: number;
   gender?: 'male' | 'female' | 'other';
   referralCode?: string; // 추천인 아이디
@@ -164,7 +171,7 @@ export interface IUser extends Document {
     expiresAt: Date;
   };
   passInfo?: {
-    type: 'NONE' | 'START' | 'SIGNATURE' | 'BLACK';
+    type: 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
     status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
     startDate?: Date;
     endDate?: Date;
@@ -193,6 +200,12 @@ export interface IUser extends Document {
     diagnosisCount: number;
     webtoonCount: number;
     lastResetDate: Date;
+  };
+  gamification?: {
+    lastSnapDate?: Date;
+    currentStreak: number;
+    highestStreak: number;
+    todayCategories: string[];
   };
 }
 
@@ -229,12 +242,12 @@ const UserSchema = new Schema<IUser>({
   },
   grade: {
     type: String,
-    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'start', 'signature', 'black'],
+    enum: ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'reset', 'reborn', 'restart', 'black'],
     default: 'cedar',
   },
   tier: {
     type: String,
-    enum: ['RESET', 'REBORN', 'RESTART'],
+    enum: ['RESET', 'REBORN', 'RESTART', 'BLACK'],
     default: 'RESET',
   },
   points: {
@@ -438,7 +451,7 @@ const UserSchema = new Schema<IUser>({
     expiresAt: { type: Date }
   },
   passInfo: {
-    type: { type: String, enum: ['NONE', 'START', 'SIGNATURE', 'BLACK'], default: 'NONE' },
+    type: { type: String, enum: ['NONE', 'RESET', 'REBORN', 'RESTART', 'BLACK'], default: 'NONE' },
     status: { type: String, enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'], default: 'ACTIVE' },
     startDate: { type: Date },
     endDate: { type: Date },
@@ -460,11 +473,24 @@ const UserSchema = new Schema<IUser>({
     metrics: { type: Schema.Types.Mixed },
     createdAt: { type: Date, default: Date.now }
   }],
+  cachedUnifiedInsight: {
+    title: { type: String },
+    description: { type: String },
+    suggestion: { type: String },
+    habits: [{ type: String }],
+    updatedAt: { type: Date }
+  },
   dailyStats: {
     scannerCount: { type: Number, default: 0 },
     diagnosisCount: { type: Number, default: 0 },
     webtoonCount: { type: Number, default: 0 },
     lastResetDate: { type: Date, default: Date.now }
+  },
+  gamification: {
+    lastSnapDate: { type: Date },
+    currentStreak: { type: Number, default: 0 },
+    highestStreak: { type: Number, default: 0 },
+    todayCategories: [{ type: String }]
   }
 }, {
   timestamps: true,
@@ -480,6 +506,10 @@ UserSchema.pre('save', function(this: any, next) {
   }
   next();
 });
+
+if (mongoose.models && mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 

@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles, CheckCircle, ArrowRight, Activity, ShieldCheck } from 'lucide-react';
+import { Sparkles, CheckCircle, ArrowRight, Activity, ShieldCheck, Layout } from 'lucide-react';
 import HeroScanner, { AnalysisResult } from './HeroScanner';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
-
+import Link from 'next/link';
 
 export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult) => void, isDiagnosing?: boolean }) {
   const { journey, resetJourney } = useRecovery();
@@ -23,7 +23,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
   });
 
   const [progress, setProgress] = useState(0);
-  const [loadingText, setLoadingText] = useState('60초 정밀 진단 시작');
+  const [loadingText, setLoadingText] = useState('60초 간편 진단 시작');
 
   // Advanced Progress animation logic
   useEffect(() => {
@@ -144,78 +144,29 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
-          {/* Left: Brand & Diagnosis */}
-          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-2 lg:order-1">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.8em] opacity-70">Scientific Recovery</span>
-                {journey && (
-                  <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-chapter-accent/10 text-chapter-accent px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">
-                    <Activity className="w-3 h-3" /> {journey} MODE
-                    <button onClick={resetJourney} className="ml-2 hover:underline opacity-60">CHANGE</button>
-                  </motion.div>
-                )}
-              </div>
-              <h1 className="text-[1.75rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
-                {personalMsg.title}
-              </h1>
-              <p className="text-base md:text-xl text-slate/70 font-medium leading-relaxed">
-                {personalMsg.desc}
-              </p>
-
-
-              <div className="pt-4 space-y-6">
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    onClick={() => onStart()}
-                    disabled={isDiagnosing}
-                    size="lg"
-                    className="btn-primary h-12 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300"
-                  >
-                    {/* Progress Bar Background */}
-                    {isDiagnosing && (
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        className="absolute inset-0 bg-white/20 z-0"
-                      />
-                    )}
-
-                    <div className="relative z-10 flex items-center">
-                      <Sparkles className={`w-5 h-5 mr-2 transition-transform ${isDiagnosing ? 'animate-spin' : 'group-hover:rotate-12'}`} />
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={loadingText}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          {loadingText}
-                        </motion.span>
-                      </AnimatePresence>
-                      {!isDiagnosing && <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-                    </div>
-                  </Button>
-                </div>
-                <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">
-                  <div className="w-2 h-2 bg-chapter-accent rounded-full animate-pulse" />
-                  60초 진단으로 맞춤 회복 피드백 받기
-                </div>
-              </div>
+          {/* 1. Texts (Top on Mobile, Top-Left on Desktop) */}
+          <div className="space-y-6 animate-in fade-in slide-in-from-left-8 duration-700 order-1 lg:order-1">
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.8em] opacity-70">Scientific Recovery</span>
+              {journey && (
+                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-chapter-accent/10 text-chapter-accent px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">
+                  <Activity className="w-3 h-3" /> {journey} MODE
+                  <button onClick={resetJourney} className="ml-2 hover:underline opacity-60">CHANGE</button>
+                </motion.div>
+              )}
             </div>
-
-            <div className="flex flex-wrap items-center gap-8 text-xs text-slate/60 font-black uppercase tracking-widest">
-              <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 회복 점수 리포트</span>
-              <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 시술/수술 케어</span>
-              <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-chapter-accent/40" /> 일상 리듬 설계</span>
-            </div>
+            <h1 className="text-[1.75rem] md:text-6xl font-serif-display text-obsidian leading-[1.1] tracking-tight">
+              {personalMsg.title}
+            </h1>
+            <p className="text-base md:text-xl text-slate/70 font-medium leading-relaxed">
+              {personalMsg.desc}
+            </p>
           </div>
 
-          {/* Right: The AI Scanner Hook */}
-          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200 order-1 lg:order-2 flex justify-center lg:block">
+          {/* 2. Scanner (Middle on Mobile, Right side on Desktop) */}
+          <div className="relative animate-in fade-in slide-in-from-right-8 duration-1000 delay-200 order-2 lg:order-2 lg:row-span-2 lg:col-start-2 flex justify-center lg:block">
             <div className="absolute -inset-4 bg-gradient-to-tr from-chapter-accent/5 to-reward-gold/5 rounded-[60px] blur-3xl opacity-50" />
             <div className="relative w-full">
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-chapter-accent/5 rounded-full blur-2xl animate-pulse" />
@@ -224,7 +175,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
             </div>
 
             {/* Contextual Nudge Bubble */}
-            <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line animate-bounce max-w-[180px] hidden md:block">
+            <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line animate-bounce max-w-[180px] hidden md:block z-10">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-3 h-3 rounded-full bg-chapter-accent animate-ping" />
                 <span className="text-[10px] font-black text-obsidian uppercase tracking-widest">Youniqle LIVE</span>
@@ -232,9 +183,40 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
               <p className="text-[11px] font-bold text-slate leading-snug">
                 {personalMsg.nudge}
               </p>
-
             </div>
           </div>
+
+          {/* 3. Button & checkmarks (Bottom on Mobile, Bottom-Left on Desktop) */}
+          <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-3 lg:order-3 lg:col-start-1">
+            <div className="pt-2 space-y-6">
+              <div className="flex flex-wrap gap-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="btn-primary w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300"
+                >
+                  <Link href="/dashboard">
+                    <div className="relative z-10 flex items-center justify-center">
+                      <Layout className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
+                      <span>나의 회복 대시보드</span>
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                </Button>
+              </div>
+              <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">
+                <div className="w-2 h-2 bg-chapter-accent rounded-full animate-pulse" />
+                맞춤형 지능형 회복 솔루션 확인
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 text-[10px] md:text-xs text-slate/60 font-black uppercase tracking-widest">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 회복 점수 리포트</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 시술/수술 케어</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 일상 리듬 설계</span>
+            </div>
+          </div>
+
 
         </div>
       </div>

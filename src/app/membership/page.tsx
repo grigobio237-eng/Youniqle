@@ -13,10 +13,10 @@ import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { PASS_SPECS } from '@/lib/constants/passes';
 
 // 구매/활동 기반 회원등급 타입
-type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'start' | 'signature' | 'black';
+type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'reset' | 'reborn' | 'restart' | 'black';
 
 // 등급 순서 정의 (비교용)
-const GRADE_ORDER: GradeType[] = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'start', 'signature', 'black'];
+const GRADE_ORDER: GradeType[] = ['cedar', 'rooter', 'bloomer', 'glower', 'ecosoul', 'reset', 'reborn', 'restart', 'black'];
 
 // 등급별 혜택 정의
 const GRADE_BENEFITS: Record<GradeType, { title: string; desc: string; benefits: string[] }> = {
@@ -44,6 +44,26 @@ const GRADE_BENEFITS: Record<GradeType, { title: string; desc: string; benefits:
         title: '에코소울',
         desc: '숲의 영혼, 최고 등급',
         benefits: ['글로워 혜택 포함', '신제품 우선 체험', '연간 멤버십 기프트']
+    },
+    reset: {
+        title: '리셋',
+        desc: '회복의 시작',
+        benefits: ['기초 회복 점수 체크', '7일 루틴 가이드']
+    },
+    reborn: {
+        title: '리본',
+        desc: '기본기를 다지는 시간',
+        benefits: ['주간 분석 리포트', '프리미엄 사운드 라이브러리']
+    },
+    restart: {
+        title: '리스타트',
+        desc: '새로운 습관의 정착',
+        benefits: ['전담 네비게이터 가이드', '정밀 분석 리포트']
+    },
+    black: {
+        title: '블랙',
+        desc: '프라이빗 컨시어지',
+        benefits: ['1:1 전담 마케어', '전문 기관 연계 및 동행']
     }
 };
 
@@ -181,39 +201,50 @@ export default function MembershipPage() {
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-chapter-accent/20" />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <GradeCard
-                        level="START PASS"
-                        icon={<MousePointer2 className="w-8 h-8 text-blue-500" />}
-                        title="스타트 패스"
-                        desc="회복의 시작, 안심 가이드"
-                        benefits={PASS_SPECS.start.keyBenefits.map((b: any) => b.title)}
-                        isCurrent={(session?.user as any)?.passInfo?.type === 'START'}
+                        level="RESET"
+                        icon={<RefreshCcw className="w-8 h-8 text-blue-500" />}
+                        title="Reset"
+                        desc="나의 유형확인"
+                        benefits={['라이프 스냅 1회', '기본 리포트', '7일 루틴 일부']}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'RESET'}
                         isFounder
                         accentColor="blue"
-                        period={PASS_SPECS.start.period}
+                        period="무료"
                     />
                     <GradeCard
-                        level="SIGNATURE PASS"
-                        icon={<Star className="w-8 h-8 text-amber-500" />}
-                        title="시그니처 패스"
-                        desc="유니클의 정수, 5년의 설계"
-                        benefits={PASS_SPECS.signature.keyBenefits.map((b: any) => b.title)}
-                        isCurrent={(session?.user as any)?.passInfo?.type === 'SIGNATURE'}
+                        level="REBORN"
+                        icon={<Leaf className="w-8 h-8 text-emerald-500" />}
+                        title="Reborn"
+                        desc="나의 기록 저장과 주간 루틴"
+                        benefits={['반복 스냅', '주간 리포트', '루틴 저장', '콘텐츠']}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'REBORN'}
+                        isFounder
+                        accentColor="emerald"
+                        period="월 19,900원"
+                    />
+                    <GradeCard
+                        level="RESTART"
+                        icon={<Zap className="w-8 h-8 text-amber-500" />}
+                        title="Restart"
+                        desc="나의 기록을 저장, 정리하고 분석 관찰"
+                        benefits={['Reborn 혜택 포함', '월 1회 리포트 정리', '가이드 메시지', '우선 신청권']}
+                        isCurrent={(session?.user as any)?.passInfo?.type === 'RESTART'}
                         isFounder
                         accentColor="amber"
-                        period={PASS_SPECS.signature.period}
+                        period="월 49,900원"
                     />
                     <GradeCard
-                        level="BLACK PASS"
+                        level="BLACK"
                         icon={<Crown className="w-8 h-8 text-slate-300" />}
-                        title="블랙 패스"
-                        desc="프라이빗 컨시어지"
-                        benefits={PASS_SPECS.black.keyBenefits.map((b: any) => b.title)}
+                        title="Black"
+                        desc="목표, 일정 프라이버시 기반 맞춤"
+                        benefits={['생활기록 검토', '맞춤 루틴', '비공개 상담', '필요시 전문 기관 연계']}
                         isCurrent={(session?.user as any)?.passInfo?.type === 'BLACK'}
                         isFounder
                         accentColor="obsidian"
-                        period={PASS_SPECS.black.period}
+                        period="개별 상담 후 안내"
                     />
                 </div>
             </section>
@@ -243,10 +274,56 @@ export default function MembershipPage() {
 function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, accentColor = 'chapter-accent', period }: any) {
     const isObsidian = accentColor === 'obsidian';
 
+    // Safe static mapping for Tailwind JIT
+    const colorStyles: Record<string, any> = {
+        blue: {
+            ring: 'ring-blue-500',
+            border: 'border-blue-100 hover:border-blue-300',
+            bgLight: 'bg-blue-50',
+            text: 'text-blue-600',
+            textDark: 'text-blue-500',
+            bgDark: 'bg-blue-500'
+        },
+        emerald: {
+            ring: 'ring-emerald-500',
+            border: 'border-emerald-100 hover:border-emerald-300',
+            bgLight: 'bg-emerald-50',
+            text: 'text-emerald-600',
+            textDark: 'text-emerald-500',
+            bgDark: 'bg-emerald-500'
+        },
+        amber: {
+            ring: 'ring-amber-500',
+            border: 'border-amber-100 hover:border-amber-300',
+            bgLight: 'bg-amber-50',
+            text: 'text-amber-600',
+            textDark: 'text-amber-500',
+            bgDark: 'bg-amber-500'
+        },
+        'chapter-accent': {
+            ring: 'ring-chapter-accent',
+            border: 'border-chapter-accent/10 hover:border-chapter-accent/30',
+            bgLight: 'bg-chapter-accent/5',
+            text: 'text-chapter-accent',
+            textDark: 'text-chapter-accent',
+            bgDark: 'bg-chapter-accent'
+        },
+        obsidian: {
+            ring: 'ring-slate-400',
+            border: 'border-slate-800 hover:border-slate-700',
+            bgLight: 'bg-white/10',
+            text: 'text-slate-300',
+            textDark: 'text-slate-400',
+            bgDark: 'bg-slate-800'
+        }
+    };
+
+    const styles = colorStyles[accentColor] || colorStyles['chapter-accent'];
+
     return (
-        <Card className={`relative overflow-hidden transition-all duration-700 rounded-[32px] border-line p-8 flex flex-col items-center text-center space-y-4 min-h-[380px] group
-            ${isCurrent ? (isFounder ? (isObsidian ? 'bg-obsidian text-mist ring-2 ring-slate-400 shadow-2xl scale-[1.05]' : `bg-white ring-2 ring-${accentColor}-500 shadow-2xl scale-[1.05]`) : 'bg-chapter-accent/10 ring-2 ring-chapter-accent shadow-xl') : (isObsidian ? 'bg-surface hover:bg-obsidian hover:text-mist' : 'bg-surface shadow-md hover:shadow-xl')}
-            ${isFounder && !isCurrent ? `border-${accentColor}-100 hover:border-${accentColor}-300` : ''}`}>
+        <Card className={`relative overflow-hidden transition-all duration-700 rounded-[32px] border-line p-8 flex flex-col items-center text-center space-y-4 min-h-[420px] group
+            ${isCurrent ? (isFounder ? (isObsidian ? 'bg-obsidian text-mist ring-2 ring-slate-400 shadow-2xl scale-[1.05]' : `bg-white ring-2 ${styles.ring} shadow-2xl scale-[1.05]`) : 'bg-chapter-accent/10 ring-2 ring-chapter-accent shadow-xl') : (isObsidian ? 'bg-surface hover:bg-obsidian hover:text-mist' : 'bg-surface shadow-md hover:shadow-xl')}
+            ${isFounder && !isCurrent ? styles.border : ''}`}>
 
             {isFounder && (
                 <div className="absolute -top-4 -right-4 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -254,11 +331,11 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
                 </div>
             )}
 
-            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 ${isCurrent ? (isObsidian ? 'bg-white/10' : `bg-${accentColor}-50`) : (isObsidian ? 'bg-slate-100 group-hover:bg-white/10' : `bg-${accentColor}-50`)}`}>
+            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 ${isCurrent ? (isObsidian ? 'bg-white/10' : styles.bgLight) : (isObsidian ? 'bg-slate-100 group-hover:bg-white/10' : styles.bgLight)}`}>
                 {icon}
             </div>
             <div className="space-y-2">
-                <div className={`text-[10px] font-black uppercase tracking-widest ${isCurrent ? (isObsidian ? 'text-amber-400' : `text-${accentColor}-600`) : (isObsidian ? 'text-slate-400 group-hover:text-amber-400' : 'text-text-secondary')}`}>{level}</div>
+                <div className={`text-[10px] font-black uppercase tracking-widest ${isCurrent ? (isObsidian ? 'text-amber-400' : styles.text) : (isObsidian ? 'text-slate-400 group-hover:text-amber-400' : 'text-text-secondary')}`}>{level}</div>
                 <h4 className={`font-black text-xl tracking-tight ${isCurrent && isObsidian ? 'text-white' : 'text-text-primary group-hover:text-inherit'}`}>{title}</h4>
             </div>
             
@@ -271,7 +348,7 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
             <ul className={`text-xs space-y-3 pt-6 w-full flex-1 ${isCurrent && isObsidian ? 'text-mist/80' : 'text-text-secondary group-hover:text-inherit'}`}>
                 {benefits?.map((benefit: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-3">
-                        <CheckCircle2 className={`w-3 h-3 mt-1 shrink-0 ${isCurrent ? (isObsidian ? 'text-amber-400' : `text-${accentColor}-500`) : (isObsidian ? 'text-slate-300 group-hover:text-amber-400' : `text-${accentColor}-500`)}`} />
+                        <CheckCircle2 className={`w-3 h-3 mt-1 shrink-0 ${isCurrent ? (isObsidian ? 'text-amber-400' : styles.textDark) : (isObsidian ? 'text-slate-300 group-hover:text-amber-400' : styles.textDark)}`} />
                         <span className="text-left leading-snug font-medium">{benefit}</span>
                     </li>
                 ))}
@@ -279,7 +356,7 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
 
             {isCurrent && (
                 <div className="pt-4">
-                    <Badge className={`${isObsidian ? 'bg-amber-500' : `bg-${accentColor}-500`} text-white border-none text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg`}>MY PASS</Badge>
+                    <Badge className={`${isObsidian ? 'bg-amber-500' : styles.bgDark} text-white border-none text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg`}>MY PASS</Badge>
                 </div>
             )}
         </Card>

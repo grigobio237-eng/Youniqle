@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, Music, Scan, Layout, Sparkles, Activity } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import DiagnosisForm from './DiagnosisForm';
+import { useRecovery } from '@/contexts/RecoveryContext';
+import { useSession } from 'next-auth/react';
 import RealtimeActivityBanner from '@/components/social/RealtimeActivityBanner';
 import DiagnosisBasedRecommendations from '@/components/personalization/DiagnosisBasedRecommendations';
 import HabitAlertBanner from '@/components/home/HabitAlertBanner';
@@ -22,6 +26,75 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
   const [progress, setProgress] = React.useState<any>(null);
   const [checklistProgress, setChecklistProgress] = React.useState({ completed: 0, total: 4, percentage: 0 });
   const [isRecoveryActive, setIsRecoveryActive] = React.useState(false);
+  const { data: session } = useSession();
+  const { journey, medicalCategory, treatmentType } = useRecovery();
+  const [showDiagnosisModal, setShowDiagnosisModal] = React.useState(false);
+  const [diagnosisQuestions, setDiagnosisQuestions] = React.useState<any[]>([]);
+  const [isDiagnosing, setIsDiagnosing] = React.useState(false);
+  const [currentTheme, setCurrentTheme] = React.useState<string>('');
+
+  const handleStartDiagnosis = async () => {
+    setIsDiagnosing(true);
+    try {
+      const res = await fetch('/api/diagnosis/dynamic-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName: session?.user?.name || '사용자'
+        })
+      });
+
+      const data = await res.json();
+      if (data.questions) {
+        setDiagnosisQuestions(data.questions);
+        setCurrentTheme(data.theme);
+        setShowDiagnosisModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch dynamic questions:', error);
+      alert('진단 문항을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsDiagnosing(false);
+    }
+  };
+
+  const handleDiagnosisComplete = async (rawScore: number, finalAnswers: any[], note: string) => {
+    // 160점 만점(10점 * 16문항)을 100점 만점으로 환산
+    const totalPossible = diagnosisQuestions.length * 10;
+    const unifiedScore = Math.round((rawScore / totalPossible) * 100);
+
+    if (session?.user?.email) {
+      try {
+        await fetch('/api/diagnosis/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'daily',
+            result: {
+              totalScore: unifiedScore,
+              convertedScores: {
+                physical: unifiedScore,
+                mental: unifiedScore,
+                lifestyle: unifiedScore,
+                sleep: unifiedScore
+              }
+            },
+            answers: finalAnswers.reduce((acc, curr) => {
+              acc[curr.questionId] = curr.score;
+              return acc;
+            }, {})
+          })
+        });
+      } catch (error) {
+        console.error('Failed to save daily diagnosis:', error);
+      }
+    }
+
+    localStorage.setItem('recovery_last_score', unifiedScore.toString());
+    setShowDiagnosisModal(false);
+    alert('오늘의 회복 진단이 기록되었습니다!');
+    window.location.reload();
+  };
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -41,10 +114,10 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
   const displayScore = score.totalScore;
   const levelInfo = getLevelInfo(displayScore);
 
-  // Constants for membership etc. (could also come from unifiedData)
-  const streak = progress?.currentStreak || 1;
-  const totalPoints = progress?.totalPoints || 5;
-  const membershipLevel = user.passInfo?.type !== 'NONE' ? user.passInfo.type : 'GATE';
+  // Constants for membership etc.
+  const streak = user?.gamification?.currentStreak || 0;
+  const totalPoints = user?.points || 0;
+  const membershipLevel = user?.passInfo?.type && user?.passInfo?.type !== 'NONE' ? user.passInfo.type : 'GATE';
   const pointsToNext = 100 - (totalPoints % 100);
 
   return (
@@ -155,13 +228,13 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                     <span className="text-[10px] text-slate font-black uppercase tracking-widest opacity-60">Update: {new Date(surveyReport.createdAt).toLocaleDateString()}</span>
                   </div>
                   <h3 className="text-3xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">
-                    {surveyReport.status === 'new' && '나의 회복 솔루션 설계 중...'}
+                    {surveyReport.status === 'new' && '나의 Youniqle 맞춤 솔루션 확인'}
                     {surveyReport.status === 'analyzed' && '네비게이터 리포트 분석 완료'}
                     {surveyReport.status === 'proposed' && '맞춤 제안 상품이 도착했습니다!'}
                     {surveyReport.status === 'converted' && '회복 플랜 진행 중'}
                   </h3>
                   <p className="text-slate font-medium text-base leading-relaxed max-w-xl">
-                    {surveyReport.status === 'new' && '네비게이터가 고객님의 설문 데이터를 바탕으로 정밀 솔루션을 설계하고 있습니다. 잠시만 기다려 주세요.'}
+                    {surveyReport.status === 'new' && '설문과 스캔 데이터를 바탕으로 도출된 AI 맞춤 솔루션 리포트가 준비되어 있습니다.'}
                     {surveyReport.status === 'analyzed' && '분석이 완료되었습니다. 조만간 가장 적합한 프로그램을 제안해 드릴 예정입니다.'}
                     {surveyReport.status === 'proposed' && '고객님께만 드리는 특별 구성 상품이 도착했습니다. 지금 바로 상세 내용을 확인해 보세요.'}
                     {surveyReport.status === 'converted' && '유니클 전문가와 함께 건강한 회복 여정을 이어가고 있습니다.'}
@@ -298,10 +371,11 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <div className="flex flex-wrap gap-6 justify-center">
           <Button
             size="lg"
-            className="bg-obsidian text-background font-black rounded-[24px] h-20 px-12 shadow-2xl hover:scale-105 transition-transform text-lg italic tracking-widest"
-            onClick={() => window.location.href = '/?action=diagnose'}
+            className="bg-obsidian text-background font-black rounded-[24px] h-20 px-12 shadow-2xl hover:scale-105 transition-transform text-lg italic tracking-widest flex flex-col items-center justify-center gap-0"
+            onClick={() => window.location.href = '/diagnosis?type=daily'}
           >
-            진단 업데이트
+            <span className="text-[10px] text-reward-gold not-italic tracking-[0.2em] mb-1">GET 100 RECOVERY PT</span>
+            1일 회복 진단 시작
           </Button>
           <Button
             onClick={onOpenWebtoon}
@@ -336,7 +410,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                   {progress?.todayChecklist?.diagnosis ? '✓' : '01'}
                 </div>
                 <div>
-                  <h3 className="font-black text-obsidian">정밀 진단</h3>
+                  <h3 className="font-black text-obsidian">1일 회복진단</h3>
                   <p className="text-xs text-slate font-medium">데이터 기반 상태 체크</p>
                 </div>
               </div>
@@ -433,25 +507,15 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         </div>
       </section>
 
-      {/* Diagnosis Based Recommendations (Unified) */}
-      <section className="container mx-auto px-4 pb-20 max-w-5xl">
-        <DiagnosisBasedRecommendations
-          limit={6}
-          showProducts={true}
-          showProtocols={true}
-          showContent={true}
-          showCategoryStatus={false}
-        />
-      </section>
 
       {/* Quick Links */}
       <section className="container mx-auto px-4 pb-24 max-w-5xl">
         <h2 className="text-2xl font-black text-obsidian mb-10 tracking-tight">System Navigation</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: 'AI 네비게이터', href: '/ai-navigator', icon: <MessageSquare className="w-6 h-6" /> },
-            { label: '면담 가이드', href: activeMedicalGuide ? `/event/consultation/report/${activeMedicalGuide._id}` : '/ai-navigator', icon: <ClipboardList className="w-6 h-6" /> },
-            { label: '회복 로드맵', href: activeRecoveryPlan ? `/event/post-care/report/${activeRecoveryPlan._id}` : '/ai-navigator', icon: <HeartPulse className="w-6 h-6" /> },
+            { label: 'Youniqle 진단', href: '/ai-navigator', icon: <MessageSquare className="w-6 h-6" /> },
+            { label: '면담 가이드', href: activeMedicalGuide ? `/event/consultation/report/${activeMedicalGuide._id}` : '/event/consultation', icon: <ClipboardList className="w-6 h-6" /> },
+            { label: '회복 로드맵', href: activeRecoveryPlan ? `/event/post-care/report/${activeRecoveryPlan._id}` : '/event/post-care', icon: <HeartPulse className="w-6 h-6" /> },
             { label: '스캔 타임라인', href: '/timeline', icon: <Activity className="w-6 h-6" /> },
           ].map((link) => (
             <Link key={link.label} href={link.href} className="group">
@@ -465,6 +529,16 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
           ))}
         </div>
       </section>
+
+      <Dialog open={showDiagnosisModal} onOpenChange={setShowDiagnosisModal}>
+        <DialogContent className="max-w-xl p-6 overflow-y-auto max-h-[90vh] border-none rounded-[40px] shadow-2xl bg-white">
+          <DialogHeader className="sr-only">
+            <DialogTitle>1일 회복진단</DialogTitle>
+            <DialogDescription>데이터 기반으로 설계하는 나만의 일상 리듬</DialogDescription>
+          </DialogHeader>
+          <DiagnosisForm questions={diagnosisQuestions} onComplete={handleDiagnosisComplete} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

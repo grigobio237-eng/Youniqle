@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPassInterest extends Document {
   userId: mongoose.Types.ObjectId;
-  passId: 'start' | 'signature' | 'black';
+  passId: 'reset' | 'reborn' | 'restart' | 'black';
   navigatorId?: mongoose.Types.ObjectId;
   viewCount: number;
   lastViewedAt: Date;
@@ -12,7 +12,7 @@ export interface IPassInterest extends Document {
 
 const PassInterestSchema = new Schema<IPassInterest>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  passId: { type: String, enum: ['start', 'signature', 'black'], required: true },
+  passId: { type: String, enum: ['reset', 'reborn', 'restart', 'black'], required: true },
   navigatorId: { type: Schema.Types.ObjectId, ref: 'User' },
   viewCount: { type: Number, default: 1 },
   lastViewedAt: { type: Date, default: Date.now },

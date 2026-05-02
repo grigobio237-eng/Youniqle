@@ -1,6 +1,6 @@
 import { IUser } from '@/models/User';
 
-export type UserGroup = 'NORMAL' | 'START' | 'PREMIUM';
+export type UserGroup = 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
 
 export interface TierLimits {
   scannerLimit: number;
@@ -11,26 +11,40 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<UserGroup, TierLimits> = {
-  NORMAL: {
+  NONE: {
+    scannerLimit: 1,
+    diagnosisLimit: 0,
+    webtoonLimitHours: 72,
+    webtoonGenerationLimit: 0,
+    dataRetentionDays: 1
+  },
+  RESET: {
     scannerLimit: 3,
     diagnosisLimit: 1,
     webtoonLimitHours: 48,
     webtoonGenerationLimit: 0,
     dataRetentionDays: 7
   },
-  START: {
+  REBORN: {
     scannerLimit: 10,
     diagnosisLimit: 3,
     webtoonLimitHours: 0, // 무제한
     webtoonGenerationLimit: 2,
     dataRetentionDays: 90
   },
-  PREMIUM: {
+  RESTART: {
     scannerLimit: 9999, // 사실상 무제한
     diagnosisLimit: 9999,
     webtoonLimitHours: 0,
     webtoonGenerationLimit: 9999,
     dataRetentionDays: 9999 // 전체 기간
+  },
+  BLACK: {
+    scannerLimit: 9999,
+    diagnosisLimit: 9999,
+    webtoonLimitHours: 0,
+    webtoonGenerationLimit: 9999,
+    dataRetentionDays: 9999
   }
 };
 
@@ -44,11 +58,13 @@ export class AccessControl {
   /**
    * 유저의 패스 타입에 따른 그룹 반환
    */
-  static getUserGroup(user: IUser): UserGroup {
+  static getUserGroup(user: any): UserGroup {
     const passType = user.passInfo?.type || 'NONE';
-    if (passType === 'SIGNATURE' || passType === 'BLACK') return 'PREMIUM';
-    if (passType === 'START' || user.subscription?.status === 'active') return 'START';
-    return 'NORMAL';
+    if (passType === 'BLACK') return 'BLACK';
+    if (passType === 'RESTART') return 'RESTART';
+    if (passType === 'REBORN' || user.subscription?.status === 'active') return 'REBORN';
+    if (passType === 'RESET') return 'RESET';
+    return 'NONE';
   }
 
   /**

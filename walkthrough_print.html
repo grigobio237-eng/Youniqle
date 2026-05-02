@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youniqle Walkthrough Full Version (Fixed)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+    <style>
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .prose { box-shadow: none !important; margin: 0 !important; padding: 20px !important; max-width: 100% !important; }
+            pre { white-space: pre-wrap !important; background: #f9fafb !important; color: #111827 !important; border: 1px solid #ddd !important; }
+        }
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #f3f4f6; }
+        .prose { max-width: 1000px; margin: 40px auto; background: white; padding: 60px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .prose h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 2rem; border-bottom: 4px solid #6366f1; padding-bottom: 1rem; }
+        .prose h2 { font-size: 1.8rem; font-weight: 800; margin-top: 3.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+        .prose table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+        .prose th, .prose td { border: 1px solid #e5e7eb; padding: 12px; }
+        .prose th { background-color: #f9fafb; font-weight: 700; }
+        .prose pre { background-color: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1.5rem 0; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.5; }
+        .prose code { background-color: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 600; color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="no-print bg-indigo-700 text-white p-4 text-center sticky top-0 shadow-xl">
+        <p class="font-bold">프로젝트 구조 수정 버전 - 브라우저 새로고침 후 Ctrl + P를 누르세요.</p>
+    </div>
+
+    <div id="content" class="prose"></div>
+
+    <script>
+        // Use String.raw to preserve backslashes in paths
+        const markdownRaw = String.raw`
+# Youniqle — 코드베이스 워크스루
+
+> **Youniqle**은 **회복 중심 건강 & 웰니스 플랫폼**입니다. AI 기반 진단, 사운드/자세 테라피, 임상 상담 워크플로우, 이커머스, 커뮤니티, 파트너(클리닉/샵) 포탈, 관리자 백오피스를 통합한 종합 생태계입니다. **Next.js 14+ App Router** 기반으로 TypeScript, MongoDB(Mongoose), Firebase Storage, NextAuth, Gemini AI, Python 비디오 렌더링 엔진으로 구성됩니다.
+
+---
+
+## 1. 기술 스택
+
+| 계층 | 기술 |
+|---|---|
+| **프레임워크** | Next.js 14+ (App Router, src/app/) |
+| **언어** | TypeScript (.tsx / .ts) |
+| **스타일링** | Tailwind CSS + 커스텀 디자인 토큰 (globals.css) |
+| **UI 라이브러리** | shadcn/ui 기반 커스텀 컴포넌트 (src/components/ui/) |
+| **상태관리** | React Context (RecoveryContext), React Hooks |
+| **인증** | NextAuth.js (이메일 + 소셜: 네이버, 구글, 카카오) |
+| **데이터베이스** | MongoDB via Mongoose (70개 이상 모델, src/models/) |
+| **AI 엔진** | Google Gemini (src/lib/ai/gemini-engine.ts — 110 KB) |
+| **파일 저장소** | Firebase Storage (src/lib/utils/firebase-storage.ts) |
+| **결제** | Mock 결제 + KG 이니시스 연동 (src/app/api/payment/) |
+| **다국어** | JSON 로케일 파일 (src/locales/ko.json, en.json, zh.json) |
+| **실시간** | WebSocket 서버 (src/lib/websocketServer.ts) + Socket.IO |
+| **비디오 엔진** | Python (MoviePy + Gemini) — python-engine/ |
+| **PWA** | Service Worker 등록 (PWARegistration.tsx) |
+| **분석** | 커스텀 분석 이벤트 + 코호트/퍼널/LTV/예측 모델 |
+
+---
+
+## 2. 프로젝트 구조 개요
+
+\`\`\`
+f:\youniqle\
+├── public/                  # 정적 자산 (이미지, 아이콘, 사운드, 폰트)
+│   ├── images/characters/   # 도구별 마스코트 캐릭터 일러스트
+│   ├── sounds/              # 테라피 오디오 파일
+│   └── icons/               # PWA 아이콘
+├── python-engine/           # 독립 Python 비디오 생성 마이크로서비스
+│   ├── main.py              # 오케스트레이터: DB 폴링 → 비디오 렌더링 → 업로드
+│   └── modules/             # Gemini 스크립트 생성, MoviePy 렌더링 등
+├── src/
+│   ├── app/                 # Next.js App Router 페이지 + API 라우트
+│   │   ├── api/             # ~290개 API 라우트 파일 (60개 도메인)
+│   │   ├── admin/           # 관리자 대시보드 (30개 하위 페이지)
+│   │   ├── partner/         # 파트너/클리닉 포탈 (15개 하위 페이지)
+│   │   ├── diagnosis/       # 회복 진단 플로우
+│   │   ├── healing-center/  # 힐링 미디어 (비디오 테라피)
+│   │   ├── navigator/       # 네비게이터 (컨시어지) 시스템
+│   │   ├── products/        # 이커머스 상품 페이지
+│   │   ├── me/              # 사용자 프로필/설정 (10개 하위 페이지)
+│   │   ├── community/       # 커뮤니티 게시판 (라운지, 미디어)
+│   │   ├── utils/           # 18개 유틸리티 도구 (BMI, QR, 호흡 등)
+│   │   ├── survey/          # 방문 후 만족도 설문
+│   │   ├── therapy/         # 사운드 테라피 페이지
+│   │   ├── chat/            # 실시간 채팅
+│   │   ├── gallery/         # 아트 갤러리 (작가 + 작품)
+│   │   ├── auth/            # 로그인, 회원가입, 비밀번호 찾기, 이메일 인증
+│   │   └── ... (40개 이상 추가 페이지 디렉토리)
+│   ├── components/          # React 컴포넌트 라이브러리 (~140개 파일)
+│   │   ├── ui/              # 기본 UI 프리미티브 (버튼, 카드, 다이얼로그 등 — 34개)
+│   │   ├── layout/          # Header, Footer, ChapterWrapper, NoticeTicker
+│   │   ├── home/            # 랜딩 페이지 컴포넌트 (Hero, Scanner, Dashboard)
+│   │   ├── diagnosis/       # AI 진단 모달 & 카드
+│   │   ├── healing/         # Secret Recovery Lab, Principal Lounge
+│   │   ├── navigator/       # 아카이브, 핫라인, 패스, 샵 관리
+│   │   ├── admin/           # 관리자 레이아웃, AB 테스트, AI 빌더, 주문 분석
+│   │   ├── partner/         # 파트너 레이아웃, 재고 관리
+│   │   ├── event/           # PreProcedureForm, PostCareForm, RecoveryMonitoring
+│   │   ├── chat/            # AI 매니저 채팅, 실시간 채팅
+│   │   ├── products/        # 상품 목록, 비교, 필터, 소셜 공유
+│   │   ├── auth/            # 로그인/회원가입 폼, 멤버십 업셀
+│   │   ├── notifications/   # 알림 템플릿 (CRUD), 실시간 알림 센터
+│   │   ├── nudge/           # 일일 체크인 팝업, 시간 기반 메시지
+│   │   ├── pomodoro/        # 플로팅 뽀모도로 타이머, 시크릿 샵 팝업
+│   │   ├── social/          # 소셜 프루프 제공자, 실시간 활동 배너
+│   │   ├── recommendations/ # 추천 섹션
+│   │   ├── personalization/ # 진단 기반 & 개인화 추천
+│   │   ├── reviews/         # 리뷰 폼 & 섹션
+│   │   ├── charts/          # 진단용 레이더 차트
+│   │   ├── community/       # 커뮤니티 게시판, 게시글 상세, 작성 폼
+│   │   ├── me/              # 마이페이지 컴포넌트 (히어로, 패스 카드, 추천 QR)
+│   │   ├── shared/          # AI 진행 오버레이, 추천 네트워크
+│   │   ├── providers/       # 세션, 넛지, PWA 제공자
+│   │   ├── qa/              # 질문 섹션
+│   │   └── utils/           # FoodScanner, PostureScanner, SoundTherapy 등
+│   ├── contexts/            # React Context (RecoveryContext 등)
+│   ├── hooks/               # 커스텀 훅 (use-ai-progress, use-toast 등)
+│   ├── lib/                 # 핵심 비즈니스 로직 & 데이터
+│   │   ├── ai/              # AI 엔진 (Gemini, mock, ChromaDB, 비디오)
+│   │   ├── audio/           # 음성 전략
+│   │   ├── data/            # 진단 질문 뱅크 (560개 이상 질문)
+│   │   ├── logic/           # 진단 채점 엔진, 접근 제어
+│   │   ├── constants/       # 패스 데이터
+│   │   ├── utils/           # 이미지 처리, 다운로드, Firebase 저장소
+│   │   ├── testing/         # 수학 유틸, 테스트 서비스
+│   │   └── video-workflow/  # 비디오 생성 파이프라인 (노드, 전략, 템플릿)
+│   ├── models/              # Mongoose 모델 (72개 파일)
+│   ├── locales/             # 다국어 JSON (한국어, 영어, 중국어)
+│   ├── styles/globals.css   # 디자인 토큰 & 기본 스타일
+│   ├── types/               # TypeScript 타입 확장
+│   ├── scripts/             # 시드/테스트 스크립트
+│   ├── pages/api/           # 레거시 Pages Router API (socket.ts, debug-env)
+│   └── utils/               # WebView 감지
+└── 설정 파일들               # next.config, tsconfig, tailwind, postcss 등
+\`\`\`
+
+---
+
+## 3. 핵심 애플리케이션 모듈
+
+### 3.1 진단 시스템 🩺
+
+다단계 자가 진단 엔진:
+
+| 단계 | 파일 | 질문 수 | 카테고리 |
+|---|---|---|---|
+| **간편 (16문항)** | diagnosis/page.tsx | 16문항 인라인 | 신체, 정신, 생활습관, 수면 |
+| **무료 (24문항)** | diagnosis-questions.ts | 10세트 × 24문항 | 사고, 감정, 사회, 신체 |
+| **전체 (60문항)** | full-diagnosis-questions.ts | IPIP-NEO Big Five 적응형 | N, E, O, A, C (하위 요인 포함) |
+| **IPIP-60** | ipip60-questions.ts | 표준 IPIP-60 | 위와 동일 |
+
+**데이터 흐름:**
+1. 사용자가 진단 페이지에서 질문에 응답
+2. 카테고리별 점수 계산 (정방향/역방향 채점)
+3. 결과를 /api/diagnosis로 POST → MongoDB에 Diagnosis 모델로 저장
+4. 결과 페이지에서 카테고리별 점수, 등급 (ECHO/NAVIGATOR/GATE/RESET), 추천 행동 표시
+5. 상품 및 회복 추천 연결
+
+**채점 엔진:** simcheung-diagnosis.ts, ipip60-engine.ts
+
+---
+
+### 3.2 AI 엔진 (Gemini) 🤖
+
+gemini-engine.ts (110 KB)가 중앙 AI 엔진으로 다음 기능을 제공합니다:
+
+- **라이프 스냅 분석** — 사진 기반 회복 분석 (/api/ai/life-snap)
+- **증상 분석** — 시술 전 증상 분류 (/api/ai/analyze-symptom)
+- **AI 조언** — 개인화된 회복 조언 (/api/ai/advice)
+- **AI 네비게이터** — 대화형 컨시어지
+- **웹툰 생성** — AI 생성 회복 웹툰
+- **상품 설명** — 자동 생성 상품 카피
+- **뉴스레터 콘텐츠** — AI 지원 뉴스레터 작성
+- **자동화 규칙** — 지능형 워크플로우 트리거
+- **AB 테스트 분석** — 실험 통계 분석
+
+**Mock 엔진** mock-engine.ts는 개발용 폴백 응답을 제공합니다.
+
+---
+
+### 3.3 HeroScanner (홈 페이지 핵심) 📸
+
+HeroScanner.tsx는 랜딩 페이지의 메인 인터랙티브 컴포넌트입니다:
+
+1. **대기** → 카메라 아이콘 + "Life Snap" CTA
+2. **유형 선택** → 스냅 카테고리 선택 (식사, 피부, 수면, 활동 등)
+3. **촬영** → 웹캠(데스크톱) 또는 파일 업로드(모바일)
+4. **스캐닝** → Gemini 분석 중 AI 진행 오버레이 표시
+5. **결과** → 점수(0-100), 영양/회복 분석 테이블, 향후 방향
+6. **여정 선택** → 웰니스 vs. 클리니컬 경로 선택기
+7. **CTA** → "60초 정밀 진단 시작하기" 버튼
+
+---
+
+### 3.4 임상 상담 워크플로우 🏥
+
+두 개의 멀티스텝 폼이 임상 상담을 처리합니다:
+
+#### PreProcedureForm (5단계)
+PreProcedureForm.tsx
+- **0단계:** AI 증상 분석기 또는 수동 카테고리 선택 (정형외과, 성형외과, 내과, 일반)
+- **1단계:** 기대 회복 수준, 다운타임, 중요 일정
+- **2단계:** 과거 치료 이력, 복용 약물, 건강 상태
+- **3단계:** 불안 요소 (다중 선택), 프라이버시 우려
+- **4단계:** 방문 준비 (동반자, 교통수단)
+- **5단계:** 예산 범위, 프리미엄 서비스
+- 의료 카테고리에 따라 콘텐츠가 **적응형**으로 변경 (다른 라벨/옵션)
+
+#### PostCareForm (3단계)
+PostCareForm.tsx
+- **1단계:** 시술명과 날짜
+- **2단계:** 증상 수준 (통증, 부기, 멍, 발열 — 1~5점 척도)
+- **3단계:** 우려 사항 (느린 회복, 비대칭, 부작용) + 생활습관
+- /api/post-care로 제출 → 회복 로드맵 생성
+
+---
+
+### 3.5 유틸리티 도구 허브 🛠️
+
+utils/page.tsx에서 **18개 유틸리티 도구**를 카테고리별로 제공합니다:
+
+| 도구 | 경로 | 유형 |
+|---|---|---|
+| 감각 스캐너 | /utils/food-scanner | AI 이미지 분석 |
+| 회복 진단 | /utils/mbti | 설문지 |
+| 자세 분석 | /utils?tool=posture | 카메라 + AI |
+| 사운드 테라피 | /utils?tool=sound | 오디오 플레이어 |
+| 수면 회복 | /utils?tool=sleep | 수면 추적 모달 |
+| 호흡 운동 | /utils/breathing | 4-7-8 프로토콜 |
+| 수분 밸런스 | /utils?tool=water | 수분 섭취 추적 모달 |
+| 오피스 스트레칭 | /utils?tool=stretch | 가이드 모달 |
+| BMI 계산기 | /utils/bmi | 계산기 |
+| 배경 제거 | /utils/remove-bg | 딥러닝 |
+| 메모 | /utils/memo | 노트 작성 |
+| 할일 | /utils/todo | 작업 관리 |
+| 환율 변환 | /utils/currency | 실시간 환율 |
+| QR 생성기 | /utils/qr | URL/텍스트 인코딩 |
+| D-Day 계산기 | /utils/dday | 날짜 계산 |
+| 단위 변환 | /utils/unit | 길이/무게/온도 |
+| 이미지 최적화 | /utils/compress | 포맷 변환 |
+| 날씨 | /utils/weather | 글로벌 날씨 데이터 |
+
+---
+
+### 3.6 이커머스 시스템 🛒
+
+**주요 모델:** Product, Cart, Order, Coupon, CouponUsage, UserCoupon, Refund, Settlement, StockAlert, PointTransaction
+
+---
+
+### 3.7 네비게이터 시스템 🧭
+
+- navigator/page.tsx — 메인 네비게이터 페이지
+- **패스** — 프리미엄 접근을 위한 구독 패스
+- **샵** — 클리닉/샵 목록
+
+**컴포넌트:** ArchiveContent.tsx (50 KB), HotlineChat, PassCatalog
+
+---
+
+### 3.8 관리자 포탈 👑
+
+admin/ — 30개 이상의 하위 페이지
+
+---
+
+### 3.9 파트너 포탈 🏪
+
+partner/ — 클리닉/샵 운영자 대시보드
+
+---
+
+### 3.10 커뮤니티 & 소셜 기능 💬
+
+- 커뮤니티 게시판 — 라운지, 미디어
+- 실시간 채팅 — ChatInterface.tsx
+
+---
+
+## 4. 데이터 모델 (72개 Mongoose 모델)
+
+주요 모델 분류:
+
+### 사용자 & 인증
+- User (15 KB), Character
+
+### 진단 & 건강
+- Diagnosis, AiAdvice, LifeSnap, RecoveryReport, PostCareSurvey
+
+### 커머스
+- Product, Cart, Order, Coupon, PointTransaction
+
+---
+
+## 5. API 라우트 구조
+
+~290개 라우트 파일 구성
+
+---
+
+## 6. 핵심 디자인 패턴
+
+### 6.1 디자인 토큰 시스템
+### 6.2 챕터/컨텍스트 시스템
+### 6.3 AI 진행 패턴
+
+---
+
+## 7. Python 비디오 엔진
+
+python-engine/ — 독립 마이크로서비스
+
+---
+
+## 8. 파일 크기 핫스팟
+
+| 파일 | 크기 |
+|---|---|
+| gemini-engine.ts | 110 KB |
+| utils/page.tsx | 70 KB |
+| diagnosis-questions.ts | 68 KB |
+
+---
+
+## 9. 다국어 지원
+
+ko.json, en.json, zh.json
+
+---
+
+## 10. 주요 아키텍처 결정 사항
+
+1. 올인원 모놀리스
+2. 인라인 질문 데이터
+3. 이중 API 패턴
+4. 적응형 콘텐츠 패턴
+`;
+
+        // Configure Marked
+        marked.setOptions({ breaks: true, gfm: true });
+        document.getElementById('content').innerHTML = marked.parse(markdownRaw);
+    </script>
+</body>
+</html>

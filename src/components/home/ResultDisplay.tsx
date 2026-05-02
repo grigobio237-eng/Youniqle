@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck, Brain } from 'lucide-react';
+import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck, Brain, Gift } from 'lucide-react';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { AnalysisResult } from './HeroScanner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -175,6 +175,27 @@ export default function ResultDisplay({
             <p className="text-sm font-bold text-chapter-accent italic opacity-70">"{message}"</p>
           </div>
         </div>
+
+        {!session && (
+          <div className="p-6 bg-white rounded-[40px] border-2 border-reward-gold/30 shadow-lg space-y-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-reward-gold/10 blur-2xl rounded-full" />
+            <div className="flex items-center justify-center gap-2 text-reward-gold font-black text-xs uppercase tracking-widest">
+              <Gift className="w-4 h-4" /> Welcome Reward
+            </div>
+            <h4 className="text-xl font-black text-obsidian tracking-tight">
+              잠깐! 회원가입하고 혜택 받기 🎁
+            </h4>
+            <p className="text-sm font-bold text-slate/70 break-keep leading-relaxed">
+              오늘 획득한 <span className="text-reward-gold font-black">10P</span>와 나만을 위한 정밀 분석 데이터가 로그인 즉시 안전하게 영구 보존됩니다.
+            </p>
+            <Button 
+              onClick={() => signIn()} 
+              className="w-full h-14 rounded-2xl bg-reward-gold text-obsidian hover:bg-reward-gold/90 font-black text-base shadow-lg shadow-reward-gold/20 transition-all flex items-center justify-center gap-2"
+            >
+              1초 만에 가입하고 포인트 받기
+            </Button>
+          </div>
+        )}
 
         <div className="flex flex-col gap-4 w-full">
           <Button size="lg" onClick={handleNextSteps} className="btn-primary w-full h-20 text-xl rounded-[24px] shadow-xl shadow-chapter-accent/20 group">
