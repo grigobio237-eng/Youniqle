@@ -80,17 +80,17 @@ export default function AboutPage() {
           <motion.div variants={itemVariants} className="space-y-6">
             <span className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/20 border border-chapter-accent/40 rounded-full backdrop-blur-md shadow-lg">
               <Sparkles className="w-4 h-4 text-chapter-accent animate-pulse" />
-              <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-[0.5em]">The Science of Recovery</span>
+              <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-[0.5em]">The Lifecare OS</span>
             </span>
             <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter italic leading-[0.9] text-white drop-shadow-2xl">
-              RECOVERY IS <br />
-              <span className="text-chapter-accent italic">NOT A FEELING.</span>
+              RECORD IS <br />
+              <span className="text-chapter-accent italic">LIFECARE.</span>
             </h1>
           </motion.div>
 
           <motion.p variants={itemVariants} className="max-w-3xl mx-auto text-lg md:text-2xl font-black text-white leading-relaxed word-keep-all drop-shadow-lg">
-            회복은 단순한 느낌이 아닙니다. 데이터와 알고리즘으로 설계된 <br className="hidden md:block" />
-            <span className="bg-chapter-accent px-2 text-white italic">최상의 컨디션을 향한 정밀한 프로토콜</span>입니다.
+            "기록이 일상이 될 때, 진정한 라이프케어가 시작됩니다." <br className="hidden md:block" />
+            <span className="bg-chapter-accent px-2 text-white italic">고객의 하루를 데이터로 자산화하여 맞춤형 솔루션을 제안합니다.</span>
           </motion.p>
 
           <motion.div variants={itemVariants} className="pt-8">
@@ -114,24 +114,25 @@ export default function AboutPage() {
             >
               <div className="space-y-6">
                 <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter italic leading-tight text-obsidian">
-                  왜 당신은<br />
-                  <span className="text-chapter-accent">회복되지 않는가?</span>
+                  나를 먼저<br />
+                  <span className="text-chapter-accent">이해하는 습관.</span>
                 </h2>
                 <p className="text-xl md:text-2xl text-slate/70 leading-relaxed font-medium word-keep-all">
-                  휴식은 가만히 있는 것이 아닙니다. 뇌와 신체가 잔여 스트레스를 완전히 소거하고 에너지를 재충전하는 데이터화된 과정입니다. 유니클은 보이지 않는 피로의 흔적을 추적하여 실감할 수 있는 반등을 만듭니다.
+                  유니클(Youniqle)은 고객의 하루를 데이터로 자산화하여<br />
+                  맞춤형 솔루션을 제안하는 <span className="text-obsidian font-black">통합 회복관리 플랫폼</span>입니다. 유니클이 제안하는 새로운 회복의 기준을 만나보세요.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-chapter-accent hover:shadow-xl transition-all duration-500">
-                  <Brain className="w-10 h-10 text-chapter-accent mb-6 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Youniqle Analysis</h4>
-                  <p className="text-sm text-slate/60 leading-relaxed font-bold">생체 리듬과 생활 패턴의 <br /> 정밀한 상관관계 분석</p>
+                  <Fingerprint className="w-10 h-10 text-chapter-accent mb-6 group-hover:scale-110 transition-transform" />
+                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Life Recording</h4>
+                  <p className="text-sm text-slate/60 leading-relaxed font-bold">사진 한 장으로 시작되는 <br /> 정직한 나의 상태 기록</p>
                 </div>
                 <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-reward-gold hover:shadow-xl transition-all duration-500">
-                  <Target className="w-10 h-10 text-reward-gold mb-6 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Precision</h4>
-                  <p className="text-sm text-slate/60 leading-relaxed font-bold">개인별 번아웃 임계점에 <br /> 맞춘 커스텀 프로토콜</p>
+                  <Activity className="w-10 h-10 text-reward-gold mb-6 group-hover:scale-110 transition-transform" />
+                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Condition Insight</h4>
+                  <p className="text-sm text-slate/60 leading-relaxed font-bold">식사, 수면, 스트레스 등 <br /> 6가지 핵심 지표 관리</p>
                 </div>
               </div>
             </motion.div>
@@ -143,19 +144,10 @@ export default function AboutPage() {
               className="relative aspect-square hidden lg:flex items-center justify-center"
             >
               <div className="absolute inset-0 bg-chapter-accent/5 rounded-full blur-[100px] animate-pulse" />
-              <div className="relative z-10 w-full h-full flex items-center justify-center">
-                 <div className="w-full h-full border-4 border-line rounded-full flex items-center justify-center animate-spin-slow">
-                    <div className="w-[85%] h-[85%] border-2 border-chapter-accent/10 border-dashed rounded-full flex items-center justify-center">
-                       <div className="w-[65%] h-[65%] bg-gradient-to-tr from-chapter-accent to-reward-gold p-1 rounded-full overflow-hidden shadow-2xl">
-                          <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                             <Sparkles className="w-24 h-24 text-chapter-accent animate-pulse" />
-                          </div>
-                       </div>
-                    </div>
+              <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
+                 <div className="relative w-full h-full rounded-[60px] overflow-hidden border-8 border-white shadow-2xl rotate-3">
+                   <Image src="/images/about/identity-record.png" alt="Recording Identity" fill className="object-cover" />
                  </div>
-                 {/* Decorative Floating Circles */}
-                 <div className="absolute top-10 right-10 w-24 h-24 bg-chapter-accent/10 rounded-full blur-2xl animate-float" />
-                 <div className="absolute bottom-20 left-0 w-32 h-32 bg-reward-gold/10 rounded-full blur-2xl animate-float-delay" />
               </div>
             </motion.div>
           </div>
@@ -166,7 +158,7 @@ export default function AboutPage() {
       <section className="py-32 md:py-48 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-32 md:space-y-56">
           
-          {/* Path 01: Rhythm */}
+          {/* Step 1. 기록 */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
@@ -176,27 +168,17 @@ export default function AboutPage() {
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
-                  <Layers className="w-4 h-4 text-chapter-accent" />
-                  <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Path 01</span>
+                  <Fingerprint className="w-4 h-4 text-chapter-accent" />
+                  <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 01</span>
                 </div>
-                <h3 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Rhythm</h3>
+                <h3 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Record</h3>
                 <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
-                  리듬 회복: <br /> 무너진 일상의 기초공사
+                  기록: <br /> 일상을 남기는 가장 쉬운 방법
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
-                  바쁜 일상 속에서 가장 먼저 깨지는 것은 '리듬'입니다. 리듬 회복 경로는 수면, 신체 활동, 영양 밸런스를 즉각적으로 정상화하여 내일을 살아갈 에너지를 복구합니다.
+                  오늘 한 장의 사진과 간단한 문답으로 당신의 일상을 남깁니다. 아주 작은 기록들이 모여 당신만의 건강한 자산이 됩니다.
                 </p>
               </div>
-              <ul className="space-y-6">
-                {['데이터 기반 수면 골든타임 재설계', '데일리 웰니스 리듬 자동 보정', '영양 밸런스 큐레이션'].map((t, i) => (
-                  <li key={i} className="flex items-center gap-5 text-base font-black text-obsidian group">
-                    <div className="w-8 h-8 rounded-full bg-chapter-accent/10 flex items-center justify-center group-hover:bg-chapter-accent transition-colors">
-                      <ChevronRight className="w-4 h-4 text-chapter-accent group-hover:text-white" />
-                    </div>
-                    {t}
-                  </li>
-                ))}
-              </ul>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
@@ -204,15 +186,15 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="lg:col-span-7 relative aspect-[4/3] rounded-[60px] md:rounded-[100px] overflow-hidden border-8 border-white shadow-2xl group"
             >
-              <Image src="/images/about/rhythm.png" alt="Rhythm Path" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+              <Image src="/images/about/identity-record.png" alt="Record Step" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               <div className="absolute inset-0 bg-gradient-to-t from-obsidian/40 to-transparent" />
               <div className="absolute bottom-10 left-10 p-8 bg-white/80 backdrop-blur-xl border border-line rounded-[40px] max-w-xs shadow-xl">
-                <p className="text-sm font-black text-obsidian italic leading-relaxed">"가장 자연스러운 속도로 삶의 주기를 되찾는 완벽한 경험"</p>
+                <p className="text-sm font-black text-obsidian italic leading-relaxed">"가장 직관적인 방법으로 기록되는 당신의 소중한 오늘"</p>
               </div>
             </motion.div>
           </div>
 
-          {/* Path 02: Focused */}
+          {/* Step 2. 분석 */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
@@ -220,10 +202,10 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="lg:col-span-7 relative aspect-[4/3] rounded-[60px] md:rounded-[100px] overflow-hidden border-8 border-white shadow-2xl group order-2 lg:order-1"
             >
-              <Image src="/images/about/focused.png" alt="Focused Path" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+              <Image src="/images/about/identity-report.png" alt="Analysis Step" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               <div className="absolute inset-0 bg-gradient-to-t from-reward-gold/20 via-transparent to-transparent" />
               <div className="absolute bottom-10 right-10 p-8 bg-white/80 backdrop-blur-xl border border-line rounded-[40px] max-w-xs text-right shadow-xl">
-                <p className="text-sm font-black text-obsidian italic leading-relaxed">"번아웃 임계점을 넘은 당신을 위한 데이터 기반 정밀 관리"</p>
+                <p className="text-sm font-black text-obsidian italic leading-relaxed">"흩어진 기록을 모아 발행하는 당신만의 회복 리포트"</p>
               </div>
             </motion.div>
             <motion.div 
@@ -234,31 +216,21 @@ export default function AboutPage() {
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-reward-gold/10 border border-reward-gold/20 rounded-full">
-                  <Zap className="w-4 h-4 text-reward-gold" />
-                  <span className="text-[10px] font-black text-reward-gold uppercase tracking-widest leading-none">Path 02</span>
+                  <Activity className="w-4 h-4 text-reward-gold" />
+                  <span className="text-[10px] font-black text-reward-gold uppercase tracking-widest leading-none">Step 02</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Focused</h3>
+                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Analysis</h3>
                 <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
-                  집중 회복: <br /> 신체 효율의 급격한 반등
+                  분석: <br /> 생활 흐름을 꿰뚫는 통찰
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
-                  회복 임계점을 넘었을 때 선택하는 경로입니다. 정밀 분석 도구와 전문 파트너의 개입을 통해 저하된 생체 효율을 빠르게 정상 궤도로 끌어올립니다.
+                  수면, 식사, 활동량, 피부 컨디션을 통합하여 지능형 '회복 리포트'를 발행합니다. 보이지 않던 피로의 원인을 데이터로 마주하세요.
                 </p>
               </div>
-              <ul className="space-y-6">
-                {['전문가 1:1 집중 피드백 시스템', '정밀 회복 툴박스 리얼타임 매칭', '스트레스 임계치 집중 관리'].map((t, i) => (
-                  <li key={i} className="flex items-center gap-5 text-base font-black text-obsidian group">
-                    <div className="w-8 h-8 rounded-full bg-reward-gold/10 flex items-center justify-center group-hover:bg-reward-gold transition-colors">
-                      <ChevronRight className="w-4 h-4 text-reward-gold group-hover:text-white" />
-                    </div>
-                    {t}
-                  </li>
-                ))}
-              </ul>
             </motion.div>
           </div>
 
-          {/* Path 03: Premium */}
+          {/* Step 3. 처방 */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
@@ -268,27 +240,17 @@ export default function AboutPage() {
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
-                  <Crown className="w-4 h-4 text-chapter-accent" />
-                  <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Path 03</span>
+                  <Zap className="w-4 h-4 text-chapter-accent" />
+                  <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 03</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Premium</h3>
+                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Prescribe</h3>
                 <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
-                  프리미엄 회복: <br /> 깊은 몰입과 본질적 변화
+                  처방: <br /> 당신을 위한 최적의 약속
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
-                  단순한 휴식을 넘어 고차원의 정신적·신체적 치유를 목적으로 합니다. 오프라인 힐링센터와 유니클 익스클루시브 공간을 통해 완전한 몰입과 회복을 제공합니다.
+                  분석 결과를 바탕으로 7일간의 최적 루틴을 제안받습니다. 대중형 패스 시스템은 당신이 지치지 않고 실천을 이어갈 수 있도록 돕습니다.
                 </p>
               </div>
-              <ul className="space-y-6">
-                {['프리미엄 힐링센터 익스클루시브 이용', '메디스테이트 전문 팀 밀착 케어', '프라이빗 회복 세션 큐레이션'].map((t, i) => (
-                  <li key={i} className="flex items-center gap-5 text-base font-black text-obsidian group">
-                    <div className="w-8 h-8 rounded-full bg-chapter-accent/10 flex items-center justify-center group-hover:bg-chapter-accent transition-colors">
-                      <ChevronRight className="w-4 h-4 text-chapter-accent group-hover:text-white" />
-                    </div>
-                    {t}
-                  </li>
-                ))}
-              </ul>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
@@ -296,10 +258,46 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="lg:col-span-7 relative aspect-[4/3] rounded-[60px] md:rounded-[100px] overflow-hidden border-8 border-white shadow-2xl group"
             >
-              <Image src="/images/about/premium.png" alt="Premium Path" fill className="object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
+              <Image src="/images/about/identity-routine.png" alt="Prescription Step" fill className="object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
               <div className="absolute inset-0 bg-gradient-to-t from-obsidian/40 via-transparent to-transparent" />
               <div className="absolute bottom-10 left-10 p-8 bg-white/80 backdrop-blur-xl border border-line rounded-[40px] max-w-xs shadow-xl">
-                <p className="text-sm font-black text-obsidian italic leading-relaxed">"현실에서 벗어나 마주하는 진정한 본질의 회복과 치유"</p>
+                <p className="text-sm font-black text-obsidian italic leading-relaxed">"오늘의 실천이 만드는 가장 확실한 내일의 회복"</p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Step 4. 케어 */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="lg:col-span-7 relative aspect-[4/3] rounded-[60px] md:rounded-[100px] overflow-hidden border-8 border-white shadow-2xl group order-2 lg:order-1"
+            >
+              <Image src="/images/about/identity-plan.png" alt="Care Step" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+              <div className="absolute inset-0 bg-gradient-to-t from-chapter-accent/20 via-transparent to-transparent" />
+              <div className="absolute bottom-10 right-10 p-8 bg-white/80 backdrop-blur-xl border border-line rounded-[40px] max-w-xs text-right shadow-xl">
+                <p className="text-sm font-black text-obsidian italic leading-relaxed">"더 깊은 회복이 필요한 당신을 위한 1:1 전담 케어"</p>
+              </div>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="lg:col-span-5 space-y-12 order-1 lg:order-2"
+            >
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
+                  <ShieldCheck className="w-4 h-4 text-chapter-accent" />
+                  <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 04</span>
+                </div>
+                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Care</h3>
+                <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
+                  케어: <br /> 당신만을 위한 프라이빗 연결
+                </p>
+                <p className="text-lg text-slate/70 leading-relaxed font-medium">
+                  더 깊은 관리가 필요한 순간, 당신만을 위한 프라이빗 상담이 연결됩니다. 유니클의 전문가들이 당신의 완전한 회복을 끝까지 책임집니다.
+                </p>
               </div>
             </motion.div>
           </div>
@@ -427,11 +425,11 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-10"
             >
-              <h2 className="text-4xl xs:text-5xl sm:text-7xl md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian">
-                CHOOSE YOUR <br />
-                <span className="text-chapter-accent">RECOVERY PATH.</span>
+              <h2 className="text-4xl xs:text-5xl sm:text-7xl md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian uppercase">
+                Life Starts <br />
+                <span className="text-chapter-accent">With Record.</span>
               </h2>
-              <p className="text-2xl md:text-5xl text-slate/40 font-black tracking-tight italic">당신께 필요한 회복의 경로, 지금 확인하시겠습니까?</p>
+              <p className="text-2xl md:text-5xl text-slate/40 font-black tracking-tight italic">나를 먼저 이해하는 습관. 유니클이 제안하는 새로운 회복의 기준입니다.</p>
             </motion.div>
 
             <motion.div 

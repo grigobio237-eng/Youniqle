@@ -71,18 +71,23 @@ function SearchParamsHandler({
   onOpenSound?: () => void;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    if (searchParams?.get('action') === 'webtoon') {
+    const action = searchParams?.get('action');
+    const tool = searchParams?.get('tool');
+
+    if (action === 'webtoon') {
       onOpenWebtoon();
-    }
-    if (searchParams?.get('action') === 'diagnose') {
+      router.replace('/', { scroll: false });
+    } else if (action === 'diagnose') {
       onDiagnose();
-    }
-    if (searchParams?.get('tool') === 'sound') {
+      router.replace('/', { scroll: false });
+    } else if (tool === 'sound') {
       onOpenSound?.();
+      router.replace('/', { scroll: false });
     }
-  }, [searchParams, onOpenWebtoon, onDiagnose, onOpenSound]);
+  }, [searchParams, onOpenWebtoon, onDiagnose, onOpenSound, router]);
 
   return null;
 }

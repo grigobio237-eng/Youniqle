@@ -67,7 +67,7 @@ export default function Header() {
 
   const menuItems = [
     { label: 'Youniqle?', href: '/about', desc: '브랜드 및 회복 경로 소개' },
-    { label: '진단', href: '/ai-navigator', desc: '맞춤 회복 루틴 안내' },
+    { label: '라이프 가이드', href: '/ai-navigator', desc: '데이터 기반 맞춤 루틴 제안' },
     { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
     { label: '힐링 라운지', href: '/products', desc: '프리미엄 회복 공간 및 프로그램' },
     { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
