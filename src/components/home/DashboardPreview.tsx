@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Music, Scan, Layout, Sparkles, Activity } from 'lucide-react';
+import { ChevronRight, Music, Scan, Layout, Sparkles, Activity, Zap, CheckCircle2, Crown, Archive } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import DiagnosisForm from './DiagnosisForm';
 import { useRecovery } from '@/contexts/RecoveryContext';
@@ -14,16 +14,20 @@ import DiagnosisBasedRecommendations from '@/components/personalization/Diagnosi
 import HabitAlertBanner from '@/components/home/HabitAlertBanner';
 import MealNutrientChart from '@/components/dashboard/MealNutrientChart';
 import ActionableInsightCard from '@/components/dashboard/ActionableInsightCard';
-import { getUserProgress, getChecklistProgress, updateChecklist, getTierChecklist } from '@/lib/progress';
+import { getUserProgress, getChecklistProgress, updateChecklist, getTierChecklist, saveUserProgress, type TierType } from '@/lib/progress';
 import { AccessControl } from '@/lib/logic/access-control';
-import { ClipboardList, Stethoscope, HeartPulse, MessageSquare, Lock } from 'lucide-react';
+import { ClipboardList, Stethoscope, HeartPulse, MessageSquare, Lock, ArrowRight } from 'lucide-react';
+import FlowTimeline from './FlowTimeline';
+import { generateDynamicRoutines, getRhythmTypeInfo } from '@/lib/logic/routines';
+import { AnalysisResult } from './HeroScanner';
 
 interface DashboardPreviewProps {
   unifiedData: any;
   onOpenWebtoon: () => void;
+  onRefresh?: () => void;
 }
 
-export default function DashboardPreview({ unifiedData, onOpenWebtoon }: DashboardPreviewProps) {
+export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh }: DashboardPreviewProps) {
   const [progress, setProgress] = React.useState<any>(null);
   const [checklistProgress, setChecklistProgress] = React.useState({ completed: 0, total: 4, percentage: 0 });
   const [isRecoveryActive, setIsRecoveryActive] = React.useState(false);
@@ -33,6 +37,9 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
   const [diagnosisQuestions, setDiagnosisQuestions] = React.useState<any[]>([]);
   const [isDiagnosing, setIsDiagnosing] = React.useState(false);
   const [currentTheme, setCurrentTheme] = React.useState<string>('');
+  const [flowData, setFlowData] = React.useState<any[]>([]);
+  const [currentJourneyDay, setCurrentJourneyDay] = React.useState(0);
+  const [showD3Reward, setShowD3Reward] = React.useState(false);
 
   const handleStartDiagnosis = async () => {
     setIsDiagnosing(true);
@@ -53,14 +60,13 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
       }
     } catch (error) {
       console.error('Failed to fetch dynamic questions:', error);
-      alert('진단 문항을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+      alert('리듬체크 문항을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsDiagnosing(false);
     }
   };
 
   const handleDiagnosisComplete = async (rawScore: number, finalAnswers: any[], note: string) => {
-    // 160점 만점(10점 * 16문항)을 100점 만점으로 환산
     const totalPossible = diagnosisQuestions.length * 10;
     const unifiedScore = Math.round((rawScore / totalPossible) * 100);
 
@@ -80,10 +86,13 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                 sleep: unifiedScore
               }
             },
-            answers: finalAnswers.reduce((acc, curr) => {
-              acc[curr.questionId] = curr.score;
-              return acc;
-            }, {})
+            answers: finalAnswers.map(a => ({
+              questionId: a.questionId,
+              category: a.category,
+              score: a.score,
+              answer: a.answer,
+              detail: a.detail
+            }))
           })
         });
       } catch (error) {
@@ -93,43 +102,176 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
 
     localStorage.setItem('recovery_last_score', unifiedScore.toString());
     setShowDiagnosisModal(false);
-    alert('오늘의 회복 진단이 기록되었습니다!');
-    window.location.reload();
+    
+    if (onRefresh) {
+      onRefresh(); // Trigger real-time sync instead of reload
+    } else {
+      window.location.reload();
+    }
   };
+
+  const { score, insights, recentActivity, user, surveyReport, activeMedicalGuide, activeRecoveryPlan, checklistStatus, assetStats } = unifiedData;
+  const userTier = (user?.grade || 'NONE') as TierType;
+  const displayScore = score?.totalScore || 0;
+  const levelInfo = getLevelInfo(displayScore);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       setProgress(getUserProgress());
-      setChecklistProgress(getChecklistProgress());
+      setChecklistProgress(getChecklistProgress(userTier));
       setIsRecoveryActive(localStorage.getItem('recovery_mode') === 'active');
     }
+  }, [userTier]);
+
+  const fetchedRef = React.useRef(false);
+
+  // Fetch Real Flow Data
+  React.useEffect(() => {
+    async function fetchFlowData() {
+      if (fetchedRef.current) return;
+      fetchedRef.current = true;
+      
+      try {
+        const res = await fetch('/api/recovery/score');
+        if (res.ok) {
+          const { scores } = await res.json();
+          if (scores && scores.length > 0) {
+            // Filter out incomplete records (score > 0) and take the MOST RECENT 7
+            const validScores = scores.filter((s: any) => s.totalScore > 0);
+            const recentScores = validScores.slice(-7);
+
+            const mappedData = recentScores.map((s: any, idx: number) => ({
+              day: idx + 1,
+              date: s.date,
+              type: s.snapData?.type || 'TEXT',
+              rhythmScore: s.totalScore
+            }));
+            setFlowData(mappedData);
+            setCurrentJourneyDay(mappedData.length);
+          } else {
+            setFlowData([]);
+            setCurrentJourneyDay(0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch flow data:', err);
+      }
+    }
+    fetchFlowData();
   }, []);
 
-  const handleChecklistItem = (item: string, points: number) => {
-    const updated = updateChecklist(item as any, points);
-    setProgress(updated);
-    setChecklistProgress(getChecklistProgress());
+  // D3 미니 보상 체크
+  React.useEffect(() => {
+    if (currentJourneyDay === 3 && !localStorage.getItem('d3_reward_shown')) {
+      setShowD3Reward(true);
+      localStorage.setItem('d3_reward_shown', 'true');
+    }
+  }, [currentJourneyDay]);
+
+  // Sync server checklist status with local progress
+  React.useEffect(() => {
+    if (unifiedData?.checklistStatus && typeof window !== 'undefined') {
+      const serverStatus = unifiedData.checklistStatus;
+      const currentProgress = getUserProgress();
+      
+      // Update local checklist based on server data
+      let changed = false;
+      Object.entries(serverStatus).forEach(([key, isDone]) => {
+        if (isDone && !currentProgress.todayChecklist[key as keyof typeof currentProgress.todayChecklist]) {
+          currentProgress.todayChecklist[key as keyof typeof currentProgress.todayChecklist] = true;
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        saveUserProgress(currentProgress);
+        setProgress(currentProgress);
+        setChecklistProgress(getChecklistProgress(userTier));
+      }
+    }
+  }, [unifiedData, userTier]);
+
+  const handleChecklistItemClick = (itemId: string, isChecked: boolean) => {
+    if (isChecked) {
+        // Already completed - maybe show a toast or just stay
+        return;
+    }
+
+    // Smart Navigation based on item ID
+    switch (itemId) {
+        case 'diagnosis':
+            window.location.href = '/diagnosis?type=daily';
+            break;
+        case 'aiAdvice':
+            // Scroll to AI Insights section
+            const insightSection = document.getElementById('ai-insights');
+            if (insightSection) {
+                insightSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            }
+            break;
+        case 'content':
+            onOpenWebtoon();
+            break;
+        case 'routine':
+            // Scroll to routines section
+            const routineSection = document.getElementById('today-routines');
+            if (routineSection) {
+                routineSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 1200, behavior: 'smooth' });
+            }
+            break;
+        case 'utility':
+            window.location.href = '/utils';
+            break;
+        case 'mealScan':
+            window.location.href = '/utils/food-scanner';
+            break;
+        case 'soundTherapy':
+            window.location.href = '/?tool=sound';
+            break;
+        case 'postureScan':
+            window.location.href = '/utils?tool=posture';
+            break;
+        default:
+            // For any other items, we can just navigate to utils or general dashboard
+            window.location.href = '/utils';
+            break;
+    }
   };
 
-  const { score, insights, recentActivity, user, surveyReport, activeMedicalGuide, activeRecoveryPlan } = unifiedData;
-  const displayScore = score.totalScore;
-  const levelInfo = getLevelInfo(displayScore);
+
+  // Dynamic routine generation considering scan results
+  const latestScanEntry = unifiedData.recentActivity?.find((a: any) => 
+    ['MEAL', 'SPACE', 'STATE', 'POSTURE', 'POST_OP', 'HYDRATION', 'SKIN', 'SLEEP', 'ACTIVITY', 'ROUTINE', 'BODY'].includes(a.type) && a.metrics?.futureDirection
+  );
+  
+  const latestScan = latestScanEntry ? {
+    futureDirection: latestScanEntry.metrics.futureDirection,
+    type: latestScanEntry.type,
+    matchScore: latestScanEntry.score,
+    summary: latestScanEntry.summary
+  } : null;
+
+  const dynamicRoutines = generateDynamicRoutines(displayScore, latestScan as any);
+  const todayRoutines = dynamicRoutines.map(r => r.text);
 
   // Constants for membership etc.
   const streak = user?.gamification?.currentStreak || 0;
   const totalPoints = user?.points || 0;
   const membershipLevel = user?.passInfo?.type && user?.passInfo?.type !== 'NONE' ? user.passInfo.type : 'GATE';
   const pointsToNext = 100 - (totalPoints % 100);
-  const userTier = AccessControl.getUserGroup(user || {});
   const tierChecklist = getTierChecklist(userTier);
 
   // 티어별 환영 메시지 및 색상
-  const tierConfig: Record<string, { color: string; bg: string; message: string; emoji: string }> = {
-    NONE: { color: 'text-slate-500', bg: 'bg-slate-100', message: '회복의 여정을 시작해 보세요', emoji: '🌱' },
-    RESET: { color: 'text-blue-600', bg: 'bg-blue-50', message: '회복의 시작을 응원합니다', emoji: '💧' },
-    REBORN: { color: 'text-emerald-600', bg: 'bg-emerald-50', message: '꾸준한 회복이 성과로 나타나고 있어요', emoji: '🌿' },
-    RESTART: { color: 'text-amber-600', bg: 'bg-amber-50', message: '전문가 수준의 회복 여정을 진행 중입니다', emoji: '⚡' },
-    BLACK: { color: 'text-obsidian', bg: 'bg-obsidian/5', message: '전담 매니저가 당신의 회복을 모니터링 중입니다', emoji: '👑' },
+  const tierConfig: Record<string, { color: string; bg: string; message: string; charImg: string }> = {
+    NONE: { color: 'text-slate-500', bg: 'bg-slate-100', message: '회복의 여정을 시작해 보세요', charImg: '/images/characters/char_todo.png' },
+    RESET: { color: 'text-blue-600', bg: 'bg-blue-50', message: '회복의 시작을 응원합니다', charImg: '/images/characters/char_water.png' },
+    REBORN: { color: 'text-emerald-600', bg: 'bg-emerald-50', message: '꾸준한 회복이 성과로 나타나고 있어요', charImg: '/images/characters/char_weather.png' },
+    RESTART: { color: 'text-amber-600', bg: 'bg-amber-50', message: '전문가 수준의 회복 여정을 진행 중입니다', charImg: '/images/characters/char_stretch.png' },
+    BLACK: { color: 'text-obsidian', bg: 'bg-obsidian/5', message: '전담 매니저가 당신의 회복을 모니터링 중입니다', charImg: '/images/characters/char_scanner.png' },
   };
   const currentTierConfig = tierConfig[userTier] || tierConfig['NONE'];
 
@@ -159,71 +301,41 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         </section>
       )}
 
-      {/* 🏥 Medical Consultation Guide Section - NEW */}
-      {activeMedicalGuide && (
-        <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="bg-white border-2 border-chapter-accent/30 rounded-[24px] md:rounded-[40px] p-5 md:p-10 shadow-2xl shadow-chapter-accent/5 relative overflow-hidden group hover:border-chapter-accent transition-all">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-chapter-accent/5 rounded-full blur-3xl -mr-24 -mt-24" />
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-10">
-              <div className="flex items-center gap-4 md:gap-8">
-                <div className="w-14 h-14 md:w-20 md:h-20 bg-chapter-accent/10 rounded-2xl md:rounded-3xl flex items-center justify-center text-3xl md:text-4xl shadow-inner group-hover:scale-110 transition-transform">
-                  🏥
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-chapter-accent text-white border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">Pre-Procedure Guide</Badge>
-                    <span className="text-[10px] text-slate font-black uppercase tracking-widest opacity-60">Status: Intelligence Ready</span>
-                  </div>
-                  <h3 className="text-xl md:text-3xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">
-                    병원 방문 필수 가이드가 도착했습니다
-                  </h3>
-                  <p className="text-slate font-medium text-sm md:text-base leading-relaxed max-w-xl">
-                    유니클이 설계한 {activeMedicalGuide.medicalCategory === 'PLASTIC' ? '성형/피부' : '전문의'} 상담 전용 리포트입니다. 의료진에게 질문해야 할 최적의 목록을 확인하세요.
-                  </p>
-                </div>
-              </div>
-              <Button asChild className="h-12 px-6 text-sm md:h-16 md:px-10 md:text-lg bg-chapter-accent text-white rounded-2xl font-black shadow-xl hover:scale-105 transition-all shrink-0">
-                <Link href={`/event/consultation/report/${activeMedicalGuide._id}`}>
-                  가이드 보기
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* 🏥 Medical Consultation Guide Section - HIDDEN FOR MVP PHASE */}
+      {/* {activeMedicalGuide && ( ... )} */}
 
-      {/* 🚀 Post-Care Recovery Plan Section - NEW */}
-      {activeRecoveryPlan && (
-        <section className="container mx-auto max-w-5xl px-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="bg-obsidian border-2 border-primary/30 rounded-[24px] md:rounded-[40px] p-5 md:p-10 shadow-2xl relative overflow-hidden group hover:border-primary transition-all">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-3xl -mr-24 -mt-24" />
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-10">
-              <div className="flex items-center gap-4 md:gap-8">
-                <div className="w-14 h-14 md:w-20 md:h-20 bg-primary/20 rounded-2xl md:rounded-3xl flex items-center justify-center text-3xl md:text-4xl shadow-inner group-hover:scale-110 transition-transform">
-                  🩹
+      {/* 🚀 Post-Care Recovery Plan Section - HIDDEN FOR MVP PHASE */}
+      {/* {activeRecoveryPlan && ( ... )} */}
+
+      {/* 🚀 Lifecare OS Upgrade Banner - NEW (Added for high visibility) */}
+      <section className="container mx-auto max-w-5xl px-4 pt-8">
+        <Link href="/membership" className="group block">
+          <div className="bg-obsidian rounded-[32px] md:rounded-[48px] p-6 md:p-10 relative overflow-hidden shadow-2xl border border-white/5 group-hover:border-primary/30 transition-all">
+            {/* Background Effects */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/30 transition-colors" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/10 blur-[80px] rounded-full -ml-16 -mb-16" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 rounded-full flex items-center justify-center shadow-inner backdrop-blur-xl group-hover:scale-110 transition-transform overflow-hidden border-2 border-white/20">
+                  <img src={currentTierConfig.charImg} alt="Tier Icon" className="w-full h-full object-cover" />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-primary text-obsidian border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">Recovery Roadmap</Badge>
-                    <span className="text-[10px] text-mist font-black uppercase tracking-widest opacity-60">Tracking: Active Phase</span>
+                <div className="space-y-1 text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start gap-3">
+                    <Badge className="bg-primary text-obsidian border-none font-black text-[10px] tracking-widest uppercase px-3 py-1">Lifecare OS</Badge>
+                    <span className={`text-lg md:text-xl font-black uppercase tracking-tighter ${currentTierConfig.color}`}>{membershipLevel} v2.5</span>
                   </div>
-                  <h3 className="text-xl md:text-3xl font-black text-mist tracking-tighter italic font-serif leading-tight">
-                    1:1 개인화 회복 로드맵
-                  </h3>
-                  <p className="text-mist/70 font-medium text-sm md:text-base leading-relaxed max-w-xl">
-                    {activeRecoveryPlan.procedureType} 후 집중 관리가 필요한 단계입니다. AI 리커버리 전문가가 제안하는 일자별 회복 가이드를 따라보세요.
-                  </p>
+                  <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">나의 회복 기록, 영구 보관하기</h3>
+                  <p className="text-white/40 text-xs md:text-sm font-bold">기록이 사라지지 않게 저장하고 전문가의 심층 분석을 받아보세요.</p>
                 </div>
               </div>
-              <Button asChild className="h-12 px-6 text-sm md:h-16 md:px-10 md:text-lg bg-primary text-obsidian rounded-2xl font-black shadow-xl hover:scale-105 transition-all shrink-0">
-                <Link href={`/event/post-care/report/${activeRecoveryPlan._id}`}>
-                  로드맵 열기
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2 bg-white text-obsidian px-6 py-3 md:px-8 md:py-4 rounded-2xl font-black text-sm md:text-base group-hover:bg-primary group-hover:text-white transition-all shadow-xl group-hover:scale-105 group-hover:border group-hover:border-white/20">
+                멤버십 혜택 확인하기 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
           </div>
-        </section>
-      )}
+        </Link>
+      </section>
 
       {/* Existing Survey Report */}
       {surveyReport && (
@@ -264,35 +376,51 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         </section>
       )}
 
-      {/* Top Status Card - Enhanced with Composite Score */}
+
       <section className="bg-white border-b border-line py-8 px-4 md:py-16">
         <div className="container mx-auto max-w-5xl">
           <div className="grid grid-cols-1 gap-10 items-stretch">
             <div className="space-y-8">
               <div className="flex items-center gap-4 md:gap-8">
-                <div className={`w-20 h-20 md:w-36 md:h-36 rounded-[24px] md:rounded-[48px] ${levelInfo.bg} flex items-center justify-center text-4xl md:text-6xl shadow-xl border border-line animate-in zoom-in-50 duration-500`}>
-                  {levelInfo.char}
+                <div className={`w-24 h-24 md:w-40 md:h-40 rounded-full ${levelInfo.bg} flex items-center justify-center shadow-2xl border-4 border-white animate-in zoom-in-50 duration-500 overflow-hidden relative group`}>
+                  <img 
+                    src={levelInfo.charImg} 
+                    alt={levelInfo.level} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
+                <div className="space-y-4 flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
                     <span className={`text-lg md:text-2xl font-black ${levelInfo.color}`}>{levelInfo.level}</span>
-                    <Badge className="bg-obsidian text-mist border-none text-[10px] px-3 py-1 uppercase tracking-widest font-black">Unified Score v2</Badge>
+                    <Badge className="bg-obsidian text-mist border-none text-[10px] px-3 py-1 uppercase tracking-widest font-black">Rhythm Flow v2</Badge>
+                    <Link href="/archive">
+                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px] px-3 py-1 uppercase tracking-widest font-black hover:bg-primary/10 transition-colors cursor-pointer">
+                        <Archive className="w-3 h-3 mr-1.5" />
+                        보관함 자산: {(assetStats?.precisionDiagnosis || 0) + (assetStats?.dailyRhythmLog || 0) + (assetStats?.scannerAnalysis || 0) + (assetStats?.toolkitUsage || 0) + (assetStats?.consultations || 0) + (assetStats?.reports || 0)}건
+                      </Badge>
+                    </Link>
                   </div>
                   <h2 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter flex items-baseline gap-3">
                     {displayScore}
-                    <span className="text-sm md:text-xl font-bold opacity-20 tracking-normal">OVERALL SCORE</span>
+                    <span className="text-sm md:text-xl font-bold opacity-20 tracking-normal uppercase">Recovery Score</span>
                   </h2>
 
-                  {/* Score Breakdown visualization */}
-                  <div className="pt-2 md:pt-4 flex items-center gap-3 md:gap-6">
+                  {/* Asset-driven Status visualization */}
+                  <div className="pt-2 md:pt-4 flex items-center gap-6 md:gap-10">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40">Diagnosis (70%)</p>
-                      <p className="text-sm md:text-base font-black text-obsidian">{score.diagnosisScore} <span className="text-[10px] opacity-30">PT</span></p>
+                      <p className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40">리듬체크 자산</p>
+                      <p className="text-sm md:text-xl font-black text-obsidian">{assetStats?.totalInsights || 0} <span className="text-[10px] opacity-30">PT</span></p>
                     </div>
                     <div className="w-px h-8 bg-line" />
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40">Scans (30%)</p>
-                      <p className="text-sm md:text-base font-black text-obsidian">{score.scanScore} <span className="text-[10px] opacity-30">PT</span></p>
+                      <p className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40">나의 회복 등급</p>
+                      <p className="text-sm md:text-xl font-black text-primary">TRUSTED</p>
+                    </div>
+                    <div className="hidden md:block w-px h-8 bg-line" />
+                    <div className="hidden md:block space-y-1">
+                      <p className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40">최근 업데이트</p>
+                      <p className="text-sm md:text-base font-black text-obsidian/60">방금 전</p>
                     </div>
                   </div>
                 </div>
@@ -307,18 +435,88 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                   <p className="text-xl md:text-3xl font-black text-obsidian">{streak}일 연속</p>
                   <p className="text-xs text-slate font-medium mt-1">당신의 회복 속도가 일정해지고 있습니다.</p>
                 </div>
-                <div className="premium-card p-5 md:p-8 bg-mist/30 rounded-[20px] md:rounded-[32px] border border-line">
+                <Link href="/membership" className="premium-card p-5 md:p-8 bg-mist/30 rounded-[20px] md:rounded-[32px] border border-line hover:border-primary/50 transition-all group/tier">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-[10px] font-black text-slate uppercase tracking-widest">Membership Tier</span>
-                    <span className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">{currentTierConfig.emoji}</span>
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover/tier:scale-110 transition-transform overflow-hidden border border-line">
+                      <img src={currentTierConfig.charImg} alt="Tier Icon" className="w-full h-full object-cover" />
+                    </div>
                   </div>
-                  <p className={`text-xl md:text-3xl font-black uppercase tracking-tighter ${currentTierConfig.color}`}>{membershipLevel}</p>
-                  <p className="text-xs text-slate font-medium mt-1">{currentTierConfig.message}</p>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className={`text-xl md:text-3xl font-black uppercase tracking-tighter ${currentTierConfig.color}`}>{membershipLevel}</p>
+                      <p className="text-xs text-slate font-medium mt-1">{currentTierConfig.message}</p>
+                    </div>
+                    <div className="text-[10px] font-black text-primary uppercase tracking-widest group-hover/tier:translate-x-1 transition-transform flex items-center gap-1">
+                      UPGRADE <ChevronRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+              </div>
+
+              {/* 🎯 오늘의 실천 루틴 (Action Protocol) - NEW */}
+              <div id="today-routines" className="bg-white border-2 border-primary/20 rounded-[32px] p-8 shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mt-16" />
+                <div className="relative z-10 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-primary" />
+                      오늘의 회복 루틴 <span className="text-[10px] text-slate/40 font-bold uppercase tracking-widest ml-2">Protocol</span>
+                    </h3>
+                    <Badge className="bg-primary text-white border-none text-[10px] font-black px-3">AI 최적화</Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(insights.posture?.habits || todayRoutines).slice(0, 3).map((routine: string, i: number) => {
+                      const isDone = unifiedData.completedRoutines?.includes(routine);
+                      return (
+                        <motion.button
+                          key={i}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={async () => {
+                            try {
+                              const res = await fetch('/api/user/complete-routine', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ routineId: routine })
+                              });
+                              if (res.ok) {
+                                window.location.reload(); // Quick sync
+                              }
+                            } catch (err) {
+                              console.error('Failed to complete routine:', err);
+                            }
+                          }}
+                          className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
+                            isDone 
+                              ? 'bg-primary/10 border-primary shadow-inner' 
+                              : 'bg-mist/30 border-line hover:border-primary/30'
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${
+                            isDone ? 'bg-primary text-white' : 'bg-white text-slate'
+                          }`}>
+                            <CheckCircle2 className="w-4 h-4" />
+                          </div>
+                          <span className={`text-xs md:text-sm font-black text-left ${isDone ? 'text-primary' : 'text-obsidian'}`}>
+                            {routine}
+                          </span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-slate/40 font-bold text-center">미션을 모두 완료하면 일일 리듬체크리스트가 자동으로 채워집니다.</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* 📊 7-Day Recovery Flow Section (D6-7) */}
+      <section className="container mx-auto px-4 py-16 max-w-5xl">
+        <FlowTimeline data={flowData} currentDay={currentJourneyDay} />
       </section>
 
       {/* 🔵 Actionable Insights Section - NEW */}
@@ -359,19 +557,22 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
             className="bg-obsidian text-background font-black rounded-[24px] h-20 px-12 shadow-2xl hover:scale-105 transition-transform text-lg italic tracking-widest flex flex-col items-center justify-center gap-0"
             onClick={() => window.location.href = '/diagnosis?type=daily'}
           >
-            <span className="text-[10px] text-reward-gold not-italic tracking-[0.2em] mb-1">GET 100 RECOVERY PT</span>
-            1일 회복 진단 시작
+            <span className="text-[10px] text-reward-gold not-italic tracking-[0.2em] mb-1">RECOVER YOUR RHYTHM</span>
+            오늘의 리듬체크 시작
           </Button>
-          <Button
-            onClick={onOpenWebtoon}
-            className="flex items-center gap-4 px-10 h-20 rounded-[24px] bg-white border border-line text-obsidian font-black cursor-pointer hover:bg-mist/10 transition-all shadow-xl group"
-          >
-            <span className="text-3xl group-hover:rotate-12 transition-transform">🎨</span>
-            <div className="text-left">
-              <p className="text-[10px] opacity-40 uppercase font-black">Daily Content</p>
-              <p className="text-lg">웹툰 챌린지 시작하기</p>
-            </div>
-          </Button>
+          
+          {(userTier === 'RESTART' || userTier === 'BLACK') && (
+            <Button
+              onClick={onOpenWebtoon}
+              className="flex items-center gap-4 px-10 h-20 rounded-[24px] bg-white border border-line text-obsidian font-black cursor-pointer hover:bg-mist/10 transition-all shadow-xl group"
+            >
+              <span className="text-3xl group-hover:rotate-12 transition-transform">🎨</span>
+              <div className="text-left">
+                <p className="text-[10px] opacity-40 uppercase font-black">Daily Content</p>
+                <p className="text-lg">웹툰 챌린지 시작하기</p>
+              </div>
+            </Button>
+          )}
         </div>
       </section>
 
@@ -380,7 +581,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <div className="bg-white rounded-[48px] shadow-sm border border-line p-5 md:p-12">
           <div className="flex justify-between items-end mb-6 md:mb-12">
             <div>
-              <h2 className="text-xl md:text-3xl font-black text-obsidian tracking-tight mb-2">✅ 일일 회복 체크리스트</h2>
+              <h2 className="text-xl md:text-3xl font-black text-obsidian tracking-tight mb-2">✅ 일일 리듬체크리스트</h2>
               <p className="text-sm text-slate font-medium">매일의 작은 기록이 당신의 등급을 결정합니다.</p>
             </div>
             <div className="text-right">
@@ -405,17 +606,23 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                                 ? `${bgColors[colorIdx]}/5 ${borderColors[colorIdx]}` 
                                 : `bg-mist/30 border-line ${hoverBorderColors[colorIdx]}`
                         }`}
-                        onClick={() => !isChecked && handleChecklistItem(item.id as any, item.points)}
+                        onClick={() => handleChecklistItemClick(item.id, !!isChecked)}
                     >
                         <div className="flex items-center gap-3 md:gap-5">
-                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm text-base md:text-lg font-black ${
-                                isChecked ? `${bgColors[colorIdx]} text-mist` : 'bg-white text-slate border border-line'
+                            <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center shadow-sm overflow-hidden transition-all ${
+                                isChecked ? `${bgColors[colorIdx]} border-2 border-white` : 'bg-white border border-line'
                             }`}>
-                                {isChecked ? '✓' : item.emoji}
+                                {isChecked ? (
+                                    <span className="text-white text-lg font-black">✓</span>
+                                ) : (
+                                    <img src={item.charImg} alt={item.label} className="w-full h-full object-cover" />
+                                )}
                             </div>
                             <div>
                                 <h3 className="font-black text-obsidian">{item.label}</h3>
-                                <p className="text-xs text-slate font-medium">미션 완료 시 포인트 적립</p>
+                                <p className="text-xs text-slate font-medium">
+                                    {isChecked ? '미션 완료! 포인트 적립됨' : '미션 수행하러 가기'}
+                                </p>
                             </div>
                         </div>
                         <span className={`text-sm font-black ${accentColors[colorIdx]}`}>+{item.points}pt</span>
@@ -427,11 +634,15 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
       </section>
 
       {/* AI Manager Insight Section */}
-      <section className="container mx-auto px-4 pb-8 max-w-5xl">
+      <section id="ai-insights" className="container mx-auto px-4 pb-8 max-w-5xl">
         <Card className="bg-white border border-line rounded-[48px] overflow-hidden shadow-sm hover:shadow-xl transition-all">
           <CardContent className="p-5 md:p-12 flex flex-col md:flex-row items-center gap-4 md:gap-12">
-            <div className="w-16 h-16 md:w-28 md:h-28 bg-mist rounded-[20px] md:rounded-[36px] flex items-center justify-center text-4xl md:text-6xl shadow-inner shrink-0 animate-in fade-in duration-700">
-              🤖
+            <div className="w-20 h-20 md:w-32 md:h-32 bg-mist rounded-[24px] md:rounded-[40px] flex items-center justify-center shadow-inner shrink-0 animate-in fade-in duration-700 overflow-hidden border border-line/50">
+              <img 
+                src="/images/characters/char_dday.png" 
+                alt="Youniqle Manager" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
@@ -451,9 +662,9 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
                 }
               </p>
               {(userTier === 'RESET' || userTier === 'REBORN' || userTier === 'NONE') && (
-                <p className="mt-4 text-xs text-chapter-accent font-bold flex items-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  리스타트 등급 이상에서 상세 수치 기반 리포트를 확인할 수 있습니다.
+                <p className="mt-4 text-xs text-slate/40 font-bold flex items-center gap-1">
+                  <Lock className="w-3 h-3 opacity-50" />
+                  기본 분석 리포트 제공 중 (리스타트 등급 이상에서 정밀 수치 데이터가 활성화됩니다)
                 </p>
               )}
             </div>
@@ -494,7 +705,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         <h2 className="text-xl md:text-2xl font-black text-obsidian mb-10 tracking-tight">System Navigation</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {[
-            { label: 'Youniqle 진단', href: '/ai-navigator', icon: <MessageSquare className="w-5 h-5 md:w-6 md:h-6" /> },
+            { label: '리듬체크', href: '/ai-navigator', icon: <MessageSquare className="w-5 h-5 md:w-6 md:h-6" /> },
             { label: '면담 가이드', href: activeMedicalGuide ? `/event/consultation/report/${activeMedicalGuide._id}` : '/event/consultation', icon: <ClipboardList className="w-5 h-5 md:w-6 md:h-6" /> },
             { label: '회복 로드맵', href: activeRecoveryPlan ? `/event/post-care/report/${activeRecoveryPlan._id}` : '/event/post-care', icon: <HeartPulse className="w-5 h-5 md:w-6 md:h-6" /> },
             { label: '스캔 타임라인', href: '/timeline', icon: <Activity className="w-5 h-5 md:w-6 md:h-6" /> },
@@ -511,51 +722,106 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon }: Dashboa
         </div>
 
         {/* 🎁 Moved Reward Pool Section */}
-        <div className="mt-12 bg-obsidian text-mist rounded-[32px] md:rounded-[48px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between shadow-3xl relative overflow-hidden group">
-          <div className="absolute -right-8 -bottom-8 w-64 h-64 bg-reward-gold/5 rounded-full blur-3xl group-hover:bg-reward-gold/10 transition-all" />
-          <div className="space-y-6 relative z-10 w-full md:w-auto">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] opacity-60 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-reward-gold" /> Reward Pool
-            </h3>
-            <div className="flex flex-col gap-2">
-              <span className="text-4xl md:text-6xl font-black tracking-tighter tabular-nums">
-                {totalPoints} <span className="text-sm md:text-xl font-bold opacity-40 tracking-normal">RECOVERY PT</span>
-              </span>
-              <div className="w-full md:w-80 bg-white/5 h-2 rounded-full overflow-hidden border border-white/10 mt-2">
-                <motion.div
-                  className="bg-reward-gold h-full rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)]"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(totalPoints % 100) || 100}%` }}
-                  transition={{ duration: 2, ease: "circOut" }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="mt-10 md:mt-0 relative z-10 flex flex-col items-center md:items-end gap-4">
-            <Button asChild size="lg" className="h-16 px-12 bg-reward-gold text-obsidian font-black rounded-2xl hover:bg-reward-gold/90 hover:scale-105 transition-all shadow-xl shadow-reward-gold/20">
-              <Link href="/membership">포인트 샵 바로가기</Link>
-            </Button>
-            <p className="text-[10px] opacity-30 font-bold uppercase tracking-[0.4em]">Protocol Alpha-237</p>
-          </div>
-        </div>
+        {/* 🎁 Reward Pool Section - HIDDEN FOR MVP PHASE */}
+        {/* <div className="mt-12 ..."> ... </div> */}
       </section>
 
       <Dialog open={showDiagnosisModal} onOpenChange={setShowDiagnosisModal}>
         <DialogContent className="max-w-xl p-6 overflow-y-auto max-h-[90vh] border-none rounded-[40px] shadow-2xl bg-white">
           <DialogHeader className="sr-only">
-            <DialogTitle>1일 회복진단</DialogTitle>
+            <DialogTitle>1일 리듬체크</DialogTitle>
             <DialogDescription>데이터 기반으로 설계하는 나만의 일상 리듬</DialogDescription>
           </DialogHeader>
           <DiagnosisForm questions={diagnosisQuestions} onComplete={handleDiagnosisComplete} />
         </DialogContent>
       </Dialog>
+
+      {/* 🎁 D3 미니 보상 팝업 - NEW */}
+      <Dialog open={showD3Reward} onOpenChange={setShowD3Reward}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
+          <div className="bg-obsidian p-10 text-center space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+            <div className="relative z-10 flex flex-col items-center space-y-4">
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center text-4xl shadow-2xl backdrop-blur-xl animate-bounce-slow">
+                ✨
+              </div>
+              <div className="space-y-2">
+                <Badge className="bg-primary text-obsidian border-none text-[10px] font-black px-3 py-1 uppercase tracking-widest">Day 03 Complete</Badge>
+                <h2 className="text-3xl font-black text-white tracking-tighter">패턴이 보이기 시작했습니다</h2>
+              </div>
+              <p className="text-white/60 text-sm font-medium leading-relaxed break-keep">
+                벌써 3일째입니다. 당신의 저녁 이후 피로와 감정 흔들림이 함께 나타나는 흐름이 보이기 시작했습니다. 7일 완주까지 조금만 더 힘내세요!
+              </p>
+              <Button 
+                onClick={() => setShowD3Reward(false)}
+                className="w-full h-16 bg-primary text-obsidian rounded-[20px] font-black text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/20"
+              >
+                내 흐름 계속 보기
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* 💎 D3 Reward Modal */}
+      <Dialog open={showD3Reward} onOpenChange={setShowD3Reward}>
+        <DialogContent className="max-w-md bg-mist border-none rounded-[40px] overflow-hidden p-0">
+          <div className="relative p-10 text-center space-y-6">
+            <div className="absolute inset-0 bg-gradient-to-b from-reward-gold/20 to-transparent pointer-events-none" />
+            <div className="relative z-10">
+              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-2xl mb-6 animate-bounce-slow">
+                <span className="text-5xl">💎</span>
+              </div>
+              <h2 className="text-3xl font-black text-obsidian tracking-tighter italic">D3: 패턴의 발견</h2>
+              <p className="text-slate font-medium leading-relaxed break-keep mt-4">
+                축하합니다! 3일간의 꾸준한 기록으로 당신만의 회복 리듬이 보이기 시작했습니다. 
+                <br /><span className="text-chapter-accent font-black">패턴 분석 리포트</span>가 잠금 해제되었습니다.
+              </p>
+              <Button 
+                onClick={() => setShowD3Reward(false)}
+                className="w-full h-16 rounded-2xl bg-obsidian text-white font-black mt-8 shadow-xl"
+              >
+                리포트 확인하기
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 🏁 D7 Weekly Summary Card (Visible only on Day 7) */}
+      {currentJourneyDay === 7 && (
+        <Dialog defaultOpen={true}>
+          <DialogContent className="max-w-md bg-obsidian border-none rounded-[40px] overflow-hidden p-0 text-white">
+            <div className="p-10 text-center space-y-8">
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                <Crown className="w-10 h-10 text-reward-gold" />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-black text-reward-gold uppercase tracking-[0.3em]">Weekly Completion</span>
+                <h2 className="text-4xl font-black italic tracking-tighter font-serif">당신의 일주일은<br />아름다웠습니다</h2>
+              </div>
+              <p className="text-mist/60 text-sm leading-relaxed break-keep">
+                7일간의 기록을 통해 총 <span className="text-white font-bold">12개의 회복 시그널</span>을 발견했습니다. 
+                당신의 회복력은 이전보다 <span className="text-reward-gold font-bold">24% 향상</span>된 것으로 분석됩니다.
+              </p>
+              <div className="pt-4 grid grid-cols-1 gap-3">
+                <Button className="w-full h-14 rounded-xl bg-reward-gold text-obsidian font-black">
+                  7일 완주 증명서 받기
+                </Button>
+                <Button variant="ghost" className="text-white/40 hover:text-white">
+                  다음에 할게요
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
 
 // helper
 function getLevelInfo(score: number) {
-  if (score >= 70) return { level: 'ECO-ZENITH', bg: 'bg-[#E3F2ED] text-[#0E3A3A]', color: 'text-[#0E3A3A]', char: '🌿' };
-  if (score >= 40) return { level: 'RECOVERY-MID', bg: 'bg-[#FFF8E6] text-[#D4AF37]', color: 'text-[#D4AF37]', char: '🧘' };
-  return { level: 'DEEP-SURGE', bg: 'bg-[#FCECEE] text-[#E11D48]', color: 'text-[#E11D48]', char: '🔋' };
+  if (score >= 70) return { level: 'ECO-ZENITH', bg: 'bg-[#E3F2ED]', color: 'text-[#0E3A3A]', charImg: '/images/characters/char_breathing.png' };
+  if (score >= 40) return { level: 'RECOVERY-MID', bg: 'bg-[#FFF8E6]', color: 'text-[#D4AF37]', charImg: '/images/characters/char_stretch.png' };
+  return { level: 'DEEP-SURGE', bg: 'bg-[#FCECEE]', color: 'text-[#E11D48]', charImg: '/images/characters/char_compress.png' };
 }

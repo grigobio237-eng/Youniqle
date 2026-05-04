@@ -9,6 +9,7 @@ import { ChevronLeft, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import Hero from '@/components/home/Hero';
+import LandingContent from '@/components/home/LandingContent';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 import { AnalysisResult } from '@/components/home/HeroScanner';
@@ -16,8 +17,8 @@ const DiagnosisForm = dynamic(() => import('@/components/home/DiagnosisForm'), {
 const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), { ssr: false });
 const DashboardPreview = dynamic(() => import('@/components/home/DashboardPreview'), { ssr: false });
 const WebtoonChallengeDialog = dynamic(() => import('@/components/home/WebtoonChallengeDialog'), { ssr: false });
-const LandingContent = dynamic(() => import('@/components/home/LandingContent'), { ssr: false });
 const SoundTherapy = dynamic(() => import('@/components/utils/SoundTherapy'), { ssr: false });
+const SnapInput = dynamic(() => import('@/components/home/SnapInput'), { ssr: false });
 
 // ---------------------------
 // 2. Welcome Modal Component
@@ -99,7 +100,8 @@ export default function HomePage() {
   const { data: session } = useSession();
   const { journey, medicalCategory, treatmentType } = useRecovery();
   const router = useRouter();
-  const [viewState, setViewState] = React.useState<'INTRO' | 'QUESTION' | 'RESULT'>('INTRO');
+  const [viewState, setViewState] = React.useState<'INTRO' | 'SNAP' | 'QUESTION' | 'RESULT'>('INTRO');
+  const [snapData, setSnapData] = React.useState<{ type: 'PHOTO' | 'TEXT'; content: string | File } | null>(null);
   const [score, setScore] = React.useState(0);
   const [answers, setAnswers] = React.useState<any[]>([]);
   const [userNote, setUserNote] = React.useState('');
@@ -109,6 +111,7 @@ export default function HomePage() {
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
   const [showSoundModal, setShowSoundModal] = useState(false);
   const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const [scannerImage, setScannerImage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // welcome=true 인 경우(신규 가입) → 랜딩 그대로 보여줌
@@ -127,36 +130,49 @@ export default function HomePage() {
 
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
-  const handleStart = async () => {
+  const handleStart = async (data?: AnalysisResult, image?: string) => {
+    if (image) {
+      setScannerImage(image);
+      // Skip the SNAP view and proceed to question generation immediately
+      handleSnapComplete({ type: 'PHOTO', content: image });
+      return;
+    }
+    setViewState('SNAP');
+  };
+
+  const handleSnapComplete = async (data: { type: 'PHOTO' | 'TEXT'; content: string | File }) => {
+    setSnapData(data);
     setIsDiagnosing(true);
     try {
-      // 스캔 결과가 있다면 해당 내용을 키워드로 사용, 없으면 기본 키워드 사용
-      const keywords = analysisData 
-        ? `${analysisData.summary}, ${analysisData.analysisTable?.map(t => t.label).join(', ')}`
-        : "일상 회복, 에너지 레벨, 신체 컨디션";
-
+      // 넥스트 넛지: 스냅 후 리듬체크로 전환
+      const keywords = typeof data.content === 'string' ? data.content : "사진 기록";
+      
+      // 약물 히스토리 가져오기
+      const medHistory = localStorage.getItem('recovery_med_history') || "";
+      
       const res = await fetch('/api/ai/diagnosis/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          theme: analysisData ? "스캔 데이터 기반 정밀 회복 점검" : "60초 초간편 간편 진단",
+          theme: "스냅 기반 맞춤형 리듬체크",
           keywords: keywords,
           journey: journey,
           medicalCategory: medicalCategory,
-          treatmentType: treatmentType
+          treatmentType: treatmentType,
+          medicationHistory: medHistory
         })
       });
       
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setQuestions(data);
+      const resData = await res.json();
+      if (Array.isArray(resData)) {
+        setQuestions(resData);
         setViewState('QUESTION');
       } else {
         throw new Error("질문을 불러오지 못했습니다.");
       }
     } catch (error) {
       console.error("Diagnosis start error:", error);
-      router.push('/dashboard'); // 오류 발생 시에만 대시보드로 이동
+      router.push('/dashboard');
     } finally {
       setIsDiagnosing(false);
     }
@@ -170,9 +186,29 @@ export default function HomePage() {
     
     // 결과 저장 (옵션)
     localStorage.setItem('recovery_last_score', totalScore.toString());
+
+    // 약물 정보가 있다면 별도로 저장하여 다음 질문에 반영
+    const medAnswer = finalAnswers.find(a => a.category === '약물' && a.detail);
+    if (medAnswer?.detail) {
+      localStorage.setItem('recovery_med_history', medAnswer.detail);
+    }
   };
 
   const renderContent = () => {
+    if (viewState === 'SNAP') {
+      return (
+        <SnapInput 
+          onComplete={handleSnapComplete}
+          onCancel={() => {
+            setViewState('INTRO');
+            setScannerImage(undefined);
+          }}
+          initialImage={scannerImage}
+          isDiagnosing={isDiagnosing}
+        />
+      );
+    }
+
     if (viewState === 'QUESTION') {
       return (
         <div className="min-h-screen bg-mist animate-fade-in">
@@ -192,6 +228,7 @@ export default function HomePage() {
             answers={answers} 
             userNote={userNote}
             analysisData={analysisData}
+            snapData={snapData}
             onEnter={() => setViewState('INTRO')}
             onOpenWebtoon={handleOpenWebtoon}
           />

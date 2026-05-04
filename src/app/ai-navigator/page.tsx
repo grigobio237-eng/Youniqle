@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle, Activity, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle, Activity, Image as ImageIcon, CheckCircle2, Lock, Download, Share2, Shield, History, Archive } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ import { useActivityTracker } from '@/hooks/useActivityTracker';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { AccessControl } from '@/lib/logic/access-control';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
-import { Lock } from 'lucide-react';
+
 
 
 // 카테고리별 상태 메시지
@@ -84,6 +84,7 @@ export default function AiNavigatorPage() {
     const [aiAdvice, setAiAdvice] = useState<string>('');
     const [tomorrowForecast, setTomorrowForecast] = useState<any>(null);
     const [isForecastOpen, setIsForecastOpen] = useState(false);
+    const [assetStats, setAssetStats] = useState<any>(null);
 
     const userName = session?.user?.name || '요원';
 
@@ -105,17 +106,26 @@ export default function AiNavigatorPage() {
     const userTier = AccessControl.getUserGroup(session?.user);
     const isClinicLocked = userTier === 'RESET' || userTier === 'NONE';
 
+    const fetchedRef = React.useRef(false);
+
     useEffect(() => {
         setIsMounted(true);
-        fetchData();
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchData();
+        }
     }, []);
 
     const fetchData = async () => {
         setLoading(true);
 
         try {
-            // 1. 타임라인 데이터 가져오기 (실제 DB 데이터)
-            const timelineRes = await fetch('/api/user/timeline');
+            // 1. 타임라인 및 상태 데이터 가져오기 (실제 DB 데이터)
+            const [timelineRes, statusRes] = await Promise.all([
+                fetch('/api/user/timeline'),
+                fetch('/api/user/status')
+            ]);
+
             let latestScore = 0;
             if (timelineRes.ok) {
                 const timelineData = await timelineRes.json();
@@ -123,6 +133,11 @@ export default function AiNavigatorPage() {
                 if (timelineData.timeline?.length > 0) {
                     latestScore = timelineData.timeline[0].score || 0;
                 }
+            }
+
+            if (statusRes.ok) {
+                const statusData = await statusRes.json();
+                setAssetStats(statusData.assetStats);
             }
 
             // localStorage에서 점수 불러오기 (백업용)
@@ -261,24 +276,71 @@ export default function AiNavigatorPage() {
     return (
         <ChapterWrapper chapter="ai-navigator">
             <div className="min-h-screen bg-background text-text-primary pb-20">
-                {/* 1. Analysis Header */}
-                <section className="relative py-16 border-b border-line overflow-hidden">
+                {/* 1. Analysis Header & Asset Dashboard */}
+                <section className="relative py-16 md:py-24 border-b border-line overflow-hidden">
                     <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
                     <div className="container mx-auto px-4 relative z-10">
-                        <div className="max-w-5xl mx-auto space-y-12">
-                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
-                                {/* 왼쪽: 헤더 + 점수 */}
-                                <div className="space-y-6 flex-1">
-                                    <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-black tracking-widest uppercase">
-                                        <Sparkles className="w-3 h-3 mr-2" />
-                                        Real-time Analysis
+                        <div className="max-w-5xl mx-auto">
+                            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-8">
+                                <div className="space-y-4">
+                                    <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
+                                        AI Recovery Navigator
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">{userName} 님의<br />리커버리 네비게이터</h1>
+                                    <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">리듬체크</h1>
+                                    <p className="text-lg md:text-xl text-slate/60 font-bold max-w-xl break-keep">
+                                        당신의 활동은 데이터 <span className="text-obsidian underline underline-offset-4 decoration-primary/30">자산</span>이 되어<br />
+                                        나만의 회복 OS를 완성하는 기반이 됩니다.
+                                    </p>
+                                </div>
+                                
+                                {/* Real-time Asset Summary Dashboard */}
+                                <div className="w-full md:w-auto bg-white rounded-[40px] p-6 border border-obsidian/5 shadow-2xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16" />
+                                    
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">Total Assets</p>
+                                            <div className="flex items-end gap-1">
+                                                <span className="text-4xl font-black text-obsidian">{(assetStats?.precisionDiagnosis || 0) + (assetStats?.dailyRhythmLog || 0) + (assetStats?.scannerAnalysis || 0) + (assetStats?.toolkitUsage || 0) + (assetStats?.consultations || 0) + (assetStats?.reports || 0)}</span>
+                                                <span className="text-xs font-bold text-slate/40 mb-2">건</span>
+                                            </div>
+                                        </div>
+                                        <div className="w-px h-12 bg-line/50" />
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">Insight Value</p>
+                                            <div className="flex items-end gap-1">
+                                                <span className="text-4xl font-black text-primary">{assetStats?.totalInsights || 0}</span>
+                                                <span className="text-xs font-bold text-primary/40 mb-2">Pts</span>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div className="flex items-center gap-2 bg-mist/50 p-3 rounded-2xl border border-line/30">
+                                        {[
+                                            { icon: <Shield className="w-3.5 h-3.5" />, count: assetStats?.precisionDiagnosis || 0, label: '문진' },
+                                            { icon: <History className="w-3.5 h-3.5" />, count: assetStats?.scannerAnalysis || 0, label: '스캔' },
+                                            { icon: <Download className="w-3.5 h-3.5" />, count: assetStats?.reports || 0, label: '리포트' }
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex flex-col items-center px-3 border-r last:border-0 border-line/50">
+                                                <span className="text-obsidian/40 mb-1">{item.icon}</span>
+                                                <span className="text-[10px] font-black text-obsidian">{item.count}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <Button asChild size="sm" className="bg-obsidian text-white rounded-xl font-bold text-[10px] hover:bg-primary hover:text-obsidian transition-colors">
+                                        <Link href="/archive">보관함 관리</Link>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 pt-12 border-t border-line/30">
+                                {/* 왼쪽: 점수 + 상태 */}
+                                <div className="space-y-6 flex-1">
                                     <div className="bg-surface/50 border border-line p-5 md:p-6 rounded-[24px] md:rounded-[32px] flex items-center gap-4 md:gap-6 w-full md:w-auto">
                                         <div className="flex-shrink-0">
-                                            <div className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-widest mb-1">Recovery Score</div>
+                                            <div className="text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-widest mb-1">Current Recovery Score</div>
                                             <div className="text-4xl md:text-5xl font-black text-primary">{todayScore}</div>
                                         </div>
                                         <div className="text-[10px] md:text-xs font-medium text-text-secondary leading-tight opacity-60">
@@ -361,6 +423,47 @@ export default function AiNavigatorPage() {
                                 </TabsList>
 
                                 <TabsContent value="personalization" className="space-y-20">
+                                    {/* Step 0: 7일 회복 흐름 OS (New Identity Core) */}
+                                    <div className="space-y-8 relative">
+                                        <div className="absolute -left-4 md:-left-20 -top-8 md:-top-14 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none uppercase">Flow</div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                                    <Sparkles className="w-5 h-5 fill-current" />
+                                                </div>
+                                                <h2 className="text-2xl font-black tracking-tight">7일 회복 흐름 OS</h2>
+                                            </div>
+                                            <Badge variant="outline" className="border-primary/20 text-primary font-black px-3">ACTIVE JOURNEY</Badge>
+                                        </div>
+
+                                        <Card 
+                                            className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl group cursor-pointer"
+                                            onClick={() => router.push('/ai-navigator/report')}
+                                        >
+                                            <CardContent className="p-0">
+                                                <div className="flex flex-col md:flex-row">
+                                                    <div className="flex-1 p-8 md:p-10 space-y-6">
+                                                        <div className="space-y-2">
+                                                            <h3 className="text-3xl font-black text-white leading-tight">당신의 7일은<br /><span className="text-primary-foreground bg-primary px-2 py-0.5 rounded-lg">하나의 흐름</span>이 되었습니다.</h3>
+                                                            <p className="text-white/80 font-medium">데이터가 발견한 당신만의 회복 리듬을 확인하세요.</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-4 text-xs font-black text-white/60 uppercase tracking-widest">
+                                                            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-primary" /> 7-DAY COMPLETE</span>
+                                                            <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-primary" /> RHYTHM INSIGHT</span>
+                                                        </div>
+                                                        <Button className="h-14 px-8 bg-white text-obsidian rounded-2xl font-black text-base group-hover:scale-105 transition-transform">
+                                                            주간 리듬 리포트 보기 <ChevronRight className="w-5 h-5 ml-2" />
+                                                        </Button>
+                                                    </div>
+                                                    <div className="w-full md:w-64 bg-primary/10 flex items-center justify-center p-10 md:p-0 relative overflow-hidden">
+                                                        <div className="text-7xl md:text-8xl filter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">🧭</div>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50" />
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+
                                     {/* Step 1: 카테고리별 상태 분석 */}
                                     <div className="space-y-8 relative">
                                         <div className="absolute -left-4 md:-left-20 -top-8 md:-top-14 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">01</div>
@@ -454,9 +557,16 @@ export default function AiNavigatorPage() {
                                                 나조차 몰랐던 내면의 데이터를 확인하세요.
                                             </p>
                                         </div>
-                                        <div className="hidden md:flex flex-col items-center justify-center w-24 h-24 bg-mist rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                            <div className="text-3xl mb-1">📊</div>
-                                            <div className="text-[10px] font-bold text-slate-400 group-hover:text-primary">View Report</div>
+                                        <div className="hidden md:flex flex-col items-center justify-center w-40 h-40 relative overflow-hidden p-2 group-hover:scale-105 transition-transform duration-500">
+                                            <div className="relative w-full h-full drop-shadow-2xl">
+                                                <Image 
+                                                   src="/images/characters/char_diagnosis.png" 
+                                                   alt="Identity Report" 
+                                                   fill 
+                                                   className="object-contain"
+                                                   sizes="160px"
+                                                />
+                                            </div>
                                         </div>
                                     </CardContent>
                                     <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 group-hover:opacity-100 transition-opacity" />
@@ -553,6 +663,35 @@ export default function AiNavigatorPage() {
                                         </div>
                                         <h2 className="text-2xl font-black tracking-tight">리커버리 타임라인</h2>
                                     </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                        <div className="bg-primary/5 border border-primary/10 p-5 rounded-3xl flex items-center gap-4 group hover:bg-primary/10 transition-all">
+                                            <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                                <Activity className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black text-primary uppercase tracking-tighter">Stored Records</p>
+                                                <p className="text-xl font-black text-obsidian">{timelineItems.length || 0}일분 축적됨</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-primary/5 border border-primary/10 p-5 rounded-3xl flex items-center gap-4 group hover:bg-primary/10 transition-all">
+                                            <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                                <Package className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black text-primary uppercase tracking-tighter">Asset Value</p>
+                                                <p className="text-xl font-black text-obsidian">{Math.ceil((timelineItems.length || 1) / 7)}개 리포트 생성</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-primary/5 border border-primary/10 p-5 rounded-3xl flex items-center gap-4 group hover:bg-primary/10 transition-all">
+                                            <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                                <Calendar className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black text-primary uppercase tracking-tighter">Last Update</p>
+                                                <p className="text-xl font-black text-obsidian">{timelineItems[0]?.date || '오늘 완료'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <Button variant="ghost" size="sm" asChild>
                                         <Link href="/timeline" className="text-xs font-bold opacity-60">전체보기</Link>
                                     </Button>
@@ -599,8 +738,64 @@ export default function AiNavigatorPage() {
                                         </Link>
                                     </Button>
                                 )}
-                                <QuickInquirySection reportId="AI_NAVIGATOR_DASHBOARD" />
-                            </div>
+                                 {/* 1. Archive Section Entry (Moved Up) */}
+                                 <div className="pt-12">
+                                     <Card 
+                                         className="bg-surface border-2 border-line rounded-[40px] overflow-hidden group cursor-pointer hover:border-primary/50 transition-all duration-500 shadow-sm hover:shadow-2xl"
+                                         onClick={() => router.push('/archive')}
+                                     >
+                                         <CardContent className="p-0">
+                                             <div className="flex flex-col md:flex-row items-center">
+                                                 <div className="flex-1 p-10 space-y-6">
+                                                     <div className="flex items-center gap-3">
+                                                        <div className="w-12 h-12 bg-obsidian text-white rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                            <Package className="w-6 h-6" />
+                                                        </div>
+                                                        <Badge variant="outline" className="border-obsidian/20 text-obsidian font-black text-[10px] uppercase tracking-widest px-3">Data Asset</Badge>
+                                                     </div>
+                                                     <div className="space-y-3">
+                                                         <h3 className="text-3xl font-black text-obsidian leading-tight">기록은 사라지지 않고<br />당신의 <span className="text-primary">데이터 자산</span>이 됩니다.</h3>
+                                                         <p className="text-slate font-medium leading-relaxed opacity-70">
+                                                             7일 이상의 모든 사진과 한 줄 기록을 영구 보관하고<br />
+                                                             필요할 때 언제든 리포트로 출력하여 활용하세요.
+                                                         </p>
+                                                     </div>
+                                                     <div className="flex flex-wrap items-center gap-3">
+                                                        <Button variant="outline" size="sm" className="bg-white/50 border-obsidian/10 text-obsidian font-bold text-xs h-10 px-4 rounded-xl hover:bg-white transition-all">
+                                                            <Download className="w-3.5 h-3.5 mr-2" />
+                                                            PDF 리포트 저장
+                                                        </Button>
+                                                        <Button variant="outline" size="sm" className="bg-white/50 border-obsidian/10 text-obsidian font-bold text-xs h-10 px-4 rounded-xl hover:bg-white transition-all">
+                                                            <Share2 className="w-3.5 h-3.5 mr-2" />
+                                                            내비게이터에게 전송
+                                                        </Button>
+                                                        <div className="flex items-center gap-2 text-primary font-black text-sm ml-auto group-hover:gap-4 transition-all">
+                                                            보관함 관리하기 <ArrowRight className="w-4 h-4" />
+                                                        </div>
+                                                     </div>
+                                                 </div>
+                                                 <div className="w-full md:w-80 bg-obsidian/5 flex items-center justify-center relative overflow-hidden self-stretch">
+                                                     <div className="relative w-full h-full group-hover:scale-110 transition-all duration-700">
+                                                         <Image 
+                                                            src="/images/about/identity-report.png" 
+                                                            alt="Identity Report Asset" 
+                                                            fill 
+                                                            className="object-cover opacity-60 group-hover:opacity-100 transition-all duration-700"
+                                                            sizes="(max-width: 768px) 100vw, 320px"
+                                                         />
+                                                     </div>
+                                                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent mix-blend-overlay" />
+                                                 </div>
+                                             </div>
+                                         </CardContent>
+                                     </Card>
+                                 </div>
+
+                                 {/* 2. Still have Questions? (Moved Down) */}
+                                 <div className="mt-12">
+                                    <QuickInquirySection reportId="AI_NAVIGATOR_DASHBOARD" />
+                                 </div>
+                             </div>
 
                                 {/* Step 5: 유니클 추천 파트너 상품 */}
                                 <div className="space-y-8 relative">

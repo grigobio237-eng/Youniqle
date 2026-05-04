@@ -18,14 +18,15 @@ function DiagnosisContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { data: session } = useSession();
-    const type = searchParams.get('type') || 'free'; // daily, personality, or free
+    const type = searchParams?.get('type') || 'free'; // daily, personality, or free
     
     const [step, setStep] = useState(-1); // -1: Intro, 0~N: Questions, N+1: Result
-    const [answers, setAnswers] = useState<Record<string, number>>({});
+    const [answers, setAnswers] = useState<Record<string | number, number>>({});
     const [questions, setQuestions] = useState<any[]>([]);
     const [result, setResult] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
     const [dailyTheme, setDailyTheme] = useState<string>('');
 
     const DEFAULT_LIKERT_OPTIONS = [
@@ -36,12 +37,25 @@ function DiagnosisContent() {
         { label: '매우 그렇다', score: 5 },
     ];
 
+    const fetchedRef = React.useRef<string | null>(null);
+
     useEffect(() => {
-        loadQuestions();
+        // 'daily'가 아닌 경우(정적 질문)에만 즉시 로드
+        if (type !== 'daily' && fetchedRef.current !== type) {
+            loadQuestions();
+            fetchedRef.current = type;
+        }
     }, [type]);
 
     const loadQuestions = async () => {
         setLoadingQuestions(true);
+        setLoadingProgress(10); // 시작점
+        
+        // 시뮬레이션된 프로그레스 업데이트 (API 응답 전까지 시각적 만족감 제공)
+        const progressInterval = setInterval(() => {
+            setLoadingProgress(prev => (prev < 90 ? prev + 2 : prev));
+        }, 200);
+
         try {
             let loadedQuestions = [];
             if (type === 'daily') {
@@ -67,10 +81,25 @@ function DiagnosisContent() {
             }));
             
             setQuestions(formattedQuestions);
+            setLoadingProgress(100);
+            return formattedQuestions; // 결과 반환
         } catch (error) {
             console.error('Failed to load questions', error);
+            return [];
         } finally {
+            clearInterval(progressInterval);
             setLoadingQuestions(false);
+        }
+    };
+
+    const handleStartDiagnosis = async () => {
+        if (questions.length > 0) {
+            setStep(0);
+            return;
+        }
+        const loaded = await loadQuestions();
+        if (loaded && loaded.length > 0) {
+            setStep(0);
         }
     };
 
@@ -86,14 +115,17 @@ function DiagnosisContent() {
         }
     };
 
-    const calculateAndSaveResults = async (finalAnswers: Record<string, number>) => {
+    const calculateAndSaveResults = async (finalAnswers: Record<string | number, number>) => {
         setIsSaving(true);
         try {
             let calculationResult;
             if (type === 'personality') {
-                calculationResult = SimcheungDiagnosisEngine.calculateResults(finalAnswers);
+                calculationResult = SimcheungDiagnosisEngine.calculateResults({ 
+                    answers: finalAnswers as any, 
+                    questions: questions as any 
+                });
             } else if (type === 'free') {
-                calculationResult = SimcheungDiagnosisEngine.calculateFreeDiagnosis(finalAnswers);
+                calculationResult = SimcheungDiagnosisEngine.calculateFreeDiagnosis(finalAnswers as any, questions);
             } else {
                 const total = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
                 const max = questions.length * 5;
@@ -187,11 +219,27 @@ function DiagnosisContent() {
                             <div className="flex flex-col gap-4">
                                 <Button 
                                     size="lg" 
-                                    onClick={() => setStep(0)} 
+                                    onClick={handleStartDiagnosis} 
                                     disabled={loadingQuestions}
-                                    className={`h-20 text-2xl font-black rounded-3xl ${theme.button} text-white transition-all shadow-2xl`}
+                                    className={`h-20 text-2xl font-black rounded-3xl ${theme.button} text-white transition-all shadow-2xl relative overflow-hidden`}
                                 >
-                                    {loadingQuestions ? <Loader2 className="animate-spin mr-2" /> : '진단 시작하기'}
+                                    {/* Progress Background Overlay */}
+                                    {loadingQuestions && (
+                                        <motion.div 
+                                            className="absolute left-0 top-0 bottom-0 bg-white/20 z-0"
+                                            initial={{ width: '0%' }}
+                                            animate={{ width: `${loadingProgress}%` }}
+                                            transition={{ ease: "linear" }}
+                                        />
+                                    )}
+                                    <span className="relative z-10 flex items-center justify-center">
+                                        {loadingQuestions ? (
+                                            <>
+                                                <Loader2 className="animate-spin mr-3 w-6 h-6" />
+                                                질문 분석 중... {loadingProgress}%
+                                            </>
+                                        ) : '진단 시작하기'}
+                                    </span>
                                 </Button>
                                 <Button variant="ghost" asChild className="text-slate font-bold">
                                     <Link href="/dashboard">나중에 하기</Link>

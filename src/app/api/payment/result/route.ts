@@ -146,15 +146,41 @@ export async function POST(request: NextRequest) {
                 const buyer = await User.findById(order.userId);
 
                 if (buyer) {
-                  // Navigator Pass 등급 상향
+                  // Navigator Pass 등급 상향 (기존 로직 유지)
                   const navigatorItem = order.items.find((item: any) => typeof item.productId === 'string' && item.productId.startsWith('navigator-'));
                   if (navigatorItem) {
                     const gradeType = navigatorItem.productId.split('-')[1];
                     if (['start', 'signature', 'black'].includes(gradeType)) {
                       buyer.grade = gradeType;
                       await buyer.save(mongoSession ? { session: mongoSession } : {});
-                      console.log(`🎊 등급 상향 완료: ${buyer.email} -> ${gradeType}`);
+                      console.log(`🎊 네비게이터 등급 상향 완료: ${buyer.email} -> ${gradeType}`);
                     }
+                  }
+
+                  // [ADD] Lifecare OS 멤버십 등급 상향
+                  if (order.orderNumber.startsWith('MEMB_')) {
+                    const parts = order.orderNumber.split('_');
+                    const passType = parts[1]; // RESET, REBORN, RESTART, BLACK
+                    
+                    buyer.tier = passType as any;
+                    // grade도 동기화 (cedar, rooter 등에서 리포트용 등급으로 전환)
+                    buyer.grade = passType.toLowerCase() as any;
+                    
+                    // passInfo 업데이트
+                    const now = new Date();
+                    const endDate = new Date();
+                    endDate.setDate(now.getDate() + 30); // 기본 30일
+
+                    buyer.passInfo = {
+                      type: passType as any,
+                      status: 'ACTIVE',
+                      startDate: now,
+                      endDate: endDate,
+                      purchaseDate: now
+                    };
+
+                    await buyer.save(mongoSession ? { session: mongoSession } : {});
+                    console.log(`🚀 Lifecare OS 멤버십 업그레이드 완료: ${buyer.email} -> ${passType}`);
                   }
 
                   // 추천인 보상

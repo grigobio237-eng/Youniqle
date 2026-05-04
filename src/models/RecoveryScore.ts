@@ -5,12 +5,17 @@ export interface IRecoveryScore extends Document {
     date: Date; // Normalized to midnight or ISO date string for "Daily" uniqueness
     rawScore: number; // 0-25 sum of 5 questions
     totalScore: number; // 0-100 converted score
-    metaphor: 'TOWER' | 'CLOCK' | 'FOOTPRINTS';
+    metaphor: string;
     answers: Array<{
         questionId: number;
         category: string;
         score: number;
+        detail?: string;
     }>;
+    snapData?: {
+        type: 'PHOTO' | 'TEXT';
+        content: string;
+    };
     userNote?: string; // 사용자의 자유 텍스트 상태 기록
     createdAt: Date;
     updatedAt: Date;
@@ -36,14 +41,18 @@ const RecoveryScoreSchema = new Schema<IRecoveryScore>({
     },
     metaphor: {
         type: String,
-        enum: ['TOWER', 'CLOCK', 'FOOTPRINTS'],
         required: true,
     },
     answers: [{
         questionId: { type: Number, required: true },
         category: { type: String, required: true },
         score: { type: Number, required: true },
+        detail: { type: String, required: false },
     }],
+    snapData: {
+        type: { type: String, enum: ['PHOTO', 'TEXT'] },
+        content: { type: String }
+    },
     userNote: {
         type: String,
         required: false

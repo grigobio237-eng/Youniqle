@@ -20,18 +20,18 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
     switch (journey) {
       case 'CLINICAL_PRE':
         return {
-          title: `성공적인 ${typeLabel}을 위한 컨디션 체크`,
-          sub: "안전하고 확실한 결과를 위한 준비 단계를 점검합니다"
+          title: "어제와 다른 오늘을 발견하는 시간",
+          sub: "60초의 리듬체크로 당신의 오늘을 기록합니다"
         };
       case 'CLINICAL_POST':
         return {
-          title: `${typeLabel} 후 회복의 골든타임, 72시간 집중 케어`,
-          sub: "이상 증상을 예방하고 회복 속도를 극대화하는 시간입니다"
+          title: "조금씩 쌓이는 회복의 신호를 읽습니다",
+          sub: "작은 기록들이 모여 당신만의 회복 지도가 됩니다"
         };
       default:
         return {
-          title: "당신에게 딱 맞는 회복 플랜을 완성합니다",
-          sub: "데이터 기반으로 설계하는 나만의 일상 리듬"
+          title: "당신의 오늘을 조용히 비추어봅니다",
+          sub: "정답은 없습니다. 지금 느껴지는 그대로를 남겨주세요"
         };
     }
   };
@@ -97,7 +97,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
           <div className="space-y-1">
             <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest block">Progress</span>
             <span className="text-sm font-bold text-slate">
-              {step + 1}번째 질문 <span className="text-slate/30">/ {questions.length}</span>
+              {step + 1}번째 리듬 <span className="text-slate/30">/ {questions.length}</span>
             </span>
           </div>
           <span className="text-2xl font-black text-chapter-accent italic">
@@ -180,7 +180,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
                 className="w-full p-4 bg-mist/30 border border-line/50 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm font-medium"
               />
               <p className="text-[10px] text-slate/50 leading-relaxed italic">
-                * 입력해주신 정보는 유니클이 당신의 상태를 더 정확히 분석하는 데 사용됩니다.
+                * 약 이름을 몰라도 괜찮아요. '혈압약', '영양제'처럼 편하게 적어주시면 유니클이 기억해둘게요.
               </p>
             </motion.div>
           )}
@@ -216,9 +216,9 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
         <Button
           onClick={handleNext}
           disabled={!currentAnswer}
-          className="flex-1 h-12 text-lg rounded-xl"
+          className="flex-[2] h-14 text-lg rounded-2xl bg-obsidian text-white font-black hover:scale-105 transition-all shadow-xl"
         >
-          {isLastStep ? '결과 보기' : '다음'} <ChevronRight className="w-5 h-5 ml-1" />
+          {isLastStep ? '리듬카드 확인하기' : '다음 리듬 확인'} <ChevronRight className="w-5 h-5 ml-1" />
         </Button>
       </div>
     </div>

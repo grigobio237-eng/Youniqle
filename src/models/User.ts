@@ -207,6 +207,7 @@ export interface IUser extends Document {
     highestStreak: number;
     todayCategories: string[];
   };
+  medicationHistory?: string[]; // 복용 중인 약물 및 식품 히스토리
 }
 
 const UserSchema = new Schema<IUser>({
@@ -484,6 +485,7 @@ const UserSchema = new Schema<IUser>({
     scannerCount: { type: Number, default: 0 },
     diagnosisCount: { type: Number, default: 0 },
     webtoonCount: { type: Number, default: 0 },
+    completedRoutines: [{ type: String }], // Track which of the 3 daily routines are done
     lastResetDate: { type: Date, default: Date.now }
   },
   gamification: {
@@ -491,7 +493,8 @@ const UserSchema = new Schema<IUser>({
     currentStreak: { type: Number, default: 0 },
     highestStreak: { type: Number, default: 0 },
     todayCategories: [{ type: String }]
-  }
+  },
+  medicationHistory: [{ type: String, trim: true }]
 }, {
   timestamps: true,
 });

@@ -136,6 +136,10 @@ export class AccessControl {
     const group = this.getUserGroup(user);
     const normalizedType = type.toUpperCase();
     
+    // Life Snap 9개 카테고리는 모든 티어에서 사용 가능
+    const lifeSnapCategories = ['MEAL', 'HYDRATION', 'SKIN', 'SLEEP', 'ACTIVITY', 'ROUTINE', 'BODY', 'MEDICAL_DOC', 'OTHER'];
+    if (lifeSnapCategories.includes(normalizedType)) return true;
+
     if (group === 'BLACK' || group === 'RESTART') return true;
     if (group === 'REBORN') return ['MEAL', 'POSTURE', 'STATE'].includes(normalizedType);
     if (group === 'RESET' || group === 'NONE') return ['MEAL', 'STATE'].includes(normalizedType);

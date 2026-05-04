@@ -11,19 +11,19 @@ import { useState, useEffect } from 'react';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
 import Link from 'next/link';
 
-export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult) => void, isDiagnosing?: boolean }) {
+export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult, image?: string) => void, isDiagnosing?: boolean }) {
   const { journey, resetJourney } = useRecovery();
   const { data: session } = useSession();
   const { trackEvent } = useActivityTracker();
 
   const [personalMsg, setPersonalMsg] = useState({
-    title: <>당신이 머무는 공간,<br />보는 것과 듣는 것,<br />그리고 먹는 모든 것이<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 조각</span>입니다.</>,
-    desc: "식단, 사운드, 시각 데이터를 통합한 유니클만의 맞춤형 회복 큐레이션",
-    nudge: "지금 먹는 음식, 회복에 도움이 될까요? 사진으로 바로 확인!"
+    title: <>당신이 머무는 공간,<br />보고 듣고 느끼는 모든 것이<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">회복의 단서</span>가 됩니다.</>,
+    desc: "일상의 작은 조각들을 모아 당신만의 회복 리듬을 기록하는 퍼스널 거울, 유니클",
+    nudge: "오늘의 컨디션은 어떠신가요? 가벼운 기록으로 시작해보세요."
   });
 
   const [progress, setProgress] = useState(0);
-  const [loadingText, setLoadingText] = useState('60초 간편 진단 시작');
+  const [loadingText, setLoadingText] = useState('60초 리듬체크 시작');
 
   // Advanced Progress animation logic
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
         setProgress(100);
         setTimeout(() => setProgress(0), 500);
       }
-      setLoadingText('60초 정밀 진단 시작');
+      setLoadingText('60초 리듬체크 시작');
     }
 
     return () => clearInterval(interval);
@@ -70,8 +70,6 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
   useEffect(() => {
     const fetchPersonalization = async () => {
-      const defaultCategory = 'physical'; // Default: 신체적 활력
-
       // 1. Check Session first
       if (session?.user) {
         const userName = session.user.name || '회원';
@@ -97,36 +95,32 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
         }
 
         // Logged in but no specific low score or fetch failed - use general greeting
-        updateMessage(userName, defaultCategory);
+        updateMessage(userName, 'physical');
         return;
       }
 
-      // 2. Guest Logic
-      const localScore = localStorage.getItem('recovery_last_score');
-      if (localScore) {
-        // If they have a previous score (even as guest), acknowledge it
-        updateMessage('방문자', defaultCategory);
-      } else {
-        // Pure unknown guest - update to "방문자님" but maybe keep original default title for clean start?
-        // User wants "방문자님" to be shown for non-logged in users.
-        updateMessage('방문자', defaultCategory);
-      }
+      // 2. Guest Logic (Fixed Option 1 Copy)
+      setPersonalMsg({
+        title: <>데이터로 읽어내는 당신만의 회복 리듬,<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">Lifecare OS 유니클</span>에 오신 것을 환영합니다.</>,
+        desc: "유니클은 당신의 일상을 정밀하게 분석하여, 지금 이 순간 가장 필요한 회복 루틴을 실시간으로 설계하는 AI 라이프케어 시스템입니다.",
+        nudge: "오늘 당신의 몸과 마음이 보내는 신호에 귀를 기울여 보세요."
+      });
     };
 
     const updateMessage = (name: string, categoryId: string) => {
-      const categoryMap: Record<string, string> = {
-        mental: '마음의 안정',
-        physical: '신체적 활력',
-        sleep: '숙면 에너지',
-        lifestyle: '생활 리듬'
+      const categoryMap: Record<string, { label: string, question: string }> = {
+        mental: { label: '마음의 안정', question: '요즘 유독 마음이 복잡하진 않으셨나요?' },
+        physical: { label: '신체적 활력', question: '부쩍 몸이 무겁게 느껴지는 날이 많으셨죠?' },
+        sleep: { label: '숙면 에너지', question: '자고 일어나도 개운하지 않은 아침이었나요?' },
+        lifestyle: { label: '생활 리듬', question: '일상의 균형이 조금씩 무너지고 있진 않나요?' }
       };
 
-      const weakName = categoryMap[categoryId] || categoryId;
+      const info = categoryMap[categoryId] || { label: categoryId, question: '오늘의 회복 리듬을 함께 살펴볼까요?' };
 
       setPersonalMsg({
-        title: <>{name}님, 오늘 가장 필요한 건<br /><span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">{weakName}</span>의 회복입니다.</>,
-        desc: `${name}님의 최근 분석 데이터에 따르면, 현재 ${weakName} 케어가 우선적으로 권장됩니다.`,
-        nudge: `${weakName} 점수가 낮아요. 맞춤 솔루션을 확인해보세요!`
+        title: <>{name}님, {info.question}<br />오늘 유니클은 <span className="text-chapter-accent underline decoration-mist decoration-8 underline-offset-4">{info.label}</span>에 주목하고 있어요.</>,
+        desc: `${name}님의 기록들을 비추어보니, 지금은 ${info.label}을(를) 위한 부드러운 케어가 가장 필요한 순간인 것 같아요.`,
+        nudge: `무너진 ${info.label} 리듬을 다시 세우러 가볼까요?`
       });
     };
 
@@ -149,7 +143,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           {/* 1. Texts (Top on Mobile, Top-Left on Desktop) */}
           <div className="space-y-6 animate-in fade-in slide-in-from-left-8 duration-700 order-1 lg:order-1">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.3em] md:tracking-[0.8em] opacity-70">Scientific Recovery</span>
+              <span className="text-[10px] md:text-xs font-black text-chapter-accent uppercase tracking-[0.3em] md:tracking-[0.8em] opacity-70">RECOVERY CGM</span>
               {journey && (
                 <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-chapter-accent/10 text-chapter-accent px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">
                   <Activity className="w-3 h-3" /> {journey} MODE
@@ -175,15 +169,23 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
             </div>
 
             {/* Contextual Nudge Bubble */}
-            <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line animate-bounce max-w-[180px] hidden md:block z-10">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onStart()}
+              className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line cursor-pointer hover:border-chapter-accent/50 transition-all z-10 group"
+            >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-3 h-3 rounded-full bg-chapter-accent animate-ping" />
                 <span className="text-[10px] font-black text-obsidian uppercase tracking-widest">Youniqle LIVE</span>
               </div>
-              <p className="text-[11px] font-bold text-slate leading-snug">
+              <p className="text-[11px] font-bold text-slate leading-snug group-hover:text-chapter-accent transition-colors">
                 {personalMsg.nudge}
               </p>
-            </div>
+              <div className="mt-2 flex items-center text-[9px] font-black text-chapter-accent opacity-0 group-hover:opacity-100 transition-all">
+                기록 시작하기 <ArrowRight className="ml-1 w-3 h-3" />
+              </div>
+            </motion.div>
           </div>
 
           {/* 3. Button & checkmarks (Bottom on Mobile, Bottom-Left on Desktop) */}
@@ -193,27 +195,39 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 <Button
                   asChild
                   size="lg"
-                  className="btn-primary w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300"
+                  className="btn-primary w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300 bg-chapter-accent hover:bg-chapter-accent/90 text-white"
                 >
                   <Link href="/dashboard">
                     <div className="relative z-10 flex items-center justify-center">
-                      <Layout className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
-                      <span>나의 회복 대시보드</span>
+                      <Layout className="w-5 h-5 mr-2" />
+                      <span>오늘 회복 흐름 보기</span>
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
                 </Button>
+
+                <Button
+                  onClick={() => onStart()}
+                  variant="outline"
+                  size="lg"
+                  className="w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-bold border-line hover:bg-mist transition-all"
+                >
+                  <div className="relative z-10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
+                    <span>60초 리듬체크</span>
+                  </div>
+                </Button>
               </div>
               <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">
                 <div className="w-2 h-2 bg-chapter-accent rounded-full animate-pulse" />
-                맞춤형 지능형 회복 솔루션 확인
+                나만을 위한 지능형 회복 솔루션
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 text-[10px] md:text-xs text-slate/60 font-black uppercase tracking-wider md:tracking-widest">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 회복 점수 리포트</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 시술/수술 케어</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 일상 리듬 설계</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 회복 리듬 기록</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 맞춤형 흐름 분석</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-chapter-accent/40" /> 일상 루틴 설계</span>
             </div>
           </div>
 

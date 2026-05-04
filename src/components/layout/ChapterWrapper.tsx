@@ -13,6 +13,8 @@ export type ChapterType =
     | 'my-page'
     | 'diagnosis-report'
     | 'partner'
+    | 'archive'
+    | 'private-report'
     | 'brand';
 
 interface ChapterWrapperProps {

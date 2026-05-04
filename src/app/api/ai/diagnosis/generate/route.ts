@@ -4,7 +4,7 @@ import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { theme, keywords, journey, medicalCategory, treatmentType, userTier } = body;
+    const { theme, keywords, journey, medicalCategory, treatmentType, userTier, medicationHistory } = body;
 
     // AI 엔진을 통해 맞춤형 5문항 생성
     const questions = await GeminiAIEngine.generateDailyQuestions(
@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
       journey || 'WELLNESS',
       medicalCategory || 'GENERAL',
       treatmentType || 'PROCEDURE',
-      userTier || 'NORMAL'
+      userTier || 'NORMAL',
+      null,
+      medicationHistory
     );
 
     return NextResponse.json(questions);

@@ -76,7 +76,12 @@ export async function GET(req: NextRequest) {
                 };
             }
 
-            // Call AI with journey, medical context AND personal context + Tier
+            // 복용 중인 약물/영양제 정보 가져오기
+            const medicationHistory = user?.medicationHistory && user.medicationHistory.length > 0 
+                ? user.medicationHistory.join(', ') 
+                : undefined;
+
+            // Call AI with journey, medical context AND personal context + Tier + Medication History
             const questions = await GeminiAIEngine.generateDailyQuestions(
                 themeData.theme, 
                 `${themeData.keywords}, ${personalContext}`, 
@@ -84,7 +89,8 @@ export async function GET(req: NextRequest) {
                 medicalCategory,
                 treatmentType,
                 userTier,
-                recentData
+                recentData,
+                medicationHistory
             );
 
 

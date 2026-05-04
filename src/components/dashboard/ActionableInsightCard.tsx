@@ -31,12 +31,12 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                         {isPosture ? <Activity className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
                     </div>
                     <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Insight Focus</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 text-mist">Insight Focus</span>
                         <h3 className="text-xl font-black tracking-tight">{insight.title}</h3>
                     </div>
                 </div>
 
-                <p className="text-lg font-medium leading-relaxed italic opacity-80">
+                <p className="text-lg font-medium leading-relaxed italic text-white">
                     "{insight.description}"
                 </p>
 

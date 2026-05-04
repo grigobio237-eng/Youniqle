@@ -1,9 +1,14 @@
 // Streak and Checklist Management
 export interface DailyChecklist {
     diagnosis: boolean;      // 진단 완료
-    aiAdvice: boolean;       // AI 조언 확인
-    content: boolean;        // 콘텐츠 읽기
+    aiAdvice: boolean;       // Youniqle 조언 확인
+    routine: boolean;        // 오늘의 루틴 완수
+    content: boolean;        // 회복 콘텐츠 읽기
     utility: boolean;        // 유틸리티 사용
+    mealScan: boolean;       // 식단 스캔
+    soundTherapy: boolean;   // 사운드 테라피
+    postureScan: boolean;    // 자세 스캔
+    meditation: boolean;     // 명상
 }
 
 export interface UserProgress {
@@ -52,8 +57,13 @@ export function getUserProgress(): UserProgress {
             progress.todayChecklist = {
                 diagnosis: false,
                 aiAdvice: false,
+                routine: false,
                 content: false,
-                utility: false
+                utility: false,
+                mealScan: false,
+                soundTherapy: false,
+                postureScan: false,
+                meditation: false
             };
 
             progress.lastCheckDate = today;
@@ -80,15 +90,18 @@ export function updateChecklist(item: keyof DailyChecklist, points: number = 0):
     return progress;
 }
 
-export function getChecklistProgress(): { completed: number; total: number; percentage: number } {
-    const checklist = getUserProgress().todayChecklist;
-    const items = Object.values(checklist);
-    const completed = items.filter(Boolean).length;
-    const total = items.length;
+export function getChecklistProgress(tier: TierType = 'NONE'): { completed: number; total: number; percentage: number } {
+    const progress = getUserProgress();
+    const checklist = progress.todayChecklist;
+    const tierItems = getTierChecklist(tier);
+    
+    const completed = tierItems.filter(item => checklist[item.id as keyof DailyChecklist]).length;
+    const total = tierItems.length;
+    
     return {
         completed,
         total,
-        percentage: Math.round((completed / total) * 100)
+        percentage: total > 0 ? Math.round((completed / total) * 100) : 0
     };
 }
 
@@ -102,8 +115,13 @@ function getDefaultProgress(): UserProgress {
         todayChecklist: {
             diagnosis: false,
             aiAdvice: false,
+            routine: false,
             content: false,
-            utility: false
+            utility: false,
+            mealScan: false,
+            soundTherapy: false,
+            postureScan: false,
+            meditation: false
         }
     };
 }
@@ -113,28 +131,29 @@ export interface TierChecklistItem {
     id: string;
     label: string;
     emoji: string;
+    charImg: string;
     points: number;
 }
 
-type TierType = 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
+export type TierType = 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
 
 const BASE_CHECKLIST: TierChecklistItem[] = [
-    { id: 'diagnosis', label: '오늘의 회복 진단', emoji: '🩺', points: 2 },
-    { id: 'aiAdvice', label: 'AI 조언 확인', emoji: '💡', points: 1 },
-    { id: 'content', label: '회복 콘텐츠 읽기', emoji: '📖', points: 1 },
-    { id: 'utility', label: '유틸리티 1회 사용', emoji: '🔧', points: 1 },
+    { id: 'diagnosis', label: '오늘의 리듬체크', emoji: '✨', charImg: '/images/characters/char_diagnosis.png', points: 2 },
+    { id: 'aiAdvice', label: 'Youniqle 조언 확인', emoji: '💡', charImg: '/images/characters/char_qr.png', points: 1 },
+    { id: 'routine', label: '오늘의 루틴 완수', emoji: '⚡', charImg: '/images/characters/char_todo.png', points: 2 },
+    { id: 'utility', label: '유틸리티 1회 사용', emoji: '🔧', charImg: '/images/characters/char_unit.png', points: 1 },
 ];
 
 const EXTENDED_CHECKLIST: TierChecklistItem[] = [
     ...BASE_CHECKLIST,
-    { id: 'mealScan', label: '식단 스캔 기록', emoji: '🥗', points: 2 },
-    { id: 'soundTherapy', label: '사운드 테라피 10분', emoji: '🎧', points: 3 },
+    { id: 'content', label: '회복 콘텐츠 읽기', emoji: '📖', charImg: '/images/characters/char_dday.png', points: 1 },
+    { id: 'mealScan', label: '식단 스캔 기록', emoji: '🥗', charImg: '/images/characters/char_scanner.png', points: 2 },
 ];
 
 const PREMIUM_CHECKLIST: TierChecklistItem[] = [
     ...EXTENDED_CHECKLIST,
-    { id: 'postureScan', label: '자세 교정 분석', emoji: '🧍', points: 3 },
-    { id: 'meditation', label: '마음 챙김 호흡', emoji: '🧘', points: 2 },
+    { id: 'soundTherapy', label: '사운드 테라피 10분', emoji: '🎧', charImg: '/images/characters/char_sound.png', points: 3 },
+    { id: 'postureScan', label: '자세 밸런스 분석', emoji: '🧍', charImg: '/images/characters/char_posture.png', points: 3 },
 ];
 
 export function getTierChecklist(tier: TierType): TierChecklistItem[] {

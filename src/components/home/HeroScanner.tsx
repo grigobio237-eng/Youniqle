@@ -16,23 +16,23 @@ import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 
 export interface AnalysisResult {
     subjectName: string;
-    type: 'MEAL' | 'SPACE' | 'STATE' | 'OTHER';
+    type: 'MEAL' | 'HYDRATION' | 'SKIN' | 'SLEEP' | 'ACTIVITY' | 'ROUTINE' | 'BODY' | 'MEDICAL_DOC' | 'OTHER' | 'AUTO';
     summary: string;
     analysisTable: { label: string; value: string; benefit: string; }[];
     futureDirection: string;
     matchScore: number;
 }
 
-export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult) => void, isDiagnosing?: boolean }) {
+export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult, image?: string) => void, isDiagnosing?: boolean }) {
     const { journey, setJourney, medicalCategory, setMedicalCategory, treatmentType, setTreatmentType } = useRecovery();
     const [selectionStep, setSelectionStep] = useState<'JOURNEY' | 'CATEGORY' | 'STAGE' | 'TYPE' | 'READY'>('JOURNEY');
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'idle' | 'select_type' | 'scanning' | 'result'>('idle');
-    const [snapType, setSnapType] = useState<string>('');
+    const [snapType, setSnapType] = useState<string>('AUTO');
     const [loading, setLoading] = useState(false);
     
     const [progress, setProgress] = useState(0);
-    const [loadingText, setLoadingText] = useState('60초 간편 진단 시작하기');
+    const [loadingText, setLoadingText] = useState('60초 리듬체크 시작하기');
 
     // Sync with AI progress
     useEffect(() => {
@@ -58,7 +58,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 setProgress(100);
                 setTimeout(() => setProgress(0), 500);
             }
-            setLoadingText('60초 정밀 진단 시작하기');
+            setLoadingText('60초 리듬체크 시작하기');
         }
         return () => clearInterval(interval);
     }, [isDiagnosing]);
@@ -221,7 +221,10 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                     imageData: imageData,
                     score: analysisResult.matchScore,
                     summary: analysisResult.summary,
-                    metrics: analysisResult.analysisTable
+                    metrics: {
+                        ...analysisResult.analysisTable,
+                        futureDirection: analysisResult.futureDirection
+                    }
                 })
             });
 
@@ -268,7 +271,10 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                     imageData: capturedImage,
                     score: result?.matchScore,
                     summary: result?.summary,
-                    metrics: result?.analysisTable
+                    metrics: {
+                        ...result?.analysisTable,
+                        futureDirection: result?.futureDirection
+                    }
                 })
             });
 
@@ -322,7 +328,10 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const renderIdleView = () => (
         <div 
-            onClick={() => setStatus('select_type')}
+            onClick={() => {
+                if (isMobile) fileInputRef.current?.click();
+                else startWebcam();
+            }}
             className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-obsidian group cursor-pointer border-4 border-white/5 shadow-2xl"
         >
             <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700" />
@@ -405,7 +414,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-black border-4 border-white/10 shadow-2xl">
             <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
             <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 bg-gradient-to-t from-black/60 to-transparent">
-                <Button size="lg" onClick={handleCapture} className="w-20 h-20 rounded-full bg-white p-1 hover:scale-105 active:scale-95 transition-all">
+                <Button size="lg" onClick={handleCapture} title="사진 촬영" aria-label="사진 촬영" className="w-20 h-20 rounded-full bg-white p-1 hover:scale-105 active:scale-95 transition-all">
                     <div className="w-full h-full rounded-full border-4 border-obsidian flex items-center justify-center bg-chapter-accent/20">
                         <div className="w-12 h-12 rounded-full bg-chapter-accent" />
                     </div>
@@ -419,6 +428,19 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const renderResultView = () => {
         if (!result) return null;
+
+        const categoryMap = {
+            MEAL: { label: '식단', icon: '🍱' },
+            HYDRATION: { label: '수분', icon: '💧' },
+            SKIN: { label: '피부', icon: '✨' },
+            SLEEP: { label: '수면', icon: '🛏️' },
+            ACTIVITY: { label: '활동', icon: '🏃' },
+            ROUTINE: { label: '루틴', icon: '💊' },
+            BODY: { label: '바디', icon: '🤕' },
+            MEDICAL_DOC: { label: '서류', icon: '📄' },
+            OTHER: { label: '기타', icon: '📸' },
+            AUTO: { label: '분석중', icon: '🧠' }
+        };
 
         // CLINICAL_PRE requires a medical category to start
         const canStartDiagnosis = journey === 'WELLNESS' || (journey && medicalCategory && treatmentType);
@@ -545,13 +567,18 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                         <div className="absolute bottom-6 left-8 right-8 flex items-end justify-between text-white">
                             <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Badge className="bg-chapter-accent/20 text-chapter-accent border-chapter-accent/30 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 backdrop-blur-md">
+                                        {categoryMap[result.type as keyof typeof categoryMap]?.icon || '📸'} {categoryMap[result.type as keyof typeof categoryMap]?.label || '기타'}
+                                    </Badge>
+                                </div>
                                 <h4 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter">{result.subjectName}</h4>
                                 <div className="text-[10px] font-black uppercase tracking-widest text-chapter-accent flex items-center gap-1">
                                     <Activity className="w-3 h-3" /> Recovery Point
                                 </div>
                             </div>
                             <div className="text-right">
-                                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-60">SCORE</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-60">POINT</span>
                                 <span className="text-2xl md:text-4xl font-black italic">{result.matchScore}<span className="text-sm opacity-40">/100</span></span>
                             </div>
                         </div>
@@ -611,7 +638,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                         {/* Nudge to Diagnosis */}
                         <div className="pt-6 border-t border-line">
                             <Button 
-                                onClick={() => onStart(result || undefined)}
+                                onClick={() => onStart(result || undefined, capturedImage || undefined)}
                                 disabled={isDiagnosing}
                                 size="lg" 
                                 className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-mist' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'}`}
@@ -630,7 +657,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                                         <div className="absolute inset-0 flex items-center justify-center z-10 text-slate/40">
                                             <div className="flex items-center gap-3">
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span>{loadingText}</span>
+                                                <span>60초 리듬체크 준비 중...</span>
                                                 <span className="tabular-nums opacity-60">{Math.round(progress)}%</span>
                                             </div>
                                         </div>
@@ -643,7 +670,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                                             <div className="w-[500px] flex items-center justify-center text-white px-8">
                                                 <div className="flex items-center gap-3 w-full justify-center">
                                                     <Sparkles className="w-6 h-6 animate-pulse" />
-                                                    <span className="whitespace-nowrap">{loadingText}</span>
+                                                    <span className="whitespace-nowrap">60초 리듬체크 준비 중...</span>
                                                     <span className="tabular-nums font-black">{Math.round(progress)}%</span>
                                                 </div>
                                             </div>
@@ -652,11 +679,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                                 ) : (
                                     <div className="relative z-10 flex items-center justify-center text-white">
                                         <Sparkles className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
-                                        <span>{loadingText}</span>
+                                        <span>60초 리듬체크 시작하기</span>
                                         <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 )}
                             </Button>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 py-2">
+                            <span className="w-2 h-2 rounded-full bg-chapter-accent animate-pulse" />
+                            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Step 01. 오늘의 스냅 완료</span>
                         </div>
                         
                         <Button variant="ghost" onClick={() => setStatus('idle')} className="w-full h-14 rounded-2xl text-slate/60 font-bold hover:bg-mist transition-all">

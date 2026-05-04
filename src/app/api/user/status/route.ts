@@ -85,6 +85,42 @@ export async function GET(req: NextRequest) {
       console.log(`[Cache Hit] Using stored unified insight for ${user.email}`);
     }
 
+    // 5. Calculate Daily Checklist Status (Automated)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checklistStatus = {
+      diagnosis: user.dailyStats?.diagnosisCount > 0,
+      aiAdvice: user.cachedUnifiedInsight?.updatedAt && new Date(user.cachedUnifiedInsight.updatedAt) >= today,
+      routine: user.dailyStats?.completedRoutines?.length >= 3,
+      content: user.dailyStats?.webtoonCount > 0,
+      utility: user.dailyStats?.scannerCount > 0
+    };
+
+    // 6. Calculate Asset Statistics for '보관함' & '리듬체크'
+    const diagnosisCount = user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0;
+    const dailyLogCount = user.diagnosisResults?.filter((d: any) => d.type === 'daily').length || 0;
+    const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
+    const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
+    
+    const [consultationCount, surveyCount] = await Promise.all([
+      Promise.all([
+        PreConsultation.countDocuments({ user: user._id }),
+        PostCareSurvey.countDocuments({ user: user._id })
+      ]).then(([c1, c2]) => c1 + c2),
+      SurveyResponse.countDocuments({ userId: user._id })
+    ]);
+
+    const assetStats = {
+      precisionDiagnosis: diagnosisCount,
+      dailyRhythmLog: dailyLogCount,
+      scannerAnalysis: scannerCount,
+      toolkitUsage: toolkitCount,
+      consultations: consultationCount,
+      reports: surveyCount,
+      totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
+    };
+
     return NextResponse.json({
       success: true,
       score: scoreData,
@@ -96,6 +132,9 @@ export async function GET(req: NextRequest) {
       activeMedicalGuide: latestPreConsultation || null,
       activeRecoveryPlan: latestPostCare || null,
       recentActivity: user.scanTimeline?.slice(-5).reverse() || [],
+      checklistStatus,
+      assetStats,
+      completedRoutines: user.dailyStats?.completedRoutines || [],
       user: {
         name: user.name,
         grade: user.grade,

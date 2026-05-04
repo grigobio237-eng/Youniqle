@@ -26,6 +26,8 @@ export class GeminiAIEngine {
     private static availableTextModels: string[] = [];
     private static availableImageModels: string[] = [];
     private static isInitialized = false;
+    private static initializationPromise: Promise<void> | null = null;
+    private static questionCache: Record<string, any[]> = {};
 
     /**
      * Automatically discovers available models from the Google API and categorizes them into tiers.
@@ -33,7 +35,13 @@ export class GeminiAIEngine {
     public static async initializeDynamicModels(forceRefresh = false): Promise<void> {
         if (this.isInitialized && !forceRefresh) return;
 
-        try {
+        // If initialization is already in progress, wait for it
+        if (this.initializationPromise && !forceRefresh) {
+            return this.initializationPromise;
+        }
+
+        this.initializationPromise = (async () => {
+            try {
             await dbConnect();
             const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
 
@@ -110,13 +118,18 @@ export class GeminiAIEngine {
                 );
             }
 
-            this.isInitialized = true;
-            console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
-        } catch (err: any) {
-            console.error('[Gemini] Failed to initialize dynamic models:', err.message);
-            // Final fallback
-            this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
-        }
+                this.isInitialized = true;
+                console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
+            } catch (err: any) {
+                console.error('[Gemini] Failed to initialize dynamic models:', err.message);
+                // Final fallback
+                this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+            } finally {
+                this.initializationPromise = null;
+            }
+        })();
+
+        return this.initializationPromise;
     }
 
     private static async getTieredModels(type: 'text' | 'image' = 'text'): Promise<string[]> {
@@ -671,11 +684,12 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
     static async generateDailyQuestions(
         theme: string,
         keywords: string,
-        journey: 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' = 'WELLNESS',
-        medicalCategory: string | null = null,
-        treatmentType: string | null = null,
+        journey: string,
+        medicalCategory: string | null,
+        treatmentType: string | null,
         userTier: string = 'NORMAL',
-        recentData?: any
+        recentData?: any,
+        medicationHistory?: string
     ): Promise<any[]> {
         if (!process.env.GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY is missing');
@@ -700,7 +714,7 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 중요 목표: 일상의 리듬 회복 및 에너지 최적화.`;
             }
 
-            // 2. Medical Category Specific Instruction (Option B)
+            // 2. Medical Category Specific Instruction
             if (medicalCategory === 'PLASTIC') {
                 categorySpecificInstruction = `진료 분야: [성형외과/피부과]
 집중 사항: 피부 상태, 붓기, 멍, 수술 전 금식 및 주의사항 준수 여부, 프라이버시 고민.`;
@@ -720,8 +734,8 @@ ${input.yesterdayScore ? `- 어제 점수: ${input.yesterdayScore}점` : ''}
 지침: ${contextInstruction} / ${categorySpecificInstruction}
 
 ## 등급별 특화 지침
-${userTier === 'PREMIUM' ? `[PREMIUM 전용] 사용자의 최근 회복 데이터(${JSON.stringify(recentData || '기본 정보')})를 기반으로, 어제와 비교하여 상태의 변화를 묻는 유기적이고 초개인화된 문항을 구성하세요.` : 
-  userTier === 'START' ? `[START 전용] 임상적 정밀도를 높여 수술/시술 후 발생 가능한 부작용 징후나 필수 회복 지표를 집중적으로 점검하세요.` :
+${userTier === 'PREMIUM' || userTier === 'BLACK' ? `[PREMIUM 전용] 사용자의 최근 회복 데이터(${JSON.stringify(recentData || '기본 정보')})를 기반으로, 어제와 비교하여 상태의 변화를 묻는 유기적이고 초개인화된 문항을 구성하세요.` : 
+  userTier === 'START' || userTier === 'RESTART' ? `[START 전용] 임상적 정밀도를 높여 수술/시술 후 발생 가능한 부작용 징후나 필수 회복 지표를 집중적으로 점검하세요.` :
   `[NORMAL 전용] 일상적인 웰니스와 보편적인 회복 가이드에 집중한 표준 문항을 생성하세요.`}
 
 위 정보를 바탕으로 사용자의 상태를 점검하는 **5개의 객관식 질문**을 JSON 배열로 생성하세요.
@@ -730,7 +744,15 @@ ${userTier === 'PREMIUM' ? `[PREMIUM 전용] 사용자의 최근 회복 데이�
 1. 어조: 전문적이고 따뜻함.
 2. 질문당 3~4개 선택지 (0=최상/해당없음, 3=보통/주의, 5=나쁨/불안정).
 3. 카테고리: [신체, 환경, 심리, 영양, 행동] 중 선택.
-4. **필수**: 1개 질문은 반드시 '약물 복용/주의사항 준수' 관련이어야 함(카테고리: "약물"). 0점 선택지에 "해당 사항 없음" 포함 필수.
+4. **초개인화 필수 (약물/영양제 질문)**:
+   - 현재 사용자의 복용 정보: "${medicationHistory || '기록 없음'}"
+   - **기록이 있는 경우**: 
+     - 사용자가 입력한 용어(예: "혈압약", "통풍약", "영양제" 등)를 반드시 사용하여 질문을 구성하세요.
+     - 매번 똑같이 "복용하셨나요?"라고 묻기보다는, "[사용자 용어] 복용 후 컨디션은 어떠신가요?", "[사용자 용어]를 정해진 시간에 맞춰 챙기기 어렵진 않으셨나요?", "[사용자 용어] 복용 이후 특별한 불편함은 없으셨나요?" 등 질문의 각도를 다양화하여 사용자가 매일 같은 질문을 받는다는 느낌을 받지 않게 하세요.
+     - 오타가 있더라도 문맥상 유추 가능하면 자연스럽게 수정하여 친근하게 질문하세요.
+   - **기록이 없는 경우**: 
+     - 현재 단계(${journey})에서 주의해야 할 일반적인 복용 여부나 보충제 섭취 시 주의사항을 확인하세요.
+   - 0점 선택지에 "정해진 시간에 복용 완료 / 해당 사항 없음 / 매우 편안함" 중 적절한 내용을 포함하세요.
 
 ## 응답 형식 (JSON Array Only)
 [
@@ -2124,15 +2146,21 @@ JSON 형식:
         theme: string,
         userName: string = "사용자"
     ): Promise<any[]> {
+        const cacheKey = `${dayOfWeek}_${theme}`;
+        if (this.questionCache[cacheKey]) {
+            console.log(`[Gemini] Returning cached questions for ${cacheKey}`);
+            return this.questionCache[cacheKey];
+        }
+
         const prompt = `
 당신은 유니클(Youniqle)의 전문 회복 네비게이터입니다.
-사용자(${userName})의 오늘의 진단 테마는 [${dayOfWeek}: ${theme}] 입니다.
+오늘의 진단 테마는 [${dayOfWeek}: ${theme}] 입니다.
 
-제공된 16개의 정밀 진단 문항(JSON)을 다음 지침에 따라 재구성하세요:
+제공된 ${baseQuestions.length}개의 정밀 진단 문항(JSON)을 다음 지침에 따라 재구성하세요:
 1. 질문의 핵심 의도와 ID, 카테고리는 절대 변경하지 마세요.
 2. 질문 문구를 오늘의 테마에 맞춰 더 자연스럽고 공감 가도록 패러프레이징하세요.
 3. 응답 옵션(options)의 문구도 테마에 맞춰 변경하되, 점수(score)가 높은 순서대로 긍정->부정의 의미적 흐름을 엄격히 유지하세요.
-4. 사용자에게 직접 말을 거는 듯한 친근하고 전문적인 톤을 유지하세요.
+4. 사용자에게 직접 말을 거는 듯한 친근하고 전문적인 톤을 유지하세요. (사용자 이름 언급은 제외하고 범용적인 "님" 또는 "당신" 호칭 사용)
 5. 출력 형식은 반드시 입력받은 JSON 구조와 동일한 배열이어야 합니다.
 
 [Base Questions JSON]:
@@ -2142,9 +2170,17 @@ JSON 배열만 반환하세요.
 `;
 
         try {
-            const response = await this.generateWithFallback(prompt);
+            console.log(`[Gemini] Paraphrasing ${baseQuestions.length} questions for theme: ${theme}`);
+            const response = await this.generateWithFallback(prompt, "AI 리커버리 네비게이터 모드", 0.7);
             const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleaned);
+            const paraphrased = JSON.parse(cleaned);
+            
+            // Validate that we got the same number of questions back
+            if (Array.isArray(paraphrased) && paraphrased.length > 0) {
+                this.questionCache[cacheKey] = paraphrased;
+                return paraphrased;
+            }
+            return baseQuestions;
         } catch (error) {
             console.error("AI Paraphrasing failed, returning base questions:", error);
             return baseQuestions;

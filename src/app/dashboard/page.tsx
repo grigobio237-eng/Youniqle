@@ -16,21 +16,27 @@ export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
   const [loading, setLoading] = useState(true);
+  const fetchedRef = React.useRef(false);
+
+  const fetchDashboardData = async (isRefresh = false) => {
+    if (!isRefresh && fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    try {
+      if (isRefresh) setLoading(false); // Don't show full loading screen on refresh
+      const response = await fetch('/api/user/status');
+      if (response.ok) {
+        const result = await response.json();
+        setData(result);
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        const response = await fetch('/api/user/status');
-        if (response.ok) {
-          const result = await response.json();
-          setData(result);
-        }
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchDashboardData();
   }, []);
 
@@ -151,6 +157,7 @@ export default function DashboardPage() {
             <DashboardPreview
               unifiedData={data}
               onOpenWebtoon={() => setShowWebtoonDialog(true)}
+              onRefresh={() => fetchDashboardData(true)}
             />
             <WebtoonChallengeDialog
               open={showWebtoonDialog}

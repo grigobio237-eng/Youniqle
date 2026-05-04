@@ -18,6 +18,8 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
   const [isSuccess, setIsSuccess] = useState(false);
   const { addToast } = useToast();
 
+  const [attachReport, setAttachReport] = useState(true);
+
   const handleSubmit = async () => {
     if (!question.trim()) return;
 
@@ -28,7 +30,8 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: question.trim(),
-          reportId: reportId
+          reportId: reportId,
+          includeData: attachReport
         })
       });
 
@@ -127,6 +130,19 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
               className="w-full h-40 p-6 bg-mist/30 border-2 border-line rounded-[24px] focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none resize-none text-obsidian font-medium"
               disabled={isSending}
             />
+          </div>
+
+          <div 
+            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 ${attachReport ? 'bg-primary/5 border-primary/20' : 'bg-mist/20 border-transparent'}`}
+            onClick={() => setAttachReport(!attachReport)}
+          >
+            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${attachReport ? 'bg-primary border-primary' : 'border-line'}`}>
+              {attachReport && <CheckCircle2 className="w-4 h-4 text-obsidian" />}
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-black text-obsidian">내 최근 리듬체크 데이터 포함</p>
+              <p className="text-[10px] text-slate font-medium">네비게이터가 유저님의 데이터를 기반으로 정밀 분석해 드립니다.</p>
+            </div>
           </div>
 
           <Button 

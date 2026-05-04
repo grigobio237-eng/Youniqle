@@ -243,9 +243,9 @@ export default function AboutPage() {
                   <Zap className="w-4 h-4 text-chapter-accent" />
                   <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 03</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Prescribe</h3>
+                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Routine</h3>
                 <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
-                  처방: <br /> 당신을 위한 최적의 약속
+                  약속: <br /> 당신을 위한 최적의 루틴
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
                   분석 결과를 바탕으로 7일간의 최적 루틴을 제안받습니다. 대중형 패스 시스템은 당신이 지치지 않고 실천을 이어갈 수 있도록 돕습니다.
@@ -442,12 +442,12 @@ export default function AboutPage() {
                 onClick={() => window.location.href = '/?action=diagnose'} 
                 className="h-24 md:h-32 px-12 md:px-24 bg-obsidian text-white rounded-full font-black text-xl md:text-3xl uppercase tracking-[0.2em] shadow-2xl hover:scale-105 active:scale-95 transition-all group flex items-center gap-8 md:gap-16 border-8 border-white"
               >
-                Start Diagnosis
+                Start Rhythm Check
                 <div className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-chapter-accent flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <ArrowRight className="w-6 h-6 md:w-10 md:h-10 text-white" />
                 </div>
               </Button>
-              <p className="text-[10px] md:text-sm font-black text-slate/30 uppercase tracking-[1em]">Integrated Youniqle Diagnosis © Youniqle</p>
+              <p className="text-[10px] md:text-sm font-black text-slate/30 uppercase tracking-[1em]">Integrated Youniqle Rhythm Check © Youniqle</p>
             </motion.div>
         </div>
       </section>
@@ -457,9 +457,9 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12 opacity-50">
            <p className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest leading-none">Designed for Better Life Transformation</p>
            <div className="flex items-center gap-16">
-              <span className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">Scientific</span>
+              <span className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">Natural</span>
               <span className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">Human</span>
-              <span className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">Future</span>
+              <span className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">Balance</span>
            </div>
            <p className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest">© 2024 Youniqle.</p>
         </div>

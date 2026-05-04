@@ -1,208 +1,435 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, TrendingUp, TrendingDown, Activity, Moon, Sun, Brain } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Sparkles, 
+  ChevronRight, 
+  Image as ImageIcon,
+  Zap,
+  Moon,
+  Clock,
+  Share2,
+  Download
+} from 'lucide-react';
+import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, YAxis } from 'recharts';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import ChapterWrapper from '@/components/layout/ChapterWrapper';
+import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
+
+interface RecoveryRecord {
+  day: number;
+  date: string;
+  type: string;
+  score: number;
+  imageUrl?: string;
+  summary?: string;
+}
 
 export default function WeeklyReportPage() {
-    const { data: session } = useSession();
-    const [loading, setLoading] = useState(true);
-    const userName = session?.user?.name || '요원';
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState<RecoveryRecord[]>([]);
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  const userName = session?.user?.name || '요원';
 
-    // Mock Data for Weekly Analysis
-    const weeklyData = [
-        { day: '월', score: 65, avg: 70 },
-        { day: '화', score: 72, avg: 70 },
-        { day: '수', score: 68, avg: 70 },
-        { day: '목', score: 85, avg: 70 },
-        { day: '금', score: 55, avg: 72 }, // The drop mentioned in the previous analysis
-        { day: '토', score: 48, avg: 75 },
-        { day: '일', score: 80, avg: 75 },
-    ];
+  const fetchedRef = React.useRef(false);
 
-    const categoryData = [
-        { subject: '수면', A: 60, fullMark: 100 },
-        { subject: '피로도', A: 85, fullMark: 100 },
-        { subject: '스트레스', A: 70, fullMark: 100 },
-        { subject: '신체활력', A: 50, fullMark: 100 },
-        { subject: '집중력', A: 80, fullMark: 100 },
-        { subject: '소화/순환', A: 65, fullMark: 100 },
-    ];
+  useEffect(() => {
+    if (!fetchedRef.current) {
+      fetchWeeklyData();
+      fetchedRef.current = true;
+    }
+  }, []);
 
-    const weeklyAverage = 67;
-    const lastWeekAverage = 72;
-    const diff = weeklyAverage - lastWeekAverage;
+  const fetchWeeklyData = async () => {
+    try {
+      const res = await fetch('/api/recovery/score');
+      if (res.ok) {
+        const { scores } = await res.json();
+        // Filter valid scores and take the most recent 7
+        const validScores = scores.filter((s: any) => s.totalScore > 0).slice(-7);
+        
+        const mapped = validScores.map((s: any, idx: number) => {
+          const content = s.snapData?.content || '';
+          const isPhoto = s.snapData?.type === 'PHOTO';
+          // Simple validation: must start with http, /, or data:
+          const isValidUrl = content && (content.startsWith('http') || content.startsWith('/') || content.startsWith('data:'));
+          
+          return {
+            day: idx + 1,
+            date: s.date,
+            type: s.snapData?.type || 'TEXT',
+            score: s.totalScore,
+            imageUrl: isPhoto && isValidUrl ? content : undefined,
+            summary: s.snapData?.type === 'TEXT' ? content : (s.userNote || s.metaphor)
+          };
+        });
+        
+        setRecords(mapped);
+      }
+    } catch (error) {
+      console.error("Failed to fetch weekly report data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        // Simulate loading
-        setTimeout(() => setLoading(false), 800);
-    }, []);
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: '#0a0a0a',
+        scale: 2, // High resolution
+        logging: false,
+        useCORS: true
+      });
+      
+      const link = document.createElement('a');
+      link.download = `youniqle-rhythm-card-${new Date().getTime()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      toast.success('발견 카드가 갤러리에 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to download card', error);
+      toast.error('카드 저장에 실패했습니다.');
+    }
+  };
 
+  const averageScore = records.length > 0 
+    ? Math.round(records.reduce((acc, curr) => acc + curr.score, 0) / records.length) 
+    : 0;
+
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
-            {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="container mx-auto px-4 h-16 flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href="/ai-navigator">
-                            <ArrowLeft className="w-5 h-5" />
-                        </Link>
-                    </Button>
-                    <h1 className="text-lg font-bold">{userName} 님의 주간 회복 리포트</h1>
-                </div>
-            </header>
-
-            <main className="container mx-auto px-4 py-8 space-y-8">
-                {/* 1. Summary Card */}
-                <Card className="bg-white shadow-sm border-none">
-                    <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <CardTitle className="text-gray-500 text-sm font-medium flex items-center gap-2">
-                                    <Calendar className="w-4 h-4" /> 12월 2주차 (12.09 ~ 12.15)
-                                </CardTitle>
-                                <div className="mt-2 flex items-baseline gap-2">
-                                    <span className="text-4xl font-black text-gray-900">{weeklyAverage}점</span>
-                                    <span className={`text-sm font-bold flex items-center ${diff >= 0 ? 'text-red-500' : 'text-blue-500'}`}>
-                                        {Math.abs(diff)}점 {diff >= 0 ? <TrendingUp className="w-3 h-3 ml-1" /> : <TrendingDown className="w-3 h-3 ml-1" />}
-                                    </span>
-                                    <span className="text-xs text-gray-400">지난주 대비</span>
-                                </div>
-                            </div>
-                            <div className="bg-blue-50 p-2 rounded-full">
-                                <Activity className="w-6 h-6 text-blue-600" />
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="p-4 bg-gray-50 rounded-xl border border-blue-100">
-                            <h3 className="font-bold text-gray-900 mb-1">&quot;{userName} 님, 주말 관리가 핵심이에요&quot;</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                평일 평균 점수는 양호하지만, 금요일부터 회복 점수가 급격히 떨어지는 패턴이 반복되고 있습니다.
-                                이번 주말에는 고강도 활동보다는 정적인 휴식을 취해보는 것이 어떨까요?
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* 2. Weekly Trend Chart */}
-                <div>
-                    <h2 className="text-lg font-bold mb-4">요일별 회복 흐름</h2>
-                    <Card className="overflow-hidden">
-                        <CardContent className="p-6">
-                            <div className="h-64 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={weeklyData}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                        <XAxis
-                                            dataKey="day"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                            dy={10}
-                                        />
-                                        <YAxis hide />
-                                        <Tooltip
-                                            cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Bar
-                                            dataKey="score"
-                                            fill="#3b82f6"
-                                            radius={[4, 4, 0, 0]}
-                                            barSize={20}
-                                        />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="mt-4 flex justify-between text-xs text-gray-500 px-2">
-                                <span>최저: 48점 (토)</span>
-                                <span>최고: 85점 (목)</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* 3. Category Radar Chart */}
-                <div>
-                    <h2 className="text-lg font-bold mb-4">{userName} 님의 회복 밸런스</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardContent className="p-4 flex items-center justify-center">
-                                <div className="h-64 w-full max-w-[300px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={categoryData}>
-                                            <PolarGrid stroke="#e5e7eb" />
-                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11 }} />
-                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                            <Radar
-                                                name={`${userName} 님의 점수`}
-                                                dataKey="A"
-                                                stroke="#2563eb"
-                                                strokeWidth={2}
-                                                fill="#3b82f6"
-                                                fillOpacity={0.3}
-                                            />
-                                        </RadarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <div className="space-y-3">
-                            <Card className="bg-red-50 border-none">
-                                <CardContent className="p-4 flex items-start gap-3">
-                                    <Moon className="w-5 h-5 text-red-500 mt-0.5" />
-                                    <div>
-                                        <h4 className="font-bold text-red-700 text-sm">{userName} 님, 수면 부족 경고</h4>
-                                        <p className="text-xs text-red-600 mt-1">
-                                            평균 수면 시간이 5시간대로 떨어졌습니다.
-                                            이번 주는 12시 이전 취침을 목표로 해보세요.
-                                        </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card className="bg-green-50 border-none">
-                                <CardContent className="p-4 flex items-start gap-3">
-                                    <Brain className="w-5 h-5 text-green-500 mt-0.5" />
-                                    <div>
-                                        <h4 className="font-bold text-green-700 text-sm">피로도 관리 우수</h4>
-                                        <p className="text-xs text-green-600 mt-1">
-                                            주중 짧은 휴식 루틴이 효과를 보고 있습니다.
-                                            업무 중간 스트레칭 빈도가 늘었습니다.
-                                        </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 4. Action Plan */}
-                <div>
-                    <h2 className="text-lg font-bold mb-4">다음 주 회복 제안</h2>
-                    <div className="space-y-3">
-                        <div className="bg-white p-5 rounded-xl border flex items-center justify-between">
-                            <div className="space-y-1">
-                                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">PRIORITY 1</span>
-                                <h3 className="font-bold">토요일 오전 늦잠 허용하기</h3>
-                                <p className="text-sm text-gray-500">부족한 수면 부채를 갚기 위해 90분 더 주무세요.</p>
-                            </div>
-                        </div>
-                        <div className="bg-white p-5 rounded-xl border flex items-center justify-between">
-                            <div className="space-y-1">
-                                <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">PRIORITY 2</span>
-                                <h3 className="font-bold">잠들기 전 스마트폰 30분 금지</h3>
-                                <p className="text-sm text-gray-500">수면의 질을 높이기 위한 가장 확실한 방법입니다.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <motion.div 
+          animate={{ rotate: 360 }} 
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full"
+        />
+      </div>
     );
+  }
+
+  return (
+    <ChapterWrapper chapter="ai-navigator">
+      <div className="min-h-screen bg-background text-text-primary pb-32">
+        {/* Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-line">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" asChild className="rounded-full">
+                <Link href="/dashboard">
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+              </Button>
+              <h1 className="text-base font-black tracking-tight">주간 리듬 해석 리포트</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Download className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Share2 className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 pt-24 max-w-2xl space-y-12">
+          {/* Hero Section */}
+          <section className="text-center space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center px-4 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase"
+            >
+              <Sparkles className="w-3 h-3 mr-2" />
+              7-Day Journey Complete
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl md:text-4xl font-black tracking-tighter leading-tight"
+            >
+              당신의 7일은<br />
+              <span className="text-primary underline decoration-primary/30 underline-offset-8">하나의 흐름</span>이 되었습니다.
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-slate font-medium opacity-60"
+            >
+              완벽하게 회복된 것이 아니라,<br />
+              이제 내 흐름을 보기 시작한 것입니다.
+            </motion.p>
+          </section>
+
+          {/* 1. 7-Day Visual Evidence (The Snapshots) */}
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-primary" />
+                7일의 자기인식 타임라인
+              </h3>
+              <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black px-2">VISUAL EVIDENCE</Badge>
+            </div>
+            
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 snap-x">
+              {records.map((record, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="flex-shrink-0 w-48 snap-start"
+                >
+                  <Card className="rounded-[24px] overflow-hidden border-line shadow-sm bg-white">
+                    <div className="aspect-[3/4] relative bg-mist">
+                      {record.imageUrl ? (
+                        <Image src={record.imageUrl} alt={`Day ${record.day}`} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate/20 p-4 text-center">
+                          <ImageIcon className="w-10 h-10 mb-2" />
+                          <p className="text-[10px] font-bold">이미지 없이 기록됨</p>
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3 bg-obsidian/80 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                        DAY {record.day.toString().padStart(2, '0')}
+                      </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <p className="text-[10px] font-bold text-slate/40 mb-1">
+                        {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                      </p>
+                      <p className="text-xs font-black text-obsidian line-clamp-2 leading-relaxed">
+                        {record.summary || '남겨진 기록이 없습니다.'}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* 2. Rhythm Interpretation Chart */}
+          <section className="space-y-6 bg-surface p-8 rounded-[40px] border border-line shadow-xl">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black tracking-tight">주간 리듬 해석</h3>
+              <p className="text-sm text-slate font-medium opacity-60">지난 7일간 {userName} 님의 회복 에너지 흐름입니다.</p>
+            </div>
+
+            <div className="h-64 w-full pt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={records}>
+                  <XAxis 
+                    dataKey="day" 
+                    tickFormatter={(val) => `D${val}`}
+                    tick={{ fontSize: 10, fontWeight: 'bold', fill: 'var(--color-text-secondary)' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis hide domain={[0, 100]} />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-obsidian p-3 rounded-xl border border-white/10 shadow-2xl">
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Energy Flow</p>
+                            <p className="text-lg font-black text-white">{payload[0].value}%</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="var(--color-primary)"
+                    strokeWidth={4}
+                    dot={{ r: 6, fill: 'var(--color-primary)', strokeWidth: 0 }}
+                    activeDot={{ r: 8, strokeWidth: 0 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-line/50">
+              <div>
+                <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest mb-1">Average Flow</p>
+                <p className="text-2xl font-black text-obsidian">{averageScore}%</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest mb-1">Status</p>
+                <p className="text-2xl font-black text-primary">STABLE</p>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. Deep Insight: Disruption Factors & Routines */}
+          <section className="space-y-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+                <Zap className="w-5 h-5 text-primary" />
+                이번 주 나를 가장 많이 흔든 것
+              </h3>
+              <div className="grid gap-3">
+                {[
+                  { icon: '🌙', label: '수면 부족', desc: '새벽 1시 이후 취침이 3회 관찰되었습니다.', color: 'bg-indigo-500' },
+                  { icon: '☕', label: '카페인 과부하', desc: '오후 4시 이후 카페인 섭취가 리듬을 깨뜨렸습니다.', color: 'bg-amber-500' },
+                  { icon: '🏃', label: '불규칙한 활동', desc: '갑작스러운 고강도 활동 후 피로도가 급증했습니다.', color: 'bg-emerald-500' }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 p-5 bg-white rounded-3xl border border-line shadow-sm">
+                    <div className="text-2xl">{item.icon}</div>
+                    <div>
+                      <h4 className="text-sm font-black text-obsidian">{item.label}</h4>
+                      <p className="text-xs text-slate font-medium opacity-60">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
+                다음 주 작은 실천 루틴
+              </h3>
+              <div className="grid gap-3">
+                {[
+                  { label: '밤 11시 스마트폰 멀리하기', time: '10분', type: 'SLEEP' },
+                  { label: '오후 3시 가벼운 스트레칭', time: '5분', type: 'BODY' },
+                  { label: '기상 직후 미지근한 물 한 잔', time: '1분', type: 'LIFESTYLE' }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-5 bg-primary/5 rounded-3xl border border-primary/10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                        <CheckCircleIcon className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="text-sm font-black text-obsidian">{item.label}</span>
+                    </div>
+                    <Badge variant="outline" className="border-primary/20 text-primary font-black text-[10px]">{item.time}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 4. Anonymous Share Card Preview */}
+          <section className="space-y-6">
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-black tracking-tight flex items-center justify-center gap-2">
+                <Share2 className="w-5 h-5 text-primary" />
+                나의 발견 카드
+              </h3>
+              <p className="text-sm text-slate font-medium opacity-60">민감한 정보는 빼고, 내 흐름의 정체성만 담았습니다.</p>
+            </div>
+
+            <div 
+              ref={cardRef}
+              className="bg-obsidian p-12 rounded-[48px] text-center space-y-8 relative overflow-hidden aspect-[4/5] flex flex-col items-center justify-center shadow-2xl"
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-[80px] -ml-24 -mb-24" />
+              
+              <div className="relative z-10 space-y-8 w-full">
+                <div className="text-6xl animate-bounce-slow">🌃</div>
+                <div className="space-y-3">
+                  <p className="text-xs font-black text-primary uppercase tracking-[0.4em]">Rhythm Identity</p>
+                  <h4 className="text-3xl font-black text-white leading-tight tracking-tighter">
+                    나는 밤에 무너지는<br />타입이었습니다.
+                  </h4>
+                </div>
+                <p className="text-white/40 text-xs font-medium max-w-[200px] mx-auto leading-relaxed">
+                  기록해보니, 피로보다 늦은 식사와 수면 리듬이 먼저 흔들리고 있었습니다.
+                </p>
+                
+                <div className="pt-8 border-t border-white/10 flex justify-between items-center text-[8px] font-black text-white/20 uppercase tracking-[0.2em] w-full">
+                  <span>YOUNIQLE Recovery CGM</span>
+                  <span>7-Day Journey COMPLETE</span>
+                </div>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handleDownload}
+              className="w-full h-18 bg-obsidian text-white rounded-[24px] font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center justify-center gap-3"
+            >
+              <Download className="w-5 h-5" />
+              카드 이미지 저장하기
+            </Button>
+          </section>
+
+          {/* 5. Value Transition: Storage & Detailed Interpretation */}
+          <section className="pt-8 space-y-6">
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-black tracking-tight">이 흐름을 계속 이어가고 싶다면</h3>
+              <p className="text-sm text-slate font-medium opacity-60">기록은 쌓이면 나를 이해하는 가장 강력한 자산이 됩니다.</p>
+            </div>
+
+            <Card className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl">
+              <CardContent className="p-10 space-y-8">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl shadow-inner animate-pulse">📦</div>
+                  <div className="flex-1 space-y-1">
+                    <h4 className="text-xl font-black text-white">리듬 보관함 시작하기</h4>
+                    <p className="text-xs text-white/40 font-medium leading-relaxed">
+                      7일의 기록이 휘발되지 않도록 안전하게 보관하고,<br />
+                      매주 데이터 기반의 심층 해석을 받아보세요.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <Button asChild className="w-full h-16 bg-primary text-obsidian rounded-[24px] font-black text-lg hover:scale-[1.02] transition-transform">
+                    <Link href="/membership">보관함 및 주간 해석 시작</Link>
+                  </Button>
+                  
+                  <div className="pt-4 border-t border-white/10">
+                    <Link href="/private-report" className="w-full text-white/40 hover:text-white text-[11px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 group">
+                      심화 정리가 필요하다면? <span className="text-primary group-hover:translate-x-1 transition-transform">조용한 정리 신청하기 →</span>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        </main>
+      </div>
+    </ChapterWrapper>
+  );
+}
+
+function CheckCircleIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  );
 }

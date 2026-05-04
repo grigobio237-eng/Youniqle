@@ -120,13 +120,21 @@ export async function POST(req: NextRequest) {
         const dayOfWeek = now.toLocaleDateString('ko-KR', { weekday: 'long' });
         const theme = WEEKDAY_THEMES[dayOfWeek] || '일상의 회복';
 
-        // Gemini를 통해 질문 변주 생성
-        const dynamicQuestions = await GeminiAIEngine.paraphrasePrecisionQuestions(
-            BASE_QUESTIONS,
-            dayOfWeek,
-            theme,
-            userName
-        );
+        // Gemini를 통해 질문 변주 생성 (타임아웃 10초 설정)
+        const dynamicQuestions = await Promise.race([
+            GeminiAIEngine.paraphrasePrecisionQuestions(
+                BASE_QUESTIONS,
+                dayOfWeek,
+                theme,
+                userName
+            ),
+            new Promise<any[]>((_, reject) => 
+                setTimeout(() => reject(new Error('AI Paraphrasing Timeout')), 10000)
+            )
+        ]).catch(err => {
+            console.warn(`[API] Paraphrasing failed or timed out: ${err.message}. Using base questions.`);
+            return BASE_QUESTIONS;
+        });
 
         return NextResponse.json({
             theme: `${dayOfWeek}의 테마: ${theme}`,
