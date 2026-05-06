@@ -11,6 +11,8 @@ const ResultDisplay = dynamic(() => import('@/components/home/ResultDisplay'), {
 const WebtoonChallengeDialog = dynamic(() => import('@/components/home/WebtoonChallengeDialog'), { ssr: false });
 import LifeSnapFeed from '@/components/dashboard/LifeSnapFeed';
 import WeeklyReportView from '@/components/dashboard/WeeklyReportView';
+import RecoveryToolkitView from '@/components/dashboard/RecoveryToolkitView';
+import RecoveryInsightView from '@/components/dashboard/RecoveryInsightView';
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
@@ -40,16 +42,35 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
-  const [activeTab, setActiveTab] = useState<'home' | 'snap' | 'report'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'toolkit' | 'insight' | 'snap'>('home');
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mist flex flex-col items-center justify-center space-y-4">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-chapter-accent/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-chapter-accent border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-mist flex flex-col pt-32 px-4 space-y-12">
+        {/* Skeleton Timeline Area */}
+        <div className="container mx-auto max-w-5xl space-y-6">
+          <div className="flex justify-between items-center">
+            <div className="w-32 h-4 bg-slate-200 rounded-full animate-pulse" />
+            <div className="w-20 h-6 bg-slate-200 rounded-full animate-pulse" />
+          </div>
+          <div className="w-full h-24 bg-white/50 rounded-[32px] border border-line/30 animate-pulse flex items-center justify-around px-8">
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div key={i} className="w-8 h-8 bg-slate-200 rounded-full" />
+            ))}
+          </div>
         </div>
-        <p className="text-obsidian font-bold tracking-widest uppercase text-xs">Syncing Recovery Data...</p>
+        
+        {/* Skeleton Card Area */}
+        <div className="container mx-auto max-w-5xl space-y-8">
+          <div className="w-40 h-4 bg-slate-200 rounded-full animate-pulse" />
+          <div className="w-full h-64 bg-white/50 rounded-[40px] border border-line/30 animate-pulse" />
+        </div>
+
+        {/* Floating Sync Indicator (Subtle) */}
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-obsidian/80 backdrop-blur-xl text-white px-6 py-3 rounded-full shadow-2xl z-50">
+          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <span className="text-[10px] font-black uppercase tracking-widest">Syncing Recovery Data</span>
+        </div>
       </div>
     );
   }
@@ -122,36 +143,43 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mist flex flex-col pb-24">
+    <div className="w-full bg-mist flex flex-col pb-24 overflow-visible min-h-screen">
       {/* Tab Navigation */}
-      <div className="sticky top-0 z-40 bg-mist/80 backdrop-blur-md pt-4 pb-2 px-4 border-b border-line/50">
+      <div className="sticky top-[110px] md:top-[120px] z-30 bg-mist/80 backdrop-blur-md pt-4 pb-2 px-4 border-b border-line/50">
         <div className="flex bg-white/50 p-1 rounded-2xl border border-white">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'home' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
               }`}
           >
-            Overview
+            홈
+          </button>
+          <button
+            onClick={() => setActiveTab('insight')}
+            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'insight' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+              }`}
+          >
+            분석
           </button>
           <button
             onClick={() => setActiveTab('snap')}
             className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'snap' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
               }`}
           >
-            Life Snap
+            로그
           </button>
           <button
-            onClick={() => setActiveTab('report')}
-            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'report' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+            onClick={() => setActiveTab('toolkit')}
+            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'toolkit' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
               }`}
           >
-            Report
+            툴킷
           </button>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 w-full px-4 pt-6">
+      <div className="flex-1 w-full px-4 pt-6 relative z-10 overflow-visible">
         {activeTab === 'home' && (
           <div className="space-y-6">
             <DashboardPreview
@@ -170,12 +198,16 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {activeTab === 'insight' && (
+          <RecoveryInsightView unifiedData={data} />
+        )}
+
         {activeTab === 'snap' && (
           <LifeSnapFeed />
         )}
 
-        {activeTab === 'report' && (
-          <WeeklyReportView />
+        {activeTab === 'toolkit' && (
+          <RecoveryToolkitView userTier={data.user?.grade} />
         )}
       </div>
     </div>

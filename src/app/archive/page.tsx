@@ -34,7 +34,8 @@ export default function ArchivePage() {
       identity: 'ECO-ZENITH',
       summary: '밤에 무너지는 수면 리듬',
       status: 'completed',
-      color: 'primary'
+      color: 'primary',
+      image: '/images/characters/char_sleep.png'
     },
     {
       id: 'j2',
@@ -42,7 +43,8 @@ export default function ArchivePage() {
       identity: 'RECOVERY-MID',
       summary: '식사 불균형과 감정 과부하',
       status: 'completed',
-      color: 'emerald-500'
+      color: 'emerald-500',
+      image: '/images/characters/char_diagnosis.png'
     }
   ];
 
@@ -207,8 +209,8 @@ export default function ArchivePage() {
                   count: assetStats?.reports || 0, total: 10, 
                   icon: <Download className="w-5 h-5" />, 
                   status: (assetStats?.reports > 0) ? 'active' : 'unexplored', 
-                  desc: 'AI 생성 리포트 및 제안서',
-                  tooltip: '데이터 기반으로 AI가 생성한 개인별 맞춤 회복 리포트 보관함입니다.',
+                  desc: '유니클 생성 리포트 및 제안서',
+                  tooltip: '데이터 기반으로 유니클이 생성한 개인별 맞춤 회복 리포트 보관함입니다.',
                   href: '/ai-navigator'
                 }
               ].map((item, i) => (
@@ -251,10 +253,10 @@ export default function ArchivePage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold opacity-60">Insight Report</p>
-                  <p className="text-sm font-black">데이터가 100포인트 이상 쌓이면 AI 정밀 분석 리포트 생성이 가능합니다.</p>
+                  <p className="text-sm font-black">데이터가 100포인트 이상 쌓이면 유니클 정밀 분석 리포트 생성이 가능합니다.</p>
                 </div>
               </div>
-              <Button asChild className="bg-primary text-obsidian font-black rounded-2xl px-8 h-12 hover:scale-105 transition-transform">
+              <Button asChild className="bg-reward-gold text-obsidian font-black rounded-2xl px-8 h-12 hover:scale-105 transition-transform shadow-lg shadow-reward-gold/20">
                 <Link href="/navigator">데이터 상담 신청하기</Link>
               </Button>
             </div>
@@ -281,7 +283,9 @@ export default function ArchivePage() {
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row items-stretch">
                         <div className="bg-mist/30 p-10 flex flex-col justify-center items-center md:w-64 border-b md:border-b-0 md:border-r border-line/50">
-                          <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🌌</div>
+                          <div className="w-24 h-24 mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
+                            <img src={journey.image} alt={journey.summary} className="w-full h-full object-contain" />
+                          </div>
                           <Badge className="bg-obsidian text-white font-black text-[9px] tracking-tighter uppercase px-3 py-1 rounded-full mb-2">{journey.identity}</Badge>
                           <p className="text-[10px] text-slate/40 font-bold tracking-widest">{journey.date}</p>
                         </div>

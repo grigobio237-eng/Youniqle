@@ -70,7 +70,7 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
     lifestyle: ['stress', 'chronic_fatigue']
 };
 
-export default function AiNavigatorPage() {
+export default function YouniqleNavigatorPage() {
     const { data: session } = useSession();
     const { trackEvent } = useActivityTracker();
     const { journey } = useRecovery();
@@ -170,7 +170,7 @@ export default function AiNavigatorPage() {
                 }
             }
 
-            // 3. AI 조언 API 호출
+            // 3. 유니클 조언 API 호출
             const adviceResponse = await fetch('/api/ai/navigator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -189,7 +189,7 @@ export default function AiNavigatorPage() {
             await fetchExternalProducts();
 
         } catch (e) {
-            console.error("AI Navigator Fetch Error", e);
+            console.error("Youniqle Navigator Fetch Error", e);
         } finally {
             setLoading(false);
         }
@@ -285,7 +285,7 @@ export default function AiNavigatorPage() {
                             <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-8">
                                 <div className="space-y-4">
                                     <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
-                                        AI Recovery Navigator
+                                        유니클 Recovery Navigator
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">리듬체크</h1>
                                     <p className="text-lg md:text-xl text-slate/60 font-bold max-w-xl break-keep">

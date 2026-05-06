@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CheckCircle, Activity, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle, Activity, Sparkles, ArrowRight } from 'lucide-react';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 
@@ -84,141 +84,147 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
   const isMedicineQuestion = currentQ.category === '약물' || currentQ.text.includes('복용') || currentQ.text.includes('약');
 
   return (
-    <div className="max-w-md mx-auto min-h-[80vh] flex flex-col justify-center px-4 py-8 md:py-12">
-      {/* Header Nudge */}
-      <div className="mb-12 text-center space-y-2 animate-fade-in">
-        <h1 className="text-2xl md:text-3xl font-black text-obsidian tracking-tight break-keep">{header.title}</h1>
-        <p className="text-sm text-slate/50 font-bold uppercase tracking-widest">{header.sub}</p>
-      </div>
+    <div className="max-w-md mx-auto min-h-[85vh] flex flex-col justify-between px-6 py-10 md:py-16 bg-mist/20 rounded-[48px]">
+      <div className="flex-1 flex flex-col justify-center">
+        {/* Header Nudge */}
+        <div className="mb-12 text-center space-y-3">
+          <h1 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">{header.title}</h1>
+          <p className="text-[10px] text-chapter-accent font-black uppercase tracking-[0.2em]">{header.sub}</p>
+        </div>
 
-      {/* Progress Indicator */}
-      <div className="mb-10">
-        <div className="flex justify-between items-end mb-3">
-          <div className="space-y-1">
-            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest block">Progress</span>
-            <span className="text-sm font-bold text-slate">
-              {step + 1}번째 리듬 <span className="text-slate/30">/ {questions.length}</span>
+        {/* Progress Indicator */}
+        <div className="mb-12 px-2">
+          <div className="flex justify-between items-end mb-4">
+            <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest">
+              STEP {step + 1} OF {questions.length}
+            </span>
+            <span className="text-2xl font-black text-chapter-accent italic tabular-nums">
+              {Math.round(progress)}%
             </span>
           </div>
-          <span className="text-2xl font-black text-chapter-accent italic">
-            {Math.round(progress)}%
-          </span>
+          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden p-[1px]">
+            <motion.div
+              className="bg-chapter-accent h-full rounded-full shadow-[0_0_15px_rgba(var(--chapter-accent-rgb),0.4)]"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.8, ease: "circOut" }}
+            />
+          </div>
         </div>
-        <div className="w-full bg-mist h-3 rounded-full overflow-hidden border border-line/30">
+
+        {/* Question Card */}
+        <AnimatePresence mode='wait'>
           <motion.div
-            className="bg-chapter-accent h-full rounded-full shadow-[0_0_10px_rgba(var(--chapter-accent-rgb),0.3)]"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          />
-        </div>
+            key={step}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-10"
+          >
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white shadow-sm border border-line">
+                <Activity className="w-3 h-3 text-chapter-accent" />
+                <span className="text-[10px] font-black text-slate uppercase tracking-widest">{currentQ.category}</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-obsidian leading-tight tracking-tight break-keep italic">
+                {currentQ.text}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {currentQ.options.map((opt, idx) => {
+                const isSelected = currentAnswer?.answer === opt.label;
+                return (
+                  <motion.button
+                    key={idx}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleOptionSelect(opt.score, opt.label)}
+                    className={`w-full p-6 text-left border-2 rounded-[28px] transition-all relative overflow-hidden group
+                      ${isSelected
+                        ? 'bg-obsidian border-obsidian text-white shadow-2xl'
+                        : 'bg-white border-line hover:border-chapter-accent text-slate'
+                      }`}
+                  >
+                    <div className="flex items-center justify-between relative z-10">
+                      <span className={`text-base md:text-lg font-bold ${isSelected ? 'text-white' : 'text-obsidian'}`}>{opt.label}</span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                        ${isSelected ? 'bg-chapter-accent border-chapter-accent' : 'border-line'}
+                      `}>
+                        {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-12 -mt-12" />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Medicine Detail Input */}
+            {isMedicineQuestion && currentAnswer && !currentAnswer.answer.includes('없음') && !currentAnswer.answer.includes('해당 사항 없음') && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-4 pt-4"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-reward-gold" />
+                  <span className="text-xs font-black text-chapter-accent uppercase tracking-widest">Details Needed</span>
+                </div>
+                <textarea
+                  value={currentAnswer.detail || ''}
+                  onChange={(e) => {
+                    const newAnswers = [...answers];
+                    newAnswers[step] = { ...currentAnswer, detail: e.target.value };
+                    setAnswers(newAnswers);
+                  }}
+                  placeholder="복용 중인 약 이름을 적어주세요."
+                  className="w-full p-6 bg-white border-2 border-line rounded-[28px] focus:border-chapter-accent outline-none min-h-[120px] resize-none text-sm font-bold shadow-sm"
+                />
+              </motion.div>
+            )}
+
+            {isLastStep && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="pt-8 border-t border-line/50 space-y-4"
+              >
+                <label className="block text-[10px] font-black text-slate/40 uppercase tracking-widest">
+                  Personal Note (Optional)
+                </label>
+                <textarea
+                  value={userNote}
+                  onChange={(e) => setUserNote(e.target.value)}
+                  placeholder="오늘의 특이사항이나 유니클에게 하고 싶은 말을 적어주세요."
+                  className="w-full p-6 bg-white/50 border-2 border-line/30 rounded-[28px] focus:border-chapter-accent outline-none min-h-[120px] resize-none text-sm font-bold"
+                />
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Question */}
-      <AnimatePresence mode='wait'>
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="space-y-8"
-        >
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-chapter-accent/10 border border-chapter-accent/20">
-              <Activity className="w-3 h-3 text-chapter-accent" />
-              <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">{currentQ.category}</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black text-obsidian leading-[1.2] tracking-tight break-keep">
-              {currentQ.text}
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {currentQ.options.map((opt, idx) => {
-              const isSelected = currentAnswer?.answer === opt.label;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleOptionSelect(opt.score, opt.label)}
-                  className={`w-full p-4 text-left border rounded-xl transition-all active:scale-98 
-                    ${isSelected
-                      ? 'bg-primary/10 border-primary text-primary ring-1 ring-primary'
-                      : 'hover:bg-primary/5 hover:border-primary text-gray-700'
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={isSelected ? 'font-bold' : ''}>{opt.label}</span>
-                    {isSelected ? (
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-gray-300" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Conditional Medicine Detail Input */}
-          {isMedicineQuestion && currentAnswer && !currentAnswer.answer.includes('없음') && !currentAnswer.answer.includes('해당 사항 없음') && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="space-y-3 pt-2"
-            >
-              <label className="text-sm font-bold text-chapter-accent flex items-center gap-2">
-                <Sparkles className="w-3 h-3" /> 어떤 약물을 복용 중이신가요?
-              </label>
-              <textarea
-                value={currentAnswer.detail || ''}
-                onChange={(e) => {
-                  const newAnswers = [...answers];
-                  newAnswers[step] = { ...currentAnswer, detail: e.target.value };
-                  setAnswers(newAnswers);
-                }}
-                placeholder="예: 아스피린, 혈압약, 영양제 등"
-                className="w-full p-4 bg-mist/30 border border-line/50 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm font-medium"
-              />
-              <p className="text-[10px] text-slate/50 leading-relaxed italic">
-                * 약 이름을 몰라도 괜찮아요. '혈압약', '영양제'처럼 편하게 적어주시면 유니클이 기억해둘게요.
-              </p>
-            </motion.div>
-          )}
-
-          {/* User Note Input (Last Step Only) */}
-          {isLastStep && (
-            <div className="pt-6 border-t animate-fade-in-up">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                더 하고 싶은 말이 있나요? (선택)
-              </label>
-              <textarea
-                value={userNote}
-                onChange={(e) => setUserNote(e.target.value)}
-                placeholder="오늘 나의 상태나 궁금한 점을 자유롭게 적어주세요."
-                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-none text-sm"
-              />
-            </div>
-          )}
-
-        </motion.div>
-      </AnimatePresence>
-
       {/* Navigation Buttons */}
-      <div className="flex gap-3 mt-8 pt-4 border-t border-gray-100">
+      <div className="flex gap-4 mt-12">
         <Button
           variant="outline"
           onClick={handlePrev}
           disabled={step === 0}
-          className="flex-1 h-12 text-lg rounded-xl"
+          className="w-20 h-16 rounded-[24px] border-line text-slate hover:bg-mist"
         >
-          <ChevronLeft className="w-5 h-5 mr-1" /> 이전
+          <ChevronLeft className="w-6 h-6" />
         </Button>
         <Button
           onClick={handleNext}
           disabled={!currentAnswer}
-          className="flex-[2] h-14 text-lg rounded-2xl bg-obsidian text-white font-black hover:scale-105 transition-all shadow-xl"
+          className={`flex-1 h-16 text-lg rounded-[24px] font-black transition-all shadow-2xl flex items-center justify-center gap-3
+            ${isLastStep ? 'bg-chapter-accent text-white hover:bg-chapter-accent/90' : 'bg-obsidian text-white hover:bg-obsidian/90'}
+          `}
         >
-          {isLastStep ? '리듬카드 확인하기' : '다음 리듬 확인'} <ChevronRight className="w-5 h-5 ml-1" />
+          {isLastStep ? '리듬카드 확인하기' : '다음 단계'}
+          <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
     </div>

@@ -73,10 +73,10 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-white flex flex-col items-center justify-center p-6 md:p-12 overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-white flex flex-col items-center justify-start md:justify-center pt-24 pb-12 px-6 md:p-12 overflow-y-auto">
       <button 
         onClick={onCancel}
-        className="absolute top-8 right-8 p-2 hover:bg-slate-100 rounded-full transition-colors"
+        className="absolute top-6 right-6 md:top-8 md:right-8 p-2 hover:bg-slate-100 rounded-full transition-colors z-10"
         title="닫기"
         aria-label="닫기"
       >
@@ -258,14 +258,53 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
               <div className="flex flex-col items-center gap-4">
                 <Button 
                   onClick={handleSubmit}
-                  disabled={!memo.trim()}
-                  className="h-16 px-12 bg-obsidian text-white rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-xl flex items-center gap-4 disabled:opacity-30 disabled:scale-100"
+                  disabled={!memo.trim() || isDiagnosing}
+                  className={`w-full max-w-[340px] h-16 rounded-[24px] text-lg font-black shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-slate-100' : 'bg-obsidian hover:bg-obsidian/90 text-white shadow-obsidian/20'}`}
                 >
-                  이 기록으로 결정 <ArrowRight className="w-5 h-5" />
+                  {isDiagnosing ? (
+                    <>
+                      {/* Progress Bar Layer */}
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        className="absolute inset-y-0 left-0 bg-chapter-accent z-0"
+                        transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
+                      />
+                      
+                      {/* Base Text (Slate) - Inactive Layer */}
+                      <div className="absolute inset-0 flex items-center justify-center z-10 text-slate/40">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>{loadingText}</span>
+                          <span className="tabular-nums opacity-60">{Math.round(progress)}%</span>
+                        </div>
+                      </div>
+
+                      {/* Inverted Text (White) - Active Layer */}
+                      <motion.div 
+                        className="absolute inset-y-0 left-0 overflow-hidden z-20 flex items-center bg-chapter-accent"
+                        style={{ width: `${progress}%` }}
+                      >
+                        <div className="w-[340px] flex items-center justify-center text-white">
+                          <div className="flex items-center gap-2 w-full justify-center">
+                            <Sparkles className="w-5 h-5 animate-pulse" />
+                            <span className="whitespace-nowrap">{loadingText}</span>
+                            <span className="tabular-nums font-black">{Math.round(progress)}%</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  ) : (
+                    <div className="relative z-10 flex items-center justify-center">
+                      <span>이 기록으로 결정</span>
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  )}
                 </Button>
                 <button 
                   onClick={() => setMode('SELECT')}
-                  className="text-slate font-bold text-sm underline underline-offset-4 opacity-40 hover:opacity-100 transition-opacity"
+                  disabled={isDiagnosing}
+                  className="text-slate font-bold text-sm underline underline-offset-4 opacity-40 hover:opacity-100 transition-opacity disabled:pointer-events-none"
                 >
                   사진 촬영으로 돌아가기
                 </button>

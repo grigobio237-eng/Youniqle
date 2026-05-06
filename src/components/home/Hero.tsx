@@ -168,12 +168,12 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
               <HeroScanner onStart={onStart} isDiagnosing={isDiagnosing} />
             </div>
 
-            {/* Contextual Nudge Bubble */}
+            {/* Contextual Nudge Bubble - Hidden on mobile to prevent overlap */}
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onStart()}
-              className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line cursor-pointer hover:border-chapter-accent/50 transition-all z-10 group"
+              className="hidden md:block absolute -bottom-6 -left-12 bg-white p-4 rounded-[30px] shadow-2xl border border-line cursor-pointer hover:border-chapter-accent/50 transition-all z-10 group"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-3 h-3 rounded-full bg-chapter-accent animate-ping" />
@@ -191,11 +191,24 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           {/* 3. Button & checkmarks (Bottom on Mobile, Bottom-Left on Desktop) */}
           <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-left-8 duration-700 order-3 lg:order-3 lg:col-start-1">
             <div className="pt-2 space-y-6">
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
                 <Button
-                  asChild
+                  onClick={() => onStart()}
                   size="lg"
                   className="btn-primary w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-black shadow-xl shadow-chapter-accent/20 group relative overflow-hidden transition-all duration-300 bg-chapter-accent hover:bg-chapter-accent/90 text-white"
+                >
+                  <div className="relative z-10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
+                    <span>60초 리듬체크</span>
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Button>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-bold border-line hover:bg-mist transition-all group"
                 >
                   <Link href="/dashboard">
                     <div className="relative z-10 flex items-center justify-center">
@@ -204,18 +217,6 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
-                </Button>
-
-                <Button
-                  onClick={() => onStart()}
-                  variant="outline"
-                  size="lg"
-                  className="w-full md:w-auto h-14 md:h-16 px-8 rounded-2xl text-base md:text-lg font-bold border-line hover:bg-mist transition-all"
-                >
-                  <div className="relative z-10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" />
-                    <span>60초 리듬체크</span>
-                  </div>
                 </Button>
               </div>
               <div className="text-sm font-bold text-chapter-accent flex items-center gap-2">

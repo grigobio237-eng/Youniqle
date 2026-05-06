@@ -103,14 +103,14 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
-      <body className={`${inter.className} min-h-screen flex flex-col`} suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen`} suppressHydrationWarning>
         <SessionProvider>
           <LanguageProvider>
             <NudgeFeaturesProvider>
               <ToastProvider>
                 <RecoveryProvider>
                   <ConditionalHeader />
-                  <main className="flex-1 pt-24 md:pt-32">
+                  <main className="w-full pt-[140px] md:pt-[160px] min-h-[100dvh] overflow-visible">
                     {children}
                   </main>
                   <Footer />

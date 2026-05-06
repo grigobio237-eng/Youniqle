@@ -108,8 +108,8 @@ export default function MembershipPage() {
                     <span className="text-primary underline decoration-primary/20 underline-offset-[12px]">나를 이해하는 자산</span>이 됩니다
                 </h1>
                 <p className="text-xl text-slate/70 leading-relaxed font-bold max-w-2xl mx-auto break-keep">
-                    유니클 패스는 병원 할인권이 아닙니다. 내 회복 흐름을 영구 보관하고, 
-                    흩어진 기록을 데이터로 해석받아 나만의 회복 OS를 구축하는 이용권입니다.
+                    유니클 패스는 당신의 회복 여정을 기록하고 영구 소장하는 데이터 멤버십입니다. 
+                    흩어진 일상의 흔적을 정밀한 데이터로 해석받아 당신만의 완벽한 회복 OS를 완성하세요.
                 </p>
             </div>
 
@@ -163,10 +163,10 @@ export default function MembershipPage() {
             <section className="max-w-4xl mx-auto bg-mist/30 p-12 rounded-[48px] text-center space-y-6">
                 <Shield className="w-12 h-12 mx-auto text-slate/40" />
                 <div className="space-y-2">
-                    <h3 className="text-xl font-black text-obsidian tracking-tight">당신의 기록은 당신의 것입니다</h3>
+                    <h3 className="text-xl font-black text-obsidian tracking-tight">당신의 기록은 당신의 데이터 자산입니다</h3>
                     <p className="text-sm text-slate/60 font-bold leading-relaxed break-keep">
                         유니클은 사용자의 명시적 요청과 별도 동의 없이는 어떠한 데이터도 외부 전문기관에 공유하지 않습니다.<br />
-                        멤버십은 기록을 '팔기 위함'이 아니라, 당신이 기록을 '더 잘 쓰게 돕기 위함'입니다.
+                        멤버십은 파편화된 기록을 체계적인 데이터로 자산화하고, 더 깊은 회복의 통찰을 제공하는 데 집중합니다.
                     </p>
                 </div>
             </section>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Calendar, ChevronDown, Activity, Brain } from 'lucide-react';
+import { Loader2, Calendar, ChevronDown, Activity, Brain, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CATEGORIES = [
@@ -82,8 +82,81 @@ export default function LifeSnapFeed() {
   const getCategoryEmoji = (catId: string) => CATEGORIES.find(c => c.id === catId)?.emoji || '📸';
   const getCategoryLabel = (catId: string) => CATEGORIES.find(c => c.id === catId)?.label || '기타';
 
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
+
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteModal({ show: true, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+
+    try {
+      const res = await fetch(`/api/dashboard/snaps/${deleteModal.id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setSnaps(prev => prev.filter(snap => snap._id !== deleteModal.id));
+        setDeleteModal({ show: false, id: null });
+      } else {
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Delete failed', error);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col space-y-6">
+    <div className="w-full flex flex-col space-y-6 relative">
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteModal.show && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteModal({ show: false, id: null })}
+              className="absolute inset-0 bg-obsidian/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-line flex flex-col items-center text-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-4xl shadow-inner">
+                🗑️
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-obsidian tracking-tight">기록을 삭제할까요?</h3>
+                <p className="text-sm text-slate/70 font-bold leading-relaxed px-4">
+                  선택하신 기록은 데이터베이스에서 <span className="text-red-500">영구히 삭제</span>되며 복구할 수 없습니다.<br/>
+                  또한 <span className="text-chapter-accent">7일 회복 챌린지</span> 데이터와 통계에도 즉시 반영됩니다.
+                </p>
+              </div>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setDeleteModal({ show: false, id: null })}
+                  className="flex-1 h-14 rounded-2xl bg-mist text-slate font-black hover:bg-line transition-all"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 h-14 rounded-2xl bg-red-500 text-white font-black hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all"
+                >
+                  기록 삭제
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Category Filter - Horizontal Scroll for Mobile */}
       <div className="w-full overflow-x-auto custom-scrollbar pb-2">
         <div className="flex gap-2 px-1">
@@ -115,94 +188,84 @@ export default function LifeSnapFeed() {
           <p className="text-slate/60 font-bold text-sm">최근 7일간 기록된 스냅이 없습니다.</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          <AnimatePresence>
-            {snaps.map((snap) => (
-              <motion.div
-                key={snap._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-[32px] border border-line overflow-hidden shadow-sm"
-              >
-                {/* Image Section */}
-                <div className="relative w-full aspect-square bg-mist">
-                  {snap.imageUrl ? (
-                    <img src={snap.imageUrl} alt="Snap" className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-5xl opacity-20">
-                      {getCategoryEmoji(snap.category)}
-                    </div>
-                  )}
-                  
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <Badge className="bg-white/90 backdrop-blur text-obsidian font-black uppercase tracking-widest text-[10px] border-none shadow-sm">
-                      {getCategoryEmoji(snap.category)} {getCategoryLabel(snap.category)}
-                    </Badge>
-                  </div>
-                  
-                  {snap.score > 0 && (
-                    <div className="absolute top-4 right-4 w-12 h-12 bg-chapter-accent text-white rounded-full flex items-center justify-center font-black shadow-lg">
-                      {snap.score}
-                    </div>
-                  )}
-                  
-                  <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-white/90 text-xs font-bold">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {formatDate(snap.createdAt)}
-                  </div>
-                </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <AnimatePresence mode="popLayout">
+              {snaps.map((snap) => (
+                <motion.div
+                  key={snap._id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group cursor-pointer relative"
+                >
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => handleDeleteClick(e, snap._id)}
+                    title="기록 삭제"
+                    className="absolute top-1.5 right-1.5 z-20 w-7 h-7 bg-black/30 hover:bg-red-500 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
 
-                {/* Content Section */}
-                <div className="p-6 space-y-4">
-                  <div className="flex gap-3">
-                    <div className="mt-1">
-                      <Brain className="w-5 h-5 text-reward-gold" />
+                  {/* Image Section - Mini Thumbnail */}
+                  <div className="relative w-full aspect-square bg-mist overflow-hidden">
+                    {snap.imageUrl ? (
+                      <img src={snap.imageUrl} alt="Snap" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-2xl opacity-20">
+                        {getCategoryEmoji(snap.category)}
+                      </div>
+                    )}
+                    
+                    <div className="absolute top-1.5 left-1.5">
+                      <div className="bg-white/90 backdrop-blur text-[8px] font-black px-1.5 py-0.5 rounded-md shadow-sm border border-line/10">
+                        {getCategoryEmoji(snap.category)}
+                      </div>
                     </div>
-                    <p className="text-sm font-bold text-obsidian leading-relaxed italic">
+                    
+                    {snap.score > 0 && (
+                      <div className="absolute bottom-1.5 right-1.5 w-6 h-6 bg-chapter-accent/80 backdrop-blur-sm text-white rounded-full flex items-center justify-center text-[9px] font-black shadow-lg">
+                        {snap.score}
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute bottom-1.5 left-1.5 text-white/90 text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      <Calendar className="w-2.5 h-2.5" />
+                      {formatDate(snap.createdAt).split(' ')[0]} {formatDate(snap.createdAt).split(' ')[1]}
+                    </div>
+                  </div>
+
+                  {/* Content Section - Ultra Compact */}
+                  <div className="p-2 space-y-1 flex-1 flex flex-col justify-center bg-mist/10">
+                    <p className="text-[10px] font-bold text-obsidian leading-tight line-clamp-2 italic text-center px-1">
                       "{snap.summary}"
                     </p>
+                    <p className="text-[8px] text-slate/40 font-bold text-center uppercase tracking-tighter">
+                      {formatDate(snap.createdAt).split(' ')[0]} {formatDate(snap.createdAt).split(' ')[1]}
+                    </p>
                   </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
 
-                  {/* Metrics Table */}
-                  {snap.metrics && Array.isArray(snap.metrics) && snap.metrics.length > 0 && (
-                    <div className="pt-4 border-t border-line/50 space-y-2">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate/50 mb-3">
-                        <Activity className="w-3 h-3 text-chapter-accent" /> Analysis Result
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {snap.metrics.map((metric: any, idx: number) => (
-                          <div key={idx} className="p-3 bg-mist/50 rounded-2xl flex flex-col gap-1">
-                            <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-black text-slate/60 uppercase">{metric.label}</span>
-                              <span className="text-[10px] font-bold text-chapter-accent bg-chapter-accent/10 px-2 py-0.5 rounded-full">{metric.value}</span>
-                            </div>
-                            {metric.benefit && (
-                              <span className="text-[11px] font-bold text-obsidian">{metric.benefit}</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-
-          {/* Load More Button */}
           {hasMore && (
-            <Button
-              variant="outline"
-              onClick={() => fetchSnaps(true)}
-              disabled={loadingMore}
-              className="w-full h-14 rounded-2xl border-2 border-line text-slate font-black tracking-widest hover:bg-mist transition-all flex justify-center items-center gap-2"
-            >
-              {loadingMore ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronDown className="w-5 h-5" />}
-              이전 7일 기록 불러오기
-            </Button>
+            <div className="pt-10 flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => fetchSnaps(true)}
+                disabled={loadingMore}
+                className="px-8 h-12 rounded-full border-2 border-line text-slate font-black text-xs tracking-widest hover:bg-mist transition-all flex items-center gap-2"
+              >
+                {loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronDown className="w-4 h-4" />}
+                더 보기
+              </Button>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

@@ -69,7 +69,7 @@ export default function WeeklyReportView() {
                 <div>
                     <h3 className="text-xl font-black text-obsidian tracking-tight">이번 주 리포트가 없습니다.</h3>
                     <p className="text-slate/60 text-sm font-bold mt-2 max-w-[280px]">
-                        지난 7일간 기록하신 라이프 스냅을 바탕으로 AI가 주간 회복 리포트를 생성해 드립니다.
+                        지난 7일간 기록하신 라이프 스냅을 바탕으로 유니클이 주간 회복 리포트를 생성해 드립니다.
                     </p>
                 </div>
                 <Button
@@ -80,7 +80,7 @@ export default function WeeklyReportView() {
                     {generating ? (
                         <>
                             <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                            AI 분석 중...
+                            유니클 분석 중...
                         </>
                     ) : (
                         <>
@@ -181,7 +181,7 @@ export default function WeeklyReportView() {
                                         </div>
                                     )}
                                     <div className="absolute top-4 right-4 bg-obsidian/80 backdrop-blur-md text-white text-xs font-black px-3 py-1 rounded-xl">
-                                        AI Pick
+                                        유니클 Pick
                                     </div>
                                 </div>
 

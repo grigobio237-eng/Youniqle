@@ -77,6 +77,15 @@ export default function ResultDisplay({
   const scoreLevel = recoveryScore >= 70 ? '활기 회복 단계' : recoveryScore >= 40 ? '회복 진행 중' : '회복 초기 단계';
 
   useEffect(() => {
+    if (isDesigning) {
+      const timer = setTimeout(() => {
+        navigateTo('/dashboard');
+      }, 3500); // Give enough time for the 2.2s progress bar + reading
+      return () => clearTimeout(timer);
+    }
+  }, [isDesigning]);
+
+  useEffect(() => {
     const saveData = async () => {
       // 1. Local Storage
       localStorage.setItem('recovery_last_check', new Date().toISOString().split('T')[0]);
