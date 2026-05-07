@@ -289,7 +289,8 @@ export default function DeepDiagnosisReportPage() {
     };
 
     const userTier = AccessControl.getUserGroup(session?.user);
-    const canSeePremium = userTier === 'RESTART' || userTier === 'BLACK';
+    const canSeePremium = userTier === 'REBORN' || userTier === 'RESTART' || userTier === 'BLACK';
+    const hasAccess = isPaid || canSeePremium;
 
     if (result && (result.type?.toUpperCase() === 'PAID' || result.type?.toUpperCase() === 'DEEP')) {
         isPaid = true;
@@ -336,7 +337,7 @@ export default function DeepDiagnosisReportPage() {
     }
 
     // Facet Data Setup
-    const dummyFacets = isPaid ? [] : [
+    const dummyFacets = hasAccess ? [] : [
         { domain: '신경증 (N)', color: '#f43f5e', facets: ['불안', '분노', '우울', '자의식', '충동성', '취약성'] },
         { domain: '외향성 (E)', color: '#f59e0b', facets: ['친밀감', '사교성', '주장성', '활동성', '흥미추구', '명랑함'] },
         { domain: '개방성 (O)', color: '#10b981', facets: ['상상력', '예술', '감수성', '모험심', '지성', '진보성'] },
@@ -385,10 +386,10 @@ export default function DeepDiagnosisReportPage() {
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
                                     <Badge variant="outline" className={`
-                                        ${isPaid ? 'border-reward-gold text-reward-gold bg-reward-gold/5' : 'border-slate-300 text-slate-500 bg-slate-50'}
+                                        ${hasAccess ? 'border-reward-gold text-reward-gold bg-reward-gold/5' : 'border-slate-300 text-slate-500 bg-slate-50'}
                                         uppercase tracking-widest text-[10px] font-black px-3 py-1 rounded-full
                                     `}>
-                                        {isPaid ? 'Premium Analysis' : 'Basic Analysis'}
+                                        {hasAccess ? 'Premium Analysis' : 'Basic Analysis'}
                                     </Badge>
                                     <ClientOnly>
                                         <span className="text-xs font-medium text-slate-400">
@@ -426,7 +427,7 @@ export default function DeepDiagnosisReportPage() {
                         {/* Main Diamond Graph */}
                         <Card className="bg-white/60 backdrop-blur-xl border-white/50 shadow-xl rounded-[40px] overflow-hidden">
                             <CardContent className="p-0 relative">
-                                {!isPaid && (
+                                {!hasAccess && (
                                     <div className="absolute top-6 right-6 z-20">
                                         <Badge className="bg-slate-900 text-white hover:bg-slate-800">Free Version</Badge>
                                     </div>
@@ -491,7 +492,7 @@ export default function DeepDiagnosisReportPage() {
 
                         {/* Detail Cards Grid */}
                         <div className="grid grid-cols-1 gap-6">
-                            {isPaid ? chartData.map((domain, idx) => (
+                            {hasAccess ? chartData.map((domain, idx) => (
                                 <Card key={domain.subject} className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
                                     <div className={`h-2 w-full bg-gradient-to-r from-transparent via-${domain.color === '#f43f5e' ? 'rose-500' : 'indigo-500'} to-transparent opacity-50 domain-header-${idx}`} />
                                     <style jsx>{`
@@ -559,7 +560,7 @@ export default function DeepDiagnosisReportPage() {
                     </section>
 
                     {/* 3. Detailed Facets Table (Only Paid) */}
-                    {isPaid && (
+                    {hasAccess && (
                         <section className="space-y-8 pb-12">
                             <div className="flex items-center gap-4">
                                 <div className="bg-obsidian w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform rotate-2">
@@ -630,7 +631,7 @@ export default function DeepDiagnosisReportPage() {
                     )}
 
                     {/* 4. AI Solution Section (New) */}
-                    {isPaid && (
+                    {hasAccess && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
                             <div className="flex items-center gap-4">
                                 <div className="bg-obsidian w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-1">

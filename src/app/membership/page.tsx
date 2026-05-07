@@ -103,11 +103,11 @@ export default function MembershipPage() {
                 <div className="inline-flex items-center px-6 py-2 bg-primary/10 text-primary rounded-full text-xs font-black tracking-[0.3em] uppercase border border-primary/20 animate-pulse">
                     YOUNIQLE Life Pass Upgrade
                 </div>
-                <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter leading-[1.1]">
+                <h1 className="text-4xl md:text-7xl font-black text-obsidian tracking-tighter leading-[1.2] break-keep">
                     기록은 사라지지 않고<br />
-                    <span className="text-primary underline decoration-primary/20 underline-offset-[12px]">나를 이해하는 자산</span>이 됩니다
+                    <span className="text-primary">나를 이해하는 자산</span>이 됩니다
                 </h1>
-                <p className="text-xl text-slate/70 leading-relaxed font-bold max-w-2xl mx-auto break-keep">
+                <p className="text-lg md:text-xl text-slate/70 leading-relaxed font-bold max-w-2xl mx-auto break-keep px-4">
                     유니클 패스는 당신의 회복 여정을 기록하고 영구 소장하는 데이터 멤버십입니다. 
                     흩어진 일상의 흔적을 정밀한 데이터로 해석받아 당신만의 완벽한 회복 OS를 완성하세요.
                 </p>
@@ -262,8 +262,9 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
                 {isCurrent ? (
                     <Badge className={`${isObsidian ? 'bg-amber-500' : styles.bgDark} text-white border-none text-[9px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg`}>CURRENT PLAN</Badge>
                 ) : (
-                    <div className="text-[10px] font-black text-slate/30 group-hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-2">
-                        View Details <ArrowRight className="w-3 h-3" />
+                    <div className={`text-[10px] font-black transition-all duration-300 uppercase tracking-widest flex items-center gap-2 group-hover:gap-3
+                        ${isObsidian ? 'text-mist/40 group-hover:text-amber-400' : 'text-slate-400 group-hover:text-primary'}`}>
+                        View Details <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                 )}
             </div>

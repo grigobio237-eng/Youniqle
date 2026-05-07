@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, History, Lock, ShieldCheck, ArrowRight, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import Image from 'next/image';
+
 interface MembershipUpsellDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,12 +41,12 @@ export default function MembershipUpsellDialog({
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full -ml-16 -mb-16" />
           
           <div className="relative z-10 flex flex-col items-center space-y-6">
-            <div className="w-20 h-20 bg-white/10 rounded-[32px] flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-xl animate-bounce-slow">
-              <History className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 bg-white/10 rounded-[32px] flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-xl animate-bounce-slow overflow-hidden">
+              <Image src="/apple-touch-icon.png" width={48} height={48} alt="Youniqle" className="rounded-2xl" />
             </div>
             
             <div className="space-y-3">
-              <div className="inline-flex items-center px-4 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 border border-primary/30">
+              <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#D4AF37] text-obsidian text-[10px] font-black uppercase tracking-[0.25em] mb-2 border border-[#D4AF37]/30 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
                 Data Archive Protocol
               </div>
               <DialogTitle className="text-3xl font-black text-white tracking-tighter leading-tight">

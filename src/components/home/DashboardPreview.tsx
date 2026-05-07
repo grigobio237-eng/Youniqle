@@ -190,10 +190,35 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
                 </p>
               </div>
               <Button 
-                className="w-full max-w-sm h-16 bg-reward-gold hover:bg-reward-gold/90 text-obsidian rounded-2xl font-black text-lg shadow-xl shadow-reward-gold/20 transition-all hover:scale-105"
-                onClick={() => window.location.href='/certificate'}
+                className={`w-full max-w-sm h-16 rounded-2xl font-black text-lg shadow-xl transition-all hover:scale-105 ${
+                  unifiedData.certificateStatus?.isCurrentCycleClaimed 
+                  ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" 
+                  : "bg-reward-gold hover:bg-reward-gold/90 text-obsidian shadow-reward-gold/20"
+                }`}
+                onClick={async () => {
+                  if (!unifiedData.certificateStatus?.isCurrentCycleClaimed) {
+                    // Claim the certificate
+                    try {
+                      const res = await fetch('/api/user/certificate/claim', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cycleNumber: unifiedData.certificateStatus?.currentCycle })
+                      });
+                      if (res.ok) {
+                        // After claiming, redirect to certificate view
+                        window.location.href='/certificate';
+                      }
+                    } catch (err) {
+                      console.error('Failed to claim certificate:', err);
+                      window.location.href='/certificate'; // Fallback
+                    }
+                  } else {
+                    // View History
+                    window.location.href='/archive/certificates';
+                  }
+                }}
               >
-                7일 완주 증명서 받기
+                {unifiedData.certificateStatus?.isCurrentCycleClaimed ? "7일 완주 증명서 확인하기" : "7일 완주 증명서 받기"}
               </Button>
               <button className="text-[10px] font-black text-mist/30 uppercase tracking-widest hover:text-mist transition-colors">
                 다음에 할게요

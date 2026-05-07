@@ -60,12 +60,29 @@ export class AccessControl {
    */
   static getUserGroup(user: any): UserGroup {
     if (!user) return 'NONE';
+    
+    // role이 admin/superadmin인 경우 우선권 부여 가능 (필요시)
+    if (this.isAdmin(user)) return 'BLACK'; // 관리자는 최고 등급 혜택
+
     const passType = user.passInfo?.type || 'NONE';
     if (passType === 'BLACK') return 'BLACK';
     if (passType === 'RESTART') return 'RESTART';
     if (passType === 'REBORN' || user.subscription?.status === 'active') return 'REBORN';
     if (passType === 'RESET') return 'RESET';
+    
+    // 구형 필드(tier) 폴백
+    const tier = user.tier || 'NONE';
+    if (['BLACK', 'RESTART', 'REBORN', 'RESET'].includes(tier)) return tier as UserGroup;
+
     return 'NONE';
+  }
+
+  /**
+   * 프리미엄(유료) 등급 여부 확인
+   */
+  static isPremium(user: any): boolean {
+    const group = this.getUserGroup(user);
+    return ['REBORN', 'RESTART', 'BLACK'].includes(group);
   }
 
   /**

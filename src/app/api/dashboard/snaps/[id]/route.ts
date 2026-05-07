@@ -46,7 +46,15 @@ export async function DELETE(
         );
         console.log(`[LifeSnap API] Removed from User.scanTimeline: ${snap.imageUrl}`);
 
-        // 4. MongoDB에서 데이터 삭제
+        // 4. RecoveryScore에서도 snapData 비우기 (리듬체크 리포트 동기화)
+        const RecoveryScore = (await import('@/models/RecoveryScore')).default;
+        await RecoveryScore.updateMany(
+            { userId, "snapData.content": snap.imageUrl },
+            { $unset: { snapData: "" } }
+        );
+        console.log(`[LifeSnap API] Cleared snapData in RecoveryScore for image: ${snap.imageUrl}`);
+
+        // 5. MongoDB에서 데이터 삭제
         await LifeSnap.deleteOne({ _id: id });
 
         return NextResponse.json({

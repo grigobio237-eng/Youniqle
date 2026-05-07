@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, TrendingUp, ThumbsUp, AlertTriangle, Target, ShoppingBag, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function WeeklyReportView() {
+export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (products: any[]) => void }) {
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState(false);
@@ -22,6 +22,9 @@ export default function WeeklyReportView() {
                 const result = await res.json();
                 if (result.data) {
                     setReport(result.data);
+                    if (onDataLoaded && result.data.recommendedProducts) {
+                        onDataLoaded(result.data.recommendedProducts);
+                    }
                 }
             }
         } catch (error) {
@@ -43,6 +46,9 @@ export default function WeeklyReportView() {
             }
 
             setReport(result.data);
+            if (onDataLoaded && result.data.recommendedProducts) {
+                onDataLoaded(result.data.recommendedProducts);
+            }
             toast.success('이번 주 회복 리포트가 성공적으로 발행되었습니다!');
         } catch (error) {
             console.error('Failed to generate report:', error);
@@ -150,66 +156,6 @@ export default function WeeklyReportView() {
                 </p>
             </div>
 
-            {/* 4. Recommended Products */}
-            {report.recommendedProducts && report.recommendedProducts.length > 0 && (
-                <div className="bg-white p-8 rounded-[32px] border border-line space-y-6 shadow-md">
-                    <div className="flex items-center gap-2 text-reward-gold font-black uppercase text-xs tracking-widest">
-                        <ShoppingBag className="w-4 h-4" /> 유니클 샵 맞춤 추천 상품
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {report.recommendedProducts.map((prod: any, idx: number) => (
-                            <div 
-                                key={idx} 
-                                onClick={() => {
-                                    if (prod.productId) {
-                                        window.location.href = `/shop/product/${prod.productId}`;
-                                    }
-                                }}
-                                className="flex flex-col bg-mist/30 border border-line/50 rounded-[24px] overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
-                            >
-                                {/* Product Image */}
-                                <div className="relative aspect-video w-full overflow-hidden bg-slate/10">
-                                    {prod.imageUrl ? (
-                                        <img 
-                                            src={prod.imageUrl} 
-                                            alt={prod.name} 
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-4xl bg-slate/5">
-                                            🛍️
-                                        </div>
-                                    )}
-                                    <div className="absolute top-4 right-4 bg-obsidian/80 backdrop-blur-md text-white text-xs font-black px-3 py-1 rounded-xl">
-                                        유니클 Pick
-                                    </div>
-                                </div>
-
-                                {/* Product Info */}
-                                <div className="p-6 flex flex-col flex-1">
-                                    <h5 className="text-lg font-black text-obsidian group-hover:text-chapter-accent transition-colors">
-                                        {prod.name}
-                                    </h5>
-                                    
-                                    {prod.price > 0 && (
-                                        <p className="text-base font-bold text-obsidian/90 mt-1">
-                                            {prod.price.toLocaleString()}원
-                                        </p>
-                                    )}
-
-                                    <p className="text-xs font-bold text-slate/70 mt-3 bg-white p-3 rounded-xl border border-line/40 flex-1">
-                                        💡 {prod.reason}
-                                    </p>
-
-                                    <div className="mt-6 w-full py-3 bg-obsidian text-white text-center text-sm font-black rounded-xl group-hover:bg-chapter-accent transition-colors">
-                                        상품 자세히 보기
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

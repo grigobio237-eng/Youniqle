@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { AreaChart, Area, LineChart, Line, XAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { Sparkles, ArrowRight, Zap, Package, Calendar, ChevronRight, RefreshCw, ExternalLink, Store, AlertTriangle, Activity, Image as ImageIcon, CheckCircle2, Lock, Download, Share2, Shield, History, Archive } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -70,7 +70,7 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
     lifestyle: ['stress', 'chronic_fatigue']
 };
 
-export default function YouniqleNavigatorPage() {
+export default function AiNavigatorPage() {
     const { data: session } = useSession();
     const { trackEvent } = useActivityTracker();
     const { journey } = useRecovery();
@@ -127,8 +127,9 @@ export default function YouniqleNavigatorPage() {
             ]);
 
             let latestScore = 0;
+            let timelineData: any = { timeline: [] };
             if (timelineRes.ok) {
-                const timelineData = await timelineRes.json();
+                timelineData = await timelineRes.json();
                 setTimelineItems(timelineData.timeline || []);
                 if (timelineData.timeline?.length > 0) {
                     latestScore = timelineData.timeline[0].score || 0;
@@ -144,17 +145,37 @@ export default function YouniqleNavigatorPage() {
             const scoreVal = latestScore || (localStorage.getItem('recovery_last_score') ? parseInt(localStorage.getItem('recovery_last_score')!) : 40);
             setTodayScore(scoreVal);
 
-            // 목데이터 히스토리 + 실제 오늘 데이터 조합
-            const mockHistory = [
-                { date: '12/09', score: 65 },
-                { date: '12/10', score: 70 },
-                { date: '12/11', score: 60 },
-                { date: '12/12', score: 75 },
-                { date: '12/13', score: 55 },
-                { date: '12/14', score: 45 },
-                { date: '오늘', score: scoreVal }
-            ];
-            setScoreHistory(mockHistory);
+            // DB 타임라인 데이터를 7일 그래프용으로 변환 (최근 7일 빈 날짜는 보간됨)
+            const today = new Date();
+            const last7Days = Array.from({ length: 7 }).map((_, i) => {
+                const d = new Date();
+                d.setDate(today.getDate() - (6 - i));
+                return {
+                    date: d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+                    fullDate: d.toISOString().split('T')[0]
+                };
+            });
+
+            const timelineMap = (timelineData.timeline || []).reduce((acc: any, item: any) => {
+                const d = new Date(item.createdAt);
+                const dateKey = d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+                if (!acc[dateKey] || item.score > acc[dateKey]) {
+                    acc[dateKey] = item.score; // 같은 날짜면 가장 높은 점수 유지
+                }
+                return acc;
+            }, {});
+
+            const dynamicHistory = last7Days.map(d => ({
+                date: d.date === today.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) ? '오늘' : d.date,
+                score: timelineMap[d.date] || null // 데이터가 없으면 null 반환하여 곡선 보간(connectNulls) 활용
+            }));
+            
+            // 오늘 데이터가 null이면 현재 scoreVal를 넣어줌 (최소한의 연결점)
+            if (dynamicHistory[6].score === null) {
+                 dynamicHistory[6].score = scoreVal;
+            }
+
+            setScoreHistory(dynamicHistory);
 
             // 2. 진단 기반 추천 API 호출
             const diagResponse = await fetch('/api/recommendations/diagnosis?limit=4&protocols=true&content=true');
@@ -170,7 +191,7 @@ export default function YouniqleNavigatorPage() {
                 }
             }
 
-            // 3. 유니클 조언 API 호출
+            // 3. AI 조언 API 호출
             const adviceResponse = await fetch('/api/ai/navigator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -189,7 +210,7 @@ export default function YouniqleNavigatorPage() {
             await fetchExternalProducts();
 
         } catch (e) {
-            console.error("Youniqle Navigator Fetch Error", e);
+            console.error("AI Navigator Fetch Error", e);
         } finally {
             setLoading(false);
         }
@@ -285,7 +306,7 @@ export default function YouniqleNavigatorPage() {
                             <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-8">
                                 <div className="space-y-4">
                                     <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
-                                        유니클 Recovery Navigator
+                                        AI Recovery Navigator
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">리듬체크</h1>
                                     <p className="text-lg md:text-xl text-slate/60 font-bold max-w-xl break-keep">
@@ -352,41 +373,83 @@ export default function YouniqleNavigatorPage() {
                                     </div>
                                 </div>
 
-                                {/* 오른쪽: 레이더 차트 */}
+                                {/* 오른쪽: 레이더 차트 (신체 밸런스) */}
                                 {isMounted && radarData.length > 0 && (
-                                    <div className="w-full md:w-80 h-64 bg-surface/30 rounded-[32px] border border-line p-4">
-                                        <DiagnosisRadarChart
-                                            data={radarData.map(d => ({
-                                                subject: d.category === 'PHYSICAL' ? '신체' :
-                                                    d.category === 'MENTAL' ? '멘탈' :
-                                                        d.category === 'SLEEP' ? '수면' : '생활',
-                                                score: Math.round((d.score / d.fullMark) * 100), // Normalize to 100
-                                                fullMark: 100
-                                            }))}
-                                            color="#0F172A" // Obsidian or use CSS var if supported, let's use a specific dark color for Navigator
-                                        />
+                                    <div className="w-full md:w-80 h-72 bg-white rounded-[32px] shadow-[0_12px_40px_rgb(0,0,0,0.08)] border border-white/50 p-6 relative flex flex-col overflow-hidden">
+                                        {/* 카드 타이틀 */}
+                                        <h3 className="text-xl font-black text-obsidian relative z-10 tracking-tight">신체 밸런스</h3>
+                                        
+                                        {/* 은은한 골드 후광 (Glow Effect) */}
+                                        <div className="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#D4AF37]/15 rounded-full blur-3xl z-0 pointer-events-none"></div>
+
+                                        <div className="flex-1 relative z-10 mt-2">
+                                            <DiagnosisRadarChart
+                                                data={radarData.map(d => ({
+                                                    subject: d.category === 'PHYSICAL' ? '신체' :
+                                                        d.category === 'MENTAL' ? '멘탈' :
+                                                            d.category === 'SLEEP' ? '수면' : '생활',
+                                                    score: Math.round((d.score / d.fullMark) * 100), // Normalize to 100
+                                                    fullMark: 100
+                                                }))}
+                                                color="#0E3A3A" // 딥 그린으로 통일
+                                            />
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
                             {/* Score Graph */}
-                            <div className="h-32 w-full opacity-80">
+                            <div className="relative h-48 w-full mt-4">
+                                {/* X축 베이지색 배경 (Pill Shape) */}
+                                <div className="absolute bottom-1 left-2 right-2 h-8 bg-[#F5F2EA] rounded-full z-0" />
+                                
                                 {isMounted && (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={scoreHistory}>
-                                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--color-text-secondary)' }} />
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: '#1A1D21', borderRadius: '16px', border: '1px solid rgba(233,226,214,0.1)', color: '#E9E2D6' }}
+                                    <ResponsiveContainer width="100%" height="100%" className="relative z-10">
+                                        <AreaChart data={scoreHistory} margin={{ top: 10, right: 15, left: 15, bottom: 5 }}>
+                                            <defs>
+                                                <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#0E3A3A" stopOpacity={0.4}/>
+                                                    <stop offset="100%" stopColor="#F5F2EA" stopOpacity={0.0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <XAxis 
+                                                dataKey="date" 
+                                                axisLine={false} 
+                                                tickLine={false} 
+                                                tick={{ fontSize: 10, fill: '#5A5A5A', fontWeight: 800 }} 
+                                                dy={10}
                                             />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="score"
-                                                stroke="var(--chapter-accent)"
-                                                strokeWidth={3}
-                                                dot={{ r: 4, fill: 'var(--chapter-accent)', strokeWidth: 0 }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            <Tooltip 
+                                                cursor={{ stroke: '#0E3A3A', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                                content={({ active, payload }) => {
+                                                    if (active && payload && payload.length && payload[0].value !== null) {
+                                                        return (
+                                                            <div className="flex flex-col items-center">
+                                                                <div className="bg-[#333333]/90 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl relative mb-2 border border-white/10">
+                                                                    <p className="text-white text-[11px] font-black tracking-widest whitespace-nowrap">
+                                                                        {payload[0].payload.date} <span className="opacity-50 mx-1">|</span> score : {payload[0].value}
+                                                                    </p>
+                                                                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#333333]/90 rotate-45 border-r border-b border-white/10"></div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
                                             />
-                                        </LineChart>
+                                            <Area 
+                                                type="monotone" 
+                                                dataKey="score" 
+                                                stroke="#0E3A3A" 
+                                                strokeWidth={3} 
+                                                fillOpacity={1} 
+                                                fill="url(#lineGradient)" 
+                                                connectNulls={true}
+                                                isAnimationActive={true}
+                                                dot={{ r: 4, fill: '#0E3A3A', stroke: '#F5F2EA', strokeWidth: 2 }}
+                                                activeDot={{ r: 7, fill: '#D4AF37', stroke: '#F5F2EA', strokeWidth: 3, className: 'drop-shadow-lg' }}
+                                            />
+                                        </AreaChart>
                                     </ResponsiveContainer>
                                 )}
                             </div>
@@ -493,15 +556,24 @@ export default function YouniqleNavigatorPage() {
                                             </p>
 
                                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                                <Button asChild size="lg" className="h-16 w-full sm:w-auto bg-primary text-background font-black rounded-2xl px-8 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                                <Button asChild size="lg" className="h-16 w-full sm:w-auto bg-primary text-background font-black rounded-2xl px-8 shadow-lg shadow-primary/20 hover:scale-105 transition-transform text-sm md:text-base">
                                                     <Link href="/diagnosis?type=free">
-                                                        24문항 약식 진단 <ArrowRight className="w-5 h-5 ml-2" />
+                                                        간단유형 확인하기 (단순) <ArrowRight className="w-5 h-5 ml-2" />
                                                     </Link>
                                                 </Button>
-                                                <Button asChild variant="outline" size="lg" className="h-16 w-full sm:w-auto rounded-2xl px-8 font-black border-2 border-primary/20 text-primary hover:bg-primary/5">
-                                                    <Link href="/diagnosis?type=personality">
-                                                        60문항 정밀 진단 <Zap className="w-4 h-4 ml-2 fill-current" />
-                                                    </Link>
+                                                <Button 
+                                                    onClick={() => {
+                                                        if (isClinicLocked) {
+                                                            setShowUpsell(true);
+                                                        } else {
+                                                            router.push('/diagnosis?type=personality');
+                                                        }
+                                                    }}
+                                                    variant="outline" 
+                                                    size="lg" 
+                                                    className="h-16 w-full sm:w-auto rounded-2xl px-8 font-black border-2 border-primary/20 text-primary hover:bg-primary/5 text-sm md:text-base"
+                                                >
+                                                    심층유형 확인하기 (정밀) <Zap className="w-4 h-4 ml-2 fill-current" />
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -520,10 +592,21 @@ export default function YouniqleNavigatorPage() {
                                             </div>
                                             <div className="flex flex-col sm:flex-row justify-center gap-4">
                                                 <Button asChild size="lg" className="h-16 bg-primary text-background font-black rounded-2xl px-10">
-                                                    <Link href="/diagnosis?type=free">약식 진단 시작 (60초)</Link>
+                                                    <Link href="/diagnosis?type=free">간단유형 확인하기 (단순)</Link>
                                                 </Button>
-                                                <Button asChild variant="outline" size="lg" className="h-16 border-2 border-line rounded-2xl px-10 font-black">
-                                                    <Link href="/diagnosis?type=personality">정밀 진단 시작 (60문항)</Link>
+                                                <Button 
+                                                    onClick={() => {
+                                                        if (isClinicLocked) {
+                                                            setShowUpsell(true);
+                                                        } else {
+                                                            router.push('/diagnosis?type=personality');
+                                                        }
+                                                    }}
+                                                    variant="outline" 
+                                                    size="lg" 
+                                                    className="h-16 border-2 border-line rounded-2xl px-10 font-black"
+                                                >
+                                                    심층유형 확인하기 (정밀)
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -573,59 +656,7 @@ export default function YouniqleNavigatorPage() {
                                 </Card>
                             </div>
 
-                                </TabsContent>
-
-                                <TabsContent value="clinic" className="space-y-20 pt-8">
-                                    {/* Step 1: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
-                                    <div className="space-y-8 relative">
-                                <div className="absolute left-0 md:left-4 top-0 md:top-4 text-5xl md:text-[100px] font-black text-slate-900/[0.03] leading-none select-none pointer-events-none italic z-0 uppercase tracking-tighter">Event</div>
-                                <div className="flex items-center gap-3 relative z-10">
-                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                        <Sparkles className="w-5 h-5" />
-                                    </div>
-                                    <h2 className="text-2xl font-black tracking-tight">Perfect Recovery Design</h2>
-                                </div>
-
-                                <Card className="bg-obsidian border-none rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl relative group">
-                                    <div className="absolute top-0 right-0 w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-all duration-700" />
-                                    <CardContent className="p-8 md:p-10 relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-10">
-                                        <div className="flex-1 space-y-4 md:space-y-6 text-center md:text-left">
-                                            <Badge className="bg-primary text-background text-[10px] font-black uppercase tracking-widest px-3 py-1">Medical Event Only</Badge>
-                                            <h3 className="text-2xl md:text-4xl font-black text-mist leading-tight tracking-tighter">
-                                                시술은 끝났어도<br />
-                                                <span className="text-[#00FFD1] drop-shadow-[0_0_15px_rgba(0,255,209,0.3)] italic">회복은 이제 시작</span>입니다.
-                                            </h3>
-                                            <p className="text-mist/70 text-sm md:text-base font-medium leading-relaxed max-w-md mx-auto md:mx-0">
-                                                줄기세포·성형 시술을 앞두고 계신가요? <br />
-                                                유니클의 정밀 문진을 통해 당신만의 72시간 집중 회복 프로토콜을 설계하세요.
-                                            </p>
-                                            <Button asChild size="lg" className="h-14 md:h-16 w-full md:w-auto px-10 rounded-[20px] bg-primary hover:bg-primary/90 text-background text-base md:text-lg font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                                                <Link href="/event/consultation">
-                                                    심층 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                        <div className="w-40 h-40 md:w-64 md:h-64 bg-mist/5 rounded-[32px] md:rounded-[40px] flex items-center justify-center text-5xl md:text-6xl relative overflow-hidden border border-mist/10 backdrop-blur-sm">
-                                            🧭
-                                            <div className="absolute inset-0 border-2 border-primary/20 rounded-[32px] md:rounded-[40px] animate-pulse" />
-                                        </div>
-                                    </CardContent>
-                                    <div className="h-1 w-full bg-primary/30" />
-                                </Card>
-                            </div>
-
-                                    {/* Step 2: 전문 회복 설계 */}
-                                    <div className="space-y-8 relative mb-16">
-                                        <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none z-0">02</div>
-                                        <div className="relative z-10 -mx-6 md:-mx-12">
-                                            <ClinicConsultationSection />
-                                        </div>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
-
-                            {/* 공통 컴포넌트: 하단에 유지 */}
-                            <div className="space-y-20 mt-20 pt-10 border-t border-line/50">
+                                <div className="space-y-20 mt-20 pt-10 border-t border-line/50">
                                 {/* Step 3: 내일의 예보 (개인화 분석과 연동되지만 전역으로 표시) */}
                                 <div className="space-y-8 relative">
                                     <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none">03</div>
@@ -697,39 +728,6 @@ export default function YouniqleNavigatorPage() {
                                     </Button>
                                 </div>
 
-                                {timelineItems.length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {timelineItems.slice(0, 3).map((item, idx) => (
-                                            <Card key={idx} className="rounded-[24px] overflow-hidden border-line group hover:border-chapter-accent transition-all bg-white">
-                                                <div className="aspect-square relative bg-mist">
-                                                    {item.imageUrl ? (
-                                                        <Image src={item.imageUrl} alt={item.type} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-slate/20">
-                                                            <ImageIcon className="w-8 h-8" />
-                                                        </div>
-                                                    )}
-                                                    <Badge className="absolute top-3 left-3 bg-obsidian text-white text-[8px] font-black px-2">
-                                                        {item.type}
-                                                    </Badge>
-                                                    <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] font-black text-obsidian shadow-sm">
-                                                        SCORE {item.score}
-                                                    </div>
-                                                </div>
-                                                <CardContent className="p-4">
-                                                    <p className="text-[11px] font-bold text-slate/60 mb-1">
-                                                        {isMounted && new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                                                    </p>
-                                                    <p className="text-xs font-black text-obsidian line-clamp-1 truncate">{item.summary || '상세 데이터 없음'}</p>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="p-12 text-center rounded-[32px] bg-mist/30 border-2 border-dashed border-line">
-                                        <p className="text-sm font-bold text-slate/40">아직 기록된 타임라인이 없습니다.<br />스캐너나 자세 분석을 시작해 보세요.</p>
-                                    </div>
-                                )}
                                 
                                 {journey === 'CLINICAL_POST' && (
                                     <Button asChild className="w-full h-16 rounded-2xl bg-chapter-accent text-white font-black text-lg shadow-xl shadow-chapter-accent/20">
@@ -883,7 +881,60 @@ export default function YouniqleNavigatorPage() {
                                 )}
                                 </div>
                             </div>
-                        </div>
+                        
+</TabsContent>
+
+                                <TabsContent value="clinic" className="space-y-20 pt-8">
+                                    {/* Step 1: 시술 전 전용 회복 설계 (Bridge for High-Intent Users) */}
+                                    <div className="space-y-8 relative">
+                                <div className="absolute left-0 md:left-4 top-0 md:top-4 text-5xl md:text-[100px] font-black text-slate-900/[0.03] leading-none select-none pointer-events-none italic z-0 uppercase tracking-tighter">Event</div>
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <h2 className="text-2xl font-black tracking-tight">Perfect Recovery Design</h2>
+                                </div>
+
+                                <Card className="bg-obsidian border-none rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl relative group">
+                                    <div className="absolute top-0 right-0 w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/30 transition-all duration-700" />
+                                    <CardContent className="p-8 md:p-10 relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-10">
+                                        <div className="flex-1 space-y-4 md:space-y-6 text-center md:text-left">
+                                            <Badge className="bg-primary text-background text-[10px] font-black uppercase tracking-widest px-3 py-1">Medical Event Only</Badge>
+                                            <h3 className="text-2xl md:text-4xl font-black text-mist leading-tight tracking-tighter">
+                                                시술은 끝났어도<br />
+                                                <span className="text-[#00FFD1] drop-shadow-[0_0_15px_rgba(0,255,209,0.3)] italic">회복은 이제 시작</span>입니다.
+                                            </h3>
+                                            <p className="text-mist/70 text-sm md:text-base font-medium leading-relaxed max-w-md mx-auto md:mx-0">
+                                                줄기세포·성형 시술을 앞두고 계신가요? <br />
+                                                유니클의 정밀 문진을 통해 당신만의 72시간 집중 회복 프로토콜을 설계하세요.
+                                            </p>
+                                            <Button asChild size="lg" className="h-14 md:h-16 w-full md:w-auto px-10 rounded-[20px] bg-primary hover:bg-primary/90 text-background text-base md:text-lg font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                                                <Link href="/event/consultation">
+                                                    심층 문진 시작하기 <ArrowRight className="w-5 h-5 ml-2" />
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                        <div className="w-40 h-40 md:w-64 md:h-64 bg-mist/5 rounded-[32px] md:rounded-[40px] flex items-center justify-center text-5xl md:text-6xl relative overflow-hidden border border-mist/10 backdrop-blur-sm">
+                                            🧭
+                                            <div className="absolute inset-0 border-2 border-primary/20 rounded-[32px] md:rounded-[40px] animate-pulse" />
+                                        </div>
+                                    </CardContent>
+                                    <div className="h-1 w-full bg-primary/30" />
+                                </Card>
+                            </div>
+
+                                    {/* Step 2: 전문 회복 설계 */}
+                                    <div className="space-y-8 relative mb-16">
+                                        <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none z-0">02</div>
+                                        <div className="relative z-10 -mx-6 md:-mx-12">
+                                            <ClinicConsultationSection />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+
+                            {/* 공통 컴포넌트: 하단에 유지 */}
+                            </div>
                     </div>
                 </section>
 

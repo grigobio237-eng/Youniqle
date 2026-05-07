@@ -208,6 +208,11 @@ export interface IUser extends Document {
     todayCategories: string[];
   };
   medicationHistory?: string[]; // 복용 중인 약물 및 식품 히스토리
+  issuedCertificates?: Array<{
+    cycleNumber: number;
+    issuedAt: Date;
+    metadata?: any;
+  }>;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -494,7 +499,12 @@ const UserSchema = new Schema<IUser>({
     highestStreak: { type: Number, default: 0 },
     todayCategories: [{ type: String }]
   },
-  medicationHistory: [{ type: String, trim: true }]
+  medicationHistory: [{ type: String, trim: true }],
+  issuedCertificates: [{
+    cycleNumber: { type: Number, required: true },
+    issuedAt: { type: Date, default: Date.now },
+    metadata: { type: Schema.Types.Mixed }
+  }]
 }, {
   timestamps: true,
 });
@@ -506,6 +516,27 @@ UserSchema.pre('save', function(this: any, next) {
     const base = idStr.slice(-6).toUpperCase();
     this.referralCode = `RF${base}`;
     console.log(`[Model/User] Generated missing referralCode: ${this.referralCode} for ${this.email}`);
+  }
+  next();
+});
+
+// 멤버십 등급 및 티어 자동 동기화 훅
+UserSchema.pre('save', function(this: any, next) {
+  if (this.isModified('passInfo.type')) {
+    const passType = this.passInfo?.type || 'NONE';
+    
+    // Tier 동기화 (대문자)
+    if (['RESET', 'REBORN', 'RESTART', 'BLACK'].includes(passType)) {
+      this.tier = passType;
+    } else {
+      this.tier = 'RESET';
+    }
+
+    // Grade 동기화 (소문자)
+    // 기존 성장형 등급(cedar 등)을 덮어쓰지 않기 위해 멤버십 관련 타입일 때만 동기화
+    if (['RESET', 'REBORN', 'RESTART', 'BLACK'].includes(passType)) {
+      this.grade = passType.toLowerCase();
+    }
   }
   next();
 });

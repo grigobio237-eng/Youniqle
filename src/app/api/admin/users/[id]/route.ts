@@ -250,10 +250,14 @@ export async function PATCH(
         break;
 
       case 'promoteTier':
-        const tiers = ['RESET', 'REBORN', 'RESTART'];
+        const tiers = ['RESET', 'REBORN', 'RESTART', 'BLACK'];
         const currentTierIndex = tiers.indexOf(user.tier || 'RESET');
         if (currentTierIndex < tiers.length - 1) {
           user.tier = tiers[currentTierIndex + 1];
+          // passInfo도 함께 업데이트하여 동기화 유도
+          if (!user.passInfo) user.passInfo = {};
+          user.passInfo.type = user.tier;
+          user.passInfo.status = 'ACTIVE';
         }
         break;
 

@@ -99,24 +99,42 @@ export class StorageService {
     }
 
     /**
-     * 파일 삭제
+     * 파일 삭제 (URL 또는 경로)
      */
-    static async deleteFile(urlOrPath: string): Promise<void> {
+    static async deleteFile(urlOrPath: string | null | undefined): Promise<void> {
+        if (!urlOrPath) return;
+
         try {
             if (urlOrPath.includes('firebasestorage.googleapis.com')) {
-                // Firebase 파일 삭제
-                const decodedPath = decodeURIComponent(
-                    urlOrPath.split('/o/')[1].split('?')[0]
-                );
+                // 1. Firebase Storage URL에서 경로 추출
+                // 예: .../o/snaps%2Fuser123%2Frhythm.webp?alt=media...
+                const parts = urlOrPath.split('/o/');
+                if (parts.length < 2) {
+                    console.warn('[StorageService] 잘못된 Firebase URL 형식:', urlOrPath);
+                    return;
+                }
+
+                const pathPart = parts[1].split('?')[0];
+                const decodedPath = decodeURIComponent(pathPart);
+
+                console.log(`[StorageService] Firebase 파일 삭제 시도: ${decodedPath}`);
                 await this.bucket.file(decodedPath).delete();
+                console.log(`[StorageService] Firebase 파일 삭제 성공: ${decodedPath}`);
+
             } else if (urlOrPath.includes('public.blob.vercel-storage.com')) {
-                // Vercel Blob 삭제
+                // 2. Vercel Blob 삭제
                 await del(urlOrPath, {
                     token: process.env.BLOB_READ_WRITE_TOKEN,
                 });
+                console.log(`[StorageService] Vercel Blob 삭제 성공: ${urlOrPath}`);
             }
-        } catch (error) {
-            console.error('File deletion error:', error);
+        } catch (error: any) {
+            // 파일이 이미 없거나 권한 문제일 경우
+            if (error.code === 404) {
+                console.warn('[StorageService] 삭제할 파일이 이미 존재하지 않습니다:', urlOrPath);
+            } else {
+                console.error('[StorageService] 파일 삭제 실패:', error.message);
+            }
         }
     }
 }

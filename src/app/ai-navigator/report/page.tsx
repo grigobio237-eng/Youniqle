@@ -17,7 +17,14 @@ import {
   Share2,
   Download
 } from 'lucide-react';
-import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer, YAxis } from 'recharts';
+import { 
+  AreaChart,
+  Area,
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
@@ -38,6 +45,9 @@ export default function WeeklyReportPage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<RecoveryRecord[]>([]);
+  const [mappedScores, setMappedScores] = useState<any[]>([]); // 차트용 데이터 상태 추가
+  const [averageScore, setAverageScore] = useState(0); // 평균 점수 상태 추가
+  const [showMembershipModal, setShowMembershipModal] = useState(false); // 멤버십 모달 상태 추가
   const cardRef = React.useRef<HTMLDivElement>(null);
   const userName = session?.user?.name || '요원';
 
@@ -55,13 +65,27 @@ export default function WeeklyReportPage() {
       const res = await fetch('/api/recovery/score');
       if (res.ok) {
         const { scores } = await res.json();
-        // Filter valid scores and take the most recent 7
-        const validScores = scores.filter((s: any) => s.totalScore > 0).slice(-7);
+        const recentScores = scores.filter((s: any) => s.totalScore > 0).slice(-7);
+        
+        // 차트 데이터 (모든 점수 포함)
+        const chartData = recentScores.map((s: any, idx: number) => ({
+          day: idx + 1,
+          score: s.totalScore
+        }));
+        setMappedScores(chartData);
+
+        // 평균 점수 계산
+        if (recentScores.length > 0) {
+          const avg = Math.round(recentScores.reduce((acc: number, curr: any) => acc + curr.totalScore, 0) / recentScores.length);
+          setAverageScore(avg);
+        }
+
+        const validScores = recentScores
+          .filter((s: any) => s.snapData?.content || s.userNote);
         
         const mapped = validScores.map((s: any, idx: number) => {
           const content = s.snapData?.content || '';
           const isPhoto = s.snapData?.type === 'PHOTO';
-          // Simple validation: must start with http, /, or data:
           const isValidUrl = content && (content.startsWith('http') || content.startsWith('/') || content.startsWith('data:'));
           
           return {
@@ -106,9 +130,7 @@ export default function WeeklyReportPage() {
     }
   };
 
-  const averageScore = records.length > 0 
-    ? Math.round(records.reduce((acc, curr) => acc + curr.score, 0) / records.length) 
-    : 0;
+
 
   if (loading) {
     return (
@@ -130,7 +152,7 @@ export default function WeeklyReportPage() {
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" asChild className="rounded-full">
-                <Link href="/dashboard">
+                <Link href="/ai-navigator">
                   <ArrowLeft className="w-5 h-5" />
                 </Link>
               </Button>
@@ -197,28 +219,56 @@ export default function WeeklyReportPage() {
                   transition={{ delay: idx * 0.1 }}
                   className="flex-shrink-0 w-48 snap-start"
                 >
-                  <Card className="rounded-[24px] overflow-hidden border-line shadow-sm bg-white">
-                    <div className="aspect-[3/4] relative bg-mist">
-                      {record.imageUrl ? (
-                        <Image src={record.imageUrl} alt={`Day ${record.day}`} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-slate/20 p-4 text-center">
-                          <ImageIcon className="w-10 h-10 mb-2" />
-                          <p className="text-[10px] font-bold">이미지 없이 기록됨</p>
+                  <Card className="rounded-[24px] overflow-hidden border-line shadow-sm bg-white h-full flex flex-col">
+                    {record.imageUrl ? (
+                      /* 1. 이미지 로그 레이아웃 */
+                      <>
+                        <div className="aspect-[3/4] relative bg-mist">
+                          <Image src={record.imageUrl} alt={`Day ${record.day}`} fill className="object-cover" />
+                          <div className="absolute top-3 left-3 bg-obsidian/80 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                            DAY {record.day.toString().padStart(2, '0')}
+                          </div>
+                          {/* 점수 오버레이 */}
+                          <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-line">
+                            <span className="text-[10px] font-black text-primary">{record.score}</span>
+                          </div>
                         </div>
-                      )}
-                      <div className="absolute top-3 left-3 bg-obsidian/80 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
-                        DAY {record.day.toString().padStart(2, '0')}
+                        <CardContent className="p-4">
+                          <p className="text-[10px] font-bold text-slate/40 mb-1">
+                            {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                          </p>
+                          <p className="text-xs font-black text-obsidian line-clamp-2 leading-relaxed">
+                            {record.summary || '기록이 없습니다.'}
+                          </p>
+                        </CardContent>
+                      </>
+                    ) : (
+                      /* 2. 텍스트 중심 메시지 카드 레이아웃 */
+                      <div className="flex-1 flex flex-col bg-mist/30 relative min-h-[200px]">
+                        <div className="absolute top-3 left-3 bg-slate/10 text-slate/60 text-[10px] font-black px-2 py-0.5 rounded-lg">
+                          DAY {record.day.toString().padStart(2, '0')}
+                        </div>
+                        
+                        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                          <div className="w-8 h-8 bg-primary/5 rounded-full flex items-center justify-center mb-3">
+                            <ImageIcon className="w-4 h-4 text-primary/20" />
+                          </div>
+                          <p className="text-[13px] font-bold text-obsidian leading-relaxed break-keep">
+                            "{record.summary || '오늘의 회복 리듬을 기록했습니다'}"
+                          </p>
+                        </div>
+
+                        <div className="p-4 border-t border-line flex items-center justify-between">
+                          <span className="text-[9px] font-bold text-slate/40">
+                            {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-bold text-slate/30 uppercase">Score</span>
+                            <span className="text-[11px] font-black text-primary">{record.score}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <p className="text-[10px] font-bold text-slate/40 mb-1">
-                        {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                      </p>
-                      <p className="text-xs font-black text-obsidian line-clamp-2 leading-relaxed">
-                        {record.summary || '남겨진 기록이 없습니다.'}
-                      </p>
-                    </CardContent>
+                    )}
                   </Card>
                 </motion.div>
               ))}
@@ -232,15 +282,22 @@ export default function WeeklyReportPage() {
               <p className="text-sm text-slate font-medium opacity-60">지난 7일간 {userName} 님의 회복 에너지 흐름입니다.</p>
             </div>
 
-            <div className="h-64 w-full pt-4">
+            <div className="h-64 w-full pt-4 relative">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={records}>
+                <AreaChart data={mappedScores} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0E3A3A" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#0E3A3A" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
                   <XAxis 
                     dataKey="day" 
                     tickFormatter={(val) => `D${val}`}
-                    tick={{ fontSize: 10, fontWeight: 'bold', fill: 'var(--color-text-secondary)' }}
+                    tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0E3A3A', opacity: 0.4 }}
                     axisLine={false}
                     tickLine={false}
+                    padding={{ left: 20, right: 20 }}
                   />
                   <YAxis hide domain={[0, 100]} />
                   <Tooltip
@@ -256,15 +313,18 @@ export default function WeeklyReportPage() {
                       return null;
                     }}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="var(--color-primary)"
+                    stroke="#0E3A3A"
                     strokeWidth={4}
-                    dot={{ r: 6, fill: 'var(--color-primary)', strokeWidth: 0 }}
-                    activeDot={{ r: 8, strokeWidth: 0 }}
+                    fillOpacity={1}
+                    fill="url(#colorScore)"
+                    dot={{ r: 4, fill: '#0E3A3A', strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: '#D4AF37' }}
+                    connectNulls
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
 
@@ -275,7 +335,7 @@ export default function WeeklyReportPage() {
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest mb-1">Status</p>
-                <p className="text-2xl font-black text-primary">STABLE</p>
+                <p className="text-2xl font-black text-[#0E3A3A]">STABLE</p>
               </div>
             </div>
           </section>
@@ -395,13 +455,19 @@ export default function WeeklyReportPage() {
                 </div>
                 
                 <div className="space-y-4">
-                  <Button asChild className="w-full h-16 bg-primary text-obsidian rounded-[24px] font-black text-lg hover:scale-[1.02] transition-transform">
-                    <Link href="/membership">보관함 및 주간 해석 시작</Link>
+                  <Button 
+                    onClick={() => setShowMembershipModal(true)}
+                    className="w-full h-16 bg-[#D4AF37] text-obsidian rounded-[24px] font-black text-lg hover:bg-[#B8962E] hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(212,175,55,0.3)]"
+                  >
+                    보관함 및 주간 해석 시작
                   </Button>
                   
-                  <div className="pt-4 border-t border-white/10">
-                    <Link href="/private-report" className="w-full text-white/40 hover:text-white text-[11px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 group">
-                      심화 정리가 필요하다면? <span className="text-primary group-hover:translate-x-1 transition-transform">조용한 정리 신청하기 →</span>
+                  <div className="pt-8 border-t border-white/10">
+                    <Link href="/private-report" className="w-full py-5 px-6 bg-white/10 border border-white/20 hover:bg-white/15 rounded-2xl transition-all flex items-center justify-center gap-4 group shadow-xl">
+                      <span className="text-white text-xs font-black uppercase tracking-wider opacity-90">심화 정리가 필요하다면?</span>
+                      <span className="text-[#D4AF37] text-xs font-black flex items-center gap-2 group-hover:underline group-hover:translate-x-1 transition-all">
+                        조용한 정리 신청하기 <span className="text-xl">→</span>
+                      </span>
                     </Link>
                   </div>
                 </div>
@@ -409,6 +475,59 @@ export default function WeeklyReportPage() {
             </Card>
           </section>
         </main>
+
+        {/* 멤버십 전환 안내 모달 */}
+        {showMembershipModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => setShowMembershipModal(false)}
+              className="absolute inset-0 bg-obsidian/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="relative w-full max-w-sm bg-white rounded-[40px] p-10 overflow-hidden shadow-2xl"
+            >
+              <div className="absolute top-0 right-0 p-6">
+                <button 
+                  onClick={() => setShowMembershipModal(false)} 
+                  className="text-slate/20 hover:text-slate/40 transition-colors"
+                  title="닫기"
+                >
+                  <ArrowLeft className="w-6 h-6 rotate-90" />
+                </button>
+              </div>
+
+              <div className="space-y-8 text-center mt-4">
+                <div className="w-20 h-20 bg-primary/5 rounded-[30px] flex items-center justify-center mx-auto">
+                  <Sparkles className="w-10 h-10 text-primary" />
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-2xl font-black text-obsidian tracking-tight">회복의 흐름을<br />평생의 자산으로</h4>
+                  <p className="text-sm text-slate font-medium leading-relaxed">
+                    멤버십으로 전환하여 무제한 기록 보관과<br />
+                    매주 AI의 심층 분석 리포트를 받아보세요.
+                  </p>
+                </div>
+
+                <div className="space-y-3 pt-4">
+                  <Button asChild className="w-full h-16 bg-primary text-white font-black text-lg rounded-2xl">
+                    <Link href="/membership">멤버십 혜택 확인하기</Link>
+                  </Button>
+                  <button 
+                    onClick={() => setShowMembershipModal(false)}
+                    className="text-xs font-bold text-slate/40 hover:text-slate/60"
+                  >
+                    다음에 할게요
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </ChapterWrapper>
   );

@@ -3,10 +3,13 @@
 import React from 'react';
 import WeeklyReportView from './WeeklyReportView';
 import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, TrendingUp, Lock, Brain, PieChart, BarChart3 } from 'lucide-react';
 import ActionableInsightCard from './ActionableInsightCard';
 import MealNutrientChart from './MealNutrientChart';
+import { ShoppingBag, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface RecoveryInsightViewProps {
     unifiedData: any;
@@ -14,7 +17,8 @@ interface RecoveryInsightViewProps {
 
 export default function RecoveryInsightView({ unifiedData }: RecoveryInsightViewProps) {
     const { user, insights, score, assetStats } = unifiedData;
-    const userTier = user?.grade || 'NONE';
+    const [recommendedProducts, setRecommendedProducts] = React.useState<any[]>([]);
+    const userTier = user?.grade?.toUpperCase() || 'NONE';
     const isPremium = ['RESTART', 'BLACK'].includes(userTier);
     const displayScore = score?.totalScore || 0;
 
@@ -77,7 +81,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                         주간 회복 리포트
                     </h3>
                 </div>
-                <WeeklyReportView />
+                <WeeklyReportView onDataLoaded={setRecommendedProducts} />
             </section>
 
             {/* Data-driven Insights (If available) */}
@@ -117,11 +121,81 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                             <h3 className="text-xl font-black text-obsidian/40">정밀 예측 분석 잠금</h3>
                             <p className="text-xs text-slate/50 font-medium">바이오 리듬 예측, 장기 회복 트렌드, 전문 의료진 가이드 등의 고도화된 기능은<br />RESTART 등급 이상의 멤버십에서 제공됩니다.</p>
                         </div>
-                        <button className="bg-obsidian/10 text-obsidian/40 px-8 py-3 rounded-xl font-black text-sm cursor-not-allowed">
+                        <Link 
+                            href="/membership" 
+                            className="inline-block bg-obsidian text-reward-gold border border-reward-gold/30 px-8 py-3 rounded-xl font-black text-sm hover:bg-obsidian/90 transition-all shadow-xl"
+                        >
                             멤버십 혜택 보기
-                        </button>
+                        </Link>
                     </div>
                 </Card>
+            )}
+            {/* Recommended Products (Moved to the very bottom) */}
+            {recommendedProducts && recommendedProducts.length > 0 && (
+                <section className="space-y-6 pt-12 border-t border-line/30">
+                    <div className="flex items-center justify-between px-2">
+                        <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                            <ShoppingBag className="w-5 h-5 text-reward-gold" />
+                            유니클 샵 맞춤 추천 상품
+                        </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {recommendedProducts.map((prod: any, idx: number) => (
+                            <div 
+                                key={idx} 
+                                onClick={() => {
+                                    if (prod.productId) {
+                                        window.location.href = `/shop/product/${prod.productId}`;
+                                    }
+                                }}
+                                className="flex flex-col bg-white border border-line rounded-[32px] overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
+                            >
+                                {/* Product Image */}
+                                <div className="relative aspect-video w-full overflow-hidden bg-mist">
+                                    {prod.imageUrl ? (
+                                        <img 
+                                            src={prod.imageUrl} 
+                                            alt={prod.name} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-4xl">
+                                            🛍️
+                                        </div>
+                                    )}
+                                    <div className="absolute top-4 right-4 bg-obsidian/80 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-xl uppercase tracking-widest">
+                                        유니클 Pick
+                                    </div>
+                                </div>
+
+                                {/* Product Info */}
+                                <div className="p-6 flex flex-col flex-1">
+                                    <h5 className="text-lg font-black text-obsidian group-hover:text-chapter-accent transition-colors leading-tight">
+                                        {prod.name}
+                                    </h5>
+                                    
+                                    {prod.price > 0 && (
+                                        <p className="text-base font-black text-obsidian/90 mt-1">
+                                            {prod.price.toLocaleString()}원
+                                        </p>
+                                    )}
+
+                                    <div className="mt-3 bg-mist/50 p-4 rounded-2xl border border-line/40 flex-1">
+                                        <p className="text-xs font-bold text-slate/70 leading-relaxed">
+                                            💡 {prod.reason}
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <Button className="w-full h-12 bg-obsidian text-white rounded-xl font-black text-xs uppercase tracking-widest group-hover:bg-chapter-accent transition-colors">
+                                            상품 자세히 보기
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             )}
         </div>
     );

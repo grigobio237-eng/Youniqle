@@ -139,6 +139,12 @@ export async function GET(req: NextRequest) {
         name: user.name,
         grade: user.grade,
         passInfo: user.passInfo
+      },
+      certificateStatus: {
+        totalDailyLogs: dailyLogCount,
+        currentCycle: Math.floor(dailyLogCount / 7),
+        isCurrentCycleClaimed: user.issuedCertificates?.some((c: any) => c.cycleNumber === Math.floor(dailyLogCount / 7)),
+        issuedCertificates: user.issuedCertificates || []
       }
     });
 
