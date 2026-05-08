@@ -10,6 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Award, Activity, RefreshCcw, Zap, Sprout, Flower2, Sun, Share2, Crown, Lock, ArrowRight, Leaf, Star, Sparkles, Shield, MousePointer2, CheckCircle2 } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { PASS_SPECS } from '@/lib/constants/passes';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // 구매/활동 기반 회원등급 타입
 type GradeType = 'cedar' | 'rooter' | 'bloomer' | 'glower' | 'ecosoul' | 'reset' | 'reborn' | 'restart' | 'black';
@@ -112,6 +119,88 @@ export default function MembershipPage() {
                     흩어진 일상의 흔적을 정밀한 데이터로 해석받아 당신만의 완벽한 회복 OS를 완성하세요.
                 </p>
             </div>
+
+            {/* Active Membership Status (Only for paid members) */}
+            {(session?.user as any)?.passInfo?.status === 'ACTIVE' && (
+              <div className="max-w-6xl mx-auto mb-32">
+                <div className="bg-obsidian rounded-[48px] p-8 md:p-12 text-mist relative overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)]">
+                  {/* Gold Gradient Shine */}
+                  <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-chapter-accent/10 rounded-full blur-[150px] -mr-96 -mt-96" />
+                  
+                  <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div className="space-y-6 flex-1">
+                      <div className="flex items-center gap-3">
+                        <Badge className="bg-chapter-accent text-obsidian border-none font-black text-[10px] tracking-widest px-4 py-1.5 rounded-full">
+                          ACTIVE {(session.user as any).passInfo.type} MEMBER
+                        </Badge>
+                        <span className="text-mist/40 text-xs font-bold">
+                          Expired at: {new Date((session.user as any).passInfo.endDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h2 className="text-3xl md:text-5xl font-black tracking-tighter">
+                          {session.user?.name}님, <br/>
+                          최적의 회복 흐름을 유지하고 있습니다
+                        </h2>
+                        <p className="text-mist/60 font-medium">네비게이터와 의료기관이 당신의 데이터를 정밀하게 분석 중입니다.</p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 pt-4">
+                        {(session.user as any).passInfo.type === 'BLACK' && (
+                          <>
+                            <Button 
+                              asChild
+                              className="bg-chapter-accent hover:bg-white text-obsidian font-black rounded-2xl h-16 px-8 transition-all hover:scale-105"
+                            >
+                              <Link href="/diagnosis/report?type=pre-visit">
+                                사전 문진 작성하기 <ArrowRight className="ml-2 w-5 h-5" />
+                              </Link>
+                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="outline"
+                                  className="bg-white/5 border-white/20 hover:bg-white/10 text-white font-black rounded-2xl h-16 px-8"
+                                >
+                                  진료용 QR 코드 제시 <Activity className="ml-2 w-5 h-5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="bg-white rounded-[40px] p-10 max-w-sm border-none shadow-2xl flex flex-col items-center text-center space-y-8">
+                                <DialogHeader>
+                                  <DialogTitle className="text-2xl font-black text-obsidian tracking-tight">진료 전용 QR</DialogTitle>
+                                </DialogHeader>
+                                <div className="p-6 bg-mist rounded-3xl shadow-inner border border-line/50">
+                                  <img 
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`YOUNIQLE_USER_${session.user.id}`)}`}
+                                    alt="Treatment QR"
+                                    className="w-48 h-48 mix-blend-multiply"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <p className="text-obsidian font-black text-lg">{session.user.name} 님</p>
+                                  <p className="text-slate/60 font-bold text-sm leading-relaxed">
+                                    의료기관 담당자에게 이 코드를 제시하세요.<br/>
+                                    안전하게 데이터를 연동합니다.
+                                  </p>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full md:w-auto shrink-0 flex justify-center">
+                      <div className="w-48 h-48 md:w-64 md:h-64 rounded-[48px] bg-white/5 backdrop-blur-3xl border border-white/10 flex items-center justify-center p-8 relative group">
+                        <div className="absolute inset-0 bg-chapter-accent/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Activity className="w-24 h-24 text-chapter-accent animate-pulse relative z-10" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 1. Core Value Pillars: Why Upgrade? */}
             <section className="mb-40 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">

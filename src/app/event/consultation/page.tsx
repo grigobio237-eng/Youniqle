@@ -18,8 +18,15 @@ export default function ConsultationPage() {
   const [showForm, setShowForm] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
 
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const userTier = AccessControl.getUserGroup(session?.user);
   const isLocked = userTier !== 'RESTART' && userTier !== 'BLACK';
+
+  useEffect(() => {
+    if (searchParams && searchParams.get('action') === 'new' && !isLocked) {
+      setShowForm(true);
+    }
+  }, [searchParams, isLocked]);
 
   useEffect(() => {
     const checkExisting = async () => {

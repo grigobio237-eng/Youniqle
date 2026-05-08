@@ -21,19 +21,21 @@ export default function ClinicConsultationSection() {
     setProgress(0);
     
     // Initial text
-    setLoadingText(type === 'pre' ? '정밀 문진 설계 중...' : '맞춤 케어 분석 중...');
+    setLoadingText(type === 'pre' ? '사용자 회복 리듬 분석 중...' : '최근 시술 데이터 동기화 중...');
 
     const startTime = Date.now();
-    const duration = 2000; // 2 seconds for a snappier feel than 60s diagnosis
+    const duration = 3000; // 3 seconds for a more thorough feel
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const newProgress = Math.min((elapsed / duration) * 100, 99);
       setProgress(newProgress);
 
-      if (newProgress > 40 && newProgress < 80) {
-        setLoadingText(type === 'pre' ? '클리닉 데이터 동기화...' : '회복 데이터 수집 중...');
-      } else if (newProgress >= 80) {
+      if (newProgress > 30 && newProgress < 60) {
+        setLoadingText(type === 'pre' ? '정밀 회복 가이드 구성 중...' : '사후 관리 프로토콜 분석 중...');
+      } else if (newProgress >= 60 && newProgress < 90) {
+        setLoadingText(type === 'pre' ? 'AI 맞춤형 문진지 생성 완료!' : '회복 로드맵 업데이트 완료!');
+      } else if (newProgress >= 90) {
         setLoadingText('준비가 완료되었습니다!');
       }
 
@@ -41,7 +43,8 @@ export default function ClinicConsultationSection() {
         clearInterval(interval);
         setProgress(100);
         setTimeout(() => {
-          router.push(href);
+          // action=new 파라미터를 추가하여 게이트웨이를 건너뜁니다.
+          router.push(`${href}?action=new`);
         }, 300);
       }
     }, 50);

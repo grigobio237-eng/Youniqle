@@ -11,40 +11,14 @@ import CharacterImage from '@/components/ui/CharacterImage';
 
 const passItems = [
   {
-    id: 'start',
-    name: 'START PASS',
-    description: '처음 시작하는 사람을 위한 입문형 회복 패스',
-    price: '330만원',
-    period: '2년',
-    discount: '20%',
-    theme: 'border-blue-200 bg-blue-50/30',
-    accent: 'text-blue-600',
-    benefitText: '멤버십 전용 회복 프로그램가 적용',
-    icon: <MousePointer2 className="w-6 h-6" />
-  },
-  {
-    id: 'signature',
-    name: 'SIGNATURE PASS',
-    description: '유니클의 주력 패스 / 가장 선호되는 핵심 상품',
-    price: '1,100만원',
-    period: '5년',
-    discount: '30%',
-    isMain: true,
-    theme: 'border-chapter-accent/20 bg-chapter-accent/5 ring-2 ring-chapter-accent/20',
-    accent: 'text-chapter-accent',
-    benefitText: '프리미엄 전용 솔루션 우대 적용',
-    icon: <Star className="w-6 h-6" />
-  },
-  {
     id: 'black',
     name: 'BLACK PASS',
     description: 'VIP 고객을 위한 프라이빗 운영형 패스',
-    price: '3,300만원',
-    period: '5년',
-    discount: '30%',
+    price: '99,000원',
+    period: '3개월',
     theme: 'border-obsidian bg-obsidian text-mist',
     accent: 'text-chapter-accent',
-    benefitText: '최상위 익스클루시브 프로그램가 적용',
+    benefitText: 'VIP 전담 매칭 및 90일 집중 관리',
     icon: <Crown className="w-6 h-6" />
   }
 ];
@@ -56,11 +30,12 @@ export default function PassCatalog() {
         <h2 className="text-3xl font-black text-obsidian mb-4">상품 프리젠테이션</h2>
         <p className="text-slate/60 font-medium leading-relaxed">
           고객에게 최적의 회복 경로를 제안하세요. 
-          각 등급별 상세 스펙 페이지를 통해 고객과 함께 구체적인 혜택을 확인하실 수 있습니다.
+          상세 스펙 페이지를 통해 고객과 함께 구체적인 혜택을 확인하실 수 있습니다.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="flex justify-center">
+        <div className="w-full max-w-lg">
         {passItems.map((pass, idx) => (
           <motion.div
             key={pass.id}
@@ -125,6 +100,7 @@ export default function PassCatalog() {
           </motion.div>
         ))}
       </div>
+    </div>
 
       {/* Guide Banner */}
       <div className="bg-primary/5 border border-line rounded-[32px] p-8 flex items-center gap-6">

@@ -196,9 +196,11 @@ export default function NavigatorPassDetailPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
               {/* Connector line for desktop */}
-              <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-px bg-white/10" />
+              {spec.roadmap && spec.roadmap.length > 0 && (
+                <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-px bg-white/10" />
+              )}
               
-              {spec.roadmap.map((step: any, idx: number) => (
+              {spec.roadmap?.map((step: any, idx: number) => (
                 <div key={step.step} className="relative space-y-4 text-center md:text-left">
                   <div className="w-14 h-14 bg-white text-obsidian rounded-full flex items-center justify-center text-xl font-black mx-auto md:mx-0 shadow-lg relative z-10">
                     {step.step}
@@ -225,8 +227,12 @@ export default function NavigatorPassDetailPage() {
               지금 바로 고객님의 맞춤형 로드맵 설계를 시작해 보세요.
             </p>
           </div>
-          <Button size="lg" className={`${spec.buttonColor} text-white font-black px-10 h-16 rounded-2xl shadow-xl transform transition-transform hover:scale-105`}>
-            상담 진행 확정하기
+          <Button 
+            size="lg" 
+            onClick={() => router.push(`/membership/${id}/checkout`)}
+            className={`${spec.buttonColor} text-white font-black px-10 h-16 rounded-2xl shadow-xl transform transition-transform hover:scale-105`}
+          >
+            결제하기
           </Button>
         </div>
       </div>

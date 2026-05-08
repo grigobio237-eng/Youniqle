@@ -149,11 +149,11 @@ export default function PassDetailPage({ params }: PageProps) {
                 <p className="text-lg font-black text-obsidian">{pass.name} <span className="text-sm text-slate/60 font-bold ml-2">{pass.price === '별도 문의' ? pass.price : `${pass.price}원`}</span></p>
               </div>
               <button 
-                onClick={() => isBlack ? window.open('https://pf.kakao.com/_...', '_blank') : router.push(`/membership/${id}/checkout`)}
+                onClick={() => router.push(`/membership/${id}/checkout`)}
                 className="w-full md:w-auto px-12 py-5 bg-obsidian text-white rounded-2xl font-black text-lg hover:bg-primary hover:text-obsidian transition-all shadow-xl flex items-center justify-center gap-3 group"
               >
                 {isBlack ? (
-                  <>상담 신청하기 <MessageCircle className="w-5 h-5" /></>
+                  <>블랙 패스 결제하기 <CreditCard className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
                 ) : (
                   <>이 플랜으로 시작하기 <CreditCard className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
                 )}

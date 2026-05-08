@@ -23,6 +23,68 @@ export default function PreProcedureForm() {
   const [symptomText, setSymptomText] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [dynamicQuestions, setDynamicQuestions] = useState<any>(null);
+  const [isAutoAnalyzing, setIsAutoAnalyzing] = useState(false);
+
+  useEffect(() => {
+    const checkAutoAnalyze = async () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get('action') === 'new' && !medicalCategory && step === 0) {
+        setIsAutoAnalyzing(true);
+        try {
+          // 1. Fetch user status to get latest insights
+          const res = await fetch('/api/user/status');
+          const data = await res.json();
+          
+          let contextSymptom = "";
+          if (data.insights?.posture?.description) {
+             contextSymptom = data.insights.posture.description;
+          } else if (data.score?.label) {
+             contextSymptom = `현재 회복 상태는 ${data.score.label} 단계이며, 종합적인 컨디션 체크가 필요합니다.`;
+          }
+
+          if (contextSymptom) {
+            setSymptomText(contextSymptom);
+            // Wait for state update or just pass directly
+            await performAutoAnalysis(contextSymptom);
+          } else {
+            setIsAutoAnalyzing(false);
+          }
+        } catch (err) {
+          console.error("Auto Analysis Failed:", err);
+          setIsAutoAnalyzing(false);
+        }
+      }
+    };
+    checkAutoAnalyze();
+  }, []);
+
+  const performAutoAnalysis = async (symptom: string) => {
+    setIsAnalyzing(true);
+    try {
+      const response = await fetch('/api/ai/analyze-symptom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptom })
+      });
+      
+      const data = await response.json();
+      
+      if (data.category) {
+        setMedicalCategory(data.category);
+        if (data.dynamicQuestions) {
+          setDynamicQuestions(data.dynamicQuestions);
+        }
+        setStep(1);
+      }
+    } catch (error) {
+      console.error('AI Auto Analysis Error:', error);
+      setMedicalCategory('GENERAL');
+      setStep(1);
+    } finally {
+      setIsAnalyzing(false);
+      setIsAutoAnalyzing(false);
+    }
+  };
 
   interface ConsultationOption {
     id?: string;
@@ -460,7 +522,7 @@ export default function PreProcedureForm() {
             {/* Symptom Input Area */}
             <div className="relative group">
               <AnimatePresence>
-                {isAnalyzing && (
+                {(isAnalyzing || isAutoAnalyzing) && (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -471,11 +533,15 @@ export default function PreProcedureForm() {
                       <motion.div 
                         initial={{ width: "0%" }}
                         animate={{ width: "100%" }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
+                        transition={{ duration: isAutoAnalyzing ? 4 : 2, ease: "easeInOut" }}
                         className="h-full bg-primary"
                       />
                     </div>
-                    <p className="text-sm font-black text-primary animate-pulse">유니클이 증상을 정밀 분석하고 있습니다...</p>
+                    <p className="text-sm font-black text-primary animate-pulse">
+                      {isAutoAnalyzing 
+                        ? "사용자의 최근 회복 데이터를 기반으로 AI 문진표를 생성 중입니다..." 
+                        : "유니클 AI가 증상을 정밀 분석하여 맞춤 질문지를 구성하고 있습니다..."}
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>

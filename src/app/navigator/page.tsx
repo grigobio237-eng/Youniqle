@@ -147,6 +147,56 @@ function NavigatorLoungeContent() {
           </p>
         </div>
 
+        {/* Navigator Toolkit */}
+        <div className="mb-12">
+          <div className="bg-obsidian rounded-[40px] p-8 md:p-10 text-mist relative overflow-hidden shadow-2xl">
+            {/* Background Decorative Gradient */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-chapter-accent/20 rounded-full blur-[120px] -mr-64 -mt-64" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="space-y-4 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-chapter-accent text-[10px] font-black uppercase tracking-[0.2em] mb-2">
+                  <Plus className="w-3 h-3" /> Navigator Assets
+                </div>
+                <h2 className="text-3xl font-black tracking-tight">고객 초대 전용 도구</h2>
+                <p className="text-mist/60 font-medium max-w-md">
+                  네비게이터님만의 고유 링크를 통해 고객을 초대하세요. 가입 즉시 블랙 패스 결제 안내로 연결됩니다.
+                </p>
+              </div>
+
+              <div className="w-full md:w-auto space-y-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                  <div className="flex items-center justify-between gap-6 mb-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-mist/40 mb-1">My Referral Code</p>
+                      <p className="text-2xl font-black text-chapter-accent">{(session.user as any).referralCode || (session.user.id.slice(-6).toUpperCase())}</p>
+                    </div>
+                    <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2 shadow-inner">
+                      {/* Placeholder for QR code component if needed, or just an icon */}
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}/auth/signup?ref=${(session.user as any).referralCode || (session.user.id.slice(-6).toUpperCase())}&callbackUrl=/navigator/passes/black`)}`}
+                        alt="QR Code"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const link = `${window.location.origin}/auth/signup?ref=${(session.user as any).referralCode || (session.user.id.slice(-6).toUpperCase())}&callbackUrl=/navigator/passes/black`;
+                      navigator.clipboard.writeText(link);
+                      alert('네비게이터 전용 초대 링크가 복사되었습니다.');
+                    }}
+                    className="w-full py-4 bg-chapter-accent text-obsidian rounded-xl font-black text-sm hover:bg-white transition-all flex items-center justify-center gap-2 group"
+                  >
+                    초대 링크 복사하기
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Tab Navigation */}
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {tabs.map((tab) => {

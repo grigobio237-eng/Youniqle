@@ -165,8 +165,10 @@ export default function CheckoutPage({ params }: PageProps) {
               <p className="text-xl font-black text-obsidian">{pass.price}원</p>
             </div>
             <div className="flex justify-between items-center py-4 border-t border-line mt-4">
-              <p className="text-sm font-bold text-slate/60">결제 주기</p>
-              <p className="text-sm font-black text-obsidian">{pass.period === '무료체험' ? '1회' : `매달 (${pass.period})`}</p>
+              <p className="text-sm font-bold text-slate/60">이용 기간</p>
+              <p className="text-sm font-black text-obsidian">
+                {id === 'black' ? '90일 (3개월)' : (pass.period === '무료체험' ? '1회성' : `매달 (${pass.period})`)}
+              </p>
             </div>
           </div>
 
@@ -188,7 +190,6 @@ export default function CheckoutPage({ params }: PageProps) {
                   <Check className="w-4 h-4 text-obsidian stroke-[3]" />
                 </div>
               </div>
-              {/* Other methods could be added here */}
             </div>
           </div>
 
@@ -203,7 +204,7 @@ export default function CheckoutPage({ params }: PageProps) {
                 className="w-5 h-5 mt-0.5 accent-obsidian cursor-pointer"
               />
               <label htmlFor="terms-agree" className="text-sm font-bold text-obsidian cursor-pointer select-none">
-                [필수] 멤버십 정기결제 및 이용약관에 동의합니다.
+                [필수] 멤버십 이용약관 및 결제에 동의합니다.
                 <button 
                   type="button"
                   onClick={() => window.open('/policies/membership', '_blank')}
@@ -217,8 +218,10 @@ export default function CheckoutPage({ params }: PageProps) {
             <div className="flex items-start gap-3 px-4 py-6 bg-slate-100 rounded-2xl">
               <ShieldCheck className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
               <p className="text-[11px] text-slate/50 font-bold leading-relaxed">
-                본 결제는 정기 결제로, 매달 동일한 날짜에 자동으로 결제됩니다. 
-                결제 정보는 보안 서버를 통해 안전하게 관리되며, 해지는 마이페이지에서 상시 가능합니다.
+                {id === 'black' 
+                  ? '본 상품은 90일간 제공되는 한시적 멤버십 패스입니다. 결제 완료 즉시 혜택이 활성화되며, 기간 만료 후에는 자동으로 등급이 조정됩니다.'
+                  : '본 결제는 정기 결제로, 매달 동일한 날짜에 자동으로 결제됩니다. 결제 정보는 안전하게 관리되며 마이페이지에서 언제든 해지 가능합니다.'
+                }
               </p>
             </div>
           </div>
@@ -236,7 +239,7 @@ export default function CheckoutPage({ params }: PageProps) {
               </>
             ) : (
               <>
-                {pass.price}원 정기 구독 시작하기
+                {pass.price}원 {id === 'black' ? '멤버십 시작하기' : '정기 구독 시작하기'}
                 <Sparkles className="w-5 h-5 group-hover:scale-125 transition-transform" />
               </>
             )}

@@ -62,6 +62,11 @@ function SignupContent() {
     }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+
+  const isBlackPassFlow = callbackUrl.includes('navigator/passes/black');
+
   useEffect(() => {
     setIsInWebView(isWebView());
   }, []);
@@ -82,6 +87,7 @@ function SignupContent() {
       return;
     }
 
+    setIsSubmitting(true);
     const referralCode = searchParams?.get('ref') || '';
 
     try {
@@ -108,17 +114,63 @@ function SignupContent() {
           alert('회원가입이 완료되었습니다! 이메일을 확인하여 인증을 완료해주세요.');
           window.location.href = '/auth/verify-email';
         } else {
-          alert('회원가입이 완료되었습니다! 로그인해주세요.');
-          window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+          // 가입 성공 오버레이 표시
+          setShowSuccessOverlay(true);
+          
+          // 3초 뒤에 로그인 페이지로 이동 (callbackUrl 유지)
+          setTimeout(() => {
+            window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+          }, 3000);
         }
       } else {
         alert(data.error || '회원가입에 실패했습니다.');
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error('Signup error:', error);
       alert('서버 오류가 발생했습니다.');
+      setIsSubmitting(false);
     }
   };
+
+  if (showSuccessOverlay) {
+    return (
+      <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+        <div className="relative">
+          <div className="absolute inset-0 bg-primary/20 blur-[100px] animate-pulse rounded-full" />
+          <div className="relative z-10 space-y-8 animate-in zoom-in duration-500">
+            <div className="w-24 h-24 bg-primary rounded-[32px] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(191,244,66,0.5)]">
+              <Check className="w-12 h-12 text-obsidian stroke-[4]" />
+            </div>
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">
+                Welcome to Youniqle
+              </h1>
+              <p className="text-primary font-bold text-xl uppercase tracking-widest">
+                회원가입이 완료되었습니다
+              </p>
+            </div>
+            
+            {isBlackPassFlow && (
+              <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 max-w-sm mx-auto">
+                <p className="text-white/80 font-medium leading-relaxed">
+                  네비게이터님께서 추천하신 <br/>
+                  <span className="text-chapter-accent font-black">90일 회복 관리 블랙 패스</span> 상세 페이지로 이동합니다.
+                </p>
+              </div>
+            )}
+
+            <div className="pt-10">
+              <div className="flex items-center justify-center gap-2 text-white/40 text-xs font-black uppercase tracking-[0.3em]">
+                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-white/40"></div>
+                Redirecting to your journey...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;

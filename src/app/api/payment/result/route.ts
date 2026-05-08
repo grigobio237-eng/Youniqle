@@ -169,7 +169,13 @@ export async function POST(request: NextRequest) {
                     // passInfo 업데이트
                     const now = new Date();
                     const endDate = new Date();
-                    endDate.setDate(now.getDate() + 30); // 기본 30일
+                    
+                    // 블랙 패스는 90일(3개월), 나머지는 30일
+                    if (passType === 'BLACK') {
+                      endDate.setDate(now.getDate() + 90);
+                    } else {
+                      endDate.setDate(now.getDate() + 30);
+                    }
 
                     buyer.passInfo = {
                       type: passType as any,
