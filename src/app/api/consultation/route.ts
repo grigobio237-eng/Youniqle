@@ -21,9 +21,9 @@ export async function POST(req: Request) {
     // 유저의 recentNavigator 값이 세션에 있다면 (네비게이터 추천으로 온 유저), 이를 기록
     const navigatorCode = (session.user as any)?.recentNavigator || '';
 
-    // 3. AI 리포트 가이드 실시간 생성
-    console.log('🤖 유니클 리커버리 리포트 생성 중...');
-    const aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(data);
+    // [성능 최적화] AI 리포트 가이드는 제출 시가 아닌 열람 시 생성(Lazy Generation)하도록 변경하여 504 타임아웃 방지
+    // console.log('🤖 유니클 리커버리 리포트 생성 중...');
+    // const aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(data);
     
     const newConsultation = new PreConsultation({
       user: (session.user as any).id,
@@ -34,11 +34,11 @@ export async function POST(req: Request) {
       visitPlan: data.visitPlan,
       investment: data.investment,
       medicalCategory: data.medicalCategory,
-      aiGuide: aiGuide // 분석 결과 저장
+      // aiGuide: aiGuide // 분석 결과는 상세 조회 시 생성
     });
 
     await newConsultation.save();
-    console.log('✅ 리포트 저장 완료:', newConsultation._id);
+    console.log('✅ 상담 데이터 저장 완료 (AI 리포트는 열람 시 생성 예정):', newConsultation._id);
 
     return NextResponse.json({ 
       success: true, 

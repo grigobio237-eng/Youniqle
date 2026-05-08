@@ -64,15 +64,26 @@ export default function ClinicPatientDetail() {
 
   const fetchPatientData = async () => {
     try {
-      const response = await fetch(`/api/consultation?userId=${userId}`, {
-        headers: {
-          'x-clinic-password': '1234'
-        }
+      // 1. 먼저 해당 유저의 최신 문진 ID를 가져옴
+      const listResponse = await fetch(`/api/consultation?userId=${userId}`, {
+        headers: { 'x-clinic-password': '1234' }
       });
-      const data = await response.json();
+      const listData = await listResponse.json();
       
-      if (data.consultations && data.consultations.length > 0) {
-        setConsultation(data.consultations[0]); // 최신 문진
+      if (listData.consultations && listData.consultations.length > 0) {
+        const latestId = listData.consultations[0]._id;
+        
+        // 2. 개별 상세 API를 호출하여 AI 리포트 생성 트리거 (없을 경우 생성함)
+        const detailResponse = await fetch(`/api/consultation/${latestId}`, {
+          headers: { 'x-clinic-password': '1234' }
+        });
+        const detailData = await detailResponse.json();
+        
+        if (detailData.consultation) {
+          setConsultation(detailData.consultation);
+        } else {
+          setError('상세 문진 데이터를 불러올 수 없습니다.');
+        }
       } else {
         setError('해당 사용자의 문진 기록을 찾을 수 없습니다.');
       }
