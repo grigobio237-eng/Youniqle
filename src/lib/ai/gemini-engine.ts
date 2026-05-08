@@ -87,10 +87,11 @@ export class GeminiAIEngine {
                     .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
                     .map(m => m.name.replace('models/', ''))
                     .sort((a, b) => {
-                        // Priority: pro > flash > lite
+                        // [Vercel Optimization] Priority: flash > pro > others
+                        // Flash models are much faster and prevent 504 Gateway Timeout
                         const getPriority = (name: string) => {
-                            if (name.includes('pro')) return 1;
-                            if (name.includes('flash')) return 2;
+                            if (name.includes('flash')) return 1;
+                            if (name.includes('pro')) return 2;
                             return 3;
                         };
                         return getPriority(a) - getPriority(b);
