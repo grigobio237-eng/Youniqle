@@ -23,26 +23,28 @@ if (!cached) {
 
 async function connectDB() {
   if (cached!.conn) {
+    console.log('Using cached MongoDB connection');
     return cached!.conn;
   }
 
   if (!cached!.promise) {
     const opts = {
-      bufferCommands: true, // 버퍼링 활성화
-      maxPoolSize: 20, // 개발 환경에서의 데드락 방지를 위해 풀 크기 증가
-      minPoolSize: 1, // 최소 1개의 연결 유지로 초기 지연 방지
-      maxIdleTimeMS: 10000, // 10초로 단축
-      serverSelectionTimeoutMS: 10000, // 10초로 연장 (콜드 스타트 대비)
-      socketTimeoutMS: 30000, // 30초로 유지
-      connectTimeoutMS: 5000, // 5초로 단축
+      bufferCommands: true,
+      maxPoolSize: 20,
+      minPoolSize: 1,
+      maxIdleTimeMS: 10000,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      connectTimeoutMS: 5000,
       retryWrites: true,
       retryReads: true,
-      // 서버리스 환경 최적화 옵션 추가
       heartbeatFrequencyMS: 10000,
       maxStalenessSeconds: 90,
     };
 
+    console.log('Creating new MongoDB connection promise...');
     cached!.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+      console.log('MongoDB connected successfully');
       return mongoose;
     });
   }
@@ -50,6 +52,7 @@ async function connectDB() {
   try {
     cached!.conn = await cached!.promise;
   } catch (e) {
+    console.error('MongoDB connection error:', e);
     cached!.promise = null;
     throw e;
   }

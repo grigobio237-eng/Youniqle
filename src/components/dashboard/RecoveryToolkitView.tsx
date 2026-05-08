@@ -37,8 +37,9 @@ function ToolkitItem({ label, desc, icon, href, color, isLocked }: ToolkitItemPr
     );
 }
 
-export default function RecoveryToolkitView({ userTier = 'NONE' }: { userTier?: string }) {
-    const isPremium = ['RESTART', 'BLACK'].includes(userTier);
+export default function RecoveryToolkitView({ userTier = 'NONE', userRole = 'member' }: { userTier?: string, userRole?: string }) {
+    const isAdmin = ['admin', 'superadmin'].includes(userRole);
+    const isPremium = isAdmin || ['RESTART', 'BLACK'].includes(userTier.toUpperCase());
 
     return (
         <div className="space-y-12 pb-20">

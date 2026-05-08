@@ -207,7 +207,7 @@ export default function DashboardPage() {
         )}
 
         {activeTab === 'toolkit' && (
-          <RecoveryToolkitView userTier={data.user?.grade} />
+          <RecoveryToolkitView userTier={data.user?.grade} userRole={data.user?.role} />
         )}
       </div>
     </div>

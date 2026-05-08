@@ -83,8 +83,19 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error fetching notices:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { success: false, error: { code: 'INTERNAL_ERROR', message: '공지사항 조회 실패' } },
+      { 
+        success: false, 
+        error: { 
+          code: 'INTERNAL_ERROR', 
+          message: '공지사항 조회 실패',
+          details: error.message || String(error)
+        } 
+      },
       { status: 500 }
     );
   }

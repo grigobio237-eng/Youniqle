@@ -23,8 +23,8 @@ const getStudioGenAI = () => {
 
 // Real Gemini AI Engine for Recovery OS
 export class GeminiAIEngine {
-    private static availableTextModels: string[] = [];
-    private static availableImageModels: string[] = [];
+    private static availableTextModels: string[] = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    private static availableImageModels: string[] = ['imagen-3.0-generate-001'];
     private static isInitialized = false;
     private static initializationPromise: Promise<void> | null = null;
     private static questionCache: Record<string, any[]> = {};
@@ -42,89 +42,103 @@ export class GeminiAIEngine {
 
         this.initializationPromise = (async () => {
             try {
-            await dbConnect();
-            const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
-
-            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
-
-            if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
-                this.availableTextModels = settings.ai.availableTextModels;
-                this.availableImageModels = settings.ai.availableImageModels || [];
-                this.isInitialized = true;
-                console.log(`[Gemini] Loaded cached models: ${this.availableTextModels.length} text, ${this.availableImageModels.length} image`);
-                return;
-            }
-
-            console.log('[Gemini] Refreshing available models list from Google API...');
-            const apiKey = process.env.GEMINI_API_KEY;
-            const studioKey = process.env.GEMINI_STUDIO_API_KEY;
-
-            if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
-
-            // Security Check: Verify if keys are reported as leaked
-            if (studioKey) {
-                const studioCheck = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${studioKey}`);
-                const studioData = await studioCheck.json();
-                if (studioData.error?.message?.toLowerCase().includes('leaked')) {
-                    console.error('⚠️ [SECURITY WARNING] GEMINI_STUDIO_API_KEY is reported as LEAKED by Google. Please rotate your keys immediately.');
+                // Pre-set defaults in case DB or API fails
+                if (this.availableTextModels.length === 0) {
+                    this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
                 }
-            }
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
-            const data = await response.json();
+                await dbConnect();
+                const settings = await AdminSettings.findOne().sort({ createdAt: -1 });
 
-            if (data.error) {
-                console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
-                // Use hardcoded defaults if discovery fails
-                this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-pro'];
-                this.availableImageModels = ['imagen-3.0-generate-001'];
-            } else if (data.models) {
-                const allModels: any[] = data.models;
+                const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
 
-                // Filter and sort text models
-                const textModels = allModels
-                    .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
-                    .map(m => m.name.replace('models/', ''))
-                    .sort((a, b) => {
-                        // [Vercel Optimization] Priority: flash > pro > others
-                        // Flash models are much faster and prevent 504 Gateway Timeout
-                        const getPriority = (name: string) => {
-                            if (name.includes('flash')) return 1;
-                            if (name.includes('pro')) return 2;
-                            return 3;
-                        };
-                        return getPriority(a) - getPriority(b);
+                if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
+                    this.availableTextModels = settings.ai.availableTextModels;
+                    this.availableImageModels = settings.ai.availableImageModels || [];
+                    this.isInitialized = true;
+                    console.log(`[Gemini] Loaded cached models: ${this.availableTextModels.length} text, ${this.availableImageModels.length} image`);
+                    return;
+                }
+
+                console.log('[Gemini] Refreshing available models list from Google API...');
+                
+                // Try Studio Key first as it is reported working, or use both
+                const apiKey = process.env.GEMINI_API_KEY;
+                const studioKey = process.env.GEMINI_STUDIO_API_KEY;
+                
+                // Effective key to use for discovery
+                const discoveryKey = studioKey || apiKey;
+
+                if (!discoveryKey) {
+                    console.warn('[Gemini] No API key available for model discovery. Using defaults.');
+                    this.isInitialized = true;
+                    return;
+                }
+
+                // Discovery with timeout to prevent Vercel 504
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for discovery
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${discoveryKey}`, {
+                        signal: controller.signal
                     });
+                    const data = await response.json();
+                    clearTimeout(timeoutId);
 
-                // Filter image models
-                const imageModels = allModels
-                    .filter(m => m.name.includes('imagen'))
-                    .map(m => m.name.replace('models/', ''));
+                    if (data.error) {
+                        console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
+                        // Keep current defaults
+                    } else if (data.models) {
+                        const allModels: any[] = data.models;
 
-                this.availableTextModels = textModels;
-                this.availableImageModels = imageModels;
+                        // Filter and sort text models
+                        const textModels = allModels
+                            .filter(m => m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini'))
+                            .map(m => m.name.replace('models/', ''))
+                            .sort((a, b) => {
+                                // [Vercel Optimization] Priority: flash > pro > others
+                                const getPriority = (name: string) => {
+                                    if (name.includes('2.5-flash')) return 0; // Highest priority if exists
+                                    if (name.includes('2.0-flash')) return 1;
+                                    if (name.includes('1.5-flash')) return 2;
+                                    if (name.includes('pro')) return 3;
+                                    return 4;
+                                };
+                                return getPriority(a) - getPriority(b);
+                            });
 
-                // Save to DB
-                await AdminSettings.findOneAndUpdate(
-                    {},
-                    {
-                        $set: {
-                            'ai.availableTextModels': textModels,
-                            'ai.availableImageModels': imageModels,
-                            'ai.lastModelRefresh': new Date()
-                        }
-                    },
-                    { upsert: true }
-                );
-            }
+                        // Filter image models
+                        const imageModels = allModels
+                            .filter(m => m.name.includes('imagen'))
+                            .map(m => m.name.replace('models/', ''));
+
+                        if (textModels.length > 0) this.availableTextModels = textModels;
+                        if (imageModels.length > 0) this.availableImageModels = imageModels;
+
+                        // Save to DB (Fire and forget to speed up response)
+                        AdminSettings.findOneAndUpdate(
+                            {},
+                            {
+                                $set: {
+                                    'ai.availableTextModels': this.availableTextModels,
+                                    'ai.availableImageModels': this.availableImageModels,
+                                    'ai.lastModelRefresh': new Date()
+                                }
+                            },
+                            { upsert: true }
+                        ).catch(e => console.error('[Gemini] DB update error:', e));
+                    }
+                } catch (fetchErr) {
+                    console.warn('[Gemini] Discovery fetch failed or timed out. Using current models.');
+                }
 
                 this.isInitialized = true;
-                console.log(`[Gemini] Dynamic discovery complete: ${this.availableTextModels.length} models found.`);
+                console.log(`[Gemini] Initialization complete. Primary model: ${this.availableTextModels[0]}`);
             } catch (err: any) {
                 console.error('[Gemini] Failed to initialize dynamic models:', err.message);
-                // Final fallback
-                this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-pro'];
+                this.isInitialized = true; // Still mark as initialized to use defaults
             } finally {
                 this.initializationPromise = null;
             }
@@ -2165,13 +2179,21 @@ JSON 형식:
 [Base Questions JSON]:
 ${JSON.stringify(baseQuestions)}
 
-JSON 배열만 반환하세요.
+JSON 배열(Square brackets [])만 반환하세요. 인사말이나 추가 설명 없이 즉시 [ 로 시작해서 ] 로 끝나는 순수 JSON 데이터만 출력하세요.
 `;
 
         try {
             console.log(`[Gemini] Paraphrasing ${baseQuestions.length} questions for theme: ${theme}`);
             const response = await this.generateWithFallback(prompt, "AI 리커버리 네비게이터 모드", 0.7);
-            const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
+            
+            // Robust JSON Extraction
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) {
+                console.error("[Gemini] No JSON array found in response");
+                return baseQuestions;
+            }
+
+            const cleaned = jsonMatch[0].trim();
             const paraphrased = JSON.parse(cleaned);
             
             // Validate that we got the same number of questions back

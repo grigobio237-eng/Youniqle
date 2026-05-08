@@ -24,7 +24,6 @@ import { useSession } from 'next-auth/react';
 
 export default function ArchivePage() {
   const { data: session } = useSession();
-  const isPremium = (session?.user as any)?.passInfo?.type && (session?.user as any)?.passInfo?.type !== 'RESET';
 
   // Mock past journeys for UI demonstration
   const pastJourneys = [
@@ -49,6 +48,7 @@ export default function ArchivePage() {
   ];
 
   const [assetStats, setAssetStats] = React.useState<any>(null);
+  const [userStatus, setUserStatus] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -58,6 +58,7 @@ export default function ArchivePage() {
         if (res.ok) {
           const data = await res.json();
           setAssetStats(data.assetStats);
+          setUserStatus(data.user);
         }
       } catch (err) {
         console.error('Failed to fetch asset stats:', err);
@@ -67,6 +68,9 @@ export default function ArchivePage() {
     }
     fetchData();
   }, []);
+
+  const isAdmin = ['admin', 'superadmin'].includes(userStatus?.role);
+  const isPremium = isAdmin || (userStatus?.grade && ['RESTART', 'BLACK'].includes(userStatus.grade.toUpperCase()));
 
   return (
     <ChapterWrapper chapter="archive" className="container mx-auto px-4 py-20 pb-40 min-h-screen">

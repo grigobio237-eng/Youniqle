@@ -22,8 +22,15 @@ export async function POST(req: Request) {
     const navigatorCode = (session.user as any)?.recentNavigator || '';
 
     // [성능 최적화 완료] Gemini 2.5 Flash 모델의 초고속 응답(약 3초)을 활용하여 즉시 리포트 생성
-    console.log('🤖 유니클 리커버리 리포트 즉시 생성 중 (Gemini 2.5 Flash)...');
-    const aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(data);
+    console.log('🤖 유니클 리커버리 리포트 즉시 생성 중 (Gemini 2.0 Flash)...');
+    
+    let aiGuide = null;
+    try {
+      aiGuide = await GeminiAIEngine.generateMedicalInterviewGuide(data);
+    } catch (aiError) {
+      console.error('⚠️ AI Report Generation failed, but proceeding with save:', aiError);
+      // AI 실패 시 빈 가이드 혹은 기본 가이드 설정 가능
+    }
     
     const newConsultation = new PreConsultation({
       user: (session.user as any).id,
@@ -34,20 +41,24 @@ export async function POST(req: Request) {
       visitPlan: data.visitPlan,
       investment: data.investment,
       medicalCategory: data.medicalCategory,
-      aiGuide: aiGuide // 분석 결과 즉시 저장
+      aiGuide: aiGuide // 분석 결과 즉시 저장 (실패 시 null)
     });
 
     await newConsultation.save();
-    console.log('✅ 상담 데이터 및 AI 리포트 저장 완료:', newConsultation._id);
+    console.log('✅ 상담 데이터 저장 완료:', newConsultation._id);
 
     return NextResponse.json({ 
       success: true, 
-      consultationId: newConsultation._id 
+      consultationId: newConsultation._id,
+      aiGenerated: !!aiGuide
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save pre-consultation:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Internal Server Error',
+      message: error.message || '상담 저장 실패'
+    }, { status: 500 });
   }
 }
 

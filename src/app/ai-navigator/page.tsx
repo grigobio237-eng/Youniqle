@@ -350,9 +350,6 @@ export default function AiNavigatorPage() {
                                         ))}
                                     </div>
 
-                                    <Button asChild size="sm" className="bg-obsidian text-white rounded-xl font-bold text-[10px] hover:bg-primary hover:text-obsidian transition-colors">
-                                        <Link href="/archive">보관함 관리</Link>
-                                    </Button>
                                 </div>
                             </div>
 
@@ -759,17 +756,9 @@ export default function AiNavigatorPage() {
                                                          </p>
                                                      </div>
                                                      <div className="flex flex-wrap items-center gap-3">
-                                                        <Button variant="outline" size="sm" className="bg-white/50 border-obsidian/10 text-obsidian font-bold text-xs h-10 px-4 rounded-xl hover:bg-white transition-all">
-                                                            <Download className="w-3.5 h-3.5 mr-2" />
-                                                            PDF 리포트 저장
-                                                        </Button>
-                                                        <Button variant="outline" size="sm" className="bg-white/50 border-obsidian/10 text-obsidian font-bold text-xs h-10 px-4 rounded-xl hover:bg-white transition-all">
-                                                            <Share2 className="w-3.5 h-3.5 mr-2" />
-                                                            내비게이터에게 전송
-                                                        </Button>
-                                                        <div className="flex items-center gap-2 text-primary font-black text-sm ml-auto group-hover:gap-4 transition-all">
-                                                            보관함 관리하기 <ArrowRight className="w-4 h-4" />
-                                                        </div>
+                                                         <Link href="/archive" className="flex items-center gap-2 text-primary font-black text-sm group-hover:gap-4 transition-all">
+                                                             보관함 관리하기 <ArrowRight className="w-4 h-4" />
+                                                         </Link>
                                                      </div>
                                                  </div>
                                                  <div className="w-full md:w-80 bg-obsidian/5 flex items-center justify-center relative overflow-hidden self-stretch">

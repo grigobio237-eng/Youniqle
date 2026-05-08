@@ -48,6 +48,7 @@ export default function WeeklyReportPage() {
   const [mappedScores, setMappedScores] = useState<any[]>([]); // 차트용 데이터 상태 추가
   const [averageScore, setAverageScore] = useState(0); // 평균 점수 상태 추가
   const [showMembershipModal, setShowMembershipModal] = useState(false); // 멤버십 모달 상태 추가
+  const [userStatus, setUserStatus] = useState<any>(null); // 사용자 권한 상태 추가
   const cardRef = React.useRef<HTMLDivElement>(null);
   const userName = session?.user?.name || '요원';
 
@@ -100,6 +101,13 @@ export default function WeeklyReportPage() {
         
         setRecords(mapped);
       }
+
+      // 2. 권한 정보 조회
+      const statusRes = await fetch('/api/user/status');
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        setUserStatus(statusData.user);
+      }
     } catch (error) {
       console.error("Failed to fetch weekly report data", error);
     } finally {
@@ -131,6 +139,9 @@ export default function WeeklyReportPage() {
   };
 
 
+
+  const isAdmin = ['admin', 'superadmin'].includes(userStatus?.role);
+  const isPremium = isAdmin || ['RESTART', 'BLACK'].includes(userStatus?.grade?.toUpperCase());
 
   if (loading) {
     return (
@@ -287,41 +298,85 @@ export default function WeeklyReportPage() {
                 <AreaChart data={mappedScores} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0E3A3A" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#0E3A3A" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#0E3A3A" stopOpacity={0.6}/>
+                      <stop offset="60%" stopColor="#0E3A3A" stopOpacity={0.1}/>
+                      <stop offset="100%" stopColor="#0E3A3A" stopOpacity={0}/>
                     </linearGradient>
+                    {/* 선에 입체감을 주기 위한 글로우 필터 */}
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    {/* 그림자 필터 */}
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0E3A3A" floodOpacity="0.3" />
+                    </filter>
                   </defs>
-                  <XAxis 
-                    dataKey="day" 
-                    tickFormatter={(val) => `D${val}`}
-                    tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0E3A3A', opacity: 0.4 }}
-                    axisLine={false}
-                    tickLine={false}
-                    padding={{ left: 20, right: 20 }}
-                  />
-                  <YAxis hide domain={[0, 100]} />
+                  
+                  {/* 배경 그리드 (입체감 부여) */}
                   <Tooltip
+                    cursor={{ stroke: '#0E3A3A', strokeWidth: 1, strokeDasharray: '4 4' }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <div className="bg-obsidian p-3 rounded-xl border border-white/10 shadow-2xl">
-                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Energy Flow</p>
-                            <p className="text-lg font-black text-white">{payload[0].value}%</p>
+                          <div className="bg-obsidian p-4 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-primary" />
+                              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Rhythm Index</p>
+                            </div>
+                            <p className="text-2xl font-black text-white">{payload[0].value}%</p>
+                            <p className="text-[10px] font-bold text-primary/60 mt-1 italic">Day {payload[0].payload.day} Flow</p>
                           </div>
                         );
                       }
                       return null;
                     }}
                   />
+
+                  <XAxis 
+                    dataKey="day" 
+                    tickFormatter={(val) => `D${val}`}
+                    tick={{ fontSize: 10, fontWeight: '900', fill: '#0E3A3A', opacity: 0.3 }}
+                    axisLine={false}
+                    tickLine={false}
+                    padding={{ left: 20, right: 20 }}
+                  />
+                  <YAxis hide domain={[0, 100]} />
+                  
+                  {/* 메인 영역 (그라데이션 레이어) */}
+                  <Area
+                    type="monotone"
+                    dataKey="score"
+                    stroke="none"
+                    fillOpacity={1}
+                    fill="url(#colorScore)"
+                    animationDuration={2000}
+                    connectNulls
+                  />
+
+                  {/* 입체적인 라인 레이어 */}
                   <Area
                     type="monotone"
                     dataKey="score"
                     stroke="#0E3A3A"
-                    strokeWidth={4}
-                    fillOpacity={1}
-                    fill="url(#colorScore)"
-                    dot={{ r: 4, fill: '#0E3A3A', strokeWidth: 2, stroke: '#fff' }}
-                    activeDot={{ r: 6, strokeWidth: 0, fill: '#D4AF37' }}
+                    strokeWidth={5}
+                    fill="none"
+                    filter="url(#shadow)"
+                    animationDuration={2500}
+                    dot={{ 
+                      r: 6, 
+                      fill: '#0E3A3A', 
+                      strokeWidth: 3, 
+                      stroke: '#fff',
+                      filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))'
+                    }}
+                    activeDot={{ 
+                      r: 10, 
+                      strokeWidth: 4, 
+                      stroke: '#fff', 
+                      fill: '#D4AF37',
+                      filter: 'drop-shadow(0px 4px 8px rgba(212,175,55,0.4))'
+                    }}
                     connectNulls
                   />
                 </AreaChart>
@@ -444,23 +499,37 @@ export default function WeeklyReportPage() {
             <Card className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl">
               <CardContent className="p-10 space-y-8">
                 <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl shadow-inner animate-pulse">📦</div>
+                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl shadow-inner animate-pulse">
+                    {isAdmin || isPremium ? '🔓' : '📦'}
+                  </div>
                   <div className="flex-1 space-y-1">
-                    <h4 className="text-xl font-black text-white">리듬 보관함 시작하기</h4>
+                    <h4 className="text-xl font-black text-white">
+                      {isAdmin || isPremium ? '리듬 보관함 활성화됨' : '리듬 보관함 시작하기'}
+                    </h4>
                     <p className="text-xs text-white/40 font-medium leading-relaxed">
-                      7일의 기록이 휘발되지 않도록 안전하게 보관하고,<br />
-                      매주 데이터 기반의 심층 해석을 받아보세요.
+                      {isAdmin || isPremium 
+                        ? '모든 7일 기록이 보관함에 안전하게 저장되고 있습니다. 매주 심층 해석 리포트를 확인하세요.'
+                        : '7일의 기록이 휘발되지 않도록 안전하게 보관하고, 매주 데이터 기반의 심층 해석을 받아보세요.'}
                     </p>
                   </div>
                 </div>
                 
                 <div className="space-y-4">
-                  <Button 
-                    onClick={() => setShowMembershipModal(true)}
-                    className="w-full h-16 bg-[#D4AF37] text-obsidian rounded-[24px] font-black text-lg hover:bg-[#B8962E] hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(212,175,55,0.3)]"
-                  >
-                    보관함 및 주간 해석 시작
-                  </Button>
+                  {isAdmin || isPremium ? (
+                    <Button 
+                      asChild
+                      className="w-full h-16 bg-white/10 text-white border border-white/20 rounded-[24px] font-black text-lg hover:bg-white/20 transition-all"
+                    >
+                      <Link href="/archive">보관함 데이터 확인하기</Link>
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => setShowMembershipModal(true)}
+                      className="w-full h-16 bg-[#D4AF37] text-obsidian rounded-[24px] font-black text-lg hover:bg-[#B8962E] hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(212,175,55,0.3)]"
+                    >
+                      보관함 및 주간 해석 시작
+                    </Button>
+                  )}
                   
                   <div className="pt-8 border-t border-white/10">
                     <Link href="/private-report" className="w-full py-5 px-6 bg-white/10 border border-white/20 hover:bg-white/15 rounded-2xl transition-all flex items-center justify-center gap-4 group shadow-xl">

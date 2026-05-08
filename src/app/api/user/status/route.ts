@@ -98,8 +98,11 @@ export async function GET(req: NextRequest) {
     };
 
     // 6. Calculate Asset Statistics for '보관함' & '리듬체크'
-    const diagnosisCount = user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0;
-    const dailyLogCount = user.diagnosisResults?.filter((d: any) => d.type === 'daily').length || 0;
+    const RecoveryScore = (await import('@/models/RecoveryScore')).default;
+    const [diagnosisCount, dailyLogCount] = await Promise.all([
+      user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
+      RecoveryScore.countDocuments({ userId: user._id })
+    ]);
     const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
     const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
     
@@ -138,12 +141,20 @@ export async function GET(req: NextRequest) {
       user: {
         name: user.name,
         grade: user.grade,
+        role: user.role, // 슈퍼어드민 등 권한 체크를 위해 추가
         passInfo: user.passInfo
       },
       certificateStatus: {
         totalDailyLogs: dailyLogCount,
-        currentCycle: Math.floor(dailyLogCount / 7),
-        isCurrentCycleClaimed: user.issuedCertificates?.some((c: any) => c.cycleNumber === Math.floor(dailyLogCount / 7)),
+        eligibleCycleCount: Math.floor(dailyLogCount / 7),
+        nextCycleToClaim: (() => {
+          const eligibleCount = Math.floor(dailyLogCount / 7);
+          const claimedNumbers = user.issuedCertificates?.map((c: any) => c.cycleNumber) || [];
+          for (let i = 1; i <= eligibleCount; i++) {
+            if (!claimedNumbers.includes(i)) return i;
+          }
+          return null;
+        })(),
         issuedCertificates: user.issuedCertificates || []
       }
     });

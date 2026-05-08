@@ -32,16 +32,14 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
 
   // Fetch Real Flow Data
   React.useEffect(() => {
-    async function fetchFlowData() {
+    const fetchFlowData = async () => {
       try {
         const res = await fetch('/api/recovery/score');
         if (res.ok) {
           const { scores } = await res.json();
-          if (scores && scores.length > 0) {
-            const validScores = scores.filter((s: any) => s.totalScore > 0);
-            const recentScores = validScores.slice(-7);
-
-            const mappedData = recentScores.map((s: any, idx: number) => ({
+          if (scores && Array.isArray(scores)) {
+            // Filter scores if necessary, but API already skips claimed ones
+            const mappedData = scores.map((s: any, idx: number) => ({
               day: idx + 1,
               date: s.date,
               type: s.snapData?.type || 'TEXT',
@@ -54,21 +52,16 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
           // Fallback to localStorage if API fails
           const savedScore = localStorage.getItem('recovery_last_score');
           if (savedScore) {
-            // Minimal fallback data to keep UI alive
             setFlowData([{ day: 1, date: new Date().toISOString(), type: 'TEXT', rhythmScore: parseInt(savedScore) }]);
+            setCurrentJourneyDay(1);
           }
         }
       } catch (err) {
         console.error('Failed to fetch flow data:', err);
-        // Fallback to localStorage on network error
-        const savedScore = localStorage.getItem('recovery_last_score');
-        if (savedScore) {
-          setFlowData([{ day: 1, date: new Date().toISOString(), type: 'TEXT', rhythmScore: parseInt(savedScore) }]);
-        }
       }
-    }
+    };
     fetchFlowData();
-  }, []);
+  }, [unifiedData]); // Re-fetch when dashboard data refreshes (e.g. after claim)
 
   // 🔮 Dynamic Insight Generation for the Black Modal (HabitAlertBanner)
   const getDynamicInsight = () => {
@@ -191,21 +184,23 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
               </div>
               <Button 
                 className={`w-full max-w-sm h-16 rounded-2xl font-black text-lg shadow-xl transition-all hover:scale-105 ${
-                  unifiedData.certificateStatus?.isCurrentCycleClaimed 
+                  !unifiedData.certificateStatus?.nextCycleToClaim 
                   ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" 
                   : "bg-reward-gold hover:bg-reward-gold/90 text-obsidian shadow-reward-gold/20"
                 }`}
                 onClick={async () => {
-                  if (!unifiedData.certificateStatus?.isCurrentCycleClaimed) {
-                    // Claim the certificate
+                  const nextCycle = unifiedData.certificateStatus?.nextCycleToClaim;
+                  if (nextCycle) {
+                    // Claim the next available certificate
                     try {
                       const res = await fetch('/api/user/certificate/claim', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cycleNumber: unifiedData.certificateStatus?.currentCycle })
+                        body: JSON.stringify({ cycleNumber: nextCycle })
                       });
                       if (res.ok) {
-                        // After claiming, redirect to certificate view
+                        // After claiming, refresh dashboard to see if more are available
+                        if (onRefresh) onRefresh();
                         window.location.href='/certificate';
                       }
                     } catch (err) {
@@ -218,7 +213,9 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
                   }
                 }}
               >
-                {unifiedData.certificateStatus?.isCurrentCycleClaimed ? "7일 완주 증명서 확인하기" : "7일 완주 증명서 받기"}
+                {unifiedData.certificateStatus?.nextCycleToClaim 
+                  ? `${unifiedData.certificateStatus.nextCycleToClaim}회차 완주 증명서 받기` 
+                  : "7일 완주 증명서 확인하기"}
               </Button>
               <button className="text-[10px] font-black text-mist/30 uppercase tracking-widest hover:text-mist transition-colors">
                 다음에 할게요
@@ -236,7 +233,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate/50">Recovery Journey</span>
           </div>
           <Badge variant="outline" className="border-chapter-accent/20 text-chapter-accent text-[10px] font-black uppercase tracking-widest px-3 py-1">
-            {currentJourneyDay}/7 Days
+            {(unifiedData.certificateStatus?.issuedCertificates?.length || 0) + 1}회차: {currentJourneyDay}/7 Days
           </Badge>
         </div>
         <FlowTimeline data={flowData} currentDay={currentJourneyDay} />

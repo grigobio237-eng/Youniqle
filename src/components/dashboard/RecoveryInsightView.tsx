@@ -19,7 +19,9 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
     const { user, insights, score, assetStats } = unifiedData;
     const [recommendedProducts, setRecommendedProducts] = React.useState<any[]>([]);
     const userTier = user?.grade?.toUpperCase() || 'NONE';
-    const isPremium = ['RESTART', 'BLACK'].includes(userTier);
+    const userRole = user?.role || 'member';
+    const isAdmin = ['admin', 'superadmin'].includes(userRole);
+    const isPremium = isAdmin || ['RESTART', 'BLACK'].includes(userTier);
     const displayScore = score?.totalScore || 0;
 
     return (

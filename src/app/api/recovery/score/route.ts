@@ -113,6 +113,13 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
+        // [회차 시스템 적용] 발급된 증명서(회차) 수만큼 로그를 건너뛰고 현재 회차의 진행 상황만 반환
+        const claimedCycles = user.issuedCertificates?.length || 0;
+        const skipCount = claimedCycles * 7;
+        const totalLogs = await RecoveryScore.countDocuments({ userId: user._id });
+
+        console.log(`[Cycle Debug] User: ${user.email} | Claimed: ${claimedCycles} | Total Logs: ${totalLogs} | Skipping: ${skipCount}`);
+
         const { searchParams } = new URL(req.url);
         const dateParam = searchParams.get('date');
 
@@ -126,15 +133,23 @@ export async function GET(req: NextRequest) {
             const score = await RecoveryScore.findOne(query);
             return NextResponse.json({ score });
         } else {
-            // If no date, maybe return recent 7 days? or just all?
-            // Let's return recent 30 days for charts
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            // 현재 회차에 해당하는 로그들만 가져옴 (최대 7개)
+            const scores = await RecoveryScore.find(query)
+                .sort({ date: 1 })
+                .skip(skipCount)
+                .limit(7);
 
-            query.date = { $gte: thirtyDaysAgo };
+            console.log(`[Cycle Debug] Returning ${scores.length} scores for current cycle`);
 
-            const scores = await RecoveryScore.find(query).sort({ date: 1 });
-            return NextResponse.json({ scores });
+            return NextResponse.json({ 
+                scores,
+                debug: {
+                    claimedCycles,
+                    skipCount,
+                    totalLogs,
+                    currentCycleProgress: scores.length
+                }
+            });
         }
 
     } catch (error) {
