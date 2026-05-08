@@ -64,9 +64,13 @@ export async function GET(req: NextRequest) {
     const mode = url.searchParams.get('mode'); // 'admin' 혹은 'navigator'
 
     let user = session?.user;
+    const clinicPassword = req.headers.get('x-clinic-password');
 
-    // NextAuth 세션이 없으면 admin-token 쿠키 확인
-    if (!user) {
+    // 1. 임시 비밀번호 인증 (계정 없는 의료진용)
+    const isTempClinicAuthorized = clinicPassword === '1234';
+
+    // 2. 관리자 토큰 확인 (로그인된 관리자용)
+    if (!user && !isTempClinicAuthorized) {
       const { verifyAdminToken } = await import('@/lib/auth');
       const adminAuth = await verifyAdminToken(req as any);
       if (adminAuth.success) {
@@ -74,26 +78,29 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    if (!user) {
+    if (!user && !isTempClinicAuthorized) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userIdParam = url.searchParams.get('userId');
+
     let query = {};
 
-    // 1. 관리자인 경우 모든 데이터를 볼 수 있음
-    if ((user as any).role === 'admin' || (user as any).role === 'superadmin') {
-      // no filter needed
-    } 
-    // 2. 네비게이터 권한인 경우 본인을 거쳐간 유저의 데이터만 볼 수 있게 제한
-    else if ((user as any).isNavigator || mode === 'navigator') {
-      const { default: User } = await import('@/models/User');
-      const me = await User.findById((user as any).id);
-      if (!me || (!me.isNavigator && me.role !== 'admin')) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // 1. 관리자 또는 의료기관 담당자(비밀번호 인증 포함)인 경우
+    const { AccessControl } = await import('@/lib/logic/access-control');
+    if (isTempClinicAuthorized || AccessControl.isClinicStaff(user)) {
+      if (userIdParam) {
+        query = { user: userIdParam };
+      } else {
+        // 관리자가 전체를 보거나, 네비게이터 모드일 때 필터링
+        if ((user as any).isNavigator || mode === 'navigator') {
+          const { default: User } = await import('@/models/User');
+          const me = await User.findById((user as any).id);
+          if (me) query = { navigator: me.referralCode };
+        }
       }
-      query = { navigator: me.referralCode };
     } 
-    // 3. 일반 유저인 경우 본인의 데이터만 조회
+    // 2. 일반 유저인 경우 본인의 데이터만 조회
     else {
       query = { user: (session.user as any).id };
     }

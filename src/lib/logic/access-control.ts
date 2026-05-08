@@ -122,6 +122,17 @@ export class AccessControl {
   }
 
   /**
+   * 의료기관 담당자 여부 확인
+   */
+  static isClinicStaff(user: any): boolean {
+    if (!user) return false;
+    if (this.isAdmin(user)) return true;
+    
+    // 파트너이면서 의료기관 타입인 경우
+    return user.role === 'partner' && user.partnerApplication?.partnerType === 'medical';
+  }
+
+  /**
    * 특정 기능 사용 가능 여부 확인
    */
   static canUseFeature(user: IUser, feature: 'scanner' | 'diagnosis' | 'webtoon'): boolean {

@@ -116,11 +116,13 @@ export default function BlackPassDashboard() {
                     <DialogTitle className="text-2xl font-black text-obsidian tracking-tight">진료 전용 QR</DialogTitle>
                   </DialogHeader>
                   <div className="p-6 bg-mist rounded-3xl shadow-inner border border-line/50">
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`YOUNIQLE_USER_${user?.id}`)}`}
-                      alt="Treatment QR"
-                      className="w-48 h-48 mix-blend-multiply"
-                    />
+                    {isMounted && (
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`${window.location.origin}/clinic/patient/${user?.id}`)}`}
+                        alt="Treatment QR"
+                        className="w-48 h-48 mix-blend-multiply"
+                      />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <p className="text-obsidian font-black text-lg">{user?.name} 님</p>
