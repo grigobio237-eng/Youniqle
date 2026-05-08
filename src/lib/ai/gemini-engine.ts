@@ -1146,11 +1146,9 @@ ${input.isStemCellSolution ? `
         }
 
         const models = [
-            'nano-banana-pro-preview',
-            'gemini-2.5-flash-image',
-            'gemini-3-pro-image-preview',
+            'gemini-2.5-flash',
             'gemini-2.0-flash',
-            'gemini-flash-latest'
+            'gemini-1.5-flash'
         ];
         let lastError: any;
 
@@ -1492,7 +1490,7 @@ ${prevSummary ? `- 이전 화 요약: ${prevSummary}` : ''}
                 throw new Error('API key is not configured');
             }
 
-            const modelNames = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
+            const modelNames = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
             let lastError: any;
 
             for (const modelName of modelNames) {
