@@ -77,7 +77,7 @@ export class GeminiAIEngine {
             if (data.error) {
                 console.error(`[Gemini] Model Discovery Error: ${data.error.message}`);
                 // Use hardcoded defaults if discovery fails
-                this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-pro'];
                 this.availableImageModels = ['imagen-3.0-generate-001'];
             } else if (data.models) {
                 const allModels: any[] = data.models;
@@ -124,7 +124,7 @@ export class GeminiAIEngine {
             } catch (err: any) {
                 console.error('[Gemini] Failed to initialize dynamic models:', err.message);
                 // Final fallback
-                this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-pro'];
             } finally {
                 this.initializationPromise = null;
             }
@@ -294,7 +294,7 @@ export class GeminiAIEngine {
         }
 
         // 기본 안전장치: 검색된 모델이 전혀 없을 경우에만 하드코딩된 최신 리스트 사용
-        const effectiveModels = models.length > 0 ? models : ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        const effectiveModels = models.length > 0 ? models : ['gemini-2.5-flash', 'gemini-2.0-flash'];
         
         let lastError: any;
 
@@ -317,7 +317,7 @@ export class GeminiAIEngine {
                     console.log('[Gemini] Emergency: All tiered models failed. Refreshing list and retrying once more...');
                     await this.initializeDynamicModels(true);
                     const freshModels = await this.getTieredModels('text');
-                    const backupModel = freshModels[0] || 'gemini-1.5-flash';
+                    const backupModel = freshModels[0] || 'gemini-2.5-flash';
                     try {
                         const emergencyText = await GeminiAIEngine.executeModelRequest(backupModel, prompt, systemInstruction, temperature);
                         if (emergencyText) return emergencyText;
