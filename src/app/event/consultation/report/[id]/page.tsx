@@ -13,25 +13,46 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
   
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchReport = async () => {
+    let pollInterval: NodeJS.Timeout;
+
+    const fetchReport = async (isRetry = false) => {
       try {
+        if (!isRetry) setLoading(true);
         const res = await fetch(`/api/consultation/${params.id}`);
         if (!res.ok) {
           throw new Error('리포트를 불러올 권한이 없거나 존재하지 않습니다.');
         }
         const json = await res.json();
         setData(json.consultation);
+
+        // 만약 aiGuide가 아직 생성되지 않았다면 분석 중 상태로 설정하고 폴링 시작
+        if (!json.consultation.aiGuide) {
+          setIsAnalyzing(true);
+          if (!pollInterval) {
+            pollInterval = setInterval(() => fetchReport(true), 3000); // 3초마다 재시도
+          }
+        } else {
+          setIsAnalyzing(false);
+          if (pollInterval) clearInterval(pollInterval);
+        }
       } catch (err: any) {
         addToast({ title: '오류', description: err.message, variant: 'error' });
+        if (pollInterval) clearInterval(pollInterval);
       } finally {
-        setLoading(false);
+        if (!isRetry) setLoading(false);
       }
     };
+
     fetchReport();
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, [params.id]);
 
   const handleDownloadPdf = async () => {
@@ -351,65 +372,85 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
                </div>
              </section>
 
-             {/* 6. AI Smart Guide (NEW) */}
-             {data.aiGuide && (
-               <section className="animate-in fade-in slide-in-from-bottom-5 duration-1000">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-obsidian rounded-xl flex items-center justify-center text-primary">
-                      <Sparkles className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-black text-obsidian tracking-tight">유니클 리커버리 매니저 면담 가이드</h2>
-                      <p className="text-xs text-slate font-bold uppercase tracking-widest">Tailored consultation strategy</p>
-                    </div>
+             {/* 6. AI Smart Guide (Optimized for Lazy Generation) */}
+             <section className="animate-in fade-in slide-in-from-bottom-5 duration-1000">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-obsidian rounded-xl flex items-center justify-center text-primary">
+                    <Sparkles className="w-6 h-6" />
                   </div>
-
-                  <div className="bg-obsidian text-white p-8 rounded-[32px] shadow-xl relative overflow-hidden group mb-8">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
-                     <p className="text-lg font-medium leading-relaxed italic opacity-90 relative z-10">
-                         &quot;{data.aiGuide.analysis}&quot;
-                     </p>
+                  <div>
+                    <h2 className="text-2xl font-black text-obsidian tracking-tight">유니클 리커버리 매니저 면담 가이드</h2>
+                    <p className="text-xs text-slate font-bold uppercase tracking-widest">Tailored consultation strategy</p>
                   </div>
+                </div>
 
+                {isAnalyzing ? (
                   <div className="space-y-6">
-                    <h3 className="text-lg font-black flex items-center gap-2 px-2">
-                       <ClipboardCheck className="text-primary w-5 h-5" /> 의료진에게 반드시 질문하세요
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                       {data.aiGuide.mustAskQuestions.map((item: any, idx: number) => (
-                         <div key={idx} className="p-6 bg-mist/30 border border-line rounded-2xl hover:border-primary transition-all group">
-                           <div className="flex gap-4">
-                             <div className="w-8 h-8 bg-white border border-line rounded-lg flex items-center justify-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                               {idx + 1}
-                             </div>
-                             <div className="flex-1">
-                               <p className="text-lg font-black text-obsidian mb-2">{item.question}</p>
-                               <div className="flex flex-col sm:flex-row gap-3 items-start opacity-80 mt-3 bg-primary/5 p-3 rounded-lg border border-primary/10">
-                                 <span className="inline-block shrink-0 text-[10px] font-black uppercase text-primary tracking-widest bg-primary/20 px-2 py-1 rounded">Rationale</span>
-                                 <p className="text-sm font-semibold leading-relaxed text-slate">{item.rationale}</p>
-                               </div>
-                             </div>
-                           </div>
-                         </div>
-                       ))}
+                    <div className="bg-obsidian/5 p-8 rounded-[32px] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center py-20 text-center">
+                       <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+                       <h4 className="text-lg font-black text-obsidian mb-2">AI가 환자 맞춤형 회복 리포트를 생성 중입니다</h4>
+                       <p className="text-sm text-slate font-medium">최신 증상 데이터를 기반으로 정밀 분석을 수행하고 있습니다. 잠시만 기다려주세요 (약 30초 소요)</p>
                     </div>
-                  </div>
-
-                  <div className="mt-10 p-8 bg-primary/5 border-2 border-primary/20 rounded-[32px]">
-                    <h3 className="text-lg font-black flex items-center gap-2 mb-6">
-                      <Stethoscope className="text-primary w-5 h-5" /> 전문가 상담 팁
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {data.aiGuide.hospitalTips.map((tip: string, idx: number) => (
-                        <div key={idx} className="flex gap-3 items-start">
-                           <CheckCircle2 className="w-5 h-5 text-status-good shrink-0 mt-0.5" />
-                           <p className="text-sm font-medium leading-relaxed">{tip}</p>
-                        </div>
+                    {/* Skeleton for questions */}
+                    <div className="grid grid-cols-1 gap-4 opacity-50">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="h-24 bg-mist rounded-2xl animate-pulse" />
                       ))}
                     </div>
                   </div>
-               </section>
-             )}
+                ) : data.aiGuide ? (
+                  <>
+                    <div className="bg-obsidian text-white p-8 rounded-[32px] shadow-xl relative overflow-hidden group mb-8">
+                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+                       <p className="text-lg font-medium leading-relaxed italic opacity-90 relative z-10">
+                           &quot;{data.aiGuide.analysis}&quot;
+                       </p>
+                    </div>
+
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-black flex items-center gap-2 px-2">
+                         <ClipboardCheck className="text-primary w-5 h-5" /> 의료진에게 반드시 질문하세요
+                      </h3>
+                      <div className="grid grid-cols-1 gap-4">
+                         {data.aiGuide.mustAskQuestions.map((item: any, idx: number) => (
+                           <div key={idx} className="p-6 bg-mist/30 border border-line rounded-2xl hover:border-primary transition-all group">
+                             <div className="flex gap-4">
+                               <div className="w-8 h-8 bg-white border border-line rounded-lg flex items-center justify-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                 {idx + 1}
+                               </div>
+                               <div className="flex-1">
+                                 <p className="text-lg font-black text-obsidian mb-2">{item.question}</p>
+                                 <div className="flex flex-col sm:flex-row gap-3 items-start opacity-80 mt-3 bg-primary/5 p-3 rounded-lg border border-primary/10">
+                                   <span className="inline-block shrink-0 text-[10px] font-black uppercase text-primary tracking-widest bg-primary/20 px-2 py-1 rounded">Rationale</span>
+                                   <p className="text-sm font-semibold leading-relaxed text-slate">{item.rationale}</p>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-10 p-8 bg-primary/5 border-2 border-primary/20 rounded-[32px]">
+                      <h3 className="text-lg font-black flex items-center gap-2 mb-6">
+                        <Stethoscope className="text-primary w-5 h-5" /> 전문가 상담 팁
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {data.aiGuide.hospitalTips.map((tip: string, idx: number) => (
+                          <div key={idx} className="flex gap-3 items-start">
+                             <CheckCircle2 className="w-5 h-5 text-status-good shrink-0 mt-0.5" />
+                             <p className="text-sm font-medium leading-relaxed">{tip}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-10 text-center bg-mist rounded-3xl">
+                    <p className="text-slate font-medium">분석 데이터를 불러올 수 없습니다. 다시 시도해주세요.</p>
+                  </div>
+                )}
+             </section>
           </div>
 
           <div className="mt-16 pt-8 border-t border-line text-center text-slate text-sm font-medium">
