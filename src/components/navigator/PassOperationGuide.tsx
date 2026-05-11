@@ -128,7 +128,7 @@ const PassOperationGuide = () => {
           </div>
           <div>
             <h4 className="text-xl font-black text-obsidian mb-1">패스 운영 시 유의사항</h4>
-            <p className="text-sm text-slate font-medium">모든 패스는 명시된 유효기간 동안 <span className="text-obsidian font-bold underline">데이터 기반의 핵심 관리 서비스</span>가 상시 유지되어야 합니다.</p>
+            <p className="text-sm text-slate font-medium">모든 패스는 명시된 유효기간 동안 <span className="text-obsidian font-bold">데이터 기반의 핵심 관리 서비스</span>가 상시 유지되어야 합니다.</p>
           </div>
         </div>
         <div className="flex gap-3">

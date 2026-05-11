@@ -101,7 +101,7 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Professional Support</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-black italic">
-              Still have <span className="text-primary underline underline-offset-8">Questions?</span>
+              Still have <span className="text-primary font-bold italic text-glow-cream">Questions?</span>
             </h3>
             <p className="text-mist/60 text-sm font-medium">
               진단 결과에 대해 전담 전문가(네비게이터)가 직접 답변해 드립니다.

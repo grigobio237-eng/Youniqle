@@ -18,16 +18,45 @@ export default function TodoPage() {
     const [todos, setTodos] = useState<TodoItem[]>([]);
     const [newTodo, setNewTodo] = useState('');
 
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
-        const saved = localStorage.getItem('todo_list');
-        if (saved) {
-            setTodos(JSON.parse(saved));
-        }
+        const fetchTodos = async () => {
+            try {
+                const response = await fetch('/api/user/todo');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.tasks) {
+                        setTodos(data.tasks);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch todos:', error);
+                // Fallback to localStorage if API fails
+                const saved = localStorage.getItem('todo_list');
+                if (saved) setTodos(JSON.parse(saved));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchTodos();
     }, []);
 
-    const saveTodos = (newTodos: TodoItem[]) => {
+    const saveTodos = async (newTodos: TodoItem[]) => {
         setTodos(newTodos);
+        // 1. Save to localStorage for instant feedback
         localStorage.setItem('todo_list', JSON.stringify(newTodos));
+        
+        // 2. Sync with DB
+        try {
+            await fetch('/api/user/todo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tasks: newTodos })
+            });
+        } catch (error) {
+            console.error('Failed to sync todos with DB:', error);
+        }
     };
 
     const addTodo = () => {

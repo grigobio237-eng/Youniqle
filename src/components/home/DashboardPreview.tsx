@@ -12,6 +12,8 @@ import { useSession } from 'next-auth/react';
 import FlowTimeline from './FlowTimeline';
 import TodayRhythmCard from './TodayRhythmCard';
 import HabitAlertBanner from './HabitAlertBanner';
+import RecoveryNoteSection from '@/components/dashboard/RecoveryNoteSection';
+
 
 interface DashboardPreviewProps {
   unifiedData: any;
@@ -156,42 +158,41 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
   };
 
   return (
-    <div className="w-full bg-mist text-obsidian relative pb-24 md:pb-10">
+    <div className="w-full bg-background text-foreground relative pb-24 md:pb-10">
       
-      {/* 🔮 Premium Black Modal (Habit Protocol) - Auto-popup logic is inside the component */}
+      {/* 🔮 Premium Black Modal (Habit Protocol) */}
       <HabitAlertBanner insight={dynamicInsight} />
 
-      {/* 🟡 0. Completion Nudge (Only visible when 7 days are complete) */}
+      {/* 🟡 0. Completion Nudge */}
       {currentJourneyDay >= 7 && (
-        <section className="container mx-auto px-4 pt-10 max-w-5xl animate-in fade-in slide-in-from-top-8 duration-1000">
-          <div className="bg-obsidian text-white rounded-[40px] p-8 md:p-12 relative overflow-hidden shadow-2xl">
+        <section className="container mx-auto px-6 pt-10 max-w-5xl animate-in fade-in slide-in-from-top-8 duration-1000">
+          <div className="bg-surface/80 backdrop-blur-2xl text-foreground rounded-5xl p-10 md:p-16 relative overflow-hidden shadow-2xl shadow-primary/5 border border-white/20">
             {/* Golden Decorative Accents */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-reward-gold/20 rounded-full blur-[100px] -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-chapter-accent/20 rounded-full blur-[80px] -ml-16 -mb-16" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-reward-gold/10 rounded-full blur-[120px] -mr-40 -mt-40" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-[100px] -ml-20 -mb-20" />
 
-            <div className="relative z-10 flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 bg-reward-gold/20 rounded-full flex items-center justify-center border border-reward-gold/30">
-                <Sparkles className="w-8 h-8 text-reward-gold" />
+            <div className="relative z-10 flex flex-col items-center text-center space-y-8">
+              <div className="w-20 h-20 bg-reward-gold/10 rounded-full flex items-center justify-center border border-reward-gold/20">
+                <Sparkles className="w-10 h-10 text-reward-gold" />
               </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl md:text-4xl font-black italic font-serif tracking-tighter leading-tight">
-                  7일간의 여정을 완주했습니다
+              <div className="space-y-4">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+                  7일간의 아름다운 여정을<br />완주하셨네요!
                 </h2>
-                <p className="text-mist/70 font-medium max-w-md mx-auto leading-relaxed">
-                  7일간의 기록을 통해 총 <span className="text-reward-gold font-black">12개의 회복 시그널</span>을 발견했습니다.<br />
-                  {session?.user?.name || '사용자'}님의 회복력은 이전보다 <span className="text-reward-gold font-black">24% 향상</span>된 것으로 분석됩니다.
+                <p className="text-foreground/50 font-medium max-w-md mx-auto leading-relaxed text-lg">
+                  당신의 기록을 통해 <span className="text-primary font-bold">12개의 소중한 회복 시그널</span>을 발견했어요.<br />
+                  {session?.user?.name || '사용자'}님의 회복 에너지가 눈에 띄게 건강해졌네요.
                 </p>
               </div>
               <Button 
-                className={`w-full max-w-sm h-16 rounded-2xl font-black text-lg shadow-xl transition-all hover:scale-105 ${
+                className={`w-full max-w-sm h-20 rounded-full font-bold text-xl shadow-2xl transition-all hover:scale-105 ${
                   !unifiedData.certificateStatus?.nextCycleToClaim 
-                  ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" 
-                  : "bg-reward-gold hover:bg-reward-gold/90 text-obsidian shadow-reward-gold/20"
+                  ? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20" 
+                  : "bg-reward-gold hover:bg-reward-gold/90 text-white shadow-reward-gold/20"
                 }`}
                 onClick={async () => {
                   const nextCycle = unifiedData.certificateStatus?.nextCycleToClaim;
                   if (nextCycle) {
-                    // Claim the next available certificate
                     try {
                       const res = await fetch('/api/user/certificate/claim', {
                         method: 'POST',
@@ -199,51 +200,49 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
                         body: JSON.stringify({ cycleNumber: nextCycle })
                       });
                       if (res.ok) {
-                        // After claiming, refresh dashboard to see if more are available
                         if (onRefresh) onRefresh();
                         window.location.href='/certificate';
                       }
                     } catch (err) {
                       console.error('Failed to claim certificate:', err);
-                      window.location.href='/certificate'; // Fallback
+                      window.location.href='/certificate';
                     }
                   } else {
-                    // View History
                     window.location.href='/archive/certificates';
                   }
                 }}
               >
                 {unifiedData.certificateStatus?.nextCycleToClaim 
                   ? `${unifiedData.certificateStatus.nextCycleToClaim}회차 완주 증명서 받기` 
-                  : "7일 완주 증명서 확인하기"}
+                  : "나의 완주 기록 확인하기"}
               </Button>
-              <button className="text-[10px] font-black text-mist/30 uppercase tracking-widest hover:text-mist transition-colors">
-                다음에 할게요
+              <button className="text-xs font-bold text-foreground/20 uppercase tracking-[0.3em] hover:text-primary transition-colors">
+                기록 보관함으로 가기
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* 🟢 1. D1-D7 Recovery Flow (Simplified Straight Timeline) */}
-      <section className="container mx-auto px-4 pt-10 pb-20 max-w-5xl relative z-10">
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-chapter-accent" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate/50">Recovery Journey</span>
+      {/* 🟢 1. Recovery Flow Timeline */}
+      <section className="container mx-auto px-6 pt-12 pb-20 max-w-5xl relative z-10">
+        <div className="flex items-center justify-between mb-12">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-5 h-5 text-primary/60" />
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Recovery Journey</span>
           </div>
-          <Badge variant="outline" className="border-chapter-accent/20 text-chapter-accent text-[10px] font-black uppercase tracking-widest px-3 py-1">
+          <Badge className="bg-primary/5 text-primary border-none text-[11px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
             {(unifiedData.certificateStatus?.issuedCertificates?.length || 0) + 1}회차: {currentJourneyDay}/7 Days
           </Badge>
         </div>
         <FlowTimeline data={flowData} currentDay={currentJourneyDay} />
       </section>
 
-      {/* 🟣 2. Today's Rhythm Analysis (Empathy & Action) */}
-      <section className="container mx-auto px-4 pb-20 max-w-5xl relative z-10">
-        <div className="flex items-center gap-2 mb-8">
-          <Sparkles className="w-4 h-4 text-reward-gold" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate/50">Today's Insight</span>
+      {/* 🟣 2. Today's Rhythm Analysis */}
+      <section className="container mx-auto px-6 pb-20 max-w-5xl relative z-10">
+        <div className="flex items-center gap-3 mb-10">
+          <Sparkles className="w-5 h-5 text-reward-gold" />
+          <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Today's Insight</span>
         </div>
         <TodayRhythmCard 
           score={displayScore} 
@@ -251,70 +250,43 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
         />
       </section>
 
-      {/* 🔵 3. Secondary Info Grid (Intuitive Buttons) */}
-      <section className="container mx-auto px-4 pb-12 max-w-5xl relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* 🔵 3. Secondary Info Grid */}
+      <section className="container mx-auto px-6 pb-16 max-w-5xl relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Membership Management */}
-          <div className="bg-white/50 backdrop-blur-md rounded-[32px] p-8 border border-line/50 flex items-center justify-between group cursor-pointer hover:border-chapter-accent transition-all shadow-sm" onClick={() => window.location.href='/membership'}>
+          <div className="bg-surface/40 backdrop-blur-xl rounded-5xl p-10 border border-white/20 flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all shadow-sm" onClick={() => window.location.href='/membership'}>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-chapter-accent mb-2">Membership</p>
-              <h3 className="text-xl font-black text-obsidian tracking-tight mb-1">멤버십 혜택 및 관리</h3>
-              <p className="text-xs font-bold text-slate/40 uppercase tracking-tighter italic">현재 등급: {(user?.grade || 'GATE')} v2.5</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-3">Membership</p>
+              <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">멤버십 혜택 관리</h3>
+              <p className="text-xs font-bold text-foreground/30 uppercase tracking-tighter italic">MY GRADE: {(user?.grade || 'GATE')}</p>
             </div>
-            <div className="w-12 h-12 bg-mist rounded-2xl flex items-center justify-center text-slate group-hover:text-chapter-accent transition-colors">
-              <ChevronRight className="w-6 h-6" />
+            <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center text-foreground/20 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+              <ChevronRight className="w-7 h-7" />
             </div>
           </div>
           
           {/* Record Archive */}
-          <div className="bg-white/50 backdrop-blur-md rounded-[32px] p-8 border border-line/50 flex items-center justify-between group cursor-pointer hover:border-chapter-accent transition-all shadow-sm" onClick={() => window.location.href='/archive'}>
+          <div className="bg-surface/40 backdrop-blur-xl rounded-5xl p-10 border border-white/20 flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all shadow-sm" onClick={() => window.location.href='/archive'}>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-chapter-accent mb-2">History Archive</p>
-              <h3 className="text-xl font-black text-obsidian tracking-tight mb-1">나의 기록 보관함</h3>
-              <p className="text-xs font-bold text-slate/40 uppercase tracking-tighter italic">총 {(unifiedData.assetStats?.totalInsights || 0)}개의 회복 기록</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-3">History Archive</p>
+              <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">나의 기록 보관함</h3>
+              <p className="text-xs font-bold text-foreground/30 uppercase tracking-tighter italic">TOTAL {(unifiedData.assetStats?.totalInsights || 0)} INSIGHTS</p>
             </div>
-            <div className="w-12 h-12 bg-mist rounded-2xl flex items-center justify-center text-slate group-hover:text-chapter-accent transition-colors">
-              <ChevronRight className="w-6 h-6" />
+            <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center text-foreground/20 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+              <ChevronRight className="w-7 h-7" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* 🟠 4. Sticky Floating Action Button (Mobile Optimization) */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 md:hidden">
-        <Button 
-          onClick={handleStartDiagnosis}
-          disabled={isDiagnosing}
-          className="w-full h-16 bg-obsidian text-white rounded-[24px] font-black text-lg shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all border border-white/10"
-        >
-          {isDiagnosing ? "분석 준비 중..." : "오늘의 리듬 남기기"}
-          <Zap className="w-5 h-5 text-reward-gold" />
-        </Button>
-      </div>
-
-      {/* Desktop Version of Action Card (Optional, keeping it clean) */}
-      <section className="hidden md:block container mx-auto px-4 pb-12 max-w-5xl">
-        <div className="bg-obsidian text-white rounded-[40px] p-10 flex items-center justify-between shadow-2xl relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-2xl font-black italic font-serif">변화를 만드는 60초의 기록</h3>
-            <p className="text-mist/60 text-sm mt-2">작은 리듬이 모여 당신의 삶을 바꿉니다.</p>
-          </div>
-          <Button 
-            onClick={handleStartDiagnosis}
-            disabled={isDiagnosing}
-            className="h-16 px-8 bg-white text-obsidian rounded-2xl font-black hover:scale-105 transition-transform relative z-10"
-          >
-            리듬체크 시작하기
-          </Button>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-chapter-accent/20 blur-3xl -mr-16 -mt-16" />
-        </div>
-      </section>
+      {/* 🟠 4. Daily Recovery Note (Self-Reflection) */}
+      <RecoveryNoteSection />
 
       <Dialog open={showDiagnosisModal} onOpenChange={setShowDiagnosisModal}>
-        <DialogContent className="max-w-xl p-0 overflow-y-auto max-h-[90vh] border-none rounded-[40px] shadow-2xl bg-white">
+        <DialogContent className="max-w-xl p-0 overflow-hidden border-none rounded-5xl shadow-2xl bg-background">
           <DialogHeader className="sr-only">
-            <DialogTitle>1일 리듬체크</DialogTitle>
-            <DialogDescription>데이터 기반으로 설계하는 나만의 일상 리듬</DialogDescription>
+            <DialogTitle>오늘의 리듬체크</DialogTitle>
+            <DialogDescription>따뜻한 관심으로 설계하는 당신만의 일상 리듬</DialogDescription>
           </DialogHeader>
           <DiagnosisForm questions={diagnosisQuestions} onComplete={handleDiagnosisComplete} />
         </DialogContent>

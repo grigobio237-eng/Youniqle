@@ -632,7 +632,7 @@ const ArchiveContent = () => {
                          {/* @ts-ignore */}
                         <point.icon className="w-7 h-7" />
                       </div>
-                      <h4 className="text-xl font-black text-obsidian underline decoration-2 underline-offset-4 decoration-chapter-accent/20">
+                      <h4 className="text-xl font-black text-obsidian">
                         {point.title}
                       </h4>
                       <ul className="space-y-3">
@@ -826,7 +826,7 @@ const ArchiveContent = () => {
              <div className="p-8 md:p-12 rounded-[32px] bg-white text-obsidian shadow-2xl space-y-6">
                 <p className="text-xl md:text-2xl font-black leading-relaxed">
                   "고객님, 어디서 시술받을지 고민하시죠? <br className="hidden md:block" />
-                  하지만 진짜 중요한 건 <span className="text-chapter-accent underline decoration-4 underline-offset-8">'누가 내 회복을 끝까지 책임져 주는가'</span>입니다. <br className="hidden md:block" />
+                  하지만 진짜 중요한 건 <span className="text-primary font-bold text-glow-cream">'누가 내 회복을 끝까지 책임져 주는가'</span>입니다. <br className="hidden md:block" />
                   유니클이 당신의 회복을 설계하고 보호하겠습니다."
                 </p>
                 <div className="pt-4">

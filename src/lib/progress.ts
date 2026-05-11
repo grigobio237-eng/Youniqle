@@ -1,3 +1,5 @@
+import { getKSTDate } from './date';
+
 // Streak and Checklist Management
 export interface DailyChecklist {
     diagnosis: boolean;      // 진단 완료
@@ -34,13 +36,13 @@ export function getUserProgress(): UserProgress {
     try {
         const progress: UserProgress = JSON.parse(stored);
 
-        // Check if it's a new day
-        const today = new Date().toISOString().split('T')[0];
+        // Check if it's a new day (KST-aware)
+        const today = getKSTDate();
         if (progress.lastCheckDate !== today) {
             // New day - check streak
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            const yesterdayStr = getKSTDate(yesterday);
 
             if (progress.lastCheckDate === yesterdayStr) {
                 // Consecutive day - increment streak
@@ -106,7 +108,7 @@ export function getChecklistProgress(tier: TierType = 'NONE'): { completed: numb
 }
 
 function getDefaultProgress(): UserProgress {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getKSTDate();
     return {
         lastCheckDate: today,
         currentStreak: 1,
@@ -169,4 +171,3 @@ export function getTierChecklist(tier: TierType): TierChecklistItem[] {
             return BASE_CHECKLIST;
     }
 }
-

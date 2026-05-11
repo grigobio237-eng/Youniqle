@@ -9,6 +9,7 @@ import { useRecovery } from '@/contexts/RecoveryContext';
 import { AnalysisResult } from './HeroScanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateDynamicRoutines, getRhythmTypeInfo } from '@/lib/logic/routines';
+import { getKSTDate } from '@/lib/date';
 
 export default function ResultDisplay({ 
   score, 
@@ -79,7 +80,7 @@ export default function ResultDisplay({
   useEffect(() => {
     if (isDesigning) {
       const timer = setTimeout(() => {
-        navigateTo('/dashboard');
+        navigateTo('/ai-navigator');
       }, 3500); // Give enough time for the 2.2s progress bar + reading
       return () => clearTimeout(timer);
     }
@@ -87,8 +88,9 @@ export default function ResultDisplay({
 
   useEffect(() => {
     const saveData = async () => {
-      // 1. Local Storage
-      localStorage.setItem('recovery_last_check', new Date().toISOString().split('T')[0]);
+      // 1. Local Storage (KST-aware)
+      const today = getKSTDate();
+      localStorage.setItem('recovery_last_check', today);
       localStorage.setItem('recovery_last_score', recoveryScore.toString());
 
       // 2. Dispatch event to open header
@@ -100,7 +102,7 @@ export default function ResultDisplay({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            date: new Date(),
+            date: today, // Use YYYY-MM-DD string for consistency
             rawScore: score,
             totalScore: recoveryScore,
             metaphor: rhythmType,
@@ -305,10 +307,10 @@ export default function ResultDisplay({
               </div>
               
               <Button 
-                onClick={() => navigateTo('/dashboard')}
+                onClick={() => navigateTo('/ai-navigator')}
                 className="w-full mt-8 bg-chapter-accent text-white rounded-2xl h-14 font-black"
               >
-                대시보드에서 결과 보기
+                리듬체크에서 결과 보기
               </Button>
             </div>
           </motion.div>

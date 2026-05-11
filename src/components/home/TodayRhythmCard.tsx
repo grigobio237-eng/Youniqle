@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Moon, Zap, Coffee, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Moon, Zap, Coffee, CheckCircle2, ArrowRight } from 'lucide-react';
 
 interface RhythmAction {
   text: string;
@@ -15,87 +15,151 @@ interface TodayRhythmCardProps {
 }
 
 export default function TodayRhythmCard({ score, userName }: TodayRhythmCardProps) {
-  // Logic to determine rhythm type (placeholder logic)
-  let type = "에너지 충전형";
-  let description = "전반적으로 안정적인 리듬입니다. 오늘은 깊은 이완에 집중해보세요.";
-  let actions: RhythmAction[] = [
-    { text: "저녁 8시 이후 블루라이트 차단하기", isCompleted: false },
-    { text: "미지근한 물로 10분간 족욕하기", isCompleted: false },
-    { text: "사운드 테라피 '심해의 휴식' 청취", isCompleted: false }
-  ];
-  let icon = <Zap className="w-8 h-8 text-reward-gold" />;
-  let themeColor = "bg-status-good/5 border-status-good/20";
+  const [missions, setMissions] = React.useState<any[]>([]);
+  const [loadingMissions, setLoadingMissions] = React.useState(true);
 
-  if (score < 40) {
-    type = "수면 리듬 주의형";
-    description = "수면 부채가 누적되고 있습니다. 오늘은 평소보다 30분 일찍 잠자리에 드는 것을 권장합니다.";
-    actions = [
-      { text: "카페인 섭취 중단 (오후 2시 이후)", isCompleted: true },
-      { text: "침실 온도 20-22도로 조절하기", isCompleted: false },
-      { text: "내일 아침 10분간 햇빛 쬐기", isCompleted: false }
-    ];
-    icon = <Moon className="w-8 h-8 text-chapter-accent" />;
-    themeColor = "bg-chapter-accent/5 border-chapter-accent/20";
-  } else if (score < 70) {
-    type = "리듬 회복 지향형";
-    description = "조금씩 회복의 궤도에 진입하고 있습니다. 꾸준한 스냅 기록이 변화를 앞당깁니다.";
-    actions = [
-      { text: "가벼운 스트레칭 5분 실시", isCompleted: false },
-      { text: "단백질 중심의 식단 구성하기", isCompleted: true },
-      { text: "오늘의 감사한 일 한 줄 기록하기", isCompleted: false }
-    ];
-    icon = <Sparkles className="w-8 h-8 text-reward-gold" />;
-    themeColor = "bg-reward-gold/5 border-reward-gold/20";
-  }
+  React.useEffect(() => {
+    const fetchMissions = async () => {
+      try {
+        const res = await fetch('/api/user/missions');
+        if (res.ok) {
+          const data = await res.json();
+          setMissions(data.missions);
+        }
+      } catch (err) {
+        console.error('Failed to fetch missions:', err);
+      } finally {
+        setLoadingMissions(false);
+      }
+    };
+    fetchMissions();
+  }, []);
+
+  const getRhythmType = () => {
+    if (score < 40) return { 
+      type: "수면 리듬 주의형", 
+      description: "조금씩 회복의 궤도에 진입하고 있어요. 오늘은 평소보다 일찍 쉬어볼까요?",
+      icon: <Moon className="w-8 h-8 text-secondary-container" />
+    };
+    if (score < 70) return { 
+      type: "회복 성장형", 
+      description: "건강한 변화가 시작되고 있어요! 작은 기록들이 당신을 더 빛나게 할 거예요.",
+      icon: <Sparkles className="w-8 h-8 text-primary" />
+    };
+    return { 
+      type: "에너지 충전형", 
+      description: "전반적으로 안정적인 리듬입니다. 오늘은 깊은 이완에 집중해보세요.",
+      icon: <Zap className="w-8 h-8 text-primary" />
+    };
+  };
+
+  const { type, description, icon } = getRhythmType();
+
+  const handleMissionClick = (mission: any) => {
+    if (!mission.isCompleted && mission.href) {
+      window.location.href = mission.href;
+    }
+  };
+
+  // Circular Score Logic
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`rounded-[40px] p-8 md:p-10 border-2 ${themeColor} relative overflow-hidden group shadow-sm`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-surface/40 backdrop-blur-2xl rounded-5xl p-10 md:p-14 border border-white/20 relative overflow-hidden shadow-2xl shadow-primary/5"
     >
-      <div className="flex flex-col md:flex-row gap-8 items-start relative z-10">
-        {/* Icon & Type */}
-        <div className="flex flex-col items-center md:items-start space-y-4 shrink-0">
-          <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-xl border border-line/50 group-hover:rotate-6 transition-transform">
-            {icon}
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center lg:items-start relative z-10">
+        
+        {/* Left: Circular Score */}
+        <div className="relative flex flex-col items-center shrink-0">
+          <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center">
+            {/* Background Circle */}
+            <svg className="absolute w-full h-full -rotate-90">
+              <circle
+                cx="50%" cy="50%" r={radius + "%"}
+                className="fill-none stroke-background/30 stroke-[8px]"
+              />
+              <motion.circle
+                initial={{ strokeDashoffset: circumference }}
+                animate={{ strokeDashoffset: offset }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                cx="50%" cy="50%" r={radius + "%"}
+                className="fill-none stroke-primary stroke-[8px] stroke-linecap-round"
+                style={{ strokeDasharray: circumference }}
+              />
+            </svg>
+            <div className="flex flex-col items-center">
+              <span className="text-5xl md:text-6xl font-bold text-foreground">{score}</span>
+              <span className="text-xs font-bold text-foreground/30 uppercase tracking-[0.3em] mt-2">Recovery</span>
+            </div>
           </div>
-          <div className="text-center md:text-left">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate/60">Today's Rhythm Type</span>
-            <h3 className="text-2xl font-black text-obsidian tracking-tighter mt-1 italic font-serif">{type}</h3>
+          <div className="mt-8 text-center">
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary/60">Today's Rhythm</span>
+            <h3 className="text-2xl font-bold text-foreground mt-2">{type}</h3>
           </div>
         </div>
 
-        {/* Description & Actions */}
-        <div className="flex-1 space-y-8">
-          <div className="space-y-3">
-            <p className="text-obsidian font-bold text-lg md:text-xl leading-snug">
+        {/* Right: Description & Actions */}
+        <div className="flex-1 space-y-12">
+          <div className="space-y-6 text-center lg:text-left">
+            <div className="flex justify-center lg:justify-start">
+              <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center shadow-inner">
+                {icon}
+              </div>
+            </div>
+            <p className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
               "{userName}님, {description}"
             </p>
-            <div className="h-[2px] w-12 bg-line" />
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            {actions.map((action, idx) => (
-              <div 
-                key={idx} 
-                className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-line/30 group/item transition-all"
-              >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${action.isCompleted ? 'bg-chapter-accent border-chapter-accent' : 'border-line'}`}>
-                  {action.isCompleted && <CheckCircle2 className="w-4 h-4 text-white" />}
-                </div>
-                <span className={`text-sm font-bold ${action.isCompleted ? 'text-slate/40 line-through' : 'text-obsidian'}`}>
-                  {action.text}
-                </span>
-              </div>
-            ))}
+          <div className="space-y-4">
+            <p className="text-xs font-bold text-foreground/30 uppercase tracking-[0.2em] mb-6">나를 위한 오늘의 작은 행동</p>
+            <div className="grid grid-cols-1 gap-4">
+              {loadingMissions ? (
+                [1, 2, 3].map(i => (
+                  <div key={i} className="h-20 bg-background/20 rounded-full animate-pulse" />
+                ))
+              ) : (
+                missions.map((mission, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => handleMissionClick(mission)}
+                    className={`flex items-center gap-5 bg-background/40 backdrop-blur-sm p-6 rounded-full border transition-all ${
+                      mission.isCompleted 
+                        ? 'border-primary/10 opacity-60' 
+                        : 'border-white/20 hover:bg-white/60 cursor-pointer hover:scale-[1.02]'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                      mission.isCompleted 
+                        ? 'bg-primary border-primary shadow-lg shadow-primary/20' 
+                        : 'border-primary/20'
+                    }`}>
+                      {mission.isCompleted && <CheckCircle2 className="w-5 h-5 text-white" />}
+                    </div>
+                    <div className="flex-1 flex items-center justify-between">
+                      <span className={`text-base md:text-lg font-bold transition-all ${
+                        mission.isCompleted ? 'text-foreground/30 line-through' : 'text-foreground/70'
+                      }`}>
+                        {mission.text}
+                      </span>
+                      {!mission.isCompleted && <ArrowRight className="w-5 h-5 text-primary/40 group-hover:text-primary transition-colors" />}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-
         </div>
       </div>
 
-      {/* Background Decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/40 blur-[100px] -mr-32 -mt-32 pointer-events-none" />
+      {/* Decorative Light Elements */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 blur-[120px] -mr-40 -mt-40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-60 h-60 bg-secondary-container/5 blur-[100px] -ml-30 -mb-30 pointer-events-none" />
     </motion.div>
   );
 }

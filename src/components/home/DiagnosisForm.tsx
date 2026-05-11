@@ -13,10 +13,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
   const [answers, setAnswers] = useState<any[]>(new Array(questions.length).fill(null));
   const [userNote, setUserNote] = useState('');
 
-  // Context-aware Header
   const getHeaderInfo = () => {
-    const typeLabel = treatmentType === 'SURGERY' ? '수술' : '시술';
-    
     switch (journey) {
       case 'CLINICAL_PRE':
         return {
@@ -31,7 +28,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       default:
         return {
           title: "당신의 오늘을 조용히 비추어봅니다",
-          sub: "정답은 없습니다. 지금 느껴지는 그대로를 남겨주세요"
+          sub: "지금 느껴지는 그대로를 남겨주세요"
         };
     }
   };
@@ -49,6 +46,10 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       detail: answers[step]?.detail || ''
     };
     setAnswers(newAnswers);
+    // Auto-advance after a short delay for better flow
+    setTimeout(() => {
+      if (step < questions.length - 1) setStep(step + 1);
+    }, 400);
   };
 
   const handleNext = () => {
@@ -69,8 +70,8 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
 
   if (!questions || questions.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-pulse text-slate font-medium">질문을 불러오는 중입니다...</div>
+      <div className="flex items-center justify-center min-h-[60vh] bg-background">
+        <div className="animate-pulse text-foreground/40 font-bold">질문을 불러오는 중입니다...</div>
       </div>
     );
   }
@@ -80,34 +81,33 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
   const progress = ((step + 1) / questions.length) * 100;
   const isLastStep = step === questions.length - 1;
 
-  // Medicine Check
   const isMedicineQuestion = currentQ.category === '약물' || currentQ.text.includes('복용') || currentQ.text.includes('약');
 
   return (
-    <div className="max-w-md mx-auto min-h-[85vh] flex flex-col justify-between px-6 py-10 md:py-16 bg-mist/20 rounded-[48px]">
+    <div className="w-full max-w-xl mx-auto min-h-[85vh] flex flex-col justify-between px-8 py-12 md:py-20 bg-background text-foreground rounded-5xl shadow-2xl">
       <div className="flex-1 flex flex-col justify-center">
-        {/* Header Nudge */}
-        <div className="mb-12 text-center space-y-3">
-          <h1 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter italic font-serif leading-tight">{header.title}</h1>
-          <p className="text-[10px] text-chapter-accent font-black uppercase tracking-[0.2em]">{header.sub}</p>
+        {/* Header Section */}
+        <div className="mb-16 text-center space-y-4">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">{header.title}</h1>
+          <p className="text-xs font-bold text-primary/60 uppercase tracking-[0.3em]">{header.sub}</p>
         </div>
 
-        {/* Progress Indicator */}
-        <div className="mb-12 px-2">
-          <div className="flex justify-between items-end mb-4">
-            <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest">
-              STEP {step + 1} OF {questions.length}
+        {/* Progress Bar */}
+        <div className="mb-16 px-4">
+          <div className="flex justify-between items-end mb-5">
+            <span className="text-[11px] font-bold text-foreground/20 uppercase tracking-[0.3em]">
+              JOURNEY STEP {step + 1} / {questions.length}
             </span>
-            <span className="text-2xl font-black text-chapter-accent italic tabular-nums">
+            <span className="text-4xl font-bold text-primary tabular-nums tracking-tighter">
               {Math.round(progress)}%
             </span>
           </div>
-          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden p-[1px]">
+          <div className="w-full bg-surface/50 h-3 rounded-full overflow-hidden p-1 shadow-inner border border-white/20">
             <motion.div
-              className="bg-chapter-accent h-full rounded-full shadow-[0_0_15px_rgba(var(--chapter-accent-rgb),0.4)]"
+              className="bg-primary h-full rounded-full shadow-lg shadow-primary/20"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8, ease: "circOut" }}
+              transition={{ duration: 1, ease: "circOut" }}
             />
           </div>
         </div>
@@ -116,17 +116,17 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
         <AnimatePresence mode='wait'>
           <motion.div
             key={step}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-10"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-12"
           >
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white shadow-sm border border-line">
-                <Activity className="w-3 h-3 text-chapter-accent" />
-                <span className="text-[10px] font-black text-slate uppercase tracking-widest">{currentQ.category}</span>
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-surface/50 border border-white/20 shadow-sm">
+                <Activity className="w-4 h-4 text-primary" />
+                <span className="text-[11px] font-bold text-foreground/40 uppercase tracking-[0.2em]">{currentQ.category}</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-obsidian leading-tight tracking-tight break-keep italic">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-tight tracking-tight break-keep">
                 {currentQ.text}
               </h2>
             </div>
@@ -139,38 +139,35 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
                     key={idx}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleOptionSelect(opt.score, opt.label)}
-                    className={`w-full p-6 text-left border-2 rounded-[28px] transition-all relative overflow-hidden group
+                    className={`w-full p-8 text-left rounded-full transition-all relative overflow-hidden group shadow-lg
                       ${isSelected
-                        ? 'bg-obsidian border-obsidian text-white shadow-2xl'
-                        : 'bg-white border-line hover:border-chapter-accent text-slate'
+                        ? 'bg-primary text-white shadow-primary/30 border-none'
+                        : 'bg-surface/40 border border-white/20 hover:border-primary/30 text-foreground/70'
                       }`}
                   >
                     <div className="flex items-center justify-between relative z-10">
-                      <span className={`text-base md:text-lg font-bold ${isSelected ? 'text-white' : 'text-obsidian'}`}>{opt.label}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                        ${isSelected ? 'bg-chapter-accent border-chapter-accent' : 'border-line'}
+                      <span className={`text-lg md:text-xl font-bold ${isSelected ? 'text-white' : 'text-foreground'}`}>{opt.label}</span>
+                      <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all
+                        ${isSelected ? 'bg-white border-white' : 'border-primary/10'}
                       `}>
-                        {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                        {isSelected && <CheckCircle className="w-5 h-5 text-primary" />}
                       </div>
                     </div>
-                    {isSelected && (
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-12 -mt-12" />
-                    )}
                   </motion.button>
                 );
               })}
             </div>
 
-            {/* Medicine Detail Input */}
-            {isMedicineQuestion && currentAnswer && !currentAnswer.answer.includes('없음') && !currentAnswer.answer.includes('해당 사항 없음') && (
+            {/* Details Input */}
+            {isMedicineQuestion && currentAnswer && !currentAnswer.answer.includes('없음') && (
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-4 pt-4"
+                className="space-y-4 pt-6"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Sparkles className="w-4 h-4 text-reward-gold" />
-                  <span className="text-xs font-black text-chapter-accent uppercase tracking-widest">Details Needed</span>
+                  <span className="text-xs font-bold text-primary/60 uppercase tracking-[0.2em]">추가 정보가 필요해요</span>
                 </div>
                 <textarea
                   value={currentAnswer.detail || ''}
@@ -179,8 +176,8 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
                     newAnswers[step] = { ...currentAnswer, detail: e.target.value };
                     setAnswers(newAnswers);
                   }}
-                  placeholder="복용 중인 약 이름을 적어주세요."
-                  className="w-full p-6 bg-white border-2 border-line rounded-[28px] focus:border-chapter-accent outline-none min-h-[120px] resize-none text-sm font-bold shadow-sm"
+                  placeholder="구체적인 내용을 들려주세요 (예: 약 이름 등)"
+                  className="w-full p-8 bg-surface/50 border border-white/20 rounded-4xl focus:border-primary outline-none min-h-[140px] resize-none text-lg font-medium shadow-inner placeholder:text-foreground/20"
                 />
               </motion.div>
             )}
@@ -189,16 +186,16 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="pt-8 border-t border-line/50 space-y-4"
+                className="pt-12 border-t border-white/10 space-y-6"
               >
-                <label className="block text-[10px] font-black text-slate/40 uppercase tracking-widest">
+                <label className="block text-xs font-bold text-foreground/20 uppercase tracking-[0.2em]">
                   Personal Note (Optional)
                 </label>
                 <textarea
                   value={userNote}
                   onChange={(e) => setUserNote(e.target.value)}
-                  placeholder="오늘의 특이사항이나 유니클에게 하고 싶은 말을 적어주세요."
-                  className="w-full p-6 bg-white/50 border-2 border-line/30 rounded-[28px] focus:border-chapter-accent outline-none min-h-[120px] resize-none text-sm font-bold"
+                  placeholder="오늘의 소중한 한 줄을 남겨주세요."
+                  className="w-full p-8 bg-surface/30 border border-white/10 rounded-4xl focus:border-primary outline-none min-h-[140px] resize-none text-lg font-medium shadow-inner placeholder:text-foreground/20"
                 />
               </motion.div>
             )}
@@ -207,24 +204,22 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex gap-4 mt-12">
+      <div className="flex gap-6 mt-16">
         <Button
           variant="outline"
           onClick={handlePrev}
           disabled={step === 0}
-          className="w-20 h-16 rounded-[24px] border-line text-slate hover:bg-mist"
+          className="w-24 h-20 rounded-full border-white/20 text-foreground/30 hover:bg-surface/50 hover:text-primary transition-all"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-8 h-8" />
         </Button>
         <Button
           onClick={handleNext}
           disabled={!currentAnswer}
-          className={`flex-1 h-16 text-lg rounded-[24px] font-black transition-all shadow-2xl flex items-center justify-center gap-3
-            ${isLastStep ? 'bg-chapter-accent text-white hover:bg-chapter-accent/90' : 'bg-obsidian text-white hover:bg-obsidian/90'}
-          `}
+          className="flex-1 h-20 text-xl rounded-full font-bold transition-all shadow-2xl shadow-primary/20 bg-primary text-white hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-4"
         >
-          {isLastStep ? '리듬카드 확인하기' : '다음 단계'}
-          <ArrowRight className="w-5 h-5" />
+          {isLastStep ? '리듬카드 완성하기' : '다음으로'}
+          <ArrowRight className="w-6 h-6" />
         </Button>
       </div>
     </div>

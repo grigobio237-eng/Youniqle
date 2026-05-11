@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IRecoveryScore extends Document {
     userId: mongoose.Types.ObjectId;
-    date: Date; // Normalized to midnight or ISO date string for "Daily" uniqueness
+    date: string; // YYYY-MM-DD (KST) - Used as a daily unique identifier
     rawScore: number; // 0-25 sum of 5 questions
     totalScore: number; // 0-100 converted score
     metaphor: string;
@@ -16,7 +16,7 @@ export interface IRecoveryScore extends Document {
         type: 'PHOTO' | 'TEXT';
         content: string;
     };
-    userNote?: string; // 사용자의 자유 텍스트 상태 기록
+    userNote?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -28,7 +28,7 @@ const RecoveryScoreSchema = new Schema<IRecoveryScore>({
         required: true
     },
     date: {
-        type: Date,
+        type: String, // Changed from Date to String for robust timezone-independent daily keys
         required: true
     },
     rawScore: {

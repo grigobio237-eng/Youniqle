@@ -158,7 +158,7 @@ export default function EmojiQuizPage() {
                             {!showHint && gameState === 'playing' && (
                                 <button
                                     onClick={() => setShowHint(true)}
-                                    className="text-sm text-gray-400 underline hover:text-pink-500 flex items-center gap-1 transition-colors"
+                                    className="text-sm text-gray-400 hover:text-pink-500 flex items-center gap-1 transition-colors"
                                 >
                                     <HelpCircle className="w-3 h-3" /> 힌트 보기
                                 </button>

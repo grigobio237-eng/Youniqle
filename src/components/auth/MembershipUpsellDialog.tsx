@@ -51,7 +51,7 @@ export default function MembershipUpsellDialog({
               </div>
               <DialogTitle className="text-3xl font-black text-white tracking-tighter leading-tight">
                 {title || (
-                  <>회복 기록을 자산으로<br /><span className="text-primary underline decoration-primary/30 underline-offset-8">보관하고 해석</span>받으세요</>
+                  <>회복 기록을 자산으로<br /><span className="text-primary font-bold text-glow-cream">보관하고 해석</span>받으세요</>
                 )}
               </DialogTitle>
             </div>

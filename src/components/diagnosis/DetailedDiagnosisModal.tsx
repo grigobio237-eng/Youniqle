@@ -351,7 +351,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                             <span className="text-sm">🤖</span> Youniqle Coach Whisper
                         </div>
                         <p className="text-sm font-medium text-obsidian leading-relaxed mt-2">
-                            &quot;{userName} 님, 전반적으로 훌륭하시지만 <span className="text-primary font-black underline decoration-2 underline-offset-2">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
+                            &quot;{userName} 님, 전반적으로 훌륭하시지만 <span className="text-primary font-bold text-glow-cream">{lowestCatName}</span> 점수가 유독 낮네요.<br /><br />
                             이 부분만 해결하면 회복 탄력성이 <span className="bg-primary/10 px-1 rounded font-bold">2배</span>는 좋아질 것 같아요. 제가 원인을 찾아드릴까요?&quot;
                         </p>
                     </motion.div>
@@ -390,7 +390,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                             </Button>
                             {/* Temporary Dev Button for Report Page Check */}
                             <div className="mt-2">
-                                <Link href="/diagnosis/report" className="text-[10px] text-slate-400 underline">
+                                <Link href="/diagnosis/report" className="text-[10px] text-slate-400">
                                     (개발용) 리포트 페이지 미리보기
                                 </Link>
                             </div>

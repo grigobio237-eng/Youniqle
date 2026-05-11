@@ -8,6 +8,11 @@ import PreConsultation from '@/models/PreConsultation';
 import PostCareSurvey from '@/models/PostCareSurvey';
 import { calculateUnifiedScore } from '@/lib/score-engine';
 import { generateUnifiedInsight } from '@/lib/ai/ai-insight';
+import { getKSTDate } from '@/lib/date';
+
+// Global request lock for unified insight
+const statusLock = (global as any)._statusLock || new Map<string, Promise<any>>();
+(global as any)._statusLock = statusLock;
 
 export async function GET(req: NextRequest) {
   try {
@@ -55,49 +60,61 @@ export async function GET(req: NextRequest) {
     const cache = user.cachedUnifiedInsight;
     let unifiedInsight = cache;
 
-    console.log(`[Cache Diagnostic] User: ${user.email} | Latest Data Time: ${latestUpdateTimestamp ? new Date(latestUpdateTimestamp).toISOString() : 'No Data'} | Cache Time: ${cache?.updatedAt ? new Date(cache.updatedAt).toISOString() : 'Empty Cache'}`);
-
+    // Lock check to prevent concurrent AI insight generations
+    const lockKey = user._id.toString();
+    
     if (!cache || !cache.updatedAt || new Date(cache.updatedAt).getTime() < latestUpdateTimestamp) {
-      console.log(`[Cache Miss] Regenerating unified insight for ${user.email}`);
-      const freshInsight = await generateUnifiedInsight({
-        scans,
-        survey: latestSurvey,
-        preConsultation: latestPreConsultation,
-        postCare: latestPostCare
-      });
-      
-      // Cache back onto User document via direct update to bypass legacy validation errors
-      const cachedData = {
-        title: freshInsight.title,
-        description: freshInsight.description,
-        suggestion: freshInsight.suggestion,
-        habits: freshInsight.habits,
-        updatedAt: new Date()
-      };
+      if (statusLock.has(lockKey)) {
+        console.log(`[Lock Hit] Waiting for in-progress unified insight generation: ${lockKey}`);
+        unifiedInsight = await statusLock.get(lockKey);
+      } else {
+        const requestPromise = (async () => {
+          console.log(`[Cache Miss] Regenerating unified insight for ${user.email}`);
+          const freshInsight = await generateUnifiedInsight({
+            scans,
+            survey: latestSurvey,
+            preConsultation: latestPreConsultation,
+            postCare: latestPostCare
+          });
+          
+          const cachedData = {
+            title: freshInsight.title,
+            description: freshInsight.description,
+            suggestion: freshInsight.suggestion,
+            habits: freshInsight.habits,
+            updatedAt: new Date()
+          };
 
-      await User.updateOne(
-        { _id: user._id },
-        { $set: { cachedUnifiedInsight: cachedData } }
-      );
-      
-      unifiedInsight = cachedData;
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { cachedUnifiedInsight: cachedData } }
+          );
+          return cachedData;
+        })();
+
+        statusLock.set(lockKey, requestPromise);
+        try {
+          unifiedInsight = await requestPromise;
+        } finally {
+          statusLock.delete(lockKey);
+        }
+      }
     } else {
-      console.log(`[Cache Hit] Using stored unified insight for ${user.email}`);
+      // console.log(`[Cache Hit] Using stored unified insight for ${user.email}`);
     }
 
-    // 5. Calculate Daily Checklist Status (Automated)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    // 5. Calculate Daily Checklist Status (Automated & KST-aware)
+    const todayStr = getKSTDate();
+    
     const checklistStatus = {
       diagnosis: user.dailyStats?.diagnosisCount > 0,
-      aiAdvice: user.cachedUnifiedInsight?.updatedAt && new Date(user.cachedUnifiedInsight.updatedAt) >= today,
+      aiAdvice: user.cachedUnifiedInsight?.updatedAt && getKSTDate(new Date(user.cachedUnifiedInsight.updatedAt)) === todayStr,
       routine: user.dailyStats?.completedRoutines?.length >= 3,
       content: user.dailyStats?.webtoonCount > 0,
       utility: user.dailyStats?.scannerCount > 0
     };
 
-    // 6. Calculate Asset Statistics for '보관함' & '리듬체크'
+    // 6. Calculate Asset Statistics
     const RecoveryScore = (await import('@/models/RecoveryScore')).default;
     const [diagnosisCount, dailyLogCount] = await Promise.all([
       user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
@@ -108,8 +125,8 @@ export async function GET(req: NextRequest) {
     
     const [consultationCount, surveyCount] = await Promise.all([
       Promise.all([
-        PreConsultation.countDocuments({ user: user._id }),
-        PostCareSurvey.countDocuments({ user: user._id })
+        PreConsultation.countDocuments({ userId: user._id }), // userId check fix
+        PostCareSurvey.countDocuments({ userId: user._id })  // userId check fix
       ]).then(([c1, c2]) => c1 + c2),
       SurveyResponse.countDocuments({ userId: user._id })
     ]);
@@ -141,7 +158,7 @@ export async function GET(req: NextRequest) {
       user: {
         name: user.name,
         grade: user.grade,
-        role: user.role, // 슈퍼어드민 등 권한 체크를 위해 추가
+        role: user.role,
         passInfo: user.passInfo
       },
       certificateStatus: {

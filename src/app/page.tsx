@@ -9,7 +9,6 @@ import { ChevronLeft, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import Hero from '@/components/home/Hero';
-import LandingContent from '@/components/home/LandingContent';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { Question } from '@/types/diagnosis';
 import { AnalysisResult } from '@/components/home/HeroScanner';
@@ -38,20 +37,20 @@ function WelcomeModal() {
 
   return (
     <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
-      <DialogContent className="sm:max-w-md text-center">
+      <DialogContent className="sm:max-w-md text-center rounded-5xl border-none p-10 bg-surface shadow-2xl shadow-primary/5">
         <DialogHeader>
-          <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-            <span className="text-3xl">🎉</span>
+          <div className="mx-auto bg-secondary-container/30 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+            <span className="text-4xl">✨</span>
           </div>
-          <DialogTitle className="text-xl font-bold text-center">가입을 축하합니다!</DialogTitle>
-          <DialogDescription className="text-center pt-2">
-            Youniqle의 회원이 되신 것을 환영합니다.<br />
-            이제 당신만의 회복 여정을 시작해보세요.
+          <DialogTitle className="text-2xl font-bold text-center text-foreground">반가워요!</DialogTitle>
+          <DialogDescription className="text-center pt-3 text-foreground/60 leading-relaxed text-base">
+            유니클의 가족이 되신 것을 진심으로 환영합니다.<br />
+            당신의 평온한 회복 여정을 우리가 함께할게요.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center pt-8">
           <Button onClick={() => setShowWelcome(false)} className="w-full">
-            확인
+            여정 시작하기
           </Button>
         </div>
       </DialogContent>
@@ -239,7 +238,6 @@ export default function HomePage() {
     return (
       <>
         <Hero onStart={handleStart} isDiagnosing={isDiagnosing} />
-        <LandingContent onStart={handleStart} onStartTherapy={() => setShowSoundModal(true)} isDiagnosing={isDiagnosing} />
       </>
     );
   };

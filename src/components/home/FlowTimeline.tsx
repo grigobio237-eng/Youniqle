@@ -20,117 +20,102 @@ interface FlowTimelineProps {
 }
 
 export default function FlowTimeline({ data, currentDay }: FlowTimelineProps) {
-  // 7 days logic
   const days = Array.from({ length: 7 }, (_, i) => {
     const existing = data.find(d => d.day === i + 1);
     return existing || { day: i + 1, date: '', type: 'NONE', rhythmScore: 0 };
   });
 
   return (
-    <div className="w-full space-y-12 py-12 overflow-visible">
+    <div className="w-full space-y-16 py-12 overflow-visible">
       {/* 7-Day Progress Header */}
-      <div className="space-y-6 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1 bg-obsidian text-white rounded-full">
-          <span className="text-[10px] font-black uppercase tracking-widest">7-Day Recovery Journey</span>
+      <div className="space-y-8 text-center">
+        <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/5 text-primary rounded-full border border-primary/10">
+          <Sparkles className="w-4 h-4" />
+          <span className="text-xs font-bold uppercase tracking-[0.3em]">Recovery Flow</span>
         </div>
-        <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tighter italic font-serif">
-          당신의 7일은 하나의 흐름이 됩니다.
+        <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+          당신의 7일은 하나의<br />아름다운 흐름이 됩니다.
         </h2>
         
         {/* Progress Summary Bar */}
-        <div className="max-w-xl mx-auto space-y-4 px-4">
+        <div className="max-w-xl mx-auto space-y-5 px-6">
           <div className="flex justify-between items-end px-2">
-            <span className="text-sm font-black text-obsidian tracking-widest">
-              {currentDay >= 7 ? 'JOURNEY COMPLETE' : `D-${7 - currentDay}`}
+            <span className="text-xs font-bold text-foreground/30 tracking-[0.3em] uppercase">
+              {currentDay >= 7 ? 'COMPLETE' : `DAY ${currentDay} / 7`}
             </span>
-            <span className="text-4xl font-black text-chapter-accent italic">
+            <span className="text-5xl font-bold text-primary tracking-tighter">
               {Math.min(100, Math.round((currentDay / 7) * 100))}%
             </span>
           </div>
-          <div className="h-4 bg-slate-100 rounded-full overflow-hidden border border-line p-1">
+          <div className="h-5 bg-background/50 rounded-full overflow-hidden border border-white/20 p-1.5 shadow-inner">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${(currentDay / 7) * 100}%` }}
-              className="h-full bg-chapter-accent rounded-full shadow-[0_0_15px_rgba(var(--chapter-accent-rgb),0.4)]"
+              className="h-full bg-primary rounded-full shadow-lg shadow-primary/30"
             />
           </div>
         </div>
       </div>
 
-      {/* 🏹 Arrow Process Flow Timeline */}
-      <div className="w-full py-20 overflow-visible">
-        <div className="relative flex items-center w-full max-w-5xl mx-auto px-4">
+      {/* 🏹 Organic Node Timeline */}
+      <div className="w-full py-16 overflow-visible">
+        <div className="relative flex items-center w-full max-w-5xl mx-auto px-8">
+          {/* Background Connecting Line */}
+          <div className="absolute left-8 right-8 h-[2px] bg-background/50 top-1/2 -translate-y-1/2 z-0" />
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: Math.min(1, currentDay / 7) }}
+            className="absolute left-8 right-8 h-[2px] bg-primary top-1/2 -translate-y-1/2 z-1 origin-left shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"
+          />
+
           {days.map((dayObj, idx) => {
             const dayNum = dayObj.day;
             const isCompleted = dayNum <= currentDay;
             const isCurrent = dayNum === currentDay;
-            
-            // Alternating colors: Navy (even idx) vs Gold (odd idx)
-            const activeColor = idx % 2 === 0 ? 'bg-chapter-accent text-white' : 'bg-reward-gold text-obsidian';
-            const bgColor = isCompleted ? activeColor : 'bg-slate-100 text-slate-400';
-            
-            // Alternating vertical position for labels: Top (even) vs Bottom (odd)
             const isTop = idx % 2 === 0;
 
             return (
               <motion.div 
                 key={dayNum}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
-                className="relative flex-1 group"
+                className="relative flex-1 flex justify-center z-10"
               >
-                {/* 🏷️ Info Section (Alternating Top/Bottom) */}
-                <div className={`absolute left-1/2 -translate-x-1/2 w-32 text-center transition-all duration-500 z-30 ${
-                  isTop ? '-top-16 group-hover:-top-20' : '-bottom-16 group-hover:-bottom-20'
+                {/* Node Label (Top/Bottom) */}
+                <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center transition-all duration-500 ${
+                  isTop ? '-top-14' : '-bottom-14'
                 }`}>
-                  {/* Vertical Line Connector */}
-                  <div className={`absolute left-1/2 -translate-x-1/2 w-[1px] h-8 bg-line/50 ${
-                    isTop ? 'bottom-0 translate-y-full' : 'top-0 -translate-y-full'
-                  }`} />
-                  
-                  <div className="space-y-1">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-obsidian' : 'text-slate-300'}`}>
-                      Day {dayNum}
-                    </span>
-                    {isCompleted && (
-                      <div className="flex items-center justify-center gap-1">
-                        <div className={`w-1 h-1 rounded-full ${idx % 2 === 0 ? 'bg-chapter-accent' : 'bg-reward-gold'}`} />
-                        <span className="text-[9px] font-bold text-slate/60">Success</span>
-                      </div>
-                    )}
-                  </div>
+                  <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isCompleted ? 'text-foreground/60' : 'text-foreground/20'}`}>
+                    Day {dayNum}
+                  </span>
+                  {isCompleted && (
+                    <CheckCircle2 className={`w-3 h-3 mt-1 ${idx % 2 === 0 ? 'text-primary' : 'text-secondary-container'}`} />
+                  )}
                 </div>
 
-                {/* 🏹 Arrow Segment Wrapper */}
-                <div className="relative h-14 flex items-center">
+                {/* The Node (Organic Pebble Shape) */}
+                <div className="relative">
                   <div 
-                    className={`w-full h-full flex items-center justify-center transition-all duration-500 ${bgColor} ${
-                      isCurrent ? 'ring-4 ring-chapter-accent/10 scale-105 z-20 shadow-xl' : 'z-10'
-                    }`}
-                    style={{
-                      clipPath: idx === 0 
-                        ? 'polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)' 
-                        : idx === 6
-                        ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%)'
-                        : 'polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)',
-                      marginLeft: idx === 0 ? '0' : '-2%'
-                    }}
+                    className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-700 shadow-xl ${
+                      isCompleted 
+                        ? (idx % 2 === 0 ? 'bg-primary text-white' : 'bg-secondary-container text-white')
+                        : 'bg-background border border-white/40 text-foreground/20'
+                    } ${isCurrent ? 'scale-125 ring-8 ring-primary/10 z-20 shadow-primary/20' : 'z-10'}`}
                   >
-                    <span className="text-xs font-black tracking-tighter opacity-40">D{dayNum}</span>
+                    <span className="text-[11px] font-bold">D{dayNum}</span>
                   </div>
-                </div>
 
-                {/* Pulse Indicator for Current Day */}
-                {isCurrent && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full animate-ping z-30 pointer-events-none" />
-                )}
+                  {/* Pulse Effect for Current Day */}
+                  {isCurrent && (
+                    <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-20 z-0" />
+                  )}
+                </div>
               </motion.div>
             );
           })}
         </div>
       </div>
-
     </div>
   );
 }

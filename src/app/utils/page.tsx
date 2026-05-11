@@ -563,24 +563,42 @@ function RecoveryModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
         );
     };
 
-    const handleSave = () => {
-        // localStorage에 저장
-        const data = {
+    const handleSave = async () => {
+        // Prepare data for DB
+        const today = new Date().toISOString().split('T')[0];
+        const sleepData = {
+            date: today,
             bedtime: `${bedtimeHour.toString().padStart(2, '0')}:${bedtimeMin.toString().padStart(2, '0')}`,
             waketime: `${wakeHour.toString().padStart(2, '0')}:${wakeMin.toString().padStart(2, '0')}`,
             duration: sleepDuration.total,
-            quality,
-            disturbances,
-            date: new Date().toISOString().split('T')[0]
+            quality: quality,
+            efficiency: Math.round((sleepDuration.hours / 8) * 100), // Basic efficiency
+            aiAnalysis: `총 ${sleepDuration.hours}시간 ${sleepDuration.mins}분 수면하셨습니다. ${advice.text}`
         };
-        localStorage.setItem('recovery_sleep_data', JSON.stringify(data));
-        localStorage.setItem('recovery_last_score', String(Math.round(sleepDuration.hours * 10)));
 
-        setIsSaved(true);
-        setTimeout(() => {
-            setIsSaved(false);
-            onOpenChange(false);
-        }, 1500);
+        try {
+            // 1. Save to DB via API
+            const response = await fetch('/api/user/sleep', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sleepData)
+            });
+
+            if (!response.ok) throw new Error('Failed to save to DB');
+
+            // 2. Fallback: also save to localStorage for legacy compatibility
+            localStorage.setItem('recovery_sleep_data', JSON.stringify(sleepData));
+            localStorage.setItem('recovery_last_score', String(Math.round(sleepDuration.hours * 10)));
+
+            setIsSaved(true);
+            setTimeout(() => {
+                setIsSaved(false);
+                onOpenChange(false);
+            }, 1500);
+        } catch (error) {
+            console.error('Error saving sleep data:', error);
+            alert('데이터 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        }
     };
 
     const getSleepAdvice = () => {

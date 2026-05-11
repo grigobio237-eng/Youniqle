@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, RefreshCw, Sparkles, Loader2, Upload, X, Check, Brain, Activity, ArrowRight } from 'lucide-react';
+import { Camera, RefreshCw, Sparkles, Loader2, Upload, X, Check, Brain, Activity, ArrowRight, Heart, Sprout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
-import { Save } from 'lucide-react';
 import { useAIProgress } from '@/hooks/use-ai-progress';
 import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
 
@@ -70,7 +69,6 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const [isSaving, setIsSaving] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
     
-    // PC Webcam States
     const { data: session } = useSession();
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [showWebcam, setShowWebcam] = useState(false);
@@ -79,7 +77,6 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 1. Device Detection
     useEffect(() => {
         const checkMobile = () => {
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -91,7 +88,6 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // 2. PC Webcam Logic
     useEffect(() => {
         if (showWebcam && stream && videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -103,21 +99,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const startWebcam = async () => {
         if (isMobile) return;
-        setShowWebcam(true); // 권한 요청 전 즉시 활성화하여 화면 깜빡임 방지
+        setShowWebcam(true);
         try {
-            const constraints: MediaStreamConstraints = {
-                video: true 
-            };
-            
+            const constraints: MediaStreamConstraints = { video: true };
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             setStream(newStream);
         } catch (err: any) {
             setShowWebcam(false);
-            console.error("Webcam Error:", err);
             toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
-            setTimeout(() => {
-                fileInputRef.current?.click();
-            }, 300);
+            setTimeout(() => { fileInputRef.current?.click(); }, 300);
         }
     };
 
@@ -139,19 +129,11 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 const MAX_HEIGHT = 1024;
                 let width = img.width;
                 let height = img.height;
-
                 if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                 }
-
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
@@ -161,49 +143,34 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         });
     };
 
-    // 3. Analysis Logic
     const analyzeImage = async (imageData: string) => {
         setStatus('scanning');
         setLoading(true);
-        setHasSaved(false); // Reset save state for new scan
+        setHasSaved(false);
         stopWebcam();
 
         try {
             const compressedData = await compressImage(imageData);
             setCapturedImage(compressedData);
-
             const response = await fetch('/api/ai/life-snap', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image: compressedData, journey, snapType })
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Analysis failed');
-            }
-
+            if (!response.ok) throw new Error('Analysis failed');
             const data = await response.json();
-
             if (data.isMismatch) {
-                toast.error(data.mismatchReason || "선택하신 카테고리와 맞지 않는 사진입니다. 정확한 사진을 다시 올려주세요.");
+                toast.error(data.mismatchReason || "선택하신 카테고리와 맞지 않는 사진입니다.");
                 setStatus('idle');
                 return;
             }
-
             finishProgress();
             await new Promise(r => setTimeout(r, 800));
-
             setResult(data);
             setStatus('result');
-
-            // 로그인한 경우 타임라인에 자동 저장 (WebP)
-            if (session?.user?.email) {
-                autoSaveResult(data, compressedData);
-            }
+            if (session?.user?.email) autoSaveResult(data, compressedData);
         } catch (err: any) {
-            console.error('Analysis Error:', err);
-            toast.error(err.message || "유니클 분석 중 오류가 발생했습니다.");
+            toast.error("유니클 분석 중 오류가 발생했습니다.");
             setStatus('idle');
         } finally {
             setLoading(false);
@@ -213,7 +180,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const autoSaveResult = async (analysisResult: AnalysisResult, imageData: string) => {
         setIsSaving(true);
         try {
-            const response = await fetch('/api/scan/save', {
+            await fetch('/api/scan/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -221,83 +188,12 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                     imageData: imageData,
                     score: analysisResult.matchScore,
                     summary: analysisResult.summary,
-                    metrics: {
-                        ...analysisResult.analysisTable,
-                        futureDirection: analysisResult.futureDirection
-                    }
+                    metrics: { ...analysisResult.analysisTable, futureDirection: analysisResult.futureDirection }
                 })
             });
-
-            if (response.ok) {
-                const resData = await response.json();
-                setHasSaved(true);
-                toast.success('분석 결과가 타임라인에 자동으로 기록되었습니다.');
-
-                // 게이미피케이션 보상 알림
-                const gf = resData.data?.gamification;
-                if (gf && gf.rewardPoints > 0) {
-                    setTimeout(() => {
-                        toast.success(gf.gamificationMessage, {
-                            style: { background: '#D4AF37', color: '#1A1A1A', fontWeight: 'bold' }
-                        });
-                    }, 500); // 이전 토스트와 겹치지 않게 딜레이
-                }
-            }
+            setHasSaved(true);
         } catch (err) {
             console.error("Auto-save failed:", err);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleSaveToTimeline = async () => {
-        if (!session) {
-            toast.error("로그인이 필요한 기능입니다.");
-            return;
-        }
-
-        if (hasSaved) {
-            toast.info("이미 저장된 결과입니다.");
-            return;
-        }
-
-        setIsSaving(true);
-        try {
-            const response = await fetch('/api/scan/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: result?.type || 'OTHER',
-                    imageData: capturedImage,
-                    score: result?.matchScore,
-                    summary: result?.summary,
-                    metrics: {
-                        ...result?.analysisTable,
-                        futureDirection: result?.futureDirection
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || '저장에 실패했습니다.');
-            }
-            
-            const resData = await response.json();
-            setHasSaved(true);
-            toast.success('스캔 타임라인에 기록되었습니다.');
-
-            // 게이미피케이션 보상 알림
-            const gf = resData.data?.gamification;
-            if (gf && gf.rewardPoints > 0) {
-                setTimeout(() => {
-                    toast.success(gf.gamificationMessage, {
-                        style: { background: '#D4AF37', color: '#1A1A1A', fontWeight: 'bold' }
-                    });
-                }, 500);
-            }
-        } catch (err: any) {
-            toast.error(err.message);
         } finally {
             setIsSaving(false);
         }
@@ -306,11 +202,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const handleCapture = () => {
         if (!videoRef.current || !canvasRef.current) return;
         const video = videoRef.current;
-        if (video.videoWidth === 0 || video.videoHeight === 0) {
-            toast.error("카메라 영상이 아직 준비되지 않았습니다. 잠시만 기다려주세요.");
-            return;
-        }
-
+        if (video.videoWidth === 0) return;
         const canvas = canvasRef.current;
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -332,76 +224,74 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 if (isMobile) fileInputRef.current?.click();
                 else startWebcam();
             }}
-            className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-obsidian group cursor-pointer border-4 border-white/5 shadow-2xl"
+            className="relative aspect-[4/3] rounded-5xl overflow-hidden bg-surface group cursor-pointer border border-primary/10 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10"
         >
-            <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-obsidian/80" />
+            <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-[2000ms]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-background/90" />
             
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-4">
-                <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/10 group-hover:scale-110 transition-all duration-500">
-                    <Camera className="w-8 h-8 text-white/50" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-6">
+                <div className="w-24 h-24 rounded-full bg-white/60 flex items-center justify-center backdrop-blur-xl border border-white/40 group-hover:scale-110 transition-all duration-700 shadow-lg shadow-primary/10">
+                    <Camera className="w-10 h-10 text-primary/60" />
                 </div>
-                <div className="space-y-2">
-                    <h3 className="text-xs font-black text-chapter-accent tracking-widest uppercase bg-chapter-accent/10 px-3 py-1 rounded-full inline-block">Life Snap</h3>
-                    <p className="text-white font-black text-2xl md:text-3xl leading-snug break-keep px-4">
-                        사진 한 장으로<br />오늘의 회복 상태를<br />기록하세요
+                <div className="space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/10">
+                        <Sparkles className="w-3 h-3 text-primary" />
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Life Snap</span>
+                    </div>
+                    <p className="text-foreground font-bold text-2xl md:text-3xl leading-snug break-keep px-4">
+                        사진 한 장으로 전하는<br />오늘 나의 회복 이야기
                     </p>
                 </div>
+                <p className="text-foreground/40 text-sm font-medium">화면을 탭하여 시작하세요</p>
             </div>
-
-            <Sparkles className="absolute top-8 right-8 w-6 h-6 text-chapter-accent animate-pulse" />
         </div>
     );
 
     const renderSelectTypeView = () => (
-        <div className="w-full h-full md:relative md:aspect-[4/3] md:rounded-[40px] overflow-hidden bg-white group cursor-pointer md:border md:border-line md:shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-line bg-mist">
+        <div className="w-full h-full md:relative md:aspect-[4/3] md:rounded-5xl overflow-hidden bg-white group cursor-pointer md:border md:border-primary/10 md:shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-8 border-b border-line bg-mist/30">
                 <div>
-                    <h3 className="text-lg font-black text-obsidian tracking-tight">어떤 스냅을 기록할까요?</h3>
-                    <p className="text-xs font-bold text-slate/60">당신의 일상을 카테고리에 맞게 선택해주세요.</p>
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">어떤 스냅을 기록할까요?</h3>
+                    <p className="text-sm font-medium text-foreground/40 mt-1">기록의 성격에 맞춰 카테고리를 선택해주세요.</p>
                 </div>
                 <button 
                     onClick={() => setStatus('idle')} 
-                    className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate/50 hover:text-obsidian hover:bg-line transition-colors"
+                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-foreground/30 hover:text-primary hover:bg-primary/5 transition-all shadow-sm"
                     aria-label="닫기"
-                    title="닫기"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                 </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                <div className="grid grid-cols-1 gap-2">
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div className="grid grid-cols-1 gap-3">
                     {[
-                        { id: 'MEAL', emoji: '🍱', title: '음식 사진', desc: '식사 패턴 기록' },
-                        { id: 'HYDRATION', emoji: '💧', title: '물/음료 사진', desc: '수분·카페인·음주 습관 기록' },
-                        { id: 'SKIN', emoji: '✨', title: '얼굴/피부 사진', desc: '외형 컨디션 변화 기록' },
-                        { id: 'SLEEP', emoji: '🛏️', title: '침실/수면환경 사진', desc: '수면 루틴 기록' },
-                        { id: 'ACTIVITY', emoji: '🏃', title: '운동/산책 사진', desc: '활동량 기록' },
-                        { id: 'ROUTINE', emoji: '💊', title: '영양제/관리제품 사진', desc: '자기관리 루틴 기록' },
-                        { id: 'BODY', emoji: '🤕', title: '몸 상태 메모 사진', desc: '피로·붓기·통증 느낌 기록' },
-                        { id: 'MEDICAL_DOC', emoji: '📄', title: '병원 서류 사진', desc: '얼굴, 민감 정보는 가리고 등록해주세요' },
-                        { id: 'OTHER', emoji: '📸', title: '기타 사진', desc: '기타 일상 기록' },
+                        { id: 'MEAL', emoji: '🍱', title: '음식 사진', desc: '오늘의 영양과 식사 패턴' },
+                        { id: 'HYDRATION', emoji: '💧', title: '물/음료 사진', desc: '수분과 카페인 섭취 기록' },
+                        { id: 'SKIN', emoji: '✨', title: '피부 컨디션', desc: '외형적인 회복의 변화' },
+                        { id: 'SLEEP', emoji: '🛏️', title: '수면 환경', desc: '충분한 휴식을 위한 준비' },
+                        { id: 'ACTIVITY', emoji: '🏃', title: '활동과 움직임', desc: '가벼운 산책이나 운동 기록' },
+                        { id: 'ROUTINE', emoji: '💊', title: '자기관리 루틴', desc: '영양제나 관리 제품 기록' },
+                        { id: 'BODY', emoji: '🤕', title: '불편한 부위', desc: '피로나 통증이 느껴지는 곳' },
+                        { id: 'MEDICAL_DOC', emoji: '📄', title: '처방전/진단서', desc: '의료적인 기록과 안내문' },
+                        { id: 'OTHER', emoji: '📸', title: '기타 일상', desc: '회복 과정의 모든 순간' },
                     ].map((cat) => (
                         <button
                             key={cat.id}
                             onClick={() => {
-                                if (cat.id === 'MEDICAL_DOC') {
-                                    toast.warning("얼굴이나 민감한 정보가 포함된 경우, 원하지 않는 부분은 가리고 등록해주세요.", { duration: 6000 });
-                                }
                                 setSnapType(cat.id);
                                 setStatus('idle');
                                 if (isMobile) fileInputRef.current?.click();
                                 else startWebcam();
                             }}
-                            className="flex items-center text-left gap-4 p-4 rounded-2xl border border-transparent hover:border-chapter-accent/20 hover:bg-chapter-accent/5 transition-all bg-mist/30"
+                            className="flex items-center text-left gap-5 p-5 rounded-3xl border border-transparent hover:border-primary/10 hover:bg-primary/5 transition-all bg-mist/10"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-white flex flex-shrink-0 items-center justify-center text-2xl shadow-sm">
+                            <div className="w-14 h-14 rounded-2xl bg-white flex flex-shrink-0 items-center justify-center text-2xl shadow-sm border border-primary/5">
                                 {cat.emoji}
                             </div>
                             <div className="flex-1">
-                                <h4 className="text-sm font-black text-obsidian">{cat.title}</h4>
-                                <p className="text-[11px] font-bold text-slate/60 mt-0.5 break-keep">{cat.desc}</p>
+                                <h4 className="text-base font-bold text-foreground">{cat.title}</h4>
+                                <p className="text-xs font-medium text-foreground/40 mt-0.5 break-keep">{cat.desc}</p>
                             </div>
                         </button>
                     ))}
@@ -411,15 +301,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     );
 
     const renderWebcamView = () => (
-        <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-black border-4 border-white/10 shadow-2xl">
+        <div className="relative aspect-[4/3] rounded-5xl overflow-hidden bg-black border border-primary/10 shadow-2xl">
             <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 bg-gradient-to-t from-black/60 to-transparent">
-                <Button size="lg" onClick={handleCapture} title="사진 촬영" aria-label="사진 촬영" className="w-20 h-20 rounded-full bg-white p-1 hover:scale-105 active:scale-95 transition-all">
-                    <div className="w-full h-full rounded-full border-4 border-obsidian flex items-center justify-center bg-chapter-accent/20">
-                        <div className="w-12 h-12 rounded-full bg-chapter-accent" />
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                <Button onClick={handleCapture} className="w-24 h-24 rounded-full bg-white p-1.5 hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                    <div className="w-full h-full rounded-full border-4 border-primary/10 flex items-center justify-center bg-primary/20">
+                        <div className="w-14 h-14 rounded-full bg-primary" />
                     </div>
                 </Button>
-                <Button variant="ghost" onClick={stopWebcam} className="absolute top-6 right-6 text-white/60 hover:text-white" aria-label="카메라 끄기" title="카메라 끄기">
+                <Button variant="ghost" onClick={stopWebcam} className="absolute top-8 right-8 text-white/60 hover:text-white bg-white/10 backdrop-blur-md rounded-full w-12 h-12" aria-label="닫기">
                     <X className="w-6 h-6" />
                 </Button>
             </div>
@@ -428,7 +318,6 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
 
     const renderResultView = () => {
         if (!result) return null;
-
         const categoryMap = {
             MEAL: { label: '식단', icon: '🍱' },
             HYDRATION: { label: '수분', icon: '💧' },
@@ -442,260 +331,106 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
             AUTO: { label: '분석중', icon: '🧠' }
         };
 
-        // CLINICAL_PRE requires a medical category to start
-        const canStartDiagnosis = journey === 'WELLNESS' || (journey && medicalCategory && treatmentType);
-
-        const renderJourneySelector = () => (
-            <div className="space-y-4 pt-4 border-t border-line">
-                <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest text-center mb-6 px-10">당신의 현재 회복 상황을 선택해주세요</p>
-                <div className="grid grid-cols-2 gap-4">
-                    <button 
-                        onClick={() => { setJourney('WELLNESS'); setSelectionStep('READY'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'WELLNESS' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white hover:border-chapter-accent/20'}`}
-                    >
-                        <div className="w-12 h-12 rounded-2xl bg-mist flex items-center justify-center text-2xl">🌿</div>
-                        <div className="text-center">
-                            <p className="text-sm font-black text-obsidian">웰니스</p>
-                            <p className="text-[9px] font-bold text-slate/50 mt-1">일상 회복</p>
-                        </div>
-                    </button>
-                    <button 
-                        onClick={() => { setSelectionStep('CATEGORY'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey?.startsWith('CLINICAL') ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white hover:border-chapter-accent/20'}`}
-                    >
-                        <div className="w-12 h-12 rounded-2xl bg-mist flex items-center justify-center text-2xl">🏥</div>
-                        <div className="text-center">
-                            <p className="text-sm font-black text-obsidian">클리닉</p>
-                            <p className="text-[9px] font-bold text-slate/50 mt-1">병원/시술/수술</p>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        );
-
-        const renderCategorySelector = () => (
-            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
-                <div className="flex justify-between items-center mb-4">
-                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">상담/진료 분야를 선택하세요</p>
-                    <button onClick={() => setSelectionStep('JOURNEY')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                    {[
-                        { id: 'PLASTIC', label: '성형/피부', emoji: '✨' },
-                        { id: 'ORTHOPEDIC', label: '정형/재활', emoji: '🦴' },
-                        { id: 'INTERNAL', label: '내과/건강검진', emoji: '🩺' },
-                        { id: 'GENERAL', label: '일반/외과', emoji: '🏥' }
-                    ].map(cat => (
-                        <button 
-                            key={cat.id}
-                            onClick={() => { setMedicalCategory(cat.id as any); setSelectionStep('STAGE'); }}
-                            className={`p-4 rounded-2xl border transition-all flex items-center gap-3 ${medicalCategory === cat.id ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
-                        >
-                            <span className="text-xl">{cat.emoji}</span>
-                            <span className="text-xs font-black text-obsidian">{cat.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        );
-
-        const renderStageSelector = () => (
-            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
-                <div className="flex justify-between items-center mb-4">
-                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">시기 선택 (전/후)</p>
-                    <button onClick={() => setSelectionStep('CATEGORY')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <button 
-                        onClick={() => { setJourney('CLINICAL_PRE'); setSelectionStep('TYPE'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'CLINICAL_PRE' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
-                    >
-                        <div className="text-2xl">⏳</div>
-                        <p className="text-sm font-black text-obsidian">시술/수술 전</p>
-                    </button>
-                    <button 
-                        onClick={() => { setJourney('CLINICAL_POST'); setSelectionStep('TYPE'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${journey === 'CLINICAL_POST' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
-                    >
-                        <div className="text-2xl">🚀</div>
-                        <p className="text-sm font-black text-obsidian">시술/수술 후</p>
-                    </button>
-                </div>
-            </div>
-        );
-
-        const renderTypeSelector = () => (
-            <div className="space-y-4 pt-4 border-t border-line animate-in fade-in slide-in-from-right-4">
-                <div className="flex justify-between items-center mb-4">
-                    <p className="text-[10px] font-black text-slate/50 uppercase tracking-widest px-2">시술 vs 수술 구분</p>
-                    <button onClick={() => setSelectionStep('STAGE')} className="text-[10px] font-black text-chapter-accent hover:underline">이전으로</button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <button 
-                        onClick={() => { setTreatmentType('PROCEDURE'); setSelectionStep('READY'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${treatmentType === 'PROCEDURE' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
-                    >
-                        <div className="text-2xl">💉</div>
-                        <p className="text-sm font-black text-obsidian">시술</p>
-                    </button>
-                    <button 
-                        onClick={() => { setTreatmentType('SURGERY'); setSelectionStep('READY'); }}
-                        className={`p-6 rounded-[32px] border-2 transition-all flex flex-col items-center gap-3 ${treatmentType === 'SURGERY' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-white'}`}
-                    >
-                        <div className="text-2xl">🔪</div>
-                        <p className="text-sm font-black text-obsidian">수술</p>
-                    </button>
-                </div>
-            </div>
-        );
-
         return (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 relative">
-                <Card className="rounded-[40px] border-none shadow-2xl overflow-hidden bg-white relative">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                <Card className="rounded-5xl border-none shadow-2xl shadow-primary/5 overflow-hidden bg-white">
                     {isDiagnosing && (
-                        <div className="absolute top-0 left-0 right-0 h-1.5 z-50 bg-mist overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-1.5 z-50 bg-mist">
                             <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
-                                className="h-full bg-chapter-accent"
+                                className="h-full bg-primary"
                                 transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
                             />
                         </div>
                     )}
-                    <div className="relative h-64 overflow-hidden">
+                    <div className="relative h-72 overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                        <div className="absolute bottom-6 left-8 right-8 flex items-end justify-between text-white">
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Badge className="bg-chapter-accent/20 text-chapter-accent border-chapter-accent/30 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 backdrop-blur-md">
-                                        {categoryMap[result.type as keyof typeof categoryMap]?.icon || '📸'} {categoryMap[result.type as keyof typeof categoryMap]?.label || '기타'}
-                                    </Badge>
-                                </div>
-                                <h4 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter">{result.subjectName}</h4>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-chapter-accent flex items-center gap-1">
-                                    <Activity className="w-3 h-3" /> Recovery Point
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                        <div className="absolute bottom-8 left-10 right-10 flex items-end justify-between">
+                            <div className="space-y-2">
+                                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full backdrop-blur-md">
+                                    {categoryMap[result.type as keyof typeof categoryMap]?.icon} {categoryMap[result.type as keyof typeof categoryMap]?.label}
+                                </Badge>
+                                <h4 className="text-3xl font-bold tracking-tight">{result.subjectName}</h4>
+                                <div className="text-[11px] font-bold uppercase tracking-widest text-primary/60 flex items-center gap-1.5">
+                                    <Activity className="w-3.5 h-3.5" /> Recovery Insights
                                 </div>
                             </div>
                             <div className="text-right">
-                                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 opacity-60">POINT</span>
-                                <span className="text-2xl md:text-4xl font-black italic">{result.matchScore}<span className="text-sm opacity-40">/100</span></span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest block mb-1 text-foreground/40">MATCH SCORE</span>
+                                <span className="text-5xl font-black tracking-tighter text-primary">{result.matchScore}<span className="text-lg opacity-30">/100</span></span>
                             </div>
                         </div>
                         <button 
                             onClick={() => setStatus('idle')} 
-                            className="absolute top-6 right-6 p-2 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full text-white/60 transition-colors"
-                            aria-label="결과 닫기"
-                            title="결과 닫기"
+                            className="absolute top-8 right-8 p-3 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full text-foreground/40 hover:text-primary transition-all shadow-sm"
+                            aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
-                    <CardContent className="p-8 space-y-8">
-                        {/* 1. Summary Section */}
+                    <CardContent className="p-10 space-y-10">
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate/60">
-                                <Brain className="w-4 h-4 text-reward-gold" /> Personalized Summary
+                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
+                                <Brain className="w-4 h-4" /> AI Personalized Summary
                             </div>
-                            <p className="text-lg md:text-2xl font-black leading-tight text-obsidian bg-mist/30 p-5 rounded-[32px] border border-line/30 italic">
+                            <div className="bg-mist/30 p-8 rounded-5xl border border-primary/5 italic text-2xl font-bold leading-tight text-foreground/80">
                                 "{result.summary}"
-                            </p>
+                            </div>
                         </div>
 
-                        {/* 2. Nutrition & Impact Table */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate/60">
-                                <Activity className="w-4 h-4 text-chapter-accent" /> Recovery Analysis
+                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
+                                <Sprout className="w-4 h-4" /> Growth Analysis
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {result.analysisTable?.map((item, idx) => (
-                                    <div key={idx} className="flex flex-col p-5 rounded-[24px] bg-white border border-line/50 shadow-sm hover:shadow-md transition-shadow">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <span className="text-[10px] font-black text-slate/60 uppercase tracking-widest">{item.label}</span>
-                                            <Badge variant="outline" className="text-[10px] font-bold border-chapter-accent/20 text-chapter-accent bg-chapter-accent/5">
+                                    <div key={idx} className="p-6 rounded-4xl bg-white border border-primary/10 shadow-sm hover:shadow-md transition-all">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{item.label}</span>
+                                            <Badge variant="outline" className="text-[10px] font-bold border-primary/20 text-primary bg-primary/5">
                                                 {item.value}
                                             </Badge>
                                         </div>
-                                        <p className="text-xs font-bold text-obsidian leading-snug">
-                                            {item.benefit}
-                                        </p>
+                                        <p className="text-sm font-medium text-foreground/70 leading-relaxed">{item.benefit}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* 3. Future Direction */}
-                        <div className="p-6 rounded-[32px] bg-obsidian text-white space-y-3 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-chapter-accent/20 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/70 relative z-10">
-                                <Sparkles className="w-4 h-4 text-chapter-accent" /> Next Step Guide
+                        <div className="p-8 rounded-5xl bg-foreground text-white space-y-4 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-transform duration-1000" />
+                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 relative z-10">
+                                <Sparkles className="w-4 h-4 text-primary" /> Gentle Recovery Guide
                             </div>
-                            <p className="text-sm font-bold leading-relaxed relative z-10">
+                            <p className="text-base font-medium leading-relaxed relative z-10 text-white/90">
                                 {result.futureDirection}
                             </p>
                         </div>
 
-                        {/* Nudge to Diagnosis */}
-                        <div className="pt-6 border-t border-line">
+                        <div className="pt-6">
                             <Button 
                                 onClick={() => onStart(result || undefined, capturedImage || undefined)}
                                 disabled={isDiagnosing}
-                                size="lg" 
-                                className={`w-full h-16 md:h-20 rounded-[24px] text-lg md:text-xl font-black shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-mist' : 'bg-chapter-accent hover:bg-chapter-accent/90 text-white shadow-chapter-accent/20'}`}
+                                className={`w-full h-20 rounded-full text-xl font-bold shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-mist' : 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'}`}
                             >
                                 {isDiagnosing ? (
-                                    <>
-                                        {/* Progress Bar Layer */}
-                                        <motion.div 
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${progress}%` }}
-                                            className="absolute inset-y-0 left-0 bg-chapter-accent z-0"
-                                            transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
-                                        />
-                                        
-                                        {/* Base Text (Black, shown on light background) */}
-                                        <div className="absolute inset-0 flex items-center justify-center z-10 text-slate/40">
-                                            <div className="flex items-center gap-3">
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span>60초 리듬체크 준비 중...</span>
-                                                <span className="tabular-nums opacity-60">{Math.round(progress)}%</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Inverted Text (White, shown over the chapter-accent progress bar) */}
-                                        <motion.div 
-                                            className="absolute inset-y-0 left-0 overflow-hidden z-20 flex items-center bg-chapter-accent"
-                                            style={{ width: `${progress}%` }}
-                                        >
-                                            <div className="w-[500px] flex items-center justify-center text-white px-8">
-                                                <div className="flex items-center gap-3 w-full justify-center">
-                                                    <Sparkles className="w-6 h-6 animate-pulse" />
-                                                    <span className="whitespace-nowrap">60초 리듬체크 준비 중...</span>
-                                                    <span className="tabular-nums font-black">{Math.round(progress)}%</span>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    </>
+                                    <div className="flex items-center gap-3">
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                        <span>맞춤 질문 생성 중... {Math.round(progress)}%</span>
+                                    </div>
                                 ) : (
-                                    <div className="relative z-10 flex items-center justify-center text-white">
-                                        <Sparkles className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
+                                    <div className="flex items-center justify-center gap-3">
+                                        <Heart className="w-6 h-6 animate-pulse" />
                                         <span>60초 리듬체크 시작하기</span>
-                                        <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 )}
                             </Button>
                         </div>
-                        <div className="flex items-center justify-center gap-2 py-2">
-                            <span className="w-2 h-2 rounded-full bg-chapter-accent animate-pulse" />
-                            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Step 01. 오늘의 스냅 완료</span>
-                        </div>
-                        
-                        <Button variant="ghost" onClick={() => setStatus('idle')} className="w-full h-14 rounded-2xl text-slate/60 font-bold hover:bg-mist transition-all">
-                            다른 대상 스캔하기 <RefreshCw className="ml-2 w-4 h-4" />
-                        </Button>
                     </CardContent>
                 </Card>
-                <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
             </motion.div>
         );
     };
@@ -708,43 +443,22 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                         {showWebcam ? renderWebcamView() : renderIdleView()}
                     </motion.div>
                 )}
-
                 {status === 'select_type' && (
-                    <motion.div 
-                        key="select_type" 
-                        initial={{ opacity: 0, y: 20 }} 
-                        animate={{ opacity: 1, y: 0 }} 
-                        exit={{ opacity: 0, y: 20 }}
-                        className="fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto"
-                    >
+                    <motion.div key="select_type" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto">
                         {renderSelectTypeView()}
                     </motion.div>
                 )}
-                
                 {status === 'scanning' && (
-                    <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist overflow-hidden">
+                    <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-5xl bg-mist flex flex-col items-center justify-center overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
-                        <AIProgressOverlay 
-                            active={loading} 
-                            progress={scanProgress} 
-                            message={statusMessage} 
-                            variant="compact"
-                        />
+                        <AIProgressOverlay active={loading} progress={scanProgress} message={statusMessage} variant="compact" />
                     </motion.div>
                 )}
-                
                 {status === 'result' && renderResultView()}
             </AnimatePresence>
             <canvas ref={canvasRef} className="hidden" />
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/*" 
-                onChange={handleMobileCapture} 
-                aria-label="회복 데이터 스캔을 위한 이미지 업로드"
-                {...({ capture: 'environment' } as any)}
-            />
+            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleMobileCapture} aria-label="이미지 업로드" />
+            <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
         </div>
     );
 }

@@ -2,13 +2,18 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAiRoutineLog extends Document {
     userId: mongoose.Types.ObjectId;
-    date: Date;
+    date: string; // YYYY-MM-DD
     routines: Array<{
-        id: string;
-        time: 'MORNING' | 'DAY' | 'NIGHT';
+        slot: 'DAWN' | 'MORNING' | 'LUNCH' | 'AFTERNOON' | 'EVENING' | 'NIGHT';
         title: string;
-        isCompleted: boolean;
-        completedAt?: Date;
+        tasks: Array<{
+            id: string;
+            title: string;
+            desc: string;
+            icon: string;
+        }>;
+        completedTasks: string[];
+        generatedAt: Date;
     }>;
     aiComment?: string;
     createdAt: Date;
@@ -22,19 +27,24 @@ const AiRoutineLogSchema = new Schema<IAiRoutineLog>({
         required: true
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     routines: [{
-        id: { type: String, required: true },
-        time: {
+        slot: {
             type: String,
-            enum: ['MORNING', 'DAY', 'NIGHT'],
+            enum: ['DAWN', 'MORNING', 'LUNCH', 'AFTERNOON', 'EVENING', 'NIGHT'],
             required: true
         },
         title: { type: String, required: true },
-        isCompleted: { type: Boolean, default: false },
-        completedAt: { type: Date }
+        tasks: [{
+            id: { type: String, required: true },
+            title: { type: String, required: true },
+            desc: { type: String, required: true },
+            icon: { type: String, required: true }
+        }],
+        completedTasks: [{ type: String }],
+        generatedAt: { type: Date, default: Date.now }
     }],
     aiComment: {
         type: String,

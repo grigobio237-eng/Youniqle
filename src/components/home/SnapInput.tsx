@@ -304,7 +304,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                 <button 
                   onClick={() => setMode('SELECT')}
                   disabled={isDiagnosing}
-                  className="text-slate font-bold text-sm underline underline-offset-4 opacity-40 hover:opacity-100 transition-opacity disabled:pointer-events-none"
+                  className="text-slate font-bold text-sm opacity-40 hover:opacity-100 transition-opacity disabled:pointer-events-none"
                 >
                   사진 촬영으로 돌아가기
                 </button>

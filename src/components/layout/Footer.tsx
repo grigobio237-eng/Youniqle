@@ -144,7 +144,7 @@ export default function Footer() {
               </button>
             </div>
             <p className="text-[10px] text-gray-600 text-center md:text-left">
-              구독 시 <Link href="/privacy" className="underline">개인정보처리방침</Link>에 동의하는 것으로 간주됩니다.
+              구독 시 <Link href="/privacy" className="font-bold">개인정보처리방침</Link>에 동의하는 것으로 간주됩니다.
             </p>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function Footer() {
         <div className="flex flex-wrap items-center justify-between gap-6 pt-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium">
             <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-white transition-colors">이용약관</Link>
-            <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:underline underline-offset-4">개인정보처리방침</Link>
+            <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:opacity-80">개인정보처리방침</Link>
             <Link href="/support/inquiry" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
           <div className="text-gray-600 text-[11px] tracking-tight">

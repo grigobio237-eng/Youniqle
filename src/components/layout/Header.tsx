@@ -11,6 +11,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 import { motion } from 'framer-motion';
 import NoticeTicker from './NoticeTicker';
 import { AccessControl } from '@/lib/logic/access-control';
+import { getKSTDate } from '@/lib/date';
 
 export default function Header() {
   const pathname = usePathname();
@@ -24,7 +25,7 @@ export default function Header() {
 
   useEffect(() => {
     if (pathname === '/') {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getKSTDate();
       const lastCheck = localStorage.getItem('recovery_last_check');
       if (lastCheck !== today) {
         setIsGateMode(true);
@@ -90,27 +91,18 @@ export default function Header() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 w-full border-b border-line transition-all duration-300 ${
-      isMenuOpen ? 'bg-background shadow-xl' : 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80'
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
+      isMenuOpen ? 'bg-background shadow-2xl shadow-primary/5' : 'bg-background/80 backdrop-blur-xl border-b border-primary/5'
     }`}>
-      <div className="container mx-auto px-3 md:px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
             className="flex items-center space-x-3 group"
-            onClick={(e) => {
-              // If already checked in today, force refresh/navigation to clear gate state if necessary
-              if (typeof window !== 'undefined') {
-                const today = new Date().toISOString().split('T')[0];
-                if (localStorage.getItem('recovery_last_check') === today) {
-                  window.dispatchEvent(new Event('recovery-gate-passed'));
-                }
-              }
-              setIsMenuOpen(false);
-            }}
+            onClick={() => setIsMenuOpen(false)}
           >
-            <div className="relative h-8 w-8 md:h-10 md:w-10 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-9 w-9 md:h-11 md:w-11 transition-all duration-500 group-hover:scale-110">
               <CharacterImage
                 src="/character/youniqle-1.png"
                 alt="Logo"
@@ -119,27 +111,27 @@ export default function Header() {
                 priority
               />
             </div>
-            <span className="text-lg md:text-xl font-serif-display text-text-primary tracking-tight">Youniqle</span>
+            <span className="text-xl md:text-2xl font-bold text-foreground tracking-tight">Youniqle</span>
           </Link>
 
           {/* Nav */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => {
               const isActive = pathname?.startsWith(item.href) || false;
               return (
                 <div key={item.label} className="relative group">
                   <Link
                     href={item.href}
-                    className={`text-sm font-semibold transition-all duration-200 relative py-2 ${
-                      isActive ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                    className={`text-[15px] font-semibold transition-all duration-300 relative py-2 ${
+                      isActive ? 'text-primary' : 'text-foreground/60 hover:text-primary'
                     }`}
                   >
                     {item.label}
                     {isActive && (
                       <motion.div
                         layoutId="nav-underline"
-                        className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                        transition={{ duration: 0.3 }}
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
                   </Link>
@@ -149,22 +141,22 @@ export default function Header() {
           </nav>
 
           {/* Right Side */}
-          <div className="flex items-center space-x-1 md:space-x-2">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative hover:bg-slate-100/50"
+              className="relative hover:bg-primary/5 rounded-full"
               onClick={() => window.dispatchEvent(new Event('open-unni-chat'))}
               title="매니저 유니 상담"
             >
-              <HelpCircle className="h-5 w-5 md:h-6 md:w-6 text-text-primary" />
+              <HelpCircle className="h-6 w-6 text-foreground/80" />
             </Button>
 
             <Link href="/cart">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="relative hover:bg-primary/5 rounded-full">
+                <ShoppingCart className="h-6 w-6 text-foreground/80" />
                 {cartCount > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 bg-secondary-container text-on-secondary-container flex items-center justify-center p-0 text-[10px] border-none">
                     {cartCount}
                   </Badge>
                 )}
@@ -172,11 +164,11 @@ export default function Header() {
             </Link>
 
             {session ? (
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/me"><User className="h-5 w-5" /></Link>
+              <Button variant="ghost" size="icon" asChild className="hover:bg-primary/5 rounded-full">
+                <Link href="/me"><User className="h-6 w-6 text-foreground/80" /></Link>
               </Button>
             ) : (
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="primary" size="sm" asChild className="hidden sm:inline-flex">
                 <Link href="/auth/signin">로그인</Link>
               </Button>
             )}
@@ -184,39 +176,38 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden hover:bg-primary/5 rounded-full"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t py-6 max-h-[85vh] overflow-y-auto bg-background animate-in slide-in-from-top-4 duration-300">
-            <nav className="flex flex-col space-y-6 px-4">
+          <div className="md:hidden border-t border-primary/5 py-10 max-h-[85vh] overflow-y-auto bg-background animate-in slide-in-from-top-4 duration-500">
+            <nav className="flex flex-col space-y-8 px-6">
               {menuItems.map((item) => (
-                <div key={item.label} className="flex flex-col space-y-1">
+                <div key={item.label} className="flex flex-col space-y-2">
                   <Link
                     href={item.href}
                     className="flex flex-col gap-1 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span className="text-lg font-black text-text-primary group-active:text-primary transition-colors">
+                    <span className="text-xl font-bold text-foreground group-active:text-primary transition-colors">
                       {item.label}
                     </span>
-                    <span className="text-[11px] font-medium text-text-secondary opacity-70">
+                    <span className="text-xs font-medium text-foreground/40">
                       {item.desc}
                     </span>
                   </Link>
-                  <div className="h-px bg-line/10 w-full mt-2" />
                 </div>
               ))}
               {!session && (
-                <Link href="/auth/signin" className="group flex flex-col gap-1" onClick={() => setIsMenuOpen(false)}>
-                  <span className="text-lg font-black text-primary">로그인</span>
-                  <span className="text-[11px] font-medium text-text-secondary opacity-70">회원 서비스 이용을 위한 로그인</span>
+                <Link href="/auth/signin" className="group flex flex-col gap-1 pt-4" onClick={() => setIsMenuOpen(false)}>
+                  <span className="text-xl font-bold text-primary">로그인</span>
+                  <span className="text-xs font-medium text-foreground/40">회원 서비스 이용을 위한 로그인</span>
                 </Link>
               )}
             </nav>

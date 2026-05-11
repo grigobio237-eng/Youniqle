@@ -13,9 +13,14 @@ import LifeSnapFeed from '@/components/dashboard/LifeSnapFeed';
 import WeeklyReportView from '@/components/dashboard/WeeklyReportView';
 import RecoveryToolkitView from '@/components/dashboard/RecoveryToolkitView';
 import RecoveryInsightView from '@/components/dashboard/RecoveryInsightView';
+import RecoveryStatusHero from '@/components/dashboard/RecoveryStatusHero';
+import { useSession } from 'next-auth/react';
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [data, setData] = useState<any>(null);
+  const [scoreHistory, setScoreHistory] = useState<any[]>([]);
+  const [radarData, setRadarData] = useState<any[]>([]);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const fetchedRef = React.useRef(false);
@@ -25,12 +30,64 @@ export default function DashboardPage() {
     fetchedRef.current = true;
 
     try {
-      if (isRefresh) setLoading(false); // Don't show full loading screen on refresh
-      const response = await fetch('/api/user/status');
-      if (response.ok) {
-        const result = await response.json();
+      if (isRefresh) setLoading(false);
+      
+      const [statusRes, timelineRes, diagRes] = await Promise.all([
+        fetch('/api/user/status'),
+        fetch('/api/user/timeline'),
+        fetch('/api/recommendations/diagnosis?limit=1&protocols=false')
+      ]);
+
+      if (statusRes.ok) {
+        const result = await statusRes.json();
         setData(result);
       }
+
+      if (timelineRes.ok) {
+        const timelineData = await timelineRes.json();
+        const timeline = timelineData.timeline || [];
+        
+        // Process timeline for the 7-day chart
+        const today = new Date();
+        const last7Days = Array.from({ length: 7 }).map((_, i) => {
+          const d = new Date();
+          d.setDate(today.getDate() - (6 - i));
+          return {
+            date: d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+            fullDate: d.toISOString().split('T')[0]
+          };
+        });
+
+        const timelineMap = timeline.reduce((acc: any, item: any) => {
+          const d = new Date(item.createdAt);
+          const dateKey = d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+          if (!acc[dateKey] || item.score > acc[dateKey]) {
+            acc[dateKey] = item.score;
+          }
+          return acc;
+        }, {});
+
+        const dynamicHistory = last7Days.map(d => ({
+          date: d.date === today.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) ? '오늘' : d.date,
+          score: timelineMap[d.date] || null
+        }));
+        
+        setScoreHistory(dynamicHistory);
+      }
+
+      if (diagRes.ok) {
+        const diagData = await diagRes.json();
+        if (diagData.metadata?.categoryScores) {
+          const scores = diagData.metadata.categoryScores;
+          setRadarData([
+            { category: 'PHYSICAL', score: scores.physical, fullMark: 40 },
+            { category: 'MENTAL', score: scores.mental, fullMark: 40 },
+            { category: 'SLEEP', score: scores.sleep, fullMark: 40 },
+            { category: 'LIFESTYLE', score: scores.lifestyle, fullMark: 40 }
+          ]);
+        }
+      }
+
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -46,30 +103,30 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mist flex flex-col pt-32 px-4 space-y-12">
+      <div className="min-h-screen bg-background flex flex-col pt-32 px-6 space-y-16">
         {/* Skeleton Timeline Area */}
-        <div className="container mx-auto max-w-5xl space-y-6">
+        <div className="container mx-auto max-w-5xl space-y-8">
           <div className="flex justify-between items-center">
-            <div className="w-32 h-4 bg-slate-200 rounded-full animate-pulse" />
-            <div className="w-20 h-6 bg-slate-200 rounded-full animate-pulse" />
+            <div className="w-40 h-5 bg-primary/5 rounded-full animate-pulse" />
+            <div className="w-24 h-8 bg-primary/5 rounded-full animate-pulse" />
           </div>
-          <div className="w-full h-24 bg-white/50 rounded-[32px] border border-line/30 animate-pulse flex items-center justify-around px-8">
+          <div className="w-full h-28 bg-surface/50 rounded-5xl border border-primary/5 animate-pulse flex items-center justify-around px-10">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div key={i} className="w-8 h-8 bg-slate-200 rounded-full" />
+              <div key={i} className="w-10 h-10 bg-primary/5 rounded-full" />
             ))}
           </div>
         </div>
         
         {/* Skeleton Card Area */}
-        <div className="container mx-auto max-w-5xl space-y-8">
-          <div className="w-40 h-4 bg-slate-200 rounded-full animate-pulse" />
-          <div className="w-full h-64 bg-white/50 rounded-[40px] border border-line/30 animate-pulse" />
+        <div className="container mx-auto max-w-5xl space-y-10">
+          <div className="w-48 h-5 bg-primary/5 rounded-full animate-pulse" />
+          <div className="w-full h-80 bg-surface/50 rounded-5xl border border-primary/5 animate-pulse" />
         </div>
 
-        {/* Floating Sync Indicator (Subtle) */}
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-obsidian/80 backdrop-blur-xl text-white px-6 py-3 rounded-full shadow-2xl z-50">
-          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Syncing Recovery Data</span>
+        {/* Floating Sync Indicator */}
+        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-surface/80 backdrop-blur-2xl text-foreground/70 px-8 py-4 rounded-full shadow-2xl border border-white/20 z-50">
+          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <span className="text-xs font-bold tracking-widest">나의 기록들을 불러오는 중...</span>
         </div>
       </div>
     );
@@ -81,58 +138,58 @@ export default function DashboardPage() {
 
     if (localScore) {
       return (
-        <div className="min-h-screen bg-mist flex flex-col items-center justify-center p-6 text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <h2 className="text-xl font-bold text-obsidian">회복 데이터를 동기화하는 중입니다...</h2>
-          <p className="text-sm text-slate">최근 수행하신 {localScore}점의 진단 결과를 불러오고 있습니다.</p>
-          <Button variant="ghost" onClick={() => window.location.reload()}>다시 시도</Button>
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 text-center space-y-6">
+          <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <h2 className="text-2xl font-bold text-foreground">회복 데이터를 정리하고 있어요</h2>
+          <p className="text-lg text-foreground/50 leading-relaxed">최근 기록하신 {localScore}점의 진단 결과를 토대로<br />오늘의 회복 리듬을 분석하고 있습니다.</p>
+          <Button variant="ghost" onClick={() => window.location.reload()} className="rounded-full">잠시만 기다려주세요</Button>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
         {/* Decorative Background Elements */}
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-chapter-accent/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-secondary-container/5 rounded-full blur-[120px] pointer-events-none" />
         
-        <div className="relative z-10 max-w-lg w-full">
-          <div className="w-24 h-24 bg-white rounded-[32px] shadow-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6 hover:rotate-0 transition-transform duration-500 border border-white/50 backdrop-blur-xl">
-            <Sparkles className="w-12 h-12 text-reward-gold" />
+        <div className="relative z-10 max-w-xl w-full">
+          <div className="w-28 h-28 bg-surface rounded-5xl shadow-2xl shadow-primary/5 flex items-center justify-center mx-auto mb-10 transform -rotate-3 hover:rotate-0 transition-transform duration-700 border border-white/50 backdrop-blur-xl">
+            <Sparkles className="w-14 h-14 text-primary" />
           </div>
           
-          <h1 className="text-4xl font-black text-obsidian tracking-tight mb-4 leading-tight">
-            나만의 회복 여정을<br />시작할 시간입니다
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-6 leading-tight">
+            나만을 위한<br />회복의 시간을 가져볼까요?
           </h1>
           
-          <p className="text-slate font-medium text-lg mb-10 leading-relaxed">
-            오늘의 컨디션을 체크하고 맞춤 솔루션을 받아보세요.<br />
-            첫 진단 완료 시 <span className="text-primary font-bold">100 PT</span>를 즉시 적립해 드립니다.
+          <p className="text-foreground/50 font-medium text-lg md:text-xl mb-12 leading-relaxed">
+            오늘 당신의 몸과 마음이 보내는 신호에 귀를 기울여보세요.<br />
+            가벼운 체크만으로도 당신에게 필요한 위로를 전해드릴게요.
           </p>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <button
               onClick={() => {
                 localStorage.removeItem('recovery_last_score');
                 window.location.href = '/diagnosis?type=daily';
               }}
-              className="w-full py-6 bg-obsidian text-white rounded-[28px] font-black text-xl tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex items-center justify-center gap-3 group"
+              className="w-full py-8 bg-primary text-white rounded-full font-bold text-2xl tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 group"
             >
-              1일 회복 진단 시작하기
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              회복 리듬 체크 시작하기
+              <ArrowRight className="w-8 h-8 group-hover:translate-x-1.5 transition-transform" />
             </button>
             
-            <div className="flex items-center justify-center gap-6 pt-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate/60 uppercase tracking-widest">
-                <div className="w-1 h-1 bg-primary rounded-full" />
+            <div className="flex items-center justify-center gap-8 pt-6">
+              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+                <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 AI Analysis
               </div>
-              <div className="flex items-center gap-2 text-xs font-bold text-slate/60 uppercase tracking-widest">
-                <div className="w-1 h-1 bg-primary rounded-full" />
+              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+                <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 Custom Protocol
               </div>
-              <div className="flex items-center gap-2 text-xs font-bold text-slate/60 uppercase tracking-widest">
-                <div className="w-1 h-1 bg-primary rounded-full" />
+              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+                <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 Daily Rewards
               </div>
             </div>
@@ -143,37 +200,46 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full bg-mist flex flex-col pb-24 overflow-visible min-h-screen">
-      {/* Tab Navigation */}
-      <div className="sticky top-[110px] md:top-[120px] z-30 bg-mist/80 backdrop-blur-md pt-4 pb-2 px-4 border-b border-line/50">
-        <div className="flex bg-white/50 p-1 rounded-2xl border border-white">
+    <div className="w-full bg-background flex flex-col pb-24 overflow-visible min-h-screen">
+      {/* 🟢 Comprehensive Recovery Summary Hero */}
+      <RecoveryStatusHero 
+        todayScore={data?.score?.totalScore || 0}
+        scoreHistory={scoreHistory}
+        radarData={radarData}
+        assetStats={data?.assetStats}
+        userName={session?.user?.name || '사용자'}
+      />
+
+      {/* Tab Navigation - Softer & Floating */}
+      <div className="sticky top-[110px] md:top-[120px] z-30 bg-background/80 backdrop-blur-md pt-6 pb-4 px-6">
+        <div className="max-w-xl mx-auto flex bg-surface/50 p-1.5 rounded-full border border-white/20 shadow-lg shadow-primary/5">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'home' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+            className={`flex-1 py-3.5 text-[11px] font-bold tracking-widest uppercase transition-all rounded-full ${activeTab === 'home' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:bg-white/50'
               }`}
           >
-            홈
+            오늘의 회복
           </button>
           <button
             onClick={() => setActiveTab('insight')}
-            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'insight' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+            className={`flex-1 py-3.5 text-[11px] font-bold tracking-widest uppercase transition-all rounded-full ${activeTab === 'insight' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:bg-white/50'
               }`}
           >
-            분석
+            흐름 분석
           </button>
           <button
             onClick={() => setActiveTab('snap')}
-            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'snap' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+            className={`flex-1 py-3.5 text-[11px] font-bold tracking-widest uppercase transition-all rounded-full ${activeTab === 'snap' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:bg-white/50'
               }`}
           >
-            로그
+            기록 로그
           </button>
           <button
             onClick={() => setActiveTab('toolkit')}
-            className={`flex-1 py-3 text-xs font-black tracking-widest uppercase transition-all rounded-xl ${activeTab === 'toolkit' ? 'bg-obsidian text-white shadow-md' : 'text-slate/60 hover:bg-white/80'
+            className={`flex-1 py-3.5 text-[11px] font-bold tracking-widest uppercase transition-all rounded-full ${activeTab === 'toolkit' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:bg-white/50'
               }`}
           >
-            툴킷
+            회복 툴킷
           </button>
         </div>
       </div>

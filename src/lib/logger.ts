@@ -54,7 +54,7 @@ class Logger {
 
   // 로그 파일명 생성
   private getLogFileName(): string {
-    const date = new Date().toISOString().split('T')[0];
+    const date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     return path.join(this.logDir, `app-${date}.log`);
   }
 
@@ -80,8 +80,9 @@ class Logger {
 
     // 기존 로그 파일들을 순차적으로 이름 변경
     for (let i = this.maxFiles - 1; i > 0; i--) {
-      const oldFile = path.join(this.logDir, `app-${new Date().toISOString().split('T')[0]}.log.${i}`);
-      const newFile = path.join(this.logDir, `app-${new Date().toISOString().split('T')[0]}.log.${i + 1}`);
+      const date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+      const oldFile = path.join(this.logDir, `app-${date}.log.${i}`);
+      const newFile = path.join(this.logDir, `app-${date}.log.${i + 1}`);
       
       if (fs.existsSync(oldFile)) {
         fs.renameSync(oldFile, newFile);
@@ -89,7 +90,8 @@ class Logger {
     }
 
     // 현재 로그 파일을 .1로 변경
-    const rotatedFile = path.join(this.logDir, `app-${new Date().toISOString().split('T')[0]}.log.1`);
+    const date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const rotatedFile = path.join(this.logDir, `app-${date}.log.1`);
     fs.renameSync(this.currentLogFile, rotatedFile);
 
     // 새로운 로그 파일 생성
@@ -113,7 +115,7 @@ class Logger {
     }
   ): LogEntry {
     const entry: LogEntry = {
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).replace(' ', 'T'),
       level,
       category,
       message,

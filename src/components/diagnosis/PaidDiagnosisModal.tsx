@@ -207,7 +207,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                     </h2>
                     <p className="text-gray-600 text-lg font-medium leading-relaxed max-w-lg mx-auto">
                         표면적인 진단을 넘어섭니다.<br />
-                        <span className="text-obsidian font-bold underline decoration-primary/30 underline-offset-4">30가지 심층 국면</span>과 <span className="text-obsidian font-bold underline decoration-primary/30 underline-offset-4">5대 성격 요인</span>을 정밀 분석하여<br />
+                        <span className="text-primary font-bold text-glow-cream">30가지 심층 국면</span>과 <span className="text-primary font-bold text-glow-cream">5대 성격 요인</span>을 정밀 분석하여<br />
                         가장 나다운 성장의 길을 제시합니다.
                     </p>
                 </motion.div>

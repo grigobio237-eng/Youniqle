@@ -78,6 +78,26 @@ export default function DeepDiagnosisReportPage() {
 
     useEffect(() => {
         setIsMounted(true);
+        
+        // Log report view for automated mission tracking
+        const logView = async () => {
+            try {
+                await fetch('/api/user/behavior', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        eventType: 'view',
+                        context: {
+                            pageUrl: window.location.href,
+                            deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop'
+                        }
+                    })
+                });
+            } catch (err) {
+                console.error('Failed to log report view:', err);
+            }
+        };
+        logView();
     }, []);
 
     const handleUnlockClick = () => {

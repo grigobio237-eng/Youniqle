@@ -124,7 +124,7 @@ export default function SitemapPage() {
       {/* Footer Info */}
       <div className="max-w-6xl mx-auto px-6 mt-20 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-xs text-gray-400 font-medium border border-gray-100">
-          찾으시는 페이지가 없나요? <Link href="/support/inquiry" className="text-chapter-accent underline font-bold">고객센터</Link>에 문의해 주세요.
+          찾으시는 페이지가 없나요? <Link href="/support/inquiry" className="text-chapter-accent font-bold">고객센터</Link>에 문의해 주세요.
         </div>
       </div>
     </div>

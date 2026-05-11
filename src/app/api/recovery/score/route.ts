@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import RecoveryScore from '@/models/RecoveryScore';
 import User from '@/models/User';
+import { getKSTDate } from '@/lib/date';
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,17 +14,12 @@ export async function POST(req: NextRequest) {
         }
 
         await dbConnect();
-
-        // Find the user to get the correct ObjectId
         const user = await User.findOne({ email: session.user.email });
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
         const body = await req.json();
         const { rawScore, totalScore, metaphor, answers, date, userNote, snapData } = body;
 
-        // 0. Handle Snap Image Upload (to Firebase as WebP)
         let processedSnapData = snapData;
         if (snapData && snapData.type === 'PHOTO' && snapData.content.startsWith('data:image')) {
             try {
@@ -32,12 +28,8 @@ export async function POST(req: NextRequest) {
                 const storagePath = `snaps/${user._id}/rhythm_${timestamp}.webp`;
                 const imageUrl = await uploadImageToFirebase(snapData.content, storagePath);
                 
-                processedSnapData = {
-                    ...snapData,
-                    content: imageUrl
-                };
+                processedSnapData = { ...snapData, content: imageUrl };
 
-                // Archive in LifeSnap for future reference
                 const LifeSnap = (await import('@/models/LifeSnap')).default;
                 await LifeSnap.create({
                     userId: user._id,
@@ -48,20 +40,15 @@ export async function POST(req: NextRequest) {
                 });
             } catch (err) {
                 console.error('[Recovery Score API] Image upload failed:', err);
-                // Fallback to base64 if upload fails (not ideal, but prevents crash)
             }
         }
 
-        // Use provided date or today (normalized to start of day)
-        const targetDate = date ? new Date(date) : new Date();
-        targetDate.setHours(0, 0, 0, 0);
+        // Use getKSTDate for the date string identifier
+        const targetDate = date ? (typeof date === 'string' && date.includes('-') ? date : getKSTDate(new Date(date))) : getKSTDate();
 
-        // 1. Save to RecoveryScore (Daily log)
+        // 1. Save to RecoveryScore (Daily log) using the YYYY-MM-DD string key
         const score = await RecoveryScore.findOneAndUpdate(
-            {
-                userId: user._id,
-                date: targetDate
-            },
+            { userId: user._id, date: targetDate },
             {
                 userId: user._id,
                 date: targetDate,
@@ -75,20 +62,13 @@ export async function POST(req: NextRequest) {
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 
-        // 2. Update User Profile (Medication History) - 영구 저장
+        // 2. Update User Profile (Medication History)
         const medAnswer = answers?.find((a: any) => a.category === '약물' && a.detail);
         if (medAnswer?.detail) {
-            // 기존 히스토리에 새로운 약물이 있다면 추가하거나 업데이트
             const currentMeds = user.medicationHistory || [];
             const newMeds = medAnswer.detail.split(',').map((m: string) => m.trim()).filter((m: string) => m !== "");
-            
-            // 중복을 제거한 새로운 리스트 생성
             const updatedMeds = Array.from(new Set([...currentMeds, ...newMeds]));
-            
-            await User.findByIdAndUpdate(user._id, {
-                $set: { medicationHistory: updatedMeds }
-            });
-            console.log(`[API/Recovery] Updated medicationHistory for ${user.email}: ${updatedMeds.join(', ')}`);
+            await User.findByIdAndUpdate(user._id, { $set: { medicationHistory: updatedMeds } });
         }
 
         return NextResponse.json({ success: true, score });
@@ -106,52 +86,31 @@ export async function GET(req: NextRequest) {
         }
 
         await dbConnect();
-
-        // Find the user to get the correct ObjectId
         const user = await User.findOne({ email: session.user.email });
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-        // [회차 시스템 적용] 발급된 증명서(회차) 수만큼 로그를 건너뛰고 현재 회차의 진행 상황만 반환
         const claimedCycles = user.issuedCertificates?.length || 0;
         const skipCount = claimedCycles * 7;
         const totalLogs = await RecoveryScore.countDocuments({ userId: user._id });
 
-        console.log(`[Cycle Debug] User: ${user.email} | Claimed: ${claimedCycles} | Total Logs: ${totalLogs} | Skipping: ${skipCount}`);
-
         const { searchParams } = new URL(req.url);
         const dateParam = searchParams.get('date');
 
-        const query: any = { userId: user._id };
-
         if (dateParam) {
-            const targetDate = new Date(dateParam);
-            targetDate.setHours(0, 0, 0, 0);
-            query.date = targetDate;
-
-            const score = await RecoveryScore.findOne(query);
+            const targetDate = dateParam.includes('-') ? dateParam : getKSTDate(new Date(dateParam));
+            const score = await RecoveryScore.findOne({ userId: user._id, date: targetDate });
             return NextResponse.json({ score });
         } else {
-            // 현재 회차에 해당하는 로그들만 가져옴 (최대 7개)
-            const scores = await RecoveryScore.find(query)
+            const scores = await RecoveryScore.find({ userId: user._id })
                 .sort({ date: 1 })
                 .skip(skipCount)
                 .limit(7);
 
-            console.log(`[Cycle Debug] Returning ${scores.length} scores for current cycle`);
-
             return NextResponse.json({ 
                 scores,
-                debug: {
-                    claimedCycles,
-                    skipCount,
-                    totalLogs,
-                    currentCycleProgress: scores.length
-                }
+                debug: { claimedCycles, skipCount, totalLogs, currentCycleProgress: scores.length }
             });
         }
-
     } catch (error) {
         console.error('Error fetching recovery score:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

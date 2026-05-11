@@ -12,67 +12,46 @@ const config: Config = {
         'xs': '475px',
       },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        border: "var(--line)",
+        input: "var(--surface-container-low)",
+        ring: "var(--primary)",
+        background: "rgb(var(--background-rgb) / <alpha-value>)",
+        foreground: "rgb(var(--foreground-rgb) / <alpha-value>)",
         surface: "var(--surface)",
         line: "var(--line)",
-        "text-primary": "var(--text-primary)",
-        "text-secondary": "var(--text-secondary)",
-        "chapter-accent": "var(--chapter-accent)",
-        "status-good": "var(--status-good)",
-        "status-normal": "var(--status-normal)",
-        "status-amber": "var(--status-amber)",
-        "status-danger": "var(--status-danger)",
-        "reward-gold": "var(--reward-gold)",
-        obsidian: "#0B0D10",
-        graphite: "#12161C",
-        mist: "#F6F4F0",
-        slate: "#667085",
-        "soft-gold": "#C7A76A",
         primary: {
-          DEFAULT: "var(--chapter-accent)",
-          foreground: "var(--background)",
+          DEFAULT: "rgb(var(--primary-rgb) / <alpha-value>)",
+          container: "var(--primary-container)",
+          foreground: "var(--on-primary)",
         },
         secondary: {
-          DEFAULT: "var(--surface)",
-          foreground: "var(--foreground)",
+          DEFAULT: "rgb(var(--secondary-rgb) / <alpha-value>)",
+          container: "var(--secondary-container)",
+          foreground: "var(--on-secondary)",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        tertiary: {
+          DEFAULT: "var(--tertiary)",
+          container: "var(--tertiary-container)",
         },
-        muted: {
-          DEFAULT: "var(--line)",
-          foreground: "var(--text-secondary)",
+        status: {
+          good: "var(--status-good)",
+          normal: "var(--status-normal)",
+          amber: "var(--status-amber)",
+          danger: "var(--status-danger)",
         },
-        accent: {
-          DEFAULT: "var(--chapter-accent)",
-          foreground: "var(--background)",
-        },
-        popover: {
-          DEFAULT: "var(--background)",
-          foreground: "var(--foreground)",
-        },
-        card: {
-          DEFAULT: "var(--surface)",
-          foreground: "var(--text-primary)",
-        },
-        luxury: {
-          gold: "var(--luxury-gold)",
-          ivory: "var(--luxury-ivory)",
-          silk: "var(--luxury-silk)",
-          emerald: "var(--luxury-emerald)",
-          navy: "var(--luxury-navy)",
-        },
+        obsidian: "#181D1A",
+        mist: "#F7FAF5",
+        "reward-gold": "#B19B81",
+        "chapter-accent": "var(--chapter-accent)",
       },
       fontFamily: {
         sans: ['Pretendard', 'Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+        '5xl': '2.5rem',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
@@ -93,4 +72,3 @@ const config: Config = {
   plugins: [],
 }
 export default config
-

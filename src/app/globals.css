@@ -6,58 +6,54 @@
 
 @layer base {
   :root {
-    /* 90% Premium Base (Mist & Ivory) */
-    --background: #F6F4F0; /* Mist - Warm Ivory Base */
-    --foreground: #0B0D10; /* Obsidian - Main Text */
+    /* Luminous Serenity Palette - Empathy & Comfort */
+    --background: #F7FAF5; /* Ethereal Sage Background */
+    --background-rgb: 247 250 245;
+    --foreground: #181D1A; /* Moss Grey - Soft Text */
+    --foreground-rgb: 24 29 26;
     
-    --surface: #FFFFFF; /* Pure White for Cards on Mist background */
-    --surface-dark: #12161C; /* Graphite - Dark Surface */
+    --surface: #FFFFFF;
+    --surface-dim: #D8DBD6;
+    --surface-bright: #F7FAF5;
+    --surface-container-lowest: #FFFFFF;
+    --surface-container-low: #F1F4EF;
+    --surface-container: #ECEFE9;
+    --surface-container-high: #E6E9E4;
+    --surface-container-highest: #E0E3DE;
     
-    --text-primary: #0B0D10; /* Obsidian */
-    --text-secondary: #667085; /* Slate */
+    --primary: #556257; /* Deep Sage */
+    --primary-rgb: 85 98 87;
+    --primary-container: #D4E2D4; /* Soft Sage */
+    --on-primary: #FFFFFF;
+    --on-primary-container: #58655A;
     
-    --line: rgba(11, 13, 16, 0.08); /* Subtle lines for light theme */
+    --secondary: #6D5A51; /* Soft Brown */
+    --secondary-rgb: 109 90 81;
+    --secondary-container: #F7DDD1; /* Soft Peach */
+    --on-secondary: #FFFFFF;
+    --on-secondary-container: #736057;
+
+    --tertiary: #5F5F59;
+    --tertiary-container: #E0DED6;
+
+    --line: rgba(85, 98, 87, 0.08);
     
-    /* 10% Chapter Signatures */
-    --chapter-accent: #0E1B2C; /* Default: Deep Navy */
+    /* Status Feedback (Softer Tones) */
+    --status-good: #556257;
+    --status-normal: #747873;
+    --status-amber: #B19B81;
+    --status-danger: #A33200;
     
-    /* Status Feedback Colors */
-    --status-good: #064E3B; /* Emerald - Deep Green */
-    --status-normal: #667085; /* Slate */
-    --status-amber: #92400E; /* Deep Amber */
-    --status-danger: #4A1C2D; /* Case Burgundy */
-    
-    /* Authority & Reward */
-    --reward-gold: #C7A76A; /* Soft Gold */
-    
-    /* Luxury Design Tokens */
-    --luxury-gold: #D4AF37;
-    --luxury-ivory: #F9F8F3;
-    --luxury-silk: #FFFDF5;
-    --luxury-emerald: #064E3B;
-    --luxury-navy: #0F172A;
-    
-    /* Premium Renewal Tokens */
-    --luxury-champagne: #F7E7CE;
-    --luxury-charcoal: #2C2C2C;
-    --luxury-platinum: #E5E4E2;
-    
-    /* Chart Colors (Internal uses these or tailwind classes) */
-    --chart-1: #0E1B2C;
-    --chart-2: #4A1C2D;
-    --chart-3: #0F2A22;
-    --chart-4: #0E3A3A;
-    --chart-5: #C7A76A;
+    /* Design Tokens */
+    --radius: 2.5rem; /* 40px */
+    --radius-md: 2rem; /* 32px */
+    --radius-sm: 1rem; /* 16px */
   }
 
-  /* Chapter Overrides */
-  [data-chapter="products"] { --chapter-accent: #0E1B2C; } /* Deep Navy */
-  [data-chapter="cases"] { --chapter-accent: #4A1C2D; } /* Case Burgundy */
-  [data-chapter="lounge"] { --chapter-accent: #0F2A22; } /* Clinic Forest */
-  [data-chapter="ai-navigator"] { --chapter-accent: #0E3A3A; } /* Data Teal */
-  [data-chapter="membership"] { --chapter-accent: #C7A76A; } /* Member Gold */
-  [data-chapter="omakase"] { --chapter-accent: #2D1B4A; } /* Omakase Purple */
-  [data-chapter="utils"] { --chapter-accent: #334155; } /* Utils Slate */
+  /* Chapter Overrides (Softer & Unified) */
+  [data-chapter] { --chapter-accent: var(--primary); }
+  [data-chapter="omakase"] { --chapter-accent: #6D5A51; }
+  [data-chapter="membership"] { --chapter-accent: #B19B81; }
 
   html {
     font-family: 'Pretendard', 'Inter', system-ui, sans-serif;
@@ -104,35 +100,33 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-chapter-accent text-white font-bold px-8 py-4 rounded-[12px] transition-all duration-300 hover:opacity-90 active:scale-95 disabled:opacity-50;
+    @apply bg-primary text-white font-bold px-8 py-5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-95 disabled:opacity-50 shadow-lg shadow-primary/10;
   }
 
   .btn-outline {
-    @apply border border-chapter-accent text-chapter-accent bg-transparent font-bold px-8 py-4 rounded-[12px] transition-all duration-300 hover:bg-chapter-accent hover:text-white active:scale-95 disabled:opacity-50;
+    @apply border border-primary text-primary bg-transparent font-bold px-8 py-5 rounded-full transition-all duration-300 hover:bg-primary/5 active:scale-95 disabled:opacity-50;
   }
 
   .premium-card {
-    @apply bg-surface border border-line rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-xl;
+    @apply bg-surface border border-line rounded-[40px] overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5;
   }
 
-  .premium-card-dark {
-    @apply bg-surface-dark border-none rounded-[32px] overflow-hidden transition-all duration-500;
-    color: white;
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-2xl border border-white/20 rounded-[40px] overflow-hidden;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
   }
 
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border;
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold border;
   }
 
   .badge-primary {
-    background-color: rgba(var(--chapter-accent), 0.1);
-    color: var(--chapter-accent);
-    border-color: var(--chapter-accent);
+    @apply bg-primary-container/20 text-primary border-primary-container/30;
   }
 
-  /* Luxury Utility Classes */
+  /* Luxury Utility Classes - Updated for Softness */
   .luxury-gradient {
-    background: linear-gradient(135deg, var(--luxury-silk) 0%, var(--luxury-ivory) 100%);
+    background: linear-gradient(135deg, #FDFCFB 0%, #E2D1C3 100%);
   }
   
   .luxury-gold-text {
@@ -262,5 +256,10 @@
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* Luminous Serenity: Text Glow Utility */
+.text-glow-cream {
+  text-shadow: 0 0 15px rgba(254, 243, 199, 0.9), 0 0 30px rgba(254, 243, 199, 0.4);
 }
 

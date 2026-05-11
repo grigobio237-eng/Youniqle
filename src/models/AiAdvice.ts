@@ -5,6 +5,12 @@ export interface IAiAdvice extends Document {
     date: string; // YYYY-MM-DD
     totalScore: number;
     aiComment: string;
+    actionItem: string;
+    tomorrowForecast: {
+        status: string;
+        description: string;
+        energyLevel: number;
+    };
     adviceItems: Array<{
         id: string;
         category: 'PHYSICAL' | 'MENTAL' | 'LIFESTYLE' | 'SLEEP' | 'NUTRITION';
@@ -33,6 +39,15 @@ const AiAdviceSchema = new Schema<IAiAdvice>({
     aiComment: {
         type: String,
         required: true,
+    },
+    actionItem: {
+        type: String,
+        required: true,
+    },
+    tomorrowForecast: {
+        status: { type: String, required: true },
+        description: { type: String, required: true },
+        energyLevel: { type: Number, required: true }
     },
     adviceItems: [{
         id: { type: String, required: true },
