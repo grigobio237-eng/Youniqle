@@ -69,6 +69,13 @@ const CATEGORY_TAG_MAP: Record<string, string[]> = {
     lifestyle: ['stress', 'chronic_fatigue']
 };
 
+// New Components
+const EnvironmentalStatus = React.lazy(() => import('@/components/navigator/EnvironmentalStatus'));
+const RoutineCard = React.lazy(() => import('@/components/navigator/RoutineCard'));
+const DailySmallActions = React.lazy(() => import('@/components/navigator/DailySmallActions'));
+const DailyFlowTimeline = React.lazy(() => import('@/components/navigator/DailyFlowTimeline'));
+const ToolkitGrid = React.lazy(() => import('@/components/navigator/ToolkitGrid'));
+
 export default function AiNavigatorPage() {
     const { data: session } = useSession();
     const { trackEvent } = useActivityTracker();
@@ -102,12 +109,6 @@ export default function AiNavigatorPage() {
     const [activeTab, setActiveTab] = useState('today-routine');
     const [showUpsell, setShowUpsell] = useState(false);
 
-    // New Components
-    const EnvironmentalStatus = React.lazy(() => import('@/components/navigator/EnvironmentalStatus'));
-    const RoutineCard = React.lazy(() => import('@/components/navigator/RoutineCard'));
-    const DailySmallActions = React.lazy(() => import('@/components/navigator/DailySmallActions'));
-    const DailyFlowTimeline = React.lazy(() => import('@/components/navigator/DailyFlowTimeline'));
-    const ToolkitGrid = React.lazy(() => import('@/components/navigator/ToolkitGrid'));
 
     const userTier = AccessControl.getUserGroup(session?.user);
     const isClinicLocked = userTier === 'RESET' || userTier === 'NONE';
