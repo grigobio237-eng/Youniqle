@@ -67,10 +67,10 @@ export default function RecoveryPortalPage() {
   return (
     <ChapterWrapper chapter="products" className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-24 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary/5 to-transparent rounded-full blur-[120px] -z-10" />
+      <section className="relative pt-12 md:pt-20 pb-12 md:pb-24 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[300px] md:h-[500px] bg-gradient-to-b from-primary/5 to-transparent rounded-full blur-[100px] md:blur-[120px] -z-10" />
         
-        <div className="container mx-auto px-6 text-center space-y-8">
+        <div className="container mx-auto px-6 text-center space-y-6 md:space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,27 +84,27 @@ export default function RecoveryPortalPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black text-text-primary tracking-tighter leading-[1.1]"
+            className="text-4xl md:text-7xl font-black text-text-primary tracking-tighter leading-[1.1]"
           >
             완전한 휴식과 회복, <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">나만의 힐링 라운지</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 text-3xl md:text-6xl">나만의 힐링 라운지</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl text-text-secondary max-w-2xl mx-auto font-medium"
+            className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto font-medium"
           >
-            예술과 데이터, 그리고 프라이빗 케어가 만나는 곳. <br />
+            예술과 데이터, 그리고 프라이빗 케어가 만나는 곳. <br className="hidden md:block" />
             당신만의 온전한 회복이 시작되는 프리미엄 라운지를 경험해 보세요.
           </motion.p>
         </div>
       </section>
 
       {/* Main Portal Navigation */}
-      <section className="container mx-auto px-6 pb-32">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section className="container mx-auto px-4 md:px-6 pb-16 md:pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {portalSections.map((section, idx) => (
             <motion.div
               key={section.title}
@@ -127,16 +127,16 @@ export default function RecoveryPortalPage() {
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${section.color} group-hover:opacity-60 transition-opacity`} />
-                    <div className="absolute inset-x-0 bottom-0 p-8 pt-20 bg-gradient-to-t from-surface via-surface/80 to-transparent">
-                      <div className="flex items-center gap-3 text-primary mb-3">
-                        {section.icon}
-                        <span className="text-[11px] font-black uppercase tracking-widest">{section.subtitle}</span>
+                    <div className="absolute inset-x-0 bottom-0 p-5 md:p-8 pt-12 md:pt-20 bg-gradient-to-t from-surface via-surface/80 to-transparent">
+                      <div className="flex items-center gap-2 md:gap-3 text-primary mb-2 md:mb-3">
+                        {React.cloneElement(section.icon as React.ReactElement, { className: 'w-5 h-5 md:w-6 md:h-6' })}
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{section.subtitle}</span>
                       </div>
-                      <h3 className="text-3xl font-black text-white mb-4 group-hover:text-primary transition-colors">{section.title}</h3>
-                      <p className="text-gray-400 text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                      <h3 className="text-2xl md:text-3xl font-black text-white mb-2 md:mb-4 group-hover:text-primary transition-colors">{section.title}</h3>
+                      <p className="text-gray-400 text-[13px] md:text-sm leading-relaxed mb-4 md:mb-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 line-clamp-2 md:line-clamp-none">
                         {section.description}
                       </p>
-                      <div className="flex items-center gap-2 text-primary text-sm font-bold opacity-60 group-hover:opacity-100 transition-all">
+                      <div className="flex items-center gap-2 text-primary text-[13px] md:text-sm font-bold opacity-60 group-hover:opacity-100 transition-all">
                         자세히 보기 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
                       </div>
                     </div>

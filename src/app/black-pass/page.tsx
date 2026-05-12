@@ -66,11 +66,11 @@ export default function BlackPassDashboard() {
   return (
     <ChapterWrapper chapter="membership" className="min-h-screen bg-background pb-32">
       {/* Hero Header */}
-      <section className="relative pt-32 pb-20 overflow-hidden border-b border-line">
+      <section className="relative pt-16 md:pt-32 pb-12 md:pb-20 overflow-hidden border-b border-line">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-chapter-accent/5 rounded-full blur-[150px] -mr-96 -mt-96 pointer-events-none" />
         
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-5xl mx-auto space-y-10">
+          <div className="max-w-5xl mx-auto space-y-8 md:space-y-10">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <Badge className="bg-chapter-accent text-obsidian border-none font-black text-[10px] tracking-widest px-4 py-1.5 rounded-full">
@@ -83,13 +83,13 @@ export default function BlackPassDashboard() {
                 )}
               </div>
               
-              <div className="space-y-2">
-                <h1 className="text-4xl md:text-7xl font-black text-obsidian tracking-tighter leading-tight">
+              <div className="space-y-3">
+                <h1 className="text-3xl md:text-7xl font-black text-obsidian tracking-tighter leading-tight">
                   {user?.name}님을 위한 <br/>
                   <span className="text-primary italic">Perfect Recovery</span> 허브
                 </h1>
-                <p className="text-xl text-slate/60 font-bold max-w-2xl break-keep">
-                  블랙 패스 멤버십의 모든 프리미엄 서비스와 데이터를 <br/>
+                <p className="text-lg md:text-xl text-slate/60 font-bold max-w-2xl break-keep">
+                  블랙 패스 멤버십의 모든 프리미엄 서비스와 데이터를 <br className="hidden md:block" />
                   이곳에서 실시간으로 관리하고 제어할 수 있습니다.
                 </p>
               </div>
@@ -99,14 +99,14 @@ export default function BlackPassDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Card className="bg-obsidian text-mist p-6 rounded-[32px] border-none shadow-2xl cursor-pointer hover:scale-105 transition-transform group">
-                    <CardContent className="p-0 space-y-4">
-                      <div className="w-12 h-12 bg-chapter-accent/20 rounded-2xl flex items-center justify-center text-chapter-accent group-hover:bg-chapter-accent group-hover:text-obsidian transition-colors">
-                        <QrCode className="w-6 h-6" />
+                  <Card className="bg-obsidian text-mist p-5 md:p-6 rounded-[32px] border-none shadow-2xl cursor-pointer hover:scale-105 transition-transform group">
+                    <CardContent className="p-0 space-y-3 md:space-y-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-chapter-accent/20 rounded-2xl flex items-center justify-center text-chapter-accent group-hover:bg-chapter-accent group-hover:text-obsidian transition-colors">
+                        <QrCode className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                       <div>
-                        <h3 className="font-black text-lg">진료 전용 QR</h3>
-                        <p className="text-xs opacity-50 font-medium">의료기관 데이터 연동</p>
+                        <h3 className="font-black text-base md:text-lg">진료 전용 QR</h3>
+                        <p className="text-[10px] md:text-xs opacity-50 font-medium">의료기관 데이터 연동</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -140,16 +140,16 @@ export default function BlackPassDashboard() {
               ].map((item, i) => (
                 <Card 
                   key={i} 
-                  className="bg-white p-6 rounded-[32px] border-line shadow-sm cursor-pointer hover:border-primary/50 transition-all group"
+                  className="bg-white p-5 md:p-6 rounded-[32px] border-line/80 shadow-xl shadow-obsidian/5 cursor-pointer hover:border-primary/50 transition-all group"
                   onClick={() => item.href.startsWith('http') ? window.open(item.href, '_blank') : router.push(item.href)}
                 >
-                  <CardContent className="p-0 space-y-4">
-                    <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                      {item.icon}
+                  <CardContent className="p-0 space-y-3 md:space-y-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                      {React.cloneElement(item.icon as React.ReactElement, { className: 'w-5 h-5 md:w-6 md:h-6' })}
                     </div>
                     <div>
-                      <h3 className="font-black text-lg text-obsidian">{item.title}</h3>
-                      <p className="text-xs text-slate/50 font-medium">{item.desc}</p>
+                      <h3 className="font-black text-base md:text-lg text-obsidian">{item.title}</h3>
+                      <p className="text-[10px] md:text-xs text-slate/50 font-medium">{item.desc}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -160,14 +160,14 @@ export default function BlackPassDashboard() {
       </section>
 
       {/* Clinic Care Section (The Core Logic) */}
-      <div className="-mt-10 relative z-20">
+      <div className="-mt-6 md:-mt-10 relative z-20">
         <div className="max-w-5xl mx-auto">
           <ClinicConsultationSection />
         </div>
       </div>
 
       {/* Secondary Management Features */}
-      <section className="container mx-auto px-6 py-20">
+      <section className="container mx-auto px-6 py-12 md:py-20">
         <div className="max-w-5xl mx-auto space-y-20">
           {/* Data Asset Status */}
           <div className="space-y-8">
@@ -180,20 +180,20 @@ export default function BlackPassDashboard() {
 
             <div className="grid grid-cols-1 gap-8">
               {/* Asset Box */}
-              <Card className="bg-surface border-line rounded-[40px] overflow-hidden group hover:border-primary/50 transition-all duration-500 shadow-sm">
-                <CardContent className="p-10 space-y-6">
+              <Card className="bg-surface border-line/80 rounded-[32px] md:rounded-[40px] overflow-hidden group hover:border-primary/50 transition-all duration-500 shadow-xl shadow-obsidian/5">
+                <CardContent className="p-6 md:p-10 space-y-5 md:space-y-6">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline" className="border-obsidian/20 text-obsidian font-black text-[10px] uppercase tracking-widest px-3">Data Security</Badge>
                     <Lock className="w-5 h-5 text-slate/30" />
                   </div>
-                  <div className="space-y-3">
-                    <h3 className="text-2xl font-black text-obsidian leading-tight">안전한 데이터 자산화</h3>
-                    <p className="text-slate font-medium leading-relaxed opacity-70">
-                      당신의 모든 회복 기록은 고도로 암호화되어 보관됩니다. <br />
+                  <div className="space-y-2 md:space-y-3">
+                    <h3 className="text-xl md:text-2xl font-black text-obsidian leading-tight">안전한 데이터 자산화</h3>
+                    <p className="text-[13px] md:text-lg text-slate font-medium leading-relaxed opacity-70">
+                      당신의 모든 회복 기록은 고도로 암호화되어 보관됩니다. <br className="hidden md:block" />
                       필요한 경우에만 의료기관과 안전하게 공유됩니다.
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 pt-4">
+                  <div className="flex items-center gap-3 pt-2 md:pt-4">
                     <Button variant="outline" size="sm" className="bg-white/50 border-obsidian/10 text-obsidian font-bold text-xs h-10 px-4 rounded-xl hover:bg-white transition-all">
                       <Download className="w-3.5 h-3.5 mr-2" /> 기록 내려받기
                     </Button>

@@ -145,11 +145,13 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 </motion.div>
               )}
             </div>
-            <h1 className="text-4xl md:text-7xl font-bold text-foreground leading-[1.15] tracking-tight">
-              {personalMsg.title}
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-[1.3] tracking-tight">
+              {/* {personalMsg.title} */}
+              당신의 몸이 보내는 작은 신호,<br />60초면 충분합니다.
             </h1>
             <p className="text-lg md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl">
-              {personalMsg.desc}
+              {/* {personalMsg.desc} */}
+              오늘의 나를 마주하는 가장 스마트한 방법, 유니클 스캔을 시작하세요.
             </p>
           </div>
 

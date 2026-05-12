@@ -4,7 +4,11 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2, ChevronDown } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2, ChevronDown, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 import PassCatalog from '@/components/navigator/PassCatalog';
 import SquareBoard from '@/components/navigator/SquareBoard';
@@ -72,7 +76,7 @@ function NavigatorLoungeContent() {
   const tabs = [
     {
       id: 'archive',
-      label: '스템셀 아카이브',
+      label: '네비게이터의 역할',
       icon: BookOpen,
       desc: '줄기세포 시술에 대한 필수 기초 상식과 자료',
     },
@@ -83,8 +87,14 @@ function NavigatorLoungeContent() {
       desc: 'START/SIGNATURE/BLACK 패스 상품 및 정책',
     },
     {
+      id: 'black-pass-guide',
+      label: 'Black Pass 사용설명서',
+      icon: Sparkles,
+      desc: '블랙 패스의 핵심 기능 및 프리미엄 혜택 활용 가이드',
+    },
+    {
       id: 'square',
-      label: '네비게이터 스퀘어',
+      label: '커뮤니티',
       icon: Users,
       desc: '현장 네비게이터 간의 노하우 공유 및 소통',
     },
@@ -126,15 +136,16 @@ function NavigatorLoungeContent() {
       case 'catalog': return <PassCatalog />;
       case 'shops': return <ShopManagement />;
       case 'consultations': return <ConsultationList />;
+      case 'black-pass-guide': return <BlackPassGuideContent />;
       default: return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pt-32 pb-20">
+    <div className="min-h-screen bg-[#FDFBF7] pt-6 md:pt-32 pb-20">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header Section */}
-        <div className="mb-12">
+        <div className="mb-6 md:mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-xs font-black uppercase tracking-widest mb-4">
             <Lock className="w-3 h-3" />
             Navigator Only
@@ -145,6 +156,32 @@ function NavigatorLoungeContent() {
           <p className="text-slate/60 text-lg">
             유니클 네비게이터들을 위한 특별한 소통 공간입니다. 필요한 지식을 얻고, 자문단과 소통하세요.
           </p>
+        </div>
+
+        {/* Tab Navigation (Sticky) */}
+        <div className="sticky top-[112px] md:top-[120px] z-40 bg-[#FDFBF7]/95 backdrop-blur-md py-3 md:py-4 mb-6 md:mb-8 -mx-4 px-4 md:mx-0 md:px-0 border-b border-line/20 shadow-sm transition-all">
+          <div className="flex flex-wrap gap-2 md:gap-3">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 md:px-5 md:py-3 rounded-full font-bold text-sm md:text-base transition-all border ${
+                    isActive
+                      ? 'bg-obsidian border-obsidian text-mist shadow-md scale-105'
+                      : 'bg-white border-line text-slate hover:border-chapter-accent/50 hover:bg-mist/30'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 md:w-5 md:h-5 ${isActive ? 'text-mist' : 'text-slate/60'}`} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Navigator Toolkit */}
@@ -196,78 +233,9 @@ function NavigatorLoungeContent() {
             </div>
           </div>
         </div>
-
-        {/* Tab Navigation */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <div key={tab.id} className="flex flex-col gap-4">
-                <button
-                  onClick={() => {
-                    if (activeTab === tab.id) {
-                      setActiveTab(null);
-                    } else {
-                      setActiveTab(tab.id);
-                      if (isMobile) {
-                        setTimeout(() => {
-                          const el = document.getElementById(`tab-${tab.id}`);
-                          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-                      }
-                    }
-                  }}
-                  id={`tab-${tab.id}`}
-                  className={`text-left p-6 rounded-3xl border transition-all relative overflow-hidden group ${
-                    isActive
-                      ? 'bg-obsidian border-obsidian text-mist shadow-xl scale-[1.02]'
-                      : 'bg-white border-line hover:border-chapter-accent/50 text-obsidian shadow-sm'
-                  }`}
-                >
-                  {isActive && (
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-mist/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                  )}
-                  <div className="relative z-10">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${
-                        isActive ? 'bg-white/10 text-mist' : 'bg-mist text-slate group-hover:text-chapter-accent'
-                      }`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      {isMobile && (
-                        <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'rotate-180 text-chapter-accent' : 'text-slate/30'}`} />
-                      )}
-                    </div>
-                    <h3 className="font-black text-xl mb-1">{tab.label}</h3>
-                    <p className={`text-[11px] leading-relaxed ${isActive ? 'text-mist/60' : 'text-slate/60'}`}>
-                      {tab.desc}
-                    </p>
-                  </div>
-                </button>
-
-                {/* Mobile Accordion Content */}
-                <AnimatePresence>
-                  {isMobile && isActive && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }}
-                      className="overflow-hidden bg-white border border-line rounded-[32px] p-6 shadow-lg mb-4"
-                    >
-                      {renderTabContent(tab.id)}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Desktop Tab Content Area */}
-        {!isMobile && (
-          <div ref={contentRef} className="bg-white border border-line rounded-[40px] p-8 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden">
+        {/* Tab Content Area (Unified for Mobile & Desktop) */}
+        <div ref={contentRef} className="bg-white border border-line rounded-[32px] md:rounded-[40px] p-6 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden mb-12">
+          {activeTab ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -277,11 +245,32 @@ function NavigatorLoungeContent() {
                 transition={{ duration: 0.2 }}
                 className="h-full"
               >
-                {activeTab && renderTabContent(activeTab)}
+                {/* Selected Tab Info Header */}
+                <div className="mb-8 pb-6 border-b border-line">
+                  <div className="flex items-center gap-3 mb-2">
+                    {(() => {
+                      const ActiveIcon = tabs.find(t => t.id === activeTab)?.icon || BookOpen;
+                      return <ActiveIcon className="w-6 h-6 text-chapter-accent" />;
+                    })()}
+                    <h2 className="text-2xl font-black text-obsidian">
+                      {tabs.find(t => t.id === activeTab)?.label}
+                    </h2>
+                  </div>
+                  <p className="text-slate/70 font-medium">
+                    {tabs.find(t => t.id === activeTab)?.desc}
+                  </p>
+                </div>
+                
+                {renderTabContent(activeTab)}
               </motion.div>
             </AnimatePresence>
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col items-center justify-center h-[400px] text-slate/40">
+              <BookOpen className="w-16 h-16 mb-4 opacity-50" />
+              <p className="font-medium text-lg">상단 탭을 선택하여 메뉴를 확인하세요.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Overlays */}
@@ -305,6 +294,87 @@ function NavigatorLoungeContent() {
           />
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function BlackPassGuideContent() {
+  return (
+    <div className="space-y-12 max-w-3xl mx-auto py-4">
+      {/* Step 1 */}
+      <div className="space-y-6 group">
+        <div className="relative aspect-video rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
+          <Image 
+            src="/images/guide/black-pass-guide-1.png" 
+            alt="전용 QR 코드로 스마트한 진료 연동" 
+            fill 
+            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        </div>
+        <div className="space-y-3 px-2">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">01</span>
+            <h3 className="text-2xl font-black text-obsidian">스마트한 진료 데이터 연동</h3>
+          </div>
+          <p className="text-slate/70 leading-relaxed font-medium break-keep">
+            블랙 패스 허브 상단의 <strong className="text-obsidian font-black">'진료 전용 QR'</strong>을 파트너 클리닉에 제시하세요. 
+            번거로운 문진 과정 없이 당신의 정밀 회복 데이터가 의료진에게 즉시 전달되어 개인화된 처방을 받을 수 있습니다.
+          </p>
+        </div>
+      </div>
+
+      {/* Step 2 */}
+      <div className="space-y-6 group">
+        <div className="relative aspect-video rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
+          <Image 
+            src="/images/guide/black-pass-guide-2.png" 
+            alt="영구적인 데이터 자산 관리" 
+            fill 
+            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        </div>
+        <div className="space-y-3 px-2">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">02</span>
+            <h3 className="text-2xl font-black text-obsidian">영구적인 데이터 자산 관리</h3>
+          </div>
+          <p className="text-slate/70 leading-relaxed font-medium break-keep">
+            <strong className="text-obsidian font-black">'나의 데이터 자산'</strong> 메뉴에서 당신의 모든 진단 기록과 회복 히스토리를 영구적으로 보관하세요. 
+            주간 정밀 분석 리포트를 통해 시간이 지남에 따라 변화하는 회복의 궤적을 데이터로 증명할 수 있습니다.
+          </p>
+        </div>
+      </div>
+
+      {/* Step 3 */}
+      <div className="space-y-6 group">
+        <div className="relative aspect-[4/5] max-w-sm mx-auto rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
+          <Image 
+            src="/images/guide/black-pass-guide-3.png" 
+            alt="클리닉 전용 정밀 케어 시스템" 
+            fill 
+            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        </div>
+        <div className="space-y-3 px-2">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">03</span>
+            <h3 className="text-2xl font-black text-obsidian">클리닉 전용 정밀 케어 시스템</h3>
+          </div>
+          <p className="text-slate/70 leading-relaxed font-medium break-keep">
+            블랙 패스 허브의 <strong className="text-obsidian font-black">'병원 방문 전 정밀 문진'</strong>을 통해 최적의 시술 결과를 먼저 설계하세요. 
+            클리닉 현장에서 QR을 제시하여 데이터를 연동하고, 귀가 후에는 <strong className="text-obsidian font-black">'시술/수술 후 맞춤 케어'</strong>를 통해 현재의 상태 분석 및 실시간 회복 관리를 받을 수 있습니다.
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-10">
+        <Button asChild className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-2xl shadow-obsidian/20 hover:scale-[1.02] transition-transform">
+          <Link href="/black-pass">블랙 패스 허브로 이동하기</Link>
+        </Button>
+      </div>
     </div>
   );
 }

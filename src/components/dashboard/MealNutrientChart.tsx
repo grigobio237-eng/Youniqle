@@ -26,13 +26,13 @@ export default function MealNutrientChart({ nutrients, advice }: MealNutrientCha
 
 
     return (
-        <div className="bg-white p-8 rounded-[32px] border border-line shadow-sm space-y-6">
+        <div className="bg-white p-6 rounded-[32px] border border-line shadow-xl shadow-obsidian/5 space-y-4">
             <div className="flex justify-between items-center">
                 <h4 className="text-sm font-black text-obsidian uppercase tracking-widest">Nutrient Balance</h4>
                 <div className="px-3 py-1 bg-mist rounded-full text-[10px] font-black italic text-slate uppercase">Latest Scan Analysis</div>
             </div>
 
-            <div className="h-64 w-full">
+            <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie

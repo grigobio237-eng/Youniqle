@@ -14,7 +14,11 @@ export interface NavigatorOutput {
     comment: string;
     actionItem: string;
     recoveryScore: number;
-    tomorrowForecast?: string;
+    tomorrowForecast?: {
+        status: string;
+        description: string;
+        energyLevel: number;
+    };
 }
 
 export interface OmakaseInput {

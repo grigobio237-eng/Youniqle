@@ -25,7 +25,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
     const displayScore = score?.totalScore || 0;
 
     return (
-        <div className="space-y-12 pb-20">
+        <div className="space-y-8 pb-10">
             {/* Header */}
             <div className="text-center space-y-2">
                 <Badge className="bg-primary text-obsidian border-none text-[10px] font-black px-3 py-1 uppercase tracking-widest">Precision Intelligence</Badge>
@@ -35,9 +35,9 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
 
             {/* AI Manager Summary Section */}
             <section>
-                <Card className="bg-white border border-line rounded-[48px] overflow-hidden shadow-sm hover:shadow-xl transition-all">
-                    <CardContent className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                        <div className="w-24 h-24 md:w-32 md:h-32 bg-mist rounded-[40px] flex items-center justify-center shadow-inner shrink-0 overflow-hidden border border-line/50">
+                <Card className="bg-white border border-line rounded-[32px] overflow-hidden shadow-xl shadow-obsidian/5 hover:shadow-2xl transition-all">
+                    <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                        <div className="w-20 h-20 md:w-28 md:h-28 bg-mist rounded-[24px] flex items-center justify-center shadow-inner shrink-0 overflow-hidden border border-line/50">
                             <img 
                                 src="/images/characters/char_dday.png" 
                                 alt="Youniqle Manager" 
@@ -114,7 +114,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
 
             {/* Locked Advanced Metrics (For Non-Premium) */}
             {!isPremium && (
-                <Card className="bg-mist/30 border border-line border-dashed rounded-[40px] p-10 text-center relative overflow-hidden">
+                <Card className="bg-mist/30 border border-line border-dashed rounded-[32px] p-6 md:p-10 text-center relative overflow-hidden">
                     <div className="space-y-6 relative z-10">
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
                             <Lock className="w-8 h-8 text-slate/40" />
@@ -134,7 +134,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
             )}
             {/* Recommended Products (Moved to the very bottom) */}
             {recommendedProducts && recommendedProducts.length > 0 && (
-                <section className="space-y-6 pt-12 border-t border-line/30">
+                <section className="space-y-4 pt-8 border-t border-line/30">
                     <div className="flex items-center justify-between px-2">
                         <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
                             <ShoppingBag className="w-5 h-5 text-reward-gold" />
@@ -150,7 +150,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                                         window.location.href = `/shop/product/${prod.productId}`;
                                     }
                                 }}
-                                className="flex flex-col bg-white border border-line rounded-[32px] overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
+                                className="flex flex-col bg-white border border-line rounded-[32px] overflow-hidden shadow-xl shadow-obsidian/5 hover:shadow-2xl transition-all cursor-pointer group"
                             >
                                 {/* Product Image */}
                                 <div className="relative aspect-video w-full overflow-hidden bg-mist">
@@ -170,9 +170,8 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                                     </div>
                                 </div>
 
-                                {/* Product Info */}
-                                <div className="p-6 flex flex-col flex-1">
-                                    <h5 className="text-lg font-black text-obsidian group-hover:text-chapter-accent transition-colors leading-tight">
+                                <div className="p-5 flex flex-col flex-1">
+                                    <h5 className="text-base font-black text-obsidian group-hover:text-chapter-accent transition-colors leading-tight">
                                         {prod.name}
                                     </h5>
                                     

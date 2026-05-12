@@ -22,10 +22,10 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
     const isPosture = type === 'posture';
 
     return (
-        <Card className="rounded-[40px] border-none overflow-hidden bg-obsidian text-mist shadow-2xl relative group">
+        <Card className="rounded-[32px] border-none overflow-hidden bg-obsidian text-mist shadow-2xl relative group">
             <div className={`absolute top-0 right-0 w-32 h-32 ${isPosture ? 'bg-chapter-accent/20' : 'bg-reward-gold/20'} rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700`} />
             
-            <CardContent className="p-10 space-y-8 relative z-10">
+            <CardContent className="p-6 md:p-10 space-y-6 md:space-y-8 relative z-10">
                 <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-2xl ${isPosture ? 'bg-chapter-accent/20 text-chapter-accent' : 'bg-reward-gold/20 text-reward-gold'}`}>
                         {isPosture ? <Activity className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
@@ -49,8 +49,8 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                             </h4>
                             <div className="space-y-2">
                                 {insight.habits?.map((habit, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
-                                        <div className="w-2 h-2 rounded-full bg-chapter-accent" />
+                                    <div key={idx} className="flex items-center gap-3 bg-white/5 p-3 md:p-4 rounded-xl border border-white/10">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-chapter-accent" />
                                         <span className="text-sm font-bold">{habit}</span>
                                     </div>
                                 ))}
@@ -59,7 +59,7 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                     )}
 
                     {insight.suggestion && (
-                        <div className="p-6 bg-reward-gold/10 rounded-3xl border border-reward-gold/20 italic text-reward-gold font-bold">
+                        <div className="p-4 md:p-6 bg-reward-gold/10 rounded-[20px] border border-reward-gold/20 italic text-reward-gold font-bold text-sm">
                             "{insight.suggestion}"
                         </div>
                     )}

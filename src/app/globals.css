@@ -62,7 +62,7 @@
     height: auto;
     min-height: 100%;
     overflow-y: auto !important;
-    overflow-x: hidden;
+    overflow-x: clip;
     @apply antialiased;
   }
 
@@ -71,7 +71,7 @@
     color: var(--foreground);
     letter-spacing: -0.01em;
     line-height: 1.5;
-    overflow-x: hidden;
+    overflow-x: clip;
     overflow-y: auto !important;
     width: 100%;
     min-height: 100vh;

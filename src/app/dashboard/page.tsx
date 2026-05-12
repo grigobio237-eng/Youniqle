@@ -211,7 +211,7 @@ export default function DashboardPage() {
       />
 
       {/* Tab Navigation - Softer & Floating */}
-      <div className="sticky top-[110px] md:top-[120px] z-30 bg-background/80 backdrop-blur-md pt-6 pb-4 px-6">
+      <div className="sticky top-[110px] md:top-[120px] z-30 bg-background/80 backdrop-blur-md pt-4 pb-2 px-4">
         <div className="max-w-xl mx-auto flex bg-surface/50 p-1.5 rounded-full border border-white/20 shadow-lg shadow-primary/5">
           <button
             onClick={() => setActiveTab('home')}

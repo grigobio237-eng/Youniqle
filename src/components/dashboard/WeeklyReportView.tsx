@@ -60,7 +60,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center py-20">
+            <div className="flex justify-center items-center py-10">
                 <Loader2 className="w-8 h-8 animate-spin text-chapter-accent" />
             </div>
         );
@@ -68,9 +68,9 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
 
     if (!report) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-                <div className="w-24 h-24 bg-mist rounded-full flex items-center justify-center shadow-sm border border-line overflow-hidden">
-                    <img src="/images/characters/char_diagnosis.png" alt="진단 리포트 캐릭터" className="w-16 h-16 object-contain" />
+            <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
+                <div className="w-20 h-20 bg-mist rounded-full flex items-center justify-center shadow-sm border border-line overflow-hidden">
+                    <img src="/images/characters/char_diagnosis.png" alt="진단 리포트 캐릭터" className="w-12 h-12 object-contain" />
                 </div>
                 <div>
                     <h3 className="text-xl font-black text-obsidian tracking-tight">이번 주 리포트가 없습니다.</h3>
@@ -102,7 +102,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
     return (
         <div className="space-y-6 pb-10">
             {/* 1. Score & Summary */}
-            <div className="bg-white rounded-[32px] p-8 border border-line shadow-sm text-center relative overflow-hidden">
+            <div className="bg-white rounded-[32px] p-6 border border-line shadow-xl shadow-obsidian/5 text-center relative overflow-hidden">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-chapter-accent/10 rounded-full blur-3xl" />
                 <h4 className="text-xs font-black uppercase tracking-widest text-slate/50 mb-2">Weekly Recovery Score</h4>
                 <div className="text-6xl font-black italic text-obsidian tracking-tighter mb-4">
@@ -115,7 +115,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
 
             {/* 2. Strengths & Weaknesses */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-mist/50 p-6 rounded-[24px] border border-line space-y-4">
+                <div className="bg-mist/50 p-5 rounded-[24px] border border-line space-y-3">
                     <div className="flex items-center gap-2 text-status-normal font-black uppercase text-xs tracking-widest">
                         <ThumbsUp className="w-4 h-4" /> 긍정적인 신호
                     </div>
@@ -128,7 +128,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                         ))}
                     </ul>
                 </div>
-                <div className="bg-mist/50 p-6 rounded-[24px] border border-line space-y-4">
+                <div className="bg-mist/50 p-5 rounded-[24px] border border-line space-y-3">
                     <div className="flex items-center gap-2 text-status-critical font-black uppercase text-xs tracking-widest">
                         <AlertTriangle className="w-4 h-4" /> 주의할 부분
                     </div>
@@ -146,7 +146,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
             </div>
 
             {/* 3. Action Plan */}
-            <div className="bg-obsidian text-white p-6 rounded-[32px] space-y-3 relative overflow-hidden">
+            <div className="bg-obsidian text-white p-5 md:p-6 rounded-[32px] space-y-2 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-chapter-accent/20 blur-3xl -mt-16 -mr-16" />
                 <div className="flex items-center gap-2 text-chapter-accent font-black uppercase text-xs tracking-widest relative z-10">
                     <Target className="w-4 h-4" /> 다음 주 행동 가이드

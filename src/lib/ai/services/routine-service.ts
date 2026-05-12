@@ -120,19 +120,42 @@ export class RoutineService {
   "comment": "오늘의 한 줄 코멘트",
   "actionItem": "오늘 실천할 구체적인 행동 팁",
   "recoveryScore": 0,
-  "tomorrowForecast": "내일의 상태 예측"
+  "tomorrowForecast": {
+    "status": "맑음|흐림|주의",
+    "description": "내일의 회복 상태 예측 설명 (1~2문장)",
+    "energyLevel": 70
+  }
 }`;
         try {
             const response = await GeminiCore.generateWithFallback(prompt, "AI 네비게이터 모드", 0.7);
             const jsonMatch = response.match(/\{[\s\S]*\}/);
-            if (jsonMatch) return JSON.parse(jsonMatch[0]);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                // tomorrowForecast가 문자열이면 객체로 변환
+                if (typeof parsed.tomorrowForecast === 'string') {
+                    parsed.tomorrowForecast = {
+                        status: '안정',
+                        description: parsed.tomorrowForecast,
+                        energyLevel: parsed.recoveryScore || 70
+                    };
+                }
+                // 필수 필드 누락 방어
+                if (parsed.tomorrowForecast && !parsed.tomorrowForecast.status) parsed.tomorrowForecast.status = '안정';
+                if (parsed.tomorrowForecast && !parsed.tomorrowForecast.description) parsed.tomorrowForecast.description = '내일의 회복 흐름을 지켜보겠습니다.';
+                if (parsed.tomorrowForecast && parsed.tomorrowForecast.energyLevel == null) parsed.tomorrowForecast.energyLevel = parsed.recoveryScore || 70;
+                return parsed;
+            }
             throw new Error("Parsing failed");
         } catch (error) {
             return {
                 comment: "오늘 하루도 당신의 회복을 응원합니다.",
                 actionItem: "가벼운 스트레칭으로 몸을 깨워보세요.",
                 recoveryScore: 70,
-                tomorrowForecast: "맑음"
+                tomorrowForecast: {
+                    status: "안정",
+                    description: "꾸준한 리듬 유지가 회복의 핵심입니다.",
+                    energyLevel: 70
+                }
             };
         }
     }

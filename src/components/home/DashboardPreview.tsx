@@ -225,8 +225,8 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       )}
 
       {/* 🟢 1. Recovery Flow Timeline */}
-      <section className="container mx-auto px-6 pt-12 pb-20 max-w-5xl relative z-10">
-        <div className="flex items-center justify-between mb-12">
+      <section className="container mx-auto px-6 pt-8 pb-10 max-w-5xl relative z-10">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Calendar className="w-5 h-5 text-primary/60" />
             <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Recovery Journey</span>
@@ -239,8 +239,8 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       </section>
 
       {/* 🟣 2. Today's Rhythm Analysis */}
-      <section className="container mx-auto px-6 pb-20 max-w-5xl relative z-10">
-        <div className="flex items-center gap-3 mb-10">
+      <section className="container mx-auto px-6 pb-10 max-w-5xl relative z-10">
+        <div className="flex items-center gap-3 mb-6">
           <Sparkles className="w-5 h-5 text-reward-gold" />
           <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Today's Insight</span>
         </div>
@@ -251,29 +251,31 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       </section>
 
       {/* 🔵 3. Secondary Info Grid */}
-      <section className="container mx-auto px-6 pb-16 max-w-5xl relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Membership Management */}
-          <div className="bg-surface/40 backdrop-blur-xl rounded-5xl p-10 border border-white/20 flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all shadow-sm" onClick={() => window.location.href='/membership'}>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-3">Membership</p>
-              <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">멤버십 혜택 관리</h3>
-              <p className="text-xs font-bold text-foreground/30 uppercase tracking-tighter italic">MY GRADE: {(user?.grade || 'GATE')}</p>
+      <section className="container mx-auto px-6 pb-8 max-w-5xl relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Membership Management - Premium Dark Mode */}
+          <div className="bg-obsidian rounded-[32px] p-6 border border-white/10 flex items-center justify-between group cursor-pointer hover:bg-[#1a1a1a] transition-all shadow-xl shadow-obsidian/20 relative overflow-hidden" onClick={() => window.location.href='/membership'}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-reward-gold/10 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-reward-gold mb-2">Membership</p>
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-1">멤버십 혜택 관리</h3>
+              <p className="text-[11px] font-bold text-white/50 uppercase tracking-widest">MY GRADE: {(user?.grade || 'GATE')}</p>
             </div>
-            <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center text-foreground/20 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-              <ChevronRight className="w-7 h-7" />
+            <div className="w-12 h-12 shrink-0 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-reward-gold group-hover:text-obsidian transition-colors relative z-10 shadow-inner">
+              <ArrowRight className="w-5 h-5" />
             </div>
           </div>
           
-          {/* Record Archive */}
-          <div className="bg-surface/40 backdrop-blur-xl rounded-5xl p-10 border border-white/20 flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all shadow-sm" onClick={() => window.location.href='/archive'}>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-3">History Archive</p>
-              <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">나의 기록 보관함</h3>
-              <p className="text-xs font-bold text-foreground/30 uppercase tracking-tighter italic">TOTAL {(unifiedData.assetStats?.totalInsights || 0)} INSIGHTS</p>
+          {/* Record Archive - High Contrast White */}
+          <div className="bg-white rounded-[32px] p-6 border border-obsidian/5 flex items-center justify-between group cursor-pointer hover:border-obsidian/20 transition-all shadow-lg shadow-obsidian/5 relative overflow-hidden" onClick={() => window.location.href='/archive'}>
+            <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mb-16 pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">History Archive</p>
+              <h3 className="text-xl md:text-2xl font-bold text-obsidian tracking-tight mb-1">나의 기록 보관함</h3>
+              <p className="text-[11px] font-bold text-obsidian/40 uppercase tracking-widest">TOTAL {(unifiedData.assetStats?.totalInsights || 0)} INSIGHTS</p>
             </div>
-            <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center text-foreground/20 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-              <ChevronRight className="w-7 h-7" />
+            <div className="w-12 h-12 shrink-0 bg-obsidian rounded-full flex items-center justify-center text-white group-hover:bg-primary transition-colors relative z-10 shadow-sm">
+              <ArrowRight className="w-5 h-5" />
             </div>
           </div>
         </div>

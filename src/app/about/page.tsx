@@ -102,15 +102,15 @@ export default function AboutPage() {
       </section>
 
       {/* 2. Philosophy Section: The Logic (Light Theme) */}
-      <section className="py-32 md:py-48 relative bg-white">
+      <section className="pt-16 pb-8 md:pt-24 md:pb-12 relative bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="space-y-12"
+              className="space-y-8 md:space-y-10"
             >
               <div className="space-y-6">
                 <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter italic leading-tight text-obsidian">
@@ -123,16 +123,24 @@ export default function AboutPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-chapter-accent hover:shadow-xl transition-all duration-500">
-                  <Fingerprint className="w-10 h-10 text-chapter-accent mb-6 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Life Recording</h4>
-                  <p className="text-sm text-slate/60 leading-relaxed font-bold">사진 한 장으로 시작되는 <br /> 정직한 나의 상태 기록</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-start gap-4 p-4 md:p-5 rounded-2xl bg-mist border border-line group hover:border-chapter-accent hover:shadow-lg transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-line/50">
+                    <Fingerprint className="w-5 h-5 text-chapter-accent group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div>
+                    <h4 className="text-base md:text-lg font-black mb-1 text-obsidian tracking-tight">Life Recording</h4>
+                    <p className="text-xs md:text-sm text-slate/60 leading-snug font-bold">사진 한 장으로 시작되는 정직한 나의 상태 기록</p>
+                  </div>
                 </div>
-                <div className="p-10 rounded-[40px] bg-mist border border-line group hover:border-reward-gold hover:shadow-xl transition-all duration-500">
-                  <Activity className="w-10 h-10 text-reward-gold mb-6 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-black mb-3 text-obsidian tracking-tight">Condition Insight</h4>
-                  <p className="text-sm text-slate/60 leading-relaxed font-bold">식사, 수면, 스트레스 등 <br /> 6가지 핵심 지표 관리</p>
+                <div className="flex items-start gap-4 p-4 md:p-5 rounded-2xl bg-mist border border-line group hover:border-reward-gold hover:shadow-lg transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-line/50">
+                    <Activity className="w-5 h-5 text-reward-gold group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div>
+                    <h4 className="text-base md:text-lg font-black mb-1 text-obsidian tracking-tight">Condition Insight</h4>
+                    <p className="text-xs md:text-sm text-slate/60 leading-snug font-bold">식사, 수면, 스트레스 등 6가지 핵심 지표 관리</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -155,16 +163,16 @@ export default function AboutPage() {
       </section>
 
       {/* 3. The Three Paths: Defined Cards (Light Theme) */}
-      <section className="py-32 md:py-48 bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-32 md:space-y-56">
+      <section className="pt-8 pb-16 md:pt-12 md:pb-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 space-y-16 md:space-y-24">
           
           {/* Step 1. 기록 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 space-y-12"
+              className="lg:col-span-5 space-y-8"
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
@@ -195,7 +203,7 @@ export default function AboutPage() {
           </div>
 
           {/* Step 2. 분석 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -212,7 +220,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 space-y-12 order-1 lg:order-2"
+              className="lg:col-span-5 space-y-8 order-1 lg:order-2"
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-reward-gold/10 border border-reward-gold/20 rounded-full">
@@ -231,12 +239,12 @@ export default function AboutPage() {
           </div>
 
           {/* Step 3. 처방 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 space-y-12"
+              className="lg:col-span-5 space-y-8"
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
@@ -267,7 +275,7 @@ export default function AboutPage() {
           </div>
 
           {/* Step 4. 케어 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -284,7 +292,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 space-y-12 order-1 lg:order-2"
+              className="lg:col-span-5 space-y-8 order-1 lg:order-2"
             >
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-chapter-accent/10 border border-chapter-accent/20 rounded-full">
@@ -305,10 +313,10 @@ export default function AboutPage() {
       </section>
 
       {/* Utility Hub & Path Preview (Moved from Hero) */}
-      <section className="py-24 md:py-32 bg-mist border-t border-line/50">
-        <div className="container mx-auto px-6 space-y-32">
+      <section className="py-12 md:py-16 bg-mist border-t border-line/50">
+        <div className="container mx-auto px-6 space-y-16">
           {/* 1. Utility Hub */}
-          <div className="space-y-16">
+          <div className="space-y-8">
             <div className="text-center space-y-4 max-w-2xl mx-auto">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
                 Recovery Tools
@@ -317,29 +325,31 @@ export default function AboutPage() {
               <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 정밀 도구들입니다.</p>
             </div>
 
-            <div className="flex justify-center mt-10">
+            <div className="flex justify-center mt-6">
               <Button 
                 onClick={() => router.push('/utils')}
-                className="group bg-white p-8 md:p-12 rounded-[40px] border border-line shadow-sm hover:shadow-2xl hover:border-chapter-accent transition-all duration-500 flex flex-col items-center justify-center space-y-6 w-full max-w-2xl h-auto"
+                className="group w-full max-w-xl h-auto p-4 md:p-6 bg-obsidian text-mist rounded-2xl border border-obsidian/20 shadow-xl hover:shadow-2xl hover:bg-obsidian/90 hover:-translate-y-1 transition-all duration-300 flex items-center justify-between gap-4 text-left"
               >
-                <div className="w-24 h-24 bg-chapter-accent/10 rounded-full flex items-center justify-center mb-2">
-                  <Compass className="w-12 h-12 text-chapter-accent" />
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-chapter-accent rounded-xl flex items-center justify-center shrink-0 shadow-inner">
+                    <Compass className="w-6 h-6 md:w-7 md:h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-base md:text-xl font-black tracking-tight mb-1">유니클 툴킷 바로가기</h3>
+                    <p className="text-mist/60 text-[11px] md:text-sm font-medium leading-snug line-clamp-2">
+                      건강과 생산성을 높여줄 정밀 도구 모음
+                    </p>
+                  </div>
                 </div>
-                <div className="text-center space-y-3">
-                  <h3 className="text-2xl md:text-3xl font-black text-obsidian tracking-tight group-hover:text-chapter-accent transition-colors">유니클 툴킷 바로가기</h3>
-                  <p className="text-slate/60 text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-                    당신의 건강과 생산성을 높여줄 10가지 이상의 정밀 도구를 한 곳에서 만나보세요.
-                  </p>
-                </div>
-                <div className="pt-6 flex items-center text-chapter-accent font-black text-sm uppercase tracking-widest gap-2 group-hover:translate-x-2 transition-transform">
-                  전체 도구 보기 <ArrowRight className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-chapter-accent transition-colors">
+                  <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                 </div>
               </Button>
             </div>
           </div>
 
           {/* 2. Path Preview */}
-          <div className="space-y-16">
+          <div className="space-y-8">
             <div className="text-center space-y-4">
               <h2 className="text-xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
               <p className="text-slate/60 font-medium">당신의 결과에 따라 활성화되는 3가지 정밀 로드맵</p>
@@ -347,11 +357,11 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Path 1 */}
-              <div className="group relative bg-white border border-line rounded-[48px] p-12 overflow-hidden hover:border-chapter-accent transition-all duration-500 shadow-sm hover:shadow-xl">
+              <div className="group relative bg-white border border-line rounded-[32px] p-6 md:p-8 overflow-hidden hover:border-chapter-accent transition-all duration-500 shadow-sm hover:shadow-xl">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-chapter-accent/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-chapter-accent/10 transition-colors" />
-                <div className="relative z-10 space-y-8">
-                  <div className="w-16 h-16 bg-mist rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
-                    <Zap className="w-8 h-8 text-chapter-accent" />
+                <div className="relative z-10 space-y-4 md:space-y-6">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-mist rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
+                    <Zap className="w-6 h-6 md:w-7 md:h-7 text-chapter-accent" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-obsidian mb-3 tracking-tight">리듬 회복</h3>
@@ -368,11 +378,11 @@ export default function AboutPage() {
               </div>
 
               {/* Path 2 */}
-              <div className="group relative bg-obsidian border border-obsidian rounded-[48px] p-12 overflow-hidden shadow-2xl">
+              <div className="group relative bg-obsidian border border-obsidian rounded-[32px] p-6 md:p-8 overflow-hidden shadow-2xl">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-reward-gold/20 rounded-full blur-3xl -mr-24 -mt-24" />
-                <div className="relative z-10 space-y-8">
-                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-white/10 text-reward-gold">
-                    <Shield className="w-8 h-8" />
+                <div className="relative z-10 space-y-4 md:space-y-6">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/10 text-reward-gold">
+                    <Shield className="w-6 h-6 md:w-7 md:h-7" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-mist mb-3 tracking-tight">집중 회복</h3>
@@ -389,11 +399,11 @@ export default function AboutPage() {
               </div>
 
               {/* Path 3 */}
-              <div className="group relative bg-white border border-line rounded-[48px] p-12 overflow-hidden hover:border-status-normal transition-all duration-500 shadow-sm hover:shadow-xl">
+              <div className="group relative bg-white border border-line rounded-[32px] p-6 md:p-8 overflow-hidden hover:border-status-normal transition-all duration-500 shadow-sm hover:shadow-xl">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-status-normal/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-status-normal/10 transition-colors" />
-                <div className="relative z-10 space-y-8">
-                  <div className="w-16 h-16 bg-mist rounded-3xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
-                    <Crown className="w-8 h-8 text-status-normal" />
+                <div className="relative z-10 space-y-4 md:space-y-6">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-mist rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-line/50">
+                    <Crown className="w-6 h-6 md:w-7 md:h-7 text-status-normal" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-obsidian mb-3 tracking-tight">프리미엄 회복</h3>
@@ -414,11 +424,11 @@ export default function AboutPage() {
       </section>
 
       {/* 4. Final CTA: Re-designed for Light Theme Impact */}
-      <section className="py-40 md:py-64 relative overflow-hidden bg-white">
+      <section className="py-20 md:py-32 relative overflow-hidden bg-white">
         {/* Background Decorative Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-chapter-accent/5 rounded-full blur-[240px]" />
         
-        <div className="max-w-5xl mx-auto px-6 relative z-10 text-center space-y-16 md:space-y-24">
+        <div className="max-w-5xl mx-auto px-6 relative z-10 text-center space-y-8 md:space-y-12">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -453,7 +463,7 @@ export default function AboutPage() {
       </section>
 
       {/* 5. Clean Light Footer */}
-      <footer className="py-24 text-center border-t border-line relative bg-mist">
+      <footer className="py-12 md:py-16 text-center border-t border-line relative bg-mist">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12 opacity-50">
            <p className="text-[10px] md:text-xs font-black text-obsidian uppercase tracking-widest leading-none">Designed for Better Life Transformation</p>
            <div className="flex items-center gap-16">

@@ -21,14 +21,14 @@ export default function RecoveryStatusHero({
     userName
 }: RecoveryStatusHeroProps) {
     return (
-        <section className="relative py-12 md:py-20 overflow-hidden bg-background">
+        <section className="relative py-6 md:py-10 overflow-hidden bg-background">
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
             
             <div className="container mx-auto px-6 relative z-10">
-                <div className="max-w-5xl mx-auto space-y-12">
+                <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
                     
                     {/* Title Area */}
-                    <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+                    <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 md:gap-6">
                         <div className="space-y-4">
                             <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
                                 Recovery Comprehensive Report
@@ -39,10 +39,10 @@ export default function RecoveryStatusHero({
                         </div>
 
                         {/* Real-time Asset Summary Dashboard */}
-                        <div className="w-full md:w-auto bg-white rounded-[40px] p-6 border border-obsidian/5 shadow-2xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                        <div className="w-full md:w-auto bg-white rounded-[32px] p-4 md:p-6 border border-obsidian/5 shadow-2xl flex flex-col md:flex-row items-center gap-4 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16" />
                             
-                            <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-4">
                                 <div className="text-right">
                                     <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">Total Assets</p>
                                     <div className="flex items-end gap-1">
@@ -77,10 +77,10 @@ export default function RecoveryStatusHero({
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 pt-12 border-t border-line/30">
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-8 pt-6 md:pt-8 border-t border-line/30">
                         {/* Left: Score & Progress */}
-                        <div className="space-y-6 flex-1">
-                            <div className="bg-surface/50 border border-line p-8 md:p-10 rounded-[40px] flex items-center gap-8 w-full md:w-auto shadow-sm">
+                        <div className="space-y-4 md:space-y-6 flex-1">
+                            <div className="bg-surface/50 border border-line p-6 md:p-8 rounded-[32px] flex items-center gap-4 md:gap-6 w-full md:w-auto shadow-sm">
                                 <div className="flex-shrink-0">
                                     <div className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-2">Current Recovery Score</div>
                                     <div className="text-6xl md:text-7xl font-black text-primary tracking-tighter">{todayScore}</div>
@@ -96,7 +96,7 @@ export default function RecoveryStatusHero({
 
                         {/* Right: Radar Chart (Physical Balance) */}
                         {radarData.length > 0 && (
-                            <div className="w-full md:w-96 h-80 bg-white rounded-[40px] shadow-[0_12px_48px_rgb(0,0,0,0.06)] border border-white/50 p-8 relative flex flex-col overflow-hidden">
+                            <div className="w-full md:w-96 h-72 bg-white rounded-[32px] shadow-[0_12px_48px_rgb(0,0,0,0.06)] border border-white/50 p-6 relative flex flex-col overflow-hidden">
                                 <h3 className="text-xl font-black text-obsidian relative z-10 tracking-tight">신체 밸런스</h3>
                                 <div className="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-[#D4AF37]/10 rounded-full blur-3xl z-0 pointer-events-none"></div>
 
@@ -117,14 +117,14 @@ export default function RecoveryStatusHero({
                     </div>
 
                     {/* Score Trend Graph */}
-                    <div className="relative h-64 w-full bg-surface/30 rounded-[40px] border border-line/30 p-8 pt-12">
-                        <div className="absolute top-8 left-8 flex items-center gap-2">
+                    <div className="relative h-56 w-full bg-surface/30 rounded-[32px] border border-line/30 p-6 pt-10">
+                        <div className="absolute top-6 left-6 flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-reward-gold" />
                             <span className="text-[11px] font-black text-slate/40 uppercase tracking-[0.2em]">7-Day Recovery Flow</span>
                         </div>
                         
                         {/* X-axis background pill */}
-                        <div className="absolute bottom-6 left-8 right-8 h-10 bg-white/60 rounded-full z-0" />
+                        <div className="absolute bottom-4 left-6 right-6 h-10 bg-white/60 rounded-full z-0" />
                         
                         <ResponsiveContainer width="100%" height="100%" className="relative z-10">
                             <AreaChart data={scoreHistory} margin={{ top: 10, right: 15, left: 15, bottom: 5 }}>

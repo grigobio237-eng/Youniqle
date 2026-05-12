@@ -506,7 +506,7 @@ const ArchiveContent = () => {
   const activeTopic = topics.find(t => t.id === selectedTopic) || subTopics.find(t => t.id === selectedSubTopic);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 md:px-0 space-y-24 pb-32">
+    <div className="max-w-4xl mx-auto py-4 md:py-8 px-4 md:px-0 space-y-8 md:space-y-24 pb-20 md:pb-32">
       {/* Intro Hero Section */}
       <motion.section 
         initial={{ opacity: 0, y: 30 }}
@@ -526,27 +526,29 @@ const ArchiveContent = () => {
           우리는 브로커가 아니라, 사용자의 불안을 해소하고 회복하는 시스템입니다.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-6 pt-12">
+        <div className="grid md:grid-cols-3 gap-2.5 md:gap-6 pt-6 md:pt-12">
           {topics.map((card, i) => (
             <motion.div 
               key={i}
               whileHover={{ y: -5 }}
               onClick={() => card.id && setSelectedTopic(card.id)}
-              className={`p-8 rounded-[32px] border text-left space-y-4 transition-all group relative overflow-hidden ${
+              className={`px-4 py-3 md:p-8 rounded-[16px] md:rounded-[32px] border text-left transition-all group relative overflow-hidden ${
                 card.id 
-                  ? 'bg-white border-chapter-accent shadow-lg shadow-chapter-accent/5 cursor-pointer hover:border-chapter-accent' 
+                  ? 'bg-white border-chapter-accent shadow-sm shadow-chapter-accent/5 cursor-pointer hover:border-chapter-accent' 
                   : 'bg-mist/30 border-line shadow-sm'
               }`}
             >
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${
-                card.id ? 'bg-chapter-accent text-white border-chapter-accent' : 'bg-white text-obsidian border-line shadow-sm'
-              }`}>
-                <card.icon className="w-6 h-6" />
-              </div>
-              
-              <div className="space-y-1">
-                <h3 className="text-xl font-black text-obsidian">{card.title}</h3>
-                <p className="text-sm text-slate/70 font-medium leading-relaxed">
+              <div className="flex flex-col md:space-y-4">
+                <div className="flex items-center gap-2.5 mb-1.5 md:mb-0">
+                  <div className={`w-7 h-7 md:w-12 md:h-12 rounded-lg md:rounded-2xl flex items-center justify-center border shrink-0 transition-all ${
+                    card.id ? 'bg-chapter-accent text-white border-chapter-accent' : 'bg-white text-obsidian border-line shadow-sm'
+                  }`}>
+                    <card.icon className="w-3.5 h-3.5 md:w-6 md:h-6" />
+                  </div>
+                  <h3 className="text-[15px] md:text-xl font-black text-obsidian tracking-tight">{card.title}</h3>
+                </div>
+                
+                <p className="text-[11px] md:text-sm text-slate/70 font-medium leading-snug md:leading-relaxed">
                   {card.desc}
                 </p>
               </div>
@@ -598,7 +600,7 @@ const ArchiveContent = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="px-12 py-10 bg-mist/30 border-b border-line flex items-start justify-between shrink-0">
+              <div className="px-6 py-5 md:px-12 md:py-10 bg-mist/30 border-b border-line flex items-start justify-between shrink-0">
                 <div className="space-y-2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest">
                     {activeTopic.icon && <activeTopic.icon className="w-3 h-3" />} Navigator Deep Dive
@@ -620,14 +622,14 @@ const ArchiveContent = () => {
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-12 custom-scrollbar space-y-12">
-                <p className="text-xl md:text-2xl font-serif text-slate/80 leading-relaxed italic border-l-4 border-chapter-accent pl-8">
+              <div className="flex-1 overflow-y-auto p-6 md:p-12 custom-scrollbar space-y-6 md:space-y-12">
+                <p className="text-xl md:text-2xl font-serif text-slate/80 leading-relaxed italic border-l-4 border-chapter-accent pl-4 md:pl-8">
                   &quot;{activeTopic.details.intro}&quot;
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid md:grid-cols-2 gap-4 md:gap-8">
                   {activeTopic.details.points.map((point, i) => (
-                    <div key={i} className="p-8 rounded-[40px] bg-mist/20 border border-line space-y-6 group hover:bg-white hover:shadow-xl transition-all">
+                    <div key={i} className="p-5 md:p-8 rounded-[24px] md:rounded-[40px] bg-mist/20 border border-line space-y-4 md:space-y-6 group hover:bg-white hover:shadow-xl transition-all">
                       <div className="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-chapter-accent group-hover:scale-110 transition-transform">
                          {/* @ts-ignore */}
                         <point.icon className="w-7 h-7" />
@@ -648,7 +650,7 @@ const ArchiveContent = () => {
                 </div>
 
                 {/* Final Summary Box in Modal */}
-                <div className="p-12 rounded-[48px] bg-obsidian text-white space-y-6 shadow-2xl relative overflow-hidden">
+                <div className="p-6 md:p-12 rounded-[24px] md:rounded-[48px] bg-obsidian text-white space-y-4 md:space-y-6 shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-12 text-white/5 pointer-events-none">
                     <HelpCircle className="w-40 h-40" />
                   </div>
@@ -666,10 +668,10 @@ const ArchiveContent = () => {
       </AnimatePresence>
 
       {/* 4-Step Guide Section */}
-      <section className="space-y-16">
-        <div className="space-y-4 text-center">
-          <h3 className="text-xs font-black text-obsidian tracking-[0.3em] uppercase opacity-30">Sales Master Guide</h3>
-          <h2 className="text-3xl font-serif text-obsidian">영업 자료의 4단계 구성 (초보자용)</h2>
+      <section className="space-y-4 md:space-y-16">
+        <div className="space-y-1.5 md:space-y-4 text-center">
+          <h3 className="text-[10px] md:text-xs font-black text-obsidian tracking-[0.3em] uppercase opacity-30">Sales Master Guide</h3>
+          <h2 className="text-xl md:text-3xl font-serif text-obsidian">영업 자료의 4단계 구성 (초보자용)</h2>
         </div>
 
         <motion.div 
@@ -677,16 +679,16 @@ const ArchiveContent = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="space-y-12"
+          className="space-y-4 md:space-y-12"
         >
           {/* Step 1 */}
-          <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-8 items-center bg-white border border-line p-10 rounded-[40px] shadow-sm hover:shadow-xl transition-all">
-             <div className="md:col-span-1 text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">01</div>
-             <div className="md:col-span-5 space-y-4">
-                <h4 className="text-2xl font-black text-obsidian tracking-tight">"사람들은 왜 무서워할까요?"</h4>
-                <p className="text-sm text-slate/60 font-medium">고객의 마음을 열기 위해 가장 먼저 알아야 할 '불편한 진실' (문제 정의)</p>
+          <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-4 md:gap-8 items-center bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm hover:shadow-xl transition-all">
+             <div className="md:col-span-1 text-4xl md:text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">01</div>
+             <div className="md:col-span-5 space-y-2 md:space-y-4">
+                <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"사람들은 왜 무서워할까요?"</h4>
+                <p className="text-xs md:text-sm text-slate/60 font-medium">고객의 마음을 열기 위해 가장 먼저 알아야 할 '불편한 진실' (문제 정의)</p>
              </div>
-             <div className="md:col-span-6 grid grid-cols-1 gap-4">
+             <div className="md:col-span-6 grid grid-cols-1 gap-3 md:gap-4 mt-2 md:mt-0">
                 {[
                   { id: 'info-barrier', label: "정보의 장벽", sub: "내게 맞는 곳이 어디인지, 상담이 진짜인지 구분하기 힘듦" },
                   { id: 'post-care-gap', label: "사후관리 공백", sub: "시술 후 통증/붓기가 생겨도 물어볼 곳이 없어 불안함" },
@@ -718,11 +720,11 @@ const ArchiveContent = () => {
           </motion.div>
 
           {/* Step 2 */}
-          <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-8 items-center bg-white border border-line p-10 rounded-[40px] shadow-sm hover:shadow-xl transition-all">
-             <div className="md:col-span-1 text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">02</div>
-             <div className="md:col-span-5 space-y-4">
-                <h4 className="text-2xl font-black text-obsidian tracking-tight">"유니클은 이렇게 해결합니다"</h4>
-                <p className="text-sm text-slate/60 font-medium">우리가 가진 무기(기술)를 아주 쉽게 설명하기 (해결책)</p>
+          <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-4 md:gap-8 items-center bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm hover:shadow-xl transition-all">
+             <div className="md:col-span-1 text-4xl md:text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">02</div>
+             <div className="md:col-span-5 space-y-2 md:space-y-4">
+                <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"유니클은 이렇게 해결합니다"</h4>
+                <p className="text-xs md:text-sm text-slate/60 font-medium">우리가 가진 무기(기술)를 아주 쉽게 설명하기 (해결책)</p>
              </div>
              <div className="md:col-span-6 grid grid-cols-1 gap-4">
                 {[
@@ -758,38 +760,40 @@ const ArchiveContent = () => {
           </motion.div>
 
           {/* Step 3 */}
-          <motion.div variants={item} className="bg-white border border-line p-10 rounded-[40px] shadow-sm space-y-8">
+          <motion.div variants={item} className="bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm space-y-4 md:space-y-8">
              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-5xl font-serif italic text-line">03</div>
-                  <h4 className="text-2xl font-black text-obsidian tracking-tight">"상대방에 따라 다르게 말해요"</h4>
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="text-4xl md:text-5xl font-serif italic text-line">03</div>
+                  <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"상대방에 따라 다르게 말해요"</h4>
                 </div>
                 <div className="px-4 py-1.5 rounded-full bg-mist text-[10px] font-black uppercase text-slate/60 tracking-widest">맞춤형 화법</div>
              </div>
-             <div className="grid md:grid-cols-3 gap-6">
+             <div className="grid md:grid-cols-3 gap-3 md:gap-6">
                 {[
                   { type: "일반 유저", text: "병원은 치료만 하지만, 우리는 당신이 다시 웃을 때까지 '회복'을 완성해 드립니다.", icon: MessageSquare },
                   { type: "줄기세포 VIP", text: "비싼 시술을 받으셨으니, 효과를 200%로 만드는 '프리미엄 회복 관리'가 필요합니다.", icon: Zap },
                   { type: "해외 유저", text: "비행기 타고 돌아가셔도 끝이 아닙니다. 원격 시스템이 당신을 끝까지 보호합니다.", icon: Plane }
                 ].map((pitch, k) => (
-                  <div key={k} className="p-6 rounded-3xl bg-mist/10 border border-line/40 space-y-4">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-obsidian border border-line">
-                      <pitch.icon className="w-5 h-5" />
+                  <div key={k} className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-mist/10 border border-line/40 space-y-2 md:space-y-4">
+                    <div className="flex items-center gap-3 mb-1 md:mb-0">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white flex items-center justify-center text-obsidian border border-line shrink-0">
+                        <pitch.icon className="w-4 h-4 md:w-5 md:h-5" />
+                      </div>
+                      <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">{pitch.type}</p>
                     </div>
-                    <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">{pitch.type}</p>
-                    <p className="text-sm text-obsidian/80 font-bold leading-relaxed italic">&quot;{pitch.text}&quot;</p>
+                    <p className="text-[11px] md:text-sm text-obsidian/80 font-bold leading-relaxed italic">&quot;{pitch.text}&quot;</p>
                   </div>
                 ))}
              </div>
           </motion.div>
 
           {/* Step 4 */}
-          <motion.div variants={item} className="bg-obsidian p-10 rounded-[40px] shadow-2xl text-white space-y-8">
-             <div className="flex items-center gap-4">
-                <div className="text-5xl font-serif italic text-white/10">04</div>
-                <h4 className="text-2xl font-black tracking-tight">"우리는 병원과 싸우지 않아요"</h4>
+          <motion.div variants={item} className="bg-obsidian p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-2xl text-white space-y-4 md:space-y-8">
+             <div className="flex items-center gap-3 md:gap-4">
+                <div className="text-4xl md:text-5xl font-serif italic text-white/10">04</div>
+                <h4 className="text-xl md:text-2xl font-black tracking-tight">"우리는 병원과 싸우지 않아요"</h4>
              </div>
-             <div className="grid md:grid-cols-2 gap-8">
+             <div className="grid md:grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-4 border-l-2 border-chapter-accent/40 pl-6">
                    <h5 className="text-[10px] font-black uppercase text-mist/70 tracking-[0.2em]">기존 매출 불가침</h5>
                    <p className="text-lg font-bold">"원장님의 진료 수익은 건드리지 않습니다. 우리는 새로 만든 '비의료 가치'만 나눕니다."</p>
@@ -808,32 +812,30 @@ const ArchiveContent = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        className="relative overflow-hidden bg-chapter-accent p-12 md:p-20 rounded-[48px] text-white text-center space-y-8"
+        className="relative z-10 w-full"
       >
-        <div className="absolute top-0 right-0 p-8 text-white/5">
-           <Quote className="w-40 h-40 transform rotate-180" />
-        </div>
-        
-        <div className="space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em]">
-            <Lightbulb className="w-4 h-4 text-mist" />
-             The Magic Sentence
-          </div>
-          <h2 className="text-2xl md:text-3xl font-serif leading-snug">
-            초보 네비게이터를 위한 '필살' 문장
-          </h2>
-          <div className="max-w-3xl mx-auto pt-8">
-             <div className="p-8 md:p-12 rounded-[32px] bg-white text-obsidian shadow-2xl space-y-6">
-                <p className="text-xl md:text-2xl font-black leading-relaxed">
-                  "고객님, 어디서 시술받을지 고민하시죠? <br className="hidden md:block" />
-                  하지만 진짜 중요한 건 <span className="text-primary font-bold text-glow-cream">'누가 내 회복을 끝까지 책임져 주는가'</span>입니다. <br className="hidden md:block" />
-                  유니클이 당신의 회복을 설계하고 보호하겠습니다."
-                </p>
-                <div className="pt-4">
-                  <span className="text-xs font-bold text-slate/40 italic">이 한 문장이 고객의 마음을 절반은 열어줄 것입니다.</span>
+        <div className="max-w-3xl mx-auto">
+           <div className="p-6 md:p-12 rounded-[24px] md:rounded-[40px] bg-white text-obsidian shadow-2xl border border-line/50 space-y-4 md:space-y-6 text-center relative overflow-hidden">
+              <div className="relative z-10 flex flex-col items-center justify-center space-y-3 md:space-y-4 mb-4 md:mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-[0.2em]">
+                  <Lightbulb className="w-3 h-3 md:w-4 md:h-4 text-chapter-accent" />
+                   The Magic Sentence
                 </div>
-             </div>
-          </div>
+                <h2 className="text-xl md:text-3xl font-serif leading-snug">
+                  초보 네비게이터를 위한 '필살' 문장
+                </h2>
+              </div>
+
+              <p className="text-[15px] md:text-2xl font-black leading-relaxed relative z-10">
+                "고객님, 어디서 시술받을지 고민하시죠? <br className="hidden md:block" />
+                하지만 진짜 중요한 건 <span className="text-chapter-accent font-bold">'누가 내 회복을 끝까지 책임져 주는가'</span>입니다. <br className="hidden md:block" />
+                유니클이 당신의 회복을 설계하고 보호하겠습니다."
+              </p>
+              
+              <div className="pt-2 md:pt-4 relative z-10">
+                <span className="text-[10px] md:text-xs font-bold text-slate/40 italic">이 한 문장이 고객의 마음을 절반은 열어줄 것입니다.</span>
+              </div>
+           </div>
         </div>
       </motion.section>
 
