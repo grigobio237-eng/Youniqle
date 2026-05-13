@@ -10,9 +10,13 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { AccessControl } from "@/lib/logic/access-control";
 import MembershipUpsellDialog from "@/components/auth/MembershipUpsellDialog";
+import { useRecovery } from "@/contexts/RecoveryContext";
+import { useRouter } from "next/navigation";
 
 export default function ConsultationPage() {
+  const router = useRouter();
   const { data: session } = useSession();
+  const { resetJourney } = useRecovery();
   const [loading, setLoading] = useState(true);
   const [recentReport, setRecentReport] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
@@ -23,17 +27,21 @@ export default function ConsultationPage() {
   const isLocked = userTier !== 'RESTART' && userTier !== 'BLACK';
 
   useEffect(() => {
-    if (searchParams && searchParams.get('action') === 'new' && !isLocked) {
-      setShowForm(true);
-    }
-  }, [searchParams, isLocked]);
-
-  useEffect(() => {
     const checkExisting = async () => {
+      const action = searchParams?.get('action');
+      
+      // 새로 작성하기(action=new)인 경우 데이터 조회를 기다리지 않고 즉시 폼 노출
+      if (action === 'new' && !isLocked) {
+        resetJourney();
+        setShowForm(true);
+        setLoading(false);
+      }
+
       if (!session?.user?.email) {
         setLoading(false);
         return;
       }
+      
       try {
         const res = await fetch('/api/user/status');
         const data = await res.json();
@@ -43,11 +51,14 @@ export default function ConsultationPage() {
       } catch (err) {
         console.error("Failed to fetch user status:", err);
       } finally {
-        setLoading(false);
+        // action=new가 아닌 경우에만 조회가 끝난 후 로딩 해제
+        if (action !== 'new') {
+          setLoading(false);
+        }
       }
     };
     checkExisting();
-  }, [session]);
+  }, [session, searchParams, isLocked]);
 
   if (loading) {
     return (
@@ -60,8 +71,7 @@ export default function ConsultationPage() {
 
   return (
     <div className="min-h-screen bg-mist">
-      <Header />
-      <main className="pt-32 pb-20">
+      <div className="pt-4 md:pt-8 pb-20">
         <AnimatePresence mode="wait">
           {!showForm ? (
             <motion.div 
@@ -111,6 +121,7 @@ export default function ConsultationPage() {
                         if (isLocked) {
                           setShowUpsell(true);
                         } else {
+                          resetJourney();
                           setShowForm(true);
                         }
                       }} 
@@ -149,6 +160,7 @@ export default function ConsultationPage() {
                         if (isLocked) {
                           setShowUpsell(true);
                         } else {
+                          resetJourney();
                           setShowForm(true);
                         }
                       }} 
@@ -180,8 +192,14 @@ export default function ConsultationPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <div className="container mx-auto px-4 max-w-4xl mb-10 flex justify-between items-center">
-                 <Button variant="ghost" onClick={() => setShowForm(false)} className="text-slate font-bold hover:text-primary">
+              <div className="container mx-auto px-4 max-w-4xl mb-4 md:mb-10 flex justify-between items-center">
+                 <Button variant="ghost" onClick={() => {
+                    if (searchParams?.get('action') === 'new') {
+                      router.back();
+                    } else {
+                      setShowForm(false);
+                    }
+                  }} className="text-slate font-bold hover:text-primary px-0">
                     <ArrowRight className="w-5 h-5 mr-1 rotate-180" /> 돌아가기
                  </Button>
                  <div className="text-[10px] font-black text-slate uppercase tracking-[0.5em] opacity-40">Section: Detailed Analysis</div>
@@ -190,7 +208,7 @@ export default function ConsultationPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </div>
 
       <MembershipUpsellDialog 
         open={showUpsell} 

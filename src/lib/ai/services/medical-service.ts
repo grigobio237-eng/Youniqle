@@ -99,7 +99,14 @@ export class MedicalService {
     }
 
     static async analyzeSymptom(symptom: string): Promise<{ category: string; reason: string }> {
-        const prompt = `증상("${symptom}")에 맞는 진료 분야(ORTHOPEDIC, INTERNAL, PLASTIC, GENERAL)를 추천하세요. JSON {category, reason}`;
+        const prompt = `증상("${symptom}")에 가장 적합한 유니클 진료 분야(ORTHOPEDIC, INTERNAL, PLASTIC, ORIENTAL, DENTAL, GENERAL)를 추천하세요. 
+        - ORTHOPEDIC: 정형/재활 (통증, 관절)
+        - INTERNAL: 내과/검진 (질환, 건강검진)
+        - PLASTIC: 성형/피부 (미용, 시술)
+        - ORIENTAL: 한방 진료 (보약, 침, 체질)
+        - DENTAL: 치과 (치아, 잇몸)
+        - GENERAL: 일반 (그 외 기본 증상)
+        응답은 JSON {category: "코드", reason: "이유"} 형식으로 하세요.`;
         try {
             const text = await GeminiCore.generateWithFallback(prompt);
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -111,5 +118,70 @@ export class MedicalService {
     static async generateRecoveryAdvice(input: any): Promise<string> {
         const prompt = `환자의 실시간 데이터 분석 리포트를 작성하세요. 데이터: ${JSON.stringify(input)}`;
         return await GeminiCore.generateWithFallback(prompt, "AI 회복 어드바이저 모드", 0.6);
+    }
+
+    static async generateDynamicQuestions(symptom: string, category: string): Promise<any> {
+        const prompt = `
+        사용자의 증상("${symptom}")과 진료 분야("${category}")를 바탕으로 최적화된 유니클(YOUNIQLE) 맞춤형 문진 질문 세트를 생성하세요.
+        유니클의 톤앤매너(프리미엄, 전문적, 따뜻함)를 유지하세요.
+
+        [응답 형식: JSON]
+        {
+          "steps": {
+            "step1": {
+              "title": "문자열",
+              "sub": "문자열",
+              "label": "문자열 (주요 변화/기대치 관련 질문)",
+              "options": [
+                { "label": "옵션1", "value": "값1" },
+                { "label": "옵션2", "value": "값2" },
+                { "label": "옵션3", "value": "값3" }
+              ],
+              "eventLabel": "문자열 (일정 관련)",
+              "eventSub": "문자열",
+              "eventPlaceholder": "문자열"
+            },
+            "step2": {
+              "title": "문자열",
+              "sub": "문자열",
+              "label": "문자열 (과거 경험 관련)",
+              "subLabel": "문자열",
+              "placeholder": "문자열"
+            },
+            "step3": {
+              "title": "문자열",
+              "sub": "문자열",
+              "label": "문자열 (우려 사항 관련)",
+              "options": [
+                { "id": "id1", "label": "우려1", "value": "값1" },
+                { "id": "id2", "label": "우려2", "value": "값2" }
+              ]
+            },
+            "step4": {
+              "title": "문자열",
+              "sub": "문자열",
+              "label": "문자열 (동행/편의 관련)",
+              "placeholder": "문자열",
+              "transportLabel": "문자열"
+            },
+            "step5": {
+              "title": "문자열",
+              "sub": "문자열",
+              "label": "문자열 (투자/예산 관련)",
+              "type": "budget 또는 text",
+              "placeholder": "문자열"
+            }
+          }
+        }
+        `;
+
+        try {
+            const text = await GeminiCore.generateWithFallback(prompt, "유니클 문진 설계 전문가 모드", 0.7);
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) return JSON.parse(jsonMatch[0]);
+        } catch (error) {
+            console.error('Failed to generate dynamic questions:', error);
+        }
+        return null;
     }
 }

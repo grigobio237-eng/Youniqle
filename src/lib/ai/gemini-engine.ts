@@ -30,6 +30,7 @@ export class GeminiAIEngine {
     static generatePostCareRoadmap = MedicalService.generatePostCareRoadmap;
     static analyzeSymptom = MedicalService.analyzeSymptom;
     static generateRecoveryAdvice = MedicalService.generateRecoveryAdvice;
+    static generateDynamicQuestions = MedicalService.generateDynamicQuestions;
     
     static async generateRecoveryChatResponse(message: string, context: any) {
         return MedicalService.generateRecoveryAdvice({ message, context });

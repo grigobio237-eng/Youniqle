@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type JourneyType = 'WELLNESS' | 'CLINICAL_PRE' | 'CLINICAL_POST' | null;
-export type MedicalCategory = 'PLASTIC' | 'ORTHOPEDIC' | 'INTERNAL' | 'GENERAL' | null;
+export type MedicalCategory = 'PLASTIC' | 'ORTHOPEDIC' | 'INTERNAL' | 'GENERAL' | 'DENTAL' | 'ORIENTAL' | null;
 export type TreatmentType = 'PROCEDURE' | 'SURGERY' | null;
 
 interface RecoveryContextType {

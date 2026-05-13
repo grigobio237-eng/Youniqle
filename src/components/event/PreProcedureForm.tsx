@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
-import { Loader2, Search, Stethoscope, Activity, Heart, ShieldCheck, Sparkles } from "lucide-react";
+import { Loader2, Search, Stethoscope, Activity, Heart, ShieldCheck, Sparkles, Smile, Leaf } from "lucide-react";
 import { useRecovery } from "@/contexts/RecoveryContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,7 +18,10 @@ export default function PreProcedureForm() {
   const router = useRouter();
   const { addToast } = useToast();
   const { medicalCategory, setMedicalCategory } = useRecovery();
-  const [step, setStep] = useState(medicalCategory ? 1 : 0);
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const isNewAction = searchParams?.get('action') === 'new';
+  
+  const [step, setStep] = useState(isNewAction ? 0 : (medicalCategory ? 1 : 0));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [symptomText, setSymptomText] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -28,8 +31,14 @@ export default function PreProcedureForm() {
   useEffect(() => {
     const checkAutoAnalyze = async () => {
       const searchParams = new URLSearchParams(window.location.search);
-      if (searchParams.get('action') === 'new' && !medicalCategory && step === 0) {
-        setIsAutoAnalyzing(true);
+      const isNewAction = searchParams.get('action') === 'new';
+
+      if (isNewAction) {
+        setStep(0);
+        setMedicalCategory(null);
+      }
+
+      if (isNewAction && step === 0) {
         try {
           // 1. Fetch user status to get latest insights
           const res = await fetch('/api/user/status');
@@ -44,14 +53,9 @@ export default function PreProcedureForm() {
 
           if (contextSymptom) {
             setSymptomText(contextSymptom);
-            // Wait for state update or just pass directly
-            await performAutoAnalysis(contextSymptom);
-          } else {
-            setIsAutoAnalyzing(false);
           }
         } catch (err) {
           console.error("Auto Analysis Failed:", err);
-          setIsAutoAnalyzing(false);
         }
       }
     };
@@ -500,7 +504,7 @@ export default function PreProcedureForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4">
+    <div className="max-w-3xl mx-auto py-4 md:py-10 px-4">
       <Card className="border-none shadow-2xl bg-surface/80 backdrop-blur-xl rounded-[32px] overflow-hidden">
         <div className={`h-2 bg-primary transition-all duration-500 ${getProgressWidth()}`} />
         {step === 0 ? (
@@ -569,50 +573,30 @@ export default function PreProcedureForm() {
               </div>
             </div>
 
-            {/* Quick Category Selection */}
+            {/* Compact Category Selection */}
             <div className="space-y-4">
-              <p className="text-xs font-black text-text-secondary uppercase tracking-widest text-center">직접 분야 선택하기</p>
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => handleCategorySelect('ORTHOPEDIC')}
-                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
-                >
-                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Activity className="w-6 h-6 text-blue-500" />
-                  </div>
-                  <h4 className="font-black text-lg mb-1">정형/재활</h4>
-                  <p className="text-xs text-text-secondary font-medium">통증 관리 및 관절 회복</p>
-                </button>
-                <button 
-                  onClick={() => handleCategorySelect('PLASTIC')}
-                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
-                >
-                  <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Heart className="w-6 h-6 text-pink-500" />
-                  </div>
-                  <h4 className="font-black text-lg mb-1">성형/피부</h4>
-                  <p className="text-xs text-text-secondary font-medium">미적 개선 및 시술 케어</p>
-                </button>
-                <button 
-                  onClick={() => handleCategorySelect('INTERNAL')}
-                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
-                >
-                  <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Stethoscope className="w-6 h-6 text-green-500" />
-                  </div>
-                  <h4 className="font-black text-lg mb-1">내과/검진</h4>
-                  <p className="text-xs text-text-secondary font-medium">건강 지표 및 질환 관리</p>
-                </button>
-                <button 
-                  onClick={() => handleCategorySelect('GENERAL')}
-                  className="p-6 bg-white border border-line rounded-3xl hover:border-primary hover:shadow-xl transition-all group text-left"
-                >
-                  <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <ShieldCheck className="w-6 h-6 text-slate-500" />
-                  </div>
-                  <h4 className="font-black text-lg mb-1">일반 진료</h4>
-                  <p className="text-xs text-text-secondary font-medium">기타 신체 회복 및 상담</p>
-                </button>
+              <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.3em] text-center opacity-60">직접 분야 선택하기</p>
+              <div className="grid grid-cols-3 gap-3 md:gap-4">
+                {[
+                  { id: 'PLASTIC', label: '성형/피부', sub: '미적 개선', icon: <Heart className="w-5 h-5 text-pink-500" />, bg: 'bg-pink-50' },
+                  { id: 'ORIENTAL', label: '한방 진료', sub: '체질 회복', icon: <Leaf className="w-5 h-5 text-emerald-500" />, bg: 'bg-emerald-50' },
+                  { id: 'DENTAL', label: '치과', sub: '치아/구강', icon: <Smile className="w-5 h-5 text-amber-500" />, bg: 'bg-amber-50' },
+                  { id: 'ORTHOPEDIC', label: '정형/재활', sub: '통증/관절', icon: <Activity className="w-5 h-5 text-blue-500" />, bg: 'bg-blue-50' },
+                  { id: 'INTERNAL', label: '내과/검진', sub: '건강 관리', icon: <Stethoscope className="w-5 h-5 text-indigo-500" />, bg: 'bg-indigo-50' },
+                  { id: 'GENERAL', label: '일반 진료', sub: '기본 상담', icon: <ShieldCheck className="w-5 h-5 text-slate-500" />, bg: 'bg-slate-50' },
+                ].map((cat) => (
+                  <button 
+                    key={cat.id}
+                    onClick={() => handleCategorySelect(cat.id as any)}
+                    className="flex flex-col items-center justify-center p-3 md:p-6 bg-white border border-line rounded-2xl md:rounded-3xl hover:border-primary hover:shadow-lg transition-all group text-center"
+                  >
+                    <div className={`w-10 h-10 md:w-12 md:h-12 ${cat.bg} rounded-xl md:rounded-2xl flex items-center justify-center mb-2 md:mb-4 group-hover:scale-110 transition-transform`}>
+                      {cat.icon}
+                    </div>
+                    <h4 className="font-black text-[11px] md:text-lg mb-0.5 whitespace-nowrap">{cat.label}</h4>
+                    <p className="hidden md:block text-[10px] text-text-secondary font-medium">{cat.sub}</p>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
