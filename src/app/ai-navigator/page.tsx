@@ -332,7 +332,7 @@ export default function AiNavigatorPage() {
                                     <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
                                         AI Recovery Navigator
                                     </div>
-                                    <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">리듬체크</h1>
+                                    <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">오늘 리듬체크</h1>
                                     <React.Suspense fallback={<div className="h-10 w-40 bg-mist animate-pulse rounded-full" />}>
                                         <EnvironmentalStatus />
                                     </React.Suspense>
@@ -411,7 +411,7 @@ export default function AiNavigatorPage() {
                                             <React.Suspense fallback={<div className="h-48 w-full bg-mist animate-pulse rounded-3xl" />}>
                                                 <DailySmallActions score={
                                                     categoryScores && Object.values(categoryScores).length > 0 
-                                                        ? Math.round(Object.values(categoryScores).reduce((a: any, b: any) => a + b, 0) / Object.values(categoryScores).length)
+                                                        ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
                                                         : 50
                                                 } />
                                             </React.Suspense>
@@ -468,10 +468,10 @@ export default function AiNavigatorPage() {
                                                     <h3 className="text-2xl font-black text-text-primary">심층 진단이 필요합니다</h3>
                                                     <div className="flex flex-col sm:flex-row justify-center gap-3">
                                                         <Button asChild className="h-12 bg-primary text-background font-black rounded-xl px-6">
-                                                            <Link href="/diagnosis?type=free">간단유형 확인</Link>
+                                                            <Link href="/diagnosis?type=free">간단유형 확인하기 (단순)</Link>
                                                         </Button>
                                                         <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" className="h-12 border-2 border-line rounded-xl px-6 font-black">
-                                                            심층유형 확인
+                                                            심층유형 확인하기 (정밀)
                                                         </Button>
                                                     </div>
                                                 </CardContent>
@@ -479,7 +479,7 @@ export default function AiNavigatorPage() {
                                         )}
                                     </div>
                                     <div className="grid grid-cols-1 gap-6">
-                                        <Card className="bg-white border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-md cursor-pointer group" onClick={() => router.push('/diagnosis/report')}>
+                                        <Card className="bg-white border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-md cursor-pointer group" onClick={() => router.push('/diagnosis/report?type=personality')}>
                                             <CardContent className="p-8 flex items-center justify-between gap-6">
                                                 <div className="flex-1 space-y-3">
                                                     <Badge className="bg-chapter-accent text-mist text-[10px] font-black uppercase tracking-widest">Premium Report</Badge>

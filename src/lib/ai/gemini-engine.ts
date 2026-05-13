@@ -18,6 +18,7 @@ export class GeminiAIEngine {
 
     // Routine & Check-in Services
     static generateDailyCheckInQuestion = RoutineService.generateDailyCheckInQuestion;
+    static generateDailyQuestions = RoutineService.generateDailyQuestions;
     static generateDailyRoutines = RoutineService.generateDailyRoutines;
     static generateNavigatorAdvice = RoutineService.generateNavigatorAdvice;
     static paraphrasePrecisionQuestions = RoutineService.paraphrasePrecisionQuestions;

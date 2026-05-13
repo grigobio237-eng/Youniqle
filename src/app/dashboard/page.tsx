@@ -175,7 +175,7 @@ export default function DashboardPage() {
               }}
               className="w-full py-8 bg-primary text-white rounded-full font-bold text-2xl tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 group"
             >
-              회복 리듬 체크 시작하기
+              오늘의 회복 리듬 측정 시작하기
               <ArrowRight className="w-8 h-8 group-hover:translate-x-1.5 transition-transform" />
             </button>
             

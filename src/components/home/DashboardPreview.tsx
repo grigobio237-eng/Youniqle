@@ -287,7 +287,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       <Dialog open={showDiagnosisModal} onOpenChange={setShowDiagnosisModal}>
         <DialogContent className="max-w-xl p-0 overflow-hidden border-none rounded-5xl shadow-2xl bg-background">
           <DialogHeader className="sr-only">
-            <DialogTitle>오늘의 리듬체크</DialogTitle>
+            <DialogTitle>오늘의 회복 리듬 측정</DialogTitle>
             <DialogDescription>따뜻한 관심으로 설계하는 당신만의 일상 리듬</DialogDescription>
           </DialogHeader>
           <DiagnosisForm questions={diagnosisQuestions} onComplete={handleDiagnosisComplete} />

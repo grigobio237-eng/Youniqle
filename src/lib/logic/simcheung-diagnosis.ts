@@ -287,7 +287,7 @@ export class SimcheungDiagnosisEngine {
     }
 
     static mapPaidToStandard(tScores: { domains: Record<string, number> }): { physical: number; mental: number; sleep: number; lifestyle: number } {
-        const t = tScores.domains;
+        const t = tScores?.domains || {};
         // Logic must match /api/diagnosis/save/route.ts
         return {
             physical: t.E || 50, // Extraversion -> Activity

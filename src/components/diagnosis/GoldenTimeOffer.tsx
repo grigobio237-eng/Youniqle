@@ -180,10 +180,10 @@ export function GoldenTimeOffer({ script, userName = '회원', gender, mood }: G
 
                         <button
                             onClick={handlePlay}
-                            disabled={isLoading}
-                            className="relative w-24 h-24 md:w-32 md:h-32 rounded-full bg-white border-4 border-emerald-500/30 flex items-center justify-center group hover:scale-105 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] z-20"
+                            disabled={isLoading || script === "YOUNIQLE_LOADING"}
+                            className={`relative w-24 h-24 md:w-32 md:h-32 rounded-full bg-white border-4 border-emerald-500/30 flex items-center justify-center group hover:scale-105 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] z-20 ${script === "YOUNIQLE_LOADING" ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            {isLoading ? (
+                            {isLoading || script === "YOUNIQLE_LOADING" ? (
                                 <Loader2 className="w-12 h-12 text-emerald-600 animate-spin" />
                             ) : isPlaying ? (
                                 <Pause className="w-12 h-12 text-emerald-600 fill-current" />
@@ -195,7 +195,7 @@ export function GoldenTimeOffer({ script, userName = '회원', gender, mood }: G
                         {!isPlaying && !isLoading && (
                             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap z-20">
                                 <span className="text-sm font-black text-white drop-shadow-lg animate-bounce block bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
-                                    {script === "AI_LOADING" ? "Preparing..." : "Click to Listen"}
+                                    {script === "YOUNIQLE_LOADING" ? "Preparing..." : "Click to Listen"}
                                 </span>
                             </div>
                         )}

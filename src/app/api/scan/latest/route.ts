@@ -1,0 +1,34 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import connectDB from '@/lib/db';
+import User from '@/models/User';
+
+export async function GET(request: NextRequest) {
+    try {
+        await connectDB();
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const user = await User.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        const scanTimeline = user.scanTimeline || [];
+
+        // Find latest scan
+        const latestScan = scanTimeline.length > 0 
+            ? [...scanTimeline].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] 
+            : null;
+
+        return NextResponse.json(latestScan);
+
+    } catch (error: any) {
+        console.error('Latest Scan Fetch Error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}

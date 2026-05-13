@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
             missions: [
                 {
                     id: 'rhythm_check',
-                    text: '오늘의 60초 리듬체크 완료하기',
+                    text: '오늘의 회복 리듬 측정 완료하기',
                     isCompleted: !!hasDiagnosis,
                     href: '/diagnosis?type=daily'
                 },

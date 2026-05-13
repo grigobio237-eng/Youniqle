@@ -151,7 +151,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
             </h1>
             <p className="text-lg md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl">
               {/* {personalMsg.desc} */}
-              오늘의 나를 마주하는 가장 스마트한 방법, 유니클 스캔을 시작하세요.
+              오늘의 나를 마주하는 가장 스마트한 방법, 60초 리듬체크를 시작하세요.
             </p>
           </div>
 
@@ -193,7 +193,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 className="w-full md:w-auto px-12 h-20 text-xl font-bold rounded-full shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 bg-primary text-white"
               >
                 <Sparkles className="w-6 h-6 mr-3" />
-                <span>오늘의 나를 보살펴주기</span>
+                <span>60초 리듬체크 시작하기</span>
               </Button>
 
               <Button

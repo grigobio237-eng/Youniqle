@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Dumbbell, Utensils, Brain, Moon, Loader2 } from 'lucide-react';
-import { ProductConciergeCard } from './ProductConciergeCard';
-import { ProductRequestModal } from './ProductRequestModal';
 
 interface AISolutionSectionProps {
     diagnosisResult: any; // Using any for flexibility with backend response structure
@@ -50,32 +48,21 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                        className="bg-white rounded-[24px] md:rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
                     >
-                        <div className={`w-12 h-12 rounded-2xl ${card.bg} ${card.color} flex items-center justify-center mb-6`}>
-                            <card.icon className="w-6 h-6" />
+                        <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0 mb-4 md:mb-6">
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl ${card.bg} ${card.color} flex items-center justify-center`}>
+                                <card.icon className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <h3 className={`text-[10px] md:text-xs font-black tracking-widest md:mt-3 ${card.color}`}>{card.title}</h3>
                         </div>
-                        <h3 className={`text-xs font-black tracking-widest mb-3 ${card.color}`}>{card.title}</h3>
-                        <div className="text-gray-700 font-medium leading-relaxed keep-all">
+                        <div className="text-gray-700 text-sm md:text-base font-medium leading-relaxed break-keep">
                             {renderContent(card.content)}
                         </div>
                     </motion.div>
                 ))}
             </div>
 
-            {solution.productConcept && (
-                <>
-                    <ProductConciergeCard
-                        productConcept={solution.productConcept}
-                        onRequestCustom={() => setIsRequestModalOpen(true)}
-                    />
-                    <ProductRequestModal
-                        open={isRequestModalOpen}
-                        onOpenChange={setIsRequestModalOpen}
-                        productConcept={solution.productConcept}
-                    />
-                </>
-            )}
         </section>
     );
 }

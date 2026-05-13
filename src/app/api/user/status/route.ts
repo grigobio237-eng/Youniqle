@@ -141,6 +141,20 @@ export async function GET(req: NextRequest) {
       totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
     };
 
+    // 7. Enhance Certificate Data with Actual Period
+    const allLogs = await RecoveryScore.find({ userId: user._id }).sort({ date: 1 }).select('date').lean();
+    const enhancedCertificates = user.issuedCertificates?.map((cert: any) => {
+      const startIndex = (cert.cycleNumber - 1) * 7;
+      const endIndex = startIndex + 6;
+      const startLog = allLogs[startIndex];
+      const endLog = allLogs[Math.min(endIndex, allLogs.length - 1)];
+      return {
+        ...cert,
+        startDate: startLog?.date,
+        endDate: endLog?.date
+      };
+    }) || [];
+
     return NextResponse.json({
       success: true,
       score: scoreData,
@@ -172,7 +186,7 @@ export async function GET(req: NextRequest) {
           }
           return null;
         })(),
-        issuedCertificates: user.issuedCertificates || []
+        issuedCertificates: enhancedCertificates
       }
     });
 

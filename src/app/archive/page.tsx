@@ -18,7 +18,9 @@ import {
   Download,
   Lock,
   ArrowRight,
-  Shield
+  Shield,
+  Award,
+  Trophy
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -48,6 +50,7 @@ export default function ArchivePage() {
   ];
 
   const [assetStats, setAssetStats] = React.useState<any>(null);
+  const [certificateStatus, setCertificateStatus] = React.useState<any>(null);
   const [userStatus, setUserStatus] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -58,6 +61,7 @@ export default function ArchivePage() {
         if (res.ok) {
           const data = await res.json();
           setAssetStats(data.assetStats);
+          setCertificateStatus(data.certificateStatus);
           setUserStatus(data.user);
         }
       } catch (err) {
@@ -73,14 +77,14 @@ export default function ArchivePage() {
   const isPremium = isAdmin || (userStatus?.grade && ['RESTART', 'BLACK'].includes(userStatus.grade.toUpperCase()));
 
   return (
-    <ChapterWrapper chapter="archive" className="container mx-auto px-4 py-20 pb-40 min-h-screen">
+    <ChapterWrapper chapter="archive" className="container mx-auto px-4 pt-8 pb-32 min-h-screen">
       {/* Header */}
-      <div className="mb-24 text-center space-y-8 max-w-3xl mx-auto">
+      <div className="mb-8 text-center space-y-6 max-w-3xl mx-auto">
         <div className="inline-flex items-center px-4 py-1.5 bg-obsidian text-white rounded-full text-[10px] font-black tracking-widest uppercase border border-white/10 shadow-xl">
           <Archive className="w-4 h-4 mr-2 text-primary" />
           Rhythm Archive
         </div>
-        <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter">보관함</h1>
+        <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter">7일 챌린지 보관함</h1>
         <p className="text-lg text-slate/60 leading-relaxed font-bold break-keep">
           완주한 7일의 여정들은 흩어지지 않고<br />
           당신의 회복 정체성을 증명하는 기록이 됩니다.
@@ -104,14 +108,14 @@ export default function ArchivePage() {
                 <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter">
                   과거의 기록이<br />잠겨있습니다
                 </h2>
-                <p className="text-white/40 text-lg font-bold leading-relaxed break-keep max-w-md mx-auto">
+                <p className="text-white/40 text-sm md:text-lg font-bold leading-relaxed break-keep max-w-md mx-auto">
                   유니클 라이프 패스로 보관함을 활성화하고,<br />
                   매주 누적되는 당신만의 회복 OS를 완성하세요.
                 </p>
               </div>
 
               <div className="pt-8 w-full max-w-sm">
-                <Button asChild className="w-full h-18 bg-primary text-obsidian rounded-[28px] font-black text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-primary/20">
+                <Button asChild className="w-full h-16 md:h-18 bg-primary text-obsidian rounded-[28px] font-black text-lg md:text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-primary/20">
                   <Link href="/membership">보관함 활성화하기</Link>
                 </Button>
               </div>
@@ -120,37 +124,35 @@ export default function ArchivePage() {
         </section>
       ) : (
         /* Premium Archive View */
-        <div className="space-y-20 max-w-5xl mx-auto">
-          {/* Navigation & Header Actions */}
-          <div className="flex items-center justify-between">
-            <Button asChild variant="ghost" className="text-slate/60 hover:text-primary font-bold transition-colors">
-              <Link href="/ai-navigator" className="flex items-center gap-2">
+        <div className="space-y-12 md:space-y-20 max-w-5xl mx-auto">
+          <div className="flex flex-col-reverse md:flex-row items-start md:items-center justify-between gap-4">
+            <Button asChild variant="ghost" className="text-slate/60 hover:text-primary font-bold transition-colors px-0 md:px-4">
+              <Link href="/reports" className="flex items-center gap-2">
                 <ChevronLeft className="w-5 h-5" />
-                리듬체크로 돌아가기
+                리포트로 돌아가기
               </Link>
             </Button>
-            <div className="flex items-center gap-3 bg-mist/30 px-5 py-2.5 rounded-2xl border border-line/50">
+            <div className="flex items-center gap-3 bg-mist/30 px-4 py-2 rounded-2xl border border-line/50">
               <Shield className="w-4 h-4 text-primary" />
-              <p className="text-xs font-black text-obsidian">보안된 데이터 자산 관리 중</p>
+              <p className="text-[10px] font-black text-obsidian">보안된 데이터 자산 관리 중</p>
             </div>
           </div>
 
-          {/* Detailed Asset Portfolio Section */}
-          <section className="bg-white rounded-[60px] p-10 md:p-16 border border-obsidian/5 space-y-16 relative overflow-hidden shadow-2xl">
+          <section className="bg-white rounded-[40px] p-6 md:p-16 border border-obsidian/5 space-y-12 md:space-y-16 relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
             
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
               <div className="space-y-4">
                 <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase">
                   Data Asset Inventory
                 </div>
-                <h3 className="text-4xl font-black text-obsidian tracking-tighter">나의 회복 자산 인벤토리</h3>
+                <h3 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter">나의 회복 자산 인벤토리</h3>
                 <p className="text-slate/60 font-bold text-sm">다양한 경로로 수집된 당신만의 회복 데이터를 관리하세요.</p>
               </div>
-              <div className="flex items-center gap-4 bg-mist/50 p-6 rounded-[32px] border border-line/50">
-                <div className="text-right">
+              <div className="flex items-center gap-4 bg-mist/50 p-4 md:p-6 rounded-[32px] border border-line/50 w-full md:w-auto">
+                <div className="text-right flex-1">
                   <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter">Total Insights</p>
-                  <p className="text-3xl font-black text-primary">{assetStats?.totalInsights || 0} Pts</p>
+                  <p className="text-2xl md:text-3xl font-black text-primary">{assetStats?.totalInsights || 0} Pts</p>
                 </div>
                 <div className="w-px h-10 bg-line" />
                 <div className="flex flex-col items-center">
@@ -221,38 +223,39 @@ export default function ArchivePage() {
                 <Link 
                   key={i} 
                   href={item.href}
-                  className={`group p-8 rounded-[40px] border transition-all duration-500 relative ${
+                  className={`group p-4 md:p-5 rounded-[28px] border transition-all duration-500 relative ${
                   item.status === 'unexplored' 
                     ? 'bg-mist/10 border-dashed border-line opacity-70 hover:opacity-100 hover:border-primary/40' 
                     : 'bg-white border-line/50 shadow-sm hover:shadow-xl hover:border-primary/40'
                 }`}>
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${
-                    item.status === 'unexplored' ? 'bg-slate/10 text-slate/40' : 'bg-primary/10 text-primary'
-                  }`}>
-                    {item.icon}
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl md:rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                      item.status === 'unexplored' ? 'bg-slate/10 text-slate/40' : 'bg-primary/10 text-primary'
+                    }`}>
+                      {React.cloneElement(item.icon as React.ReactElement, { className: 'w-5 h-5 md:w-6 md:h-6' })}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <h4 className="font-black text-obsidian text-sm md:text-base truncate">{item.label}</h4>
+                        <span className="text-[10px] font-bold text-primary ml-2 shrink-0">{item.count}/{item.total}</span>
+                      </div>
+                      <p className="text-[11px] md:text-xs font-bold text-slate/40 truncate">
+                        {item.status === 'unexplored' ? '미수집 데이터' : item.desc}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-black text-obsidian text-lg">{item.label}</h4>
-                      <span className="text-[10px] font-bold text-primary">{item.count}/{item.total}</span>
-                    </div>
-                    <p className="text-xs font-bold text-slate/50 leading-snug">
-                      {item.status === 'unexplored' ? '아직 수집된 데이터가 없습니다' : item.desc}
-                    </p>
-                    
-                    {/* Tooltip-like Explanation */}
-                    <div className="pt-4 border-t border-line/30 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-[10px] leading-relaxed text-slate/60 font-medium">{item.tooltip}</p>
-                    </div>
+                  
+                  <div className="absolute inset-x-4 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <p className="text-[9px] text-slate/40 font-medium text-center">{item.tooltip}</p>
                   </div>
                 </Link>
               ))}
             </div>
 
             {/* Asset Insights Footer */}
-            <div className="bg-obsidian rounded-[40px] p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-obsidian rounded-[32px] p-6 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4 text-white">
-                <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary">
+                <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -260,19 +263,87 @@ export default function ArchivePage() {
                   <p className="text-sm font-black">데이터가 100포인트 이상 쌓이면 유니클 정밀 분석 리포트 생성이 가능합니다.</p>
                 </div>
               </div>
-              <Button asChild className="bg-reward-gold text-obsidian font-black rounded-2xl px-8 h-12 hover:scale-105 transition-transform shadow-lg shadow-reward-gold/20">
+              <Button asChild className="w-full md:w-auto bg-reward-gold text-obsidian font-black rounded-2xl px-8 h-12 hover:scale-105 transition-transform shadow-lg shadow-reward-gold/20">
                 <Link href="/navigator">데이터 상담 신청하기</Link>
               </Button>
             </div>
           </section>
 
-          <section className="space-y-8">
-            <div className="flex items-center justify-between px-4">
-              <h2 className="text-2xl font-black text-obsidian flex items-center gap-3">
-                <History className="w-6 h-6 text-primary" />
-                수집된 리커버리 자산 목록
-              </h2>
-              <Badge variant="outline" className="border-line font-black text-[10px] tracking-widest">{pastJourneys.length} ASSETS COLLECTED</Badge>
+          {/* Completion Certificates Section */}
+          <section className="space-y-8 md:space-y-12">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 px-4">
+              <div className="space-y-1">
+                <h2 className="text-2xl font-black text-obsidian flex items-center gap-3">
+                  <Award className="w-6 h-6 text-reward-gold" />
+                  완주 증명서 콜렉션
+                </h2>
+                <p className="text-[10px] md:text-xs font-bold text-slate/40 uppercase tracking-widest">Records of completed 7-day journeys</p>
+              </div>
+              <Badge variant="outline" className="border-line font-black text-[9px] md:text-[10px] tracking-widest px-3 py-1">
+                {(certificateStatus?.issuedCertificates?.length || 0)} CERTIFICATES
+              </Badge>
+            </div>
+
+            {(!certificateStatus?.issuedCertificates || certificateStatus.issuedCertificates.length === 0) ? (
+              <div className="bg-mist/20 border border-dashed border-line/50 rounded-[40px] p-12 text-center space-y-4">
+                <Trophy className="w-10 h-10 text-slate/20 mx-auto" />
+                <p className="text-sm font-bold text-slate/40">아직 발급된 증명서가 없습니다. <br />첫 번째 7일 챌린지를 완주해 보세요!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {certificateStatus.issuedCertificates.map((cert: any, i: number) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Link href={`/certificate?cycle=${cert.cycleNumber}`}>
+                      <Card className="group relative overflow-hidden rounded-[28px] border-line/50 hover:border-primary hover:shadow-xl transition-all bg-white">
+                        <CardContent className="p-4 flex items-center gap-4">
+                          <div className="w-20 h-20 md:w-24 md:h-24 bg-obsidian rounded-[20px] relative overflow-hidden flex flex-col items-center justify-center shrink-0 border border-white/10 transition-transform group-hover:scale-105">
+                            <div className="absolute inset-0 bg-gradient-to-br from-reward-gold/20 via-transparent to-primary/20 opacity-50" />
+                            <div className="relative z-10 text-center">
+                              <Sparkles className="w-6 h-6 text-reward-gold mx-auto mb-1" />
+                              <span className="text-white font-black text-[10px] italic block">Cert.</span>
+                            </div>
+                          </div>
+                          <div className="flex-1 space-y-2 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black px-2 py-0.5 rounded-full">
+                                {cert.cycleNumber}회차 완주
+                              </Badge>
+                              <span className="text-[8px] md:text-[9px] font-bold text-slate/30">
+                                {cert.startDate && cert.endDate 
+                                  ? `${new Date(cert.startDate).toLocaleDateString().replace(/\.$/, '')} - ${new Date(cert.endDate).toLocaleDateString().replace(/\.$/, '')}`
+                                  : new Date(cert.issuedAt).toLocaleDateString()
+                                }
+                              </span>
+                            </div>
+                            <div>
+                              <h3 className="text-sm md:text-base font-black text-obsidian tracking-tight">7일 완주 증명서</h3>
+                              <p className="text-[10px] text-slate/40 font-bold truncate">완주를 진심으로 축하드립니다!</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="space-y-8 md:space-y-12">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 px-4">
+              <div className="space-y-2">
+                <h2 className="text-2xl md:text-3xl font-black text-obsidian flex items-center gap-3">
+                  <History className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                  수집된 리커버리 자산 목록
+                </h2>
+                <p className="text-[10px] md:text-xs font-bold text-slate/40 uppercase tracking-widest">Detailed breakdown of your recovery assets</p>
+              </div>
+              <Badge variant="outline" className="border-line font-black text-[9px] md:text-[10px] tracking-widest px-3 py-1">{pastJourneys.length} ASSETS COLLECTED</Badge>
             </div>
 
             <div className="grid gap-6">
@@ -283,31 +354,33 @@ export default function ArchivePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="group hover:border-primary/30 border-line/50 rounded-[40px] transition-all duration-500 overflow-hidden shadow-lg hover:shadow-2xl">
+                  <Card className="group hover:border-primary/30 border-line/50 rounded-[28px] md:rounded-[40px] transition-all duration-500 overflow-hidden shadow-lg hover:shadow-2xl bg-white">
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row items-stretch">
-                        <div className="bg-mist/30 p-10 flex flex-col justify-center items-center md:w-64 border-b md:border-b-0 md:border-r border-line/50">
-                          <div className="w-24 h-24 mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
+                        <div className="bg-mist/30 p-4 md:p-10 flex flex-row md:flex-col items-center gap-4 md:w-56 border-b md:border-b-0 md:border-r border-line/50">
+                          <div className="w-16 h-16 md:w-24 md:h-24 group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
                             <img src={journey.image} alt={journey.summary} className="w-full h-full object-contain" />
                           </div>
-                          <Badge className="bg-obsidian text-white font-black text-[9px] tracking-tighter uppercase px-3 py-1 rounded-full mb-2">{journey.identity}</Badge>
-                          <p className="text-[10px] text-slate/40 font-bold tracking-widest">{journey.date}</p>
-                        </div>
-                        <div className="flex-1 p-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                          <div className="space-y-2 text-center md:text-left">
-                            <h3 className="text-2xl font-black text-obsidian">{journey.summary}</h3>
-                            <p className="text-sm text-slate/60 font-medium italic">"기록해보니, 피로보다 늦은 식사가 문제였습니다."</p>
+                          <div className="flex-1 md:flex-none space-y-1 md:text-center">
+                            <Badge className="bg-obsidian text-white font-black text-[8px] md:text-[9px] tracking-tighter uppercase px-2 py-0.5 md:px-3 md:py-1 rounded-full">{journey.identity}</Badge>
+                            <p className="text-[9px] md:text-[10px] text-slate/40 font-bold tracking-widest">{journey.date}</p>
                           </div>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <Button variant="outline" asChild className="h-10 rounded-xl border-line font-black text-[10px] px-4 hover:bg-mist transition-all">
+                        </div>
+                        <div className="flex-1 p-5 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                          <div className="space-y-1 md:space-y-2 text-left">
+                            <h3 className="text-base md:text-2xl font-black text-obsidian leading-tight">{journey.summary}</h3>
+                            <p className="text-xs md:text-sm text-slate/60 font-medium italic">"기록해보니, 피로보다 늦은 식사가 문제였습니다."</p>
+                          </div>
+                          <div className="flex items-center gap-2 w-full md:w-auto">
+                            <Button variant="outline" asChild className="flex-1 md:flex-none h-9 md:h-10 rounded-xl border-line font-black text-[10px] px-3 md:px-4 hover:bg-mist transition-all">
                               <Link href={`/ai-navigator/report?id=${journey.id}`}>리포트 상세</Link>
                             </Button>
-                            <Button variant="outline" className="h-10 rounded-xl border-line font-black text-[10px] px-4 hover:bg-mist transition-all">
-                              <Download className="w-3.5 h-3.5 mr-2" />
-                              PDF 저장
+                            <Button variant="outline" className="flex-1 md:flex-none h-9 md:h-10 rounded-xl border-line font-black text-[10px] px-3 md:px-4 hover:bg-mist transition-all">
+                              <Download className="w-3.5 h-3.5 mr-1 md:mr-2" />
+                              PDF
                             </Button>
-                            <Button className="h-10 w-10 rounded-xl bg-obsidian text-white flex items-center justify-center p-0 hover:bg-primary hover:text-obsidian transition-all">
-                              <Share2 className="w-4 h-4" />
+                            <Button className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-obsidian text-white flex items-center justify-center p-0 hover:bg-primary hover:text-obsidian transition-all shrink-0">
+                              <Share2 className="w-3.5 h-3.5" />
                             </Button>
                           </div>
                         </div>

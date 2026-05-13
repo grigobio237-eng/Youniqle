@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
                 source: '60s-diagnosis',
                 originalRawScore: body.rawScore
             };
-        } else if (type === 'paid' || type === 'deep' || type === 'DEEP') {
+        } else if (type === 'paid' || type === 'deep' || type === 'DEEP' || type === 'personality') {
             // Deep Diagnosis
             scores = result.tScores.domains;
             totalScore = Math.round(Object.values(result.tScores.domains as Record<string, number>).reduce((a, b) => a + b, 0) / 5);
@@ -147,12 +147,12 @@ export async function POST(request: NextRequest) {
                     totalScoreVal = result.totalScore;
                     resultTitle = `간편 진단 결과: ${result.totalScore}점`;
                     resultDescription = `${result.lowestCategory} 영역의 케어가 시급합니다.`;
-                } else if (type === 'paid' || type === 'DEEP' || type === 'deep') {
+                } else if (type === 'paid' || type === 'DEEP' || type === 'deep' || type === 'personality') {
                     // Use Shared Mapping Logic
                     categoryScores = SimcheungDiagnosisEngine.mapPaidToStandard({ domains: result.tScores.domains });
                     const t = result.tScores.domains;
                     totalScoreVal = Math.round((t.N + t.E + t.O + t.A + t.C) / 5); // Average T-score
-                    resultTitle = type.toUpperCase() === 'DEEP' ? `심층 심리 진단 (IPIP-60)` : `심층 심리 진단 (Premium)`;
+                    resultTitle = (type.toUpperCase() === 'DEEP' || type === 'personality') ? `심층 심리 진단 (IPIP-60)` : `심층 심리 진단 (Premium)`;
                     resultDescription = `5대 요인 및 30개 국면 정밀 분석 완료`;
                 } else if (type === 'daily' || type === 'DAILY') {
                     totalScoreVal = result.totalScore;

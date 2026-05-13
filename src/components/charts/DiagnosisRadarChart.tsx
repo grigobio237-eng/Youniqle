@@ -27,11 +27,11 @@ export function DiagnosisRadarChart({ data, color = '#2563eb', className }: Diag
     return (
         <div className={`w-full h-full ${className}`}>
             <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
                     <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                     <PolarAngleAxis
                         dataKey="subject"
-                        tick={{ fill: '#64748b', fontSize: 11, fontWeight: 'bold' }}
+                        tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }}
                     />
                     {/* Hiding Radius Axis for cleaner look, or typical 0-100 */}
                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />

@@ -10,6 +10,7 @@ import { ToastProvider } from '@/components/ui/toast';
 import AiManagerChat from '@/components/chat/AiManagerChat';
 import MandatoryConsentModal from '@/components/auth/MandatoryConsentModal';
 import PWARegistration from '@/components/providers/PWARegistration';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -109,9 +110,10 @@ export default function RootLayout({
               <ToastProvider>
                 <RecoveryProvider>
                   <ConditionalHeader />
-                  <main className="w-full pt-[140px] md:pt-[160px] min-h-[100dvh] overflow-visible">
+                  <main className="w-full pt-[140px] md:pt-[160px] pb-24 md:pb-0 min-h-[100dvh] overflow-visible">
                     {children}
                   </main>
+                  <MobileBottomNav />
                   <Footer />
                   <AiManagerChat />
                   <MandatoryConsentModal />

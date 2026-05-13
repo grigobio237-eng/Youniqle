@@ -243,7 +243,7 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['member', 'partner', 'admin'],
+    enum: ['member', 'partner', 'admin', 'superadmin'],
     default: 'member',
   },
   grade: {

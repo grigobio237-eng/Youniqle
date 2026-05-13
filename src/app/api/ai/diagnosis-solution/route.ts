@@ -18,10 +18,10 @@ export async function POST(req: NextRequest) {
 
         await connectDB();
 
-        // 1. If diagnosisId is provided, check if solution already exists
+        // 1. If diagnosisId is provided, check if solution already exists with full content
         if (diagnosisId) {
             const existingDiag = await Diagnosis.findById(diagnosisId);
-            if (existingDiag?.aiSolution?.analysis) {
+            if (existingDiag?.aiSolution?.analysis && existingDiag?.aiSolution?.audioScript) {
                 return NextResponse.json(existingDiag.aiSolution);
             }
         }

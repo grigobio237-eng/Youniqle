@@ -110,7 +110,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    type: 'free',
+                    type: 'daily',
                     result: res,
                     answers: answers
                 })

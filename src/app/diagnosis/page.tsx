@@ -28,6 +28,7 @@ function DiagnosisContent() {
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [dailyTheme, setDailyTheme] = useState<string>('');
+    const [dailyGreeting, setDailyGreeting] = useState<string>('');
 
     const DEFAULT_LIKERT_OPTIONS = [
         { label: '전혀 그렇지 않다', score: 1 },
@@ -68,6 +69,11 @@ function DiagnosisContent() {
                     const data = await res.json();
                     loadedQuestions = data.questions || [];
                     setDailyTheme(data.theme || '');
+                    setDailyGreeting(data.greeting || '');
+                } else {
+                    // Fallback to static set if API fails
+                    loadedQuestions = (FREE_DIAGNOSIS_QUESTIONS || []).slice(0, 16);
+                    setDailyTheme('오늘의 회복 리듬체크');
                 }
             } else if (type === 'personality') {
                 loadedQuestions = FULL_DIAGNOSIS_QUESTIONS;
@@ -204,17 +210,29 @@ function DiagnosisContent() {
                                 </Badge>
                                 <h1 className="text-5xl md:text-6xl font-black text-obsidian tracking-tighter leading-tight">
                                     {type === 'daily' ? (
-                                        <>오늘의 회복 리듬을<br /><span className="text-reward-gold italic">측정하세요</span></>
+                                        <>오늘의 회복 리듬 측정</>
                                     ) : (
                                         <>당신의 내면 세계를<br /><span className="text-chapter-accent">분석합니다</span></>
                                     )}
                                 </h1>
                                 <p className="text-slate font-medium text-lg max-w-md mx-auto">
                                     {type === 'daily' 
-                                        ? '16개의 AI 최적화 질문으로 오늘 하루의 에너지를 확인하고 100PT를 받으세요.' 
+                                        ? (dailyGreeting || '16개의 AI 최적화 질문으로 오늘 하루의 에너지를 확인하고 100PT를 받으세요.')
                                         : '정교한 질문을 통해 당신만의 고유한 회복 프로토콜을 설계합니다.'}
                                 </p>
                             </div>
+
+                            {type === 'daily' && dailyTheme && (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="bg-reward-gold/10 border border-reward-gold/20 p-4 rounded-2xl max-w-sm mx-auto"
+                                >
+                                    <span className="text-reward-gold font-black text-sm uppercase tracking-tighter flex items-center justify-center">
+                                        <Sparkles className="w-4 h-4 mr-2" /> {dailyTheme}
+                                    </span>
+                                </motion.div>
+                            )}
 
                             <div className="flex flex-col gap-4">
                                 <Button 

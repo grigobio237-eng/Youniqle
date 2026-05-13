@@ -197,4 +197,68 @@ JSON 배열만 반환하세요.`;
             return { summary: "데이터 분석 중입니다.", status: "안정", recommendations: ["규칙적인 생활 유지"], insight: "조금씩 나아지는 모습이 보입니다." };
         }
     }
+
+    static async generateDailyQuestions(
+        theme: string,
+        keywords: string,
+        journey: string,
+        medicalCategory: string | null,
+        treatmentType: string | null,
+        userTier: string,
+        context: any,
+        medicationHistory?: string
+    ): Promise<any[]> {
+        const prompt = `
+당신은 '유니클(Youniqle)'의 수석 리커버리 코치입니다. 사용자를 위한 **'60초 리듬체크'** 문항 5개를 생성해주세요.
+
+## 분석 컨텍스트
+- 테마: ${theme}
+- 주요 키워드: ${keywords}
+- 현재 여정: ${journey}
+- 시술 정보: ${medicalCategory || '일반'} / ${treatmentType || '관리'}
+- 유저 등급: ${userTier}
+- 약물 이력: ${medicationHistory || '없음'}
+
+## 문항 구성 원칙
+1. **정확히 5개의 문항**을 생성하세요.
+2. 각 문항은 **리커버리(회복), 에너지, 컨디션, 심리적 안정, 신체적 불편감**을 골고루 다루어야 합니다.
+3. 질문은 부드럽고 공감적인 톤앤매너를 유지하세요. (예: "~은 어떠셨나요?", "~하게 느껴지시나요?")
+4. 답변 방식은 5점 척도(Likert)를 기본으로 합니다.
+
+## 응답 형식 (JSON Array Only)
+[
+  {
+    "id": "q1",
+    "category": "Physical",
+    "text": "질문 내용",
+    "options": [
+      { "label": "전혀 그렇지 않다", "score": 1 },
+      { "label": "그렇지 않다", "score": 2 },
+      { "label": "보통이다", "score": 3 },
+      { "label": "그렇다", "score": 4 },
+      { "label": "매우 그렇다", "score": 5 }
+    ]
+  },
+  ... (총 5개)
+]`;
+
+        try {
+            const response = await GeminiCore.generateWithFallback(prompt, "60초 리듬체크 생성 모드", 0.8);
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error("Invalid JSON in AI response");
+        } catch (error) {
+            console.error("Failed to generate daily questions:", error);
+            // Fallback: 5 simple questions
+            return [
+                { id: "f1", category: "Physical", text: "오늘 전반적인 신체 컨디션은 어떠신가요?", options: [] },
+                { id: "f2", category: "Mindset", text: "오늘 하루를 시작하는 마음이 평온하신가요?", options: [] },
+                { id: "f3", category: "Emotional", text: "최근 스트레스 수준은 어느 정도인가요?", options: [] },
+                { id: "f4", category: "Social", text: "주변 사람들과의 소통에서 즐거움을 느끼시나요?", options: [] },
+                { id: "f5", category: "Physical", text: "몸의 긴장이나 통증이 느껴지지는 않나요?", options: [] }
+            ];
+        }
+    }
 }
