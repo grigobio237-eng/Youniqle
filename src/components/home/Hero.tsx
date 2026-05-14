@@ -125,7 +125,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
 
   return (
-    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-4 pb-8 md:pt-20 md:pb-32">
+    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-3 pb-8 md:pt-[60px] md:pb-32">
       {/* Decorative Blur Elements - Softer */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
         <div className="absolute -top-[15%] -left-[10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[150px]" />

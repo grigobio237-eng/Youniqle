@@ -110,7 +110,7 @@ export default function RootLayout({
               <ToastProvider>
                 <RecoveryProvider>
                   <ConditionalHeader />
-                  <main className="w-full pt-[120px] md:pt-[160px] pb-24 md:pb-0 min-h-[100dvh] overflow-visible">
+                  <main className="w-full pt-[112px] md:pt-[120px] pb-24 md:pb-0 min-h-[100dvh] overflow-visible">
                     {children}
                   </main>
                   <MobileBottomNav />
