@@ -84,7 +84,7 @@ function SigninContent() {
         <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[80px]"></div>
       </div>
 
-      <div className="w-full max-w-md relative z-10 space-y-8">
+      <div className="w-full max-w-md relative z-10 space-y-4 md:space-y-8">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
             <div className="relative w-16 h-16">
@@ -102,7 +102,7 @@ function SigninContent() {
         </div>
 
         <Card className="bg-surface border-line shadow-2xl rounded-[32px] overflow-hidden">
-          <CardContent className="p-8 space-y-8">
+          <CardContent className="p-5 md:p-8 space-y-4 md:space-y-8">
             {/* WebView Warning */}
             {isInWebView && (
               <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl space-y-3">
@@ -128,14 +128,14 @@ function SigninContent() {
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => handleSocialLogin('kakao')}
-                className="h-14 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none rounded-2xl font-bold transition-all"
+                className="h-12 md:h-14 bg-[#FEE500] hover:bg-[#FDD835] text-black border-none rounded-2xl font-bold transition-all"
               >
                 <KakaoIcon className="w-5 h-5 mr-2" />
                 카카오
               </Button>
               <Button
                 onClick={() => handleSocialLogin('google')}
-                className="h-14 bg-white border-none text-gray-900 hover:bg-gray-100 rounded-2xl font-bold transition-all"
+                className="h-12 md:h-14 bg-white border-none text-gray-900 hover:bg-gray-100 rounded-2xl font-bold transition-all"
               >
                 <GoogleIcon className="w-5 h-5 mr-2" />
                 구글
@@ -166,7 +166,7 @@ function SigninContent() {
                     required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
+                    className="bg-background border-line h-12 md:h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
                   />
                 </div>
               </div>
@@ -183,7 +183,7 @@ function SigninContent() {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="bg-background border-line h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
+                    className="bg-background border-line h-12 md:h-14 pl-12 rounded-2xl focus:border-primary transition-all text-text-primary"
                   />
                   <button
                     type="button"
@@ -214,7 +214,7 @@ function SigninContent() {
 
               <Button
                 type="submit"
-                className="w-full h-16 bg-primary hover:bg-primary/90 text-background font-black text-lg rounded-2xl shadow-xl transition-all hover:scale-[1.02]"
+                className="w-full h-14 md:h-16 bg-primary hover:bg-primary/90 text-background font-black text-lg rounded-2xl shadow-xl transition-all hover:scale-[1.02]"
               >
                 로그인하기
               </Button>
