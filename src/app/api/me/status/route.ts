@@ -5,6 +5,7 @@ import connectDB from '@/lib/db';
 import ConciergeRequest from '@/models/ConciergeRequest';
 import Inquiry from '@/models/Inquiry';
 import User from '@/models/User';
+import NavigatorConsultation from '@/models/NavigatorConsultation';
 
 export async function GET() {
     try {
@@ -36,6 +37,26 @@ export async function GET() {
             ]
         }).sort({ createdAt: -1 });
 
+        // 상담 피드백 알람 확인
+        let hasNewConsultationFeedback = false;
+        if (user.isNavigator) {
+            // 네비게이터인 경우: 본인에게 할당된 상담 중 읽지 않은 pending 상태 확인
+            const unreadInquiry = await NavigatorConsultation.findOne({
+                navigatorId: user.referralCode,
+                status: 'pending',
+                isReadByNavigator: false
+            });
+            hasNewConsultationFeedback = !!unreadInquiry;
+        } else {
+            // 일반 유저인 경우: 본인의 상담 중 답변이 달렸고 읽지 않은 상태 확인
+            const unreadFeedback = await NavigatorConsultation.findOne({
+                userId: user._id,
+                status: 'answered',
+                isReadByUser: false
+            });
+            hasNewConsultationFeedback = !!unreadFeedback;
+        }
+
         return NextResponse.json({
             concierge: latestConcierge ? {
                 status: latestConcierge.status,
@@ -47,7 +68,8 @@ export async function GET() {
                 createdAt: latestInquiry.createdAt,
                 subject: latestInquiry.subject,
                 type: latestInquiry.type
-            } : null
+            } : null,
+            hasNewConsultationFeedback
         });
 
     } catch (error) {

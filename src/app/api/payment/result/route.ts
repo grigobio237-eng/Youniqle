@@ -145,6 +145,16 @@ export async function POST(request: NextRequest) {
                 const User = (await import('@/models/User')).default;
                 const buyer = await User.findById(order.userId);
 
+                // 예약 데이터에서 네비게이터 ID 추출
+                let reservedNavigatorId = '';
+                try {
+                  const reservedStr = approvalDataObj.ReqReserved || approvalDataObj.reqReserved;
+                  if (reservedStr) {
+                    const reserved = JSON.parse(reservedStr);
+                    reservedNavigatorId = reserved.navigatorId;
+                  }
+                } catch (e) { console.error('Reserved data parse error:', e); }
+
                 if (buyer) {
                   // Navigator Pass 등급 상향 (기존 로직 유지)
                   const navigatorItem = order.items.find((item: any) => typeof item.productId === 'string' && item.productId.startsWith('navigator-'));
@@ -182,8 +192,14 @@ export async function POST(request: NextRequest) {
                       status: 'ACTIVE',
                       startDate: now,
                       endDate: endDate,
-                      purchaseDate: now
+                      purchaseDate: now,
+                      navigatorId: reservedNavigatorId || buyer.referredBy || buyer.recentNavigator || 'ADMIN'
                     };
+
+                    // 유저의 전담 네비게이터 정보도 업데이트
+                    if (reservedNavigatorId && reservedNavigatorId !== 'ADMIN') {
+                      buyer.recentNavigator = reservedNavigatorId;
+                    }
 
                     await buyer.save(mongoSession ? { session: mongoSession } : {});
                     console.log(`🚀 Lifecare OS 멤버십 업그레이드 완료: ${buyer.email} -> ${passType}`);

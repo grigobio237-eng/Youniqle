@@ -52,6 +52,7 @@ import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import QRReferralCard from '@/components/me/QRReferralCard';
 import MedicalPassCard from '@/components/me/MedicalPassCard';
 import ReferralNetwork from '@/components/shared/ReferralNetwork';
+import NavigatorConsultationCenter from '@/components/me/NavigatorConsultationCenter';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -824,6 +825,28 @@ export default function MyPage() {
                       </Button>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* 전담 네비게이터 상담 센터 */}
+              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-indigo-50 transition-all hover:shadow-3xl">
+                <CardHeader className="p-8 md:p-10 pb-0 border-none">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
+                        <MessageCircle className="h-7 w-7" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">
+                          {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
+                        </h3>
+                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 md:p-10">
+                  <NavigatorConsultationCenter />
                 </CardContent>
               </Card>
 

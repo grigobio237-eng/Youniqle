@@ -224,21 +224,21 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 if (isMobile) fileInputRef.current?.click();
                 else startWebcam();
             }}
-            className="relative aspect-[4/3] rounded-5xl overflow-hidden bg-surface group cursor-pointer border border-primary/10 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10"
+            className="relative aspect-[16/10] md:aspect-[4/3] rounded-5xl overflow-hidden bg-surface group cursor-pointer border border-primary/10 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10"
         >
             <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-[2000ms]" />
             <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-background/90" />
             
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-6">
-                <div className="w-24 h-24 rounded-full bg-white/60 flex items-center justify-center backdrop-blur-xl border border-white/40 group-hover:scale-110 transition-all duration-700 shadow-lg shadow-primary/10">
-                    <Camera className="w-10 h-10 text-primary/60" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 md:space-y-6">
+                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white/60 flex items-center justify-center backdrop-blur-xl border border-white/40 group-hover:scale-110 transition-all duration-700 shadow-lg shadow-primary/10">
+                    <Camera className="w-6 h-6 md:w-10 md:h-10 text-primary/60" />
                 </div>
                 <div className="space-y-3">
                     <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/10">
                         <Sparkles className="w-3 h-3 text-primary" />
                         <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Life Snap</span>
                     </div>
-                    <p className="text-foreground font-bold text-2xl md:text-3xl leading-snug break-keep px-4">
+                    <p className="text-foreground font-bold text-xl md:text-3xl leading-snug break-keep px-4">
                         사진 한 장으로 전하는<br />오늘 나의 회복 이야기
                     </p>
                 </div>

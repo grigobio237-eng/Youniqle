@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { AccessControl } from '@/lib/logic/access-control';
 import ClinicConsultationSection from '@/components/home/ClinicConsultationSection';
+import NavigatorConsultationSection from '@/components/black-pass/NavigatorConsultationSection';
 import Image from 'next/image';
 
 export default function BlackPassDashboard() {
@@ -168,7 +169,11 @@ export default function BlackPassDashboard() {
 
       {/* Secondary Management Features */}
       <section className="container mx-auto px-6 py-12 md:py-20">
-        <div className="max-w-5xl mx-auto space-y-20">
+        <div className="max-w-5xl mx-auto space-y-24">
+          
+          {/* Navigator Consultation Section */}
+          <NavigatorConsultationSection />
+
           {/* Data Asset Status */}
           <div className="space-y-8">
             <div className="flex items-center gap-3">

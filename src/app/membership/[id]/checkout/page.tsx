@@ -10,7 +10,11 @@ import {
   Loader2,
   Sparkles,
   Zap,
-  Lock
+  Lock,
+  Users,
+  Search,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,13 +36,49 @@ export default function CheckoutPage({ params }: PageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
+  const [navigatorCode, setNavigatorCode] = useState('');
+  const [isNavVerified, setIsNavVerified] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [navName, setNavName] = useState('');
 
   if (!pass) return null;
+
+  const user = session?.user as any;
+  const hasNavigator = !!(user?.referredBy || user?.recentNavigator);
+
+  const verifyNavigator = async () => {
+    if (!navigatorCode.trim()) return;
+    setIsValidating(true);
+    try {
+      const res = await fetch(`/api/user/by-code?code=${navigatorCode}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user?.isNavigator) {
+          setIsNavVerified(true);
+          setNavName(data.user.name);
+        } else {
+          alert('유효한 네비게이터 코드가 아닙니다.');
+          setIsNavVerified(false);
+        }
+      } else {
+        alert('네비게이터를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('Nav validation error:', error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const handlePayment = async () => {
     if (!session?.user) {
       alert('로그인이 필요한 서비스입니다.');
       router.push('/login');
+      return;
+    }
+
+    if (id === 'black' && !hasNavigator && !isNavVerified) {
+      alert('블랙 패스 이용을 위해 전담 네비게이터 코드를 먼저 확인해 주세요.');
       return;
     }
 
@@ -74,7 +114,8 @@ export default function CheckoutPage({ params }: PageProps) {
           reqReserved: JSON.stringify({
             userId: (session.user as any).id,
             passId: id,
-            type: 'MEMBERSHIP_UPGRADE'
+            type: 'MEMBERSHIP_UPGRADE',
+            navigatorId: isNavVerified ? navigatorCode : undefined
           })
         })
       });
@@ -171,6 +212,46 @@ export default function CheckoutPage({ params }: PageProps) {
               </p>
             </div>
           </div>
+
+          {/* Navigator Code Selection (Only for BLACK PASS and if no navigator) */}
+          {id === 'black' && !hasNavigator && (
+            <div className="bg-white rounded-[32px] p-8 shadow-xl border-2 border-indigo-100">
+              <h2 className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-6 border-b border-indigo-50 pb-4">전담 네비게이터 확인</h2>
+              <div className="space-y-4">
+                <p className="text-sm font-bold text-slate/70 break-keep">
+                  블랙 패스 회원은 전문적인 상담과 관리를 위해 전담 네비게이터가 반드시 지정되어야 합니다. 전달받으신 네비게이터 코드를 입력해 주세요.
+                </p>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate/30" />
+                    <Input 
+                      placeholder="네비게이터 코드 입력"
+                      value={navigatorCode}
+                      onChange={(e) => {
+                        setNavigatorCode(e.target.value.toUpperCase());
+                        setIsNavVerified(false);
+                      }}
+                      disabled={isNavVerified || isValidating}
+                      className="pl-11 h-14 rounded-2xl border-line bg-mist/30 font-black text-obsidian placeholder:text-slate/20"
+                    />
+                  </div>
+                  <Button 
+                    onClick={verifyNavigator}
+                    disabled={!navigatorCode.trim() || isValidating || isNavVerified}
+                    className="h-14 px-8 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black"
+                  >
+                    {isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : '코드 확인'}
+                  </Button>
+                </div>
+                {isNavVerified && (
+                  <div className="flex items-center gap-2 p-4 bg-emerald-50 rounded-2xl text-emerald-600 animate-in fade-in slide-in-from-top-1">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="text-sm font-black">[{navName}] 네비게이터가 확인되었습니다.</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Payment Method */}
           <div className="bg-white rounded-[32px] p-8 shadow-xl border border-line/50">

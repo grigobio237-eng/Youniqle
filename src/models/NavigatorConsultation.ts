@@ -14,6 +14,8 @@ export interface INavigatorConsultation extends Document {
   lastNudgedAt?: Date;
   answeredBy?: 'navigator' | 'admin';
   answeredAt?: Date;
+  isReadByUser: boolean;
+  isReadByNavigator: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,6 +72,14 @@ const NavigatorConsultationSchema = new Schema<INavigatorConsultation>({
   },
   answeredAt: {
     type: Date
+  },
+  isReadByUser: {
+    type: Boolean,
+    default: false
+  },
+  isReadByNavigator: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

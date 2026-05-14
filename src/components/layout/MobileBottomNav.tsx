@@ -2,12 +2,36 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Activity, LayoutDashboard, FileText } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Home, Activity, LayoutDashboard, FileText, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [hasAlert, setHasAlert] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user) return;
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetch('/api/me/status');
+        if (res.ok) {
+          const data = await res.json();
+          setHasAlert(data.hasNewConsultationFeedback);
+        }
+      } catch (error) {
+        console.error('Failed to fetch status:', error);
+      }
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 30000); // 30초마다 확인
+    return () => clearInterval(interval);
+  }, [session]);
 
   const navItems = [
     {
@@ -29,6 +53,11 @@ export default function MobileBottomNav() {
       label: '내 회복 리포트',
       href: '/reports',
       icon: FileText,
+    },
+    {
+      label: '마이페이지',
+      href: '/me',
+      icon: User,
     },
   ];
 
@@ -53,6 +82,9 @@ export default function MobileBottomNav() {
                   "w-6 h-6 transition-transform duration-300",
                   isActive ? "scale-110" : "scale-100"
                 )} />
+                {item.label === '마이페이지' && hasAlert && (
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-bounce shadow-sm" />
+                )}
               </div>
               <span className={cn(
                 "text-[10px] font-bold tracking-tight transition-colors duration-300",

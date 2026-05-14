@@ -165,7 +165,7 @@ export default function Header() {
             </Link>
 
             {session ? (
-              <Button variant="ghost" size="icon" asChild className="hover:bg-primary/5 rounded-full">
+              <Button variant="ghost" size="icon" asChild className="hidden md:flex hover:bg-primary/5 rounded-full">
                 <Link href="/me"><User className="h-6 w-6 text-foreground/80" /></Link>
               </Button>
             ) : (

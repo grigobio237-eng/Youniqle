@@ -125,7 +125,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
 
   return (
-    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-8 pb-20 md:pt-20 md:pb-32">
+    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-4 pb-8 md:pt-20 md:pb-32">
       {/* Decorative Blur Elements - Softer */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
         <div className="absolute -top-[15%] -left-[10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[150px]" />
@@ -133,10 +133,10 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-24 items-center">
 
           {/* 1. Texts */}
-          <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+          <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold text-primary/60 uppercase tracking-[0.5em]">RECOVERY CGM</span>
               {journey && (
@@ -149,7 +149,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
               {/* {personalMsg.title} */}
               당신의 몸이 보내는 작은 신호,<br />60초면 충분합니다.
             </h1>
-            <p className="text-lg md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl">
+            <p className="text-base md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl">
               {/* {personalMsg.desc} */}
               오늘의 나를 마주하는 가장 스마트한 방법, 60초 리듬체크를 시작하세요.
             </p>
@@ -185,12 +185,12 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
           </div>
 
           {/* 3. Button & checkmarks */}
-          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500 lg:col-span-2 mt-8 lg:mt-0">
+          <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500 lg:col-span-2 mt-4 lg:mt-0">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <Button
                 onClick={() => onStart()}
                 size="lg"
-                className="w-full md:w-auto px-12 h-20 text-xl font-bold rounded-full shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 bg-primary text-white"
+                className="w-full md:w-auto px-8 md:px-12 h-14 md:h-20 text-lg md:text-xl font-bold rounded-full shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 bg-primary text-white"
               >
                 <Sparkles className="w-6 h-6 mr-3" />
                 <span>60초 리듬체크 시작하기</span>
@@ -200,7 +200,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 asChild
                 variant="ghost"
                 size="lg"
-                className="w-full md:w-auto h-20 px-12 text-xl font-bold rounded-full hover:bg-primary/5"
+                className="w-full md:w-auto h-14 md:h-20 px-8 md:px-12 text-lg md:text-xl font-bold rounded-full hover:bg-primary/5"
               >
                 <Link href="/dashboard">
                   <Layout className="w-6 h-6 mr-3" />

@@ -52,6 +52,19 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .lean();
 
+    // 읽음 처리 (백그라운드 업데이트)
+    if (mode === 'navigator') {
+      await NavigatorConsultation.updateMany(
+        { ...query, isReadByNavigator: false },
+        { $set: { isReadByNavigator: true } }
+      );
+    } else if (!mode || mode === 'user') {
+      await NavigatorConsultation.updateMany(
+        { ...query, status: 'answered', isReadByUser: false },
+        { $set: { isReadByUser: true } }
+      );
+    }
+
     return NextResponse.json({ success: true, consultations });
 
   } catch (error) {
