@@ -70,7 +70,7 @@ function SigninContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-120px)] bg-background flex flex-col items-center justify-start md:justify-center p-4 pt-8 md:pt-4">
       {/* Back Button */}
       <div className="absolute top-8 left-8">
         <Button variant="ghost" asChild className="text-text-secondary hover:text-text-primary">
@@ -85,7 +85,7 @@ function SigninContent() {
       </div>
 
       <div className="w-full max-w-md relative z-10 space-y-4 md:space-y-8">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-2">
           <div className="flex justify-center">
             <div className="relative w-16 h-16">
               <CharacterImage
