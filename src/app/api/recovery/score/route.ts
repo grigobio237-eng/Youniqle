@@ -5,6 +5,7 @@ import dbConnect from '@/lib/db';
 import RecoveryScore from '@/models/RecoveryScore';
 import User from '@/models/User';
 import { getKSTDate } from '@/lib/date';
+import { BadgeService } from '@/lib/gamification/badge-service';
 
 export async function POST(req: NextRequest) {
     try {
@@ -71,7 +72,10 @@ export async function POST(req: NextRequest) {
             await User.findByIdAndUpdate(user._id, { $set: { medicationHistory: updatedMeds } });
         }
 
-        return NextResponse.json({ success: true, score });
+        // 3. Check for new badges (Gamification)
+        const newBadges = await BadgeService.checkAndAwardBadges(user._id);
+
+        return NextResponse.json({ success: true, score, newBadges });
     } catch (error) {
         console.error('Error saving recovery score:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

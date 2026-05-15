@@ -54,6 +54,8 @@ import QRReferralCard from '@/components/me/QRReferralCard';
 import MedicalPassCard from '@/components/me/MedicalPassCard';
 import ReferralNetwork from '@/components/shared/ReferralNetwork';
 import NavigatorConsultationCenter from '@/components/me/NavigatorConsultationCenter';
+import RecoveryLeaderboard from '@/components/me/RecoveryLeaderboard';
+import RecoveryActivityFeed from '@/components/me/RecoveryActivityFeed';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -101,6 +103,7 @@ export default function MyPage() {
   const [communityAverages, setCommunityAverages] = useState<any[]>([]);
   const [weeklyReport, setWeeklyReport] = useState<any>(null);
   const [notificationPermission, setNotificationPermission] = useState<string>('default');
+  const [userBadges, setUserBadges] = useState<any[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -143,6 +146,18 @@ export default function MyPage() {
       }
     } catch (e) {
       console.error('Failed to fetch weekly report:', e);
+    }
+  };
+
+  const fetchBadges = async () => {
+    try {
+      const res = await fetch('/api/me/badges');
+      if (res.ok) {
+        const data = await res.json();
+        setUserBadges(data.badges || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch badges:', e);
     }
   };
 
@@ -194,6 +209,7 @@ export default function MyPage() {
       fetchUserStatus();
       fetchCommunityData();
       fetchWeeklyReport();
+      fetchBadges();
     }
   }, [session]);
 
@@ -647,6 +663,61 @@ export default function MyPage() {
             </div>
           )}
 
+          {/* Badge Collection Section */}
+          {userBadges.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                <div className="p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-black text-obsidian tracking-tighter">회복 성취 뱃지</h3>
+                        <p className="text-xs font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
+                      </div>
+                    </div>
+                    <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">
+                      {userBadges.length}개 획득
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                    {userBadges.map((badge, idx) => (
+                      <motion.div
+                        key={idx}
+                        whileHover={{ scale: 1.1 }}
+                        className="flex flex-col items-center gap-2 group cursor-help"
+                      >
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border-2 transition-all ${
+                          badge.rarity === 'legendary' ? 'bg-purple-50 border-purple-200 shadow-purple-100' :
+                          badge.rarity === 'epic' ? 'bg-indigo-50 border-indigo-200 shadow-indigo-100' :
+                          badge.rarity === 'rare' ? 'bg-amber-50 border-amber-200 shadow-amber-100' :
+                          'bg-slate-50 border-slate-100'
+                        }`}>
+                          {badge.icon}
+                        </div>
+                        <span className="text-[10px] font-black text-slate text-center leading-tight group-hover:text-obsidian">
+                          {badge.name}
+                        </span>
+                        {/* Hover Tooltip (Simplified) */}
+                        <div className="hidden group-hover:block absolute z-10 w-40 p-2 bg-obsidian text-white text-[10px] rounded-lg mt-16 shadow-xl">
+                          <p className="font-black text-amber-400 mb-0.5">{badge.name}</p>
+                          <p className="opacity-80 leading-relaxed">{badge.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 mb-6">
             {/* Membership Rewards (Left) */}
             <div className="lg:col-span-4 transition-transform hover:scale-[1.01]">
@@ -704,6 +775,28 @@ export default function MyPage() {
                   <p className="text-xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            <div className="lg:col-span-8">
+              <RecoveryLeaderboard />
+            </div>
+            <div className="lg:col-span-4">
+              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100 h-full">
+                <div className="p-6 md:p-8">
+                   <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500">
+                        <Activity className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-black text-obsidian tracking-tighter">실시간 회복 리듬</h3>
+                        <p className="text-xs font-bold text-slate">다른 요원들의 지금은?</p>
+                      </div>
+                    </div>
+                   <RecoveryActivityFeed />
+                </div>
+              </Card>
             </div>
           </div>
 
