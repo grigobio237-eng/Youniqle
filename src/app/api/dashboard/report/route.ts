@@ -50,7 +50,25 @@ export async function GET(req: NextRequest) {
 
                 if (scores.length === 0) return { report: null, message: 'No data for this week' };
 
-                // 3. Generate with Gemini
+                // 3. Fetch community insight for context
+                const allWeekScores = await RecoveryScore.find({
+                    date: { $gte: weekStart }
+                }).select('totalScore');
+                
+                let communityInsights;
+                if (allWeekScores.length > 0) {
+                    const globalAvg = allWeekScores.reduce((a, b) => a + b, 0) / allWeekScores.length;
+                    const userAvg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                    
+                    // Simple percentile calculation
+                    const sortedScores = allWeekScores.map(s => s.totalScore).sort((a, b) => b - a);
+                    const rank = sortedScores.findIndex(s => userAvg >= s);
+                    const percentile = Math.max(1, Math.round((rank / sortedScores.length) * 100));
+                    
+                    communityInsights = { avgScore: globalAvg, percentile };
+                }
+
+                // 4. Generate with Gemini
                 console.log(`[Gemini] Generating weekly recovery report for ${user._id} (${weekStart})...`);
                 const aiAnalysis = await GeminiAIEngine.analyzeRecoveryTrend({
                     userName: user.name,
@@ -58,10 +76,11 @@ export async function GET(req: NextRequest) {
                         date: s.date,
                         score: s.totalScore,
                         metaphor: s.metaphor
-                    }))
+                    })),
+                    communityInsights
                 });
 
-                // 4. Save/Update report
+                // 5. Save/Update report
                 report = await RecoveryReport.findOneAndUpdate(
                     { userId: user._id, startDate: weekStart },
                     {
@@ -71,7 +90,8 @@ export async function GET(req: NextRequest) {
                         summary: aiAnalysis.summary,
                         status: aiAnalysis.status,
                         recommendations: aiAnalysis.recommendations,
-                        insight: aiAnalysis.insight
+                        insight: aiAnalysis.insight,
+                        percentileFeedback: aiAnalysis.percentileFeedback // New field
                     },
                     { upsert: true, new: true }
                 );

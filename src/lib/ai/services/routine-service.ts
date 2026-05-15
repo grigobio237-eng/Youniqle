@@ -187,14 +187,54 @@ JSON 배열만 반환하세요.`;
         return baseQuestions;
     }
 
-    static async analyzeRecoveryTrend(input: { userName: string; scores: any[] }): Promise<any> {
-        const prompt = `주간 회복 데이터를 분석하여 종합 리포트를 작성하세요. 데이터: ${JSON.stringify(input.scores)}`;
+    static async analyzeRecoveryTrend(input: { 
+        userName: string; 
+        scores: any[]; 
+        communityInsights?: {
+            avgScore: number;
+            percentile: number;
+        }
+    }): Promise<any> {
+        const communityContext = input.communityInsights 
+            ? `\n## 사회적 증거 (Social Proof) 데이터
+- 유니클 전체 유저 평균 점수: ${input.communityInsights.avgScore}
+- 사용자의 현재 위치: 상위 ${input.communityInsights.percentile}% (수치가 낮을수록 우수)
+- 위 정보를 분석 결과에 자연스럽게 녹여내어 사용자가 자부심을 느끼거나 분발하도록 동기를 부여하세요.`
+            : "";
+
+        const prompt = `
+당신은 유니클(Youniqle)의 수석 데이터 사이언티스트이자 회복 코치입니다.
+사용자의 주간 회복 데이터를 분석하여 종합 리포트를 작성하세요.
+
+## 사용자 데이터
+- 이름: ${input.userName}
+- 주간 기록: ${JSON.stringify(input.scores)}
+${communityContext}
+
+## 분석 가이드
+1. **Trend Analysis**: 한 주 동안의 회복 점수 변화 추이를 전문적으로 분석하세요.
+2. **Personalized Insight**: 단순히 수치 나열이 아닌, 사용자의 상태를 비유(metaphor)와 연결해 깊이 있게 통찰하세요.
+3. **Actionable Advice**: 다음 주에 실천할 수 있는 가장 효과적인 회복 행동 3가지를 제안하세요.
+
+## 응답 형식 (JSON Only)
+{
+  "summary": "전체 요약 (1~2문장)",
+  "status": "회복 상승|안정 유지|주의 필요",
+  "percentileFeedback": "백분위 기반의 칭찬 또는 격려 문구 (communityInsights가 있을 때만 작성)",
+  "insight": "심층 분석 내용 (3~4문장)",
+  "recommendations": ["추천 행동 1", "추천 행동 2", "추천 행동 3"]
+}`;
         try {
             const response = await GeminiCore.generateWithFallback(prompt, "AI 데이터 분석가 모드", 0.6);
             const jsonMatch = response.match(/\{[\s\S]*\}/);
             if (jsonMatch) return JSON.parse(jsonMatch[0]);
         } catch (error) {
-            return { summary: "데이터 분석 중입니다.", status: "안정", recommendations: ["규칙적인 생활 유지"], insight: "조금씩 나아지는 모습이 보입니다." };
+            return { 
+                summary: "데이터 분석 중입니다.", 
+                status: "안정", 
+                recommendations: ["규칙적인 생활 유지"], 
+                insight: "조금씩 나아지는 모습이 보입니다." 
+            };
         }
     }
 
