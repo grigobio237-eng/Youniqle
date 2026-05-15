@@ -48,6 +48,7 @@ import { motion } from 'framer-motion';
 import DynamicHero from '@/components/me/DynamicHero';
 import MembershipProgress from '@/components/me/MembershipProgress';
 import AILatestBrief from '@/components/me/AILatestBrief';
+import { Switch } from '@/components/ui/switch';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import QRReferralCard from '@/components/me/QRReferralCard';
 import MedicalPassCard from '@/components/me/MedicalPassCard';
@@ -99,6 +100,27 @@ export default function MyPage() {
   const [userStatus, setUserStatus] = useState<any>(null);
   const [communityAverages, setCommunityAverages] = useState<any[]>([]);
   const [weeklyReport, setWeeklyReport] = useState<any>(null);
+  const [notificationPermission, setNotificationPermission] = useState<string>('default');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    }
+  }, []);
+
+  const handleNotificationToggle = async (checked: boolean) => {
+    if (checked) {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+      if (permission === 'granted') {
+        // PWARegistration에서 처리하므로 권한만 요청해도 되지만, 즉각적인 반응을 위해 강제 재등록 유도 가능
+        window.location.reload(); // 서비스워커 재등록 유도
+      }
+    } else {
+      // 알림 끄기는 브라우저 설정에서 해야 하므로 안내만 표시
+      alert('알림을 끄려면 브라우저 설정에서 유니클 사이트의 알림 권한을 차단해 주세요.');
+    }
+  };
 
   const fetchCommunityData = async () => {
     try {
@@ -754,7 +776,21 @@ export default function MyPage() {
                           disabled={!isEditing}
                           className="rounded-md"
                         />
-                        <label htmlFor="marketing" className="ml-3 text-sm font-bold text-slate cursor-pointer select-none">이벤트 등 마케팅 수신동의 (선택)</label>
+                        <label htmlFor="marketing" className="ml-3 text-sm font-bold text-slate cursor-pointer select-none">이벤트 수신동의</label>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">회복 리듬 알림</Label>
+                      <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${notificationPermission === 'granted' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                        <div className="flex items-center gap-3">
+                          <Bell className={`h-4 w-4 ${notificationPermission === 'granted' ? 'text-chapter-accent' : 'text-slate opacity-40'}`} />
+                          <span className="text-sm font-bold text-slate">데스크톱/모바일 푸시</span>
+                        </div>
+                        <Switch 
+                          checked={notificationPermission === 'granted'}
+                          onCheckedChange={handleNotificationToggle}
+                          className="data-[state=checked]:bg-chapter-accent"
+                        />
                       </div>
                     </div>
                   </div>

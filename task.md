@@ -13,7 +13,15 @@
 - [x] Verify data synchronization between user scores and community benchmarks
 
 ## Phase 2: Proactive Engagement (PWA & Push)
-- [ ] Implement Web Manifest and Service Worker for PWA
-- [ ] Set up Firebase Cloud Messaging (FCM) or similar for Push Notifications
-- [ ] Create push notification service for "Daily Rhythm Check" reminders
-- [ ] Implement "Recovery Streak" push nudges
+- [x] Implement Web Manifest and Service Worker for PWA
+- [x] Set up VAPID-based Push Notification system (web-push)
+- [x] Create PushSubscription model and API
+- [x] Create NudgeService for "Daily Rhythm Check" reminders
+- [x] Implement "Recovery Streak" push nudges
+- [x] UI: Add notification preference toggle in MyPage
+- [x] Set up Cron job API for automated nudge delivery
+
+## Phase 3: Gamification & Rewards
+- [ ] Implement "Recovery Badges" system
+- [ ] Add "Weekly Best Recovery" leaderboard
+- [ ] Create "Friend's Recovery" activity feed (Privacy-first)
