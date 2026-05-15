@@ -7,7 +7,7 @@ export interface IRecoveryScore extends Document {
     totalScore: number; // 0-100 converted score
     metaphor: string;
     answers: Array<{
-        questionId: number;
+        questionId: string;
         category: string;
         score: number;
         detail?: string;
@@ -44,7 +44,7 @@ const RecoveryScoreSchema = new Schema<IRecoveryScore>({
         required: true,
     },
     answers: [{
-        questionId: { type: Number, required: true },
+        questionId: { type: String, required: true },
         category: { type: String, required: true },
         score: { type: Number, required: true },
         detail: { type: String, required: false },
