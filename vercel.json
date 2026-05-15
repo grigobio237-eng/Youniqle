@@ -4,6 +4,12 @@
       "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/notifications/cron-nudge",
+      "schedule": "0 0 * * *"
+    }
+  ],
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
