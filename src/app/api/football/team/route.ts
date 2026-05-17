@@ -109,7 +109,13 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ teams });
+    // 본인이 신청했으나 승인 대기 중인 팀 조회
+    const pendingTeam = await FootballTeam.findOne({
+      createdBy: session.user.id,
+      status: 'pending',
+    });
+
+    return NextResponse.json({ teams, pendingTeam });
   } catch (error: any) {
     console.error('[Football Team GET]', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

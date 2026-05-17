@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Loader2, Activity, Heart, Trophy, Users, Calendar,
-  Megaphone, ChevronRight, CheckCircle2, AlertCircle, Crown, MessageSquare
+  Megaphone, ChevronRight, CheckCircle2, AlertCircle, Crown, MessageSquare,
+  Clock, RefreshCw, Shield, UserPlus, Link as LinkIcon
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -29,8 +30,21 @@ interface TeamInfo {
 export default function FootballMyPage() {
   const { data: session } = useSession();
   const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null);
+  const [pendingTeam, setPendingTeam] = useState<any>(null);
   const [wellness, setWellness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // 초대 코드 및 신규 창단 상태
+  const [inviteCode, setInviteCode] = useState('');
+  const [joiningTeam, setJoiningTeam] = useState(false);
+  const [creationMode, setCreationMode] = useState(false);
+  const [newTeamName, setNewTeamName] = useState('');
+  const [newCategory, setNewCategory] = useState('youth');
+  const [newAgeGroup, setNewAgeGroup] = useState('');
+  const [newRegion, setNewRegion] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [creationLoading, setCreationLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -47,6 +61,13 @@ export default function FootballMyPage() {
         const teamData = await teamRes.json();
         if (teamData.teams?.length > 0) {
           setTeamInfo(teamData.teams[0]);
+        } else {
+          setTeamInfo(null);
+        }
+        if (teamData.pendingTeam) {
+          setPendingTeam(teamData.pendingTeam);
+        } else {
+          setPendingTeam(null);
         }
       }
 
@@ -58,6 +79,52 @@ export default function FootballMyPage() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleJoinByCode = async () => {
+    if (!inviteCode) return;
+    setJoiningTeam(true);
+    setError('');
+    try {
+      const cleanCode = inviteCode.trim().toUpperCase();
+      window.location.href = `/football/join/${cleanCode}`;
+    } catch (e) {
+      setError('올바른 초대 코드를 입력해 주세요');
+      setJoiningTeam(false);
+    }
+  };
+
+  const handleCreateTeam = async () => {
+    if (!newTeamName) {
+      setError('팀 이름을 입력해 주세요');
+      return;
+    }
+    setCreationLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/football/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teamName: newTeamName,
+          category: newCategory,
+          ageGroup: newAgeGroup,
+          region: newRegion,
+          description: newDescription
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('축구팀 창단 신청이 접수되었습니다! 관리자 승인 후 개설이 완료됩니다.');
+        await fetchData();
+      } else {
+        setError(data.error || '팀 신청에 실패했습니다');
+      }
+    } catch (e) {
+      setError('네트워크 오류가 발생했습니다');
+    } finally {
+      setCreationLoading(false);
     }
   };
 
@@ -85,6 +152,198 @@ export default function FootballMyPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+      </div>
+    );
+  }
+
+  // 1. 창단 승인 대기 중인 상태 렌더링
+  if (!teamInfo && pendingTeam) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 via-background to-background p-4 pb-24">
+        <div className="max-w-lg mx-auto space-y-6 pt-4 md:pt-24">
+          <Card className="rounded-[32px] border-2 border-yellow-300 shadow-2xl overflow-hidden bg-white">
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <Clock className="w-10 h-10 text-yellow-500" />
+              </div>
+              <div className="space-y-2">
+                <Badge className="bg-yellow-100 text-yellow-700 border-none font-bold text-sm">
+                  창단 승인 대기 중
+                </Badge>
+                <h1 className="text-2xl font-black text-obsidian">{pendingTeam.teamName}</h1>
+                <p className="text-sm text-slate">
+                  축구팀 창단 요청이 정상적으로 접수되었습니다.<br />
+                  관리자 승인이 완료되면 즉시 클럽하우스 서비스가 활성화됩니다!
+                </p>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-2xl text-left text-xs space-y-2 text-slate font-medium">
+                <p>• <strong>카테고리:</strong> {pendingTeam.category === 'youth' ? '유소년' : pendingTeam.category === 'pro' ? '프로' : '동호회'}</p>
+                {pendingTeam.region && <p>• <strong>지역:</strong> {pendingTeam.region}</p>}
+                {pendingTeam.ageGroup && <p>• <strong>연령대:</strong> {pendingTeam.ageGroup}</p>}
+                <p>• <strong>신청일:</strong> {new Date(pendingTeam.createdAt).toLocaleDateString('ko-KR')}</p>
+              </div>
+
+              <div className="pt-2">
+                <Button variant="outline" onClick={fetchData} className="w-full h-12 rounded-2xl font-bold gap-2">
+                  <RefreshCw className="w-4 h-4" /> 승인 상태 확인하기
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. 가입/창단된 팀이 전혀 없을 때 렌더링 (초기 유저 뷰)
+  if (!teamInfo && !pendingTeam) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 via-background to-background p-4 pb-24">
+        <div className="max-w-lg mx-auto space-y-6 pt-4 md:pt-24">
+          {/* 타이틀 헤더 */}
+          <div className="text-center space-y-2 py-4">
+            <div className="w-16 h-16 bg-green-500 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-green-200">
+              <Trophy className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-black text-obsidian tracking-tight mt-3">⚽ 클럽하우스 시작하기</h1>
+            <p className="text-sm text-slate leading-relaxed">
+              팀의 소속 선수, 보호자 또는 감독으로서<br />
+              체계적이고 과학적인 웰니스 분석을 받아보세요.
+            </p>
+          </div>
+
+          {/* 선택 카드 1: 선수/학부모로 합류 */}
+          <Card className="rounded-[32px] border-none shadow-xl bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center">
+                  <Users className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-black text-obsidian">선수 / 보호자로 팀 합류</h3>
+                  <p className="text-xs text-slate">코치에게 받은 팀 초대 코드가 있다면 입력하세요.</p>
+                </div>
+              </div>
+
+              {error && inviteCode && (
+                <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-bold">
+                  ⚠️ {error}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  placeholder="초대 코드 입력 (예: FCXXXX)"
+                  className="flex-1 h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold uppercase"
+                />
+                <Button
+                  onClick={handleJoinByCode}
+                  disabled={!inviteCode || joiningTeam}
+                  className="h-12 px-5 rounded-2xl bg-green-600 hover:bg-green-700 font-black text-sm"
+                >
+                  {joiningTeam ? <Loader2 className="w-4 h-4 animate-spin" /> : '합류하기'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 선택 카드 2: 감독/코치로 팀 개설 */}
+          <Card className="rounded-[32px] border-none shadow-xl bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => setCreationMode(!creationMode)}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-obsidian">👨‍🏫 감독 / 코치로 팀 창단</h3>
+                    <p className="text-xs text-slate">새로운 팀을 개설하고 승인을 신청합니다.</p>
+                  </div>
+                </div>
+                <ChevronRight className={`w-5 h-5 text-slate transition-transform duration-300 ${creationMode ? 'rotate-90' : ''}`} />
+              </div>
+
+              {creationMode && (
+                <div className="pt-4 border-t border-line space-y-4">
+                  {error && !inviteCode && (
+                    <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-bold">
+                      ⚠️ {error}
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate">팀 이름 (필수)</label>
+                    <input
+                      type="text"
+                      value={newTeamName}
+                      onChange={(e) => setNewTeamName(e.target.value)}
+                      placeholder="예: 강남 FC 유소년클럽"
+                      className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate">카테고리</label>
+                    <select
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm bg-white font-bold"
+                    >
+                      <option value="youth">유소년 클럽</option>
+                      <option value="pro">엘리트 / 프로</option>
+                      <option value="amateur">아마추어 / 동호회</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate">연령대</label>
+                      <input
+                        type="text"
+                        value={newAgeGroup}
+                        onChange={(e) => setNewAgeGroup(e.target.value)}
+                        placeholder="예: U-12"
+                        className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate">연고 지역</label>
+                      <input
+                        type="text"
+                        value={newRegion}
+                        onChange={(e) => setNewRegion(e.target.value)}
+                        placeholder="예: 서울 강남구"
+                        className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate">팀 소개 (선택)</label>
+                    <textarea
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
+                      placeholder="팀에 대한 간단한 소개를 적어주세요."
+                      className="w-full h-20 p-3 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleCreateTeam}
+                    disabled={creationLoading}
+                    className="w-full h-12 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-black text-sm text-white"
+                  >
+                    {creationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : '팀 개설 신청하기'}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
