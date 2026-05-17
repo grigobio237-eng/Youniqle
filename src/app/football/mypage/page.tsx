@@ -287,8 +287,10 @@ export default function FootballMyPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate">카테고리</label>
+                    <label htmlFor="team-category-select" className="text-xs font-bold text-slate">카테고리</label>
                     <select
+                      id="team-category-select"
+                      title="카테고리 선택"
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
                       className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm bg-white font-bold"

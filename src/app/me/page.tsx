@@ -1025,8 +1025,10 @@ export default function MyPage() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label className="text-xs font-black text-slate-500">카테고리</Label>
+                              <Label htmlFor="football-category-select" className="text-xs font-black text-slate-500">카테고리</Label>
                               <select 
+                                id="football-category-select"
+                                title="팀 카테고리 선택"
                                 value={footballNewCategory}
                                 onChange={(e) => setFootballNewCategory(e.target.value)}
                                 className="w-full h-11 px-3 rounded-lg border border-input bg-white text-sm font-bold focus:outline-none focus:ring-1 focus:ring-ring"
