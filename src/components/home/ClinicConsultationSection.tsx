@@ -34,7 +34,7 @@ export default function ClinicConsultationSection() {
       if (newProgress > 30 && newProgress < 60) {
         setLoadingText(type === 'pre' ? '정밀 회복 가이드 구성 중...' : '사후 관리 프로토콜 분석 중...');
       } else if (newProgress >= 60 && newProgress < 90) {
-        setLoadingText(type === 'pre' ? 'AI 맞춤형 문진지 생성 완료!' : '회복 로드맵 업데이트 완료!');
+        setLoadingText(type === 'pre' ? '유니클 맞춤형 문진지 생성 완료!' : '회복 로드맵 업데이트 완료!');
       } else if (newProgress >= 90) {
         setLoadingText('준비가 완료되었습니다!');
       }

@@ -73,7 +73,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
       if (session?.user) {
         const userName = session.user.name || '회원';
         try {
-          const res = await fetch('/api/user/status');
+          const res = await fetch('/api/user/status?minimal=true');
           if (res.ok) {
             const data = await res.json();
             const { score } = data;

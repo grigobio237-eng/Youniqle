@@ -41,33 +41,43 @@ export default function ClinicPatientDetail() {
   useEffect(() => {
     // 세션 스토리지에서 인증 여부 확인
     const authorized = sessionStorage.getItem('clinic_authorized') === 'true';
-    if (authorized) {
+    const storedPassword = sessionStorage.getItem('clinic_password') || '';
+    if (authorized && storedPassword) {
       setIsAuthorized(true);
-      fetchPatientData();
+      fetchPatientData(storedPassword);
     } else {
       setLoading(false);
     }
   }, [userId]);
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === '1234') {
+    setLoading(true);
+    const success = await fetchPatientData(password);
+    if (success) {
       setIsAuthorized(true);
-      setLoading(true);
       sessionStorage.setItem('clinic_authorized', 'true');
-      fetchPatientData();
+      sessionStorage.setItem('clinic_password', password);
     } else {
       setPassError(true);
+      setLoading(false);
       setTimeout(() => setPassError(false), 2000);
     }
   };
 
-  const fetchPatientData = async () => {
+  const fetchPatientData = async (pswd?: string) => {
     try {
+      const authPassword = pswd || password || sessionStorage.getItem('clinic_password') || '';
+      
       // 1. 먼저 해당 유저의 최신 문진 ID를 가져옴
       const listResponse = await fetch(`/api/consultation?userId=${userId}`, {
-        headers: { 'x-clinic-password': '1234' }
+        headers: { 'x-clinic-password': authPassword }
       });
+      
+      if (!listResponse.ok) {
+        return false;
+      }
+      
       const listData = await listResponse.json();
       
       if (listData.consultations && listData.consultations.length > 0) {
@@ -75,21 +85,25 @@ export default function ClinicPatientDetail() {
         
         // 2. 개별 상세 API를 호출하여 AI 리포트 생성 트리거 (없을 경우 생성함)
         const detailResponse = await fetch(`/api/consultation/${latestId}`, {
-          headers: { 'x-clinic-password': '1234' }
+          headers: { 'x-clinic-password': authPassword }
         });
         const detailData = await detailResponse.json();
         
         if (detailData.consultation) {
           setConsultation(detailData.consultation);
+          return true;
         } else {
           setError('상세 문진 데이터를 불러올 수 없습니다.');
+          return false;
         }
       } else {
         setError('해당 사용자의 문진 기록을 찾을 수 없습니다.');
+        return false;
       }
     } catch (err) {
       console.error('Fetch error:', err);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
+      return false;
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import PreConsultation from '@/models/PreConsultation';
@@ -21,9 +21,10 @@ export async function GET(request: NextRequest) {
 
         // Find latest pre-consultation document
         const latestConsultation = await PreConsultation.findOne({ user: user._id })
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
 
-        return NextResponse.json(latestConsultation);
+        return NextResponse.json({ consultation: latestConsultation });
 
     } catch (error: any) {
         console.error('Latest Consultation Fetch Error:', error);

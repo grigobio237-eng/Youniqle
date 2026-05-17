@@ -129,8 +129,9 @@ export function PaidDiagnosisModal({ open, onOpenChange }: PaidDiagnosisModalPro
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl h-[85vh] p-0 overflow-hidden bg-white/60 backdrop-blur-xl text-slate-900 border-white/80 shadow-2xl flex flex-col sm:rounded-[32px]">
                 {/* Accessibility: Persistent Title */}
-                <DialogTitle className="sr-only">심층 심리 진단 (Premium)</DialogTitle>
-                <DialogDescription className="sr-only">60문항으로 구성된 유료 심층 심리 진단 모달입니다.</DialogDescription>
+                <DialogTitle className="sr-only">심층 상태 분석 (Premium)</DialogTitle>
+                <DialogDescription className="sr-only">60문항으로 구성된 유료 심층 상태 분석 모달입니다.</DialogDescription>
+
 
                 <AnimatePresence mode="wait">
                     {step === 'intro' && (
@@ -242,7 +243,8 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                         onClick={onNext}
                         className="w-full max-w-sm mx-auto h-16 bg-obsidian text-white font-bold rounded-full text-lg shadow-xl shadow-obsidian/10 hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
-                        심층 진단 시작하기 <ArrowRight className="w-5 h-5 ml-1" />
+                        심층 분석 시작하기 <ArrowRight className="w-5 h-5 ml-1" />
+
                     </Button>
                     <p className="mt-4 text-gray-400 text-xs font-medium">약 5-10분 소요됩니다</p>
                 </motion.div>

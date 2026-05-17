@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import ConciergeRequest from '@/models/ConciergeRequest';
@@ -9,66 +9,52 @@ import NavigatorConsultation from '@/models/NavigatorConsultation';
 
 export async function GET() {
     try {
+        console.log('📡 [GET /api/me/status] Request started');
         const session = await getServerSession(authOptions);
+        console.log('📡 [GET /api/me/status] Session check:', !!session, session?.user?.email);
+        
         if (!session || !session.user || !session.user.email) {
             return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
         }
 
         await connectDB();
-        const user = await User.findOne({ email: session.user.email });
+        
+        // 병렬 쿼리 실행으로 성능 최적화
+        const [user, latestConcierge, latestInquiry] = await Promise.all([
+            User.findOne({ email: session.user.email }).select('_id referralCode isNavigator email').lean(),
+            ConciergeRequest.findOne({ 
+                $or: [{ userId: session.user.id }, { userEmail: session.user.email }] 
+            }).sort({ createdAt: -1 }).select('status createdAt painPoint').lean(),
+            Inquiry.findOne({ 
+                $or: [{ userId: session.user.id }, { userEmail: session.user.email }] 
+            }).sort({ createdAt: -1 }).select('status createdAt subject type').lean()
+        ]);
+
         if (!user) {
             return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
         }
 
-        // 최신 컨시어지 신청 현황 조회 ($or 사용하여 ID 또는 이메일로 검색)
-        const latestConcierge = await ConciergeRequest.findOne({
-            $or: [
-                { userId: user._id },
-                { userId: user._id.toString() },
-                { userEmail: user.email }
-            ]
-        }).sort({ createdAt: -1 });
-
-        // 최신 일반 문의 현황 조회
-        const latestInquiry = await Inquiry.findOne({
-            $or: [
-                { userId: user._id },
-                { userEmail: user.email }
-            ]
-        }).sort({ createdAt: -1 });
-
-        // 상담 피드백 알람 확인
+        // 알람 확인 (독립 쿼리)
         let hasNewConsultationFeedback = false;
         if (user.isNavigator) {
-            // 네비게이터인 경우: 본인에게 할당된 상담 중 읽지 않은 pending 상태 확인
             const unreadInquiry = await NavigatorConsultation.findOne({
                 navigatorId: user.referralCode,
                 status: 'pending',
                 isReadByNavigator: false
-            });
+            }).select('_id').lean();
             hasNewConsultationFeedback = !!unreadInquiry;
         } else {
-            // 일반 유저인 경우: 본인의 상담 중 답변이 달렸고 읽지 않은 상태 확인
             const unreadFeedback = await NavigatorConsultation.findOne({
                 userId: user._id,
                 status: 'answered',
                 isReadByUser: false
-            });
+            }).select('_id').lean();
             hasNewConsultationFeedback = !!unreadFeedback;
         }
 
         return NextResponse.json({
-            concierge: latestConcierge ? {
-                status: latestConcierge.status,
-                createdAt: latestConcierge.createdAt,
-                painPoint: latestConcierge.painPoint
-            } : null,
-            inquiry: latestInquiry ? {
-                status: latestInquiry.status,
-                createdAt: latestInquiry.createdAt,
-                subject: latestInquiry.subject,
-                type: latestInquiry.type
-            } : null,
+            concierge: latestConcierge,
+            inquiry: latestInquiry,
             hasNewConsultationFeedback
         });
 

@@ -17,6 +17,7 @@
     "test:e2e": "jest --testPathPattern=e2e",
     "test-email": "tsx src/scripts/test-email.ts",
     "create-test-data": "node scripts/create-test-data.js",
+    "seed:football": "node scripts/seed-football-test.js",
     "create-analytics-data": "node scripts/create-analytics-test-data.js",
     "test-mongodb": "node scripts/test-mongodb-connection.js",
     "diagnose-mongodb": "node scripts/diagnose-mongodb.js",

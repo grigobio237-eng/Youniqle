@@ -5,6 +5,7 @@ export interface ICommunityPost extends Document {
   title: string;
   content: string;
   category: 'free' | 'review' | 'question' | 'notice' | 'tip';
+  teamId?: mongoose.Types.ObjectId;
   
   // 작성자 정보
   authorId: mongoose.Types.ObjectId;
@@ -52,6 +53,11 @@ const CommunityPostSchema = new Schema<ICommunityPost>(
       enum: ['free', 'review', 'question', 'notice', 'tip'],
       default: 'free',
       required: true,
+    },
+    teamId: {
+      type: Schema.Types.ObjectId,
+      ref: 'FootballTeam',
+      index: true,
     },
     authorId: {
       type: Schema.Types.ObjectId,
@@ -116,6 +122,8 @@ const CommunityPostSchema = new Schema<ICommunityPost>(
 // 인덱스 설정
 CommunityPostSchema.index({ createdAt: -1 });
 CommunityPostSchema.index({ category: 1, createdAt: -1 });
+CommunityPostSchema.index({ teamId: 1, createdAt: -1 });
+
 
 const CommunityPost: Model<ICommunityPost> =
   mongoose.models.CommunityPost || mongoose.model<ICommunityPost>('CommunityPost', CommunityPostSchema);

@@ -36,27 +36,38 @@ const LABELS: Record<TimeSlot, string> = {
     DAWN: '새벽 루틴', MORNING: '오전 루틴', AFTERNOON: '오후 루틴', EVENING: '저녁 루틴', NIGHT: '심야 루틴'
 };
 
-export default function RoutineCard({ userStatus }: { userStatus?: any }) {
+export default function RoutineCard({ userStatus, initialData }: { userStatus?: any, initialData?: any }) {
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [title, setTitle] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+    const [tasks, setTasks] = useState<Task[]>(initialData?.tasks || []);
+    const [title, setTitle] = useState(initialData?.title || '');
+    const [loading, setLoading] = useState(!initialData);
+    const [completedTasks, setCompletedTasks] = useState<string[]>(initialData?.completedTasks || []);
     
+    const fetchedRef = React.useRef<string | null>(initialData ? getTimeSlot(new Date()) : null);
     const currentSlot = getTimeSlot(currentTime);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
         
         const loadData = async () => {
+            // Prevent double fetching for the same slot
+            if (fetchedRef.current === currentSlot) return;
+            
+            // If we have initialData and the slot matches, skip first fetch
+            if (initialData && !fetchedRef.current) {
+                fetchedRef.current = currentSlot;
+                return;
+            }
+
             setLoading(true);
             await fetchAiRoutine();
+            fetchedRef.current = currentSlot;
         };
 
         loadData();
         
         return () => clearInterval(timer);
-    }, [currentSlot]);
+    }, [currentSlot, initialData]);
 
     const fetchAiRoutine = async () => {
         try {

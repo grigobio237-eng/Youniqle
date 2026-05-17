@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, TrendingUp, ThumbsUp, AlertTriangle, Target, ShoppingBag, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (products: any[]) => void }) {
+export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (products: any[], report?: any) => void }) {
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState(false);
@@ -22,8 +22,8 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                 const result = await res.json();
                 if (result.data) {
                     setReport(result.data);
-                    if (onDataLoaded && result.data.recommendedProducts) {
-                        onDataLoaded(result.data.recommendedProducts);
+                    if (onDataLoaded) {
+                        onDataLoaded(result.data.recommendedProducts || [], result.data);
                     }
                 }
             }
@@ -46,8 +46,8 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
             }
 
             setReport(result.data);
-            if (onDataLoaded && result.data.recommendedProducts) {
-                onDataLoaded(result.data.recommendedProducts);
+            if (onDataLoaded) {
+                onDataLoaded(result.data.recommendedProducts || [], result.data);
             }
             toast.success('이번 주 회복 리포트가 성공적으로 발행되었습니다!');
         } catch (error) {

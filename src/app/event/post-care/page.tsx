@@ -28,7 +28,7 @@ export default function PostCarePage() {
         return;
       }
       try {
-        const res = await fetch('/api/user/status');
+        const res = await fetch('/api/user/status?minimal=true');
         const data = await res.json();
         if (data.activeRecoveryPlan) {
           setRecentRoadmap(data.activeRecoveryPlan);

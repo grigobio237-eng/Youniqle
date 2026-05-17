@@ -15,45 +15,72 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
   const [loading, setLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let pollInterval: NodeJS.Timeout;
-
-    const fetchReport = async (isRetry = false) => {
-      try {
-        if (!isRetry) setLoading(true);
-        const res = await fetch(`/api/consultation/${params.id}`);
-        if (!res.ok) {
-          throw new Error('리포트를 불러올 권한이 없거나 존재하지 않습니다.');
-        }
-        const json = await res.json();
-        setData(json.consultation);
-
-        // 만약 aiGuide가 아직 생성되지 않았다면 분석 중 상태로 설정하고 폴링 시작
-        if (!json.consultation.aiGuide) {
-          setIsAnalyzing(true);
-          if (!pollInterval) {
-            pollInterval = setInterval(() => fetchReport(true), 3000); // 3초마다 재시도
-          }
-        } else {
-          setIsAnalyzing(false);
-          if (pollInterval) clearInterval(pollInterval);
-        }
-      } catch (err: any) {
-        addToast({ title: '오류', description: err.message, variant: 'error' });
-        if (pollInterval) clearInterval(pollInterval);
-      } finally {
-        if (!isRetry) setLoading(false);
-      }
-    };
-
     fetchReport();
-
-    return () => {
-      if (pollInterval) clearInterval(pollInterval);
-    };
   }, [params.id]);
+
+  const fetchReport = async (isRetry = false, pswd?: string) => {
+    let pollInterval: NodeJS.Timeout;
+    try {
+      if (!isRetry) setLoading(true);
+      
+      const headers: any = {};
+      const currentPassword = pswd || password;
+      if (currentPassword) {
+        headers['x-clinic-password'] = currentPassword;
+      }
+
+      const res = await fetch(`/api/consultation/${params.id}`, { headers });
+      
+      if (res.status === 403) {
+        setShowPasswordPrompt(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error('리포트를 불러올 권한이 없거나 존재하지 않습니다.');
+      }
+
+      const json = await res.json();
+      setData(json.consultation);
+      setShowPasswordPrompt(false);
+
+      // 만약 aiGuide가 아직 생성되지 않았다면 분석 중 상태로 설정하고 폴링 시작
+      if (!json.consultation.aiGuide) {
+        setIsAnalyzing(true);
+        pollInterval = setInterval(async () => {
+          const pollRes = await fetch(`/api/consultation/${params.id}`, { headers });
+          if (pollRes.ok) {
+            const pollJson = await pollRes.json();
+            if (pollJson.consultation.aiGuide) {
+              setData(pollJson.consultation);
+              setIsAnalyzing(false);
+              clearInterval(pollInterval);
+            }
+          }
+        }, 3000);
+      } else {
+        setIsAnalyzing(false);
+      }
+    } catch (err: any) {
+      addToast({ title: '오류', description: err.message, variant: 'error' });
+    } finally {
+      if (!isRetry) setLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsVerifying(true);
+    await fetchReport(false, password);
+    setIsVerifying(false);
+  };
 
   const handleDownloadPdf = async () => {
     if (!reportRef.current) return;
@@ -114,6 +141,50 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
       setDownloading(false);
     }
   };
+
+  if (showPasswordPrompt) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-mist px-4">
+        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-2xl space-y-6 text-center border border-primary/10">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-2">
+            <ShieldCheck className="w-10 h-10" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-obsidian tracking-tight">병원 전용 보안 액세스</h2>
+            <p className="text-slate font-medium text-sm">
+              이 리포트는 비밀번호로 보호되어 있습니다.<br/>
+              부여받은 병원 고유 코드를 입력해주세요.
+            </p>
+          </div>
+          
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="병원 고유 코드 입력"
+              className="w-full h-14 px-6 bg-mist border-none rounded-2xl focus:ring-2 focus:ring-primary text-center font-bold text-lg tracking-widest outline-none"
+              autoFocus
+            />
+            <Button 
+              type="submit" 
+              disabled={isVerifying || !password}
+              className="w-full h-14 bg-obsidian text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-lg"
+            >
+              {isVerifying ? <Loader2 className="w-6 h-6 animate-spin" /> : '액세스 승인'}
+            </Button>
+          </form>
+          
+          <button 
+            onClick={() => router.push('/')}
+            className="text-xs text-slate font-bold uppercase tracking-widest hover:text-primary transition-colors"
+          >
+            홈으로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

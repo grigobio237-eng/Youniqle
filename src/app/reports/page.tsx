@@ -120,11 +120,24 @@ export default function ReportsHub() {
           fetch('/api/event/consultation/latest')
         ]);
 
-        const diagnosisData = diagnosisRes.ok ? await diagnosisRes.json() : {};
-        const snapData = snapRes.ok ? await snapRes.json() : null;
-        const weeklyData = weeklyRes.ok ? await weeklyRes.json() : {};
-        const postCareData = postCareRes.ok ? await postCareRes.json() : null;
-        const consultData = consultRes.ok ? await consultRes.json() : null;
+        // Robust JSON parsing with fallbacks
+        const parseJson = async (res: Response, fallback: any) => {
+          if (!res.ok) return fallback;
+          try {
+            const text = await res.text();
+            if (!text) return fallback;
+            return JSON.parse(text);
+          } catch (e) {
+            console.error('JSON parse error:', e);
+            return fallback;
+          }
+        };
+
+        const diagnosisData = await parseJson(diagnosisRes, {});
+        const snapData = await parseJson(snapRes, null);
+        const weeklyData = await parseJson(weeklyRes, {});
+        const postCareData = await parseJson(postCareRes, null);
+        const consultData = await parseJson(consultRes, null);
 
         setReports({
           daily: diagnosisData.daily || null,
@@ -203,7 +216,7 @@ export default function ReportsHub() {
                 Overall Status
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                {session?.user?.name || '요원'}님의<br />회복 인사이트가 준비되었습니다.
+                {session?.user?.name || '유저'}님의<br />회복 인사이트가 준비되었습니다.
               </h2>
               <p className="text-foreground/40 font-medium max-w-md">
                 데이터는 거짓말을 하지 않습니다. 유니클의 분석을 통해 매일 더 나은 회복을 설계하세요.
@@ -275,7 +288,7 @@ export default function ReportsHub() {
                       </div>
                     </div>
                     <p className="text-slate/60 font-medium text-lg leading-relaxed max-w-2xl break-keep">
-                      당신의 심박 변이도와 스트레스 지수를 분석한 실시간 결과입니다. 현재 회복이 가장 필요한 시점입니다.
+                      오늘 기록하신 답변을 토대로 분석한 주관적 회복 리듬과 스트레스 지수입니다. 내면의 신호에 귀를 기울여 보세요.
                     </p>
                   </div>
                   <div className="bg-mist/30 p-8 rounded-[32px] text-center w-full md:w-64 border border-line/50">
@@ -478,7 +491,7 @@ export default function ReportsHub() {
             >
               <ReportCard 
                 title="방문 전 정밀 문진"
-                desc="병원 방문 전 작성한 상세 문진표와 AI 분석 상담 가이드입니다."
+                desc="병원 방문 전 작성한 상세 문진표와 유니클 분석 상담 가이드입니다."
                 date={reports.consultation?.createdAt ? new Date(reports.consultation.createdAt).toLocaleDateString() : undefined}
                 status={reports.consultation ? 'COMPLETED' : 'NOT_STARTED'}
                 type="consultation"

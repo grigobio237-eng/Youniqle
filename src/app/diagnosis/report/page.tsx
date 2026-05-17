@@ -544,7 +544,7 @@ export default function DeepDiagnosisReportPage() {
 
                 <MockPaymentModal open={paymentOpen} onOpenChange={setPaymentOpen} price={3900} productName="심층 심리 분석 리포트 + 유니클 솔루션" onSuccess={handlePaymentSuccess} />
                 <DeepDiagnosisModal open={deepDiagnosisModalOpen} onOpenChange={setDeepDiagnosisModalOpen} />
-                <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} title="심층 분석 리포트 접근 권한" description="5대 성격 요인과 30개 세부 지표, 그리고 AI 맞춤 솔루션을 확인하시려면 멤버십을 확인하세요." />
+                <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} title="심층 분석 리포트 접근 권한" description="5대 성격 요인과 30개 세부 지표, 그리고 유니클 맞춤 솔루션을 확인하시려면 멤버십을 확인하세요." />
             </div>
         </ChapterWrapper>
     );

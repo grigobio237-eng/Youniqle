@@ -19,9 +19,9 @@ const SITEMAP_DATA = [
     title: '회복 솔루션',
     icon: <Heart className="w-5 h-5" />,
     links: [
-      { name: 'AI 진단', href: '/diagnosis' },
-      { name: 'AI 내비게이터', href: '/ai-navigator' },
-      { name: 'AI 어드바이스', href: '/ai-advice' },
+      { name: '유니클 진단', href: '/diagnosis' },
+      { name: '유니클 내비게이터', href: '/ai-navigator' },
+      { name: '유니클 어드바이스', href: '/ai-advice' },
       { name: '힐링 센터', href: '/healing-center' },
       { name: '딥 사운드 테라피', href: '/therapy' },
     ]

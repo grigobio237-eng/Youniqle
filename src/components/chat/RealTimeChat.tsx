@@ -121,7 +121,7 @@ export default function RealTimeChat() {
             <div className="text-lg font-black tracking-tight">Director Kim</div>
             <div className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                AI Recovery Guide
+                Youniqle Recovery Guide
             </div>
           </div>
         </CardTitle>

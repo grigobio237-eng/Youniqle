@@ -182,7 +182,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-center gap-8 pt-6">
               <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
                 <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
-                AI Analysis
+                Youniqle Analysis
               </div>
               <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
                 <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />

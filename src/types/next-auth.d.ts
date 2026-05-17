@@ -14,6 +14,8 @@ declare module "next-auth" {
             grade?: string
             tier?: string
             subscription?: any
+            footballRole?: 'coach' | 'player' | 'guardian' | null
+            activeTeamId?: string | null
         } & DefaultSession["user"]
     }
 
@@ -25,6 +27,8 @@ declare module "next-auth" {
         provider?: string
         providerId?: string
         emailVerified?: boolean | null
+        footballRole?: 'coach' | 'player' | 'guardian' | null
+        activeTeamId?: string | null
     }
 }
 
@@ -37,5 +41,7 @@ declare module "next-auth/jwt" {
         grade?: string
         tier?: string
         subscription?: any
+        footballRole?: 'coach' | 'player' | 'guardian' | null
+        activeTeamId?: string | null
     }
 }

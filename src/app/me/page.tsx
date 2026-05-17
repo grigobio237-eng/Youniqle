@@ -561,7 +561,7 @@ export default function MyPage() {
         <div className="container mx-auto max-w-6xl px-0 md:px-4">
 
           {/* Dynamic Hero Section */}
-          <DynamicHero userName={session.user?.name || '요원'} />
+          <DynamicHero userName={session.user?.name || '유저'} />
 
           {/* Service Progress Status Cards */}
           {(userStatus?.concierge || userStatus?.inquiry) && (
@@ -791,7 +791,7 @@ export default function MyPage() {
                       </div>
                       <div>
                         <h3 className="text-lg font-black text-obsidian tracking-tighter">실시간 회복 리듬</h3>
-                        <p className="text-xs font-bold text-slate">다른 요원들의 지금은?</p>
+                        <p className="text-xs font-bold text-slate">다른 유저들의 지금은?</p>
                       </div>
                     </div>
                    <RecoveryActivityFeed />

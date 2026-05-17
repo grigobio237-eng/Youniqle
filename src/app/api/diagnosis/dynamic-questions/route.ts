@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
             // Use AI to generate a theme/greeting for the day
             const prompt = `
-            사용자(${userName || '요원'})를 위한 오늘의 '회복 리듬 측정' 테마와 환영 메시지를 생성해주세요.
+            사용자(${userName || '유저'})를 위한 오늘의 '회복 리듬 측정' 테마와 환영 메시지를 생성해주세요.
             오늘의 날짜는 ${today}입니다.
             
             [응답 형식 (JSON)]
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
               "greeting": "친근한 인사말 (1~2문장)"
             }`;
 
-            let themeData = { theme: '오늘의 회복 리듬체크', greeting: `${userName || '요원'}님, 오늘의 에너지를 확인해볼까요?` };
+            let themeData = { theme: '오늘의 회복 리듬체크', greeting: `${userName || '유저'}님, 오늘의 에너지를 확인해볼까요?` };
             try {
                 const aiResponse = await GeminiAIEngine.generateText(prompt);
                 const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);

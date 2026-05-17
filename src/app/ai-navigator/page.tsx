@@ -92,7 +92,7 @@ export default function AiNavigatorPage() {
     const [isForecastOpen, setIsForecastOpen] = useState(false);
     const [assetStats, setAssetStats] = useState<any>(null);
 
-    const userName = session?.user?.name || '요원';
+    const userName = session?.user?.name || '유저';
 
     // 외부 상품 관련 상태
     const [externalProducts, setExternalProducts] = useState<any[]>([]);
@@ -106,8 +106,10 @@ export default function AiNavigatorPage() {
     const [protocols, setProtocols] = useState<any[]>([]);
     const [timelineItems, setTimelineItems] = useState<any[]>([]);
     const [isMounted, setIsMounted] = useState(false);
-    const [activeTab, setActiveTab] = useState('today-routine');
     const [showUpsell, setShowUpsell] = useState(false);
+    const [activeTab, setActiveTab] = useState('today-routine');
+    const [routineData, setRoutineData] = useState<any>(null);
+    const [dailyMissions, setDailyMissions] = useState<any>(null);
 
 
     const userTier = AccessControl.getUserGroup(session?.user);
@@ -130,7 +132,7 @@ export default function AiNavigatorPage() {
             // 1. 타임라인 및 상태 데이터 가져오기 (실제 DB 데이터)
             const [timelineRes, statusRes] = await Promise.all([
                 fetch('/api/user/timeline'),
-                fetch('/api/user/status')
+                fetch('/api/user/status?minimal=true')
             ]);
 
             let latestScore = 0;
@@ -213,6 +215,23 @@ export default function AiNavigatorPage() {
                 setAiAdvice(adviceData.comment);
                 setTomorrowForecast(adviceData.tomorrowForecast);
             }
+
+            // 4. 루틴 통합 가져오기
+            const [morningRoutineRes, dailyRoutineRes] = await Promise.all([
+                fetch('/api/ai/routine', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timeSlot: '오전 루틴', userStatus: { score: scoreVal } })
+                }),
+                fetch('/api/ai/routine', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timeSlot: 'DAILY', userStatus: { score: scoreVal } })
+                })
+            ]);
+
+            if (morningRoutineRes.ok) setRoutineData(await morningRoutineRes.json());
+            if (dailyRoutineRes.ok) setDailyMissions(await dailyRoutineRes.json());
 
             await fetchExternalProducts();
 
@@ -402,18 +421,21 @@ export default function AiNavigatorPage() {
                                             </div>
                                             
                                             <React.Suspense fallback={<div className="h-96 w-full bg-mist animate-pulse rounded-[2rem]" />}>
-                                                <RoutineCard userStatus={categoryScores} />
+                                                <RoutineCard userStatus={categoryScores} initialData={routineData} />
                                             </React.Suspense>
                                         </div>
-
+ 
                                         {/* 섹션 2: 오늘 하루의 회복 미션 */}
                                         <div>
                                             <React.Suspense fallback={<div className="h-48 w-full bg-mist animate-pulse rounded-3xl" />}>
-                                                <DailySmallActions score={
-                                                    categoryScores && Object.values(categoryScores).length > 0 
-                                                        ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
-                                                        : 50
-                                                } />
+                                                <DailySmallActions 
+                                                    score={
+                                                        categoryScores && Object.values(categoryScores).length > 0 
+                                                            ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
+                                                            : 50
+                                                    } 
+                                                    initialData={dailyMissions}
+                                                />
                                             </React.Suspense>
                                         </div>
 
@@ -479,25 +501,26 @@ export default function AiNavigatorPage() {
                                         )}
                                     </div>
                                     <div className="grid grid-cols-1 gap-6">
-                                        <Card className="bg-white border-line rounded-[32px] overflow-hidden shadow-sm hover:shadow-md cursor-pointer group" onClick={() => router.push('/diagnosis/report?type=personality')}>
+                                        <Card className="bg-white border-primary/10 rounded-[32px] overflow-hidden shadow-xl hover:shadow-primary/5 cursor-pointer group transition-all" onClick={() => router.push('/?action=diagnose')}>
                                             <CardContent className="p-8 flex items-center justify-between gap-6">
                                                 <div className="flex-1 space-y-3">
-                                                    <Badge className="bg-chapter-accent text-mist text-[10px] font-black uppercase tracking-widest">Premium Report</Badge>
-                                                    <h3 className="text-2xl font-black text-obsidian group-hover:text-primary transition-colors">내면 데이터 리포트</h3>
-                                                    <p className="text-sm font-medium text-slate opacity-80">5가지 성격 요인 분석</p>
+                                                    <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">1일 루틴</Badge>
+                                                    <h3 className="text-2xl font-black text-obsidian group-hover:text-primary transition-colors">60초 리듬체크</h3>
+                                                    <p className="text-sm font-medium text-slate opacity-80">사진 한 장으로 시작하는 일상의 회복 기록</p>
                                                 </div>
-                                                <div className="w-16 h-16 bg-obsidian/5 rounded-2xl flex items-center justify-center text-3xl">📊</div>
+                                                <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">📸</div>
                                             </CardContent>
                                         </Card>
-                                        <Card className="bg-surface border-2 border-line rounded-[32px] overflow-hidden cursor-pointer hover:border-primary/50 transition-all shadow-sm" onClick={() => router.push('/archive')}>
+                                        
+                                        <Card className="bg-surface border-2 border-reward-gold/20 rounded-[32px] overflow-hidden cursor-pointer hover:border-reward-gold/50 transition-all shadow-xl shadow-reward-gold/5" onClick={() => router.push('/diagnosis?type=daily')}>
                                             <CardContent className="p-8 flex items-center justify-between gap-6">
                                                 <div className="flex-1 space-y-3">
-                                                    <Badge variant="outline" className="border-obsidian/20 text-obsidian font-black text-[10px] uppercase tracking-widest">Data Asset</Badge>
-                                                    <h3 className="text-2xl font-black text-obsidian">나의 기록 보관함</h3>
-                                                    <p className="text-sm font-medium text-slate opacity-70">모든 회복 데이터의 기록</p>
+                                                    <Badge className="bg-reward-gold/20 text-obsidian border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">정밀 리듬 측정</Badge>
+                                                    <h3 className="text-2xl font-black text-obsidian">오늘의 회복 리듬 측정</h3>
+                                                    <p className="text-sm font-medium text-slate opacity-70">16가지 정밀 질문으로 분석하는 오늘의 에너지</p>
                                                 </div>
-                                                <div className="w-16 h-16 bg-obsidian text-white rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                    <Package className="w-8 h-8" />
+                                                <div className="w-16 h-16 bg-reward-gold rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg shadow-reward-gold/20">
+                                                    ⚡
                                                 </div>
                                             </CardContent>
                                         </Card>

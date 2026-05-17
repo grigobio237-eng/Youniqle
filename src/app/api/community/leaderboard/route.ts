@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
             const user = await User.findById(entry._id);
             if (!user) continue;
 
-            const name = user.name || '요원';
+            const name = user.name || '유저';
             const anonymizedName = name.length > 2 
                 ? name[0] + '*'.repeat(name.length - 2) + name.slice(-1)
                 : name[0] + '*';

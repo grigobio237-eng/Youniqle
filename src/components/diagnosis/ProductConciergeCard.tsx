@@ -33,7 +33,7 @@ export function ProductConciergeCard({ productConcept, onRequestCustom }: Produc
                 </div>
 
                 {/* Content */}
-                <h3 className="text-sm font-bold text-indigo-500 uppercase tracking-widest mb-2">AI PRODUCT CONCIERGE</h3>
+                <h3 className="text-sm font-bold text-indigo-500 uppercase tracking-widest mb-2">YOUNIQLE PRODUCT CONCIERGE</h3>
                 <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-3">
                     "{typeof productConcept.name === 'object' ? (productConcept.name as any).title || (productConcept.name as any).name || JSON.stringify(productConcept.name) : productConcept.name}"
                 </h2>

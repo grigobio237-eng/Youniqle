@@ -138,7 +138,7 @@ export default function WishlistPage() {
           <div className="text-center md:text-left">
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Interest Inventory</p>
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">관심 상품 리스트</h1>
-            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원의 위시리스트입니다.</p>
+            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 위시리스트입니다.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={fetchWishlist} className="h-12 px-6 rounded-xl hover:bg-white text-slate font-black flex gap-2">

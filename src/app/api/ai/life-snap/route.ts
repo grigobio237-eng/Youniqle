@@ -59,7 +59,11 @@ export async function POST(request: NextRequest) {
 
         // 사용자 컨텍스트 및 여정 정보
         let contextInstruction = "";
-        if (journey === 'CLINICAL_PRE' || journey === 'CLINICAL_POST') {
+        if (journey === 'FOOTBALL') {
+            contextInstruction += `[USER JOURNEY: FOOTBALL ATHLETE] 
+            사용자는 축구 선수, 코치 혹은 보호자입니다. 
+            훈련 부하 관리, 부상 예방(근육 회복, 피로도 관리), 수면 질 향상, 영양 보충 등 스포츠 퍼포먼스와 회복(Recovery) 관점에서 전문적이고 동기부여가 되는 조언을 제공하세요. \n`;
+        } else if (journey === 'CLINICAL_PRE' || journey === 'CLINICAL_POST') {
             contextInstruction += `[USER JOURNEY: CLINICAL CARE] 
             사용자는 현재 시술이나 수술을 앞두고 있거나 회복 중인 환자 모드입니다. 
             상처 회복, 면역력 강화, 부기 완화, 금기 사항 등 '의학적 보조 회복' 관점에서 전문적이고 따뜻한 조언을 제공하세요. \n`;

@@ -213,6 +213,9 @@ export interface IUser extends Document {
     issuedAt: Date;
     metadata?: any;
   }>;
+  // 축구 플랫폼 연동
+  footballRole?: 'coach' | 'player' | 'guardian' | null;
+  activeTeamId?: mongoose.Types.ObjectId | null;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -504,7 +507,18 @@ const UserSchema = new Schema<IUser>({
     cycleNumber: { type: Number, required: true },
     issuedAt: { type: Date, default: Date.now },
     metadata: { type: Schema.Types.Mixed }
-  }]
+  }],
+  // 축구 플랫폼 연동
+  footballRole: {
+    type: String,
+    enum: ['coach', 'player', 'guardian', null],
+    default: null,
+  },
+  activeTeamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'FootballTeam',
+    default: null,
+  }
 }, {
   timestamps: true,
 });
@@ -540,10 +554,6 @@ UserSchema.pre('save', function(this: any, next) {
   }
   next();
 });
-
-if (mongoose.models && mongoose.models.User) {
-  delete mongoose.models.User;
-}
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 

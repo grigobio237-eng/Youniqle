@@ -9,6 +9,12 @@ import { ALL_QUESTIONS } from '@/lib/data/diagnosis-questions';
 import { FULL_DIAGNOSIS_QUESTIONS } from '@/lib/data/full-diagnosis-questions';
 import { SimcheungDiagnosisEngine } from '@/lib/logic/simcheung-diagnosis';
 import { IPIP60_QUESTIONS } from '@/lib/data/ipip60-questions';
+import RecoveryScore from '@/models/RecoveryScore';
+import { getKSTDate } from '@/lib/date';
+import FootballTeamMember from '@/models/FootballTeamMember';
+import WellnessCheck from '@/models/WellnessCheck';
+import { calculateACWR } from '@/lib/football/acwr';
+import Notification from '@/models/Notification';
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,7 +27,7 @@ export async function POST(request: NextRequest) {
         // if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await request.json();
-        const { type, result } = body;
+        const { type, result, journey } = body;
 
         if (!type || !result) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -204,6 +210,117 @@ export async function POST(request: NextRequest) {
                     createdAt: new Date()
                 });
                 console.log('✅ Diagnosis document created successfully');
+
+                // 3. Integration with RecoveryScore (CGM 7-Day Flow)
+                if (type === 'daily' || type === 'DAILY') {
+                    const targetDate = getKSTDate();
+                    const recoveryAnswers = Array.isArray(body.answers) 
+                        ? body.answers 
+                        : Object.entries(body.answers).map(([qId, score]) => {
+                            const qData = ALL_QUESTIONS.find(q => q.id === qId) || { category: 'General' };
+                            return {
+                                questionId: qId,
+                                category: qData.category || 'General',
+                                score: Number(score)
+                            };
+                        });
+
+                    await RecoveryScore.findOneAndUpdate(
+                        { userId: user._id, date: targetDate },
+                        {
+                            userId: user._id,
+                            date: targetDate,
+                            rawScore: totalScoreVal, // Using totalScoreVal as raw score for daily
+                            totalScore: totalScoreVal,
+                            metaphor: resultTitle || '오늘의 리듬체크',
+                            answers: recoveryAnswers,
+                            userNote: body.userNote || ''
+                        },
+                        { upsert: true, new: true, setDefaultsOnInsert: true }
+                    );
+                    console.log('✅ RecoveryScore (CGM Flow) updated successfully');
+
+                    // 4. Integration with Football WellnessCheck
+                    if (journey === 'FOOTBALL') {
+                        const membership = await FootballTeamMember.findOne({ userId: user._id, status: 'active' });
+                        if (membership) {
+                            const to1To5 = (score100: number) => Math.max(1, Math.min(5, Math.round((score100 || 0) / 20)));
+                            
+                            // 매핑 로직 (0-100 스케일을 1-5 스케일로 변환)
+                            // categoryScores.sleep, physical, mental
+                            const sleepVal = to1To5(categoryScores.sleep);
+                            const physicalVal = to1To5(categoryScores.physical);
+                            const mentalVal = to1To5(categoryScores.mental);
+
+                            const wellnessScore = parseFloat(((sleepVal + physicalVal * 2 + mentalVal * 2) / 5).toFixed(1));
+
+                            await WellnessCheck.findOneAndUpdate(
+                                { userId: user._id, date: targetDate },
+                                {
+                                    userId: user._id,
+                                    teamId: membership.teamId,
+                                    date: targetDate,
+                                    sleep: sleepVal,
+                                    soreness: physicalVal, // 1-5
+                                    fatigue: physicalVal, // 1-5
+                                    stress: mentalVal, // 1-5
+                                    mood: mentalVal, // 1-5
+                                    wellnessScore,
+                                    source: 'diagnosis',
+                                    sessionLoad: wellnessScore * 10 // 가상의 부하 계산 (RPE 대체)
+                                },
+                                { upsert: true, new: true, setDefaultsOnInsert: true }
+                            );
+                            console.log('✅ Football WellnessCheck updated successfully');
+
+                            // ACWR 위험 알림 로직
+                            const recentChecks = await WellnessCheck.find({
+                                userId: user._id,
+                                teamId: membership.teamId
+                            }).sort({ date: -1 }).limit(30);
+
+                            const loads = recentChecks.map(c => ({
+                                date: c.date,
+                                sessionLoad: c.sessionLoad || (c.wellnessScore * 10)
+                            }));
+
+                            if (loads.length >= 7) {
+                                const acwrData = calculateACWR(loads);
+                                if (acwrData.zone === 'danger' || acwrData.zone === 'caution') {
+                                    // 선수 본인에게 알림
+                                    await Notification.create({
+                                        userId: user._id,
+                                        type: 'system',
+                                        category: acwrData.zone === 'danger' ? 'urgent' : 'warning',
+                                        title: '부상 위험 알림 (ACWR)',
+                                        message: `현재 훈련 부하가 급증하여 부상 위험이 높습니다. 휴식이나 훈련량 조절이 필요합니다. (ACWR: ${acwrData.acwr})`,
+                                        priority: acwrData.zone === 'danger' ? 9 : 7,
+                                        source: 'football_acwr'
+                                    });
+
+                                    // 코치에게 알림
+                                    const coaches = await FootballTeamMember.find({
+                                        teamId: membership.teamId,
+                                        role: { $in: ['head_coach', 'coach'] },
+                                        status: 'active'
+                                    });
+
+                                    for (const coach of coaches) {
+                                        await Notification.create({
+                                            userId: coach.userId,
+                                            type: 'system',
+                                            category: acwrData.zone === 'danger' ? 'urgent' : 'warning',
+                                            title: `[팀 알림] ${user.name} 선수 부상 위험`,
+                                            message: `${user.name} 선수의 ACWR 수치가 ${acwrData.acwr}로 ${acwrData.zoneLabel} 구간에 진입했습니다. 부하 관리가 필요합니다.`,
+                                            priority: acwrData.zone === 'danger' ? 9 : 7,
+                                            source: 'football_acwr'
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } catch (diagError) {
                 console.error('Failed to create Diagnosis document:', diagError);
                 // 메인 로직(User 저장)은 성공했으므로 에러를 던지지 않음

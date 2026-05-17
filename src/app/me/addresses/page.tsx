@@ -227,7 +227,7 @@ export default function AddressesPage() {
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Logistics Control</p>
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">물류 터미널 관리</h1>
-            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원의 활성 배송 거점 목록입니다.</p>
+            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 활성 배송 거점 목록입니다.</p>
           </div>
           {!isAdding && addresses.length < 5 && (
             <Button onClick={() => setIsAdding(true)} className="h-14 px-8 rounded-2xl bg-obsidian text-mist font-black flex gap-2 shadow-xl shadow-obsidian/10">
@@ -308,11 +308,11 @@ export default function AddressesPage() {
                   <Input value={formData.label} onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value }))} placeholder="예: 거점 센터, 서브 스테이션" className="h-14 rounded-2xl bg-mist/50 border-line" />
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">수신 요원 명칭</Label>
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">수신 유저 명칭</Label>
                   <Input value={formData.recipient} onChange={(e) => setFormData(prev => ({ ...prev, recipient: e.target.value }))} placeholder="성함을 입력하십시오" className="h-14 rounded-2xl bg-mist/50 border-line" />
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">요원 연락처</Label>
+                  <Label className="text-[10px] font-black text-slate uppercase tracking-widest ml-1">유저 연락처</Label>
                   <Input value={formData.phone} onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))} placeholder="010-XXXX-XXXX" className="h-14 rounded-2xl bg-mist/50 border-line" />
                 </div>
                 <div className="space-y-3">

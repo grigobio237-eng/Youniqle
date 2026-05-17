@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Activity, LayoutDashboard, FileText, User } from 'lucide-react';
+import { Home, Activity, LayoutDashboard, FileText, User, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -29,7 +29,7 @@ export default function MobileBottomNav() {
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 30000); // 30초마다 확인
+    const interval = setInterval(checkStatus, 300000); // 5분마다 확인
     return () => clearInterval(interval);
   }, [session]);
 
@@ -60,6 +60,16 @@ export default function MobileBottomNav() {
       icon: User,
     },
   ];
+
+  // 축구 클럽하우스 탭 추가 (조건부)
+  const isFootballUser = (session?.user as any)?.footballRole;
+  if (isFootballUser) {
+    navItems.splice(3, 0, {
+      label: '클럽하우스',
+      href: '/football/mypage',
+      icon: Trophy,
+    });
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">

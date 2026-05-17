@@ -98,13 +98,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     }, [showWebcam, stream]);
 
     const startWebcam = async () => {
-        if (isMobile) return;
         setShowWebcam(true);
         try {
-            const constraints: MediaStreamConstraints = { video: true };
+            const constraints: MediaStreamConstraints = { 
+                video: { facingMode: 'environment' } 
+            };
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             setStream(newStream);
         } catch (err: any) {
+            console.error("Camera access error:", err);
             setShowWebcam(false);
             toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
             setTimeout(() => { fileInputRef.current?.click(); }, 300);
@@ -221,8 +223,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const renderIdleView = () => (
         <div 
             onClick={() => {
-                if (isMobile) fileInputRef.current?.click();
-                else startWebcam();
+                startWebcam();
             }}
             className="relative aspect-[16/10] md:aspect-[4/3] rounded-5xl overflow-hidden bg-surface group cursor-pointer border border-primary/10 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10"
         >
@@ -281,8 +282,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                             onClick={() => {
                                 setSnapType(cat.id);
                                 setStatus('idle');
-                                if (isMobile) fileInputRef.current?.click();
-                                else startWebcam();
+                                startWebcam();
                             }}
                             className="flex items-center text-left gap-5 p-5 rounded-3xl border border-transparent hover:border-primary/10 hover:bg-primary/5 transition-all bg-mist/10"
                         >
@@ -373,7 +373,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                     <CardContent className="p-10 space-y-10">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
-                                <Brain className="w-4 h-4" /> AI Personalized Summary
+                                <Brain className="w-4 h-4" /> Youniqle Personalized Summary
                             </div>
                             <div className="bg-mist/30 p-8 rounded-5xl border border-primary/5 italic text-2xl font-bold leading-tight text-foreground/80">
                                 "{result.summary}"

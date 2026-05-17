@@ -223,7 +223,7 @@ export default function ScanTimelinePage() {
                                                 <div className="mt-6 flex items-center justify-between border-t border-line/30 pt-6">
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-8 h-8 rounded-full bg-mist flex items-center justify-center text-xs">👤</div>
-                                                        <span className="text-[10px] font-black text-slate uppercase tracking-widest">AI Verified</span>
+                                                        <span className="text-[10px] font-black text-slate uppercase tracking-widest">Youniqle Verified</span>
                                                     </div>
                                                     <Button variant="ghost" size="sm" className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-mist">
                                                         View Full Report →

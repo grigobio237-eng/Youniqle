@@ -379,7 +379,7 @@ export default function AdminUsersPage() {
                   <SelectItem value="partner">파트너</SelectItem>
                   <SelectItem value="admin">관리자</SelectItem>
                   <SelectItem value="superadmin">최고 관리자</SelectItem>
-                  <SelectItem value="navigator">네비게이터 요원</SelectItem>
+                  <SelectItem value="navigator">네비게이터 유저</SelectItem>
                 </SelectContent>
               </Select>
 

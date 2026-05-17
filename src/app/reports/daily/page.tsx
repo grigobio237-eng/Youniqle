@@ -301,7 +301,7 @@ export default function DailyHistoryPage() {
                     <div className="flex items-center justify-between px-2">
                         <h3 className="font-black text-lg text-obsidian tracking-tight flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-primary" />
-                            AI 리커버리 인사이트
+                            유니클 리커버리 인사이트
                         </h3>
                         {insight?.analyzedAt && (
                             <span className="text-[10px] font-bold text-slate/50">

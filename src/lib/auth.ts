@@ -237,7 +237,7 @@ export const authOptions: AuthOptions = {
       if (token.email) {
         try {
           await connectDB();
-          const dbUser = await User.findOne({ email: token.email });
+          const dbUser = await User.findOne({ email: token.email }).maxTimeMS(5000);
           if (dbUser) {
             token.role = dbUser.role;
             token.grade = dbUser.grade;
@@ -252,6 +252,9 @@ export const authOptions: AuthOptions = {
             token.privacyAcceptedAt = dbUser.privacyAcceptedAt;
             token.sensitiveInfoAcceptedAt = dbUser.sensitiveInfoAcceptedAt;
             token.thirdPartyAcceptedAt = dbUser.thirdPartyAcceptedAt;
+            // 축구 플랫폼 연동
+            token.footballRole = dbUser.footballRole || null;
+            token.activeTeamId = dbUser.activeTeamId?.toString() || null;
             
             // 추천 코드가 없는 경우 자동 생성 (ID 기반)
             if (!dbUser.referralCode) {
@@ -298,6 +301,9 @@ export const authOptions: AuthOptions = {
         (session.user as any).privacyAcceptedAt = token.privacyAcceptedAt as string;
         (session.user as any).sensitiveInfoAcceptedAt = token.sensitiveInfoAcceptedAt as string;
         (session.user as any).thirdPartyAcceptedAt = token.thirdPartyAcceptedAt as string;
+        // 축구 플랫폼 연동
+        (session.user as any).footballRole = token.footballRole || null;
+        (session.user as any).activeTeamId = token.activeTeamId || null;
       }
       return session;
     },

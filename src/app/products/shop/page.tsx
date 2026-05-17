@@ -124,7 +124,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
             </Suspense>
           </ErrorBoundary>
 
-          {/* AI 추천 외부 큐레이션 */}
+          {/* 유니클 추천 외부 큐레이션 */}
           {!isFunding && (
             <div className="mt-16 pt-12 border-t border-line">
               <ExternalProductCuration

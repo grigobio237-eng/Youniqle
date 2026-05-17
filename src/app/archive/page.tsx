@@ -57,7 +57,7 @@ export default function ArchivePage() {
   React.useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/api/user/status');
+        const res = await fetch('/api/user/status?minimal=true');
         if (res.ok) {
           const data = await res.json();
           setAssetStats(data.assetStats);

@@ -83,7 +83,7 @@ export default function RecoveryCertificate({
             </div>
             <div className="text-right">
               <p className="text-[9px] font-black text-chapter-accent uppercase tracking-widest mb-1">Authenticated by</p>
-              <p className="text-xl font-serif-display italic text-obsidian font-black">YOUNIQLE AI</p>
+              <p className="text-xl font-serif-display italic text-obsidian font-black">YOUNIQLE</p>
             </div>
           </div>
         </div>

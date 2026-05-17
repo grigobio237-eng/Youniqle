@@ -34,7 +34,8 @@ import {
   Clock,
   DollarSign,
   MessageCircle,
-  Sparkles
+  Sparkles,
+  Building2
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
@@ -70,6 +71,24 @@ const navigationItems = [
     href: '/admin/consultations',
     icon: Target,
     description: '고객 사전 문진(Recovery Design) 리포트'
+  },
+  {
+    name: '병원 관리',
+    href: '/admin/hospitals',
+    icon: Building2,
+    description: '제휴 병원 및 고유 코드 관리'
+  },
+  {
+    name: '⚽ 축구 팀 관리',
+    href: '/admin/football/teams',
+    icon: Shield,
+    description: '축구 팀 승인 및 관리'
+  },
+  {
+    name: '📊 축구 플랫폼 통계',
+    href: '/admin/football/stats',
+    icon: Shield,
+    description: '축구 플랫폼 전체 현황 및 통계'
   },
   {
     name: '파트너 관리',

@@ -65,20 +65,26 @@ export async function POST(req: Request) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+    
     await connectDB();
 
     const url = new URL(req.url);
     const mode = url.searchParams.get('mode'); // 'admin' 혹은 'navigator'
-
-    let user = session?.user;
     const clinicPassword = req.headers.get('x-clinic-password');
 
-    // 1. 임시 비밀번호 인증 (계정 없는 의료진용)
-    const isTempClinicAuthorized = clinicPassword === '1234';
+    let user = session?.user;
+    let isTempClinicAuthorized = false;
+    let authorizedHospitalId = null;
+
+    // 1. Check against dynamic Hospital codes
+    if (clinicPassword) {
+      const { default: Hospital } = await import('@/models/Hospital');
+      const hospital = await Hospital.findOne({ code: clinicPassword, isActive: true });
+      if (hospital) {
+        isTempClinicAuthorized = true;
+        authorizedHospitalId = hospital._id;
+      }
+    }
 
     // 2. 관리자 토큰 확인 (로그인된 관리자용)
     if (!user && !isTempClinicAuthorized) {
@@ -94,7 +100,6 @@ export async function GET(req: NextRequest) {
     }
 
     const userIdParam = url.searchParams.get('userId');
-
     let query = {};
 
     // 1. 관리자 또는 의료기관 담당자(비밀번호 인증 포함)인 경우
@@ -104,16 +109,29 @@ export async function GET(req: NextRequest) {
         query = { user: userIdParam };
       } else {
         // 관리자가 전체를 보거나, 네비게이터 모드일 때 필터링
-        if ((user as any).isNavigator || mode === 'navigator') {
+        if (user && ((user as any).isNavigator || mode === 'navigator')) {
           const { default: User } = await import('@/models/User');
           const me = await User.findById((user as any).id);
           if (me) query = { navigator: me.referralCode };
         }
       }
+
+      // Log the visit if authorized via hospital code
+      if (isTempClinicAuthorized && authorizedHospitalId && userIdParam) {
+        const { default: HospitalVisitLog } = await import('@/models/HospitalVisitLog');
+        await HospitalVisitLog.create({
+          hospitalId: authorizedHospitalId,
+          userId: userIdParam,
+          accessType: 'patient-detail',
+          timestamp: new Date()
+        });
+      }
     } 
     // 2. 일반 유저인 경우 본인의 데이터만 조회
-    else {
-      query = { user: (session.user as any).id };
+    else if (user) {
+      query = { user: (user as any).id };
+    } else {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const consultations = await PreConsultation.find(query)

@@ -216,8 +216,11 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
                   ? `${unifiedData.certificateStatus.nextCycleToClaim}회차 완주 증명서 받기` 
                   : "나의 완주 기록 확인하기"}
               </Button>
-              <button className="text-xs font-bold text-foreground/20 uppercase tracking-[0.3em] hover:text-primary transition-colors">
-                기록 보관함으로 가기
+              <button 
+                onClick={() => window.location.href='/reports'}
+                className="text-xs font-bold text-foreground/20 uppercase tracking-[0.3em] hover:text-primary transition-colors"
+              >
+                회복 리포트로 가기
               </button>
             </div>
           </div>
@@ -266,12 +269,12 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
             </div>
           </div>
           
-          {/* Record Archive - High Contrast White */}
-          <div className="bg-white rounded-[32px] p-6 border border-obsidian/5 flex items-center justify-between group cursor-pointer hover:border-obsidian/20 transition-all shadow-lg shadow-obsidian/5 relative overflow-hidden" onClick={() => window.location.href='/archive'}>
+          {/* Recovery Report - High Contrast White */}
+          <div className="bg-white rounded-[32px] p-6 border border-obsidian/5 flex items-center justify-between group cursor-pointer hover:border-obsidian/20 transition-all shadow-lg shadow-obsidian/5 relative overflow-hidden" onClick={() => window.location.href='/reports'}>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mb-16 pointer-events-none" />
             <div className="relative z-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">History Archive</p>
-              <h3 className="text-xl md:text-2xl font-bold text-obsidian tracking-tight mb-1">나의 기록 보관함</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Recovery Report</p>
+              <h3 className="text-xl md:text-2xl font-bold text-obsidian tracking-tight mb-1">내 회복 리포트</h3>
               <p className="text-[11px] font-bold text-obsidian/40 uppercase tracking-widest">TOTAL {(unifiedData.assetStats?.totalInsights || 0)} INSIGHTS</p>
             </div>
             <div className="w-12 h-12 shrink-0 bg-obsidian rounded-full flex items-center justify-center text-white group-hover:bg-primary transition-colors relative z-10 shadow-sm">

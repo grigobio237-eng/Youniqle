@@ -194,7 +194,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           <div className="flex gap-2">
              {user.isNavigator && (
               <Badge className="bg-amber-500 text-white hover:bg-amber-600 px-3 py-1 flex items-center gap-1 text-xs">
-                <Sparkles className="h-3 w-3" /> 네비게이터 요원
+                <Sparkles className="h-3 w-3" /> 네비게이터 유저
               </Badge>
             )}
              <Badge variant="outline" className={`px-3 py-1 ${user.emailVerified ? 'text-green-600 border-green-200' : 'text-gray-400'}`}>

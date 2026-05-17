@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         const hasViewedReport = await UserBehavior.exists({
             userId,
             eventType: 'view',
-            'context.pageUrl': { $regex: /\/diagnosis\/report/ },
+            'context.pageUrl': { $regex: /\/reports|\/diagnosis\/report/ },
             timestamp: { $gte: startOfDay, $lte: endOfDay }
         });
 
@@ -50,9 +50,9 @@ export async function GET(request: NextRequest) {
                 },
                 {
                     id: 'report_view',
-                    text: '나의 정밀 회복 리포트 확인하기',
+                    text: '내 회복 리포트 확인하기',
                     isCompleted: !!hasViewedReport,
-                    href: '/diagnosis/report'
+                    href: '/reports'
                 },
                 {
                     id: 'recovery_log',

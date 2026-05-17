@@ -77,14 +77,10 @@ export default function ResultDisplay({
 
   const scoreLevel = recoveryScore >= 70 ? '활기 회복 단계' : recoveryScore >= 40 ? '회복 진행 중' : '회복 초기 단계';
 
-  useEffect(() => {
-    if (isDesigning) {
-      const timer = setTimeout(() => {
-        navigateTo('/ai-navigator');
-      }, 3500); // Give enough time for the 2.2s progress bar + reading
-      return () => clearTimeout(timer);
-    }
-  }, [isDesigning]);
+  // Remove artificial 3.5s delay and redirect immediately
+  const handleStartDesign = () => {
+    navigateTo('/ai-navigator');
+  };
 
   useEffect(() => {
     const saveData = async () => {
@@ -197,7 +193,7 @@ export default function ResultDisplay({
 
           <div className="grid grid-cols-1 gap-4">
             <Button 
-              onClick={() => setIsDesigning(true)} 
+              onClick={handleStartDesign} 
               size="lg" 
               className="w-full h-16 md:h-20 rounded-[24px] bg-obsidian text-white text-lg md:text-xl font-black shadow-2xl shadow-obsidian/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
@@ -226,96 +222,6 @@ export default function ResultDisplay({
           </div>
       </div>
 
-      <AnimatePresence>
-        {isDesigning && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-mist/95 backdrop-blur-xl"
-          >
-            <div className="max-w-md w-full space-y-12 text-center">
-              {/* Animated Core */}
-              <div className="relative w-32 h-32 mx-auto">
-                <motion.div 
-                  animate={{ rotate: 360 }} 
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 border-4 border-chapter-accent/20 rounded-full border-t-chapter-accent"
-                />
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1] }} 
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-4 bg-chapter-accent rounded-full flex items-center justify-center text-white shadow-2xl shadow-chapter-accent/40"
-                >
-                  <Sparkles className="w-10 h-10" />
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="absolute -top-2 -right-2 bg-reward-gold text-white p-2 rounded-xl shadow-lg"
-                >
-                  <Brain className="w-4 h-4" />
-                </motion.div>
-              </div>
-
-              {/* Status Message */}
-              <div className="space-y-4">
-                <h3 className="text-3xl font-black text-obsidian tracking-tight">당신만을 위한<br />회복 루틴 설계 중</h3>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="flex gap-2">
-                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <span className="w-1.5 h-1.5 bg-chapter-accent rounded-full animate-bounce" />
-                  </div>
-                  <p className="text-sm font-bold text-slate/60 uppercase tracking-widest">Integrating Data Sources</p>
-                </div>
-              </div>
-
-              {/* Combined Data Indicators */}
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  { label: "이미지 분석", value: (analysisData?.summary?.split(' ')[0] || "대상") + " 외 키워드", delay: 0 },
-                  { label: "문진 데이터", value: `${recoveryScore} 포인트 회복 프로토콜`, delay: 0.2 },
-                  { label: "환경 조건", value: analysisData ? "데이터 연동 완료" : "라이프스타일 매칭", delay: 0.4 }
-                ].map((item, idx) => (
-                  <motion.div 
-                    key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: item.delay }}
-                    className="flex justify-between items-center bg-white/50 backdrop-blur-sm border border-line/50 p-4 rounded-2xl"
-                  >
-                    <span className="text-[10px] font-black text-slate/50 uppercase tracking-wider">{item.label}</span>
-                    <span className="text-xs font-bold text-obsidian">{item.value}</span>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Progress Bar */}
-              <div className="pt-4">
-                <div className="h-1.5 w-full bg-mist rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 2.2, ease: "easeInOut" }}
-                    className="h-full bg-chapter-accent"
-                  />
-                </div>
-                <p className="mt-3 text-[10px] font-black text-chapter-accent uppercase tracking-[0.2em] animate-pulse">
-                  Synthesizing your personalized timeline...
-                </p>
-              </div>
-              
-              <Button 
-                onClick={() => navigateTo('/ai-navigator')}
-                className="w-full mt-8 bg-chapter-accent text-white rounded-2xl h-14 font-black"
-              >
-                리듬체크에서 결과 보기
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

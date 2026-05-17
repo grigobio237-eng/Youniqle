@@ -192,11 +192,14 @@ const ArchiveContent = () => {
     },
     {
       id: 'recovery-diagnosis',
-      title: "3분 회복진단 (Recovery Diagnosis)",
+      title: "3분 상태정리 (Recovery Summary)",
+
       icon: ClipboardList,
       details: {
-        title: "🧭 3분 회복진단: \"나만을 위한 맞춤형 회복 지도 그리기\"",
-        intro: "이 진단은 단순히 질문 몇 개 던지는 게 아닙니다. 손님의 불안함을 '데이터'로 바꾸고, '우리가 당신의 회복을 책임질게요'라고 약속하는 '회복 설계도'를 그리는 과정입니다.",
+        title: "🧭 3분 상태정리: \"나만을 위한 맞춤형 회복 지도 그리기\"",
+
+        intro: "이 과정은 단순히 질문 몇 개 던지는 게 아닙니다. 손님의 불안함을 '데이터'로 바꾸고, '우리가 당신의 회복을 책임질게요'라고 약속하는 '회복 설계도'를 그리는 과정입니다.",
+
         points: [
           {
             title: "1. \"당신을 먼저 이해합니다\" (15개의 마법 질문)",
@@ -234,7 +237,8 @@ const ArchiveContent = () => {
             icon: FileText
           }
         ],
-        summaryText: "고객님, 시술을 정하기 전에 먼저 '3분 회복진단'부터 받아보세요. 고객님의 예산과 일정, 무서워하시는 부분까지 모두 고려해서 세상에 하나뿐인 안전한 회복 지도를 그려드릴게요."
+        summaryText: "고객님, 시술을 정하기 전에 먼저 '3분 상태정리'부터 받아보세요. 고객님의 예산과 일정, 무서워하시는 부분까지 모두 고려해서 세상에 하나뿐인 안전한 회복 지도를 그려드릴게요."
+
       },
     },
     {
@@ -728,7 +732,8 @@ const ArchiveContent = () => {
              </div>
              <div className="md:col-span-6 grid grid-cols-1 gap-4">
                 {[
-                  { id: 'recovery-diagnosis', icon: Zap, label: "3분 회복진단", sub: "몇 번의 질문으로 고객의 '회복 유형'을 즉시 파악" },
+                  { id: 'recovery-diagnosis', icon: Zap, label: "3분 상태정리", sub: "몇 번의 질문으로 고객의 '회복 유형'을 즉시 파악" },
+
                   { id: 'recovery-prediction', icon: Clock, label: "회복 예측표", sub: "가격표보다 먼저 '언제 출근 가능할지' 숫자로 안심 유도" },
                   { id: 'intensive-care-72h', icon: ShieldCheck, label: "72시간 밀착 케어", sub: "시술 직후 가장 불안한 3일 동안 전문가 동행 관리" }
                 ].map((point, k) => (

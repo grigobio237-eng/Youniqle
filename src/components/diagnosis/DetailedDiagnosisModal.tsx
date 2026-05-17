@@ -29,7 +29,7 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
     const [result, setResult] = useState<FreeDiagnosisResult | null>(null);
     const [questions, setQuestions] = useState<DiagnosisQuestionData[]>([]);
 
-    const userName = session?.user?.name || '요원';
+    const userName = session?.user?.name || '유저';
 
     // Reset or Initialize when opened
     useEffect(() => {
@@ -138,10 +138,11 @@ export function DetailedDiagnosisModal({ open, onOpenChange, onUnlockPaid, initi
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-none rounded-[32px] bg-surface shadow-2xl h-[600px] flex flex-col">
                 <DialogHeader className="sr-only">
-                    <DialogTitle>{userName} 님의 정밀 심리 진단</DialogTitle>
+                    <DialogTitle>{userName} 님의 정밀 상태 분석</DialogTitle>
                     <DialogDescription>
-                        심리 진단을 통해 당신의 상태를 분석하고 솔루션을 제공합니다.
+                        상태 분석을 통해 당신의 회복 흐름을 파악하고 솔루션을 제공합니다.
                     </DialogDescription>
+
                 </DialogHeader>
                 <AnimatePresence mode="wait">
                     {step === 'intro' && (
@@ -194,7 +195,8 @@ function IntroView({ onStart, onClose, userName }: { onStart: () => void, onClos
                     <span className="text-4xl">🧠</span>
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black text-obsidian mb-4">{userName} 님을 위한<br />심층 심리 진단</h2>
+                    <h2 className="text-3xl font-black text-obsidian mb-4">{userName} 님을 위한<br />심층 상태 분석</h2>
+
                     <p className="text-slate font-medium leading-relaxed max-w-sm mx-auto">
                         나의 마음, 감정, 관계, 신체 4가지 영역을<br />
                         정밀하게 분석하여<br />
@@ -209,7 +211,8 @@ function IntroView({ onStart, onClose, userName }: { onStart: () => void, onClos
             </div>
             <div className="p-8 bg-white border-t border-line">
                 <Button onClick={onStart} className="w-full h-14 rounded-2xl bg-primary text-background font-black text-lg shadow-lg hover:scale-[1.02] transition-transform">
-                    지금 진단 시작하기
+                    지금 분석 시작하기
+
                 </Button>
             </div>
         </motion.div>

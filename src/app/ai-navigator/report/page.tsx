@@ -50,7 +50,7 @@ export default function WeeklyReportPage() {
   const [showMembershipModal, setShowMembershipModal] = useState(false); // 멤버십 모달 상태 추가
   const [userStatus, setUserStatus] = useState<any>(null); // 사용자 권한 상태 추가
   const cardRef = React.useRef<HTMLDivElement>(null);
-  const userName = session?.user?.name || '요원';
+  const userName = session?.user?.name || '유저';
 
   const fetchedRef = React.useRef(false);
 

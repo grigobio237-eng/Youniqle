@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
-import { Loader2, Search, Stethoscope, Activity, Heart, ShieldCheck, Sparkles, Smile, Leaf } from "lucide-react";
+import { Loader2, Search, Stethoscope, Activity, Heart, ShieldCheck, Sparkles, Smile, Leaf, AlertCircle } from "lucide-react";
 import { useRecovery } from "@/contexts/RecoveryContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,6 +27,7 @@ export default function PreProcedureForm() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [dynamicQuestions, setDynamicQuestions] = useState<any>(null);
   const [isAutoAnalyzing, setIsAutoAnalyzing] = useState(false);
+  const [aiRecommendation, setAiRecommendation] = useState("");
 
   useEffect(() => {
     const checkAutoAnalyze = async () => {
@@ -39,9 +40,10 @@ export default function PreProcedureForm() {
       }
 
       if (isNewAction && step === 0) {
+        setIsAutoAnalyzing(true);
         try {
-          // 1. Fetch user status to get latest insights
-          const res = await fetch('/api/user/status');
+          // 1. Fetch user status with minimal flag to avoid heavy AI tasks
+          const res = await fetch('/api/user/status?minimal=true');
           const data = await res.json();
           
           let contextSymptom = "";
@@ -52,10 +54,12 @@ export default function PreProcedureForm() {
           }
 
           if (contextSymptom) {
-            setSymptomText(contextSymptom);
+            setAiRecommendation(contextSymptom);
           }
         } catch (err) {
           console.error("Auto Analysis Failed:", err);
+        } finally {
+          setIsAutoAnalyzing(false);
         }
       }
     };
@@ -344,7 +348,31 @@ export default function PreProcedureForm() {
     customBudget: "",
     needsDedicatedManager: false,
     needsPremiumKit: false,
+    isEmergency: false,
+    emergencyDetails: [] as string[],
   });
+
+  const emergencyOptions = [
+    "38도 이상의 고열",
+    "갑작스러운 호흡 곤란",
+    "가슴 통증 또는 압박감",
+    "의식 저하 또는 심한 어지럼증",
+    "조절되지 않는 심한 출혈",
+    "갑작스러운 마비 또는 감각 저하"
+  ];
+
+  const handleEmergencyToggle = (option: string) => {
+    setFormData(prev => {
+      const newDetails = prev.emergencyDetails.includes(option)
+        ? prev.emergencyDetails.filter(d => d !== option)
+        : [...prev.emergencyDetails, option];
+      return {
+        ...prev,
+        emergencyDetails: newDetails,
+        isEmergency: newDetails.length > 0
+      };
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -515,12 +543,13 @@ export default function PreProcedureForm() {
                 <span className="text-xs font-black text-primary uppercase tracking-widest">Intelligent Trigger</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-black tracking-tight italic">
-                어디가 <span className="text-primary">불편</span>하신가요?
+                현재 <span className="text-primary">회복 상태</span>가 어떠신가요?
               </h2>
               <p className="text-text-secondary font-medium">
                 증상을 알려주시거나 방문하시려는 분야를 선택하시면<br />
-                유니클이 당신을 위한 맞춤 문진표를 구성합니다.
+                유니클이 당신의 회복을 위한 맞춤 상태 정리표를 구성합니다.
               </p>
+
             </div>
 
             {/* Symptom Input Area */}
@@ -543,8 +572,9 @@ export default function PreProcedureForm() {
                     </div>
                     <p className="text-sm font-black text-primary animate-pulse">
                       {isAutoAnalyzing 
-                        ? "사용자의 최근 회복 데이터를 기반으로 AI 문진표를 생성 중입니다..." 
-                        : "유니클 AI가 증상을 정밀 분석하여 맞춤 질문지를 구성하고 있습니다..."}
+                        ? "사용자의 최근 회복 데이터를 기반으로 상태 정리표를 생성 중입니다..." 
+                        : "유니클 AI가 증상을 정밀 분석하여 맞춤 상태 체크 리스트를 구성하고 있습니다..."}
+
                     </p>
                   </motion.div>
                 )}
@@ -571,6 +601,30 @@ export default function PreProcedureForm() {
                   {isAnalyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : "분석 시작"}
                 </Button>
               </div>
+
+              <AnimatePresence>
+                {aiRecommendation && !symptomText && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-3 flex items-start gap-2 bg-primary/5 p-3 rounded-2xl border border-primary/10"
+                  >
+                    <div className="flex-1">
+                      <p className="text-[11px] font-black text-primary/60 uppercase tracking-wider mb-1">AI 추천 증상</p>
+                      <p className="text-sm text-text-primary font-medium line-clamp-2">{aiRecommendation}</p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setSymptomText(aiRecommendation)}
+                      className="text-xs font-bold text-primary hover:bg-primary/10 rounded-xl whitespace-nowrap"
+                    >
+                      적용하기
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Compact Category Selection */}
@@ -579,11 +633,12 @@ export default function PreProcedureForm() {
               <div className="grid grid-cols-3 gap-3 md:gap-4">
                 {[
                   { id: 'PLASTIC', label: '성형/피부', sub: '미적 개선', icon: <Heart className="w-5 h-5 text-pink-500" />, bg: 'bg-pink-50' },
-                  { id: 'ORIENTAL', label: '한방 진료', sub: '체질 회복', icon: <Leaf className="w-5 h-5 text-emerald-500" />, bg: 'bg-emerald-50' },
+                  { id: 'ORIENTAL', label: '한방 회복', sub: '체질 분석', icon: <Leaf className="w-5 h-5 text-emerald-500" />, bg: 'bg-emerald-50' },
                   { id: 'DENTAL', label: '치과', sub: '치아/구강', icon: <Smile className="w-5 h-5 text-amber-500" />, bg: 'bg-amber-50' },
                   { id: 'ORTHOPEDIC', label: '정형/재활', sub: '통증/관절', icon: <Activity className="w-5 h-5 text-blue-500" />, bg: 'bg-blue-50' },
                   { id: 'INTERNAL', label: '내과/검진', sub: '건강 관리', icon: <Stethoscope className="w-5 h-5 text-indigo-500" />, bg: 'bg-indigo-50' },
-                  { id: 'GENERAL', label: '일반 진료', sub: '기본 상담', icon: <ShieldCheck className="w-5 h-5 text-slate-500" />, bg: 'bg-slate-50' },
+                  { id: 'GENERAL', label: '일반 상담', sub: '상태 체크', icon: <ShieldCheck className="w-5 h-5 text-slate-500" />, bg: 'bg-slate-50' },
+
                 ].map((cat) => (
                   <button 
                     key={cat.id}
@@ -608,12 +663,13 @@ export default function PreProcedureForm() {
                    ← 방문 분야 다시 선택
                  </Button>
               </div>
-              <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery Design</CardTitle>
+              <CardTitle className="text-3xl font-black tracking-tight mb-2 italic">Recovery State Summary</CardTitle>
               <CardDescription className="text-lg font-medium text-text-secondary">
                 {medicalCategory === 'PLASTIC' ? '성형/피부' : 
                  medicalCategory === 'ORTHOPEDIC' ? '정형/재활' : 
-                 medicalCategory === 'INTERNAL' ? '내과/검진' : '정밀'} 회복 설계를 시작합니다.
+                 medicalCategory === 'INTERNAL' ? '내과/검진' : '정밀'} 맞춤 상태 분석을 시작합니다.
               </CardDescription>
+
             </CardHeader>
             <CardContent className="pb-10">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 sm:px-6">
@@ -622,9 +678,11 @@ export default function PreProcedureForm() {
             {step === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="text-center mb-6">
+                  <div className="text-xs font-black text-primary/50 mb-2">LAYER 1: RECOVERY TRIGGER</div>
                   <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step1Title}</h3>
                   <p className="text-text-secondary">{activeContent.step1Sub}</p>
                 </div>
+
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">{activeContent.changeLabel}</Label>
@@ -707,15 +765,51 @@ export default function PreProcedureForm() {
               </div>
             )}
 
-            {/* STEP 2: 과거 경험과 안전 */}
+            {/* STEP 2: 과거 경험과 안전 (LAYER 2) */}
             {step === 2 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                  <div className="text-center mb-6">
+                  <div className="text-xs font-black text-chapter-accent mb-2">LAYER 2: BODY DATA & SAFETY</div>
                   <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step2Title}</h3>
                   <p className="text-text-secondary">{activeContent.step2Sub}</p>
                 </div>
 
-                <div className="space-y-4">
+
+                {/* Emergency Filter Logic */}
+                <div className="p-6 bg-red-50 border-2 border-red-200 rounded-[24px] space-y-4">
+                  <div className="flex items-center gap-3 text-red-600">
+                    <AlertCircle className="w-6 h-6 animate-pulse" />
+                    <h4 className="font-black">필수 안전 확인: 응급 상황 체크</h4>
+                  </div>
+                  <p className="text-xs text-red-700 font-medium leading-relaxed">
+                    현재 아래 중 하나라도 해당되는 증상이 있으신가요? <br/>
+                    응급 상황의 경우 문진을 중단하고 즉시 의료진에게 연락하거나 가까운 응급실을 방문해야 합니다.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {emergencyOptions.map(opt => (
+                      <div 
+                        key={opt} 
+                        onClick={() => handleEmergencyToggle(opt)}
+                        className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${formData.emergencyDetails.includes(opt) ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-red-200 text-red-600 hover:bg-red-50'}`}
+                      >
+                        <Checkbox checked={formData.emergencyDetails.includes(opt)} className="border-red-300 data-[state=checked]:bg-white data-[state=checked]:text-red-600" />
+                        <span className="text-xs font-bold">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {formData.isEmergency && (
+                    <div className="mt-4 p-4 bg-white rounded-xl border border-red-200 animate-in fade-in zoom-in-95">
+                      <p className="text-sm font-black text-red-600 mb-3">⚠️ 현재 증상은 즉각적인 의료 조치가 필요할 수 있습니다.</p>
+                      <div className="flex gap-2">
+                        <Button variant="destructive" className="flex-1 font-black" onClick={() => window.location.href = 'tel:119'}>119 연결</Button>
+                        <Button variant="outline" className="flex-1 font-black border-red-600 text-red-600" onClick={() => router.push('/concierge')}>내비게이터 상담</Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className={`space-y-4 ${formData.isEmergency ? 'opacity-20 pointer-events-none' : ''}`}>
                   <Label className="text-xl font-bold">{activeContent.pastLabel}</Label>
                   <p className="text-sm text-text-secondary">{activeContent.pastSub}</p>
                   <RadioGroup 
@@ -834,9 +928,11 @@ export default function PreProcedureForm() {
             {step === 3 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
+                  <div className="text-xs font-black text-chapter-accent mb-2">LAYER 3: RECOVERY CONCERNS</div>
                   <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step3Title}</h3>
                   <p className="text-text-secondary">{activeContent.step3Sub}</p>
                 </div>
+
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">{activeContent.anxietyLabel}</Label>
@@ -886,9 +982,11 @@ export default function PreProcedureForm() {
             {step === 4 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="text-center mb-6">
+                  <div className="text-xs font-black text-chapter-accent mb-2">LAYER 4: EXECUTION DESIGN</div>
                   <h3 className="text-2xl font-black text-primary mb-2">{activeContent.step4Title}</h3>
                   <p className="text-text-secondary">{activeContent.step4Sub}</p>
                 </div>
+
 
                 <div className="space-y-4">
                   <Label className="text-xl font-bold">1. 방문 시 보호자 동행 유무</Label>
@@ -1054,16 +1152,34 @@ export default function PreProcedureForm() {
                   </div>
                 </div>
 
+                {/* 위험 요소 요약 배너 (LAYER 2 데이터 기반) */}
+                {(formData.isTakingMedication || formData.hasHealthIssue || formData.isEmergency) && (
+                  <div className="p-5 bg-amber-50 border-2 border-amber-200 rounded-[24px] space-y-2 animate-in zoom-in-95">
+                    <div className="flex items-center gap-2 text-amber-700">
+                      <AlertCircle className="w-5 h-5" />
+                      <h4 className="font-black text-sm">주의가 필요한 회복 위험 요소가 감지되었습니다.</h4>
+                    </div>
+                    <ul className="text-xs text-amber-600 font-medium list-disc list-inside pl-1 space-y-1">
+                      {formData.isEmergency && <li>현재 응급성 증상이 포함되어 있습니다.</li>}
+                      {formData.isTakingMedication && <li>복용 중인 약물/영양제: {formData.medicationDetails}</li>}
+                      {formData.hasHealthIssue && <li>최근 컨디션 이슈: {formData.healthIssueDetails}</li>}
+                    </ul>
+                    <p className="text-[10px] text-amber-500 pt-1">위 내용은 의료진과 상담 시 반드시 다시 한 번 말씀해 주세요.</p>
+                  </div>
+                )}
+
                 <div className="flex gap-3 pt-6">
-                  <Button type="button" variant="outline" onClick={() => setStep(4)} className="flex-1 h-14 rounded-2xl font-bold">이전</Button>
+                  <Button type="button" variant="outline" onClick={() => setStep(4)}
+ className="flex-1 h-14 rounded-2xl font-bold">이전</Button>
                   <Button 
                     type="button" 
                     onClick={handleSubmit} 
                     disabled={isSubmitting || !formData.budgetRange || (formData.budgetRange === 'custom' && !formData.customBudget)}
                     className="flex-[2] h-14 rounded-2xl text-lg font-bold bg-primary"
                   >
-                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : '상담 신청 및 완료'}
+                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : '상태 정리 완료'}
                   </Button>
+
                 </div>
               </div>
             )}

@@ -142,7 +142,7 @@ export default function DailyCheckInPopup() {
                                 🤖
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-chapter-accent uppercase tracking-wider">AI Recovery Coach</p>
+                                <p className="text-xs font-bold text-chapter-accent uppercase tracking-wider">Youniqle Recovery Coach</p>
                                 <p className="text-lg font-black text-obsidian">Daily Check-in</p>
                             </div>
                         </div>

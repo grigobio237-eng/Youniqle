@@ -131,7 +131,7 @@ export default function ScannerReportPage() {
                                     {/* Content Side */}
                                     <div className="p-8 space-y-6">
                                         <div className="flex items-center justify-between">
-                                            <div className="text-xs font-black text-primary uppercase tracking-[0.3em]">AI Analysis Score</div>
+                                            <div className="text-xs font-black text-primary uppercase tracking-[0.3em]">Youniqle Analysis Score</div>
                                             <div className="flex items-baseline gap-1">
                                                 <span className="text-4xl font-black text-obsidian">{latestScan.score || 0}</span>
                                                 <span className="text-sm font-bold text-slate">pt</span>
@@ -276,7 +276,7 @@ export default function ScannerReportPage() {
                                 <div className="space-y-4">
                                     <h4 className="font-black text-obsidian text-lg tracking-tight flex items-center gap-2">
                                         <Sparkles className="w-5 h-5 text-primary" />
-                                        AI 분석 요약
+                                        유니클 분석 요약
                                     </h4>
                                     <p className="text-sm font-medium text-slate leading-relaxed bg-mist/30 p-6 rounded-3xl border border-line/50 italic">
                                         "{selectedScan.summary}"
@@ -306,7 +306,7 @@ export default function ScannerReportPage() {
                                         <h5 className="font-black text-primary text-xs uppercase tracking-[0.2em]">Coach Insight</h5>
                                         <p className="text-sm font-bold leading-relaxed text-mist/80">
                                             이 분석 데이터를 기반으로 당신의 회복 흐름이 설계됩니다. 
-                                            지속적인 스캐닝을 통해 더 정밀한 AI 가이드를 받아보세요.
+                                            지속적인 스캐닝을 통해 더 정밀한 유니클 가이드를 받아보세요.
                                         </p>
                                     </div>
                                 </div>

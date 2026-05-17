@@ -64,13 +64,22 @@ export async function GET(request: NextRequest) {
     // 사용자 정보 확인
     const admin = await User.findById(decoded.id).select('-passwordHash').maxTimeMS(5000);
     
-    if (admin.role !== 'admin' && admin.role !== 'superadmin') {
+    if (!admin) {
       console.log('❌ 관리자 사용자를 찾을 수 없음:', decoded.id);
+      return NextResponse.json(
+        { error: '관리자 정보를 찾을 수 없습니다.' },
+        { status: 401 }
+      );
+    }
+
+    if (admin.role !== 'admin' && admin.role !== 'superadmin') {
+      console.log('❌ 관리자 권한이 없음:', admin.email, admin.role);
       return NextResponse.json(
         { error: '관리자 권한이 없습니다.' },
         { status: 401 }
       );
     }
+
 
     console.log('✅ 관리자 인증 성공:', admin.email);
     return NextResponse.json({

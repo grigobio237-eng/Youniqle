@@ -18,6 +18,7 @@ interface RecoveryInsightViewProps {
 export default function RecoveryInsightView({ unifiedData }: RecoveryInsightViewProps) {
     const { user, insights, score, assetStats } = unifiedData;
     const [recommendedProducts, setRecommendedProducts] = React.useState<any[]>([]);
+    const [weeklyReport, setWeeklyReport] = React.useState<any>(null);
     const userTier = user?.grade?.toUpperCase() || 'NONE';
     const userRole = user?.role || 'member';
     const isAdmin = ['admin', 'superadmin'].includes(userRole);
@@ -54,15 +55,18 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                                     {isPremium ? 'Expert Analysis' : 'Standard Analysis'}
                                 </Badge>
                             </div>
-                            <p className="text-lg text-slate font-medium leading-relaxed italic opacity-80">
-                                {isPremium
-                                    ? `"${displayScore >= 70 
+                            <p className="text-lg text-obsidian font-bold leading-relaxed italic">
+                                {weeklyReport?.summary ? (
+                                    `"${weeklyReport.summary}"`
+                                ) : isPremium ? (
+                                    `"${displayScore >= 70 
                                         ? '현재 회복 흐름이 매우 우수합니다. 수면 데이터 분석 결과, 깊은 수면 단계 진입이 빨라지고 있습니다. 이 리듬을 유지한다면 다음 주에는 신체적 가동 범위가 15% 이상 개선될 것으로 예측됩니다.' 
                                         : '회복 지수가 불안정한 흐름을 보이고 있습니다. 어제 기록된 높은 피로도는 수면 전 블루라이트 노출과 연관이 있을 수 있습니다. 오늘부터 수면 전 30분 디지털 디톡스를 권장합니다.'}"` 
-                                    : `"${displayScore >= 70 
+                                ) : (
+                                    `"${displayScore >= 70 
                                         ? '전반적으로 양호한 상태입니다. 꾸준한 기록이 좋은 성과를 내고 있습니다.' 
                                         : '신체적 피로도가 감지되었습니다. 충분한 휴식과 수분 섭취가 필요합니다.'}"` 
-                                }
+                                )}
                             </p>
                             {!isPremium && (
                                 <p className="text-[10px] text-slate/40 font-bold flex items-center justify-center md:justify-start gap-1">
@@ -83,7 +87,10 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                         주간 회복 리포트
                     </h3>
                 </div>
-                <WeeklyReportView onDataLoaded={setRecommendedProducts} />
+                <WeeklyReportView onDataLoaded={(prods, report) => {
+                    setRecommendedProducts(prods);
+                    if (report) setWeeklyReport(report);
+                }} />
             </section>
 
             {/* Data-driven Insights (If available) */}

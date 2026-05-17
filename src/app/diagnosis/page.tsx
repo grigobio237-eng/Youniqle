@@ -19,6 +19,7 @@ function DiagnosisContent() {
     const router = useRouter();
     const { data: session } = useSession();
     const type = searchParams?.get('type') || 'free'; // daily, personality, or free
+    const journey = searchParams?.get('journey');
     
     const [step, setStep] = useState(-1); // -1: Intro, 0~N: Questions, N+1: Result
     const [answers, setAnswers] = useState<Record<string | number, number>>({});
@@ -63,7 +64,7 @@ function DiagnosisContent() {
                 const res = await fetch('/api/diagnosis/dynamic-questions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userName: session?.user?.name || '요원' })
+                    body: JSON.stringify({ userName: session?.user?.name || '유저' })
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -152,6 +153,7 @@ function DiagnosisContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type,
+                    journey,
                     answers: finalAnswers,
                     result: calculationResult,
                     points: type === 'daily' ? 100 : 0

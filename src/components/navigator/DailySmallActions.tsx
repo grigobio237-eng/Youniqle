@@ -12,15 +12,19 @@ interface Mission {
     icon: string;
 }
 
-export default function DailySmallActions({ score = 50 }: { score?: number }) {
-    const [missions, setMissions] = useState<Mission[]>([]);
-    const [completedIds, setCompletedIds] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [title, setTitle] = useState('오늘의 회복 미션');
+export default function DailySmallActions({ score = 50, initialData }: { score?: number, initialData?: any }) {
+    const [missions, setMissions] = useState<Mission[]>(initialData?.tasks || []);
+    const [completedIds, setCompletedIds] = useState<string[]>(initialData?.completedTasks || []);
+    const [loading, setLoading] = useState(!initialData);
+    const [title, setTitle] = useState(initialData?.title || '오늘의 회복 미션');
 
     useEffect(() => {
+        if (initialData && missions.length > 0) {
+            setLoading(false);
+            return;
+        }
         fetchDailyMissions();
-    }, [score]);
+    }, [score, initialData]);
 
     const fetchDailyMissions = async () => {
         setLoading(true);

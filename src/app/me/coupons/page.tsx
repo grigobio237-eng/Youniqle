@@ -138,7 +138,7 @@ export default function MyCouponsPage() {
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Inventory Analysis</p>
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">쿠폰 인벤토리</h1>
-            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원이 보유한 활성 혜택입니다.</p>
+            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저가 보유한 활성 혜택입니다.</p>
           </div>
           <Button variant="outline" onClick={fetchCoupons} className="h-12 px-6 rounded-xl border-line text-slate font-black flex gap-2 hover:bg-white transition-all">
             <RefreshCw className="h-4 w-4" />

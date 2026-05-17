@@ -43,7 +43,7 @@ export default function ConsultationPage() {
       }
       
       try {
-        const res = await fetch('/api/user/status');
+        const res = await fetch('/api/user/status?minimal=true');
         const data = await res.json();
         if (data.activeMedicalGuide) {
           setRecentReport(data.activeMedicalGuide);
@@ -176,7 +176,7 @@ export default function ConsultationPage() {
                  <div className="flex items-center gap-6">
                     <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-3xl">🤖</div>
                     <div>
-                       <h4 className="font-black text-xl mb-1">AI 닥터 내비게이터</h4>
+                       <h4 className="font-black text-xl mb-1">유니클 닥터 내비게이터</h4>
                        <p className="text-primary/70 text-sm font-medium italic">"당신의 데이터가 완벽한 시술을 만듭니다."</p>
                     </div>
                  </div>

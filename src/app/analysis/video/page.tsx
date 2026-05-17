@@ -47,11 +47,6 @@ export default function PostureAnalysisPage() {
 
     // Camera Logic
     const startWebcam = async () => {
-        if (isMobile) {
-            fileInputRef.current?.click();
-            return;
-        }
-
         setIsCameraReady(false);
         try {
             const constraints: MediaStreamConstraints = {
@@ -73,7 +68,8 @@ export default function PostureAnalysisPage() {
                 setStream(fallbackStream);
                 setStatus('webcam');
             } catch (fallbackErr) {
-                toast.error("카메라를 시작할 수 없습니다. 권한 설정을 확인해주세요.");
+                toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
+                setTimeout(() => { fileInputRef.current?.click(); }, 300);
             }
         }
     };

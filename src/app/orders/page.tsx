@@ -174,7 +174,7 @@ export default function OrdersPage() {
           <div>
             <p className="text-slate font-black uppercase tracking-[0.2em] text-[10px] mb-2 text-chapter-accent">Transaction Ledger</p>
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">주문 인벤토리</h1>
-            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 요원의 최근 보급 현황입니다.</p>
+            <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 최근 보급 현황입니다.</p>
           </div>
           <Button variant="ghost" onClick={fetchOrders} className="h-12 px-6 rounded-xl hover:bg-white text-slate font-black flex gap-2">
             <RefreshCw className="h-4 w-4" />

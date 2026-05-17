@@ -168,7 +168,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     </div>
                     <div className="space-y-2">
                         <h3 className="text-4xl font-black text-[#0B0D10] tracking-tighter italic">Still have questions?</h3>
-                        <p className="text-lg text-[#0B0D10]/40 font-bold">원장 김미정 혹은 AI 어시스턴트와 1:1로 직접 대화하세요.</p>
+                        <p className="text-lg text-[#0B0D10]/40 font-bold">원장 김미정 혹은 유니클 어시스턴트와 1:1로 직접 대화하세요.</p>
                     </div>
                 </div>
                 

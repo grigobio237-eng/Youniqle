@@ -70,6 +70,9 @@ export default function Header() {
   const menuItems = [
     { label: 'Youniqle?', href: '/about', desc: '브랜드 및 회복 경로 소개' },
     { label: '오늘 리듬체크', href: '/ai-navigator', desc: '데이터 기반 맞춤 루틴 제안' },
+    // @ts-ignore — 축구 유저(코치/선수/보호자)에게만 클럽하우스 메뉴 노출
+    ...(session?.user?.footballRole
+      ? [{ label: '⚽ 클럽하우스', href: '/football/mypage', desc: '팀 일정 & 컨디션 소통' }] : []),
     { label: '내 회복 리포트', href: '/reports', desc: '나의 모든 체크 및 회복 리포트' },
     { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
     { label: '힐링 라운지', href: '/products', desc: '프리미엄 회복 공간 및 프로그램' },

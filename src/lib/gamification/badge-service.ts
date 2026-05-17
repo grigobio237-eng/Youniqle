@@ -27,11 +27,17 @@ export class BadgeService {
 
             const isEligible = await this.evaluateCriteria(userId, badge);
             if (isEligible) {
-                const award = await UserBadge.create({
-                    userId,
-                    badgeId: badge._id
-                });
-                newEarnedBadges.push(badge);
+                // Use findOneAndUpdate with upsert to prevent race conditions
+                const result = await UserBadge.findOneAndUpdate(
+                    { userId, badgeId: badge._id },
+                    { $setOnInsert: { userId, badgeId: badge._id, earnedAt: new Date() } },
+                    { upsert: true, new: true, rawResult: true }
+                );
+                
+                // If the document was upserted (newly created), it's a new badge
+                if (!result.lastErrorObject?.updatedExisting) {
+                    newEarnedBadges.push(badge);
+                }
             }
         }
 

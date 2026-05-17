@@ -67,11 +67,6 @@ export default function PostureScanner() {
             return;
         }
 
-        if (isMobile) {
-            fileInputRef.current?.click();
-            return;
-        }
-
         setIsCameraReady(false);
         try {
             const constraints: MediaStreamConstraints = {
@@ -87,7 +82,8 @@ export default function PostureScanner() {
             setStatus('webcam');
         } catch (err: any) {
             console.error(err);
-            toast.error("카메라를 시작할 수 없습니다. 권한을 확인해주세요.");
+            toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
+            setTimeout(() => { fileInputRef.current?.click(); }, 300);
         }
     };
 

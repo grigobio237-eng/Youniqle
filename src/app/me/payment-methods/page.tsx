@@ -198,7 +198,7 @@ export default function PaymentMethodsPage() {
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Financial Protocol</p>
             <h1 className="text-5xl font-black text-obsidian tracking-tighter">결제 수단 관리</h1>
-            <p className="text-slate font-bold tracking-tight mt-1">{session?.user?.name} 요원의 승인된 결제 수단 목록입니다.</p>
+            <p className="text-slate font-bold tracking-tight mt-1">{session?.user?.name} 유저의 승인된 결제 수단 목록입니다.</p>
           </div>
           {!isAdding && (
             <Button onClick={() => setIsAdding(true)} className="h-14 px-8 rounded-2xl bg-obsidian text-mist font-black flex gap-2 shadow-xl shadow-obsidian/10">

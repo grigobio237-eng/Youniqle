@@ -104,7 +104,7 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
               Still have <span className="text-primary font-bold italic text-glow-cream">Questions?</span>
             </h3>
             <p className="text-mist/60 text-sm font-medium">
-              진단 결과에 대해 전담 전문가(네비게이터)가 직접 답변해 드립니다.
+              상태 분석 결과에 대해 전담 전문가(네비게이터)가 직접 답변해 드립니다.
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/5 flex items-center gap-4">

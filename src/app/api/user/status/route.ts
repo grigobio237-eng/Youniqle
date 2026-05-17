@@ -16,6 +16,9 @@ const statusLock = (global as any)._statusLock || new Map<string, Promise<any>>(
 
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const isMinimal = searchParams.get('minimal') === 'true';
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
@@ -31,76 +34,74 @@ export async function GET(req: NextRequest) {
     // 1. Calculate Unified Score
     const scoreData = calculateUnifiedScore(user);
 
-    // 2. Fetch latest Survey/Analysis Report
-    const latestSurvey = await SurveyResponse.findOne({ userId: user._id })
-      .sort({ createdAt: -1 })
-      .select('status answers createdAt')
-      .lean();
-
-    // 3. Fetch latest Specialized AI Reports
-    const latestPreConsultation = await PreConsultation.findOne({ userId: user._id })
-      .sort({ createdAt: -1 })
-      .select('medicalCategory aiGuide createdAt')
-      .lean();
-
-    const latestPostCare = await PostCareSurvey.findOne({ userId: user._id })
-      .sort({ createdAt: -1 })
-      .select('procedureType lastStatus aiRoadmap createdAt')
-      .lean();
+    // 2. Fetch latest Survey/Analysis Report & Specialized AI Reports in parallel
+    const [latestSurvey, latestPreConsultation, latestPostCare] = await Promise.all([
+      SurveyResponse.findOne({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .select('status answers createdAt')
+        .lean(),
+      PreConsultation.findOne({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .select('medicalCategory aiGuide createdAt')
+        .lean(),
+      PostCareSurvey.findOne({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .select('procedureType lastStatus aiRoadmap createdAt')
+        .lean()
+    ]);
 
     // 4. Conditional Caching for Unified Actionable Insight
-    const scans = user.scanTimeline?.slice(-5) || [];
+    let unifiedInsight = user.cachedUnifiedInsight;
     
-    const latestScanDate = scans.length > 0 ? Math.max(...scans.map((s: any) => new Date(s.createdAt).getTime())) : 0;
-    const latestSurveyDate = latestSurvey ? new Date((latestSurvey as any).createdAt).getTime() : 0;
-    const latestPreDate = latestPreConsultation ? new Date((latestPreConsultation as any).createdAt).getTime() : 0;
-    const latestPostDate = latestPostCare ? new Date((latestPostCare as any).createdAt).getTime() : 0;
+    if (!isMinimal) {
+      const scans = user.scanTimeline?.slice(-5) || [];
+      
+      const latestScanDate = scans.length > 0 ? Math.max(...scans.map((s: any) => new Date(s.createdAt).getTime())) : 0;
+      const latestSurveyDate = latestSurvey ? new Date((latestSurvey as any).createdAt).getTime() : 0;
+      const latestPreDate = latestPreConsultation ? new Date((latestPreConsultation as any).createdAt).getTime() : 0;
+      const latestPostDate = latestPostCare ? new Date((latestPostCare as any).createdAt).getTime() : 0;
 
-    const latestUpdateTimestamp = Math.max(latestScanDate, latestSurveyDate, latestPreDate, latestPostDate);
-    const cache = user.cachedUnifiedInsight;
-    let unifiedInsight = cache;
+      const latestUpdateTimestamp = Math.max(latestScanDate, latestSurveyDate, latestPreDate, latestPostDate);
+      const cache = user.cachedUnifiedInsight;
 
-    // Lock check to prevent concurrent AI insight generations
-    const lockKey = user._id.toString();
-    
-    if (!cache || !cache.updatedAt || new Date(cache.updatedAt).getTime() < latestUpdateTimestamp) {
-      if (statusLock.has(lockKey)) {
-        console.log(`[Lock Hit] Waiting for in-progress unified insight generation: ${lockKey}`);
-        unifiedInsight = await statusLock.get(lockKey);
-      } else {
-        const requestPromise = (async () => {
-          console.log(`[Cache Miss] Regenerating unified insight for ${user.email}`);
-          const freshInsight = await generateUnifiedInsight({
-            scans,
-            survey: latestSurvey,
-            preConsultation: latestPreConsultation,
-            postCare: latestPostCare
-          });
-          
-          const cachedData = {
-            title: freshInsight.title,
-            description: freshInsight.description,
-            suggestion: freshInsight.suggestion,
-            habits: freshInsight.habits,
-            updatedAt: new Date()
-          };
+      // Lock check to prevent concurrent AI insight generations
+      const lockKey = user._id.toString();
+      
+      if (!cache || !cache.updatedAt || new Date(cache.updatedAt).getTime() < latestUpdateTimestamp) {
+        if (statusLock.has(lockKey)) {
+          unifiedInsight = await statusLock.get(lockKey);
+        } else {
+          const requestPromise = (async () => {
+            const freshInsight = await generateUnifiedInsight({
+              scans,
+              survey: latestSurvey,
+              preConsultation: latestPreConsultation,
+              postCare: latestPostCare
+            });
+            
+            const cachedData = {
+              title: freshInsight.title,
+              description: freshInsight.description,
+              suggestion: freshInsight.suggestion,
+              habits: freshInsight.habits,
+              updatedAt: new Date()
+            };
 
-          await User.updateOne(
-            { _id: user._id },
-            { $set: { cachedUnifiedInsight: cachedData } }
-          );
-          return cachedData;
-        })();
+            await User.updateOne(
+              { _id: user._id },
+              { $set: { cachedUnifiedInsight: cachedData } }
+            );
+            return cachedData;
+          })();
 
-        statusLock.set(lockKey, requestPromise);
-        try {
-          unifiedInsight = await requestPromise;
-        } finally {
-          statusLock.delete(lockKey);
+          statusLock.set(lockKey, requestPromise);
+          try {
+            unifiedInsight = await requestPromise;
+          } finally {
+            statusLock.delete(lockKey);
+          }
         }
       }
-    } else {
-      // console.log(`[Cache Hit] Using stored unified insight for ${user.email}`);
     }
 
     // 5. Calculate Daily Checklist Status (Automated & KST-aware)
@@ -115,45 +116,52 @@ export async function GET(req: NextRequest) {
     };
 
     // 6. Calculate Asset Statistics
-    const RecoveryScore = (await import('@/models/RecoveryScore')).default;
-    const [diagnosisCount, dailyLogCount] = await Promise.all([
-      user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
-      RecoveryScore.countDocuments({ userId: user._id })
-    ]);
-    const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
-    const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
-    
-    const [consultationCount, surveyCount] = await Promise.all([
-      Promise.all([
-        PreConsultation.countDocuments({ userId: user._id }), // userId check fix
-        PostCareSurvey.countDocuments({ userId: user._id })  // userId check fix
-      ]).then(([c1, c2]) => c1 + c2),
-      SurveyResponse.countDocuments({ userId: user._id })
-    ]);
+    let assetStats = null;
+    let enhancedCertificates = [];
+    let dailyLogCount = 0;
 
-    const assetStats = {
-      precisionDiagnosis: diagnosisCount,
-      dailyRhythmLog: dailyLogCount,
-      scannerAnalysis: scannerCount,
-      toolkitUsage: toolkitCount,
-      consultations: consultationCount,
-      reports: surveyCount,
-      totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
-    };
+    if (!isMinimal) {
+      const RecoveryScore = (await import('@/models/RecoveryScore')).default;
+      const [diagnosisCount, dailyCount] = await Promise.all([
+        user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
+        RecoveryScore.countDocuments({ userId: user._id })
+      ]);
+      dailyLogCount = dailyCount;
+      const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
+      const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
+      
+      const [consultationCount, surveyCount] = await Promise.all([
+        Promise.all([
+          PreConsultation.countDocuments({ userId: user._id }),
+          PostCareSurvey.countDocuments({ userId: user._id })
+        ]).then(([c1, c2]) => c1 + c2),
+        SurveyResponse.countDocuments({ userId: user._id })
+      ]);
 
-    // 7. Enhance Certificate Data with Actual Period
-    const allLogs = await RecoveryScore.find({ userId: user._id }).sort({ date: 1 }).select('date').lean();
-    const enhancedCertificates = user.issuedCertificates?.map((cert: any) => {
-      const startIndex = (cert.cycleNumber - 1) * 7;
-      const endIndex = startIndex + 6;
-      const startLog = allLogs[startIndex];
-      const endLog = allLogs[Math.min(endIndex, allLogs.length - 1)];
-      return {
-        ...cert,
-        startDate: startLog?.date,
-        endDate: endLog?.date
+      assetStats = {
+        precisionDiagnosis: diagnosisCount,
+        dailyRhythmLog: dailyLogCount,
+        scannerAnalysis: scannerCount,
+        toolkitUsage: toolkitCount,
+        consultations: consultationCount,
+        reports: surveyCount,
+        totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
       };
-    }) || [];
+
+      // 7. Enhance Certificate Data
+      const allLogs = await RecoveryScore.find({ userId: user._id }).sort({ date: 1 }).select('date').limit(100).lean();
+      enhancedCertificates = user.issuedCertificates?.map((cert: any) => {
+        const startIndex = (cert.cycleNumber - 1) * 7;
+        const endIndex = startIndex + 6;
+        const startLog = allLogs[startIndex];
+        const endLog = allLogs[Math.min(endIndex, allLogs.length - 1)];
+        return {
+          ...cert,
+          startDate: startLog?.date,
+          endDate: endLog?.date
+        };
+      }) || [];
+    }
 
     return NextResponse.json({
       success: true,
