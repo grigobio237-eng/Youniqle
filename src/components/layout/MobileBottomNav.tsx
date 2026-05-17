@@ -62,7 +62,7 @@ export default function MobileBottomNav() {
   ];
 
   // 축구 클럽하우스 탭 추가 (조건부)
-  const isFootballUser = (session?.user as any)?.footballRole;
+  const isFootballUser = (session?.user as any)?.footballRole || (session?.user as any)?.role === 'admin' || (session?.user as any)?.role === 'superadmin';
   if (isFootballUser) {
     navItems.splice(3, 0, {
       label: '클럽하우스',

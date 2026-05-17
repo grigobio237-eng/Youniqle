@@ -74,7 +74,10 @@ export async function GET(req: NextRequest) {
       populate: { path: 'createdBy', select: 'name' },
     });
 
-    const teams = memberships
+    const user = await User.findById(session.user.id);
+    const isAdminUser = user && ['admin', 'superadmin'].includes(user.role);
+
+    let teams = memberships
       .filter((m) => m.teamId)
       .map((m) => ({
         membership: {
@@ -87,6 +90,24 @@ export async function GET(req: NextRequest) {
         },
         team: m.teamId,
       }));
+
+    // 어드민/수퍼어드민인데 소속된 팀이 없다면 모니터링/테스트용으로 최초의 팀 하나를 head_coach로 연결하여 전달
+    if (teams.length === 0 && isAdminUser) {
+      const sampleTeam = await FootballTeam.findOne({ status: 'approved' }) || await FootballTeam.findOne();
+      if (sampleTeam) {
+        teams = [{
+          membership: {
+            _id: 'admin-temp-membership',
+            role: 'head_coach',
+            position: 'ADMIN',
+            playerNumber: 99,
+            joinedAt: new Date(),
+            permissions: DEFAULT_PERMISSIONS.head_coach,
+          },
+          team: sampleTeam,
+        }];
+      }
+    }
 
     return NextResponse.json({ teams });
   } catch (error: any) {

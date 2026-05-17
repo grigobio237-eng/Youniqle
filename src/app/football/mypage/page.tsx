@@ -61,7 +61,8 @@ export default function FootballMyPage() {
     }
   };
 
-  const footballRole = (session?.user as any)?.footballRole;
+  const isAdmin = (session?.user as any)?.role === 'admin' || (session?.user as any)?.role === 'superadmin';
+  const footballRole = isAdmin ? 'coach' : (session?.user as any)?.footballRole;
 
   const getRoleLabel = (role: string) => {
     const map: Record<string, string> = {
