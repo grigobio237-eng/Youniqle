@@ -61,9 +61,8 @@ export default function MobileBottomNav() {
     },
   ];
 
-  // 축구 클럽하우스 탭 추가 (조건부)
-  const isFootballUser = (session?.user as any)?.footballRole || (session?.user as any)?.role === 'admin' || (session?.user as any)?.role === 'superadmin';
-  if (isFootballUser) {
+  // 축구 클럽하우스 탭 추가 (로그인된 모든 유저 노출)
+  if (session?.user) {
     navItems.splice(3, 0, {
       label: '클럽하우스',
       href: '/football/mypage',
