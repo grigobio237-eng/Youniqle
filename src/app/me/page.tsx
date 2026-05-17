@@ -38,7 +38,8 @@ import {
   Heart,
   Activity,
   Zap,
-  Sparkles
+  Sparkles,
+  Trophy
 } from 'lucide-react';
 import Link from 'next/link';
 import ReferralSection from '@/components/ui/ReferralSection';
@@ -104,6 +105,23 @@ export default function MyPage() {
   const [weeklyReport, setWeeklyReport] = useState<any>(null);
   const [notificationPermission, setNotificationPermission] = useState<string>('default');
   const [userBadges, setUserBadges] = useState<any[]>([]);
+
+  // 축구 클럽하우스 전용 상태
+  const [footballTeamInfo, setFootballTeamInfo] = useState<any>(null);
+  const [footballPendingTeam, setFootballPendingTeam] = useState<any>(null);
+  const [footballLoading, setFootballLoading] = useState(true);
+
+  // 축구 신청 및 가입 폼 상태
+  const [footballInviteCode, setFootballInviteCode] = useState('');
+  const [footballJoining, setFootballJoining] = useState(false);
+  const [footballCreationMode, setFootballCreationMode] = useState(false);
+  const [footballNewTeamName, setFootballNewTeamName] = useState('');
+  const [footballNewCategory, setFootballNewCategory] = useState('youth');
+  const [footballNewAgeGroup, setFootballNewAgeGroup] = useState('');
+  const [footballNewRegion, setFootballNewRegion] = useState('');
+  const [footballNewDescription, setFootballNewDescription] = useState('');
+  const [footballCreationLoading, setFootballCreationLoading] = useState(false);
+  const [footballError, setFootballError] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -192,6 +210,83 @@ export default function MyPage() {
     });
   };
 
+  const fetchFootballStatus = async () => {
+    try {
+      const res = await fetch('/api/football/team');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.teams && data.teams.length > 0) {
+          setFootballTeamInfo(data.teams[0]);
+        } else {
+          setFootballTeamInfo(null);
+        }
+        if (data.pendingTeam) {
+          setFootballPendingTeam(data.pendingTeam);
+        } else {
+          setFootballPendingTeam(null);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch football status:', e);
+    } finally {
+      setFootballLoading(false);
+    }
+  };
+
+  const handleFootballJoin = async () => {
+    if (!footballInviteCode) {
+      setFootballError('초대 코드를 입력해 주세요.');
+      return;
+    }
+    setFootballJoining(true);
+    setFootballError('');
+    try {
+      const cleanCode = footballInviteCode.trim().toUpperCase();
+      window.location.href = `/football/join/${cleanCode}`;
+    } catch (e) {
+      setFootballError('초대 코드가 올바르지 않거나 합류 처리 중 오류가 발생했습니다.');
+      setFootballJoining(false);
+    }
+  };
+
+  const handleFootballCreate = async () => {
+    if (!footballNewTeamName) {
+      setFootballError('팀 이름을 입력해 주세요.');
+      return;
+    }
+    setFootballCreationLoading(true);
+    setFootballError('');
+    try {
+      const res = await fetch('/api/football/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teamName: footballNewTeamName,
+          category: footballNewCategory,
+          ageGroup: footballNewAgeGroup,
+          region: footballNewRegion,
+          description: footballNewDescription
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('축구팀 창단 신청이 정상적으로 접수되었습니다! 관리자 승인 완료 후 대시보드가 오픈됩니다.');
+        setFootballNewTeamName('');
+        setFootballNewAgeGroup('');
+        setFootballNewRegion('');
+        setFootballNewDescription('');
+        setFootballCreationMode(false);
+        await fetchFootballStatus();
+      } else {
+        setFootballError(data.error || '팀 신청에 실패했습니다.');
+      }
+    } catch (e) {
+      setFootballError('네트워크 오류가 발생했습니다.');
+    } finally {
+      setFootballCreationLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (session?.user) {
       setFormData({
@@ -210,6 +305,7 @@ export default function MyPage() {
       fetchCommunityData();
       fetchWeeklyReport();
       fetchBadges();
+      fetchFootballStatus();
     }
   }, [session]);
 
@@ -802,6 +898,204 @@ export default function MyPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-10">
             <div className="lg:col-span-8 space-y-6 md:space-y-8">
+              {/* 축구 클럽하우스 프로토콜 카드 */}
+              <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden border border-emerald-100/30">
+                <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                      <Trophy className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">축구 클럽하우스 프로토콜</CardTitle>
+                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Football Clubhouse Entry & Registration</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 md:p-10 space-y-6">
+                  {footballLoading ? (
+                    <div className="py-12 flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                    </div>
+                  ) : footballTeamInfo ? (
+                    <div className="bg-emerald-50/40 p-6 md:p-8 rounded-[24px] border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 font-black text-xl">
+                          ⚽
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Active Football Team</p>
+                          <h4 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                            {footballTeamInfo.teamName}
+                            <Badge className="bg-emerald-500 text-white font-black text-[9px] px-2 py-0.5 rounded">
+                              {session.user?.footballRole === 'coach' ? '감독/코치' : 
+                               session.user?.footballRole === 'player' ? '선수' : '보호자'}
+                            </Badge>
+                          </h4>
+                          <p className="text-xs font-bold text-slate mt-1">소속 팀의 훈련 일정과 당일 컨디션을 관리하고 분석하세요.</p>
+                        </div>
+                      </div>
+                      <Button asChild className="w-full md:w-auto h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 shadow-lg shadow-emerald-600/10">
+                        <Link href="/football/mypage" className="flex items-center gap-2">
+                          클럽하우스 대시보드 입장 <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  ) : footballPendingTeam ? (
+                    <div className="bg-amber-50/40 p-6 md:p-8 rounded-[24px] border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700">
+                          <Clock className="w-8 h-8 animate-pulse" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Approval Pending Protocol</p>
+                          <h4 className="text-xl font-black text-obsidian tracking-tight">
+                            {footballPendingTeam.teamName} <span className="text-amber-600 font-bold text-sm ml-2">(승인 심사 중)</span>
+                          </h4>
+                          <p className="text-xs font-medium text-slate-500 mt-1">
+                            보안 승인 심사가 진행 중입니다. 1~2영업일 이내에 승인 및 초대코드가 발급됩니다.
+                          </p>
+                        </div>
+                      </div>
+                      <Button onClick={fetchFootballStatus} className="w-full md:w-auto h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black px-6">
+                        승인 상태 새로고침
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      <p className="text-sm font-bold text-slate leading-relaxed">
+                        유니클 축구 클럽하우스는 감독, 코치, 선수 및 학부모들이 과학적인 회복 CGM 데이터를 기반으로 
+                        스마트하게 소통하는 커뮤니티 공간입니다. **아래 방법 중 하나를 선택하여 클럽하우스 프로토콜을 활성화하십시오.**
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <div className="p-6 md:p-8 rounded-[24px] bg-slate-50 border border-slate-100 space-y-4">
+                          <h4 className="text-lg font-black text-obsidian flex items-center gap-2">
+                            <span className="text-base">🔑</span> 초대 코드로 팀 합류
+                          </h4>
+                          <p className="text-xs font-bold text-slate leading-relaxed">
+                            감독/코치님에게 발급받은 팀 고유의 초대 코드를 입력하여 즉시 스쿼드로 합류하십시오.
+                          </p>
+                          <div className="flex gap-2 pt-2">
+                            <Input
+                              value={footballInviteCode}
+                              onChange={(e) => setFootballInviteCode(e.target.value)}
+                              placeholder="초대 코드 입력 (예: ST-XXXXX)"
+                              className="h-12 rounded-xl bg-white border-slate-200"
+                            />
+                            <Button 
+                              onClick={handleFootballJoin} 
+                              disabled={footballJoining}
+                              className="h-12 rounded-xl bg-obsidian text-white font-black px-6"
+                            >
+                              {footballJoining ? '합류 중...' : '합류하기'}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="p-6 md:p-8 rounded-[24px] bg-emerald-50/20 border border-emerald-100/30 space-y-4 flex flex-col justify-between">
+                          <div>
+                            <h4 className="text-lg font-black text-obsidian flex items-center gap-2">
+                              <span className="text-base">⚽</span> 감독 / 코치로 팀 창단
+                            </h4>
+                            <p className="text-xs font-bold text-slate leading-relaxed">
+                              팀을 새롭게 창단하고 감독/코치 전용 스마트 클럽하우스 플랫폼을 신청합니다. (본사 승인 필요)
+                            </p>
+                          </div>
+                          <Button 
+                            onClick={() => setFootballCreationMode(!footballCreationMode)}
+                            className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black mt-4"
+                          >
+                            {footballCreationMode ? '신청 양식 접기' : '신규 축구팀 개설 신청서 작성'}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {footballCreationMode && (
+                        <div className="bg-slate-50/50 p-6 md:p-8 rounded-[24px] border border-slate-200/60 space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                          <h4 className="text-base font-black text-obsidian border-b pb-2">📋 신규 팀 개설 신청서</h4>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-xs font-black text-slate-500">팀 이름 <span className="text-rose-500">*</span></Label>
+                              <Input 
+                                value={footballNewTeamName} 
+                                onChange={(e) => setFootballNewTeamName(e.target.value)} 
+                                placeholder="예: 유니클 FC"
+                                className="h-11 rounded-lg bg-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-black text-slate-500">카테고리</Label>
+                              <select 
+                                value={footballNewCategory}
+                                onChange={(e) => setFootballNewCategory(e.target.value)}
+                                className="w-full h-11 px-3 rounded-lg border border-input bg-white text-sm font-bold focus:outline-none focus:ring-1 focus:ring-ring"
+                              >
+                                <option value="youth">유소년 클럽</option>
+                                <option value="amateur">성인 조기 축구 / 동호회</option>
+                                <option value="school">초/중/고/대학교 엘리트 팀</option>
+                                <option value="academy">전문 사설 아카데미</option>
+                              </select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-black text-slate-500">주요 연령대</Label>
+                              <Input 
+                                value={footballNewAgeGroup} 
+                                onChange={(e) => setFootballNewAgeGroup(e.target.value)} 
+                                placeholder="예: 초등 U-12, 성인 일반부 등"
+                                className="h-11 rounded-lg bg-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-black text-slate-500">활동 지역</Label>
+                              <Input 
+                                value={footballNewRegion} 
+                                onChange={(e) => setFootballNewRegion(e.target.value)} 
+                                placeholder="예: 서울 송파구, 경기 성남시 등"
+                                className="h-11 rounded-lg bg-white"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-xs font-black text-slate-500">팀 소개 및 개설 목적</Label>
+                            <textarea 
+                              value={footballNewDescription} 
+                              onChange={(e) => setFootballNewDescription(e.target.value)} 
+                              placeholder="팀의 가입 인원 및 창단 목적을 간략하게 작성해주시면 빠른 검토와 승인에 도움이 됩니다."
+                              className="w-full min-h-[80px] p-3 rounded-lg border border-input bg-white text-sm font-medium focus:outline-none focus:ring-1 focus:ring-ring"
+                            />
+                          </div>
+
+                          {footballError && (
+                            <p className="text-xs font-bold text-rose-500 bg-rose-50 p-3 rounded-lg flex items-center gap-2">
+                              ⚠ {footballError}
+                            </p>
+                          )}
+
+                          <div className="flex justify-end gap-2 pt-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setFootballCreationMode(false)}
+                              className="h-11 rounded-lg px-6"
+                            >
+                              취소
+                            </Button>
+                            <Button 
+                              onClick={handleFootballCreate}
+                              disabled={footballCreationLoading}
+                              className="h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6"
+                            >
+                              {footballCreationLoading ? '제출 중...' : '신청서 제출 완료'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* 프로필 정보 */}
               <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden">
                 <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
