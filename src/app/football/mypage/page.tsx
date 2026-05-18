@@ -599,7 +599,6 @@ export default function FootballMyPage() {
                 <CardContent className="p-4 text-center space-y-2">
                   <span className="text-2xl">📸</span>
                   <p className="text-sm font-bold text-obsidian">유니클 푸드 스캐너</p>
-                  <p className="text-[10px] text-pink-500 font-extrabold tracking-tight">영양분석 카메라</p>
                 </CardContent>
               </Card>
             </Link>
