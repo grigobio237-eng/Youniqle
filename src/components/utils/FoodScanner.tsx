@@ -36,7 +36,13 @@ const CATEGORY_MAP = {
     AUTO: { label: '자동 분류', icon: Sparkles, color: 'text-chapter-accent', bg: 'bg-chapter-accent/5' }
 };
 
-export default function FoodScanner({ onStart }: { onStart?: (data?: AnalysisResult) => void } = {}) {
+export default function FoodScanner({ 
+    onStart, 
+    autoStart = false 
+}: { 
+    onStart?: (data?: AnalysisResult) => void;
+    autoStart?: boolean;
+} = {}) {
     const { data: session } = useSession();
     const router = useRouter();
     const [status, setStatus] = useState<'idle' | 'webcam' | 'analyzing' | 'result'>('idle');
@@ -92,6 +98,13 @@ export default function FoodScanner({ onStart }: { onStart?: (data?: AnalysisRes
             fileInputRef.current?.click();
         }
     };
+
+    // 자동 카메라 구동 트리거
+    useEffect(() => {
+        if (autoStart && status === 'idle') {
+            startWebcam();
+        }
+    }, [autoStart, status]);
 
     useEffect(() => {
         if (status === 'webcam' && stream && videoRef.current) {

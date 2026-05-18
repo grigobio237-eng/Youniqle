@@ -594,11 +594,12 @@ export default function FootballMyPage() {
         <div className="space-y-3">
           <h3 className="text-sm font-black text-slate uppercase tracking-wider px-1">Youniqle Recovery</h3>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/">
+            <Link href="/utils/food-scanner?auto=true" className="block">
               <Card className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer">
                 <CardContent className="p-4 text-center space-y-2">
                   <span className="text-2xl">📸</span>
-                  <p className="text-sm font-bold text-obsidian">리커버리 스캐너</p>
+                  <p className="text-sm font-bold text-obsidian">유니클 푸드 스캐너</p>
+                  <p className="text-[10px] text-pink-500 font-extrabold tracking-tight">영양분석 카메라</p>
                 </CardContent>
               </Card>
             </Link>

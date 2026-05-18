@@ -119,10 +119,22 @@ export async function GET(req: NextRequest) {
       const todayStr = getKSTDateString();
       const todayCheck = checks.find((c) => c.date === todayStr);
 
+      // 오늘 등록한 영양분석 식단(MEAL) 데이터 조회
+      const LifeSnap = (await import('@/models/LifeSnap')).default;
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
+      const todayMeals = await LifeSnap.find({
+        userId: targetUserId,
+        category: 'MEAL',
+        createdAt: { $gte: startOfToday }
+      }).sort({ createdAt: -1 });
+
       return NextResponse.json({
         checks,
         acwr,
         todayCheck: todayCheck || null,
+        todayMeals: todayMeals || [], // 실시간 영양분석 데이터 추가
         stats: {
           totalDays: checks.length,
           avgWellness: checks.length > 0
