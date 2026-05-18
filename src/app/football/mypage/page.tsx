@@ -34,6 +34,19 @@ export default function FootballMyPage() {
   const [wellness, setWellness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // 어드민 롤 에뮬레이션 상태 선언
+  const [activeViewRole, setActiveViewRole] = useState<'coach' | 'player' | 'guardian'>('coach');
+
+  // 세션이 완전히 활성화되었을 때 실제 사용자의 축구 역할(footballRole)이 있다면 시뮬레이터 초기값으로 설정
+  useEffect(() => {
+    if (session?.user?.footballRole) {
+      const actualRole = session.user.footballRole;
+      if (actualRole === 'coach' || actualRole === 'player' || actualRole === 'guardian') {
+        setActiveViewRole(actualRole);
+      }
+    }
+  }, [session?.user?.footballRole]);
+
   // 초대 코드 및 신규 창단 상태
   const [inviteCode, setInviteCode] = useState('');
   const [joiningTeam, setJoiningTeam] = useState(false);
@@ -45,6 +58,9 @@ export default function FootballMyPage() {
   const [newDescription, setNewDescription] = useState('');
   const [creationLoading, setCreationLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const isAdmin = (session?.user as any)?.role === 'admin' || (session?.user as any)?.role === 'superadmin';
+  const footballRole = isAdmin ? activeViewRole : (session?.user as any)?.footballRole;
 
   useEffect(() => {
     fetchData();
@@ -61,10 +77,28 @@ export default function FootballMyPage() {
         const teamData = await teamRes.json();
         if (teamData.teams?.length > 0) {
           setTeamInfo(teamData.teams[0]);
+        } else if (isAdmin) {
+          // 어드민 계정으로 접속했고 소속팀이 없는 경우 테스트용 목업 팀 정보 자동 주입
+          setTeamInfo({
+            membership: {
+              role: 'admin',
+              position: 'MF',
+              playerNumber: 7
+            },
+            team: {
+              _id: 'mock-team-id',
+              teamName: '유니클 FC (MOCK)',
+              teamCode: 'UNQ-MOCK',
+              category: 'youth',
+              ageGroup: 'U-12'
+            }
+          });
         } else {
           setTeamInfo(null);
         }
-        if (teamData.pendingTeam) {
+        
+        // 어드민은 펜딩 팀 가드 스크린에 막히지 않도록 강제 null 처리
+        if (teamData.pendingTeam && !isAdmin) {
           setPendingTeam(teamData.pendingTeam);
         } else {
           setPendingTeam(null);
@@ -127,9 +161,6 @@ export default function FootballMyPage() {
       setCreationLoading(false);
     }
   };
-
-  const isAdmin = (session?.user as any)?.role === 'admin' || (session?.user as any)?.role === 'superadmin';
-  const footballRole = isAdmin ? 'coach' : (session?.user as any)?.footballRole;
 
   const getRoleLabel = (role: string) => {
     const map: Record<string, string> = {
@@ -386,29 +417,88 @@ export default function FootballMyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-background p-4 pb-24">
       <div className="max-w-lg mx-auto space-y-6 pt-4 md:pt-24">
+        {/* 👑 어드민 전용 역할 시뮬레이션 제어 센터 */}
+        {isAdmin && (
+          <Card className="rounded-[28px] border border-slate-800 bg-[#0F172A] shadow-xl overflow-hidden p-5 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+                  👑 Master Operator Mode
+                </span>
+              </div>
+              <Badge className="bg-slate-800 hover:bg-slate-800 text-slate-300 border-none font-bold text-[9px] uppercase tracking-wider px-2 py-0.5">
+                Role Emulator
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-950/60 rounded-2xl border border-slate-800/40">
+              <button
+                type="button"
+                onClick={() => setActiveViewRole('coach')}
+                className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
+                  activeViewRole === 'coach'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <span className="text-base">👨‍🏫</span>
+                <span>감독 / 코치</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveViewRole('player')}
+                className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
+                  activeViewRole === 'player'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <span className="text-base">⚽</span>
+                <span>선수 뷰</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveViewRole('guardian')}
+                className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
+                  activeViewRole === 'guardian'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <span className="text-base">👨‍👩‍👦</span>
+                <span>보호자 뷰</span>
+              </button>
+            </div>
+          </Card>
+        )}
+
         {/* 프로필 카드 */}
         <Card className="rounded-[32px] border-none shadow-2xl overflow-hidden">
           <div className="h-24 bg-gradient-to-br from-green-600 to-emerald-700 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent)]" />
           </div>
-          <CardContent className="p-6 -mt-8 relative z-10">
-            <div className="flex items-end gap-4">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl border-2 border-green-200">
+          <CardContent className="p-5 -mt-8 relative z-10">
+            <div className="flex items-center gap-3.5">
+              <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl border-2 border-green-200 shrink-0">
                 {footballRole === 'coach' ? '👨‍🏫' : footballRole === 'guardian' ? '👨‍👩‍👦' : '⚽'}
               </div>
-              <div className="flex-1 pb-1">
-                <h2 className="text-xl font-black text-obsidian">{session?.user?.name || '선수'}</h2>
-                <div className="flex items-center gap-2 mt-1">
+              <div className="flex-1 min-w-0 pb-1">
+                <h2 className="text-lg md:text-xl font-black text-obsidian truncate">{session?.user?.name || '선수'}</h2>
+                <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                   {teamInfo && (
                     <>
-                      <Badge className="bg-green-100 text-green-700 border-none font-bold text-xs">
+                      <Badge className="bg-green-100 text-green-700 border-none font-black text-[10px] md:text-xs px-2 py-0.5 whitespace-nowrap">
                         {teamInfo.team.teamName}
                       </Badge>
-                      <Badge variant="outline" className="font-bold text-xs">
+                      <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-slate-200 text-slate-600 whitespace-nowrap">
                         {getRoleLabel(teamInfo.membership.role)}
                       </Badge>
                       {teamInfo.membership.position && (
-                        <Badge variant="outline" className="font-bold text-xs">
+                        <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-slate-200 text-slate-600 whitespace-nowrap">
                           {getPositionLabel(teamInfo.membership.position)}
                           {teamInfo.membership.playerNumber && ` #${teamInfo.membership.playerNumber}`}
                         </Badge>
@@ -478,7 +568,7 @@ export default function FootballMyPage() {
           {menus.map((menu) => {
             const Icon = menu.icon;
             return (
-              <Link key={menu.label} href={menu.href}>
+              <Link key={menu.label} href={menu.href} className="block">
                 <Card className={`rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer ${
                   (menu as any).highlight ? 'ring-2 ring-green-400 ring-offset-2' : ''
                 }`}>

@@ -11,7 +11,40 @@ interface AILatestBriefProps {
 }
 
 export default function AILatestBrief({ solution, createdAt }: AILatestBriefProps) {
-    if (!solution) return null;
+    if (!solution) {
+        return (
+            <div className="bg-obsidian rounded-[32px] md:rounded-[40px] p-6 md:p-8 shadow-2xl relative overflow-hidden text-white group h-full flex flex-col justify-between min-h-[320px]">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
+
+                <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md">
+                            <Brain className="w-6 h-6 text-primary animate-pulse" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">YOUNIQLE AI Navigator</p>
+                            <h3 className="text-lg font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
+                        </div>
+                    </div>
+
+                    <p className="text-xs font-bold text-slate-300 leading-relaxed">
+                        아직 기록된 회복 솔루션이 존재하지 않습니다.<br />
+                        매일 60초 리듬 체크와 AI 진단을 통해 나에게 딱 맞는 1:1 맞춤 회복 처방 솔루션을 확인해보세요!
+                    </p>
+                </div>
+
+                <div className="relative z-10 mt-6 space-y-3">
+                    <div className="p-4 rounded-[20px] bg-white/5 border border-white/5 flex items-center gap-3">
+                        <span className="text-base">💡</span>
+                        <p className="text-[11px] font-bold text-slate-400">CGM 분석을 통해 수면, 영양, 운동 맞춤 추천 처방</p>
+                    </div>
+                    <Link href="/ai-navigator" className="w-full py-3.5 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
+                        AI 진단 시작하기 <ArrowRight className="w-4 h-4" />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     const items = [
         { icon: Dumbbell, title: "Exercise", content: solution.exercise, color: "text-blue-500", bg: "bg-blue-50" },

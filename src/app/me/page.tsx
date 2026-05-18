@@ -39,7 +39,9 @@ import {
   Activity,
   Zap,
   Sparkles,
-  Trophy
+  Trophy,
+  Link2,
+  UserPlus
 } from 'lucide-react';
 import Link from 'next/link';
 import ReferralSection from '@/components/ui/ReferralSection';
@@ -307,7 +309,7 @@ export default function MyPage() {
       fetchBadges();
       fetchFootballStatus();
     }
-  }, [session]);
+  }, [session?.user?.email]);
 
   const fetchUserData = async () => {
     if (!session?.user) return;
@@ -373,13 +375,6 @@ export default function MyPage() {
       console.error('Failed to fetch user status:', error);
     }
   };
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchHistory();
-      fetchUserStatus();
-    }
-  }, [session]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -917,28 +912,94 @@ export default function MyPage() {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                     </div>
                   ) : footballTeamInfo ? (
-                    <div className="bg-emerald-50/40 p-6 md:p-8 rounded-[24px] border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 font-black text-xl">
-                          ⚽
+                    <div className="space-y-6">
+                      <div className="bg-emerald-50/40 p-6 md:p-8 rounded-[24px] border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 font-black text-xl">
+                            ⚽
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Active Football Team</p>
+                            <h4 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                              {footballTeamInfo.teamName}
+                              <Badge className="bg-emerald-500 text-white font-black text-[9px] px-2 py-0.5 rounded">
+                                {session.user?.footballRole === 'coach' ? '감독/코치' : 
+                                 session.user?.footballRole === 'player' ? '선수' : '보호자'}
+                              </Badge>
+                            </h4>
+                            <p className="text-xs font-bold text-slate mt-1">소속 팀의 훈련 일정과 당일 컨디션을 관리하고 분석하세요.</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Active Football Team</p>
-                          <h4 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
-                            {footballTeamInfo.teamName}
-                            <Badge className="bg-emerald-500 text-white font-black text-[9px] px-2 py-0.5 rounded">
-                              {session.user?.footballRole === 'coach' ? '감독/코치' : 
-                               session.user?.footballRole === 'player' ? '선수' : '보호자'}
-                            </Badge>
-                          </h4>
-                          <p className="text-xs font-bold text-slate mt-1">소속 팀의 훈련 일정과 당일 컨디션을 관리하고 분석하세요.</p>
-                        </div>
+                        <Button asChild className="w-full md:w-auto h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 shadow-lg shadow-emerald-600/10">
+                          <Link href="/football/mypage" className="flex items-center gap-2">
+                            클럽하우스 대시보드 입장 <ChevronRight className="h-4 w-4" />
+                          </Link>
+                        </Button>
                       </div>
-                      <Button asChild className="w-full md:w-auto h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 shadow-lg shadow-emerald-600/10">
-                        <Link href="/football/mypage" className="flex items-center gap-2">
-                          클럽하우스 대시보드 입장 <ChevronRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
+
+                      {/* 감독/코치 전용 스쿼드 회원 초대 허브 */}
+                      {session.user?.footballRole === 'coach' && (
+                        <div className="p-6 md:p-8 rounded-[24px] bg-slate-50 border border-slate-100 space-y-4">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-lg">📢</span>
+                            <h5 className="text-sm font-black text-obsidian tracking-tight">소속 선수 및 보호자 초대 프로토콜</h5>
+                          </div>
+                          <p className="text-xs font-bold text-slate leading-relaxed">
+                            선수와 학부모가 우리 팀 스쿼드에 등록하여 일일 웰니스와 회복 Rhythms를 연동할 수 있도록 초대 코드를 배포하십시오.
+                            회원들이 유니클 마이페이지에 합류하거나 초대 링크를 통해 즉시 등록할 수 있습니다.
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            {/* 초대 코드 복사 */}
+                            <div className="p-4 bg-white rounded-xl border border-slate-200/60 flex items-center justify-between">
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-black text-slate uppercase opacity-50 tracking-wider">팀 고유 초대 코드</p>
+                                <p className="text-sm font-black text-obsidian tracking-widest mt-0.5 uppercase truncate">
+                                  {footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || 'ST-CODE'}
+                                </p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  const code = footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode;
+                                  if (code) {
+                                    navigator.clipboard.writeText(code.toUpperCase());
+                                    alert(`팀 초대 코드 (${code.toUpperCase()})가 클립보드에 복사되었습니다!`);
+                                  }
+                                }}
+                                className="h-9 px-3 rounded-lg font-black text-xs gap-1.5 shrink-0 hover:bg-slate-50"
+                              >
+                                <Link2 className="w-3.5 h-3.5" /> 코드 복사
+                              </Button>
+                            </div>
+
+                            {/* 자동 합류 링크 복사 */}
+                            <div className="p-4 bg-white rounded-xl border border-slate-200/60 flex items-center justify-between">
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-black text-slate uppercase opacity-50 tracking-wider">선수 자동 가입 링크</p>
+                                <p className="text-[10px] font-bold text-slate truncate max-w-[170px] mt-0.5">
+                                  /football/join/{(footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || '').toLowerCase()}
+                                </p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                onClick={() => {
+                                  const code = footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode;
+                                  if (code) {
+                                    const link = `${window.location.origin}/football/join/${code.toUpperCase()}`;
+                                    navigator.clipboard.writeText(link);
+                                    alert('소속 선수 전용 자동 가입/팀합류 초대 링크가 복사되었습니다! 카카오톡이나 밴드에 즉시 공유하세요.');
+                                  }
+                                }}
+                                className="h-9 px-3 rounded-lg bg-obsidian hover:bg-obsidian/90 text-white font-black text-xs gap-1.5 shrink-0"
+                              >
+                                <UserPlus className="w-3.5 h-3.5" /> 초대 링크 복사
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : footballPendingTeam ? (
                     <div className="bg-amber-50/40 p-6 md:p-8 rounded-[24px] border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -1098,116 +1159,6 @@ export default function MyPage() {
                 </CardContent>
               </Card>
 
-              {/* 프로필 정보 */}
-              <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden">
-                <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-mist rounded-2xl text-obsidian">
-                      <User className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로필 설정</CardTitle>
-                  </div>
-                  <Button variant="ghost" onClick={() => setIsEditing(!isEditing)} className="font-black text-xs text-slate hover:bg-mist h-10 px-4 rounded-xl">
-                    {isEditing ? <><X className="h-4 w-4 mr-2" /> 취소</> : <><Settings className="h-4 w-4 mr-2" /> 편집</>}
-                  </Button>
-                </CardHeader>
-                <CardContent className="p-6 md:p-10 space-y-8 md:space-y-10">
-                  <div className="bg-mist/30 p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-line/30 flex items-center gap-4 md:gap-6">
-                    <div className="relative w-24 h-24 rounded-[32px] overflow-hidden bg-white shadow-md border-4 border-white group/avatar">
-                      <Image src={formData.avatar || session.user?.image || '/placeholder-user.jpg'} alt="" fill className="object-cover" />
-                      {isEditing && (
-                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover/avatar:opacity-100 transition-opacity">
-                          <Upload className="text-white h-6 w-6" />
-                          <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} aria-label="프로필 이미지 변경" />
-                        </label>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-obsidian">{session.user?.name}</h3>
-                      <p className="text-sm font-bold text-slate flex items-center gap-2 opacity-60">
-                        <Mail className="h-3 w-3" /> {session.user?.email}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-3">
-                          {(session.user as any)?.provider || 'Email Member'}
-                        </Badge>
-                        {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
-                          <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[9px] uppercase tracking-widest px-3 flex items-center gap-1">
-                            <Zap className="w-2.5 h-2.5" /> FOUNDER PASS
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">연락처</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate h-4 w-4 opacity-40" />
-                        <Input
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="010-XXXX-XXXX"
-                          className="h-14 pl-12 rounded-2xl bg-mist/50 border-line focus:ring-chapter-accent"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">마케팅 활용 동의</Label>
-                      <div className={`h-14 flex items-center px-5 rounded-2xl border transition-all ${formData.marketingConsent ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
-                        <Checkbox
-                          id="marketing"
-                          checked={formData.marketingConsent}
-                          onCheckedChange={(c) => setFormData(prev => ({ ...prev, marketingConsent: c as boolean }))}
-                          disabled={!isEditing}
-                          className="rounded-md"
-                        />
-                        <label htmlFor="marketing" className="ml-3 text-sm font-bold text-slate cursor-pointer select-none">이벤트 수신동의</label>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">회복 리듬 알림</Label>
-                      <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${notificationPermission === 'granted' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
-                        <div className="flex items-center gap-3">
-                          <Bell className={`h-4 w-4 ${notificationPermission === 'granted' ? 'text-chapter-accent' : 'text-slate opacity-40'}`} />
-                          <span className="text-sm font-bold text-slate">데스크톱/모바일 푸시</span>
-                        </div>
-                        <Switch 
-                          checked={notificationPermission === 'granted'}
-                          onCheckedChange={handleNotificationToggle}
-                          className="data-[state=checked]:bg-chapter-accent"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
-                    <div className="space-y-3">
-                      <UnifiedAddressSearch
-                        provider="google"
-                        onAddressSelect={handleAddressSelect}
-                        disabled={!isEditing}
-                      />
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                        <Input value={formData.address1} readOnly placeholder="주소" className="h-14 md:col-span-3 rounded-2xl bg-mist/50 border-line" />
-                      </div>
-                      <Input name="address2" value={formData.address2} onChange={handleInputChange} disabled={!isEditing} placeholder="상세 주소를 입력하세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                    </div>
-                  </div>
-
-                  {isEditing && (
-                    <Button onClick={handleSave} className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
-                      <Save className="h-5 w-5" /> 프로필 저장하기
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-
               {/* 회복 성장 곡선 위젯 (Social Proof 통합 버전) */}
               <Card className="border-none shadow-xl rounded-[32px] md:rounded-[40px] bg-white overflow-hidden group">
                 <CardHeader className="p-6 md:p-8 pb-4 flex flex-row items-center justify-between">
@@ -1350,28 +1301,6 @@ export default function MyPage() {
                 </CardContent>
               </Card>
 
-              {/* 전담 네비게이터 상담 센터 */}
-              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-indigo-50 transition-all hover:shadow-3xl">
-                <CardHeader className="p-8 md:p-10 pb-0 border-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
-                        <MessageCircle className="h-7 w-7" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">
-                          {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
-                        </h3>
-                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-8 md:p-10">
-                  <NavigatorConsultationCenter />
-                </CardContent>
-              </Card>
-
               {/* 통합 인비테이션 & 메디컬 허브 */}
               <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
                 <CardHeader className="p-8 md:p-10 pb-0 border-none">
@@ -1425,6 +1354,146 @@ export default function MyPage() {
                 </CardHeader>
                 <CardContent className="p-8 md:p-10 pt-2">
                   <ReferralNetwork mode="accordion" />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* 우측 사이드바 영역 */}
+            <div className="lg:col-span-4 space-y-6 md:space-y-8">
+              {/* 프로필 정보 */}
+              <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden">
+                <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-mist rounded-2xl text-obsidian">
+                      <User className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로필 설정</CardTitle>
+                  </div>
+                  <Button variant="ghost" onClick={() => setIsEditing(!isEditing)} className="font-black text-xs text-slate hover:bg-mist h-10 px-4 rounded-xl">
+                    {isEditing ? <><X className="h-4 w-4 mr-2" /> 취소</> : <><Settings className="h-4 w-4 mr-2" /> 편집</>}
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-6 md:p-10 space-y-8 md:space-y-10">
+                  <div className="bg-mist/30 p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-line/30 flex items-center gap-4 md:gap-6">
+                    <div className="relative w-20 h-20 rounded-[28px] overflow-hidden bg-slate-100 shadow-md border-4 border-white group/avatar flex-shrink-0">
+                      <Image 
+                        src={formData.avatar || session.user?.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"} 
+                        alt="" 
+                        fill 
+                        className="object-cover" 
+                      />
+                      {isEditing && (
+                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                          <Upload className="text-white h-5 w-5" />
+                          <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} aria-label="프로필 이미지 변경" />
+                        </label>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-black text-obsidian truncate">{session.user?.name}</h3>
+                      <p className="text-xs font-bold text-slate flex items-center gap-1.5 opacity-60 truncate">
+                        <Mail className="h-3 w-3" /> {session.user?.email}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-0.5">
+                          {(session.user as any)?.provider || 'Email'}
+                        </Badge>
+                        {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
+                          <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[8px] uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
+                            <Zap className="w-2.5 h-2.5" /> FOUNDER
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">연락처</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate h-4 w-4 opacity-40" />
+                        <Input
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          placeholder="010-XXXX-XXXX"
+                          className="h-14 pl-12 rounded-2xl bg-mist/50 border-line focus:ring-chapter-accent"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
+                      <div className="space-y-3">
+                        <UnifiedAddressSearch
+                          provider="google"
+                          onAddressSelect={handleAddressSelect}
+                          disabled={!isEditing}
+                        />
+                        <div className="grid grid-cols-1 gap-3">
+                          <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                          <Input value={formData.address1} readOnly placeholder="주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                          <Input name="address2" value={formData.address2} onChange={handleInputChange} disabled={!isEditing} placeholder="상세 주소를 입력하세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">알림 및 동의</Label>
+                      <div className="space-y-3">
+                        <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${formData.marketingConsent ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                          <label htmlFor="marketing" className="text-sm font-bold text-slate cursor-pointer select-none">이벤트 수신동의</label>
+                          <Checkbox
+                            id="marketing"
+                            checked={formData.marketingConsent}
+                            onCheckedChange={(c) => setFormData(prev => ({ ...prev, marketingConsent: c as boolean }))}
+                            disabled={!isEditing}
+                            className="rounded-md"
+                          />
+                        </div>
+                        <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${notificationPermission === 'granted' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                          <div className="flex items-center gap-2">
+                            <Bell className={`h-4 w-4 ${notificationPermission === 'granted' ? 'text-chapter-accent' : 'text-slate opacity-40'}`} />
+                            <span className="text-sm font-bold text-slate">푸시 알림</span>
+                          </div>
+                          <Switch 
+                            checked={notificationPermission === 'granted'}
+                            onCheckedChange={handleNotificationToggle}
+                            className="data-[state=checked]:bg-chapter-accent"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {isEditing && (
+                    <Button onClick={handleSave} className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+                      <Save className="h-5 w-5" /> 프로필 저장하기
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 전담 네비게이터 상담 센터 */}
+              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-indigo-50 transition-all hover:shadow-3xl">
+                <CardHeader className="p-8 md:p-10 pb-0 border-none">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
+                        <MessageCircle className="h-7 w-7" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-black text-obsidian tracking-tighter">
+                          {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
+                        </h3>
+                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 md:p-10">
+                  <NavigatorConsultationCenter />
                 </CardContent>
               </Card>
             </div>
