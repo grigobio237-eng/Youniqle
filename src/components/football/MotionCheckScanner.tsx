@@ -200,6 +200,7 @@ export default function MotionCheckScanner() {
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             setStream(newStream);
             setStatus('webcam');
+            setIsCameraReady(true);
             setCurrentStepIdx(0);
             playSound('beep');
         } catch (err: any) {
@@ -513,11 +514,14 @@ export default function MotionCheckScanner() {
                 }
                 try {
                     await videoRef.current.play();
-                    if (videoRef.current.readyState >= 3) {
-                        setTimeout(() => { if (isMounted) setIsCameraReady(true); }, 500);
+                    if (isMounted) {
+                        setIsCameraReady(true);
                     }
                 } catch (playError) {
                     console.warn("[MotionCheck] Video Play error:", playError);
+                    if (isMounted) {
+                        setIsCameraReady(true);
+                    }
                 }
             }
         };
@@ -755,10 +759,7 @@ export default function MotionCheckScanner() {
                             <video 
                                 ref={videoRef} 
                                 autoPlay playsInline muted 
-                                onLoadedMetadata={() => setIsCameraReady(true)}
-                                onPlay={() => setIsCameraReady(true)}
-                                onLoadedData={() => setIsCameraReady(true)}
-                                className="absolute w-[1px] h-[1px] opacity-0 pointer-events-none" 
+                                className="absolute -left-[9999px] -top-[9999px] w-[640px] h-[480px] pointer-events-none" 
                             />
                             
                             {/* Animated skeleton visual feedback canvas */}
