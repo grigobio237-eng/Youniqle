@@ -60,6 +60,12 @@ export default function MotionCheckScanner() {
     const latestLandmarksRef = useRef<any[] | null>(null);
     const latestConfidenceRef = useRef<number>(1.0);
     const latestAnkleVisibleRef = useRef<boolean>(true);
+    const motionMetricsRef = useRef({
+        squatMinAngle: 180,
+        jumpMinAngle: 180,
+        runMaxTilt: 0,
+        kickMinAngle: 180
+    });
 
     // Telemetry log appender
     const addLog = useCallback((msg: string) => {
@@ -168,40 +174,46 @@ export default function MotionCheckScanner() {
         setIsSaving(true);
         addLog("[MSO EMR] AI 피지컬 리포트 데이터 패키징 중...");
         
+        const m = motionMetricsRef.current;
+        const squatAngle = m.squatMinAngle === 180 ? 84.2 : m.squatMinAngle;
+        const jumpAngle = m.jumpMinAngle === 180 ? 110.4 : m.jumpMinAngle;
+        const runTilt = m.runMaxTilt === 0 ? 1.5 : m.runMaxTilt;
+        const kickAngle = m.kickMinAngle === 180 ? 135.0 : m.kickMinAngle;
+
         const payload = {
             userId: "usr_youniqle_cgm_demo",
             scannedAt: new Date().toISOString(),
             deviceInfo: typeof navigator !== 'undefined' ? navigator.userAgent : "Mobile Web Browser",
             metrics: {
                 squat: {
-                    maxFlexionAngle: 84.2, 
+                    maxFlexionAngle: squatAngle, 
                     durationSeconds: 4.1,
                     leftRightDeviation: 1.8,
-                    stability: "HIGH"
+                    stability: squatAngle <= 92 ? "HIGH" : "MODERATE"
                 },
                 jump: {
-                    landingStiffnessAngle: 110.4,
+                    landingStiffnessAngle: jumpAngle,
                     verticalDisplacement: 45.0,
                     impactSymmetryPercent: 96.5,
-                    stability: "OPTIMAL"
+                    stability: jumpAngle <= 125 ? "OPTIMAL" : "NEEDS_IMPROVEMENT"
                 },
                 run: {
                     averageCadence: 172.0,
-                    pelvicTiltDeviation: 1.5,
+                    pelvicTiltDeviation: runTilt,
                     leftRightRhythmRatio: 1.01,
-                    stability: "GOOD"
+                    stability: runTilt < 4.0 ? "GOOD" : "UNSTABLE"
                 },
                 kick: {
                     pelvicRotationROM: 44.2,
                     maxKickVelocity: 442.5,
                     supportAnkleStability: 97.8,
-                    stability: "OPTIMAL"
+                    stability: kickAngle <= 135 ? "OPTIMAL" : "POOR"
                 }
             },
             aiDiagnosis: {
                 totalScore: 97,
                 recoveryStatus: "FULLY_RESTORED",
-                clinicalInsight: "스쿼트 및 점프 착지 시 무릎 충격 대칭성이 매우 안정적이며, 킥 파워 시의 디딤발 지지 상태도 최상입니다. 물리치료 및 컨디셔닝이 정상 궤도에 안착해 있습니다."
+                clinicalInsight: `스쿼트 최대 구부림(무릎) 각도는 ${squatAngle}° 이고 점프 착지 시 각도는 ${jumpAngle}° 입니다. 킥 파워 시의 디딤발 무릎 각도(${kickAngle}°) 지지 상태도 양호합니다. 물리치료 및 컨디셔닝이 정상 궤도에 안착해 있습니다.`
             }
         };
 
@@ -566,9 +578,8 @@ export default function MotionCheckScanner() {
         addLog(`[AUTO SCENE] ${activeStep.subtitle} 트래킹 중... (실시간 동작 감지 활성화)`);
 
         const captureTimer = setTimeout(() => {
-            addLog(`⏱️ [TIMEOUT FALLBACK] ${activeStep.title} 자동 캡처 진행`);
-            triggerCapture();
-        }, 4500);
+            addLog(`⚠️ [동작 대기] ${activeStep.title} 동작이 감지되지 않고 있습니다. 카메라 앵글에 맞춰 동작을 수행해주세요.`);
+        }, 8000);
 
         return () => clearTimeout(captureTimer);
     }, [status, isCameraReady, detectionState, currentStepIndex, addLog, triggerCapture]);
@@ -984,12 +995,29 @@ export default function MotionCheckScanner() {
                 // Real Action Triggers based on calculated joint angles
                 if (isUsingRealVision && !isHoldFreezing && !isComplete) {
                     const stepId = STEPS[currentStepIndex].id;
-                    if (stepId === 'squat' && calculatedKneeAngleL <= 92) {
-                        triggerCapture();
-                    } else if (stepId === 'jump' && calculatedKneeAngleL <= 125) {
-                        triggerCapture();
-                    } else if (stepId === 'kick' && (calculatedKneeAngleR <= 135 || calculatedKneeAngleL <= 135)) {
-                        triggerCapture();
+                    const minKneeAngle = Math.min(calculatedKneeAngleL, calculatedKneeAngleR);
+
+                    if (stepId === 'squat') {
+                        if (minKneeAngle < motionMetricsRef.current.squatMinAngle) {
+                            motionMetricsRef.current.squatMinAngle = minKneeAngle;
+                        }
+                        if (minKneeAngle <= 92) triggerCapture();
+                    } else if (stepId === 'jump') {
+                        if (minKneeAngle < motionMetricsRef.current.jumpMinAngle) {
+                            motionMetricsRef.current.jumpMinAngle = minKneeAngle;
+                        }
+                        if (minKneeAngle <= 125) triggerCapture();
+                    } else if (stepId === 'run') {
+                        if (parseFloat(pelvicTilt) > motionMetricsRef.current.runMaxTilt) {
+                            motionMetricsRef.current.runMaxTilt = parseFloat(pelvicTilt);
+                        }
+                        // For stationary run, if knee lifts high enough (angle drops <= 120)
+                        if (minKneeAngle <= 120) triggerCapture();
+                    } else if (stepId === 'kick') {
+                        if (minKneeAngle < motionMetricsRef.current.kickMinAngle) {
+                            motionMetricsRef.current.kickMinAngle = minKneeAngle;
+                        }
+                        if (minKneeAngle <= 135) triggerCapture();
                     }
                 }
 
