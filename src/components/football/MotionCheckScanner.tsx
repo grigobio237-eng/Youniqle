@@ -289,6 +289,70 @@ export default function MotionCheckScanner() {
 
             ctx.clearRect(0, 0, w, h);
 
+            // If physical stream is not active (e.g. secure context block or user denied permission), render a high-fidelity digital scanner backdrop
+            if (!stream) {
+                // Futuristic dark cyber background
+                ctx.fillStyle = '#060A13';
+                ctx.fillRect(0, 0, w, h);
+
+                // Thin matrix-grid lines
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.04)';
+                ctx.lineWidth = 1;
+                const gridSize = 30;
+                for (let x = 0; x < w; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < h; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+
+                // Concentric scanner radar circles in center
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.03)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.35, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.15, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Cyberpunk crosshairs at corners
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.25)';
+                ctx.lineWidth = 1.5;
+                const len = 12;
+                const pad = 15;
+                // Top-Left
+                ctx.beginPath();
+                ctx.moveTo(pad, pad + len); ctx.lineTo(pad, pad); ctx.lineTo(pad + len, pad);
+                ctx.stroke();
+                // Top-Right
+                ctx.beginPath();
+                ctx.moveTo(w - pad, pad + len); ctx.lineTo(w - pad, pad); ctx.lineTo(w - pad - len, pad);
+                ctx.stroke();
+                // Bottom-Left
+                ctx.beginPath();
+                ctx.moveTo(pad, h - pad - len); ctx.lineTo(pad, h - pad); ctx.lineTo(pad + len, h - pad);
+                ctx.stroke();
+                // Bottom-Right
+                ctx.beginPath();
+                ctx.moveTo(w - pad, h - pad - len); ctx.lineTo(w - pad, h - pad); ctx.lineTo(w - pad - len, h - pad);
+                ctx.stroke();
+
+                // Blinking red SIMULATION watermark
+                if (frameCount % 60 < 30) {
+                    ctx.fillStyle = 'rgba(255, 59, 48, 0.5)';
+                    ctx.font = '900 8px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('CAMERA BLOCK - RUNNING SIMULATOR MODE', w / 2, 25);
+                }
+            }
+
             // 1. Draw Futuristic Scanning Laser Line
             const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
             const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
@@ -309,48 +373,46 @@ export default function MotionCheckScanner() {
             ctx.shadowBlur = 0; // Reset shadow
 
             // 2. Draw Guided Translucent Silhouette Overlays based on step (Static Calibration Anchor)
-            ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.7)' : 'rgba(255, 255, 255, 0.25)';
-            ctx.lineWidth = isAligned ? 3.5 : 2.0;
+            // HIDES static outline completely once user is aligned to allow skeleton to bend cleanly without overlapping static line
             if (!isAligned) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.lineWidth = 2.0;
                 ctx.setLineDash([6, 6]);
-            } else {
-                ctx.setLineDash([]);
+                
+                if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
+                    // Frontal body silhouette guide (Standing Calibration Target)
+                    ctx.beginPath();
+                    ctx.arc(w / 2, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
+                    ctx.moveTo(w / 2, h * 0.28);
+                    ctx.lineTo(w / 2, h * 0.55); // Spine
+                    ctx.moveTo(w / 2 - w * 0.12, h * 0.32);
+                    ctx.lineTo(w / 2 + w * 0.12, h * 0.32); // Shoulders
+                    ctx.moveTo(w / 2 - w * 0.08, h * 0.55);
+                    ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Hips
+                    ctx.moveTo(w / 2 - w * 0.08, h * 0.88);
+                    ctx.lineTo(w / 2 - w * 0.08, h * 0.55); // Left Leg outline
+                    ctx.moveTo(w / 2 + w * 0.08, h * 0.88);
+                    ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Right Leg outline
+                    ctx.stroke();
+                } else if (currentStep.id === 'RUNNING') {
+                    // Lateral body silhouette guide (Standing Side-profile Calibration Target)
+                    ctx.beginPath();
+                    ctx.arc(w * 0.45, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
+                    ctx.moveTo(w * 0.45, h * 0.28);
+                    ctx.lineTo(w * 0.42, h * 0.58); // Spine
+                    ctx.lineTo(w * 0.42, h * 0.88); // Legs
+                    ctx.stroke();
+                } else if (currentStep.id === 'KICK') {
+                    // Kick target circular overlay on ground + Stance guideline
+                    ctx.strokeStyle = 'rgba(0, 216, 246, 0.4)';
+                    ctx.beginPath();
+                    ctx.arc(w * 0.5, h * 0.8, 45, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(0, 216, 246, 0.08)';
+                    ctx.fill();
+                }
+                ctx.setLineDash([]); // Reset line dash
             }
-            
-            if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
-                // Frontal body silhouette guide (Standing Calibration Target)
-                ctx.beginPath();
-                ctx.arc(w / 2, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
-                ctx.moveTo(w / 2, h * 0.28);
-                ctx.lineTo(w / 2, h * 0.55); // Spine
-                ctx.moveTo(w / 2 - w * 0.12, h * 0.32);
-                ctx.lineTo(w / 2 + w * 0.12, h * 0.32); // Shoulders
-                ctx.moveTo(w / 2 - w * 0.08, h * 0.55);
-                ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Hips
-                ctx.moveTo(w / 2 - w * 0.08, h * 0.88);
-                ctx.lineTo(w / 2 - w * 0.08, h * 0.55); // Left Leg outline
-                ctx.moveTo(w / 2 + w * 0.08, h * 0.88);
-                ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Right Leg outline
-                ctx.stroke();
-            } else if (currentStep.id === 'RUNNING') {
-                // Lateral body silhouette guide (Standing Side-profile Calibration Target)
-                ctx.beginPath();
-                ctx.arc(w * 0.45, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
-                ctx.moveTo(w * 0.45, h * 0.28);
-                ctx.lineTo(w * 0.42, h * 0.58); // Spine
-                ctx.lineTo(w * 0.42, h * 0.88); // Legs
-                ctx.stroke();
-            } else if (currentStep.id === 'KICK') {
-                // Kick target circular overlay on ground + Stance guideline
-                ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.7)' : 'rgba(0, 216, 246, 0.4)';
-                ctx.setLineDash([]);
-                ctx.beginPath();
-                ctx.arc(w * 0.5, h * 0.8, 45, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.fillStyle = isAligned ? 'rgba(0, 245, 155, 0.08)' : 'rgba(0, 216, 246, 0.08)';
-                ctx.fill();
-            }
-            ctx.setLineDash([]); // Reset line dash
 
             // 3. Draw neon Biomechanical Skeletons
             const time = frameCount * 0.05;
@@ -866,7 +928,7 @@ export default function MotionCheckScanner() {
                         className="flex-1 flex flex-col items-center justify-center py-12 text-center space-y-8"
                     >
                         <button 
-                            onClick={startWebcam}
+                            onClick={() => startWebcam()}
                             className="w-28 h-28 bg-gradient-to-tr from-[#00F59B]/20 to-[#00D8F6]/20 border border-[#00F59B]/40 rounded-3xl flex flex-col items-center justify-center relative group hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-none"
                             aria-label="Start camera stream"
                         >
