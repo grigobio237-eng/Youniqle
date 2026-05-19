@@ -115,15 +115,42 @@ export default function FoodScanner({
         }
     };
 
+    const compressImage = (base64: string): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1024;
+                const MAX_HEIGHT = 1024;
+                let width = img.width;
+                let height = img.height;
+                if (width > height) {
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/webp', 0.8));
+            };
+        });
+    };
+
     const analyzeImage = async (imageData: string) => {
         setStatus('analyzing');
         setLoading(true);
         try {
+            const compressedData = await compressImage(imageData);
+            setCapturedImage(compressedData);
+            
             const response = await fetch('/api/ai/life-snap', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    image: imageData,
+                    image: compressedData,
                     snapType: 'AUTO',
                     journey: 'WELLNESS' 
                 }),
@@ -142,7 +169,7 @@ export default function FoodScanner({
             
             // Auto save for members
             if (session?.user?.email) {
-                autoSaveResult(data, imageData);
+                autoSaveResult(data, compressedData);
             }
         } catch (err: any) {
             toast.error(err.message || "분석 중 오류가 발생했습니다.");

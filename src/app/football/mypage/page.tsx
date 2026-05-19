@@ -602,11 +602,11 @@ export default function FootballMyPage() {
                 </CardContent>
               </Card>
             </Link>
-            <Link href="/diagnosis?type=daily">
+            <Link href="/football/motion-check">
               <Card className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer">
                 <CardContent className="p-4 text-center space-y-2">
-                  <span className="text-2xl">🎯</span>
-                  <p className="text-sm font-bold text-obsidian">60초 리듬체크</p>
+                  <span className="text-2xl">👟</span>
+                  <p className="text-sm font-bold text-obsidian">60초 동작체크</p>
                 </CardContent>
               </Card>
             </Link>
