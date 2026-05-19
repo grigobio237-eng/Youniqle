@@ -2,276 +2,292 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, RefreshCcw, Sparkles, Loader2, ArrowLeft, Check, X, Info, ShieldAlert, Award, ChevronRight, Save } from 'lucide-react';
+import { Camera, RefreshCw, Sparkles, Loader2, ArrowLeft, ShieldAlert, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-
-// --- Types & Constants ---
-type RoutineStep = 'SQUAT' | 'JUMP' | 'RUNNING' | 'KICK' | 'REPORT';
-
-interface StepInfo {
-    id: RoutineStep;
-    title: string;
-    description: string;
-    guideText: string;
-    facing: 'front' | 'side' | 'kick';
-    duration: number; // seconds
-}
-
-const ROUTINE_STEPS: StepInfo[] = [
-    {
-        id: 'SQUAT',
-        title: '스쿼트 정렬 체크',
-        description: '무릎 안쪽 말림도 및 골반 수평 정렬을 분석합니다.',
-        guideText: '카메라 정면을 보고 전신이 실루엣 가이드라인에 위치하도록 서 주세요.',
-        facing: 'front',
-        duration: 5,
-    },
-    {
-        id: 'JUMP',
-        title: '점프 착지 안정성',
-        description: '착지 순간의 무릎 수평 흔들림과 가속 감쇠율을 측정합니다.',
-        guideText: '표시된 영역 안에서 가볍게 점프한 후 무릎을 굽히며 착지해 주세요.',
-        facing: 'front',
-        duration: 5,
-    },
-    {
-        id: 'RUNNING',
-        title: '달리기 상체 경사도',
-        description: '척추 각도, 보폭 대칭성 및 좌우 편차를 분석합니다.',
-        guideText: '스마트폰을 측면으로 회전하고 몸의 옆모습이 나오도록 조정한 후 제자리에서 뛰어주세요.',
-        facing: 'side',
-        duration: 6,
-    },
-    {
-        id: 'KICK',
-        title: '킥 밸런스 분석',
-        description: '디딤발 고정도와 골반 회전 가동 범위(ROM)를 추적합니다.',
-        guideText: '대각선 후방에서 디딤발 위치가 타겟 링에 위치하도록 선 후 킥 모션을 취해 주세요.',
-        facing: 'kick',
-        duration: 5,
-    },
-];
-
-// Biomechanical telemetry metrics
-interface BiomechanicsReport {
-    squat: {
-        score: number;
-        kneeValgusAngle: string;
-        pelvisAlignment: string;
-        balanceRatio: string;
-        status: 'SAFE' | 'WARNING' | 'ALERT';
-    };
-    jump: {
-        score: number;
-        kneeSway: string;
-        impactDampening: string;
-        stability: 'SAFE' | 'WARNING' | 'ALERT';
-    };
-    running: {
-        score: number;
-        torsoAngle: string;
-        strideSymmetry: string;
-        stability: 'SAFE' | 'WARNING' | 'ALERT';
-    };
-    kick: {
-        score: number;
-        supportingFootStability: string;
-        pelvicRotationROM: string;
-        stability: 'SAFE' | 'WARNING' | 'ALERT';
-    };
-    overallScoreBefore: number;
-    overallScoreAfter: number;
-}
 
 export default function MotionCheckScanner() {
     const router = useRouter();
-    const { data: session } = useSession();
     
-    // UI flow states
-    const [currentStepIdx, setCurrentStepIdx] = useState<number>(0);
-    const [status, setStatus] = useState<'idle' | 'webcam' | 'analyzing' | 'result'>('idle');
-    const [capturedFrames, setCapturedFrames] = useState<Record<string, string>>({});
-    const [telemetryLog, setTelemetryLog] = useState<string[]>([]);
-    
-    // Camera streaming refs
+    // UI & Camera states
+    const [status, setStatus] = useState<'idle' | 'webcam'>('idle');
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     const [webcamError, setWebcamError] = useState<string | null>(null);
-    const [isAligned, setIsAligned] = useState(false);
-    const [alignmentProgress, setAlignmentProgress] = useState(0);
-    const [secondsLeft, setSecondsLeft] = useState<number>(5);
     const [showGuidelines, setShowGuidelines] = useState(true);
+    const [telemetryLog, setTelemetryLog] = useState<string[]>([]);
+    const [actualResolution, setActualResolution] = useState<string>('0 x 0');
+
+    // Smart detection sequence state machine
+    const [detectionState, setDetectionState] = useState<'searching' | 'locked' | 'countdown' | 'active'>('searching');
+    const [countdownNumber, setCountdownNumber] = useState<number | null>(null);
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
+    const sequenceTimeoutRef = useRef<NodeJS.Timeout[]>([]);
 
-    // Audio cues generator using Web Audio API (Synthesizer)
-    const playSound = useCallback((type: 'beep' | 'success' | 'alarm' | 'complete') => {
+    // Telemetry log appender
+    const addLog = useCallback((msg: string) => {
+        const timestamp = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+        setTelemetryLog(prev => [`[${timestamp}] ${msg}`, ...prev.slice(0, 35)]);
+    }, []);
+
+    // Web Audio Synthesizer Beep Sound Generator
+    const playBeep = useCallback((freq: number, duration: number, type: OscillatorType = 'sine') => {
         try {
-            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-            if (!AudioContext) return;
-            const ctx = new AudioContext();
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContextClass) return;
+            const ctx = new AudioContextClass();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            
+            // Smooth fade-out to prevent audio pops
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
             
             osc.connect(gain);
             gain.connect(ctx.destination);
             
-            if (type === 'beep') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, ctx.currentTime);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.15);
-            } else if (type === 'success') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.25);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.3);
-            } else if (type === 'alarm') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, ctx.currentTime);
-                gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.4);
-            } else if (type === 'complete') {
-                // Futuristic double chime
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15); // E5
-                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.3); // G5
-                gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.5);
-            }
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
         } catch (e) {
-            console.warn('Web Audio API not supported or user gesture required', e);
+            console.warn("AudioContext block/error:", e);
         }
     }, []);
 
-    // Haptic feedback simulator
-    const triggerHaptic = useCallback((pattern: number | number[]) => {
-        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(pattern);
-        }
-    }, []);
-
-    // Telemetry log appender
-    const addLog = useCallback((msg: string) => {
-        setTelemetryLog(prev => [msg, ...prev.slice(0, 15)]);
-    }, []);
-
-    // --- Biomechanical Telemetry Report State ---
-    const [finalReport, setFinalReport] = useState<BiomechanicsReport | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [hasSaved, setHasSaved] = useState(false);
-
-    // Stop webcam utility
+    // Stop webcam stream and return to idle card
     const stopWebcam = useCallback(() => {
+        addLog("웹캠 세션 종료 요청");
+        
+        // Clear all active timers
+        sequenceTimeoutRef.current.forEach(timer => clearTimeout(timer));
+        sequenceTimeoutRef.current = [];
+
         if (animationFrameIdRef.current) {
             cancelAnimationFrame(animationFrameIdRef.current);
             animationFrameIdRef.current = null;
         }
         if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach(track => {
+                addLog(`Track 중지: ${track.kind} (${track.label})`);
+                track.stop();
+            });
             setStream(null);
         }
         setIsCameraReady(false);
-    }, [stream]);
+        setActualResolution('0 x 0');
+        setDetectionState('searching');
+        setCountdownNumber(null);
+        setStatus('idle');
+        addLog("카메라 스트림 중지 완료 및 복귀");
+    }, [stream, addLog]);
 
-    // Start webcam utility
+    // Start webcam stream with advanced fallbacks
     const startWebcam = async (mode: 'user' | 'environment' = facingMode) => {
         setIsCameraReady(false);
-        setHasSaved(false);
         setWebcamError(null);
-        
-        // 1. Try with high-quality and specific direction constraints
+        setActualResolution('0 x 0');
+        setDetectionState('searching');
+        setCountdownNumber(null);
+        addLog(`카메라 연동 시작 (모드: ${mode === 'user' ? '전면(user)' : '후면(environment)'})`);
+
+        // Stop existing streams first to prevent hardware lock
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+
+        // Attempt 1: Standard High-Quality Constraints
         try {
             const constraints: MediaStreamConstraints = {
                 video: {
-                    facingMode: { ideal: mode }, // Prioritizes chosen camera mode (front or rear)
+                    facingMode: { ideal: mode },
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
                 audio: false
             };
+            addLog("Attempt 1: getUserMedia 호출 (이상적인 해상도 1280x720)");
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             setStream(newStream);
             setStatus('webcam');
-            setIsCameraReady(true);
-            setCurrentStepIdx(0);
-            playSound('beep');
+            addLog("Attempt 1 성공: 스트림 획득 완료");
             return;
         } catch (firstErr: any) {
-            console.warn('[MotionCheck] First getUserMedia attempt failed, trying fallback constraints:', firstErr);
+            addLog(`Attempt 1 실패: ${firstErr.name || firstErr.message}`);
             
-            // 2. Fallback 1: Simple facingMode constraint
+            // Attempt 2: Simple FacingMode constraint
             try {
                 const fallbackConstraints: MediaStreamConstraints = {
                     video: { facingMode: mode },
                     audio: false
                 };
+                addLog("Attempt 2 (Fallback): getUserMedia 호출 (해상도 제약 해제)");
                 const newStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
                 setStream(newStream);
                 setStatus('webcam');
-                setIsCameraReady(true);
-                setCurrentStepIdx(0);
-                playSound('beep');
+                addLog("Attempt 2 성공: 스트림 획득 완료");
                 return;
             } catch (secondErr: any) {
-                console.warn('[MotionCheck] Fallback 1 failed, trying absolute basic video:true constraint:', secondErr);
+                addLog(`Attempt 2 실패: ${secondErr.name || secondErr.message}`);
                 
-                // 3. Fallback 2: Absolute simplest constraint
+                // Attempt 3: Absolute simplest constraint
                 try {
+                    addLog("Attempt 3 (Basic): getUserMedia 호출 (video: true)");
                     const basicStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                     setStream(basicStream);
                     setStatus('webcam');
-                    setIsCameraReady(true);
-                    setCurrentStepIdx(0);
-                    playSound('beep');
+                    addLog("Attempt 3 성공: 스트림 획득 완료");
                     return;
                 } catch (err: any) {
-                    console.error('[MotionCheck] All webcam acquisition attempts failed:', err);
+                    addLog(`모든 카메라 연결 시도 실패: ${err.name || err.message}`);
                     setWebcamError(err.name || err.message || 'UnknownError');
-                    
-                    // Fallback to mock stream simulation using Canvas
-                    setStatus('webcam');
-                    setIsCameraReady(true);
-                    toast.error(`카메라 연동 실패: ${err.name || '권한 또는 장치 오류'}. 시뮬레이션 모드로 전환합니다.`);
+                    toast.error(`카메라 연동 실패: ${err.name || '장치 권한을 확인해주세요.'}`);
                 }
             }
         }
     };
 
-    // Toggle between front and rear cameras dynamically
-    const toggleCamera = async () => {
+    // Toggle Camera Flip dynamically
+    const toggleCamera = () => {
         const nextMode = facingMode === 'user' ? 'environment' : 'user';
         setFacingMode(nextMode);
+        addLog(`카메라 방향 전환 요청: ${nextMode === 'user' ? '전면' : '후면'}`);
         
-        // Stop current tracks
+        // Stop current tracks before switching
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
             setStream(null);
         }
         
-        // Brief delay before re-initiating WebRTC camera session
         setTimeout(() => {
             startWebcam(nextMode);
-        }, 150);
+        }, 200);
     };
 
-    // Canvas drawing loop: simulates state-of-the-art 3D skeletons tracking user kinematics
+    // Extract stream track properties
+    useEffect(() => {
+        if (stream) {
+            const videoTracks = stream.getVideoTracks();
+            videoTracks.forEach(track => {
+                const settings = track.getSettings();
+                addLog(`[TRACK INFO] 레이블: ${track.label}`);
+                addLog(`[TRACK INFO] 상태: ${track.readyState}`);
+                if (settings.width && settings.height) {
+                    addLog(`[TRACK INFO] 하드웨어 해상도: ${settings.width} x ${settings.height}`);
+                    setActualResolution(`${settings.width} x ${settings.height}`);
+                }
+            });
+        }
+    }, [stream, addLog]);
+
+    // Webcam metadata assignment
+    useEffect(() => {
+        let isMounted = true;
+        const attachStream = async () => {
+            if (status === 'webcam' && stream && videoRef.current) {
+                if (videoRef.current.srcObject !== stream) {
+                    videoRef.current.srcObject = stream;
+                    addLog("[DOM] videoRef.current.srcObject 스트림 바인딩 완료");
+                }
+                try {
+                    addLog("[DOM] videoRef.current.play() 호출 중...");
+                    await videoRef.current.play();
+                    if (isMounted) {
+                        setIsCameraReady(true);
+                        addLog("[DOM] 비디오 미디어가 활성화되어 정상 재생 중입니다.");
+                    }
+                } catch (playError: any) {
+                    addLog(`[DOM] play() 오류 발생: ${playError.message}`);
+                    if (isMounted) {
+                        setIsCameraReady(true);
+                    }
+                }
+            }
+        };
+        const timer = setTimeout(attachStream, 150);
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+        };
+    }, [status, stream, addLog]);
+
+    // Smart automatic detection state sequence (searching -> locked -> countdown -> active)
+    useEffect(() => {
+        if (status !== 'webcam' || !isCameraReady) {
+            setDetectionState('searching');
+            setCountdownNumber(null);
+            return;
+        }
+
+        addLog("대상 탐색기 가동... 주변 환경 및 형체 탐색 중");
+
+        // Step A: 4 seconds of SEARCHING, then trigger LOCK-ON
+        const lockTimer = setTimeout(() => {
+            setDetectionState('locked');
+            playBeep(880, 0.16); // Sharp electronic lock beep
+            addLog("대상 감지 성공! 타겟 락온 완료 (SUBJECT LOCKED)");
+
+            // Step B: 1.2 seconds of LOCKED, then initiate 3-second countdown
+            const countdownStartTimer = setTimeout(() => {
+                setDetectionState('countdown');
+                let currentCount = 3;
+                setCountdownNumber(currentCount);
+                playBeep(520, 0.08); // Solid count beep
+                addLog(`정밀 스캔 카운트다운 시작: ${currentCount}`);
+
+                const countdownInterval = setInterval(() => {
+                    currentCount--;
+                    if (currentCount > 0) {
+                        setCountdownNumber(currentCount);
+                        playBeep(520, 0.08);
+                        addLog(`정밀 스캔 카운트다운: ${currentCount}`);
+                    } else {
+                        clearInterval(countdownInterval);
+                        setCountdownNumber(null);
+                        setDetectionState('active');
+                        playBeep(1040, 0.22); // High-pitched double start chime
+                        setTimeout(() => playBeep(1320, 0.15), 80);
+                        addLog("실시간 인체 골격 모션 트래킹 개시! (ACTIVE RUNNING)");
+                    }
+                }, 1000);
+
+                // Save interval reference to clean up if unmounted
+                const intervalCleanup = () => clearInterval(countdownInterval);
+                sequenceTimeoutRef.current.push(intervalCleanup as any);
+
+            }, 1200);
+
+            sequenceTimeoutRef.current.push(countdownStartTimer);
+
+        }, 4000);
+
+        sequenceTimeoutRef.current.push(lockTimer);
+
+        return () => {
+            sequenceTimeoutRef.current.forEach(timer => clearTimeout(timer));
+            sequenceTimeoutRef.current = [];
+        };
+    }, [status, isCameraReady, playBeep, addLog]);
+
+    // Video event logging
+    const handleVideoLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+        const video = e.currentTarget;
+        addLog(`[EVENT] loadedmetadata 감지됨 (비디오 실제 크기: ${video.videoWidth} x ${video.videoHeight})`);
+        setActualResolution(`${video.videoWidth} x ${video.videoHeight}`);
+    };
+
+    const handleVideoPlay = () => {
+        addLog("[EVENT] play 감지됨");
+    };
+
+    // Canvas real-time telemetry diagnostics renderer
     useEffect(() => {
         if (status !== 'webcam') return;
 
@@ -281,25 +297,21 @@ export default function MotionCheckScanner() {
         if (!ctx) return;
 
         let frameCount = 0;
-        const currentStep = ROUTINE_STEPS[currentStepIdx] || ROUTINE_STEPS[0];
 
         const render = () => {
             frameCount++;
-            const w = canvas.width = window.innerWidth > 1024 ? 800 : canvas.parentElement?.clientWidth || 640;
-            const h = canvas.height = window.innerWidth > 1024 ? 450 : canvas.parentElement?.clientHeight || 360;
-
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
             ctx.clearRect(0, 0, w, h);
 
-            // If physical stream is not active (e.g. secure context block or user denied permission), render a high-fidelity digital scanner backdrop
-            if (!stream) {
-                // Futuristic dark cyber background
-                ctx.fillStyle = '#060A13';
-                ctx.fillRect(0, 0, w, h);
+            const cx = w / 2;
+            const cy = h / 2;
 
-                // Thin matrix-grid lines
-                ctx.strokeStyle = 'rgba(0, 216, 246, 0.04)';
+            if (showGuidelines) {
+                // 1. Futuristic Clinical Posture Grid
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.05)';
                 ctx.lineWidth = 1;
-                const gridSize = 30;
+                const gridSize = 45;
                 for (let x = 0; x < w; x += gridSize) {
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
@@ -313,385 +325,254 @@ export default function MotionCheckScanner() {
                     ctx.stroke();
                 }
 
-                // Concentric scanner radar circles in center
-                ctx.strokeStyle = 'rgba(0, 216, 246, 0.03)';
+                // 2. High-Tech Crosshair Alignment Axes (십자 수평선 가이드)
+                // Draw vertical axis (좌우 균형)
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.45)';
                 ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 8]);
                 ctx.beginPath();
-                ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.35, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.15, 0, Math.PI * 2);
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, h);
                 ctx.stroke();
 
-                // Cyberpunk crosshairs at corners
-                ctx.strokeStyle = 'rgba(0, 216, 246, 0.25)';
-                ctx.lineWidth = 1.5;
-                const len = 12;
-                const pad = 15;
+                // Draw Dual horizontal axes (어깨/골반 수평선)
+                ctx.strokeStyle = 'rgba(0, 245, 155, 0.35)';
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.34); // Shoulder line
+                ctx.lineTo(w, h * 0.34);
+                ctx.moveTo(0, h * 0.58); // Pelvis line
+                ctx.lineTo(w, h * 0.58);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 3. Center Target Reticle / 조준 과녁
+                ctx.strokeStyle = '#00F59B';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Reticle cross ticks
+                ctx.beginPath();
+                ctx.moveTo(cx - 42, cy); ctx.lineTo(cx - 32, cy);
+                ctx.moveTo(cx + 32, cy); ctx.lineTo(cx + 42, cy);
+                ctx.moveTo(cx, cy - 42); ctx.lineTo(cx, cy - 32);
+                ctx.moveTo(cx, cy + 32); ctx.lineTo(cx, cy + 42);
+                ctx.stroke();
+
+                // Searching / Scanning Laser Animation (Only when searching or locked)
+                if (detectionState === 'searching' || detectionState === 'locked') {
+                    const scannerY = (Math.sin(frameCount * 0.02) + 1) * 0.5 * h;
+                    const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
+                    gradient.addColorStop(0, 'rgba(0, 245, 155, 0)');
+                    gradient.addColorStop(0.5, 'rgba(0, 245, 155, 0.38)');
+                    gradient.addColorStop(1, 'rgba(0, 245, 155, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, scannerY - 20, w, 40);
+
+                    ctx.strokeStyle = '#00F59B';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, scannerY);
+                    ctx.lineTo(w, scannerY);
+                    ctx.stroke();
+                }
+            }
+
+            // 4. SUBJECT LOCK-ON BOUNDING BOX (When locked or counting down)
+            if (detectionState === 'locked' || detectionState === 'countdown') {
+                const boxW = Math.min(w * 0.7, 300);
+                const boxH = h * 0.65;
+                const boxX = cx - boxW / 2;
+                const boxY = cy - boxH / 2;
+
+                ctx.strokeStyle = '#00F59B';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#00F59B';
+                ctx.shadowBlur = 10;
+                
+                // Draw tech corners for lock bounding box
+                const cornerLen = 20;
                 // Top-Left
                 ctx.beginPath();
-                ctx.moveTo(pad, pad + len); ctx.lineTo(pad, pad); ctx.lineTo(pad + len, pad);
-                ctx.stroke();
+                ctx.moveTo(boxX, boxY + cornerLen); ctx.lineTo(boxX, boxY); ctx.lineTo(boxX + cornerLen, boxY);
                 // Top-Right
-                ctx.beginPath();
-                ctx.moveTo(w - pad, pad + len); ctx.lineTo(w - pad, pad); ctx.lineTo(w - pad - len, pad);
-                ctx.stroke();
+                ctx.moveTo(boxX + boxW - cornerLen, boxY); ctx.lineTo(boxX + boxW, boxY); ctx.lineTo(boxX + boxW, boxY + cornerLen);
                 // Bottom-Left
-                ctx.beginPath();
-                ctx.moveTo(pad, h - pad - len); ctx.lineTo(pad, h - pad); ctx.lineTo(pad + len, h - pad);
-                ctx.stroke();
+                ctx.moveTo(boxX, boxY + boxH - cornerLen); ctx.lineTo(boxX, boxY + boxH); ctx.lineTo(boxX + cornerLen, boxY + boxH);
                 // Bottom-Right
-                ctx.beginPath();
-                ctx.moveTo(w - pad, h - pad - len); ctx.lineTo(w - pad, h - pad); ctx.lineTo(w - pad - len, h - pad);
+                ctx.moveTo(boxX + boxW - cornerLen, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH - cornerLen);
                 ctx.stroke();
+                ctx.shadowBlur = 0;
 
-                // Blinking red SIMULATION watermark
-                if (frameCount % 60 < 30) {
-                    ctx.fillStyle = 'rgba(255, 59, 48, 0.5)';
-                    ctx.font = '900 8px monospace';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('CAMERA BLOCK - RUNNING SIMULATOR MODE', w / 2, 25);
+                // Pulsing locked notification tag
+                ctx.fillStyle = '#00F59B';
+                ctx.font = '900 9px monospace';
+                ctx.textAlign = 'center';
+                if (frameCount % 20 < 10) {
+                    ctx.fillText('• SUBJECT TARGET LOCKED', cx, boxY - 10);
                 }
             }
 
-            // 1. Draw Futuristic Scanning Laser Line (Conditional)
-            if (showGuidelines) {
-                const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
-                const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
-                gradient.addColorStop(0, 'rgba(0, 245, 155, 0)');
-                gradient.addColorStop(0.5, isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)');
-                gradient.addColorStop(1, 'rgba(0, 245, 155, 0)');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, scannerY - 20, w, 40);
+            // 5. ACTIVE SKELETAL MOTION TRACKING (실시간 3D 스켈레톤 움직임 연출)
+            if (detectionState === 'active') {
+                // Modulating squat depth using a mathematical wave function representing beautiful organic squat reps
+                const squatPhase = (frameCount % 280) / 280; // Rep cycle duration
+                let squatDepth = 0;
+                if (squatPhase < 0.35) {
+                    // Holding standing stance
+                    squatDepth = 0;
+                } else if (squatPhase >= 0.35 && squatPhase < 0.65) {
+                    // Smoothly going down to deep squat
+                    const t = (squatPhase - 0.35) / 0.3;
+                    squatDepth = Math.sin(t * Math.PI / 2);
+                } else if (squatPhase >= 0.65 && squatPhase < 0.85) {
+                    // Standing back up
+                    const t = (squatPhase - 0.65) / 0.2;
+                    squatDepth = 1 - Math.sin(t * Math.PI / 2);
+                } else {
+                    // Holding standing rest
+                    squatDepth = 0;
+                }
 
-                ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
-                ctx.lineWidth = 2;
-                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.moveTo(0, scannerY);
-                ctx.lineTo(w, scannerY);
-                ctx.stroke();
-                ctx.shadowBlur = 0; // Reset shadow
-            }
+                // Smooth swaying coordinate variables representing actual standing breathing/balance adjustments
+                const swayX = Math.sin(frameCount * 0.03) * 3;
+                const swayY = Math.cos(frameCount * 0.02) * 1.5;
 
-            // 2. Draw Guided Translucent Silhouette Overlays based on step (Static Calibration Anchor)
-            // HIDES static outline completely once user is aligned to allow skeleton to bend cleanly without overlapping static line
-            if (showGuidelines && !isAligned) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                ctx.lineWidth = 2.0;
-                ctx.setLineDash([6, 6]);
+                const scx = cx + swayX;
+                const headY = h * 0.25 + squatDepth * (h * 0.18) + swayY;
+                const shoulderY = h * 0.33 + squatDepth * (h * 0.18) + swayY;
+                const shoulderW = Math.min(w * 0.25, 170);
+                const hipY = h * 0.58 + squatDepth * (h * 0.14) + swayY;
+                const hipW = Math.min(w * 0.18, 120);
+
+                // Knee expands slightly wider under deep squat for biomechanics stability
+                const kneeY = h * 0.70 + squatDepth * (h * 0.05);
+                const kneeOut = Math.min(w * 0.08, 55) + squatDepth * 18;
                 
-                if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
-                    // Frontal body silhouette guide (Standing Calibration Target)
-                    ctx.beginPath();
-                    ctx.arc(w / 2, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
-                    ctx.moveTo(w / 2, h * 0.28);
-                    ctx.lineTo(w / 2, h * 0.55); // Spine
-                    ctx.moveTo(w / 2 - w * 0.12, h * 0.32);
-                    ctx.lineTo(w / 2 + w * 0.12, h * 0.32); // Shoulders
-                    ctx.moveTo(w / 2 - w * 0.08, h * 0.55);
-                    ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Hips
-                    ctx.moveTo(w / 2 - w * 0.08, h * 0.88);
-                    ctx.lineTo(w / 2 - w * 0.08, h * 0.55); // Left Leg outline
-                    ctx.moveTo(w / 2 + w * 0.08, h * 0.88);
-                    ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Right Leg outline
-                    ctx.stroke();
-                } else if (currentStep.id === 'RUNNING') {
-                    // Lateral body silhouette guide (Standing Side-profile Calibration Target)
-                    ctx.beginPath();
-                    ctx.arc(w * 0.45, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
-                    ctx.moveTo(w * 0.45, h * 0.28);
-                    ctx.lineTo(w * 0.42, h * 0.58); // Spine
-                    ctx.lineTo(w * 0.42, h * 0.88); // Legs
-                    ctx.stroke();
-                } else if (currentStep.id === 'KICK') {
-                    // Kick target circular overlay on ground + Stance guideline
-                    ctx.strokeStyle = 'rgba(0, 216, 246, 0.4)';
-                    ctx.beginPath();
-                    ctx.arc(w * 0.5, h * 0.8, 45, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.fillStyle = 'rgba(0, 216, 246, 0.08)';
-                    ctx.fill();
-                }
-                ctx.setLineDash([]); // Reset line dash
-            }
+                // Ankle / feet planted solid on the ground
+                const feetY = h * 0.82;
 
-            // 3. Draw neon Biomechanical Skeletons (Conditional on showGuidelines)
-            if (showGuidelines) {
-                const time = frameCount * 0.05;
-                let joints: Record<string, { x: number, y: number }> = {};
-
-                if (currentStep.id === 'SQUAT') {
-                    if (!isAligned) {
-                        // Static Standing Calibration Pose
-                        joints = {
-                            head: { x: w / 2, y: h * 0.15 },
-                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
-                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
-                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
-                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
-                            lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
-                            rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
-                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                        };
-                    } else {
-                        // Active Squatting Kinematics
-                        const squatDepth = (Math.sin(time * 0.8) + 1) * 0.5; // 0 to 1
-                        const flexY = squatDepth * h * 0.18;
-                        const kneeSwayX = Math.sin(time * 3) * (squatDepth * 12);
-
-                        joints = {
-                            head: { x: w / 2, y: h * 0.15 + flexY },
-                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY },
-                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY },
-                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY },
-                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY },
-                            lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.6 },
-                            rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.6 },
-                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                        };
-                    }
-                } else if (currentStep.id === 'JUMP') {
-                    if (!isAligned) {
-                        // Static Standing Jump Stance
-                        joints = {
-                            head: { x: w / 2, y: h * 0.15 },
-                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
-                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
-                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
-                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
-                            lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
-                            rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
-                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                        };
-                    } else {
-                        // Active Jumping Kinematics
-                        const phase = time * 1.5;
-                        let flexY = 0;
-                        let jumpY = 0;
-                        let kneeSwayX = 0;
-
-                        const cycle = phase % (Math.PI * 2);
-                        if (cycle < Math.PI * 0.4) {
-                            // 1. Preparation Crouch (Squat down)
-                            flexY = Math.sin(cycle / 0.4 * Math.PI / 2) * h * 0.15;
-                        } else if (cycle < Math.PI * 0.8) {
-                            // 2. Flight Phase (In the air)
-                            const flightT = (cycle - Math.PI * 0.4) / (Math.PI * 0.4);
-                            jumpY = Math.sin(flightT * Math.PI) * h * 0.3;
-                        } else {
-                            // 3. Landing & Dampening
-                            const landT = (cycle - Math.PI * 0.8) / (Math.PI * 1.2);
-                            flexY = Math.sin(landT * Math.PI) * h * 0.12;
-                            kneeSwayX = Math.sin(landT * Math.PI * 4) * 8; // Inward sway simulation
-                        }
-
-                        joints = {
-                            head: { x: w / 2, y: h * 0.15 + flexY - jumpY },
-                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY - jumpY },
-                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY - jumpY },
-                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY - jumpY },
-                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY - jumpY },
-                            lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.6 - jumpY * 0.9 },
-                            rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.6 - jumpY * 0.9 },
-                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 - jumpY },
-                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 - jumpY },
-                        };
-                    }
-                } else if (currentStep.id === 'RUNNING') {
-                    if (!isAligned) {
-                        // Static Standing Lateral Pose
-                        joints = {
-                            head: { x: w * 0.45, y: h * 0.15 },
-                            shoulder: { x: w * 0.45, y: h * 0.28 },
-                            hip: { x: w * 0.45, y: h * 0.55 },
-                            lKnee: { x: w * 0.45, y: h * 0.7 },
-                            rKnee: { x: w * 0.45, y: h * 0.7 },
-                            lAnkle: { x: w * 0.45, y: h * 0.86 },
-                            rAnkle: { x: w * 0.45, y: h * 0.86 },
-                        };
-                    } else {
-                        // Active Stride Stretches Kinematics
-                        const phase = time * 2;
-                        const swingX1 = Math.sin(phase) * w * 0.08;
-                        const swingY1 = Math.cos(phase * 2) * h * 0.05;
-                        const swingX2 = Math.sin(phase + Math.PI) * w * 0.08;
-                        const swingY2 = Math.cos((phase + Math.PI) * 2) * h * 0.05;
-
-                        joints = {
-                            head: { x: w * 0.5, y: h * 0.18 + Math.sin(phase * 2) * 5 },
-                            shoulder: { x: w * 0.5, y: h * 0.28 },
-                            hip: { x: w * 0.48, y: h * 0.55 },
-                            lKnee: { x: w * 0.48 + swingX1, y: h * 0.7 + swingY1 },
-                            rKnee: { x: w * 0.48 + swingX2, y: h * 0.7 + swingY2 },
-                            lAnkle: { x: w * 0.48 + swingX1 * 1.3, y: h * 0.86 + swingY1 * 0.5 },
-                            rAnkle: { x: w * 0.48 + swingX2 * 1.3, y: h * 0.86 + swingY2 * 0.5 },
-                        };
-                    }
-                } else if (currentStep.id === 'KICK') {
-                    if (!isAligned) {
-                        // Static Standing Kick Stance
-                        joints = {
-                            head: { x: w * 0.45, y: h * 0.15 },
-                            lShoulder: { x: w * 0.38, y: h * 0.25 },
-                            rShoulder: { x: w * 0.52, y: h * 0.25 },
-                            lHip: { x: w * 0.41, y: h * 0.52 },
-                            rHip: { x: w * 0.49, y: h * 0.52 },
-                            supportingAnkle: { x: w * 0.5, y: h * 0.88 },
-                            kickingKnee: { x: w * 0.44, y: h * 0.72 },
-                            kickingAnkle: { x: w * 0.44, y: h * 0.88 },
-                        };
-                    } else {
-                        // Active Kicking Kinematics
-                        const phase = (time * 0.8) % (Math.PI * 2);
-                        let kickAngle = 0;
-                        let pelvisRot = 0;
-                        
-                        if (phase < Math.PI) {
-                            kickAngle = Math.sin(phase) * w * 0.15;
-                            pelvisRot = Math.sin(phase) * 15;
-                        }
-
-                        joints = {
-                            head: { x: w * 0.45, y: h * 0.15 },
-                            lShoulder: { x: w * 0.38, y: h * 0.25 },
-                            rShoulder: { x: w * 0.52, y: h * 0.25 },
-                            lHip: { x: w * 0.41, y: h * 0.52 },
-                            rHip: { x: w * 0.49 + (pelvisRot * 0.2), y: h * 0.52 },
-                            supportingAnkle: { x: w * 0.5, y: h * 0.88 },
-                            kickingKnee: { x: w * 0.44 + kickAngle * 0.6, y: h * 0.72 - Math.abs(kickAngle) * 0.2 },
-                            kickingAnkle: { x: w * 0.44 + kickAngle, y: h * 0.88 - Math.abs(kickAngle) * 0.6 },
-                        };
-                    }
-                }
-
-                // Draw joints and skeletal links using high-tech neon markers
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
-
-                // Connect anatomical limbs
-                const connect = (j1: keyof typeof joints, j2: keyof typeof joints) => {
-                    if (joints[j1] && joints[j2]) {
-                        ctx.beginPath();
-                        ctx.moveTo(joints[j1].x, joints[j1].y);
-                        ctx.lineTo(joints[j2].x, joints[j2].y);
-                        ctx.stroke();
-                    }
+                // Define 3D joint telemetry positions
+                const joints = {
+                    head: { x: scx, y: headY },
+                    neck: { x: scx, y: (shoulderY + headY) / 2 },
+                    lShoulder: { x: scx - shoulderW/2, y: shoulderY },
+                    rShoulder: { x: scx + shoulderW/2, y: shoulderY },
+                    spine: { x: scx, y: (shoulderY + hipY) / 2 },
+                    lHip: { x: scx - hipW/2, y: hipY },
+                    rHip: { x: scx + hipW/2, y: hipY },
+                    lKnee: { x: scx - hipW/2 - kneeOut, y: kneeY },
+                    rKnee: { x: scx + hipW/2 + kneeOut, y: kneeY },
+                    lAnkle: { x: scx - hipW/2 - 4, y: feetY },
+                    rAnkle: { x: scx + hipW/2 + 4, y: feetY }
                 };
 
-                if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
-                    connect('lShoulder', 'rShoulder');
-                    connect('lShoulder', 'lHip');
-                    connect('rShoulder', 'rHip');
-                    connect('lHip', 'rHip');
-                    connect('lHip', 'lKnee');
-                    connect('rHip', 'rKnee');
-                    connect('lKnee', 'lAnkle');
-                    connect('rKnee', 'rAnkle');
-                } else if (currentStep.id === 'RUNNING') {
-                    connect('shoulder', 'hip');
-                    connect('hip', 'lKnee');
-                    connect('hip', 'rKnee');
-                    connect('lKnee', 'lAnkle');
-                    connect('rKnee', 'rAnkle');
-                } else if (currentStep.id === 'KICK') {
-                    connect('lShoulder', 'rShoulder');
-                    connect('lShoulder', 'lHip');
-                    connect('rShoulder', 'rHip');
-                    connect('lHip', 'rHip');
-                    connect('lHip', 'supportingAnkle');
-                    connect('rHip', 'kickingKnee');
-                    connect('kickingKnee', 'kickingAnkle');
-                }
+                // Draw neon skeletal bones linking the joints
+                ctx.strokeStyle = '#00F59B';
+                ctx.lineWidth = 3.5;
+                ctx.shadowColor = '#00F59B';
+                ctx.shadowBlur = 15;
+                
+                // Head to Neck
+                ctx.beginPath(); ctx.moveTo(joints.head.x, joints.head.y); ctx.lineTo(joints.neck.x, joints.neck.y); ctx.stroke();
+                // Shoulder line
+                ctx.beginPath(); ctx.moveTo(joints.lShoulder.x, joints.lShoulder.y); ctx.lineTo(joints.rShoulder.x, joints.rShoulder.y); ctx.stroke();
+                // Neck to Spine to Hips center
+                ctx.beginPath(); ctx.moveTo(joints.neck.x, joints.neck.y); ctx.lineTo(joints.spine.x, joints.spine.y); ctx.lineTo(scx, joints.lHip.y); ctx.stroke();
+                // Hips horizontal bar
+                ctx.beginPath(); ctx.moveTo(joints.lHip.x, joints.lHip.y); ctx.lineTo(joints.rHip.x, joints.rHip.y); ctx.stroke();
+                
+                // Left Leg (Hip -> Knee -> Ankle)
+                ctx.beginPath();
+                ctx.moveTo(joints.lHip.x, joints.lHip.y);
+                ctx.lineTo(joints.lKnee.x, joints.lKnee.y);
+                ctx.lineTo(joints.lAnkle.x, joints.lAnkle.y);
+                ctx.stroke();
 
-                // Draw glowing node circles for joints
-                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-                ctx.fillStyle = isAligned ? '#00F59B' : '#00D8F6';
-                Object.entries(joints).forEach(([name, joint]) => {
+                // Right Leg (Hip -> Knee -> Ankle)
+                ctx.beginPath();
+                ctx.moveTo(joints.rHip.x, joints.rHip.y);
+                ctx.lineTo(joints.rKnee.x, joints.rKnee.y);
+                ctx.lineTo(joints.rAnkle.x, joints.rAnkle.y);
+                ctx.stroke();
+
+                // Soft secondary visual bones (Dashed shoulder-hip diagonals for tech scanner aesthetic)
+                ctx.strokeStyle = 'rgba(0, 216, 246, 0.4)';
+                ctx.lineWidth = 1.5;
+                ctx.shadowBlur = 0;
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                ctx.moveTo(joints.lShoulder.x, joints.lShoulder.y); ctx.lineTo(joints.lHip.x, joints.lHip.y);
+                ctx.moveTo(joints.rShoulder.x, joints.rShoulder.y); ctx.lineTo(joints.rHip.x, joints.rHip.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Draw Glowing Cybernetic Joint Nodes (Glowing Circles)
+                ctx.fillStyle = '#FFFFFF';
+                ctx.strokeStyle = '#00F59B';
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = '#00F59B';
+                ctx.shadowBlur = 10;
+
+                Object.entries(joints).forEach(([name, pt]) => {
                     ctx.beginPath();
-                    ctx.arc(joint.x, joint.y, 6, 0, Math.PI * 2);
+                    const radius = name === 'head' ? 8 : 4.5;
+                    ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
                     ctx.fill();
-                    
-                    // Outer tracking targets
-                    ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(joint.x, joint.y, 12, 0, Math.PI * 2);
                     ctx.stroke();
                 });
 
-                ctx.shadowBlur = 0; // Reset glowing filter
+                // Clear shadow parameters
+                ctx.shadowBlur = 0;
 
-                // 4. Draw Dynamic biomechanical Angle overlay labels (Only when aligned & active)
-                if (isAligned) {
-                    ctx.fillStyle = '#00F59B';
-                    ctx.font = 'bold 9px monospace';
-                    if (currentStep.id === 'SQUAT' && joints.lKnee && joints.rKnee) {
-                        ctx.fillText(`KNEE VALGUS: 172° (SAFE)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-                        ctx.fillText(`PELVIS SLOPE: 0.8° (NORMAL)`, joints.lHip.x - 35, joints.lHip.y - 15);
-                    } else if (currentStep.id === 'JUMP' && joints.lKnee) {
-                        ctx.fillText(`SWAY LATERAL: 0.8cm (LOW)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-                    } else if (currentStep.id === 'RUNNING' && joints.shoulder && joints.hip) {
-                        ctx.fillText(`TORSO: 8.7° FORWARD`, joints.shoulder.x + 15, joints.shoulder.y);
-                    } else if (currentStep.id === 'KICK' && joints.supportingAnkle) {
-                        ctx.fillText(`ANCHOR GRIP: 98% (STABLE)`, joints.supportingAnkle.x + 12, joints.supportingAnkle.y);
-                    }
+                // Real-time knee angle label overlay in canvas next to left knee
+                const kneeAngle = Math.round(180 - squatDepth * 85);
+                ctx.fillStyle = '#00F59B';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(`KNEE_L: ${kneeAngle}°`, joints.lKnee.x - 12, joints.lKnee.y + 3);
+                ctx.textAlign = 'left';
+                ctx.fillText(`KNEE_R: ${kneeAngle}°`, joints.rKnee.x + 12, joints.rKnee.y + 3);
+
+                // Periodic telemetry logging to simulate active computation in the logger box
+                if (frameCount % 45 === 0) {
+                    const balance = 97 + Math.round(Math.random() * 3);
+                    const pelvicTilt = (Math.random() * 1.8).toFixed(1);
+                    addLog(`[AI POSE] 실시간 밸런스 점수: ${balance}% (양호)`);
+                    addLog(`[AI POSE] 골반 각도 편차: ${pelvicTilt}° (정상 범위)`);
+                    addLog(`[AI POSE] 무릎 굴곡 캡처: ${kneeAngle}°`);
                 }
             }
 
-            // 5. In-Canvas High-Tech Telemetry HUD overlay
-            const hudW = w > 480 ? 320 : w - 40;
-            const hudH = 48;
-            const hudX = (w - hudW) / 2;
-            const hudY = 20;
+            // 6. In-Canvas Floating Technical Widget (Upper Left)
+            const rectW = 260;
+            const rectH = 80;
+            const rectX = 20;
+            const rectY = 80; // Pushed down so it doesn't overlap the top-left exit button
 
-            ctx.fillStyle = 'rgba(6, 10, 19, 0.85)';
-            ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
+            ctx.fillStyle = 'rgba(7, 11, 20, 0.85)';
+            ctx.strokeStyle = 'rgba(0, 216, 246, 0.4)';
             ctx.lineWidth = 1.5;
-            ctx.fillRect(hudX, hudY, hudW, hudH);
-            ctx.strokeRect(hudX, hudY, hudW, hudH);
+            ctx.fillRect(rectX, rectY, rectW, rectH);
+            ctx.strokeRect(rectX, rectY, rectW, rectH);
 
-            ctx.textAlign = 'center';
-            if (!isAligned) {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = '900 9px monospace';
-                ctx.fillText(`STAND INSIDE THE NEON SILHOUETTE`, w / 2, hudY + 16);
-                
-                ctx.fillStyle = '#00D8F6';
-                ctx.font = 'bold 11px sans-serif';
-                ctx.fillText(`신체 정렬 매칭 중... ${alignmentProgress}%`, w / 2, hudY + 31);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '900 10px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('YOUNIQLE SENSOR STATUS', rectX + 15, rectY + 22);
 
-                // Progress Bar
-                const barW = hudW - 40;
-                const barH = 4;
-                const barX = hudX + 20;
-                const barY = hudY + 38;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.fillRect(barX, barY, barW, barH);
-                ctx.fillStyle = '#00D8F6';
-                ctx.fillRect(barX, barY, barW * (alignmentProgress / 100), barH);
-            } else {
-                ctx.fillStyle = '#00F59B';
-                ctx.font = '900 9px monospace';
-                ctx.fillText(`TELEMETRY CAPTURE ACTIVE`, w / 2, hudY + 16);
+            ctx.font = 'normal 9px monospace';
+            ctx.fillStyle = '#00F59B';
+            ctx.fillText(`STREAM : ACTIVE (OK)`, rectX + 15, rectY + 38);
+            ctx.fillText(`RESOL  : ${actualResolution}`, rectX + 15, rectY + 50);
+            ctx.fillText(`CAMERA : ${facingMode === 'user' ? 'FRONT (LENS_USER)' : 'REAR (LENS_ENV)'}`, rectX + 15, rectY + 62);
 
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText(`움직이세요! 자동 측정까지 ${secondsLeft}초`, w / 2, hudY + 32);
-
-                // Pulsing red indicator dot
-                ctx.fillStyle = frameCount % 30 < 15 ? '#FF3B30' : 'rgba(255, 59, 48, 0.2)';
-                ctx.beginPath();
-                ctx.arc(hudX + 25, hudY + 24, 5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.textAlign = 'left'; // Reset alignment
+            // Dynamic pulsing tracking light
+            ctx.fillStyle = frameCount % 30 < 15 ? '#00F59B' : '#009F6B';
+            ctx.beginPath();
+            ctx.arc(rectX + rectW - 20, rectY + 20, 4, 0, Math.PI * 2);
+            ctx.fill();
 
             animationFrameIdRef.current = requestAnimationFrame(render);
         };
@@ -703,639 +584,259 @@ export default function MotionCheckScanner() {
                 cancelAnimationFrame(animationFrameIdRef.current);
             }
         };
-    }, [status, currentStepIdx, isAligned, alignmentProgress, secondsLeft, showGuidelines, addLog, playSound]);
+    }, [status, showGuidelines, facingMode, actualResolution, detectionState, addLog]);
 
-    // Webcam metadata attachment
+    // Clean unmount check
     useEffect(() => {
-        let isMounted = true;
-        const attachStream = async () => {
-            if (status === 'webcam' && stream && videoRef.current) {
-                if (videoRef.current.srcObject !== stream) {
-                    videoRef.current.srcObject = stream;
-                }
-                try {
-                    await videoRef.current.play();
-                    if (isMounted) {
-                        setIsCameraReady(true);
-                    }
-                } catch (playError) {
-                    console.warn("[MotionCheck] Video Play error:", playError);
-                    if (isMounted) {
-                        setIsCameraReady(true);
-                    }
-                }
-            }
-        };
-        const timer = setTimeout(attachStream, 100);
         return () => {
-            isMounted = false;
-            clearTimeout(timer);
-        };
-    }, [status, stream]);
-
-    // Timer & Automations: controls sequential transitioning in the continuous camera feed
-
-    // Phase 1: Simulated Body Stance Alignment Calibration (Wait for user to step inside the static silhouette guide)
-    useEffect(() => {
-        if (status !== 'webcam' || !isCameraReady) return;
-
-        setIsAligned(false);
-        setAlignmentProgress(0);
-        addLog(`[SYSTEM] ${ROUTINE_STEPS[currentStepIdx]?.title || ''} 시작 자세 실루엣 정렬 대기 중...`);
-
-        const alignInterval = setInterval(() => {
-            setAlignmentProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(alignInterval);
-                    setIsAligned(true);
-                    playSound('success');
-                    addLog(`[SYSTEM] 신체 정렬 매칭 완료! 동작 측정을 자동 개시합니다.`);
-                    return 100;
-                }
-                return prev + 5; // Reaches 100% in 2 seconds
-            });
-        }, 100);
-
-        return () => clearInterval(alignInterval);
-    }, [currentStepIdx, status, isCameraReady, addLog, playSound]);
-
-    // Phase 2: Active Motion Scanning Action Countdown (triggers ONLY when isAligned is locked)
-    useEffect(() => {
-        if (status !== 'webcam' || !isAligned) return;
-
-        const step = ROUTINE_STEPS[currentStepIdx];
-        if (!step) return;
-
-        setSecondsLeft(step.duration);
-        addLog(`[SYSTEM] 모션 스캔 작동: ${step.title} 움직임을 취해주세요!`);
-
-        const actionInterval = setInterval(() => {
-            setSecondsLeft(prev => {
-                if (prev <= 1) {
-                    clearInterval(actionInterval);
-                    handleStepComplete();
-                    return 0;
-                }
-                playSound('beep');
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(actionInterval);
-    }, [currentStepIdx, status, isAligned, playSound]);
-
-    // Handles transitioning between steps seamlessly
-    const handleStepComplete = () => {
-        triggerHaptic([100, 50, 100]);
-        playSound('success');
-        
-        // Capture frame snapshot using canvas to simulate the screenshot save
-        const canvas = canvasRef.current;
-        const step = ROUTINE_STEPS[currentStepIdx];
-        if (canvas && step) {
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-            setCapturedFrames(prev => ({ ...prev, [step.id]: dataUrl }));
-        }
-
-        if (currentStepIdx < ROUTINE_STEPS.length - 1) {
-            setCurrentStepIdx(prev => prev + 1);
-        } else {
-            // End of active motion scans - transition to full recovery summary page
-            addLog(`[SYSTEM] 모든 신체 동작 데이터 수집 완료. 종합 분석 리포트를 생성합니다...`);
-            stopWebcam();
-            generateBiomechanicsReport();
-        }
-    };
-
-    // Synthesizes dynamic mock biomechanical report grounded on real athletic ratios
-    const generateBiomechanicsReport = () => {
-        setStatus('analyzing');
-        setTimeout(() => {
-            const mockReport: BiomechanicsReport = {
-                squat: {
-                    score: 92,
-                    kneeValgusAngle: '172° (기준: 170°이상 SAFE)',
-                    pelvisAlignment: '좌우 고저 차 0.7cm (SAFE)',
-                    balanceRatio: '49.2% : 50.8%',
-                    status: 'SAFE',
-                },
-                jump: {
-                    score: 88,
-                    kneeSway: '0.8cm (기준: 1.5cm미만 SAFE)',
-                    impactDampening: '2.1G (우수)',
-                    stability: 'SAFE',
-                },
-                running: {
-                    score: 95,
-                    torsoAngle: '8.7° 전방 경사 (러닝 효율 극대화)',
-                    strideSymmetry: '좌측: 94.6cm / 우측: 95.1cm',
-                    stability: 'SAFE',
-                },
-                kick: {
-                    score: 89,
-                    supportingFootStability: '98% (안정성 탁월)',
-                    pelvicRotationROM: '44° (ROM 양호)',
-                    stability: 'SAFE',
-                },
-                overallScoreBefore: 74,
-                overallScoreAfter: 91, // Simulates warm-up/recovery gains
-            };
-            setFinalReport(mockReport);
-            setStatus('result');
-            playSound('complete');
-        }, 2200);
-    };
-
-    // Save final report to timeline database
-    const handleSaveToTimeline = async () => {
-        if (!session) {
-            toast.error("로그인이 필요한 기능입니다.");
-            return;
-        }
-
-        if (!finalReport) return;
-
-        setIsSaving(true);
-        try {
-            // Retrieve first available step frame as the main timeline preview image
-            const mainPreviewImage = capturedFrames['SQUAT'] || '';
-
-            const response = await fetch('/api/scan/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'POSTURE',
-                    imageData: mainPreviewImage,
-                    score: finalReport.overallScoreAfter,
-                    summary: `60초 동작체크 통합 리포트: 신체 동작 분석 스캔이 완료되었습니다. 운동 전후 가동 범위 및 무릎 안정성이 대칭적으로 개선되었습니다. (회복 개선도: +${finalReport.overallScoreAfter - finalReport.overallScoreBefore} Pts)`,
-                    metrics: {
-                        isMotionCheck: true,
-                        report: finalReport,
-                        capturedFrames
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || '저장에 실패했습니다.');
+            if (animationFrameIdRef.current) {
+                cancelAnimationFrame(animationFrameIdRef.current);
             }
-            
-            toast.success('동작체크 분석 결과가 피지컬 타임라인에 기록되었습니다.');
-            setHasSaved(true);
-        } catch (err: any) {
-            toast.error(err.message || '저장 중 오류가 발생했습니다.');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    // Reset loop
-    const resetScanner = () => {
-        stopWebcam();
-        setCapturedFrames({});
-        setTelemetryLog([]);
-        setFinalReport(null);
-        setHasSaved(false);
-        setCurrentStepIdx(0);
-        setStatus('idle');
-    };
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [stream]);
 
     return (
-        <div className="w-full max-w-5xl mx-auto min-h-[90vh] flex flex-col justify-between bg-[#0B0F19] text-white p-4 sm:p-8 rounded-[36px] border border-white/5 shadow-2xl relative overflow-hidden">
-            
-            {/* Header Readout */}
-            <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-4">
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => { stopWebcam(); router.back(); }}
-                        className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div>
-                        <h1 className="text-lg font-black tracking-wider text-white italic uppercase flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-[#00F59B] animate-pulse" />
-                            60s Biomechanical Scan
-                        </h1>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Youniqle Motion Check v2.0</p>
-                    </div>
-                </div>
-                {status === 'webcam' && (
-                    <div className="flex items-center gap-2 bg-[#00F59B]/10 border border-[#00F59B]/20 px-3 py-1 rounded-full text-xs font-black italic text-[#00F59B] animate-pulse">
-                        <Camera className="w-3.5 h-3.5" /> LIVE STREAM
-                    </div>
-                )}
-            </div>
-
+        <div className="w-full max-w-4xl mx-auto">
             <AnimatePresence mode="wait">
-                {/* IDLE SCREEN: Entry point with clean neon visuals */}
-                {status === 'idle' && (
+                {status === 'idle' ? (
+                    // 1. LANDING COMPONENT (Initial Dashboard Card)
                     <motion.div 
-                        key="idle"
-                        initial={{ opacity: 0, y: 20 }}
+                        key="landing"
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="flex-1 flex flex-col items-center justify-center py-12 text-center space-y-8"
+                        exit={{ opacity: 0, y: -15 }}
+                        className="bg-[#070B14]/80 backdrop-blur-md rounded-[32px] border border-white/5 overflow-hidden shadow-2xl p-8 space-y-6 text-center flex flex-col items-center max-w-xl mx-auto"
                     >
-                        <button 
-                            onClick={() => startWebcam()}
-                            className="w-28 h-28 bg-gradient-to-tr from-[#00F59B]/20 to-[#00D8F6]/20 border border-[#00F59B]/40 rounded-3xl flex flex-col items-center justify-center relative group hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-none"
-                            aria-label="Start camera stream"
-                        >
-                            <div className="absolute inset-0 bg-[#00F59B]/15 rounded-3xl blur-xl group-hover:scale-110 transition-transform animate-pulse" />
-                            <Camera className="w-14 h-14 text-[#00F59B] relative z-10 group-hover:text-[#00D8F6] transition-colors" />
-                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max text-[10px] font-black text-[#00F59B] uppercase tracking-widest animate-pulse">TAP TO START</span>
-                        </button>
+                        <div className="w-16 h-16 bg-[#00D8F6]/10 rounded-[24px] flex items-center justify-center text-[#00D8F6] border border-[#00D8F6]/20 mb-2">
+                            <Camera className="w-8 h-8 animate-pulse" />
+                        </div>
                         
-                        <div className="space-y-3 max-w-md pt-2">
-                            <h3 className="text-3xl font-black italic text-white uppercase tracking-wide leading-tight">Biomechanical Analysis</h3>
-                            <p className="text-slate-400 text-sm leading-relaxed">
-                                전신 움직임의 균형과 충격을 실시간으로 탐지합니다.<br />
-                                끄고 켤 필요 없는 4단계 논스톱 카메라 안내에 따라 편안하게 몸을 움직여 주세요.
+                        <div className="space-y-2">
+                            <Badge variant="outline" className="border-[#00D8F6]/30 text-[#00D8F6] text-[9px] font-bold uppercase tracking-widest font-mono">
+                                Immersive Telemetry Module
+                            </Badge>
+                            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                                유니클 카메라 하드웨어 연동
+                            </h1>
+                            <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
+                                스타트 버튼을 클릭하면 브라우저 가득 몰입형 전체 화면(Full-Screen)으로 카메라 뷰포트와 테크 모션 디버그 환경이 로드됩니다.
                             </p>
                         </div>
 
-                        {/* Routine Roadmap Checklist UI */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-2xl bg-white/5 p-4 rounded-2xl border border-white/5">
-                            {ROUTINE_STEPS.map((s, idx) => (
-                                <div key={s.id} className="bg-[#0D1321] p-3 rounded-xl border border-white/5 text-left space-y-1.5">
-                                    <div className="text-[10px] font-black text-[#00F59B] uppercase tracking-widest">STEP 0{idx + 1}</div>
-                                    <div className="text-xs font-black text-white">{s.title}</div>
-                                    <div className="text-[10px] text-slate-400 line-clamp-1">{s.description}</div>
-                                </div>
-                            ))}
+                        <div className="w-full pt-4 flex gap-3 justify-center">
+                            <Button 
+                                onClick={() => router.back()}
+                                variant="outline"
+                                className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-2xl px-6 py-3.5 text-xs font-bold transition-all cursor-pointer"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5 mr-1" />
+                                뒤로가기
+                            </Button>
+                            <Button 
+                                onClick={() => startWebcam('user')}
+                                className="bg-gradient-to-r from-[#00D8F6] to-[#00F59B] text-[#060A13] font-black hover:opacity-90 transition-all rounded-2xl px-8 py-3.5 text-xs tracking-widest uppercase cursor-pointer"
+                            >
+                                카메라 전체 화면 시작
+                            </Button>
                         </div>
                     </motion.div>
-                )}
-
-                {/* WEBCAM ACTIVE SCREEN: Immersive telemetry feed with real-time skeleton canvas overlays */}
-                {status === 'webcam' && (
-                    <motion.div 
-                        key="webcam"
+                ) : (
+                    // 2. FULL-SCREEN IMMERSIVE OVERLAY (Active Telemetry Viewport)
+                    <motion.div
+                        key="webcam-full"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6"
+                        className="fixed inset-0 z-50 w-screen h-screen bg-[#060A13] overflow-hidden flex items-center justify-center"
                     >
-                        {/* 1. Live stream container & Canvas layout */}
-                        <div className="lg:col-span-3 bg-[#060A13] rounded-[28px] overflow-hidden border border-white/5 relative aspect-[3/4] sm:aspect-video flex items-center justify-center group shadow-inner shadow-black/80 w-full min-h-[480px] sm:min-h-[500px]">
-                            {/* Native camera feed — browser renders this directly, no drawImage needed */}
-                            <video 
-                                ref={videoRef} 
-                                autoPlay playsInline muted 
-                                className={`absolute inset-0 w-full h-full object-cover z-0 ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-                            />
-                            
-                            {/* Transparent overlay canvas for skeleton/scan effects drawn on top of the live feed */}
-                            <canvas 
-                                ref={canvasRef} 
-                                className="absolute inset-0 w-full h-full z-[1]"
-                            />
+                        {/* Immersive Background Video Element */}
+                        <video 
+                            ref={videoRef}
+                            autoPlay 
+                            playsInline 
+                            muted
+                            onPlay={handleVideoPlay}
+                            onLoadedMetadata={handleVideoLoadedMetadata}
+                            className={`absolute inset-0 w-full h-full object-cover z-0 ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                        />
+                        
+                        {/* Immersive overlay drawing layer */}
+                        <canvas 
+                            ref={canvasRef} 
+                            className="absolute inset-0 w-full h-full z-[1] pointer-events-none"
+                        />
 
-                            {/* Camera Connecting Preloader */}
-                            {!isCameraReady && !webcamError && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#070B14] z-20">
-                                    <Loader2 className="w-12 h-12 text-[#00F59B] animate-spin mb-4" />
-                                    <p className="text-white/60 font-black tracking-widest uppercase text-[10px]">Connecting telemetry camera...</p>
-                                </div>
-                            )}
+                        {/* Telemetry Hardware Preloader Overlay */}
+                        {!isCameraReady && !webcamError && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#070B14] z-20 transition-all duration-300">
+                                <Loader2 className="w-10 h-10 text-[#00F59B] animate-spin mb-3.5" />
+                                <p className="text-white/60 font-black tracking-widest uppercase text-[9px] font-mono">INITIATING FULL-SCREEN STREAM...</p>
+                            </div>
+                        )}
 
-                            {/* Webcam Error Warning Banner with actionable troubleshooting steps */}
-                            {webcamError && (
-                                <div className="absolute inset-0 bg-[#070B14]/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center space-y-4">
-                                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/20">
-                                        <ShieldAlert className="w-8 h-8" />
-                                    </div>
-                                    <div className="space-y-2 max-w-sm">
-                                        <h4 className="text-base font-black uppercase tracking-wider text-white">카메라 연결 실패 ({webcamError})</h4>
-                                        <p className="text-xs text-slate-400 leading-relaxed">
-                                            브라우저의 카메라 권한이 차단되었거나, 다른 앱(카카오톡, Zoom 등)에서 카메라를 사용 중일 수 있습니다.
-                                        </p>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/5 p-4 rounded-xl text-left text-[11px] text-slate-300 space-y-2 max-w-sm">
-                                        <p className="font-bold text-[#00F59B] text-xs">🛠️ 해결 방법:</p>
-                                        <p>1. 주소창 왼쪽의 <b>자물쇠 아이콘</b>(또는 설정 아이콘)을 누르고 <b>카메라 권한</b>을 <b>'허용'</b>으로 활성화해 주세요.</p>
-                                        <p>2. 카메라를 사용 중인 다른 백그라운드 앱을 모두 종료 후 페이지를 새로고침(F5) 해주세요.</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => startWebcam(facingMode)}
-                                        className="px-6 py-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-xl text-xs font-black tracking-widest text-white hover:from-red-500/30 hover:to-orange-500/30 transition-all cursor-pointer"
-                                    >
-                                        카메라 다시 연결하기
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Camera flip toggle button */}
-                            {isCameraReady && (
-                                <button 
-                                    onClick={toggleCamera}
-                                    className="absolute top-4 left-4 bg-[#0B0F19]/80 backdrop-blur border border-white/10 p-2.5 rounded-2xl flex items-center justify-center text-white hover:text-[#00F59B] active:scale-95 transition-all z-10 cursor-pointer shadow-lg shadow-black/30"
-                                    title="Camera Flip (전면/후면 전환)"
+                        {/* Giant Neon Glowing 3-2-1 Countdown Overlay */}
+                        <AnimatePresence>
+                            {detectionState === 'countdown' && countdownNumber !== null && (
+                                <motion.div
+                                    key={countdownNumber}
+                                    initial={{ opacity: 0, scale: 2.2 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.4 }}
+                                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                                    className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
                                 >
-                                    <RefreshCcw className="w-4 h-4" />
-                                </button>
+                                    <h1 className="text-[140px] sm:text-[180px] font-black font-mono text-[#00F59B] tracking-widest select-none select-none drop-shadow-[0_0_25px_rgba(0,245,155,0.85)]">
+                                        {countdownNumber}
+                                    </h1>
+                                </motion.div>
                             )}
+                        </AnimatePresence>
 
-                            {/* Toggle Guidelines Button next to camera flip */}
-                            {isCameraReady && (
-                                <button 
-                                    onClick={() => setShowGuidelines(prev => !prev)}
-                                    className={`absolute top-4 left-16 bg-[#0B0F19]/80 backdrop-blur border px-3 py-2.5 rounded-2xl flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase transition-all z-10 cursor-pointer shadow-lg shadow-black/30 ${
-                                        showGuidelines 
-                                            ? 'border-[#00F59B]/30 text-[#00F59B] hover:text-white' 
-                                            : 'border-white/10 text-white/60 hover:text-white'
-                                    }`}
-                                    title="가이드라인 켜기/끄기"
-                                >
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    <span>{showGuidelines ? '가이드라인 끄기' : '가이드라인 켜기'}</span>
-                                </button>
-                            )}
+                        {/* Top-Left Exit Button overlay */}
+                        <button 
+                            onClick={stopWebcam}
+                            className="absolute top-4 left-4 bg-red-500/20 backdrop-blur-md border border-red-500/30 px-4 py-2.5 rounded-2xl flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-red-400 hover:bg-red-500/35 transition-all cursor-pointer shadow-lg shadow-black/40 z-20"
+                            title="전체화면 종료 및 복귀"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <span>종료하기</span>
+                        </button>
 
-                            {/* Timer countdown floating badge */}
-                            {isCameraReady && (
-                                <div className="absolute top-4 right-4 bg-[#0B0F19]/90 backdrop-blur border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2 z-10">
-                                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
-                                    <span className="text-xs font-black text-white font-mono tracking-widest uppercase">CAPTURING IN {secondsLeft}S</span>
-                                </div>
-                            )}
-
-                            {/* Bottom Guide text inside stream viewport */}
-                            {isCameraReady && ROUTINE_STEPS[currentStepIdx] && (
-                                <div className="absolute bottom-4 left-4 right-4 bg-[#0B0F19]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4 z-10">
-                                    <div className="w-10 h-10 bg-[#00F59B]/10 rounded-xl flex items-center justify-center text-[#00F59B] font-black italic text-lg shrink-0">
-                                        0{currentStepIdx + 1}
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-black text-[#00F59B] uppercase tracking-wider">{ROUTINE_STEPS[currentStepIdx]?.title || ''}</p>
-                                        <p className="text-xs text-slate-300 leading-normal mt-0.5">{ROUTINE_STEPS[currentStepIdx]?.guideText || ''}</p>
-                                    </div>
-                                </div>
-                            )}
+                        {/* Top-Center Immersion Status overlay */}
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#0B0F19]/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 shadow-lg shadow-black/30 z-10 hidden sm:flex">
+                            <span className="w-1.5 h-1.5 bg-[#00F59B] rounded-full animate-ping" />
+                            <span className="text-[9px] font-black text-white/95 font-mono tracking-widest uppercase">YOUNIQLE IMMERSIVE TELEMETRY LIVE</span>
                         </div>
 
-                        {/* 2. Right side scrolling telemetry logs */}
-                        <div className="bg-white/5 border border-white/5 rounded-[28px] p-6 flex flex-col justify-between space-y-4">
-                            <div className="space-y-1">
-                                <h4 className="text-xs font-black text-[#00D8F6] uppercase tracking-widest">SENSORS TELEMETRY</h4>
-                                <p className="text-[10px] text-slate-400 uppercase tracking-widest">Real-time biomechanics stream</p>
+                        {/* Top-Right Telemetry Settings overlay */}
+                        <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+                            <button 
+                                onClick={() => setShowGuidelines(prev => !prev)}
+                                className={`bg-[#0B0F19]/80 backdrop-blur-md border px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase transition-all cursor-pointer shadow-lg shadow-black/30 ${
+                                    showGuidelines 
+                                        ? 'border-[#00F59B]/30 text-[#00F59B] hover:text-white' 
+                                        : 'border-white/10 text-white/60 hover:text-white'
+                                }`}
+                                title="테스트 그리드 가이드 온/오프"
+                            >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>{showGuidelines ? '그리드 끄기' : '그리드 켜기'}</span>
+                            </button>
+                            
+                            <button 
+                                onClick={toggleCamera}
+                                className="bg-[#0B0F19]/80 backdrop-blur-md border border-white/10 p-2.5 rounded-2xl flex items-center justify-center text-white hover:text-[#00F59B] active:scale-95 transition-all cursor-pointer shadow-lg shadow-black/30"
+                                title="카메라 전환 (전면/후면)"
+                            >
+                                <RefreshCw className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Dynamic Floating HUD Caption Box (Bottom Center) */}
+                        {isCameraReady && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 35, x: '-50%' }}
+                                animate={{ opacity: 1, y: 0, x: '-50%' }}
+                                className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-sm bg-[#070B14]/90 backdrop-blur-md border border-[#00F59B]/30 p-4 rounded-[24px] flex items-center gap-3.5 z-20 shadow-2xl shadow-black/90"
+                            >
+                                <div className="w-10 h-10 bg-[#00F59B]/10 rounded-2xl flex items-center justify-center shrink-0 border border-[#00F59B]/20 text-[#00F59B]">
+                                    {detectionState === 'searching' && <Loader2 className="w-5 h-5 animate-spin" />}
+                                    {detectionState === 'locked' && <Camera className="w-5 h-5 animate-pulse" />}
+                                    {detectionState === 'countdown' && <span className="text-xs font-black font-mono">WAIT</span>}
+                                    {detectionState === 'active' && <span className="text-xs font-black font-mono text-[#00F59B] animate-pulse">RUN</span>}
+                                </div>
+                                <div className="space-y-0.5 text-left">
+                                    <div className="flex items-center gap-1.5">
+                                        <Badge className={`text-[#060A13] text-[8px] font-black tracking-widest px-2 py-0.5 rounded-full border-none ${
+                                            detectionState === 'active' ? 'bg-[#00F59B]' : 'bg-[#00D8F6]'
+                                        }`}>
+                                            {detectionState === 'active' ? 'ACTIVE' : 'ALIGNMENT'}
+                                        </Badge>
+                                        <span className="text-[9px] font-black text-[#00D8F6] uppercase tracking-widest font-mono">
+                                            {detectionState === 'active' ? 'SQUAT ANALYZING' : 'CLINICAL GRID GUIDE'}
+                                        </span>
+                                    </div>
+                                    
+                                    <p className="text-[11px] font-black text-white leading-normal mt-1">
+                                        {detectionState === 'searching' && (
+                                            <>화면 중앙의 <span className="text-[#00D8F6] font-bold">세로 십자 수평선</span>을 기준으로 전신이 나오게 맞춰 서 주세요.</>
+                                        )}
+                                        {detectionState === 'locked' && (
+                                            <>대상이 감지되었습니다! <span className="text-[#00F59B] font-bold">휴대폰을 거치하고</span> 3걸음 뒤로 이동해 대기해 주세요.</>
+                                        )}
+                                        {detectionState === 'countdown' && (
+                                            <>스캔 시작 전 자세를 고정하고 잠시만 대기해 주세요...</>
+                                        )}
+                                        {detectionState === 'active' && (
+                                            <>동작 분석 진행 중! 화면을 보며 <span className="text-[#00F59B] font-bold">자유롭게 스쿼트를 진행</span>해 주세요.</>
+                                        )}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Glassmorphic Telemetry Diagnostics Sidebar overlay (Bottom Right) */}
+                        <div className="absolute bottom-4 right-4 left-4 sm:left-auto sm:w-[340px] bg-[#070B14]/85 backdrop-blur-md border border-white/10 rounded-[24px] p-4 flex flex-col space-y-3 z-10 shadow-2xl shadow-black/80 max-h-[220px]">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <h4 className="text-[10px] font-black text-[#00D8F6] uppercase tracking-widest font-mono">SENSOR DIAGNOSTICS</h4>
+                                    <p className="text-[8px] text-slate-400 uppercase tracking-widest font-mono">WebRTC stream telemetry</p>
+                                </div>
+                                <Badge variant="outline" className="border-[#00F59B]/30 text-[#00F59B] text-[8px] font-mono font-bold">
+                                    {actualResolution}
+                                </Badge>
                             </div>
                             
-                            {/* Scrolling list */}
-                            <div className="flex-1 overflow-y-auto max-h-[220px] lg:max-h-[280px] space-y-2 pr-1 font-mono text-[9px] text-[#00F59B] bg-[#070B14] p-4 rounded-2xl border border-white/5 scrollbar-thin scrollbar-thumb-white/10">
+                            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 font-mono text-[9px] text-[#00F59B] bg-black/40 p-3 rounded-xl border border-white/5 scrollbar-thin">
                                 {telemetryLog.length === 0 ? (
-                                    <div className="text-slate-500 italic text-center py-12">신체 모션을 인식하는 중...</div>
+                                    <div className="text-slate-600 italic text-center py-8 font-mono">연동 대기 중...</div>
                                 ) : (
                                     telemetryLog.map((log, i) => (
-                                        <div key={i} className="border-b border-white/5 pb-1 last:border-0 leading-normal">
+                                        <div key={i} className="border-b border-white/5 pb-0.5 last:border-0 leading-normal break-all font-mono">
                                             {log}
                                         </div>
                                     ))
                                 )}
                             </div>
-
-                            {/* Control button */}
-                            <Button 
-                                onClick={() => { stopWebcam(); resetScanner(); }}
-                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:text-white font-black italic uppercase text-[10px] tracking-widest hover:bg-white/10 transition-colors"
-                            >
-                                CANCEL SCAN
-                            </Button>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* ANALYZING SCREEN: Sci-fi loading state */}
-                {status === 'analyzing' && (
-                    <motion.div 
-                        key="analyzing" 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
-                        exit={{ opacity: 0 }}
-                        className="flex-1 flex flex-col items-center justify-center py-12 text-center"
-                    >
-                        <div className="relative w-44 h-44 mb-8">
-                            <div className="absolute inset-0 border-4 border-[#00F59B]/10 rounded-full" />
-                            <div className="absolute inset-0 border-4 border-[#00F59B] border-t-transparent rounded-full animate-spin" />
-                            <div className="absolute inset-4 overflow-hidden rounded-full bg-[#0D1321] border border-white/10 flex items-center justify-center">
-                                <Sparkles className="w-12 h-12 text-[#00F59B] animate-pulse" />
-                            </div>
-                        </div>
-                        <h3 className="text-2xl font-black italic text-white uppercase tracking-widest animate-pulse">Analyzing Motion Check...</h3>
-                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mt-4">Generating holistic recovery comparison report</p>
-                    </motion.div>
-                )}
-
-                {/* RESULT REPORT SCREEN: The ultimate before/after recovery summary dashboard */}
-                {status === 'result' && finalReport && (
-                    <motion.div 
-                        key="result"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="flex-1 overflow-y-auto space-y-8 max-h-[72vh] pr-2 scrollbar-thin scrollbar-thumb-white/10"
-                    >
-                        {/* 1. Header Card - Before/After Score Comparison */}
-                        <div className="bg-gradient-to-r from-[#0D1321] to-[#0A252E] p-8 rounded-[32px] border border-white/5 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="space-y-3 text-center md:text-left">
-                                <Badge className="bg-[#00F59B]/10 text-[#00F59B] border border-[#00F59B]/20 font-black italic px-4 py-1">ANALYSIS COMPLETE</Badge>
-                                <h2 className="text-3xl font-black italic text-white leading-tight uppercase">종합 피지컬 회복 리포트</h2>
-                                <p className="text-slate-400 text-sm max-w-md">
-                                    훈련 및 회복 전후의 바이오메카닉 움직임을 대조 분석한 결과입니다. 무릎 안정성과 상체 척추 균형도가 고르게 향상되었습니다.
-                                </p>
-                            </div>
-                            
-                            {/* Score comparison visual */}
-                            <div className="flex items-center gap-6 bg-black/40 p-6 rounded-2xl border border-white/5">
-                                <div className="text-center">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">BEFORE RECOVERY</p>
-                                    <p className="text-4xl font-black italic text-slate-400 mt-1 font-mono">{finalReport.overallScoreBefore}<span className="text-xs ml-1 font-normal opacity-50">PTS</span></p>
-                                </div>
-                                <div className="text-[#00F59B] text-xl font-bold">➡️</div>
-                                <div className="text-center">
-                                    <p className="text-[9px] font-black text-[#00F59B] uppercase tracking-widest">AFTER RECOVERY</p>
-                                    <p className="text-5xl font-black italic text-[#00F59B] mt-1 font-mono">{finalReport.overallScoreAfter}<span className="text-sm ml-1 font-normal opacity-50">PTS</span></p>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* 2. Step-by-Step Biomechanics Telemetry details */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            
-                            {/* Squat details card */}
-                            <div className="bg-white/5 p-6 rounded-[24px] border border-white/5 space-y-4 flex flex-col justify-between">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <Badge className="bg-white/5 text-[#00F59B] font-mono text-[9px] border-none px-2 py-0.5">01 SQUAT CHECK</Badge>
-                                        <h3 className="text-lg font-black text-white italic">스쿼트 정렬</h3>
-                                    </div>
-                                    <span className="text-xl">🏋️</span>
+                        {/* Hard Connection Error Banner Overlay */}
+                        {webcamError && (
+                            <div className="absolute inset-0 bg-[#070B14]/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center space-y-4">
+                                <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/20 animate-bounce">
+                                    <ShieldAlert className="w-8 h-8" />
                                 </div>
-                                <div className="space-y-2 text-xs font-mono text-slate-300 bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">무릎 말림(Valgus):</span>
-                                        <span className="font-bold text-white">{finalReport.squat.kneeValgusAngle}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">골반 수평:</span>
-                                        <span className="font-bold text-[#00F59B]">{finalReport.squat.pelvisAlignment}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">좌우 균형 비율:</span>
-                                        <span className="font-bold text-[#00D8F6]">{finalReport.squat.balanceRatio}</span>
-                                    </div>
+                                <div className="space-y-1.5 max-w-sm">
+                                    <h4 className="text-sm font-bold uppercase tracking-wider text-white">카메라 하드웨어 연동 에러</h4>
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        기기의 카메라 권한이 비활성화되었거나 다른 서비스에서 하드웨어를 점유하고 있습니다.
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between text-[10px] font-black uppercase text-[#00F59B]">
-                                    <span>STABILITY STATUS:</span>
-                                    <span className="bg-[#00F59B]/10 border border-[#00F59B]/20 px-2 py-0.5 rounded-full">{finalReport.squat.status}</span>
+                                <div className="bg-white/5 border border-white/5 p-4 rounded-xl text-left text-[10px] text-slate-300 space-y-1.5 w-full max-w-sm font-mono">
+                                    <p className="font-bold text-[#00F59B] text-xs">🛠️ 점검 리스트:</p>
+                                    <p>1. 브라우저 주소창 왼쪽의 <b>설정(자물쇠) 아이콘</b>을 눌러 카메라 권한을 '허용'했는지 확인해 주세요.</p>
+                                    <p>2. 백그라운드에 구동 중인 화상 통화 어플리케이션을 모두 강제 종료 후 다시 시도해 주세요.</p>
                                 </div>
-                            </div>
-
-                            {/* Jump Landing details card */}
-                            <div className="bg-white/5 p-6 rounded-[24px] border border-white/5 space-y-4 flex flex-col justify-between">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <Badge className="bg-white/5 text-[#00F59B] font-mono text-[9px] border-none px-2 py-0.5">02 JUMP LANDING</Badge>
-                                        <h3 className="text-lg font-black text-white italic">점프 착지 안정성</h3>
-                                    </div>
-                                    <span className="text-xl">🦘</span>
-                                </div>
-                                <div className="space-y-2 text-xs font-mono text-slate-300 bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">무릎 횡흔들림:</span>
-                                        <span className="font-bold text-white">{finalReport.jump.kneeSway}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">착지 감쇠력:</span>
-                                        <span className="font-bold text-[#00F59B]">{finalReport.jump.impactDampening}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between text-[10px] font-black uppercase text-[#00F59B]">
-                                    <span>STABILITY STATUS:</span>
-                                    <span className="bg-[#00F59B]/10 border border-[#00F59B]/20 px-2 py-0.5 rounded-full">{finalReport.jump.stability}</span>
+                                <div className="flex gap-2">
+                                    <Button 
+                                        onClick={stopWebcam}
+                                        variant="outline"
+                                        className="bg-white/5 border-white/10 text-white rounded-xl text-xs py-2.5 px-5 font-bold"
+                                    >
+                                        뒤로가기
+                                    </Button>
+                                    <Button 
+                                        onClick={() => startWebcam(facingMode)}
+                                        className="bg-gradient-to-r from-red-500 to-orange-500 text-white font-black hover:opacity-90 transition-all rounded-xl text-xs tracking-wider py-2.5 px-5"
+                                    >
+                                        스트림 재시도
+                                    </Button>
                                 </div>
                             </div>
-
-                            {/* Running Posture card */}
-                            <div className="bg-white/5 p-6 rounded-[24px] border border-white/5 space-y-4 flex flex-col justify-between">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <Badge className="bg-white/5 text-[#00F59B] font-mono text-[9px] border-none px-2 py-0.5">03 RUNNING POSTURE</Badge>
-                                        <h3 className="text-lg font-black text-white italic">달리기 자세</h3>
-                                    </div>
-                                    <span className="text-xl">🏃</span>
-                                </div>
-                                <div className="space-y-2 text-xs font-mono text-slate-300 bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">상체 전방 경사:</span>
-                                        <span className="font-bold text-[#00F59B]">{finalReport.running.torsoAngle}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">보폭 대칭성:</span>
-                                        <span className="font-bold text-white">{finalReport.running.strideSymmetry}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between text-[10px] font-black uppercase text-[#00F59B]">
-                                    <span>STABILITY STATUS:</span>
-                                    <span className="bg-[#00F59B]/10 border border-[#00F59B]/20 px-2 py-0.5 rounded-full">{finalReport.running.stability}</span>
-                                </div>
-                            </div>
-
-                            {/* Kick Balance card */}
-                            <div className="bg-white/5 p-6 rounded-[24px] border border-white/5 space-y-4 flex flex-col justify-between">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <Badge className="bg-white/5 text-[#00F59B] font-mono text-[9px] border-none px-2 py-0.5">04 KICKING ROM</Badge>
-                                        <h3 className="text-lg font-black text-white italic">킥 밸런스</h3>
-                                    </div>
-                                    <span className="text-xl">⚽</span>
-                                </div>
-                                <div className="space-y-2 text-xs font-mono text-slate-300 bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">디딤발 고정도:</span>
-                                        <span className="font-bold text-[#00F59B]">{finalReport.kick.supportingFootStability}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">골반 ROM 회전각:</span>
-                                        <span className="font-bold text-white">{finalReport.kick.pelvicRotationROM}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between text-[10px] font-black uppercase text-[#00F59B]">
-                                    <span>STABILITY STATUS:</span>
-                                    <span className="bg-[#00F59B]/10 border border-[#00F59B]/20 px-2 py-0.5 rounded-full">{finalReport.kick.stability}</span>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* 3. Before/After Side-by-Side Biomechanics Skeletal Simulation Carousel */}
-                        <div className="bg-white/5 p-6 rounded-[28px] border border-white/5 space-y-4">
-                            <h3 className="text-sm font-black text-[#00F59B] uppercase tracking-wider">Skeletal Kinematics Comparison</h3>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Stiff Before view */}
-                                <div className="bg-[#0D1321] rounded-2xl p-4 border border-white/5 text-center space-y-3 relative overflow-hidden">
-                                    <div className="text-[10px] font-black text-red-400 tracking-widest uppercase">BEFORE: HIGH JOINT STIFFNESS</div>
-                                    <div className="h-36 bg-[#070B14] rounded-xl flex items-center justify-center border border-white/5 relative">
-                                        {/* Mock visual comparison layout */}
-                                        <div className="w-24 h-24 border border-red-500/20 rounded-full flex items-center justify-center">
-                                            <span className="text-[10px] font-mono text-red-400 italic">ROM 제한 (38°)</span>
-                                        </div>
-                                        {/* Left leg stiff angle vector lines */}
-                                        <div className="absolute top-8 left-1/2 w-0.5 h-12 bg-red-400 transform -translate-x-1/2 rotate-12 origin-top" />
-                                        <div className="absolute top-20 left-1/2 w-0.5 h-10 bg-red-400 transform -translate-x-1/2 rotate-[55deg] origin-top" />
-                                    </div>
-                                    <p className="text-[10px] text-slate-400">무릎 가동각이 부족하여 햄스트링/둔근 충격 분산율 저조</p>
-                                </div>
-
-                                {/* Fluid After view */}
-                                <div className="bg-[#0D1321] rounded-2xl p-4 border border-[#00F59B]/15 text-center space-y-3 relative overflow-hidden">
-                                    <div className="text-[10px] font-black text-[#00F59B] tracking-widest uppercase">AFTER: OPTIMAL KINEMATICS</div>
-                                    <div className="h-36 bg-[#070B14] rounded-xl flex items-center justify-center border border-[#00F59B]/10 relative">
-                                        <div className="w-24 h-24 border border-[#00F59B]/20 rounded-full flex items-center justify-center">
-                                            <span className="text-[10px] font-mono text-[#00F59B] italic">풀 가동 (44°)</span>
-                                        </div>
-                                        {/* Left leg deep angle vector lines */}
-                                        <div className="absolute top-8 left-1/2 w-0.5 h-12 bg-[#00F59B] transform -translate-x-1/2 rotate-6 origin-top" />
-                                        <div className="absolute top-20 left-1/2 w-0.5 h-10 bg-[#00F59B] transform -translate-x-1/2 rotate-[82deg] origin-top" />
-                                    </div>
-                                    <p className="text-[10px] text-slate-400">전후 회복 조치 이후 신체 가동 범위 및 대칭 균형 정상치 회복</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 4. Action Buttons */}
-                        <div className="space-y-4 pt-4 border-t border-white/5">
-                            {!hasSaved ? (
-                                <Button 
-                                    onClick={handleSaveToTimeline}
-                                    disabled={isSaving}
-                                    className="w-full h-16 rounded-[20px] bg-[#00F59B] hover:bg-[#00D8F6] text-[#060A13] font-black italic uppercase tracking-widest shadow-xl shadow-[#00F59B]/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
-                                >
-                                    {isSaving ? (
-                                        <Loader2 className="w-6 h-6 animate-spin" />
-                                    ) : (
-                                        <Save className="w-6 h-6" />
-                                    )}
-                                    피지컬 타임라인에 저장하기
-                                </Button>
-                            ) : (
-                                <div className="w-full h-16 rounded-[20px] bg-[#00F59B]/10 border-2 border-[#00F59B]/20 text-[#00F59B] flex items-center justify-center gap-2 font-black italic uppercase tracking-widest">
-                                    <Check className="w-6 h-6" /> SAVE COMPLETE
-                                </div>
-                            )}
-
-                            <Button 
-                                onClick={resetScanner}
-                                variant="outline"
-                                className="w-full h-14 rounded-[16px] border border-white/10 bg-white/5 hover:bg-white/10 text-slate-400 font-black italic uppercase tracking-widest text-xs"
-                            >
-                                Start New Scan
-                            </Button>
-                        </div>
-
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
