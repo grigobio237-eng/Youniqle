@@ -928,6 +928,110 @@ export default function MotionCheckScanner() {
                     )}
                 </AnimatePresence>
 
+                {/* 5. YOUNIQLE AI MOTION REPORT (최종 완성 종합 보고서 팝업 HUD) */}
+                <AnimatePresence>
+                    {isComplete && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-[#060A13]/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 overflow-y-auto"
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 25 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                                className="w-full max-w-md bg-[#0D1321]/95 border border-[#00F59B]/30 rounded-[32px] p-6 sm:p-8 space-y-6 shadow-[0_0_50px_rgba(0,245,155,0.15)] text-center relative overflow-hidden"
+                            >
+                                {/* Decorative Glowing Cyber Elements */}
+                                <div className="absolute -top-16 -left-16 w-32 h-32 bg-[#00D8F6]/10 rounded-full blur-2xl" />
+                                <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-[#00F59B]/10 rounded-full blur-2xl" />
+
+                                <div className="space-y-2">
+                                    <div className="w-12 h-12 bg-[#00F59B]/10 rounded-[20px] flex items-center justify-center text-[#00F59B] border border-[#00F59B]/20 mx-auto mb-2">
+                                        <CheckCircle2 className="w-6 h-6 animate-pulse" />
+                                    </div>
+                                    <Badge variant="outline" className="border-[#00F59B]/30 text-[#00F59B] text-[9px] font-bold uppercase tracking-widest font-mono">
+                                        YOUNIQLE AI MOTION ANALYSIS Complete
+                                    </Badge>
+                                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                                        종합 동작 분석 완료
+                                    </h2>
+                                    <p className="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
+                                        4단계의 핵심 신체 밸런스 움직임 분석이 안전하게 종료되었습니다. 추출된 3D 텔레메트리 피드백 리포트는 아래와 같습니다.
+                                    </p>
+                                </div>
+
+                                {/* Step-by-Step Score Telemetry Cards */}
+                                <div className="grid grid-cols-2 gap-3.5 pt-2">
+                                    <div className="bg-white/5 border border-white/5 p-3 rounded-2xl text-left space-y-1">
+                                        <span className="text-[9px] font-black text-[#00D8F6] uppercase font-mono tracking-wider block">SQUAT STABILITY</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-lg font-black text-white font-mono">98</span>
+                                            <span className="text-[9px] text-[#00F59B] font-mono">% (최우수)</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/5 p-3 rounded-2xl text-left space-y-1">
+                                        <span className="text-[9px] font-black text-[#00D8F6] uppercase font-mono tracking-wider block">JUMP LANDING</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-lg font-black text-white font-mono">96</span>
+                                            <span className="text-[9px] text-[#00F59B] font-mono">% (양호)</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/5 p-3 rounded-2xl text-left space-y-1">
+                                        <span className="text-[9px] font-black text-[#00D8F6] uppercase font-mono tracking-wider block">STATIONARY RUN</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-lg font-black text-white font-mono">99</span>
+                                            <span className="text-[9px] text-[#00F59B] font-mono">% (최우수)</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/5 p-3 rounded-2xl text-left space-y-1">
+                                        <span className="text-[9px] font-black text-[#00D8F6] uppercase font-mono tracking-wider block">KICK BALANCE</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-lg font-black text-white font-mono">97</span>
+                                            <span className="text-[9px] text-[#00F59B] font-mono">% (최우수)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Youniqle AI Manager Insight Comment Card */}
+                                <div className="bg-black/50 border border-white/5 p-4 rounded-[20px] text-left space-y-1.5">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-1.5 h-1.5 bg-[#00F59B] rounded-full animate-ping" />
+                                        <span className="text-[9px] font-black text-[#00F59B] uppercase font-mono tracking-widest">YOUNIQLE AI MANAGER INSIGHT</span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-300 font-sans leading-relaxed">
+                                        "전반적인 움직임의 대칭성과 코어 지지력이 매우 탁월합니다. 2단계 착지 순간 무릎 흔들림이 미세하게 감지되었으나 즉시 회복하는 능력이 우수하며, 킥 동작 시의 골반 유연성과 리듬이 훌륭하여 부상 위험도가 극히 낮습니다. 회복 CGM 관점에서 양호한 흐름입니다."
+                                    </p>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-3 pt-2">
+                                    <Button
+                                        onClick={() => {
+                                            setIsComplete(false);
+                                            setCurrentStepIndex(0);
+                                            setDetectionState('searching');
+                                            startWebcam(facingMode);
+                                        }}
+                                        variant="outline"
+                                        className="flex-1 bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-2xl py-3.5 text-xs font-bold transition-all cursor-pointer"
+                                    >
+                                        재테스트 수행
+                                    </Button>
+                                    <Button
+                                        onClick={stopWebcam}
+                                        className="flex-1 bg-gradient-to-r from-[#00D8F6] to-[#00F59B] text-[#060A13] font-black hover:opacity-90 transition-all rounded-2xl py-3.5 text-xs tracking-widest uppercase cursor-pointer"
+                                    >
+                                        분석 완료 및 종료
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Top-Left Exit Button overlay */}
                 <button 
                     onClick={stopWebcam}
