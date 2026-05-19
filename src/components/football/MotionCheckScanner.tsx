@@ -534,8 +534,11 @@ export default function MotionCheckScanner() {
     useEffect(() => {
         if (status !== 'webcam') return;
         
-        setSecondsLeft(ROUTINE_STEPS[currentStepIdx].duration);
-        addLog(`[SYSTEM] ${ROUTINE_STEPS[currentStepIdx].title} 센서 감지 중...`);
+        const step = ROUTINE_STEPS[currentStepIdx];
+        if (!step) return;
+        
+        setSecondsLeft(step.duration);
+        addLog(`[SYSTEM] ${step.title} 센서 감지 중...`);
         
         const interval = setInterval(() => {
             setSecondsLeft(prev => {
@@ -559,10 +562,10 @@ export default function MotionCheckScanner() {
         
         // Capture frame snapshot using canvas to simulate the screenshot save
         const canvas = canvasRef.current;
-        if (canvas) {
+        const step = ROUTINE_STEPS[currentStepIdx];
+        if (canvas && step) {
             const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-            const stepId = ROUTINE_STEPS[currentStepIdx].id;
-            setCapturedFrames(prev => ({ ...prev, [stepId]: dataUrl }));
+            setCapturedFrames(prev => ({ ...prev, [step.id]: dataUrl }));
         }
 
         if (currentStepIdx < ROUTINE_STEPS.length - 1) {
@@ -747,19 +750,21 @@ export default function MotionCheckScanner() {
                         className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6"
                     >
                         {/* 1. Live stream container & Canvas layout */}
-                        <div className="lg:col-span-3 bg-black rounded-[28px] overflow-hidden border border-white/5 relative aspect-video flex items-center justify-center group shadow-inner shadow-black/80">
-                            {/* Offscreen real video element */}
+                        <div className="lg:col-span-3 bg-[#060A13] rounded-[28px] overflow-hidden border border-white/5 relative aspect-[3/4] sm:aspect-video flex items-center justify-center group shadow-inner shadow-black/80 w-full min-h-[480px] sm:min-h-[500px]">
+                            {/* Offscreen real video element styled to prevent mobile power-saver display:none lock */}
                             <video 
                                 ref={videoRef} 
                                 autoPlay playsInline muted 
                                 onLoadedMetadata={() => setIsCameraReady(true)}
-                                className="hidden" 
+                                onPlay={() => setIsCameraReady(true)}
+                                onLoadedData={() => setIsCameraReady(true)}
+                                className="absolute w-[1px] h-[1px] opacity-0 pointer-events-none" 
                             />
                             
                             {/* Animated skeleton visual feedback canvas */}
                             <canvas 
                                 ref={canvasRef} 
-                                className="w-full h-full object-contain"
+                                className="w-full h-full"
                             />
 
                             {/* Camera Connecting Preloader */}
@@ -772,21 +777,21 @@ export default function MotionCheckScanner() {
 
                             {/* Timer countdown floating badge */}
                             {isCameraReady && (
-                                <div className="absolute top-4 right-4 bg-[#0B0F19]/90 backdrop-blur border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2">
+                                <div className="absolute top-4 right-4 bg-[#0B0F19]/90 backdrop-blur border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2 z-10">
                                     <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
                                     <span className="text-xs font-black text-white font-mono tracking-widest uppercase">CAPTURING IN {secondsLeft}S</span>
                                 </div>
                             )}
 
                             {/* Bottom Guide text inside stream viewport */}
-                            {isCameraReady && (
-                                <div className="absolute bottom-4 left-4 right-4 bg-[#0B0F19]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4">
+                            {isCameraReady && ROUTINE_STEPS[currentStepIdx] && (
+                                <div className="absolute bottom-4 left-4 right-4 bg-[#0B0F19]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4 z-10">
                                     <div className="w-10 h-10 bg-[#00F59B]/10 rounded-xl flex items-center justify-center text-[#00F59B] font-black italic text-lg shrink-0">
                                         0{currentStepIdx + 1}
                                     </div>
                                     <div>
-                                        <p className="text-xs font-black text-[#00F59B] uppercase tracking-wider">{ROUTINE_STEPS[currentStepIdx].title}</p>
-                                        <p className="text-xs text-slate-300 leading-normal mt-0.5">{ROUTINE_STEPS[currentStepIdx].guideText}</p>
+                                        <p className="text-xs font-black text-[#00F59B] uppercase tracking-wider">{ROUTINE_STEPS[currentStepIdx]?.title || ''}</p>
+                                        <p className="text-xs text-slate-300 leading-normal mt-0.5">{ROUTINE_STEPS[currentStepIdx]?.guideText || ''}</p>
                                     </div>
                                 </div>
                             )}
