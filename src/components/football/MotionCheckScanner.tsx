@@ -105,6 +105,7 @@ export default function MotionCheckScanner() {
     const [isAligned, setIsAligned] = useState(false);
     const [alignmentProgress, setAlignmentProgress] = useState(0);
     const [secondsLeft, setSecondsLeft] = useState<number>(5);
+    const [showGuidelines, setShowGuidelines] = useState(true);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
@@ -353,28 +354,30 @@ export default function MotionCheckScanner() {
                 }
             }
 
-            // 1. Draw Futuristic Scanning Laser Line
-            const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
-            const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
-            gradient.addColorStop(0, 'rgba(0, 245, 155, 0)');
-            gradient.addColorStop(0.5, isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)');
-            gradient.addColorStop(1, 'rgba(0, 245, 155, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, scannerY - 20, w, 40);
+            // 1. Draw Futuristic Scanning Laser Line (Conditional)
+            if (showGuidelines) {
+                const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
+                const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
+                gradient.addColorStop(0, 'rgba(0, 245, 155, 0)');
+                gradient.addColorStop(0.5, isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)');
+                gradient.addColorStop(1, 'rgba(0, 245, 155, 0)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, scannerY - 20, w, 40);
 
-            ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.moveTo(0, scannerY);
-            ctx.lineTo(w, scannerY);
-            ctx.stroke();
-            ctx.shadowBlur = 0; // Reset shadow
+                ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.moveTo(0, scannerY);
+                ctx.lineTo(w, scannerY);
+                ctx.stroke();
+                ctx.shadowBlur = 0; // Reset shadow
+            }
 
             // 2. Draw Guided Translucent Silhouette Overlays based on step (Static Calibration Anchor)
             // HIDES static outline completely once user is aligned to allow skeleton to bend cleanly without overlapping static line
-            if (!isAligned) {
+            if (showGuidelines && !isAligned) {
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
                 ctx.lineWidth = 2.0;
                 ctx.setLineDash([6, 6]);
@@ -414,223 +417,231 @@ export default function MotionCheckScanner() {
                 ctx.setLineDash([]); // Reset line dash
             }
 
-            // 3. Draw neon Biomechanical Skeletons
-            const time = frameCount * 0.05;
-            let joints: Record<string, { x: number, y: number }> = {};
+            // 3. Draw neon Biomechanical Skeletons (Conditional on showGuidelines)
+            if (showGuidelines) {
+                const time = frameCount * 0.05;
+                let joints: Record<string, { x: number, y: number }> = {};
 
-            if (currentStep.id === 'SQUAT') {
-                if (!isAligned) {
-                    // Static Standing Calibration Pose
-                    joints = {
-                        head: { x: w / 2, y: h * 0.15 },
-                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
-                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
-                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
-                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
-                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
-                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
-                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                    };
-                } else {
-                    // Active Squatting Kinematics
-                    const squatDepth = (Math.sin(time * 0.8) + 1) * 0.5; // 0 to 1
-                    const flexY = squatDepth * h * 0.18;
-                    const kneeSwayX = Math.sin(time * 3) * (squatDepth * 12);
-
-                    joints = {
-                        head: { x: w / 2, y: h * 0.15 + flexY },
-                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY },
-                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY },
-                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY },
-                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY },
-                        lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.4 },
-                        rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.4 },
-                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                    };
-                }
-
-                if (frameCount % 60 === 0 && isAligned) {
-                    addLog(`[SQUAT] ROM Depth: ${Math.round(85 + Math.random() * 10)}%, Sway: SAFE`);
-                }
-            } else if (currentStep.id === 'JUMP') {
-                if (!isAligned) {
-                    // Static Standing Ready Pose
-                    joints = {
-                        head: { x: w / 2, y: h * 0.15 },
-                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
-                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
-                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
-                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
-                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
-                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
-                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                    };
-                } else {
-                    // Active Landing Shock Kinematics
-                    const phase = (time * 0.7) % (Math.PI * 2);
-                    let jumpY = 0;
-                    let flexY = 0;
-                    
-                    if (phase < Math.PI) {
-                        jumpY = -Math.sin(phase) * h * 0.22;
+                if (currentStep.id === 'SQUAT') {
+                    if (!isAligned) {
+                        // Static Standing Calibration Pose
+                        joints = {
+                            head: { x: w / 2, y: h * 0.15 },
+                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
+                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
+                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
+                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
+                            lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
+                            rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
+                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                        };
                     } else {
-                        flexY = Math.sin(phase) * h * 0.08;
+                        // Active Squatting Kinematics
+                        const squatDepth = (Math.sin(time * 0.8) + 1) * 0.5; // 0 to 1
+                        const flexY = squatDepth * h * 0.18;
+                        const kneeSwayX = Math.sin(time * 3) * (squatDepth * 12);
+
+                        joints = {
+                            head: { x: w / 2, y: h * 0.15 + flexY },
+                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY },
+                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY },
+                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY },
+                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY },
+                            lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.6 },
+                            rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.6 },
+                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                        };
                     }
+                } else if (currentStep.id === 'JUMP') {
+                    if (!isAligned) {
+                        // Static Standing Jump Stance
+                        joints = {
+                            head: { x: w / 2, y: h * 0.15 },
+                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
+                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
+                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
+                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
+                            lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
+                            rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
+                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                        };
+                    } else {
+                        // Active Jumping Kinematics
+                        const phase = time * 1.5;
+                        let flexY = 0;
+                        let jumpY = 0;
+                        let kneeSwayX = 0;
 
-                    joints = {
-                        head: { x: w / 2, y: h * 0.15 + jumpY + flexY },
-                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + jumpY + flexY },
-                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + jumpY + flexY },
-                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + jumpY + flexY },
-                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + jumpY + flexY },
-                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
-                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
-                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 + jumpY },
-                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 + jumpY },
-                    };
-                }
-            } else if (currentStep.id === 'RUNNING') {
-                if (!isAligned) {
-                    // Static Standing Lateral Profile Pose
-                    joints = {
-                        head: { x: w * 0.45, y: h * 0.18 },
-                        shoulder: { x: w * 0.45, y: h * 0.28 },
-                        hip: { x: w * 0.45, y: h * 0.55 },
-                        lKnee: { x: w * 0.45, y: h * 0.7 },
-                        rKnee: { x: w * 0.45, y: h * 0.7 },
-                        lAnkle: { x: w * 0.45, y: h * 0.86 },
-                        rAnkle: { x: w * 0.45, y: h * 0.86 },
-                    };
-                } else {
-                    // Active Stride Stretches Kinematics
-                    const phase = time * 2;
-                    const swingX1 = Math.sin(phase) * w * 0.08;
-                    const swingY1 = Math.cos(phase * 2) * h * 0.05;
-                    const swingX2 = Math.sin(phase + Math.PI) * w * 0.08;
-                    const swingY2 = Math.cos((phase + Math.PI) * 2) * h * 0.05;
+                        const cycle = phase % (Math.PI * 2);
+                        if (cycle < Math.PI * 0.4) {
+                            // 1. Preparation Crouch (Squat down)
+                            flexY = Math.sin(cycle / 0.4 * Math.PI / 2) * h * 0.15;
+                        } else if (cycle < Math.PI * 0.8) {
+                            // 2. Flight Phase (In the air)
+                            const flightT = (cycle - Math.PI * 0.4) / (Math.PI * 0.4);
+                            jumpY = Math.sin(flightT * Math.PI) * h * 0.3;
+                        } else {
+                            // 3. Landing & Dampening
+                            const landT = (cycle - Math.PI * 0.8) / (Math.PI * 1.2);
+                            flexY = Math.sin(landT * Math.PI) * h * 0.12;
+                            kneeSwayX = Math.sin(landT * Math.PI * 4) * 8; // Inward sway simulation
+                        }
 
-                    joints = {
-                        head: { x: w * 0.5, y: h * 0.18 + Math.sin(phase * 2) * 5 },
-                        shoulder: { x: w * 0.5, y: h * 0.28 },
-                        hip: { x: w * 0.48, y: h * 0.55 },
-                        lKnee: { x: w * 0.48 + swingX1, y: h * 0.7 + swingY1 },
-                        rKnee: { x: w * 0.48 + swingX2, y: h * 0.7 + swingY2 },
-                        lAnkle: { x: w * 0.48 + swingX1 * 1.3, y: h * 0.86 + swingY1 * 0.5 },
-                        rAnkle: { x: w * 0.48 + swingX2 * 1.3, y: h * 0.86 + swingY2 * 0.5 },
-                    };
-                }
-            } else if (currentStep.id === 'KICK') {
-                if (!isAligned) {
-                    // Static Standing Kick Stance
-                    joints = {
-                        head: { x: w * 0.45, y: h * 0.15 },
-                        lShoulder: { x: w * 0.38, y: h * 0.25 },
-                        rShoulder: { x: w * 0.52, y: h * 0.25 },
-                        lHip: { x: w * 0.41, y: h * 0.52 },
-                        rHip: { x: w * 0.49, y: h * 0.52 },
-                        supportingAnkle: { x: w * 0.5, y: h * 0.88 },
-                        kickingKnee: { x: w * 0.44, y: h * 0.72 },
-                        kickingAnkle: { x: w * 0.44, y: h * 0.88 },
-                    };
-                } else {
-                    // Active Kicking Kinematics
-                    const phase = (time * 0.8) % (Math.PI * 2);
-                    let kickAngle = 0;
-                    let pelvisRot = 0;
-                    
-                    if (phase < Math.PI) {
-                        kickAngle = Math.sin(phase) * w * 0.15;
-                        pelvisRot = Math.sin(phase) * 15;
+                        joints = {
+                            head: { x: w / 2, y: h * 0.15 + flexY - jumpY },
+                            lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY - jumpY },
+                            rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY - jumpY },
+                            lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY - jumpY },
+                            rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY - jumpY },
+                            lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.6 - jumpY * 0.9 },
+                            rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.6 - jumpY * 0.9 },
+                            lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 - jumpY },
+                            rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 - jumpY },
+                        };
                     }
+                } else if (currentStep.id === 'RUNNING') {
+                    if (!isAligned) {
+                        // Static Standing Lateral Pose
+                        joints = {
+                            head: { x: w * 0.45, y: h * 0.15 },
+                            shoulder: { x: w * 0.45, y: h * 0.28 },
+                            hip: { x: w * 0.45, y: h * 0.55 },
+                            lKnee: { x: w * 0.45, y: h * 0.7 },
+                            rKnee: { x: w * 0.45, y: h * 0.7 },
+                            lAnkle: { x: w * 0.45, y: h * 0.86 },
+                            rAnkle: { x: w * 0.45, y: h * 0.86 },
+                        };
+                    } else {
+                        // Active Stride Stretches Kinematics
+                        const phase = time * 2;
+                        const swingX1 = Math.sin(phase) * w * 0.08;
+                        const swingY1 = Math.cos(phase * 2) * h * 0.05;
+                        const swingX2 = Math.sin(phase + Math.PI) * w * 0.08;
+                        const swingY2 = Math.cos((phase + Math.PI) * 2) * h * 0.05;
 
-                    joints = {
-                        head: { x: w * 0.45, y: h * 0.15 },
-                        lShoulder: { x: w * 0.38, y: h * 0.25 },
-                        rShoulder: { x: w * 0.52, y: h * 0.25 },
-                        lHip: { x: w * 0.41, y: h * 0.52 },
-                        rHip: { x: w * 0.49 + (pelvisRot * 0.2), y: h * 0.52 },
-                        supportingAnkle: { x: w * 0.5, y: h * 0.88 },
-                        kickingKnee: { x: w * 0.44 + kickAngle * 0.6, y: h * 0.72 - Math.abs(kickAngle) * 0.2 },
-                        kickingAnkle: { x: w * 0.44 + kickAngle, y: h * 0.88 - Math.abs(kickAngle) * 0.6 },
-                    };
+                        joints = {
+                            head: { x: w * 0.5, y: h * 0.18 + Math.sin(phase * 2) * 5 },
+                            shoulder: { x: w * 0.5, y: h * 0.28 },
+                            hip: { x: w * 0.48, y: h * 0.55 },
+                            lKnee: { x: w * 0.48 + swingX1, y: h * 0.7 + swingY1 },
+                            rKnee: { x: w * 0.48 + swingX2, y: h * 0.7 + swingY2 },
+                            lAnkle: { x: w * 0.48 + swingX1 * 1.3, y: h * 0.86 + swingY1 * 0.5 },
+                            rAnkle: { x: w * 0.48 + swingX2 * 1.3, y: h * 0.86 + swingY2 * 0.5 },
+                        };
+                    }
+                } else if (currentStep.id === 'KICK') {
+                    if (!isAligned) {
+                        // Static Standing Kick Stance
+                        joints = {
+                            head: { x: w * 0.45, y: h * 0.15 },
+                            lShoulder: { x: w * 0.38, y: h * 0.25 },
+                            rShoulder: { x: w * 0.52, y: h * 0.25 },
+                            lHip: { x: w * 0.41, y: h * 0.52 },
+                            rHip: { x: w * 0.49, y: h * 0.52 },
+                            supportingAnkle: { x: w * 0.5, y: h * 0.88 },
+                            kickingKnee: { x: w * 0.44, y: h * 0.72 },
+                            kickingAnkle: { x: w * 0.44, y: h * 0.88 },
+                        };
+                    } else {
+                        // Active Kicking Kinematics
+                        const phase = (time * 0.8) % (Math.PI * 2);
+                        let kickAngle = 0;
+                        let pelvisRot = 0;
+                        
+                        if (phase < Math.PI) {
+                            kickAngle = Math.sin(phase) * w * 0.15;
+                            pelvisRot = Math.sin(phase) * 15;
+                        }
+
+                        joints = {
+                            head: { x: w * 0.45, y: h * 0.15 },
+                            lShoulder: { x: w * 0.38, y: h * 0.25 },
+                            rShoulder: { x: w * 0.52, y: h * 0.25 },
+                            lHip: { x: w * 0.41, y: h * 0.52 },
+                            rHip: { x: w * 0.49 + (pelvisRot * 0.2), y: h * 0.52 },
+                            supportingAnkle: { x: w * 0.5, y: h * 0.88 },
+                            kickingKnee: { x: w * 0.44 + kickAngle * 0.6, y: h * 0.72 - Math.abs(kickAngle) * 0.2 },
+                            kickingAnkle: { x: w * 0.44 + kickAngle, y: h * 0.88 - Math.abs(kickAngle) * 0.6 },
+                        };
+                    }
                 }
-            }
 
-            // Draw joints and skeletal links using high-tech neon markers
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
+                // Draw joints and skeletal links using high-tech neon markers
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
 
-            // Connect anatomical limbs
-            const connect = (j1: keyof typeof joints, j2: keyof typeof joints) => {
-                if (joints[j1] && joints[j2]) {
+                // Connect anatomical limbs
+                const connect = (j1: keyof typeof joints, j2: keyof typeof joints) => {
+                    if (joints[j1] && joints[j2]) {
+                        ctx.beginPath();
+                        ctx.moveTo(joints[j1].x, joints[j1].y);
+                        ctx.lineTo(joints[j2].x, joints[j2].y);
+                        ctx.stroke();
+                    }
+                };
+
+                if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
+                    connect('lShoulder', 'rShoulder');
+                    connect('lShoulder', 'lHip');
+                    connect('rShoulder', 'rHip');
+                    connect('lHip', 'rHip');
+                    connect('lHip', 'lKnee');
+                    connect('rHip', 'rKnee');
+                    connect('lKnee', 'lAnkle');
+                    connect('rKnee', 'rAnkle');
+                } else if (currentStep.id === 'RUNNING') {
+                    connect('shoulder', 'hip');
+                    connect('hip', 'lKnee');
+                    connect('hip', 'rKnee');
+                    connect('lKnee', 'lAnkle');
+                    connect('rKnee', 'rAnkle');
+                } else if (currentStep.id === 'KICK') {
+                    connect('lShoulder', 'rShoulder');
+                    connect('lShoulder', 'lHip');
+                    connect('rShoulder', 'rHip');
+                    connect('lHip', 'rHip');
+                    connect('lHip', 'supportingAnkle');
+                    connect('rHip', 'kickingKnee');
+                    connect('kickingKnee', 'kickingAnkle');
+                }
+
+                // Draw glowing node circles for joints
+                ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
+                ctx.fillStyle = isAligned ? '#00F59B' : '#00D8F6';
+                Object.entries(joints).forEach(([name, joint]) => {
                     ctx.beginPath();
-                    ctx.moveTo(joints[j1].x, joints[j1].y);
-                    ctx.lineTo(joints[j2].x, joints[j2].y);
+                    ctx.arc(joint.x, joint.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Outer tracking targets
+                    ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(joint.x, joint.y, 12, 0, Math.PI * 2);
                     ctx.stroke();
-                }
-            };
+                });
 
-            if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
-                connect('lShoulder', 'rShoulder');
-                connect('lShoulder', 'lHip');
-                connect('rShoulder', 'rHip');
-                connect('lHip', 'rHip');
-                connect('lHip', 'lKnee');
-                connect('rHip', 'rKnee');
-                connect('lKnee', 'lAnkle');
-                connect('rKnee', 'rAnkle');
-            } else if (currentStep.id === 'RUNNING') {
-                connect('shoulder', 'hip');
-                connect('hip', 'lKnee');
-                connect('hip', 'rKnee');
-                connect('lKnee', 'lAnkle');
-                connect('rKnee', 'rAnkle');
-            } else if (currentStep.id === 'KICK') {
-                connect('lShoulder', 'rShoulder');
-                connect('lShoulder', 'lHip');
-                connect('rShoulder', 'rHip');
-                connect('lHip', 'rHip');
-                connect('lHip', 'supportingAnkle');
-                connect('rHip', 'kickingKnee');
-                connect('kickingKnee', 'kickingAnkle');
-            }
+                ctx.shadowBlur = 0; // Reset glowing filter
 
-            // Draw glowing node circles for joints
-            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
-            ctx.fillStyle = isAligned ? '#00F59B' : '#00D8F6';
-            Object.entries(joints).forEach(([name, joint]) => {
-                ctx.beginPath();
-                ctx.arc(joint.x, joint.y, 6, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Outer tracking targets
-                ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(joint.x, joint.y, 12, 0, Math.PI * 2);
-                ctx.stroke();
-            });
-
-            ctx.shadowBlur = 0; // Reset glowing filter
-
-            // 4. Draw Dynamic biomechanical Angle overlay labels (Only when aligned & active)
-            if (isAligned) {
-                ctx.fillStyle = '#00F59B';
-                ctx.font = 'bold 9px monospace';
-                if (currentStep.id === 'SQUAT' && joints.lKnee && joints.rKnee) {
-                    ctx.fillText(`KNEE VALGUS: 172° (SAFE)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-                    ctx.fillText(`PELVIS SLOPE: 0.8° (NORMAL)`, joints.lHip.x - 35, joints.lHip.y - 15);
-                } else if (currentStep.id === 'JUMP' && joints.lKnee) {
-                    ctx.fillText(`SWAY LATERAL: 0.8cm (LOW)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-                } else if (currentStep.id === 'RUNNING' && joints.shoulder && joints.hip) {
-                    ctx.fillText(`TORSO: 8.7° FORWARD`, joints.shoulder.x + 15, joints.shoulder.y);
-                } else if (currentStep.id === 'KICK' && joints.supportingAnkle) {
-                    ctx.fillText(`ANCHOR GRIP: 98% (STABLE)`, joints.supportingAnkle.x + 12, joints.supportingAnkle.y);
+                // 4. Draw Dynamic biomechanical Angle overlay labels (Only when aligned & active)
+                if (isAligned) {
+                    ctx.fillStyle = '#00F59B';
+                    ctx.font = 'bold 9px monospace';
+                    if (currentStep.id === 'SQUAT' && joints.lKnee && joints.rKnee) {
+                        ctx.fillText(`KNEE VALGUS: 172° (SAFE)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
+                        ctx.fillText(`PELVIS SLOPE: 0.8° (NORMAL)`, joints.lHip.x - 35, joints.lHip.y - 15);
+                    } else if (currentStep.id === 'JUMP' && joints.lKnee) {
+                        ctx.fillText(`SWAY LATERAL: 0.8cm (LOW)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
+                    } else if (currentStep.id === 'RUNNING' && joints.shoulder && joints.hip) {
+                        ctx.fillText(`TORSO: 8.7° FORWARD`, joints.shoulder.x + 15, joints.shoulder.y);
+                    } else if (currentStep.id === 'KICK' && joints.supportingAnkle) {
+                        ctx.fillText(`ANCHOR GRIP: 98% (STABLE)`, joints.supportingAnkle.x + 12, joints.supportingAnkle.y);
+                    }
                 }
             }
 
@@ -692,7 +703,7 @@ export default function MotionCheckScanner() {
                 cancelAnimationFrame(animationFrameIdRef.current);
             }
         };
-    }, [status, currentStepIdx, isAligned, alignmentProgress, secondsLeft, addLog, playSound]);
+    }, [status, currentStepIdx, isAligned, alignmentProgress, secondsLeft, showGuidelines, addLog, playSound]);
 
     // Webcam metadata attachment
     useEffect(() => {
@@ -1024,6 +1035,22 @@ export default function MotionCheckScanner() {
                                     title="Camera Flip (전면/후면 전환)"
                                 >
                                     <RefreshCcw className="w-4 h-4" />
+                                </button>
+                            )}
+
+                            {/* Toggle Guidelines Button next to camera flip */}
+                            {isCameraReady && (
+                                <button 
+                                    onClick={() => setShowGuidelines(prev => !prev)}
+                                    className={`absolute top-4 left-16 bg-[#0B0F19]/80 backdrop-blur border px-3 py-2.5 rounded-2xl flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase transition-all z-10 cursor-pointer shadow-lg shadow-black/30 ${
+                                        showGuidelines 
+                                            ? 'border-[#00F59B]/30 text-[#00F59B] hover:text-white' 
+                                            : 'border-white/10 text-white/60 hover:text-white'
+                                    }`}
+                                    title="가이드라인 켜기/끄기"
+                                >
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>{showGuidelines ? '가이드라인 끄기' : '가이드라인 켜기'}</span>
                                 </button>
                             )}
 
