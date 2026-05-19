@@ -250,30 +250,7 @@ export default function MotionCheckScanner() {
 
             ctx.clearRect(0, 0, w, h);
 
-            // 1. Draw webcam frame onto canvas if available
-            if (video && video.readyState >= 2) {
-                ctx.drawImage(video, 0, 0, w, h);
-            } else {
-                // Neon laboratory fallback placeholder grid
-                ctx.fillStyle = '#060A13';
-                ctx.fillRect(0, 0, w, h);
-                
-                ctx.strokeStyle = 'rgba(0, 245, 155, 0.05)';
-                ctx.lineWidth = 1;
-                const gridSpacing = 30;
-                for (let x = 0; x < w; x += gridSpacing) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, h);
-                    ctx.stroke();
-                }
-                for (let y = 0; y < h; y += gridSpacing) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(w, y);
-                    ctx.stroke();
-                }
-            }
+            // Canvas is now purely an overlay — the video element below renders the camera feed natively
 
             // 2. Draw Futuristic Scanning Laser Line
             const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
@@ -773,17 +750,17 @@ export default function MotionCheckScanner() {
                     >
                         {/* 1. Live stream container & Canvas layout */}
                         <div className="lg:col-span-3 bg-[#060A13] rounded-[28px] overflow-hidden border border-white/5 relative aspect-[3/4] sm:aspect-video flex items-center justify-center group shadow-inner shadow-black/80 w-full min-h-[480px] sm:min-h-[500px]">
-                            {/* Offscreen real video element styled to prevent mobile power-saver display:none lock */}
+                            {/* Native camera feed — browser renders this directly, no drawImage needed */}
                             <video 
                                 ref={videoRef} 
                                 autoPlay playsInline muted 
-                                className="absolute -left-[9999px] -top-[9999px] w-[640px] h-[480px] pointer-events-none" 
+                                className={`absolute inset-0 w-full h-full object-cover z-0 ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                             />
                             
-                            {/* Animated skeleton visual feedback canvas */}
+                            {/* Transparent overlay canvas for skeleton/scan effects drawn on top of the live feed */}
                             <canvas 
                                 ref={canvasRef} 
-                                className="w-full h-full"
+                                className="absolute inset-0 w-full h-full z-[1]"
                             />
 
                             {/* Camera Connecting Preloader */}
