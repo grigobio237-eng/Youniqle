@@ -191,7 +191,7 @@ export default function MotionCheckScanner() {
         try {
             const constraints: MediaStreamConstraints = {
                 video: {
-                    facingMode: 'environment', // Rear camera prioritized for athletic scanning
+                    facingMode: { ideal: 'environment' }, // Prioritizes rear camera but allows fallback on emulators/desktops
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
