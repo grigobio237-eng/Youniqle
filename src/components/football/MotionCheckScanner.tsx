@@ -104,6 +104,7 @@ export default function MotionCheckScanner() {
     const [webcamError, setWebcamError] = useState<string | null>(null);
     const [isAligned, setIsAligned] = useState(false);
     const [alignmentProgress, setAlignmentProgress] = useState(0);
+    const [secondsLeft, setSecondsLeft] = useState<number>(5);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
@@ -660,7 +661,6 @@ export default function MotionCheckScanner() {
     }, [status, stream]);
 
     // Timer & Automations: controls sequential transitioning in the continuous camera feed
-    const [secondsLeft, setSecondsLeft] = useState<number>(5);
 
     // Phase 1: Simulated Body Stance Alignment Calibration (Wait for user to step inside the static silhouette guide)
     useEffect(() => {
