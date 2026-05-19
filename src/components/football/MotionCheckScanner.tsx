@@ -101,6 +101,7 @@ export default function MotionCheckScanner() {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+    const [webcamError, setWebcamError] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
@@ -189,6 +190,9 @@ export default function MotionCheckScanner() {
     const startWebcam = async (mode: 'user' | 'environment' = facingMode) => {
         setIsCameraReady(false);
         setHasSaved(false);
+        setWebcamError(null);
+        
+        // 1. Try with high-quality and specific direction constraints
         try {
             const constraints: MediaStreamConstraints = {
                 video: {
@@ -204,12 +208,45 @@ export default function MotionCheckScanner() {
             setIsCameraReady(true);
             setCurrentStepIdx(0);
             playSound('beep');
-        } catch (err: any) {
-            console.error('[MotionCheck] Webcam access failed, falling back to mock streaming:', err);
-            // Fallback to mock stream simulation using Canvas
-            setStatus('webcam');
-            setIsCameraReady(true);
-            toast.info("카메라 장치가 제한되어 시뮬레이션 센서 모드로 자동 전환합니다.");
+            return;
+        } catch (firstErr: any) {
+            console.warn('[MotionCheck] First getUserMedia attempt failed, trying fallback constraints:', firstErr);
+            
+            // 2. Fallback 1: Simple facingMode constraint
+            try {
+                const fallbackConstraints: MediaStreamConstraints = {
+                    video: { facingMode: mode },
+                    audio: false
+                };
+                const newStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                setStream(newStream);
+                setStatus('webcam');
+                setIsCameraReady(true);
+                setCurrentStepIdx(0);
+                playSound('beep');
+                return;
+            } catch (secondErr: any) {
+                console.warn('[MotionCheck] Fallback 1 failed, trying absolute basic video:true constraint:', secondErr);
+                
+                // 3. Fallback 2: Absolute simplest constraint
+                try {
+                    const basicStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    setStream(basicStream);
+                    setStatus('webcam');
+                    setIsCameraReady(true);
+                    setCurrentStepIdx(0);
+                    playSound('beep');
+                    return;
+                } catch (err: any) {
+                    console.error('[MotionCheck] All webcam acquisition attempts failed:', err);
+                    setWebcamError(err.name || err.message || 'UnknownError');
+                    
+                    // Fallback to mock stream simulation using Canvas
+                    setStatus('webcam');
+                    setIsCameraReady(true);
+                    toast.error(`카메라 연동 실패: ${err.name || '권한 또는 장치 오류'}. 시뮬레이션 모드로 전환합니다.`);
+                }
+            }
         }
     };
 
@@ -764,10 +801,36 @@ export default function MotionCheckScanner() {
                             />
 
                             {/* Camera Connecting Preloader */}
-                            {!isCameraReady && (
+                            {!isCameraReady && !webcamError && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#070B14] z-20">
                                     <Loader2 className="w-12 h-12 text-[#00F59B] animate-spin mb-4" />
                                     <p className="text-white/60 font-black tracking-widest uppercase text-[10px]">Connecting telemetry camera...</p>
+                                </div>
+                            )}
+
+                            {/* Webcam Error Warning Banner with actionable troubleshooting steps */}
+                            {webcamError && (
+                                <div className="absolute inset-0 bg-[#070B14]/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center space-y-4">
+                                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/20">
+                                        <ShieldAlert className="w-8 h-8" />
+                                    </div>
+                                    <div className="space-y-2 max-w-sm">
+                                        <h4 className="text-base font-black uppercase tracking-wider text-white">카메라 연결 실패 ({webcamError})</h4>
+                                        <p className="text-xs text-slate-400 leading-relaxed">
+                                            브라우저의 카메라 권한이 차단되었거나, 다른 앱(카카오톡, Zoom 등)에서 카메라를 사용 중일 수 있습니다.
+                                        </p>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/5 p-4 rounded-xl text-left text-[11px] text-slate-300 space-y-2 max-w-sm">
+                                        <p className="font-bold text-[#00F59B] text-xs">🛠️ 해결 방법:</p>
+                                        <p>1. 주소창 왼쪽의 <b>자물쇠 아이콘</b>(또는 설정 아이콘)을 누르고 <b>카메라 권한</b>을 <b>'허용'</b>으로 활성화해 주세요.</p>
+                                        <p>2. 카메라를 사용 중인 다른 백그라운드 앱을 모두 종료 후 페이지를 새로고침(F5) 해주세요.</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => startWebcam(facingMode)}
+                                        className="px-6 py-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-xl text-xs font-black tracking-widest text-white hover:from-red-500/30 hover:to-orange-500/30 transition-all cursor-pointer"
+                                    >
+                                        카메라 다시 연결하기
+                                    </button>
                                 </div>
                             )}
 
