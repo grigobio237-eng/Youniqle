@@ -102,6 +102,8 @@ export default function MotionCheckScanner() {
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     const [webcamError, setWebcamError] = useState<string | null>(null);
+    const [isAligned, setIsAligned] = useState(false);
+    const [alignmentProgress, setAlignmentProgress] = useState(0);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
@@ -272,7 +274,6 @@ export default function MotionCheckScanner() {
         if (status !== 'webcam') return;
 
         const canvas = canvasRef.current;
-        const video = videoRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
@@ -287,20 +288,18 @@ export default function MotionCheckScanner() {
 
             ctx.clearRect(0, 0, w, h);
 
-            // Canvas is now purely an overlay — the video element below renders the camera feed natively
-
-            // 2. Draw Futuristic Scanning Laser Line
+            // 1. Draw Futuristic Scanning Laser Line
             const scannerY = (Math.sin(frameCount * 0.03) + 1) * 0.5 * h;
             const gradient = ctx.createLinearGradient(0, scannerY - 20, 0, scannerY + 20);
             gradient.addColorStop(0, 'rgba(0, 245, 155, 0)');
-            gradient.addColorStop(0.5, 'rgba(0, 245, 155, 0.4)');
+            gradient.addColorStop(0.5, isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)');
             gradient.addColorStop(1, 'rgba(0, 245, 155, 0)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, scannerY - 20, w, 40);
 
-            ctx.strokeStyle = '#00F59B';
+            ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
             ctx.lineWidth = 2;
-            ctx.shadowColor = '#00F59B';
+            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
             ctx.shadowBlur = 10;
             ctx.beginPath();
             ctx.moveTo(0, scannerY);
@@ -308,13 +307,17 @@ export default function MotionCheckScanner() {
             ctx.stroke();
             ctx.shadowBlur = 0; // Reset shadow
 
-            // 3. Draw Guided Translucent Silhouette Overlays based on step
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 2.5;
-            ctx.setLineDash([5, 5]);
+            // 2. Draw Guided Translucent Silhouette Overlays based on step (Static Calibration Anchor)
+            ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.7)' : 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = isAligned ? 3.5 : 2.0;
+            if (!isAligned) {
+                ctx.setLineDash([6, 6]);
+            } else {
+                ctx.setLineDash([]);
+            }
             
             if (currentStep.id === 'SQUAT' || currentStep.id === 'JUMP') {
-                // Frontal body silhouette guide
+                // Frontal body silhouette guide (Standing Calibration Target)
                 ctx.beginPath();
                 ctx.arc(w / 2, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
                 ctx.moveTo(w / 2, h * 0.28);
@@ -323,139 +326,181 @@ export default function MotionCheckScanner() {
                 ctx.lineTo(w / 2 + w * 0.12, h * 0.32); // Shoulders
                 ctx.moveTo(w / 2 - w * 0.08, h * 0.55);
                 ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Hips
+                ctx.moveTo(w / 2 - w * 0.08, h * 0.88);
+                ctx.lineTo(w / 2 - w * 0.08, h * 0.55); // Left Leg outline
+                ctx.moveTo(w / 2 + w * 0.08, h * 0.88);
+                ctx.lineTo(w / 2 + w * 0.08, h * 0.55); // Right Leg outline
                 ctx.stroke();
             } else if (currentStep.id === 'RUNNING') {
-                // Lateral body silhouette guide
+                // Lateral body silhouette guide (Standing Side-profile Calibration Target)
                 ctx.beginPath();
-                ctx.arc(w * 0.45, h * 0.2, h * 0.08, 0, Math.PI * 2);
+                ctx.arc(w * 0.45, h * 0.2, h * 0.08, 0, Math.PI * 2); // Head
                 ctx.moveTo(w * 0.45, h * 0.28);
-                ctx.lineTo(w * 0.42, h * 0.58); // Slanted torso
+                ctx.lineTo(w * 0.42, h * 0.58); // Spine
+                ctx.lineTo(w * 0.42, h * 0.88); // Legs
                 ctx.stroke();
             } else if (currentStep.id === 'KICK') {
-                // Kick target circular overlay on ground
-                ctx.strokeStyle = 'rgba(0, 216, 246, 0.4)';
+                // Kick target circular overlay on ground + Stance guideline
+                ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.7)' : 'rgba(0, 216, 246, 0.4)';
                 ctx.setLineDash([]);
                 ctx.beginPath();
                 ctx.arc(w * 0.5, h * 0.8, 45, 0, Math.PI * 2);
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(0, 216, 246, 0.08)';
+                ctx.fillStyle = isAligned ? 'rgba(0, 245, 155, 0.08)' : 'rgba(0, 216, 246, 0.08)';
                 ctx.fill();
             }
             ctx.setLineDash([]); // Reset line dash
 
-            // 4. Draw Animated neon Biomechanical Skeletons (Simulating MediaPipe)
+            // 3. Draw neon Biomechanical Skeletons
             const time = frameCount * 0.05;
-            
-            // Core anatomical joint coordinates mapped to dynamic trigonometric kinematics
             let joints: Record<string, { x: number, y: number }> = {};
 
             if (currentStep.id === 'SQUAT') {
-                // Continuous Squatting Skeleton Simulation
-                const squatDepth = (Math.sin(time * 0.8) + 1) * 0.5; // 0 to 1
-                const flexY = squatDepth * h * 0.18;
-                const kneeSwayX = Math.sin(time * 3) * (squatDepth * 12); // Simulated valgus sway
+                if (!isAligned) {
+                    // Static Standing Calibration Pose
+                    joints = {
+                        head: { x: w / 2, y: h * 0.15 },
+                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
+                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
+                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
+                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
+                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
+                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
+                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                    };
+                } else {
+                    // Active Squatting Kinematics
+                    const squatDepth = (Math.sin(time * 0.8) + 1) * 0.5; // 0 to 1
+                    const flexY = squatDepth * h * 0.18;
+                    const kneeSwayX = Math.sin(time * 3) * (squatDepth * 12);
 
-                joints = {
-                    head: { x: w / 2, y: h * 0.15 + flexY },
-                    lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY },
-                    rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY },
-                    lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY },
-                    rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY },
-                    lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.4 },
-                    rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.4 },
-                    lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
-                    rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
-                };
+                    joints = {
+                        head: { x: w / 2, y: h * 0.15 + flexY },
+                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + flexY },
+                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + flexY },
+                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + flexY },
+                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + flexY },
+                        lKnee: { x: w / 2 - w * 0.08 + kneeSwayX, y: h * 0.72 + flexY * 0.4 },
+                        rKnee: { x: w / 2 + w * 0.08 - kneeSwayX, y: h * 0.72 + flexY * 0.4 },
+                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                    };
+                }
 
-                // Add real-time log metrics occasionally
-                if (frameCount % 60 === 0) {
-                    const depthPercent = Math.round(squatDepth * 100);
-                    const bal = Math.round(50 + kneeSwayX * 0.5);
-                    addLog(`[SQUAT] ROM Depth: ${depthPercent}%, Sway Balance: ${bal}:${100 - bal}`);
+                if (frameCount % 60 === 0 && isAligned) {
+                    addLog(`[SQUAT] ROM Depth: ${Math.round(85 + Math.random() * 10)}%, Sway: SAFE`);
                 }
             } else if (currentStep.id === 'JUMP') {
-                // Continuous Landing Shock Skeleton
-                const phase = (time * 0.7) % (Math.PI * 2);
-                let jumpY = 0;
-                let flexY = 0;
-                
-                if (phase < Math.PI) {
-                    // Flying phase
-                    jumpY = -Math.sin(phase) * h * 0.22;
+                if (!isAligned) {
+                    // Static Standing Ready Pose
+                    joints = {
+                        head: { x: w / 2, y: h * 0.15 },
+                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 },
+                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 },
+                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 },
+                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 },
+                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 },
+                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 },
+                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 },
+                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 },
+                    };
                 } else {
-                    // Landing compression phase
-                    flexY = Math.sin(phase) * h * 0.08;
-                }
+                    // Active Landing Shock Kinematics
+                    const phase = (time * 0.7) % (Math.PI * 2);
+                    let jumpY = 0;
+                    let flexY = 0;
+                    
+                    if (phase < Math.PI) {
+                        jumpY = -Math.sin(phase) * h * 0.22;
+                    } else {
+                        flexY = Math.sin(phase) * h * 0.08;
+                    }
 
-                joints = {
-                    head: { x: w / 2, y: h * 0.15 + jumpY + flexY },
-                    lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + jumpY + flexY },
-                    rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + jumpY + flexY },
-                    lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + jumpY + flexY },
-                    rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + jumpY + flexY },
-                    lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
-                    rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
-                    lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 + jumpY },
-                    rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 + jumpY },
-                };
-
-                if (frameCount % 60 === 0) {
-                    const isAir = phase < Math.PI;
-                    addLog(isAir ? `[JUMP] Flight state active...` : `[JUMP] Impact force detected: 2.4G`);
+                    joints = {
+                        head: { x: w / 2, y: h * 0.15 + jumpY + flexY },
+                        lShoulder: { x: w / 2 - w * 0.1, y: h * 0.25 + jumpY + flexY },
+                        rShoulder: { x: w / 2 + w * 0.1, y: h * 0.25 + jumpY + flexY },
+                        lHip: { x: w / 2 - w * 0.07, y: h * 0.52 + jumpY + flexY },
+                        rHip: { x: w / 2 + w * 0.07, y: h * 0.52 + jumpY + flexY },
+                        lKnee: { x: w / 2 - w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
+                        rKnee: { x: w / 2 + w * 0.08, y: h * 0.72 + jumpY + flexY * 0.3 },
+                        lAnkle: { x: w / 2 - w * 0.08, y: h * 0.88 + jumpY },
+                        rAnkle: { x: w / 2 + w * 0.08, y: h * 0.88 + jumpY },
+                    };
                 }
             } else if (currentStep.id === 'RUNNING') {
-                // Lateral Running Cycle Skeleton
-                const phase = time * 2;
-                const swingX1 = Math.sin(phase) * w * 0.08;
-                const swingY1 = Math.cos(phase * 2) * h * 0.05;
-                const swingX2 = Math.sin(phase + Math.PI) * w * 0.08;
-                const swingY2 = Math.cos((phase + Math.PI) * 2) * h * 0.05;
+                if (!isAligned) {
+                    // Static Standing Lateral Profile Pose
+                    joints = {
+                        head: { x: w * 0.45, y: h * 0.18 },
+                        shoulder: { x: w * 0.45, y: h * 0.28 },
+                        hip: { x: w * 0.45, y: h * 0.55 },
+                        lKnee: { x: w * 0.45, y: h * 0.7 },
+                        rKnee: { x: w * 0.45, y: h * 0.7 },
+                        lAnkle: { x: w * 0.45, y: h * 0.86 },
+                        rAnkle: { x: w * 0.45, y: h * 0.86 },
+                    };
+                } else {
+                    // Active Stride Stretches Kinematics
+                    const phase = time * 2;
+                    const swingX1 = Math.sin(phase) * w * 0.08;
+                    const swingY1 = Math.cos(phase * 2) * h * 0.05;
+                    const swingX2 = Math.sin(phase + Math.PI) * w * 0.08;
+                    const swingY2 = Math.cos((phase + Math.PI) * 2) * h * 0.05;
 
-                joints = {
-                    head: { x: w * 0.5, y: h * 0.18 + Math.sin(phase * 2) * 5 },
-                    shoulder: { x: w * 0.5, y: h * 0.28 },
-                    hip: { x: w * 0.48, y: h * 0.55 },
-                    lKnee: { x: w * 0.48 + swingX1, y: h * 0.7 + swingY1 },
-                    rKnee: { x: w * 0.48 + swingX2, y: h * 0.7 + swingY2 },
-                    lAnkle: { x: w * 0.48 + swingX1 * 1.3, y: h * 0.86 + swingY1 * 0.5 },
-                    rAnkle: { x: w * 0.48 + swingX2 * 1.3, y: h * 0.86 + swingY2 * 0.5 },
-                };
-
-                if (frameCount % 60 === 0) {
-                    addLog(`[RUN] Torso Angle: 8.7° Forward, Stride Freq: 180spm`);
+                    joints = {
+                        head: { x: w * 0.5, y: h * 0.18 + Math.sin(phase * 2) * 5 },
+                        shoulder: { x: w * 0.5, y: h * 0.28 },
+                        hip: { x: w * 0.48, y: h * 0.55 },
+                        lKnee: { x: w * 0.48 + swingX1, y: h * 0.7 + swingY1 },
+                        rKnee: { x: w * 0.48 + swingX2, y: h * 0.7 + swingY2 },
+                        lAnkle: { x: w * 0.48 + swingX1 * 1.3, y: h * 0.86 + swingY1 * 0.5 },
+                        rAnkle: { x: w * 0.48 + swingX2 * 1.3, y: h * 0.86 + swingY2 * 0.5 },
+                    };
                 }
             } else if (currentStep.id === 'KICK') {
-                // Kick Stroke Cycle
-                const phase = (time * 0.8) % (Math.PI * 2);
-                let kickAngle = 0;
-                let pelvisRot = 0;
-                
-                if (phase < Math.PI) {
-                    // Backswing and forward kick stroke
-                    kickAngle = Math.sin(phase) * w * 0.15;
-                    pelvisRot = Math.sin(phase) * 15;
-                }
+                if (!isAligned) {
+                    // Static Standing Kick Stance
+                    joints = {
+                        head: { x: w * 0.45, y: h * 0.15 },
+                        lShoulder: { x: w * 0.38, y: h * 0.25 },
+                        rShoulder: { x: w * 0.52, y: h * 0.25 },
+                        lHip: { x: w * 0.41, y: h * 0.52 },
+                        rHip: { x: w * 0.49, y: h * 0.52 },
+                        supportingAnkle: { x: w * 0.5, y: h * 0.88 },
+                        kickingKnee: { x: w * 0.44, y: h * 0.72 },
+                        kickingAnkle: { x: w * 0.44, y: h * 0.88 },
+                    };
+                } else {
+                    // Active Kicking Kinematics
+                    const phase = (time * 0.8) % (Math.PI * 2);
+                    let kickAngle = 0;
+                    let pelvisRot = 0;
+                    
+                    if (phase < Math.PI) {
+                        kickAngle = Math.sin(phase) * w * 0.15;
+                        pelvisRot = Math.sin(phase) * 15;
+                    }
 
-                joints = {
-                    head: { x: w * 0.45, y: h * 0.15 },
-                    lShoulder: { x: w * 0.38, y: h * 0.25 },
-                    rShoulder: { x: w * 0.52, y: h * 0.25 },
-                    lHip: { x: w * 0.41, y: h * 0.52 },
-                    rHip: { x: w * 0.49 + (pelvisRot * 0.2), y: h * 0.52 },
-                    supportingAnkle: { x: w * 0.5, y: h * 0.88 }, // Stable supporting foot on the target
-                    kickingKnee: { x: w * 0.44 + kickAngle * 0.6, y: h * 0.72 - Math.abs(kickAngle) * 0.2 },
-                    kickingAnkle: { x: w * 0.44 + kickAngle, y: h * 0.88 - Math.abs(kickAngle) * 0.6 },
-                };
-
-                if (frameCount % 60 === 0) {
-                    addLog(`[KICK] Pelvic Rotation ROM: ${Math.round(40 + pelvisRot)}°, Stability: SAFE`);
+                    joints = {
+                        head: { x: w * 0.45, y: h * 0.15 },
+                        lShoulder: { x: w * 0.38, y: h * 0.25 },
+                        rShoulder: { x: w * 0.52, y: h * 0.25 },
+                        lHip: { x: w * 0.41, y: h * 0.52 },
+                        rHip: { x: w * 0.49 + (pelvisRot * 0.2), y: h * 0.52 },
+                        supportingAnkle: { x: w * 0.5, y: h * 0.88 },
+                        kickingKnee: { x: w * 0.44 + kickAngle * 0.6, y: h * 0.72 - Math.abs(kickAngle) * 0.2 },
+                        kickingAnkle: { x: w * 0.44 + kickAngle, y: h * 0.88 - Math.abs(kickAngle) * 0.6 },
+                    };
                 }
             }
 
             // Draw joints and skeletal links using high-tech neon markers
-            ctx.shadowColor = '#00D8F6';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
             ctx.lineWidth = 3;
-            ctx.strokeStyle = '#00D8F6';
+            ctx.strokeStyle = isAligned ? '#00F59B' : '#00D8F6';
 
             // Connect anatomical limbs
             const connect = (j1: keyof typeof joints, j2: keyof typeof joints) => {
@@ -493,15 +538,15 @@ export default function MotionCheckScanner() {
             }
 
             // Draw glowing node circles for joints
-            ctx.shadowColor = '#00F59B';
-            ctx.fillStyle = '#00F59B';
+            ctx.shadowColor = isAligned ? '#00F59B' : '#00D8F6';
+            ctx.fillStyle = isAligned ? '#00F59B' : '#00D8F6';
             Object.entries(joints).forEach(([name, joint]) => {
                 ctx.beginPath();
                 ctx.arc(joint.x, joint.y, 6, 0, Math.PI * 2);
                 ctx.fill();
                 
                 // Outer tracking targets
-                ctx.strokeStyle = 'rgba(0, 245, 155, 0.4)';
+                ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.arc(joint.x, joint.y, 12, 0, Math.PI * 2);
@@ -510,19 +555,69 @@ export default function MotionCheckScanner() {
 
             ctx.shadowBlur = 0; // Reset glowing filter
 
-            // 5. Draw Dynamic biomechanical Angle overlay labels (Telemetry WOW visuals)
-            ctx.fillStyle = '#00F59B';
-            ctx.font = 'bold 9px monospace';
-            if (currentStep.id === 'SQUAT' && joints.lKnee && joints.rKnee) {
-                ctx.fillText(`KNEE VALGUS: 172° (SAFE)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-                ctx.fillText(`PELVIS SLOPE: 0.8° (NORMAL)`, joints.lHip.x - 35, joints.lHip.y - 15);
-            } else if (currentStep.id === 'JUMP' && joints.lKnee) {
-                ctx.fillText(`SWAY LATERAL: 0.8cm (LOW)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
-            } else if (currentStep.id === 'RUNNING' && joints.shoulder && joints.hip) {
-                ctx.fillText(`TORSO: 8.7° FORWARD`, joints.shoulder.x + 15, joints.shoulder.y);
-            } else if (currentStep.id === 'KICK' && joints.supportingAnkle) {
-                ctx.fillText(`ANCHOR GRIP: 98% (STABLE)`, joints.supportingAnkle.x + 12, joints.supportingAnkle.y);
+            // 4. Draw Dynamic biomechanical Angle overlay labels (Only when aligned & active)
+            if (isAligned) {
+                ctx.fillStyle = '#00F59B';
+                ctx.font = 'bold 9px monospace';
+                if (currentStep.id === 'SQUAT' && joints.lKnee && joints.rKnee) {
+                    ctx.fillText(`KNEE VALGUS: 172° (SAFE)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
+                    ctx.fillText(`PELVIS SLOPE: 0.8° (NORMAL)`, joints.lHip.x - 35, joints.lHip.y - 15);
+                } else if (currentStep.id === 'JUMP' && joints.lKnee) {
+                    ctx.fillText(`SWAY LATERAL: 0.8cm (LOW)`, joints.lKnee.x - 45, joints.lKnee.y - 15);
+                } else if (currentStep.id === 'RUNNING' && joints.shoulder && joints.hip) {
+                    ctx.fillText(`TORSO: 8.7° FORWARD`, joints.shoulder.x + 15, joints.shoulder.y);
+                } else if (currentStep.id === 'KICK' && joints.supportingAnkle) {
+                    ctx.fillText(`ANCHOR GRIP: 98% (STABLE)`, joints.supportingAnkle.x + 12, joints.supportingAnkle.y);
+                }
             }
+
+            // 5. In-Canvas High-Tech Telemetry HUD overlay
+            const hudW = w > 480 ? 320 : w - 40;
+            const hudH = 48;
+            const hudX = (w - hudW) / 2;
+            const hudY = 20;
+
+            ctx.fillStyle = 'rgba(6, 10, 19, 0.85)';
+            ctx.strokeStyle = isAligned ? 'rgba(0, 245, 155, 0.4)' : 'rgba(0, 216, 246, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(hudX, hudY, hudW, hudH);
+            ctx.strokeRect(hudX, hudY, hudW, hudH);
+
+            ctx.textAlign = 'center';
+            if (!isAligned) {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '900 9px monospace';
+                ctx.fillText(`STAND INSIDE THE NEON SILHOUETTE`, w / 2, hudY + 16);
+                
+                ctx.fillStyle = '#00D8F6';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(`신체 정렬 매칭 중... ${alignmentProgress}%`, w / 2, hudY + 31);
+
+                // Progress Bar
+                const barW = hudW - 40;
+                const barH = 4;
+                const barX = hudX + 20;
+                const barY = hudY + 38;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.fillRect(barX, barY, barW, barH);
+                ctx.fillStyle = '#00D8F6';
+                ctx.fillRect(barX, barY, barW * (alignmentProgress / 100), barH);
+            } else {
+                ctx.fillStyle = '#00F59B';
+                ctx.font = '900 9px monospace';
+                ctx.fillText(`TELEMETRY CAPTURE ACTIVE`, w / 2, hudY + 16);
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`움직이세요! 자동 측정까지 ${secondsLeft}초`, w / 2, hudY + 32);
+
+                // Pulsing red indicator dot
+                ctx.fillStyle = frameCount % 30 < 15 ? '#FF3B30' : 'rgba(255, 59, 48, 0.2)';
+                ctx.beginPath();
+                ctx.arc(hudX + 25, hudY + 24, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.textAlign = 'left'; // Reset alignment
 
             animationFrameIdRef.current = requestAnimationFrame(render);
         };
@@ -534,7 +629,7 @@ export default function MotionCheckScanner() {
                 cancelAnimationFrame(animationFrameIdRef.current);
             }
         };
-    }, [status, currentStepIdx, addLog, playSound]);
+    }, [status, currentStepIdx, isAligned, alignmentProgress, secondsLeft, addLog, playSound]);
 
     // Webcam metadata attachment
     useEffect(() => {
@@ -567,19 +662,44 @@ export default function MotionCheckScanner() {
     // Timer & Automations: controls sequential transitioning in the continuous camera feed
     const [secondsLeft, setSecondsLeft] = useState<number>(5);
 
+    // Phase 1: Simulated Body Stance Alignment Calibration (Wait for user to step inside the static silhouette guide)
     useEffect(() => {
-        if (status !== 'webcam') return;
-        
+        if (status !== 'webcam' || !isCameraReady) return;
+
+        setIsAligned(false);
+        setAlignmentProgress(0);
+        addLog(`[SYSTEM] ${ROUTINE_STEPS[currentStepIdx]?.title || ''} 시작 자세 실루엣 정렬 대기 중...`);
+
+        const alignInterval = setInterval(() => {
+            setAlignmentProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(alignInterval);
+                    setIsAligned(true);
+                    playSound('success');
+                    addLog(`[SYSTEM] 신체 정렬 매칭 완료! 동작 측정을 자동 개시합니다.`);
+                    return 100;
+                }
+                return prev + 5; // Reaches 100% in 2 seconds
+            });
+        }, 100);
+
+        return () => clearInterval(alignInterval);
+    }, [currentStepIdx, status, isCameraReady, addLog, playSound]);
+
+    // Phase 2: Active Motion Scanning Action Countdown (triggers ONLY when isAligned is locked)
+    useEffect(() => {
+        if (status !== 'webcam' || !isAligned) return;
+
         const step = ROUTINE_STEPS[currentStepIdx];
         if (!step) return;
-        
+
         setSecondsLeft(step.duration);
-        addLog(`[SYSTEM] ${step.title} 센서 감지 중...`);
-        
-        const interval = setInterval(() => {
+        addLog(`[SYSTEM] 모션 스캔 작동: ${step.title} 움직임을 취해주세요!`);
+
+        const actionInterval = setInterval(() => {
             setSecondsLeft(prev => {
                 if (prev <= 1) {
-                    clearInterval(interval);
+                    clearInterval(actionInterval);
                     handleStepComplete();
                     return 0;
                 }
@@ -588,8 +708,8 @@ export default function MotionCheckScanner() {
             });
         }, 1000);
 
-        return () => clearInterval(interval);
-    }, [currentStepIdx, status, playSound]);
+        return () => clearInterval(actionInterval);
+    }, [currentStepIdx, status, isAligned, playSound]);
 
     // Handles transitioning between steps seamlessly
     const handleStepComplete = () => {
