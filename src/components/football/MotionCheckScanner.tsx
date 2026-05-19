@@ -706,12 +706,17 @@ export default function MotionCheckScanner() {
                         exit={{ opacity: 0, y: -20 }}
                         className="flex-1 flex flex-col items-center justify-center py-12 text-center space-y-8"
                     >
-                        <div className="w-24 h-24 bg-gradient-to-tr from-[#00F59B]/20 to-[#00D8F6]/20 border border-[#00F59B]/30 rounded-3xl flex items-center justify-center relative group">
-                            <div className="absolute inset-0 bg-[#00F59B]/10 rounded-3xl blur-xl group-hover:scale-110 transition-transform" />
-                            <Camera className="w-12 h-12 text-[#00F59B] relative z-10" />
-                        </div>
+                        <button 
+                            onClick={startWebcam}
+                            className="w-28 h-28 bg-gradient-to-tr from-[#00F59B]/20 to-[#00D8F6]/20 border border-[#00F59B]/40 rounded-3xl flex flex-col items-center justify-center relative group hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-none"
+                            aria-label="Start camera stream"
+                        >
+                            <div className="absolute inset-0 bg-[#00F59B]/15 rounded-3xl blur-xl group-hover:scale-110 transition-transform animate-pulse" />
+                            <Camera className="w-14 h-14 text-[#00F59B] relative z-10 group-hover:text-[#00D8F6] transition-colors" />
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max text-[10px] font-black text-[#00F59B] uppercase tracking-widest animate-pulse">TAP TO START</span>
+                        </button>
                         
-                        <div className="space-y-3 max-w-md">
+                        <div className="space-y-3 max-w-md pt-2">
                             <h3 className="text-3xl font-black italic text-white uppercase tracking-wide leading-tight">Biomechanical Analysis</h3>
                             <p className="text-slate-400 text-sm leading-relaxed">
                                 전신 움직임의 균형과 충격을 실시간으로 탐지합니다.<br />
@@ -729,13 +734,6 @@ export default function MotionCheckScanner() {
                                 </div>
                             ))}
                         </div>
-
-                        <Button 
-                            onClick={startWebcam}
-                            className="bg-[#00F59B] text-[#060A13] h-16 px-10 rounded-2xl font-black italic tracking-widest uppercase hover:bg-[#00D8F6] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 shadow-lg shadow-[#00F59B]/20"
-                        >
-                            <Camera className="w-5 h-5" /> Start Motion Scan
-                        </Button>
                     </motion.div>
                 )}
 
