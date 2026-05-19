@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { calculateAngle } from '@/utils/poseAnalyzer';
 
 interface MotionStep {
     id: 'squat' | 'jump' | 'run' | 'kick';
@@ -724,20 +725,35 @@ export default function MotionCheckScanner() {
                 // Clear shadow parameters
                 ctx.shadowBlur = 0;
 
-                // Real-time knee angle label overlay in canvas next to left knee
+                // Real-time knee angle label overlay in canvas calculated via poseAnalyzer utility math
+                const calculatedKneeAngleL = Math.round(
+                    calculateAngle(
+                        { x: joints.lHip.x, y: joints.lHip.y, z: 0 },
+                        { x: joints.lKnee.x, y: joints.lKnee.y, z: 0 },
+                        { x: joints.lAnkle.x, y: joints.lAnkle.y, z: 0 }
+                    )
+                );
+                const calculatedKneeAngleR = Math.round(
+                    calculateAngle(
+                        { x: joints.rHip.x, y: joints.rHip.y, z: 0 },
+                        { x: joints.rKnee.x, y: joints.rKnee.y, z: 0 },
+                        { x: joints.rAnkle.x, y: joints.rAnkle.y, z: 0 }
+                    )
+                );
+
                 ctx.fillStyle = '#00F59B';
                 ctx.font = 'bold 9px monospace';
                 ctx.textAlign = 'right';
-                ctx.fillText(`KNEE_L: ${kneeAngle}°`, joints.lKnee.x - 12, joints.lKnee.y + 3);
+                ctx.fillText(`KNEE_L: ${calculatedKneeAngleL}°`, joints.lKnee.x - 12, joints.lKnee.y + 3);
                 ctx.textAlign = 'left';
-                ctx.fillText(`KNEE_R: ${kneeAngle}°`, joints.rKnee.x + 12, joints.rKnee.y + 3);
+                ctx.fillText(`KNEE_R: ${calculatedKneeAngleR}°`, joints.rKnee.x + 12, joints.rKnee.y + 3);
 
                 // Periodic telemetry logging to simulate active computation in the logger box
                 if (frameCount % 45 === 0) {
                     const balance = 97 + Math.round(Math.random() * 3);
                     addLog(`[AI POSE] 실시간 밸런스 점수: ${balance}% (양호)`);
                     addLog(`[AI POSE] 골반 각도 편차: ${pelvicTilt}° (정상 범위)`);
-                    addLog(`[AI POSE] 무릎 굴곡 캡처: ${kneeAngle}°`);
+                    addLog(`[AI POSE] [MATH INTEGRATION] 실시간 무릎 각도 L: ${calculatedKneeAngleL}°, R: ${calculatedKneeAngleR}°`);
                 }
             }
 
