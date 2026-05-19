@@ -100,6 +100,7 @@ export default function MotionCheckScanner() {
     // Camera streaming refs
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
+    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameIdRef = useRef<number | null>(null);
@@ -185,13 +186,13 @@ export default function MotionCheckScanner() {
     }, [stream]);
 
     // Start webcam utility
-    const startWebcam = async () => {
+    const startWebcam = async (mode: 'user' | 'environment' = facingMode) => {
         setIsCameraReady(false);
         setHasSaved(false);
         try {
             const constraints: MediaStreamConstraints = {
                 video: {
-                    facingMode: { ideal: 'environment' }, // Prioritizes rear camera but allows fallback on emulators/desktops
+                    facingMode: { ideal: mode }, // Prioritizes chosen camera mode (front or rear)
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
@@ -210,6 +211,23 @@ export default function MotionCheckScanner() {
             setIsCameraReady(true);
             toast.info("카메라 장치가 제한되어 시뮬레이션 센서 모드로 자동 전환합니다.");
         }
+    };
+
+    // Toggle between front and rear cameras dynamically
+    const toggleCamera = async () => {
+        const nextMode = facingMode === 'user' ? 'environment' : 'user';
+        setFacingMode(nextMode);
+        
+        // Stop current tracks
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            setStream(null);
+        }
+        
+        // Brief delay before re-initiating WebRTC camera session
+        setTimeout(() => {
+            startWebcam(nextMode);
+        }, 150);
     };
 
     // Canvas drawing loop: simulates state-of-the-art 3D skeletons tracking user kinematics
@@ -774,6 +792,17 @@ export default function MotionCheckScanner() {
                                     <Loader2 className="w-12 h-12 text-[#00F59B] animate-spin mb-4" />
                                     <p className="text-white/60 font-black tracking-widest uppercase text-[10px]">Connecting telemetry camera...</p>
                                 </div>
+                            )}
+
+                            {/* Camera flip toggle button */}
+                            {isCameraReady && (
+                                <button 
+                                    onClick={toggleCamera}
+                                    className="absolute top-4 left-4 bg-[#0B0F19]/80 backdrop-blur border border-white/10 p-2.5 rounded-2xl flex items-center justify-center text-white hover:text-[#00F59B] active:scale-95 transition-all z-10 cursor-pointer shadow-lg shadow-black/30"
+                                    title="Camera Flip (전면/후면 전환)"
+                                >
+                                    <RefreshCcw className="w-4 h-4" />
+                                </button>
                             )}
 
                             {/* Timer countdown floating badge */}
