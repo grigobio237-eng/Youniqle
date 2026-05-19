@@ -98,18 +98,9 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     }, [showWebcam, stream]);
 
     const startWebcam = async () => {
-        setShowWebcam(true);
-        try {
-            const constraints: MediaStreamConstraints = { 
-                video: { facingMode: 'environment' } 
-            };
-            const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-            setStream(newStream);
-        } catch (err: any) {
-            console.error("Camera access error:", err);
-            setShowWebcam(false);
-            toast.info("카메라 연결에 실패하여 파일 업로드로 전환합니다.");
-            setTimeout(() => { fileInputRef.current?.click(); }, 300);
+        setShowWebcam(false);
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
         }
     };
 
@@ -457,7 +448,15 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                 {status === 'result' && renderResultView()}
             </AnimatePresence>
             <canvas ref={canvasRef} className="hidden" />
-            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleMobileCapture} aria-label="이미지 업로드" />
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/*" 
+                onChange={handleMobileCapture} 
+                aria-label="이미지 업로드" 
+                {...({ capture: 'environment' } as any)}
+            />
             <MembershipUpsellDialog open={showUpsell} onOpenChange={setShowUpsell} />
         </div>
     );

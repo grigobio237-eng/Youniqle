@@ -80,29 +80,18 @@ export default function FoodScanner({
 
     const startWebcam = async () => {
         setIsCameraReady(false);
-        try {
-            const constraints: MediaStreamConstraints = {
-                video: { 
-                    facingMode: 'environment', 
-                    width: { ideal: 1280 }, 
-                    height: { ideal: 720 } 
-                },
-                audio: false
-            };
-            const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-            setStream(newStream);
-            setStatus('webcam');
-        } catch (err: any) {
-            console.error(err);
-            toast.error("카메라를 시작할 수 없습니다. 파일 업로드 모드로 전환합니다.");
-            fileInputRef.current?.click();
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
         }
     };
 
     // 자동 카메라 구동 트리거
     useEffect(() => {
         if (autoStart && status === 'idle') {
-            startWebcam();
+            const timer = setTimeout(() => {
+                startWebcam();
+            }, 150);
+            return () => clearTimeout(timer);
         }
     }, [autoStart, status]);
 
@@ -276,8 +265,8 @@ export default function FoodScanner({
                             <div className="space-y-1">
                                 <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Ready to Scan</h3>
                                 <p className="text-white/60 text-xs font-bold leading-relaxed break-keep px-4">
-                                    당신의 일상 속 회복의 순간을 촬영하세요.<br />
-                                    AI가 9가지 카테고리로 자동 분석합니다.
+                                    클릭하여 카메라로 음식을 촬영하거나 사진을 선택하세요.<br />
+                                    제미나이 AI가 영양과 칼로리를 정밀 분석합니다.
                                 </p>
                             </div>
                             <div className="flex flex-wrap justify-center gap-2">

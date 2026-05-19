@@ -249,16 +249,16 @@ export default function PersonalityHistoryPage() {
                                                 <h4 className="text-xl font-black text-obsidian">성장 인사이트</h4>
                                                 <p className="text-sm text-slate-500 font-medium leading-relaxed">
                                                     {diagnoses.length >= 2 ? (
-                                                        <>이전 진단 대비 <strong>{Math.abs(chartData[chartData.length-1].total - chartData[chartData.length-2].total)}pt</strong>의 종합 회복 지수 변화가 감지되었습니다. 주요 요인별 변화를 통해 당신의 적응 기제를 확인하세요.</>
+                                                        <>이전 기록 대비 <strong>{Math.abs(chartData[chartData.length-1].total - chartData[chartData.length-2].total)}레벨</strong>의 종합 회복 흐름 변화가 감지되었습니다. 주요 요인별 변화를 통해 당신의 적응 기제를 확인하세요.</>
                                                     ) : (
-                                                        <>진단 데이터가 쌓일수록 당신의 성격적 특성이 회복에 미치는 영향을 더욱 정밀하게 분석할 수 있습니다.</>
+                                                        <>회복 기록 데이터가 쌓일수록 당신의 성격적 특성이 회복에 미치는 영향을 더욱 정밀하게 분석할 수 있습니다.</>
                                                     )}
                                                 </p>
                                             </div>
                                             <div className="pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Latest Score</span>
-                                                    <span className="text-2xl font-black text-obsidian">{chartData[chartData.length-1]?.total || 0}<span className="text-xs ml-0.5 text-slate-300">pt</span></span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">최근 회복 지표</span>
+                                                    <span className="text-2xl font-black text-obsidian">{chartData[chartData.length-1]?.total || 0}<span className="text-xs ml-0.5 text-slate-300">레벨</span></span>
                                                 </div>
                                                 <div>
                                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</span>
@@ -289,7 +289,7 @@ export default function PersonalityHistoryPage() {
                                 필터
                             </Button>
                             <Button className="bg-obsidian text-white rounded-2xl h-12 px-6 flex-1 md:flex-none" asChild>
-                                <Link href="/diagnosis">새로운 진단 시작</Link>
+                                <Link href="/diagnosis">새로운 회복 기록 시작</Link>
                             </Button>
                         </div>
                     </section>
@@ -376,9 +376,9 @@ export default function PersonalityHistoryPage() {
                                     <Brain className="w-8 h-8 text-slate-200" />
                                 </div>
                                 <h4 className="text-lg font-bold text-slate-800">기록을 찾을 수 없습니다</h4>
-                                <p className="text-slate-400 text-sm mt-2">검색어를 변경하거나 새로운 진단을 진행해 보세요.</p>
+                                <p className="text-slate-400 text-sm mt-2">검색어를 변경하거나 새로운 회복 기록을 작성해 보세요.</p>
                                 <Button className="mt-8 bg-obsidian text-white rounded-full px-8 h-12" asChild>
-                                    <Link href="/diagnosis">새로운 진단 시작</Link>
+                                    <Link href="/diagnosis">새로운 회복 기록 시작</Link>
                                 </Button>
                             </div>
                         )}
@@ -439,7 +439,7 @@ export default function PersonalityHistoryPage() {
                                     <div className="space-y-2">
                                         <h5 className="font-black text-obsidian tracking-tight">가이드북 활용법</h5>
                                         <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                                            이 가이드북은 당신의 Big 5 성격 데이터를 바탕으로 최적의 회복 환경을 설계하는 방법을 제안합니다. 각 진단 시점마다 변화하는 당신의 내면 상태에 맞춰 업데이트됩니다.
+                                            이 가이드북은 당신의 Big 5 성격 데이터를 바탕으로 최적의 회복 환경을 설계하는 방법을 제안합니다. 각 기록 시점마다 변화하는 당신의 내면 상태에 맞춰 업데이트됩니다.
                                         </p>
                                     </div>
                                 </div>

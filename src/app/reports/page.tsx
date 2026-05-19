@@ -213,7 +213,7 @@ export default function ReportsHub() {
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="space-y-4">
               <Badge className="bg-primary/10 text-primary border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
-                Overall Status
+                종합 분석 상태
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
                 {session?.user?.name || '유저'}님의<br />회복 인사이트가 준비되었습니다.
@@ -222,14 +222,16 @@ export default function ReportsHub() {
                 데이터는 거짓말을 하지 않습니다. 유니클의 분석을 통해 매일 더 나은 회복을 설계하세요.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:w-80">
-              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-primary/5 border border-primary/5">
-                <span className="text-[10px] font-black text-foreground/20 uppercase tracking-widest block mb-1">Total Reports</span>
-                <span className="text-3xl font-black text-primary">06</span>
+            <div className="grid grid-cols-2 gap-4 md:w-80 shrink-0">
+              <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl shadow-primary/5 border border-primary/10 flex flex-col justify-between h-28">
+                <span className="text-xs font-black text-slate-500 tracking-tight block">전체 리포트</span>
+                <span className="text-3xl font-black text-obsidian flex items-baseline gap-0.5">
+                  06<span className="text-xs font-bold text-slate-400">건</span>
+                </span>
               </div>
-              <div className="bg-foreground p-6 rounded-3xl shadow-xl shadow-primary/5">
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest block mb-1">Last Update</span>
-                <span className="text-lg font-black text-white">Today</span>
+              <div className="bg-obsidian p-6 rounded-3xl shadow-xl shadow-primary/10 border border-white/5 flex flex-col justify-between h-28">
+                <span className="text-xs font-black text-slate-400 tracking-tight block">최근 업데이트</span>
+                <span className="text-2xl font-black text-primary">오늘</span>
               </div>
             </div>
           </div>
@@ -240,7 +242,7 @@ export default function ReportsHub() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-6 bg-primary rounded-full" />
-              <h2 className="text-2xl font-black tracking-tight">핵심 회복 분석 (Core Analysis)</h2>
+              <h2 className="text-2xl font-black tracking-tight">핵심 회복 분석</h2>
             </div>
             
             {/* Tab Menu */}
@@ -291,26 +293,26 @@ export default function ReportsHub() {
                       오늘 기록하신 답변을 토대로 분석한 주관적 회복 리듬과 스트레스 지수입니다. 내면의 신호에 귀를 기울여 보세요.
                     </p>
                   </div>
-                  <div className="bg-mist/30 p-8 rounded-[32px] text-center w-full md:w-64 border border-line/50">
-                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-2">Recovery Score</p>
-                    <span className="text-6xl font-black text-primary tracking-tighter">
-                      {reports.daily?.score || '--'}<span className="text-xl opacity-30 ml-1">pt</span>
+                  <div className="bg-mist/30 p-8 rounded-[32px] text-center w-full md:w-64 border border-line/50 flex flex-col justify-center">
+                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-2">회복 상태</p>
+                    <span className="text-2xl font-black text-primary tracking-tight leading-none">
+                      {reports.daily ? '신호 안정화 흐름' : '기록 없음'}
                     </span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-mist/10 p-6 rounded-3xl border border-line/30 space-y-3">
-                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">Stress Level</p>
-                    <p className="text-xl font-black text-obsidian">매우 높음 (82%)</p>
+                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">스트레스 흐름</p>
+                    <p className="text-xl font-black text-obsidian">높게 기록됨</p>
                   </div>
                   <div className="bg-mist/10 p-6 rounded-3xl border border-line/30 space-y-3">
-                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">Sleep Quality</p>
-                    <p className="text-xl font-black text-obsidian">불규칙함 (45%)</p>
+                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">수면 상태</p>
+                    <p className="text-xl font-black text-obsidian">주의 필요</p>
                   </div>
                   <div className="bg-mist/10 p-6 rounded-3xl border border-line/30 space-y-3">
-                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">Energy Balance</p>
-                    <p className="text-xl font-black text-obsidian">소진됨 (12%)</p>
+                    <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest">활동성 지표</p>
+                    <p className="text-xl font-black text-obsidian">참고 필요</p>
                   </div>
                 </div>
 
@@ -342,12 +344,12 @@ export default function ReportsHub() {
                   </div>
                   <div className="flex flex-col gap-3 w-full md:w-64">
                     <div className="bg-mist/30 p-6 rounded-[28px] border border-line/50 text-center">
-                      <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-1">Detected Items</p>
+                      <p className="text-[10px] font-black text-slate/40 uppercase tracking-widest mb-1">검출 항목</p>
                       <p className="text-2xl font-black text-obsidian">04 건</p>
                     </div>
                     <div className="bg-primary/5 p-6 rounded-[28px] border border-primary/20 text-center">
-                      <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Warning Level</p>
-                      <p className="text-2xl font-black text-primary">Caution</p>
+                      <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">주의 단계</p>
+                      <p className="text-2xl font-black text-primary">주의</p>
                     </div>
                   </div>
                 </div>
@@ -379,17 +381,17 @@ export default function ReportsHub() {
                       </div>
                       <div>
                         <h3 className="text-2xl md:text-3xl font-black text-obsidian tracking-tight">내면 데이터 리포트</h3>
-                        <p className="text-slate/40 font-bold text-sm">진단 완료: {reports.personality?.createdAt ? new Date(reports.personality.createdAt).toLocaleDateString() : '데이터 없음'}</p>
+                        <p className="text-slate/40 font-bold text-sm">생활 기록 완료: {reports.personality?.createdAt ? new Date(reports.personality.createdAt).toLocaleDateString() : '데이터 없음'}</p>
                       </div>
                     </div>
                     <p className="text-slate/60 font-medium text-lg leading-relaxed max-w-2xl break-keep">
-                      Big 5 모델을 통해 당신의 타고난 기질과 스트레스 취약점을 분석했습니다. 당신은 '회복 탄력성'이 높은 유형입니다.
+                      Big 5 모델을 통해 당신의 타고난 기질과 회복 성향을 분석했습니다. 당신은 '회복 탄력성'이 높은 유형입니다.
                     </p>
                   </div>
                   <div className="bg-obsidian p-8 rounded-[32px] text-center w-full md:w-64 shadow-2xl">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Inner Type</p>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">내면 유형</p>
                     <span className="text-2xl font-black text-white tracking-tighter">
-                      RECOVERY-GENIUS
+                      오후 피로 집중형
                     </span>
                   </div>
                 </div>
@@ -399,15 +401,15 @@ export default function ReportsHub() {
                     <div className="h-full bg-primary w-[75%]" />
                   </div>
                   <div className="flex justify-between text-[10px] font-black text-slate/40 uppercase tracking-widest">
-                    <span>Stress Vulnerability</span>
-                    <span>75% Optimization</span>
+                    <span>스트레스 밸런스</span>
+                    <span>안정성 확보 유형</span>
                   </div>
                 </div>
 
                 <div className="pt-8 border-t border-line/30 flex justify-between items-center">
                   <p className="text-sm font-bold text-slate/40 italic">"내면의 힘을 길러주는 맞춤 가이드를 만나보세요."</p>
                   <Button asChild className="bg-obsidian text-white rounded-2xl px-8 h-12 font-black transition-transform hover:scale-105">
-                    <Link href="/reports/personality">프리미엄 리포트 읽기</Link>
+                    <Link href="/reports/personality">회복 분석 읽기</Link>
                   </Button>
                 </div>
               </div>
@@ -431,9 +433,9 @@ export default function ReportsHub() {
                     </p>
                   </div>
                   <div className="bg-primary p-8 rounded-[32px] text-center w-full md:w-64 shadow-xl shadow-primary/20">
-                    <p className="text-[10px] font-black text-obsidian uppercase tracking-widest mb-2">Weekly Trend</p>
+                    <p className="text-[10px] font-black text-obsidian uppercase tracking-widest mb-2">주간 추세</p>
                     <span className="text-4xl font-black text-obsidian tracking-tighter">
-                      UPWARD
+                      우상향
                     </span>
                   </div>
                 </div>
@@ -464,7 +466,7 @@ export default function ReportsHub() {
         <section>
           <div className="flex items-center gap-3 mb-8">
             <div className="w-1.5 h-6 bg-foreground/20 rounded-full" />
-            <h2 className="text-2xl font-bold tracking-tight text-foreground/60">시술 관리 및 정밀 설계 (Support Area)</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground/60">생활기록 관리 및 회복 지원</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -474,8 +476,8 @@ export default function ReportsHub() {
               transition={{ delay: 0.5 }}
             >
               <ReportCard 
-                title="회복 로드맵 (Post-Op)"
-                desc="시술 및 수술 후 단계별 회복 지침과 주의사항이 담긴 맞춤 로드맵입니다."
+                title="일일 회복 로드맵"
+                desc="참여 프로젝트 단계별 회복 지침과 안내 사항이 담긴 맞춤 로드맵입니다."
                 date={reports.roadmap?.createdAt ? new Date(reports.roadmap.createdAt).toLocaleDateString() : undefined}
                 status={reports.roadmap ? 'COMPLETED' : 'NOT_STARTED'}
                 type="roadmap"
@@ -490,8 +492,8 @@ export default function ReportsHub() {
               transition={{ delay: 0.6 }}
             >
               <ReportCard 
-                title="방문 전 정밀 문진"
-                desc="병원 방문 전 작성한 상세 문진표와 유니클 분석 상담 가이드입니다."
+                title="상담용 회복기록 메모"
+                desc="기관 상담 전 작성한 기록 요약 및 준비 메모입니다."
                 date={reports.consultation?.createdAt ? new Date(reports.consultation.createdAt).toLocaleDateString() : undefined}
                 status={reports.consultation ? 'COMPLETED' : 'NOT_STARTED'}
                 type="consultation"
