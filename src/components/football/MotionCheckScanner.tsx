@@ -2,11 +2,26 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, RefreshCw, Sparkles, Loader2, ArrowLeft, ShieldAlert, AlertCircle, Info } from 'lucide-react';
+import { Camera, RefreshCw, Sparkles, Loader2, ArrowLeft, ShieldAlert, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+
+interface MotionStep {
+    id: 'squat' | 'jump' | 'run' | 'kick';
+    title: string;
+    subtitle: string;
+    instruction: string;
+    targetZone: string;
+}
+
+const STEPS: MotionStep[] = [
+    { id: 'squat', title: 'SQUAT STABILITY', subtitle: '1단계: 스쿼트 안정성', instruction: '화면 중앙 십자선에 맞춰 깊게 스쿼트 동작을 수행하세요.', targetZone: '무릎 정렬 & 좌우 밸런스' },
+    { id: 'jump', title: 'JUMP LANDING', subtitle: '2단계: 점프 착지', instruction: '가볍게 수직 점프 후 양발로 흔들림 없이 안정적으로 착지하세요.', targetZone: '무릎 충격 분산 & 착지 안정성' },
+    { id: 'run', title: 'STATIONARY RUN', subtitle: '3단계: 제자리 달리기', instruction: '제자리에서 경쾌하게 무릎을 들어 뛰는 모션을 유지하세요.', targetZone: '상체 기울기 & 뛰는 리듬' },
+    { id: 'kick', title: 'KICK BALANCE', subtitle: '4단계: 디딤발 & 킥', instruction: '디딤발을 견고히 지지하고 가볍게 차는 킥 자세를 취하세요.', targetZone: '골반 회전 & 디딤발 대칭' }
+];
 
 export default function MotionCheckScanner() {
     const router = useRouter();
@@ -20,6 +35,12 @@ export default function MotionCheckScanner() {
     const [showGuidelines, setShowGuidelines] = useState(true);
     const [telemetryLog, setTelemetryLog] = useState<string[]>([]);
     const [actualResolution, setActualResolution] = useState<string>('0 x 0');
+
+    // Sequential check states
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [showFlash, setShowFlash] = useState(false);
+    const [isComplete, setIsComplete] = useState(false);
+    const [isHoldFreezing, setIsHoldFreezing] = useState(false);
 
     // Smart detection sequence state machine
     const [detectionState, setDetectionState] = useState<'searching' | 'locked' | 'countdown' | 'active'>('searching');
@@ -62,6 +83,47 @@ export default function MotionCheckScanner() {
         }
     }, []);
 
+    // Web Audio Synthesizer Shutter Click Sound Generator
+    const playShutterSound = useCallback(() => {
+        try {
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContextClass) return;
+            const ctx = new AudioContextClass();
+            
+            // High frequency crisp click and low frequency body click
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            const gain2 = ctx.createGain();
+            
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(600, ctx.currentTime);
+            osc1.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.12);
+            
+            gain1.gain.setValueAtTime(0.35, ctx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+            
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1450, ctx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(550, ctx.currentTime + 0.05);
+            
+            gain2.gain.setValueAtTime(0.25, ctx.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+            
+            osc1.connect(gain1);
+            osc2.connect(gain2);
+            gain1.connect(ctx.destination);
+            gain2.connect(ctx.destination);
+            
+            osc1.start();
+            osc2.start();
+            osc1.stop(ctx.currentTime + 0.12);
+            osc2.stop(ctx.currentTime + 0.05);
+        } catch (e) {
+            console.warn("AudioContext shutter click failed:", e);
+        }
+    }, []);
+
     // Stop webcam stream and return to idle card
     const stopWebcam = useCallback(() => {
         addLog("웹캠 세션 종료 요청");
@@ -85,6 +147,10 @@ export default function MotionCheckScanner() {
         setActualResolution('0 x 0');
         setDetectionState('searching');
         setCountdownNumber(null);
+        setCurrentStepIndex(0);
+        setIsComplete(false);
+        setIsHoldFreezing(false);
+        setShowFlash(false);
         setStatus('idle');
         addLog("카메라 스트림 중지 완료 및 복귀");
     }, [stream, addLog]);
@@ -227,13 +293,14 @@ export default function MotionCheckScanner() {
             return;
         }
 
-        addLog("대상 탐색기 가동... 주변 환경 및 형체 탐색 중");
+        const activeStep = STEPS[currentStepIndex];
+        addLog(`[${activeStep.title}] 대상 탐색기 가동... 주변 환경 및 형체 탐색 중`);
 
         // Step A: 4 seconds of SEARCHING, then trigger LOCK-ON
         const lockTimer = setTimeout(() => {
             setDetectionState('locked');
             playBeep(880, 0.16); // Sharp electronic lock beep
-            addLog("대상 감지 성공! 타겟 락온 완료 (SUBJECT LOCKED)");
+            addLog(`[${activeStep.title}] 대상 감지 성공! 타겟 락온 완료 (SUBJECT LOCKED)`);
 
             // Step B: 1.2 seconds of LOCKED, then initiate 3-second countdown
             const countdownStartTimer = setTimeout(() => {
@@ -241,21 +308,21 @@ export default function MotionCheckScanner() {
                 let currentCount = 3;
                 setCountdownNumber(currentCount);
                 playBeep(520, 0.08); // Solid count beep
-                addLog(`정밀 스캔 카운트다운 시작: ${currentCount}`);
+                addLog(`[${activeStep.title}] 정밀 스캔 카운트다운 시작: ${currentCount}`);
 
                 const countdownInterval = setInterval(() => {
                     currentCount--;
                     if (currentCount > 0) {
                         setCountdownNumber(currentCount);
                         playBeep(520, 0.08);
-                        addLog(`정밀 스캔 카운트다운: ${currentCount}`);
+                        addLog(`[${activeStep.title}] 정밀 스캔 카운트다운: ${currentCount}`);
                     } else {
                         clearInterval(countdownInterval);
                         setCountdownNumber(null);
                         setDetectionState('active');
                         playBeep(1040, 0.22); // High-pitched double start chime
                         setTimeout(() => playBeep(1320, 0.15), 80);
-                        addLog("실시간 인체 골격 모션 트래킹 개시! (ACTIVE RUNNING)");
+                        addLog(`[${activeStep.title}] 실시간 인체 골격 모션 트래킹 개시! (ACTIVE RUNNING)`);
                     }
                 }, 1000);
 
@@ -275,7 +342,48 @@ export default function MotionCheckScanner() {
             sequenceTimeoutRef.current.forEach(timer => clearTimeout(timer));
             sequenceTimeoutRef.current = [];
         };
-    }, [status, isCameraReady, playBeep, addLog]);
+    }, [status, isCameraReady, playBeep, addLog, currentStepIndex]);
+
+    // Touchless automatic step capture & transition pipeline
+    useEffect(() => {
+        if (status !== 'webcam' || !isCameraReady || detectionState !== 'active') return;
+
+        const activeStep = STEPS[currentStepIndex];
+        addLog(`[AUTO SCENE] ${activeStep.subtitle} 트래킹 중... (자동 캡처 대기)`);
+
+        const captureTimer = setTimeout(() => {
+            // Trigger 1: White Flash and Shutter synthesis audio click
+            setShowFlash(true);
+            playShutterSound();
+            setIsHoldFreezing(true);
+            addLog(`📸 [SUCCESS] ${activeStep.title} 캡처 완료!`);
+
+            // Turn off flash after 150ms
+            setTimeout(() => {
+                setShowFlash(false);
+            }, 150);
+
+            // Hold freeze frame for 1.2s to show success feedback, then proceed
+            setTimeout(() => {
+                setIsHoldFreezing(false);
+
+                if (currentStepIndex < STEPS.length - 1) {
+                    setCurrentStepIndex(prev => prev + 1);
+                    setDetectionState('searching');
+                } else {
+                    // All steps completed successfully!
+                    setIsComplete(true);
+                    playBeep(880, 0.1);
+                    setTimeout(() => playBeep(1100, 0.1), 100);
+                    setTimeout(() => playBeep(1320, 0.2), 200);
+                    addLog("🏆 [COMPLETED] 4단계 전신 모션 스캔 최종 완료! 🏆");
+                }
+            }, 1200);
+
+        }, 4500);
+
+        return () => clearTimeout(captureTimer);
+    }, [status, isCameraReady, detectionState, currentStepIndex, playShutterSound, addLog, playBeep]);
 
     // Video event logging
     const handleVideoLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -300,7 +408,9 @@ export default function MotionCheckScanner() {
         let frameCount = 0;
 
         const render = () => {
-            frameCount++;
+            if (!isHoldFreezing) {
+                frameCount++;
+            }
             const w = canvas.width = canvas.clientWidth;
             const h = canvas.height = canvas.clientHeight;
             ctx.clearRect(0, 0, w, h);
@@ -417,44 +527,131 @@ export default function MotionCheckScanner() {
 
             // 5. ACTIVE SKELETAL MOTION TRACKING (실시간 3D 스켈레톤 움직임 연출)
             if (detectionState === 'active') {
-                // Modulating squat depth using a mathematical wave function representing beautiful organic squat reps
-                const squatPhase = (frameCount % 280) / 280; // Rep cycle duration
-                let squatDepth = 0;
-                if (squatPhase < 0.35) {
-                    // Holding standing stance
-                    squatDepth = 0;
-                } else if (squatPhase >= 0.35 && squatPhase < 0.65) {
-                    // Smoothly going down to deep squat
-                    const t = (squatPhase - 0.35) / 0.3;
-                    squatDepth = Math.sin(t * Math.PI / 2);
-                } else if (squatPhase >= 0.65 && squatPhase < 0.85) {
-                    // Standing back up
-                    const t = (squatPhase - 0.65) / 0.2;
-                    squatDepth = 1 - Math.sin(t * Math.PI / 2);
-                } else {
-                    // Holding standing rest
-                    squatDepth = 0;
+                const activeStep = STEPS[currentStepIndex].id;
+                let kneeAngle = 180;
+                let pelvicTilt = (Math.sin(frameCount * 0.08) * 0.8).toFixed(1);
+                
+                const swayX = Math.sin(frameCount * 0.03) * 2.5;
+                const swayY = Math.cos(frameCount * 0.02) * 1.2;
+                const scx = cx + swayX;
+
+                let headY = h * 0.25 + swayY;
+                let shoulderY = h * 0.33 + swayY;
+                let shoulderW = Math.min(w * 0.25, 170);
+                let hipY = h * 0.58 + swayY;
+                let hipW = Math.min(w * 0.18, 120);
+                let kneeY = h * 0.70;
+                let kneeOut = Math.min(w * 0.08, 55);
+                let feetY = h * 0.82;
+
+                let lKneeX = scx - hipW/2 - kneeOut;
+                let rKneeX = scx + hipW/2 + kneeOut;
+                let lKneeY = kneeY;
+                let rKneeY = kneeY;
+                let lAnkleX = scx - hipW/2 - 4;
+                let rAnkleX = scx + hipW/2 + 4;
+                let lAnkleY = feetY;
+                let rAnkleY = feetY;
+
+                if (activeStep === 'squat') {
+                    const squatPhase = (frameCount % 180) / 180;
+                    let squatDepth = 0;
+                    if (squatPhase >= 0.2 && squatPhase < 0.6) {
+                        const t = (squatPhase - 0.2) / 0.4;
+                        squatDepth = Math.sin(t * Math.PI);
+                    } else if (squatPhase >= 0.6 && squatPhase < 0.8) {
+                        squatDepth = 0.9;
+                    }
+                    
+                    headY += squatDepth * (h * 0.16);
+                    shoulderY += squatDepth * (h * 0.16);
+                    hipY += squatDepth * (h * 0.13);
+                    lKneeY += squatDepth * (h * 0.04);
+                    rKneeY += squatDepth * (h * 0.04);
+                    lKneeX -= squatDepth * 16;
+                    rKneeX += squatDepth * 16;
+                    
+                    kneeAngle = Math.round(180 - squatDepth * 85);
+                } 
+                else if (activeStep === 'jump') {
+                    const jumpPhase = (frameCount % 180) / 180;
+                    let yOffset = 0;
+                    let landingStiff = 0;
+                    
+                    if (jumpPhase < 0.2) {
+                        const t = jumpPhase / 0.2;
+                        landingStiff = Math.sin(t * Math.PI / 2) * 0.4;
+                    } else if (jumpPhase >= 0.2 && jumpPhase < 0.5) {
+                        const t = (jumpPhase - 0.2) / 0.3;
+                        yOffset = -Math.sin(t * Math.PI) * (h * 0.24);
+                    } else if (jumpPhase >= 0.5 && jumpPhase < 0.75) {
+                        const t = (jumpPhase - 0.5) / 0.25;
+                        landingStiff = Math.sin(t * Math.PI) * 0.75;
+                    }
+                    
+                    headY += yOffset + landingStiff * (h * 0.18);
+                    shoulderY += yOffset + landingStiff * (h * 0.18);
+                    hipY += yOffset + landingStiff * (h * 0.14);
+                    lKneeY += yOffset + landingStiff * (h * 0.04);
+                    rKneeY += yOffset + landingStiff * (h * 0.04);
+                    lKneeX -= landingStiff * 18;
+                    rKneeX += landingStiff * 18;
+                    
+                    lAnkleY += yOffset;
+                    rAnkleY += yOffset;
+                    
+                    kneeAngle = Math.round(180 - landingStiff * 85 + (yOffset < 0 ? 30 : 0));
+                    pelvicTilt = (Math.sin(frameCount * 0.15) * 2.2).toFixed(1);
+                } 
+                else if (activeStep === 'run') {
+                    const runPhase = (frameCount % 24) / 24;
+                    const leftUp = runPhase < 0.5;
+                    const runDepth = Math.sin((runPhase * 2) * Math.PI);
+                    
+                    if (leftUp) {
+                        lKneeY -= runDepth * 40;
+                        lKneeX += runDepth * 15;
+                        lAnkleY -= runDepth * 45;
+                        lAnkleX += runDepth * 5;
+                        kneeAngle = Math.round(180 - runDepth * 70);
+                    } else {
+                        rKneeY -= runDepth * 40;
+                        rKneeX -= runDepth * 15;
+                        rAnkleY -= runDepth * 45;
+                        rAnkleX -= runDepth * 5;
+                        kneeAngle = Math.round(180 - runDepth * 70);
+                    }
+                    
+                    headY += Math.sin(frameCount * 0.2) * 2.5;
+                    shoulderY += Math.sin(frameCount * 0.2) * 2.5;
+                    hipY += Math.sin(frameCount * 0.2) * 1.5;
+                    
+                    pelvicTilt = (Math.sin(frameCount * 0.2) * 3.2).toFixed(1);
+                } 
+                else if (activeStep === 'kick') {
+                    const kickPhase = (frameCount % 120) / 120;
+                    let kickReach = 0;
+                    
+                    if (kickPhase >= 0.2 && kickPhase < 0.6) {
+                        const t = (kickPhase - 0.2) / 0.4;
+                        kickReach = Math.sin(t * Math.PI);
+                    }
+                    
+                    // Lean back torso
+                    headY += kickReach * 15;
+                    shoulderY += kickReach * 10;
+                    scx -= kickReach * 10;
+                    
+                    // Right leg kicks high up and forward!
+                    rKneeY -= kickReach * 45;
+                    rKneeX += kickReach * 35;
+                    rAnkleY -= kickReach * 80;
+                    rAnkleX += kickReach * 65;
+                    
+                    kneeAngle = Math.round(180 - kickReach * 45);
+                    pelvicTilt = (kickReach * 6.8 + Math.sin(frameCount * 0.1) * 0.4).toFixed(1);
                 }
 
-                // Smooth swaying coordinate variables representing actual standing breathing/balance adjustments
-                const swayX = Math.sin(frameCount * 0.03) * 3;
-                const swayY = Math.cos(frameCount * 0.02) * 1.5;
-
-                const scx = cx + swayX;
-                const headY = h * 0.25 + squatDepth * (h * 0.18) + swayY;
-                const shoulderY = h * 0.33 + squatDepth * (h * 0.18) + swayY;
-                const shoulderW = Math.min(w * 0.25, 170);
-                const hipY = h * 0.58 + squatDepth * (h * 0.14) + swayY;
-                const hipW = Math.min(w * 0.18, 120);
-
-                // Knee expands slightly wider under deep squat for biomechanics stability
-                const kneeY = h * 0.70 + squatDepth * (h * 0.05);
-                const kneeOut = Math.min(w * 0.08, 55) + squatDepth * 18;
-                
-                // Ankle / feet planted solid on the ground
-                const feetY = h * 0.82;
-
-                // Define 3D joint telemetry positions
                 const joints = {
                     head: { x: scx, y: headY },
                     neck: { x: scx, y: (shoulderY + headY) / 2 },
@@ -463,10 +660,10 @@ export default function MotionCheckScanner() {
                     spine: { x: scx, y: (shoulderY + hipY) / 2 },
                     lHip: { x: scx - hipW/2, y: hipY },
                     rHip: { x: scx + hipW/2, y: hipY },
-                    lKnee: { x: scx - hipW/2 - kneeOut, y: kneeY },
-                    rKnee: { x: scx + hipW/2 + kneeOut, y: kneeY },
-                    lAnkle: { x: scx - hipW/2 - 4, y: feetY },
-                    rAnkle: { x: scx + hipW/2 + 4, y: feetY }
+                    lKnee: { x: lKneeX, y: lKneeY },
+                    rKnee: { x: rKneeX, y: rKneeY },
+                    lAnkle: { x: lAnkleX, y: lAnkleY },
+                    rAnkle: { x: rAnkleX, y: rAnkleY }
                 };
 
                 // Draw neon skeletal bones linking the joints
@@ -528,7 +725,6 @@ export default function MotionCheckScanner() {
                 ctx.shadowBlur = 0;
 
                 // Real-time knee angle label overlay in canvas next to left knee
-                const kneeAngle = Math.round(180 - squatDepth * 85);
                 ctx.fillStyle = '#00F59B';
                 ctx.font = 'bold 9px monospace';
                 ctx.textAlign = 'right';
@@ -539,7 +735,6 @@ export default function MotionCheckScanner() {
                 // Periodic telemetry logging to simulate active computation in the logger box
                 if (frameCount % 45 === 0) {
                     const balance = 97 + Math.round(Math.random() * 3);
-                    const pelvicTilt = (Math.random() * 1.8).toFixed(1);
                     addLog(`[AI POSE] 실시간 밸런스 점수: ${balance}% (양호)`);
                     addLog(`[AI POSE] 골반 각도 편차: ${pelvicTilt}° (정상 범위)`);
                     addLog(`[AI POSE] 무릎 굴곡 캡처: ${kneeAngle}°`);
@@ -585,7 +780,7 @@ export default function MotionCheckScanner() {
                 cancelAnimationFrame(animationFrameIdRef.current);
             }
         };
-    }, [status, showGuidelines, facingMode, actualResolution, detectionState, addLog]);
+    }, [status, showGuidelines, facingMode, actualResolution, detectionState, addLog, currentStepIndex, isHoldFreezing]);
 
     // Clean unmount check
     useEffect(() => {
@@ -680,6 +875,19 @@ export default function MotionCheckScanner() {
                     </div>
                 )}
 
+                {/* Camera Shutter Flash Overlay */}
+                <AnimatePresence>
+                    {showFlash && (
+                        <motion.div 
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute inset-0 bg-white z-40 pointer-events-none"
+                        />
+                    )}
+                </AnimatePresence>
+
                 {/* Giant Neon Glowing 3-2-1 Countdown Overlay */}
                 <AnimatePresence>
                     {status === 'webcam' && detectionState === 'countdown' && countdownNumber !== null && (
@@ -698,6 +906,28 @@ export default function MotionCheckScanner() {
                     )}
                 </AnimatePresence>
 
+                {/* Hold Freeze Secured Feedback Overlay */}
+                <AnimatePresence>
+                    {isHoldFreezing && (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="absolute inset-0 bg-[#070B14]/40 z-30 flex items-center justify-center pointer-events-none"
+                        >
+                            <div className="bg-[#0D1321]/95 border border-[#00F59B] px-6 py-4 rounded-[24px] flex items-center gap-3 shadow-2xl shadow-black max-w-xs text-left">
+                                <div className="w-8 h-8 rounded-xl bg-[#00F59B]/10 border border-[#00F59B]/20 flex items-center justify-center text-[#00F59B] shrink-0 animate-ping">
+                                    <CheckCircle2 className="w-4.5 h-4.5" />
+                                </div>
+                                <div>
+                                    <h5 className="text-[10px] font-black text-[#00F59B] uppercase font-mono tracking-widest">POSE SECURED</h5>
+                                    <p className="text-[9px] text-white/80 mt-0.5 font-sans leading-relaxed">프레임 데이터가 안전하게 캡처 및 전송되었습니다.</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Top-Left Exit Button overlay */}
                 <button 
                     onClick={stopWebcam}
@@ -708,11 +938,40 @@ export default function MotionCheckScanner() {
                     <span>종료하기</span>
                 </button>
 
-                {/* Top-Center Immersion Status overlay */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#0B0F19]/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 shadow-lg shadow-black/30 z-10 hidden sm:flex">
-                    <span className="w-1.5 h-1.5 bg-[#00F59B] rounded-full animate-ping" />
-                    <span className="text-[9px] font-black text-white/95 font-mono tracking-widest uppercase">YOUNIQLE IMMERSIVE TELEMETRY LIVE</span>
-                </div>
+                {/* Top-Center Multi-Step Progress Tracker Overlay */}
+                {status === 'webcam' && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#070B14]/90 backdrop-blur-md border border-[#00F59B]/20 px-4 py-2.5 rounded-[20px] flex items-center gap-3.5 shadow-xl shadow-black/55 z-20 max-w-[92%] sm:max-w-md">
+                        {STEPS.map((step, idx) => {
+                            const isActive = idx === currentStepIndex;
+                            const isPast = idx < currentStepIndex;
+                            return (
+                                <div key={step.id} className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className={`w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-black font-mono border transition-all ${
+                                            isActive 
+                                                ? 'bg-[#00F59B] border-[#00F59B] text-[#070B14] shadow-md shadow-[#00F59B]/30' 
+                                                : isPast 
+                                                    ? 'bg-[#00D8F6]/20 border-[#00D8F6]/40 text-[#00D8F6]' 
+                                                    : 'bg-white/5 border-white/10 text-white/40'
+                                        }`}>
+                                            {isPast ? '✓' : idx + 1}
+                                        </div>
+                                        <span className={`text-[9px] font-black tracking-widest uppercase font-mono ${
+                                            isActive ? 'text-[#00F59B]' : isPast ? 'text-[#00D8F6]' : 'text-white/30'
+                                        } hidden xs:inline`}>
+                                            {step.id}
+                                        </span>
+                                    </div>
+                                    {idx < STEPS.length - 1 && (
+                                        <div className={`w-3 h-[1px] ${
+                                            isPast ? 'bg-[#00D8F6]/30' : 'bg-white/5'
+                                        }`} />
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
 
                 {/* Top-Right Telemetry Settings overlay */}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
@@ -759,22 +1018,22 @@ export default function MotionCheckScanner() {
                                     {detectionState === 'active' ? 'ACTIVE' : 'ALIGNMENT'}
                                 </Badge>
                                 <span className="text-[9px] font-black text-[#00D8F6] uppercase tracking-widest font-mono">
-                                    {detectionState === 'active' ? 'SQUAT ANALYZING' : 'CLINICAL GRID GUIDE'}
+                                    {STEPS[currentStepIndex].title} ({currentStepIndex + 1}/{STEPS.length})
                                 </span>
                             </div>
                             
                             <p className="text-[11px] font-black text-white leading-normal mt-1">
                                 {detectionState === 'searching' && (
-                                    <>화면 중앙의 <span className="text-[#00D8F6] font-bold">세로 십자 수평선</span>을 기준으로 전신이 나오게 맞춰 서 주세요.</>
+                                    <>중앙 십자선에 맞춰 전신이 나오게 맞춰 서 주세요. <span className="text-[#00D8F6] font-bold">({STEPS[currentStepIndex].targetZone})</span></>
                                 )}
                                 {detectionState === 'locked' && (
                                     <>대상이 감지되었습니다! <span className="text-[#00F59B] font-bold">휴대폰을 거치하고</span> 3걸음 뒤로 이동해 대기해 주세요.</>
                                 )}
                                 {detectionState === 'countdown' && (
-                                    <>스캔 시작 전 자세를 고정하고 잠시만 대기해 주세요...</>
+                                    <>자세를 고정하고 캡처 전 대기해 주세요...</>
                                 )}
                                 {detectionState === 'active' && (
-                                    <>동작 분석 진행 중! 화면을 보며 <span className="text-[#00F59B] font-bold">자유롭게 스쿼트를 진행</span>해 주세요.</>
+                                    <>실시간 트래킹 중! <span className="text-[#00F59B] font-bold">{STEPS[currentStepIndex].instruction}</span></>
                                 )}
                             </p>
                         </div>
