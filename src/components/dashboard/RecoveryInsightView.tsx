@@ -10,6 +10,7 @@ import ActionableInsightCard from './ActionableInsightCard';
 import MealNutrientChart from './MealNutrientChart';
 import { ShoppingBag, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import GuardianNudgeCard from './GuardianNudgeCard';
 
 interface RecoveryInsightViewProps {
     unifiedData: any;
@@ -24,6 +25,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
     const isAdmin = ['admin', 'superadmin'].includes(userRole);
     const isPremium = isAdmin || ['RESTART', 'BLACK'].includes(userTier);
     const displayScore = score?.totalScore || 0;
+    const isGuardian = user?.footballRole === 'guardian';
 
     return (
         <div className="space-y-8 pb-10">
@@ -78,6 +80,14 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                     </CardContent>
                 </Card>
             </section>
+
+            {/* Parent Nudge Card (Conditional) */}
+            {isGuardian && (
+                <GuardianNudgeCard 
+                    playerName={user?.name || '선수'} 
+                    fatigueLevel={displayScore < 50 ? 'HIGH' : displayScore < 80 ? 'MEDIUM' : 'LOW'} 
+                />
+            )}
 
             {/* Weekly Report Section */}
             <section className="space-y-6">

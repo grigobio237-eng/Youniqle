@@ -14,6 +14,7 @@ import WeeklyReportView from '@/components/dashboard/WeeklyReportView';
 import RecoveryToolkitView from '@/components/dashboard/RecoveryToolkitView';
 import RecoveryInsightView from '@/components/dashboard/RecoveryInsightView';
 import RecoveryStatusHero from '@/components/dashboard/RecoveryStatusHero';
+import AiNudgeBanner, { AiNudge } from '@/components/dashboard/AiNudgeBanner';
 import { useSession } from 'next-auth/react';
 
 export default function DashboardPage() {
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [scoreHistory, setScoreHistory] = useState<any[]>([]);
   const [radarData, setRadarData] = useState<any[]>([]);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
+  const [nudges, setNudges] = useState<AiNudge[]>([]);
   const [loading, setLoading] = useState(true);
   const fetchedRef = React.useRef(false);
 
@@ -32,15 +34,23 @@ export default function DashboardPage() {
     try {
       if (isRefresh) setLoading(false);
       
-      const [statusRes, timelineRes, diagRes] = await Promise.all([
+      const [statusRes, timelineRes, diagRes, nudgesRes] = await Promise.all([
         fetch('/api/user/status'),
         fetch('/api/user/timeline'),
-        fetch('/api/recommendations/diagnosis?limit=1&protocols=false')
+        fetch('/api/recommendations/diagnosis?limit=1&protocols=false'),
+        fetch('/api/football/nudges')
       ]);
 
       if (statusRes.ok) {
         const result = await statusRes.json();
         setData(result);
+      }
+
+      if (nudgesRes.ok) {
+        const nudgesData = await nudgesRes.json();
+        if (nudgesData.success) {
+          setNudges(nudgesData.data);
+        }
       }
 
       if (timelineRes.ok) {
@@ -209,6 +219,19 @@ export default function DashboardPage() {
         assetStats={data?.assetStats}
         userName={session?.user?.name || '사용자'}
       />
+
+      {/* AI Nudge Banners Area */}
+      {nudges.length > 0 && (
+        <div className="px-4 pt-4 max-w-xl mx-auto w-full space-y-3 z-20 relative">
+          {nudges.map(nudge => (
+            <AiNudgeBanner 
+              key={nudge.id} 
+              nudge={nudge} 
+              onDismiss={(id) => setNudges(prev => prev.filter(n => n.id !== id))} 
+            />
+          ))}
+        </div>
+      )}
 
       {/* Tab Navigation - Softer & Floating */}
       <div className="sticky top-[110px] md:top-[120px] z-30 bg-background/80 backdrop-blur-md pt-4 pb-2 px-4">
