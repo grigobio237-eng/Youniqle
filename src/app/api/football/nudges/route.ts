@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       nudges.push({
         id: 'p-2',
         type: 'MENTAL_CARE',
-        title: 'AI가 추천하는 5분 이완 호흡법',
+        title: '유니클이 추천하는 5분 이완 호흡법',
         message: '최근 긴장감이 높아 보이네요. 잠들기 전 심호흡 루틴을 해보는 건 어떨까요?'
       });
     }

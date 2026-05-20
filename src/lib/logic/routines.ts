@@ -43,7 +43,7 @@ const ROUTINE_POOL: Record<string, RoutineAction[]> = {
 };
 
 /**
- * 점수와 AI 분석 데이터를 기반으로 최적의 3가지 루틴을 생성합니다.
+ // 점수와 Youniqle 엔진 데이터를 기반으로 최적의 3가지 루틴을 생성합니다.
  */
 export function generateDynamicRoutines(
   score: number, 
@@ -61,7 +61,7 @@ export function generateDynamicRoutines(
   if (analysisData?.futureDirection) {
     result.push({
       text: analysisData.futureDirection,
-      icon: '✨', // AI 생성 항목 아이콘
+      // Youniqle 엔진 생성 항목 아이콘
       category: 'AI_SCAN'
     });
   }

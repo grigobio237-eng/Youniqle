@@ -88,26 +88,25 @@ export default function DailySmallActions({ score = 50, initialData }: { score?:
             </div>
         );
     }
-
     return (
-        <div className="space-y-6 py-4">
+        <div className="space-y-2 py-1 md:space-y-6 md:py-4">
             <div className="flex items-center justify-between px-2">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-black text-obsidian tracking-tight">{title}</h3>
-                        <div className="px-2 py-0.5 rounded-full bg-reward-gold/10 text-reward-gold text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                            <Trophy className="w-3 h-3" /> +10P
+                <div className="space-y-0.5">
+                    <div className="flex items-center gap-1.5">
+                        <h3 className="text-sm md:text-lg font-black text-obsidian tracking-tight">{title}</h3>
+                        <div className="px-1.5 py-0.5 rounded-full bg-reward-gold/10 text-reward-gold text-[8px] md:text-[10px] font-black uppercase tracking-widest flex items-center gap-0.5">
+                            <Trophy className="w-2.5 h-2.5" /> +10P
                         </div>
                     </div>
-                    <p className="text-xs font-medium text-slate/60">오늘 하루 꼭 실천해야 할 3가지 루틴</p>
+                    <p className="text-[10px] md:text-xs font-medium text-slate/60">오늘 하루 꼭 실천해야 할 3가지 루틴</p>
                 </div>
-                <div className="text-right">
-                    <span className="text-2xl font-black text-primary italic">{completedCount}</span>
-                    <span className="text-xs font-black text-slate/30 uppercase ml-1">/ {missions.length || 3}</span>
+                <div className="text-right leading-none">
+                    <span className="text-xl md:text-2xl font-black text-primary italic">{completedCount}</span>
+                    <span className="text-[10px] md:text-xs font-black text-slate/30 uppercase ml-0.5">/ {missions.length || 3}</span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-1.5 md:gap-3">
                 {missions.map((mission, idx) => {
                     const isDone = completedIds.includes(mission.id);
                     return (
@@ -117,42 +116,42 @@ export default function DailySmallActions({ score = 50, initialData }: { score?:
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             onClick={() => toggleMission(mission.id)}
-                            className={`
-                                group relative flex items-center gap-4 p-5 rounded-[24px] border-2 transition-all cursor-pointer
-                                ${isDone 
-                                    ? 'bg-primary/5 border-primary/20 shadow-inner' 
-                                    : 'bg-white border-line hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5'}
-                            `}
-                        >
-                            <div className={`
-                                w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-transform
-                                ${isDone ? 'scale-90 opacity-50' : 'group-hover:scale-110'}
-                                bg-mist/50
-                            `}>
-                                {mission.icon}
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                                <h4 className={`text-sm md:text-base font-bold transition-colors ${isDone ? 'text-slate/40 line-through' : 'text-obsidian'}`}>
-                                    {mission.title}
-                                </h4>
-                                <p className="text-xs font-medium text-slate/40 line-clamp-1">{mission.desc}</p>
-                            </div>
-
-                            <div className={`
-                                w-8 h-8 rounded-full flex items-center justify-center transition-all
-                                ${isDone ? 'bg-primary text-white scale-110' : 'bg-mist text-slate/20 group-hover:text-primary/40'}
-                            `}>
-                                {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
-                            </div>
+                             className={`
+                                 group relative flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl md:rounded-[24px] border transition-all cursor-pointer
+                                 ${isDone 
+                                     ? 'bg-primary/5 border-primary/20 shadow-inner' 
+                                     : 'bg-white border-line hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5'}
+                             `}
+                         >
+                             <div className={`
+                                 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-2xl flex items-center justify-center text-sm md:text-2xl shadow-sm transition-transform flex-shrink-0
+                                 ${isDone ? 'scale-90 opacity-50' : 'group-hover:scale-110'}
+                                 bg-mist/50
+                             `}>
+                                 {mission.icon}
+                             </div>
+                             
+                             <div className="flex-1 min-w-0">
+                                 <h4 className={`text-[11px] md:text-base font-bold transition-colors truncate ${isDone ? 'text-slate/40 line-through' : 'text-obsidian'}`}>
+                                     {mission.title}
+                                 </h4>
+                                 <p className="text-[9px] md:text-xs font-medium text-slate/40 line-clamp-1">{mission.desc}</p>
+                             </div>
+ 
+                             <div className={`
+                                 w-5 h-5 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all flex-shrink-0
+                                 ${isDone ? 'bg-primary text-white scale-110' : 'bg-mist text-slate/20 group-hover:text-primary/40'}
+                             `}>
+                                 {isDone ? <CheckCircle2 className="w-3.5 h-3.5 md:w-5 md:h-5" /> : <Circle className="w-3.5 h-3.5 md:w-5 md:h-5" />}
+                             </div>
 
                             {isDone && (
                                 <motion.div 
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="absolute -top-1 -right-1 bg-reward-gold text-white p-1 rounded-full shadow-lg"
+                                    className="absolute -top-1 -right-1 bg-reward-gold text-white p-0.5 rounded-full shadow-lg"
                                 >
-                                    <Sparkles className="w-3 h-3" />
+                                    <Sparkles className="w-2.5 h-2.5" />
                                 </motion.div>
                             )}
                         </motion.div>
@@ -164,9 +163,9 @@ export default function DailySmallActions({ score = 50, initialData }: { score?:
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="p-4 bg-obsidian text-white rounded-2xl text-center"
+                    className="p-3 md:p-4 bg-obsidian text-white rounded-xl md:rounded-2xl text-center"
                 >
-                    <p className="text-sm font-black italic tracking-tight">
+                    <p className="text-xs md:text-sm font-black italic tracking-tight">
                         🎉 오늘의 회복 루틴을 모두 완료했습니다! 꾸준한 실천이 내일의 에너지를 만듭니다.
                     </p>
                 </motion.div>

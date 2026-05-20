@@ -22,38 +22,75 @@ export function DiagnosisRadarChart({ data, color = '#2563eb', className }: Diag
 
     if (!mounted) return <div className={`w-full h-full ${className}`} />;
 
-    // Normalize data if needed, or trust strict props.
+    // Translate English category/subject to beautiful premium Korean labels
+    const TRANSLATION_MAP: Record<string, string> = {
+        'PHYSICAL': '신체 리듬',
+        'MENTAL': '정신 리듬',
+        'SLEEP': '수면 리듬',
+        'LIFESTYLE': '생활 리듬',
+        'physical': '신체 리듬',
+        'mental': '정신 리듬',
+        'sleep': '수면 리듬',
+        'lifestyle': '생활 리듬'
+    };
+
+    const formattedData = (data || []).map(item => {
+        const rawSubject = item.subject || (item as any).category || '';
+        const translatedSubject = TRANSLATION_MAP[rawSubject] || rawSubject;
+        const scoreVal = Number(item.score);
+        return {
+            ...item,
+            subject: translatedSubject,
+            score: isNaN(scoreVal) || !isFinite(scoreVal) ? 0 : scoreVal,
+            fullMark: Number(item.fullMark) || 100
+        };
+    });
+
+    // 레이더 차트는 최소 3개 이상의 데이터 포인트가 있어야 정상적인 다각형(SVG Path) 생성이 가능합니다.
+    // 3개 미만이거나 유효하지 않은 데이터가 유입되면 Recharts가 렌더링 중 오류를 발생시키므로 안전 차단 처리를 합니다.
+    if (formattedData.length < 3) {
+        return (
+            <div className={`w-full h-full flex items-center justify-center text-[10px] text-slate/40 ${className}`}>
+                데이터 분석 중...
+            </div>
+        );
+    }
 
     return (
         <div className={`w-full h-full ${className}`}>
             <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-                    <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                <RadarChart cx="50%" cy="50%" outerRadius="75%" data={formattedData}>
+                    <PolarGrid stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 3" />
                     <PolarAngleAxis
                         dataKey="subject"
-                        tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }}
+                        tick={{ fill: '#1e293b', fontSize: 9.5, fontWeight: 'bold' }}
                     />
-                    {/* Hiding Radius Axis for cleaner look, or typical 0-100 */}
                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                     <Radar
-                        name="Score"
+                        name="리듬 점수"
                         dataKey="score"
-                        stroke={color}
-                        fill={color}
-                        fillOpacity={0.4}
+                        stroke="#0D9488"
+                        strokeWidth={2}
+                        fill="#14B8A6"
+                        fillOpacity={0.35}
+                        dot={{ r: 3.5, fill: '#0E3A3A', stroke: '#2DD4BF', strokeWidth: 1.5 }}
                     />
                     <Tooltip
                         contentStyle={{
-                            borderRadius: '12px',
-                            border: 'none',
-                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                            backgroundColor: 'white',
-                            color: '#1e293b'
+                            borderRadius: '14px',
+                            border: '1px solid rgba(14, 58, 58, 0.08)',
+                            boxShadow: '0 8px 24px rgba(14, 58, 58, 0.1)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#0E3A3A',
+                            fontSize: '10.5px',
+                            fontWeight: 'bold'
                         }}
-                        itemStyle={{ color: color, fontWeight: 'bold' }}
+                        itemStyle={{ color: '#0D9488', fontWeight: 'bold' }}
                     />
                 </RadarChart>
             </ResponsiveContainer>
         </div>
     );
 }
+

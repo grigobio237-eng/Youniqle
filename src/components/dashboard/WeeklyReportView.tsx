@@ -65,6 +65,17 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
         }
     };
 
+    // 법인/회사 괄호 등 지저분한 접미사 정밀 정제 로직
+    const sanitizeText = (text: string) => {
+        if (!text) return '';
+        return text
+            .replace(/주식회사/g, '')
+            .replace(/\(주\)/g, '')
+            .replace(/주\)/g, '')
+            .replace(/\(주/g, '')
+            .trim();
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center py-10">
@@ -115,10 +126,12 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                     </div>
                 </div>
 
-                {/* Mandatory Instructions */}
-                <div className="bg-mist/30 p-6 rounded-2xl border border-line/60 max-w-md mx-auto">
-                    <p className="text-slate/60 text-sm font-bold leading-relaxed break-keep">
-                        "아직 첫 번째 회복 리포트가 열리지 않았습니다. 7일 동안 1분 기록을 완료하면 회복흐름·반복 패턴·다음 7일 루틴·열릴 수 있는 혜택이 정리됩니다."
+                {/* Mandated Instructions (가독성을 극대화한 프렌들리 가이드 카드) */}
+                <div className="bg-mist/30 p-5 rounded-2xl border border-line/50 max-w-sm mx-auto">
+                    <p className="text-slate/60 text-xs font-semibold leading-relaxed break-keep text-center">
+                        아직 첫 번째 회복 리포트가 생성되지 않았습니다.<br />
+                        <span className="text-obsidian font-bold">7일 동안 1분 기록</span>을 완료하시면,<br />
+                        회복 흐름 · 반복 패턴 · 향후 루틴이 제공됩니다.
                     </p>
                 </div>
 
@@ -146,7 +159,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
 
     // 2. Premium 7-Day Recovery Audit Report UI
     return (
-        <div className="space-y-6 pb-12">
+        <div className="space-y-6 pb-6">
             
             {/* [Section 1] Cover & Profile Summary */}
             <div className="bg-white rounded-[32px] p-6 border border-line shadow-xl relative overflow-hidden space-y-4">
@@ -220,12 +233,12 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                     </table>
                 </div>
 
-                {/* Fluctuation Comment */}
-                <div className="bg-mist/30 p-5 rounded-2xl border border-line/60">
-                    <div className="text-sm font-bold text-obsidian leading-relaxed break-keep">
-                        <span className="text-primary font-black block mb-1 text-xs">📝 지표 변동 사유 요약 코멘트</span>
-                        "{report.summary || '수면 및 활동성 지표는 양호한 흐름을 유지하고 있으나, 야간 식사 패턴 등의 영향으로 식습관 지표가 일시적으로 하락하였습니다. 야간 소화 부하에 따른 피로 신호 누적을 예방하기 위한 루틴 설정이 권장됩니다.'}"
-                    </div>
+                {/* Fluctuation Comment (이탤릭을 전면 제거하고 둥글고 정갈한 가독성 레이아웃으로 변경) */}
+                <div className="bg-mist/30 p-4.5 rounded-2xl border border-line/50">
+                    <span className="text-primary font-black block mb-1.5 text-xs">📝 지표 변동 사유 요약 코멘트</span>
+                    <p className="text-xs font-semibold text-obsidian/85 leading-relaxed break-keep">
+                        {sanitizeText(report.summary || '수면 및 활동성 지표는 양호한 흐름을 유지하고 있으나, 야간 식사 패턴 등의 영향으로 식습관 지표가 일시적으로 하락하였습니다. 야간 소화 부하에 따른 피로 신호 누적을 예방하기 위한 루틴 설정이 권장됩니다.')}
+                    </p>
                 </div>
             </div>
 
@@ -286,11 +299,11 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                         <p className="text-[10px] font-bold text-slate/40">생활 스냅 분석 결과 감지된 원인 결합</p>
                     </div>
 
-                    <div className="bg-mist p-5 rounded-2xl text-center font-black text-lg text-obsidian tracking-tight shadow-inner">
+                    <div className="bg-mist p-5 rounded-2xl text-center font-black text-base text-obsidian tracking-tight shadow-inner">
                         [심야 활동 기록 증가] <span className="text-primary">×</span> [늦은 식생활]
                     </div>
 
-                    <p className="text-xs font-bold text-slate/60 leading-relaxed break-keep">
+                    <p className="text-xs font-semibold text-slate/60 leading-relaxed break-keep">
                         야간 각성 활동이 증가하면서 수면 진입 직전 신체 피로도가 증가하였고, 이와 함께 늦은 시각 식사가 소화 기관에 스트레스를 더해 아침 기상 시의 회복감을 저해하고 있습니다.
                     </p>
                 </div>
@@ -319,21 +332,21 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                     <div className="bg-mist/30 p-5 rounded-2xl border border-line/60 space-y-2">
                         <span className="text-[9px] font-black text-primary uppercase tracking-widest block">Day 1 ~ Day 2</span>
                         <h5 className="font-bold text-sm text-obsidian">오후 야외 가벼운 산책</h5>
-                        <p className="text-xs font-medium text-slate/50 leading-relaxed">
+                        <p className="text-xs font-semibold text-slate/50 leading-relaxed">
                             오후 2시경 야외 가벼운 산책 10분으로 낮 시간대의 활동성을 고르게 유도합니다.
                         </p>
                     </div>
                     <div className="bg-mist/30 p-5 rounded-2xl border border-line/60 space-y-2">
                         <span className="text-[9px] font-black text-primary uppercase tracking-widest block">Day 3 ~ Day 5</span>
                         <h5 className="font-bold text-sm text-obsidian">심야 디바이스 화면 잠금</h5>
-                        <p className="text-xs font-medium text-slate/50 leading-relaxed">
+                        <p className="text-xs font-semibold text-slate/50 leading-relaxed">
                             밤 10시 이후 디바이스 노출을 최소화하여 수면 진입 전의 생체 각성을 줄여 줍니다.
                         </p>
                     </div>
                     <div className="bg-mist/30 p-5 rounded-2xl border border-line/60 space-y-2">
                         <span className="text-[9px] font-black text-primary uppercase tracking-widest block">Day 6 ~ Day 7</span>
                         <h5 className="font-bold text-sm text-obsidian">식사 후 3시간 공복 후 수면</h5>
-                        <p className="text-xs font-medium text-slate/50 leading-relaxed">
+                        <p className="text-xs font-semibold text-slate/50 leading-relaxed">
                             수면 전 식사 간격을 최소 3시간 유지하여 야간 소화계 무리를 방지합니다.
                         </p>
                     </div>
@@ -341,9 +354,9 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
             </div>
 
             {/* [Section 6] Legal Disclaimer Footer */}
-            <div className="text-center max-w-xl mx-auto pt-6 border-t border-line/50">
-                <p className="text-[10px] font-bold text-slate/40 leading-relaxed break-keep">
-                    "이 리포트는 진단서가 아닙니다. 사용자가 입력한 생활 기록을 바탕으로 회복 흐름과 반복 패턴을 이해하기 위한 개인 기록 리포트입니다. 의학적 판단이 필요한 경우 전문 의료진과 상담해야 합니다."
+            <div className="text-center max-w-xl mx-auto pt-4 border-t border-line/30">
+                <p className="text-[10px] font-semibold text-slate/40 leading-relaxed break-keep">
+                    이 리포트는 의학적 진단서가 아닙니다. 사용자가 입력한 생활 기록을 바탕으로 회복 흐름과 반복 패턴을 이해하기 위한 개인 참고용 리포트이며, 정확한 의학적 판단은 전문 의료진과 상담해야 합니다.
                 </p>
             </div>
 

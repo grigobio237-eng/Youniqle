@@ -57,7 +57,7 @@ export default function LandingContent({ onStart, onStartTherapy, isDiagnosing =
                 <Camera className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-2xl font-bold mb-4">라이프 스냅</h3>
-              <p className="text-foreground/50 leading-relaxed mb-8">당신의 하루를 사진으로 기록하세요. AI가 사진 속 숨겨진 회복의 신호를 읽어드립니다.</p>
+              <p className="text-foreground/50 leading-relaxed mb-8">당신의 하루를 사진으로 기록하세요. 유니클이 사진 속 숨겨진 회복의 신호를 읽어드립니다.</p>
               <Button 
                 variant="ghost" 
                 onClick={() => onStart()}

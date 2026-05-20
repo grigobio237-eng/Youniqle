@@ -133,112 +133,116 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                 key={currentSlot}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full"
+                transition={{ duration: 0.25 }}
             >
-                <Card className="bg-obsidian border-none rounded-[40px] overflow-hidden shadow-2xl relative min-h-[300px]">
+                <Card className="bg-obsidian border-none rounded-[20px] md:rounded-[40px] overflow-hidden shadow-2xl relative min-h-[170px] md:min-h-[300px]">
                     <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${THEMES[currentSlot]}`} />
-                    
-                    <CardContent className="p-6 md:p-10 relative z-10">
-                        {loading ? (
-                            <div className="flex flex-col items-center justify-center py-24 space-y-6 w-full">
-                                <div className="relative">
-                                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                                    <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-ping" />
-                                </div>
-                                <div className="space-y-2 text-center">
-                                    <p className="text-mist font-black text-base tracking-tighter">
-                                        유니클이 당신을 위한 루틴을 설계 중입니다...
-                                    </p>
-                                    <p className="text-mist/30 text-[10px] font-bold uppercase tracking-[0.2em]">
-                                        회복 데이터 및 환경 분석 중
-                                    </p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-8">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-3">
-                                            <Badge className="bg-primary text-background font-black text-[10px] uppercase tracking-widest px-3">
-                                                {LABELS[currentSlot]}
-                                            </Badge>
-                                            <span className="text-mist/40 text-[10px] font-bold">
-                                                {currentTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-3xl font-black text-mist tracking-tight">
-                                            {title}
-                                        </h3>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-4 bg-white/5 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10">
-                                        <div className="relative w-12 h-12 flex items-center justify-center">
-                                            <svg className="w-full h-full transform -rotate-90">
-                                                <circle cx="24" cy="24" r="20" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-white/10" />
-                                                <circle cx="24" cy="24" r="20" fill="transparent" stroke="currentColor" strokeWidth="4" 
-                                                    strokeDasharray={126} strokeDashoffset={126 - (126 * progress) / 100}
-                                                    className="text-primary transition-all duration-1000 ease-out" />
-                                            </svg>
-                                            <span className="absolute text-[10px] font-black text-mist">{progress}%</span>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-bold text-mist/40 uppercase">회복 점수</p>
-                                            <p className="text-xl font-black text-mist">{completedCount}/{tasks.length}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {tasks.map((task, idx) => {
-                                        const isDone = completedTasks.includes(task.id);
-                                        return (
-                                            <motion.div
-                                                key={task.id}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: idx * 0.1 }}
-                                                onClick={() => handleToggleTask(task.id)}
-                                                className={`group cursor-pointer flex items-center gap-5 p-5 rounded-3xl transition-all border ${
-                                                    isDone ? 'bg-primary/10 border-primary/30' : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20'
-                                                }`}
-                                            >
-                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-black/20 group-hover:scale-110 transition-transform ${isDone ? 'grayscale-0' : 'grayscale'}`}>
-                                                    {task.icon}
-                                                </div>
-                                                
-                                                <div className="flex-1">
-                                                    <h4 className={`text-lg font-black transition-colors ${isDone ? 'text-primary' : 'text-mist'}`}>
-                                                        {task.title}
-                                                    </h4>
-                                                    <p className="text-sm font-medium text-mist/50 line-clamp-1">
-                                                        {task.desc}
-                                                    </p>
-                                                </div>
-
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isDone ? 'bg-primary text-background' : 'border-2 border-white/20 text-white/20'}`}>
-                                                    {isDone ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
-                                                </div>
-                                            </motion.div>
-                                        );
-                                    })}
-                                </div>
-
-                                {progress === 100 && tasks.length > 0 && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="bg-primary/20 border border-primary/30 p-4 rounded-2xl flex items-center justify-center gap-3"
-                                    >
-                                        <Trophy className="w-5 h-5 text-primary" />
-                                        <p className="text-sm font-black text-primary uppercase tracking-tighter">오늘의 완벽한 회복! +10 포인트 적립</p>
-                                    </motion.div>
-                                )}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </motion.div>
-        </AnimatePresence>
-    );
-}
+                     
+                     <CardContent className="p-3 md:p-10 relative z-10">
+                         {loading ? (
+                             <div className="flex flex-col items-center justify-center py-16 md:py-24 space-y-4 md:space-y-6 w-full">
+                                 <div className="relative">
+                                     <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
+                                     <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-ping" />
+                                 </div>
+                                 <div className="space-y-1 md:space-y-2 text-center">
+                                     <p className="text-mist font-black text-sm md:text-base tracking-tighter">
+                                         유니클이 당신을 위한 루틴을 설계 중입니다...
+                                     </p>
+                                     <p className="text-mist/30 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]">
+                                         회복 데이터 및 환경 분석 중
+                                     </p>
+                                 </div>
+                             </div>
+                         ) : (
+                             <div className="flex flex-col gap-2.5 md:gap-8">
+                                 <div className="flex justify-between items-center gap-2">
+                                     <div className="space-y-0.5 md:space-y-1">
+                                         <div className="flex items-center gap-2 md:gap-3">
+                                             <Badge className="bg-primary text-background font-black text-[9px] md:text-[10px] uppercase tracking-widest px-2 md:px-3 py-0.5">
+                                                 {LABELS[currentSlot]}
+                                             </Badge>
+                                             <span className="text-mist/40 text-[9px] md:text-[10px] font-bold">
+                                                 {currentTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                             </span>
+                                         </div>
+                                         <h3 className="text-xs md:text-3xl font-black text-mist tracking-tight leading-tight">
+                                             {title}
+                                         </h3>
+                                     </div>
+                                     
+                                     <div className="flex items-center gap-1.5 md:gap-4 bg-white/5 backdrop-blur-md rounded-xl md:rounded-2xl px-2 py-0.5 md:px-5 md:py-3 border border-white/10 flex-shrink-0">
+                                         <div className="relative w-8 h-8 md:w-12 md:h-12 flex items-center justify-center flex-shrink-0">
+                                             <svg className="w-full h-full transform -rotate-90">
+                                                 <circle cx="16" cy="16" r="13" fill="transparent" stroke="currentColor" strokeWidth="2.5" className="text-white/10 hidden md:block" />
+                                                 <circle cx="16" cy="16" r="13" fill="transparent" stroke="currentColor" strokeWidth="2.5" 
+                                                     strokeDasharray={82} strokeDashoffset={82 - (82 * progress) / 100}
+                                                     className="text-primary transition-all duration-1000 ease-out hidden md:block" />
+                                                 
+                                                 <circle cx="12" cy="12" r="9" fill="transparent" stroke="currentColor" strokeWidth="2" className="text-white/10 md:hidden" />
+                                                 <circle cx="12" cy="12" r="9" fill="transparent" stroke="currentColor" strokeWidth="2" 
+                                                     strokeDasharray={57} strokeDashoffset={57 - (57 * progress) / 100}
+                                                     className="text-primary transition-all duration-1000 ease-out md:hidden" />
+                                             </svg>
+                                             <span className="absolute text-[8px] md:text-[10px] font-black text-mist">{progress}%</span>
+                                         </div>
+                                         <div className="text-right leading-none">
+                                             <p className="text-[8px] md:text-[10px] font-bold text-mist/40 uppercase mb-0.5">회복 점수</p>
+                                             <p className="text-xs md:text-xl font-black text-mist">{completedCount}/{tasks.length}</p>
+                                         </div>
+                                     </div>
+                                 </div>
+ 
+                                 <div className="space-y-1.5 md:space-y-4">
+                                     {tasks.map((task, idx) => {
+                                         const isDone = completedTasks.includes(task.id);
+                                         return (
+                                             <motion.div
+                                                 key={task.id}
+                                                 initial={{ opacity: 0, x: -20 }}
+                                                 animate={{ opacity: 1, x: 0 }}
+                                                 transition={{ delay: idx * 0.1 }}
+                                                 onClick={() => handleToggleTask(task.id)}
+                                                 className={`group cursor-pointer flex items-center gap-2 md:gap-3.5 p-2 md:p-3 rounded-xl md:rounded-2xl transition-all border ${
+                                                     isDone ? 'bg-primary/10 border-primary/30' : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20'
+                                                 }`}
+                                             >
+                                                 <div className={`w-8 h-8 md:w-14 md:h-14 rounded-lg md:rounded-2xl flex items-center justify-center text-sm md:text-2xl bg-black/20 group-hover:scale-110 transition-transform flex-shrink-0 ${isDone ? 'grayscale-0' : 'grayscale'}`}>
+                                                     {task.icon}
+                                                 </div>
+                                                 
+                                                 <div className="flex-1 min-w-0">
+                                                     <h4 className={`text-[11px] md:text-lg font-black transition-colors truncate ${isDone ? 'text-primary' : 'text-mist'}`}>
+                                                         {task.title}
+                                                     </h4>
+                                                     <p className="text-[9px] md:text-sm font-medium text-mist/50 line-clamp-1">
+                                                         {task.desc}
+                                                     </p>
+                                                 </div>
+ 
+                                                 <div className={`w-5 h-5 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${isDone ? 'bg-primary text-background' : 'border-2 border-white/20 text-white/20'}`}>
+                                                     {isDone ? <CheckCircle2 className="w-3.5 h-3.5 md:w-6 md:h-6" /> : <Circle className="w-3.5 h-3.5 md:w-6 md:h-6" />}
+                                                 </div>
+                                             </motion.div>
+                                         );
+                                     })}
+                                 </div>
+ 
+                                 {progress === 100 && tasks.length > 0 && (
+                                     <motion.div 
+                                         initial={{ opacity: 0, scale: 0.9 }}
+                                         animate={{ opacity: 1, scale: 1 }}
+                                         className="bg-primary/20 border border-primary/30 p-3 md:p-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 md:gap-3"
+                                     >
+                                         <Trophy className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                                         <p className="text-xs md:text-sm font-black text-primary uppercase tracking-tighter">오늘의 완벽한 회복! +10 포인트 적립</p>
+                                     </motion.div>
+                                 )}
+                             </div>
+                         )}
+                     </CardContent>
+                 </Card>
+             </motion.div>
+         </AnimatePresence>
+     );
+ }

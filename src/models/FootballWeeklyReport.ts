@@ -8,8 +8,8 @@ export interface IFootballWeeklyReport extends Document {
     averageWellnessScore: number;
     highestAcwr: number;
     lowestAcwr: number;
-    aiSummary: string; // AI가 생성한 3-4문장 요약
-    aiRecommendations: string[]; // AI가 제안하는 훈련 및 회복 방향
+    aiSummary: string; // Youniqle 엔진이 생성한 3-4문장 요약
+    aiRecommendations: string[]; // Youniqle 엔진이 제안하는 훈련 및 회복 방향
     createdAt: Date;
     updatedAt: Date;
 }

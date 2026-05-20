@@ -16,6 +16,8 @@ import RecoveryInsightView from '@/components/dashboard/RecoveryInsightView';
 import RecoveryStatusHero from '@/components/dashboard/RecoveryStatusHero';
 import AiNudgeBanner, { AiNudge } from '@/components/dashboard/AiNudgeBanner';
 import { useSession } from 'next-auth/react';
+import RecoveryModal from '@/components/dashboard/RecoveryModal';
+
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -23,8 +25,10 @@ export default function DashboardPage() {
   const [scoreHistory, setScoreHistory] = useState<any[]>([]);
   const [radarData, setRadarData] = useState<any[]>([]);
   const [showWebtoonDialog, setShowWebtoonDialog] = useState(false);
+  const [showSleepModal, setShowSleepModal] = useState(false);
   const [nudges, setNudges] = useState<AiNudge[]>([]);
   const [loading, setLoading] = useState(true);
+
   const fetchedRef = React.useRef(false);
 
   const fetchDashboardData = async (isRefresh = false) => {
@@ -218,7 +222,9 @@ export default function DashboardPage() {
         radarData={radarData}
         assetStats={data?.assetStats}
         userName={session?.user?.name || '사용자'}
+        onOpenSleepModal={() => setShowSleepModal(true)}
       />
+
 
       {/* AI Nudge Banners Area */}
       {nudges.length > 0 && (
@@ -299,6 +305,18 @@ export default function DashboardPage() {
           <RecoveryToolkitView userTier={data.user?.grade} userRole={data.user?.role} />
         )}
       </div>
+
+      {/* 🌙 수면 기록 퀵 모달 */}
+      <RecoveryModal 
+        open={showSleepModal} 
+        onOpenChange={(open) => {
+          setShowSleepModal(open);
+          if (!open) {
+            fetchDashboardData(true); // 모달이 닫힐 때 대시보드 데이터 최신 갱신
+          }
+        }} 
+      />
     </div>
+
   );
 }

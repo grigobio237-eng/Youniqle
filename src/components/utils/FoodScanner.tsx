@@ -293,7 +293,7 @@ export default function FoodScanner({
                                 <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Ready to Scan</h3>
                                 <p className="text-white/60 text-xs font-bold leading-relaxed break-keep px-4">
                                     클릭하여 카메라로 음식을 촬영하거나 사진을 선택하세요.<br />
-                                    제미나이 AI가 영양과 칼로리를 정밀 분석합니다.
+                                    제미나이 유니클 엔진이 영양과 칼로리를 정밀 분석합니다.
                                 </p>
                             </div>
                             <div className="flex flex-wrap justify-center gap-2">

@@ -228,13 +228,13 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       )}
 
       {/* 🟢 1. Recovery Flow Timeline */}
-      <section className="container mx-auto px-6 pt-8 pb-10 max-w-5xl relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-primary/60" />
-            <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Recovery Journey</span>
+      <section className="container mx-auto px-4 pt-3 pb-3 max-w-5xl relative z-10">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-primary/60" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-foreground/30">Recovery Journey</span>
           </div>
-          <Badge className="bg-primary/5 text-primary border-none text-[11px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
+          <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
             {(unifiedData.certificateStatus?.issuedCertificates?.length || 0) + 1}회차: {currentJourneyDay}/7 Days
           </Badge>
         </div>
@@ -242,10 +242,10 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       </section>
 
       {/* 🟣 2. Today's Rhythm Analysis */}
-      <section className="container mx-auto px-6 pb-10 max-w-5xl relative z-10">
-        <div className="flex items-center gap-3 mb-6">
-          <Sparkles className="w-5 h-5 text-reward-gold" />
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/30">Today's Insight</span>
+      <section className="container mx-auto px-4 pb-3 max-w-5xl relative z-10">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-4 h-4 text-reward-gold" />
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-foreground/30">Today's Insight</span>
         </div>
         <TodayRhythmCard 
           score={displayScore} 
@@ -254,7 +254,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
       </section>
 
       {/* 🔵 3. Secondary Info Grid */}
-      <section className="container mx-auto px-6 pb-8 max-w-5xl relative z-10">
+      <section className="container mx-auto px-4 pb-3 max-w-5xl relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Membership Management - Premium Dark Mode */}
           <div className="bg-obsidian rounded-[32px] p-6 border border-white/10 flex items-center justify-between group cursor-pointer hover:bg-[#1a1a1a] transition-all shadow-xl shadow-obsidian/20 relative overflow-hidden" onClick={() => window.location.href='/membership'}>

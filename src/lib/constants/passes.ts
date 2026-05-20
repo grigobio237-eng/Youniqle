@@ -17,7 +17,7 @@ export const PASS_SPECS: Record<string, any> = {
       '작은 루틴부터 가볍게 시작하고 싶으신 분'
     ],
     keyBenefits: [
-      { id: 1, title: '데일리 리듬 체크', desc: '1일 1회 AI 기반의 컨디션 및 회복 점수를 산출합니다.' },
+      { id: 1, title: '데일리 리듬 체크', desc: '1일 1회 Youniqle 기반의 컨디션 및 회복 점수를 산출합니다.' },
       { id: 2, title: '기본 회복 리포트', desc: '오늘의 데이터를 바탕으로 한 기초적인 성향 분석을 제공합니다.' },
       { id: 3, title: '7일 루틴 가이드', desc: '회복의 감각을 깨우는 초기 7일 루틴을 체험할 수 있습니다.' }
     ],

@@ -463,7 +463,7 @@ export default function PersonalityHistoryPage() {
                             </div>
 
                             <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 text-center">
-                                <p className="text-sm font-bold text-obsidian">상세한 맞춤형 가이드북은 현재 AI가 생성 중입니다.</p>
+                                <p className="text-sm font-bold text-obsidian">상세한 맞춤형 가이드북은 현재 유니클 엔진이 생성 중입니다.</p>
                                 <p className="text-xs text-slate-500 mt-1">곧 정식 버전으로 만나보실 수 있습니다.</p>
                             </div>
                         </div>

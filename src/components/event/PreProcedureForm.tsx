@@ -573,7 +573,7 @@ export default function PreProcedureForm() {
                     <p className="text-sm font-black text-primary animate-pulse">
                       {isAutoAnalyzing 
                         ? "사용자의 최근 회복 데이터를 기반으로 상태 정리표를 생성 중입니다..." 
-                        : "유니클 AI가 증상을 정밀 분석하여 맞춤 상태 체크 리스트를 구성하고 있습니다..."}
+                      : "유니클이 증상을 정밀 분석하여 맞춤 상태 체크 리스트를 구성하고 있습니다..."}
 
                     </p>
                   </motion.div>

@@ -27,49 +27,66 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
     const displayScore = score?.totalScore || 0;
     const isGuardian = user?.footballRole === 'guardian';
 
+    // 법인/회사 괄호 등 지저분한 접미사 정밀 정제 로직
+    const sanitizeText = (text: string) => {
+        if (!text) return '';
+        return text
+            .replace(/주식회사/g, '')
+            .replace(/\(주\)/g, '')
+            .replace(/주\)/g, '')
+            .replace(/\(주/g, '')
+            .trim();
+    };
+
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-6 pb-6">
             {/* Header */}
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1">
                 <Badge className="bg-primary text-obsidian border-none text-[10px] font-black px-3 py-1 uppercase tracking-widest">Precision Intelligence</Badge>
-                <h2 className="text-3xl font-black text-obsidian tracking-tight italic">전문 데이터 분석</h2>
-                <p className="text-slate text-sm font-medium">유니클이 분석한 당신의 회복 패턴과 최적화 솔루션입니다.</p>
+                <h2 className="text-2xl font-black text-obsidian tracking-tight">전문 데이터 분석</h2>
+                <p className="text-slate text-xs font-semibold">유니클이 분석한 당신의 회복 패턴과 최적화 솔루션입니다.</p>
             </div>
 
             {/* AI Manager Summary Section */}
             <section>
                 <Card className="bg-white border border-line rounded-[32px] overflow-hidden shadow-xl shadow-obsidian/5 hover:shadow-2xl transition-all">
-                    <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
-                        <div className="w-20 h-20 md:w-28 md:h-28 bg-mist rounded-[24px] flex items-center justify-center shadow-inner shrink-0 overflow-hidden border border-line/50">
+                    <CardContent className="p-5 md:p-8 flex flex-col md:flex-row items-center gap-5 md:gap-8">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-mist rounded-[24px] flex items-center justify-center shadow-inner shrink-0 overflow-hidden border border-line/50">
                             <img 
                                 src="/images/characters/char_dday.png" 
                                 alt="Youniqle Manager" 
                                 className="w-full h-full object-contain"
                             />
                         </div>
-                        <div className="flex-1 text-center md:text-left space-y-4">
-                            <div className="flex flex-col md:flex-row items-center gap-4">
-                                <h3 className="font-black text-2xl text-obsidian tracking-tight flex items-center gap-2">
-                                    <Brain className="w-6 h-6 text-primary" />
+                        <div className="flex-1 w-full text-center md:text-left space-y-3">
+                            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3">
+                                <h3 className="font-black text-lg text-obsidian tracking-tight flex items-center gap-2">
+                                    <Brain className="w-5 h-5 text-primary" />
                                     유니클 매니저 통합 코멘트
                                 </h3>
-                                <Badge className="bg-obsidian text-mist border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">
+                                <Badge className="bg-obsidian text-mist border-none text-[9px] font-black tracking-widest uppercase px-2 py-0.5">
                                     {isPremium ? 'Expert Analysis' : 'Standard Analysis'}
                                 </Badge>
                             </div>
-                            <p className="text-lg text-obsidian font-bold leading-relaxed italic">
-                                {weeklyReport?.summary ? (
-                                    `"${weeklyReport.summary}"`
-                                ) : isPremium ? (
-                                    `"${displayScore >= 70 
-                                        ? '현재 회복 흐름이 매우 우수합니다. 수면 데이터 분석 결과, 깊은 수면 단계 진입이 빨라지고 있습니다. 이 리듬을 유지한다면 다음 주에는 신체적 가동 범위가 15% 이상 개선될 것으로 예측됩니다.' 
-                                        : '회복 지수가 불안정한 흐름을 보이고 있습니다. 어제 기록된 높은 피로도는 수면 전 블루라이트 노출과 연관이 있을 수 있습니다. 오늘부터 수면 전 30분 디지털 디톡스를 권장합니다.'}"` 
-                                ) : (
-                                    `"${displayScore >= 70 
-                                        ? '전반적으로 양호한 상태입니다. 꾸준한 기록이 좋은 성과를 내고 있습니다.' 
-                                        : '신체적 피로도가 감지되었습니다. 충분한 휴식과 수분 섭취가 필요합니다.'}"` 
-                                )}
-                            </p>
+                            
+                            {/* 이탤릭을 제거하고 시인성이 극대화된 고급 쿼트 보드 래퍼 */}
+                            <div className="bg-mist/30 border border-line/50 p-4 md:p-5 rounded-2xl relative">
+                                <span className="absolute top-2 left-3 text-3xl font-serif text-primary/30 leading-none">“</span>
+                                <p className="text-xs md:text-sm font-semibold leading-relaxed text-obsidian/80 px-4 pt-1 break-keep text-left">
+                                    {sanitizeText(
+                                        weeklyReport?.summary || (
+                                            isPremium 
+                                                ? (displayScore >= 70 
+                                                    ? '현재 회복 흐름이 매우 우수합니다. 수면 데이터 분석 결과, 깊은 수면 단계 진입이 빨라지고 있습니다. 이 리듬을 유지한다면 다음 주에는 신체적 가동 범위가 15% 이상 개선될 것으로 예측됩니다.' 
+                                                    : '회복 지수가 불안정한 흐름을 보이고 있습니다. 어제 기록된 높은 피로도는 수면 전 블루라이트 노출과 연관이 있을 수 있습니다. 오늘부터 수면 전 30분 디지털 디톡스를 권장합니다.')
+                                                : (displayScore >= 70 
+                                                    ? '전반적으로 양호한 상태입니다. 꾸준한 기록이 좋은 성과를 내고 있습니다.' 
+                                                    : '신체적 피로도가 감지되었습니다. 충분한 휴식과 수분 섭취가 필요합니다.')
+                                        )
+                                    )}
+                                </p>
+                            </div>
+
                             {!isPremium && (
                                 <p className="text-[10px] text-slate/40 font-bold flex items-center justify-center md:justify-start gap-1">
                                     <Lock className="w-3 h-3 opacity-50" />
@@ -90,9 +107,9 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
             )}
 
             {/* Weekly Report Section */}
-            <section className="space-y-6">
+            <section className="space-y-4">
                 <div className="flex items-center justify-between px-2">
-                    <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                    <h3 className="text-lg font-black text-obsidian tracking-tight flex items-center gap-2">
                         <BarChart3 className="w-5 h-5 text-chapter-accent" />
                         주간 회복 리포트
                     </h3>
@@ -105,19 +122,19 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
 
             {/* Data-driven Insights (If available) */}
             {(insights?.posture || insights?.meal) && (
-                <section className="space-y-8">
+                <section className="space-y-4">
                     <div className="flex items-center justify-between px-2">
-                        <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                        <h3 className="text-lg font-black text-obsidian tracking-tight flex items-center gap-2">
                             <PieChart className="w-5 h-5 text-reward-gold" />
                             영역별 정밀 가이드
                         </h3>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {insights.posture && (
                             <ActionableInsightCard type="posture" insight={insights.posture} />
                         )}
                         {insights.meal && (
-                            <div className="space-y-8">
+                            <div className="space-y-6">
                                 <ActionableInsightCard type="meal" insight={insights.meal} />
                                 <MealNutrientChart
                                     nutrients={insights.meal.nutrients}
@@ -149,11 +166,12 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                     </div>
                 </Card>
             )}
+            
             {/* Recommended Products (Moved to the very bottom) */}
             {recommendedProducts && recommendedProducts.length > 0 && (
-                <section className="space-y-4 pt-8 border-t border-line/30">
+                <section className="space-y-4 pt-6 border-t border-line/30">
                     <div className="flex items-center justify-between px-2">
-                        <h3 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
+                        <h3 className="text-lg font-black text-obsidian tracking-tight flex items-center gap-2">
                             <ShoppingBag className="w-5 h-5 text-reward-gold" />
                             유니클 샵 맞춤 추천 상품
                         </h3>

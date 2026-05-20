@@ -8,7 +8,7 @@ export interface ILifeSnap extends Document {
     category: SnapCategory; // 스냅 종류 (9가지)
     imageUrl: string; // 업로드/스캔된 원본 또는 압축된 이미지 URL
     
-    // AI 분석 결과
+    // Youniqle 엔진 분석 결과
     score?: number; // 건강/매칭 점수 (0-100)
     summary?: string; // 한 줄 요약 문구
     metrics?: Record<string, any>; // 카테고리별 세부 데이터 (예: 영양소, 수면 시간, 피부 톤 등)

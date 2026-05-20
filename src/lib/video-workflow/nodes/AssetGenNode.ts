@@ -88,7 +88,7 @@ export class AssetGenNode {
                 }
             }
 
-            // 3. 파일이 없는 경우에만 AI 생성 (Vision 분석 포함)
+            // 3. 파일이 없는 경우에만 Youniqle 엔진 생성 (Vision 분석 포함)
             if (!fs.existsSync(imagePath)) {
                 console.log(`[AssetNode] Analyzing reference assets for scene ${scene.id}...`);
 

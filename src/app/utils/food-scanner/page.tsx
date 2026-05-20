@@ -30,7 +30,7 @@ export default function FoodScannerPage() {
                         </h1>
                         <p className="text-xl md:text-2xl text-slate font-medium max-w-2xl mx-auto leading-relaxed">
                             선수들이 하루 동안 먹는 음식을 카메라로 찍고 분석하는<br />
-                            유니클의 실시간 비전 AI 영양 분석 카메라입니다.
+                            유니클의 실시간 비전 영양 분석 카메라입니다.
                         </p>
                         
                         <div className="flex items-center justify-center gap-4 text-sm font-black uppercase tracking-widest text-slate/40">
@@ -61,7 +61,7 @@ export default function FoodScannerPage() {
                     <div className="max-w-xl mx-auto p-12 bg-white/50 backdrop-blur-xl rounded-[40px] border border-line text-center space-y-4">
                         <h4 className="text-lg font-black text-obsidian tracking-tight">유니클 푸드 스캐너 이용 안내</h4>
                         <p className="text-sm font-medium text-slate opacity-60 leading-relaxed">
-                            매 끼니마다 음식을 카메라로 찍으면 제미나이 AI가 영양성분을 정밀하게 분석합니다. <br />
+                            매 끼니마다 음식을 카메라로 찍으면 제미나이 유니클 엔진이 영양성분을 정밀하게 분석합니다. <br />
                             분석된 칼로리 점수와 코멘트는 실시간으로 클럽하우스 DB에 기록되며, <br />
                             코치 및 보호자의 대시보드 화면에 즉시 동기화되어 소속 팀과 연동됩니다.
                         </p>
