@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
             "analysisTable": [
                 { "label": "항목(예: 칼로리, 조도, 홍조 등)", "value": "상태/수치", "benefit": "회복에 미치는 긍정적 이점" }
             ],
-            "futureDirection": "향후 추천되는 다음 회복 단계",
+            "futureDirection": "향후 추천되는 다음 회복 단계. 사용자가 모바일에서 3초 안에 핵심 가이드를 한눈에 스캔할 수 있도록 반드시 적절한 이모지(Emoji), 마크다운 볼드(**), 그리고 줄바꿈(\\n)을 활용한 3줄 이내의 리스트 형태로 작성하세요. (예: 🚨 **현재 상황:** ...\\n💡 **권장 행동:** ...\\n🍵 **대체 루틴:** ...)",
             "matchScore": 85
         }
         `;

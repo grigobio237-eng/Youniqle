@@ -84,7 +84,7 @@ export default function DailySmallActions({ score = 50, initialData }: { score?:
         return (
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-xs font-black text-slate/40 uppercase tracking-widest">AI가 오늘의 하루를 설계 중...</p>
+                <p className="text-xs font-black text-slate/40 uppercase tracking-widest">유니클이 오늘의 하루를 설계 중...</p>
             </div>
         );
     }

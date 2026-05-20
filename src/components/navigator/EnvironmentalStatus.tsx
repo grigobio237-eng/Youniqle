@@ -90,7 +90,7 @@ export default function EnvironmentalStatus() {
           </div>
           <div className="flex items-center gap-1.5">
             <Wind className="w-3 h-3 text-emerald-400" />
-            <span>DUST: {weather?.dust}</span>
+            <span>미세먼지: {weather?.dust}</span>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function EnvironmentalStatus() {
         className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full"
       >
         <Zap className="w-3 h-3 text-primary fill-current" />
-        <span className="text-[10px] font-black text-primary uppercase">Optimizing Routine...</span>
+        <span className="text-[10px] font-black text-primary uppercase">루틴 최적화 중...</span>
       </motion.div>
     </motion.div>
   );

@@ -66,7 +66,7 @@ export default function DailyFlowTimeline() {
                         <Clock className="w-4 h-4 text-primary" />
                         데일리 회복 타임라인
                     </h3>
-                    <Badge variant="outline" className="text-[10px] font-bold opacity-60">TODAY'S FLOW</Badge>
+                    <Badge variant="outline" className="text-[10px] font-bold opacity-60">오늘의 회복 흐름</Badge>
                 </div>
 
                 <div className="relative flex justify-between items-start">

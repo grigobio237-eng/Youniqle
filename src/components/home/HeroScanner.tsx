@@ -323,8 +323,12 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
         };
 
         return (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                <Card className="rounded-5xl border-none shadow-2xl shadow-primary/5 overflow-hidden bg-white">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="space-y-6 fixed inset-0 z-[100] bg-mist overflow-y-auto w-full h-full p-4 md:relative md:inset-auto md:z-auto md:p-0 md:bg-transparent md:h-auto"
+            >
+                <Card className="rounded-[40px] md:rounded-5xl border-none shadow-2xl shadow-primary/5 overflow-hidden bg-white max-w-lg mx-auto my-4 md:my-0">
                     {isDiagnosing && (
                         <div className="absolute top-0 left-0 right-0 h-1.5 z-50 bg-mist">
                             <motion.div 
@@ -335,49 +339,49 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                             />
                         </div>
                     )}
-                    <div className="relative h-72 overflow-hidden">
+                    <div className="relative h-64 md:h-72 overflow-hidden">
                         {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                        <div className="absolute bottom-8 left-10 right-10 flex items-end justify-between">
+                        <div className="absolute bottom-6 md:bottom-8 left-6 md:left-10 right-6 md:right-10 flex items-end justify-between">
                             <div className="space-y-2">
                                 <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full backdrop-blur-md">
                                     {categoryMap[result.type as keyof typeof categoryMap]?.icon} {categoryMap[result.type as keyof typeof categoryMap]?.label}
                                 </Badge>
-                                <h4 className="text-3xl font-bold tracking-tight">{result.subjectName}</h4>
+                                <h4 className="text-2xl md:text-3xl font-bold tracking-tight">{result.subjectName}</h4>
                                 <div className="text-[11px] font-bold uppercase tracking-widest text-primary/60 flex items-center gap-1.5">
                                     <Activity className="w-3.5 h-3.5" /> Recovery Insights
                                 </div>
                             </div>
                             <div className="text-right">
                                 <span className="text-[10px] font-bold uppercase tracking-widest block mb-1 text-foreground/40">MATCH SCORE</span>
-                                <span className="text-5xl font-black tracking-tighter text-primary">{result.matchScore}<span className="text-lg opacity-30">/100</span></span>
+                                <span className="text-4xl md:text-5xl font-black tracking-tighter text-primary">{result.matchScore}<span className="text-lg opacity-30">/100</span></span>
                             </div>
                         </div>
                         <button 
                             onClick={() => setStatus('idle')} 
-                            className="absolute top-8 right-8 p-3 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full text-foreground/40 hover:text-primary transition-all shadow-sm"
+                            className="absolute top-6 right-6 md:top-8 md:right-8 p-3 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full text-foreground/40 hover:text-primary transition-all shadow-sm"
                             aria-label="닫기"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
-                    <CardContent className="p-10 space-y-10">
-                        <div className="space-y-4">
+                    <CardContent className="p-6 md:p-10 space-y-6 md:space-y-10">
+                        <div className="space-y-3 md:space-y-4">
                             <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
                                 <Brain className="w-4 h-4" /> Youniqle Personalized Summary
                             </div>
-                            <div className="bg-mist/30 p-8 rounded-5xl border border-primary/5 italic text-2xl font-bold leading-tight text-foreground/80">
+                            <div className="bg-mist/30 p-5 md:p-8 rounded-[32px] md:rounded-5xl border border-primary/5 italic text-lg md:text-2xl font-bold leading-tight text-foreground/80">
                                 "{result.summary}"
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3 md:space-y-4">
                             <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
                                 <Sprout className="w-4 h-4" /> Growth Analysis
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {result.analysisTable?.map((item, idx) => (
-                                    <div key={idx} className="p-6 rounded-4xl bg-white border border-primary/10 shadow-sm hover:shadow-md transition-all">
+                                    <div key={idx} className="p-5 md:p-6 rounded-[28px] md:rounded-4xl bg-white border border-primary/10 shadow-sm hover:shadow-md transition-all">
                                         <div className="flex justify-between items-start mb-3">
                                             <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{item.label}</span>
                                             <Badge variant="outline" className="text-[10px] font-bold border-primary/20 text-primary bg-primary/5">
@@ -390,35 +394,84 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                             </div>
                         </div>
 
-                        <div className="p-8 rounded-5xl bg-foreground text-white space-y-4 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-transform duration-1000" />
-                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 relative z-10">
-                                <Sparkles className="w-4 h-4 text-primary" /> Gentle Recovery Guide
+                        <div className="p-6 md:p-8 rounded-[32px] md:rounded-5xl bg-primary/5 border border-primary/10 space-y-4 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-transform duration-1000" />
+                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-primary relative z-10">
+                                <Sparkles className="w-4 h-4 text-primary animate-pulse" /> Gentle Recovery Guide
                             </div>
-                            <p className="text-base font-medium leading-relaxed relative z-10 text-white/90">
-                                {result.futureDirection}
-                            </p>
+                            <div className="space-y-3 relative z-10">
+                                {result.futureDirection.split(/\n|\\n/).filter(line => line.trim().length > 0).map((line, index) => {
+                                    const parts = line.split(/(\*\*.*?\*\*)/g);
+                                    return (
+                                        <div key={index} className="flex items-start gap-3 bg-white/80 backdrop-blur-sm p-4 rounded-3xl border border-primary/5 shadow-sm hover:shadow transition-all duration-300">
+                                            <span className="text-primary font-bold text-base leading-none mt-0.5 select-none">•</span>
+                                            <p className="text-sm md:text-base font-medium text-foreground/80 leading-relaxed">
+                                                {parts.map((part, pIdx) => {
+                                                    if (part.startsWith('**') && part.endsWith('**')) {
+                                                        return <strong key={pIdx} className="text-primary font-extrabold">{part.slice(2, -2)}</strong>;
+                                                    }
+                                                    return part;
+                                                })}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
 
-                        <div className="pt-6">
-                            <Button 
-                                onClick={() => onStart(result || undefined, capturedImage || undefined)}
-                                disabled={isDiagnosing}
-                                className={`w-full h-20 rounded-full text-xl font-bold shadow-2xl transition-all group relative overflow-hidden ${isDiagnosing ? 'bg-mist' : 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'}`}
-                            >
-                                {isDiagnosing ? (
-                                    <div className="flex items-center gap-3">
-                                        <Loader2 className="w-6 h-6 animate-spin" />
-                                        <span>맞춤 질문 생성 중... {Math.round(progress)}%</span>
+                        <div className="pt-4 md:pt-6 flex flex-col gap-3">
+                            {isDiagnosing ? (
+                                <div className="w-full bg-primary/5 border border-primary/10 rounded-[32px] p-5 md:p-6 space-y-4 relative overflow-hidden shadow-inner">
+                                    {/* Shimmer/Scanner line effect running from left to right */}
+                                    <motion.div 
+                                        animate={{ x: ['-100%', '200%'] }}
+                                        transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                                        className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-primary/10 to-transparent pointer-events-none"
+                                    />
+                                    
+                                    <div className="flex justify-between items-center text-xs md:text-sm font-bold text-primary relative z-10">
+                                        <div className="flex items-center gap-2.5">
+                                            <Loader2 className="w-4 h-4 animate-spin text-primary shrink-0" />
+                                            <span className="tracking-tight text-foreground/80">{loadingText}</span>
+                                        </div>
+                                        <span className="font-mono text-sm shrink-0 bg-primary/10 px-2 py-0.5 rounded-full">{Math.round(progress)}%</span>
                                     </div>
-                                ) : (
-                                    <div className="flex items-center justify-center gap-3">
-                                        <Heart className="w-6 h-6 animate-pulse" />
+                                    
+                                    {/* Progress Bar Container */}
+                                    <div className="h-2.5 w-full bg-primary/10 rounded-full overflow-hidden relative z-10 border border-primary/5">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progress}%` }}
+                                            className="h-full bg-primary rounded-full relative"
+                                            transition={{ type: 'spring', stiffness: 60, damping: 12 }}
+                                        >
+                                            {/* Glow effect on progress bar cap */}
+                                            <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-white/40 blur-[1px]" />
+                                        </motion.div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Button 
+                                    onClick={() => onStart(result || undefined, capturedImage || undefined)}
+                                    className="w-full h-16 md:h-20 rounded-full text-sm sm:text-base md:text-xl font-bold shadow-2xl transition-all group relative overflow-hidden bg-primary hover:bg-primary/90 text-white shadow-primary/20"
+                                >
+                                    <div className="flex items-center justify-center gap-2 md:gap-3">
+                                        <Heart className="w-5 h-5 md:w-6 md:h-6 animate-pulse" />
                                         <span>60초 리듬체크 시작하기</span>
-                                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                        <ArrowRight className="ml-1 md:ml-2 w-4.5 h-4.5 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
                                     </div>
-                                )}
-                            </Button>
+                                </Button>
+                            )}
+                            
+                            {!isDiagnosing && (
+                                <Button 
+                                    variant="ghost" 
+                                    onClick={() => setStatus('idle')}
+                                    className="w-full h-12 md:hidden rounded-full text-foreground/50 hover:text-foreground font-bold text-sm"
+                                >
+                                    닫기
+                                </Button>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

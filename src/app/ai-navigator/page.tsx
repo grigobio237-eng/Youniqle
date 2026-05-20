@@ -349,7 +349,7 @@ export default function AiNavigatorPage() {
                             <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 gap-8">
                                 <div className="space-y-4">
                                     <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
-                                        AI Recovery Navigator
+                                        유니클 회복 내비게이터
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">오늘 리듬체크</h1>
                                     <React.Suspense fallback={<div className="h-10 w-40 bg-mist animate-pulse rounded-full" />}>
@@ -361,7 +361,7 @@ export default function AiNavigatorPage() {
                                 <div className="w-full md:w-auto bg-white rounded-[32px] p-5 border border-obsidian/5 shadow-xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
                                     <div className="flex items-center gap-6">
                                         <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">Total Assets</p>
+                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">총 회복 자산</p>
                                             <div className="flex items-end gap-1">
                                                 <span className="text-3xl font-black text-obsidian">{(assetStats?.precisionDiagnosis || 0) + (assetStats?.dailyRhythmLog || 0)}</span>
                                                 <span className="text-[10px] font-bold text-slate/40 mb-1.5">건</span>
@@ -369,10 +369,10 @@ export default function AiNavigatorPage() {
                                         </div>
                                         <div className="w-px h-10 bg-line/50" />
                                         <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">Value</p>
+                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">회복 포인트</p>
                                             <div className="flex items-end gap-1">
                                                 <span className="text-3xl font-black text-primary">{assetStats?.totalInsights || 0}</span>
-                                                <span className="text-[10px] font-bold text-primary/40 mb-1.5">Pts</span>
+                                                <span className="text-[10px] font-bold text-primary/40 mb-1.5">점</span>
                                             </div>
                                         </div>
                                     </div>
@@ -381,7 +381,7 @@ export default function AiNavigatorPage() {
                         </div>
                     </div>
                 </section>
-
+ 
                 {/* 2. Main Tabbed Interface */}
                 <section className="py-8">
                     <div className="container mx-auto px-4">
@@ -406,7 +406,7 @@ export default function AiNavigatorPage() {
                                         회복 클리닉
                                     </TabsTrigger>
                                 </TabsList>
-
+ 
                                 {/* TAB 1: 오늘의 루틴 */}
                                 <TabsContent value="today-routine" className="space-y-10 outline-none">
                                     <div className="space-y-12">
@@ -417,7 +417,7 @@ export default function AiNavigatorPage() {
                                                     <Sparkles className="w-5 h-5 text-primary fill-current" />
                                                     지금 바로 회복하세요
                                                 </h2>
-                                                <Badge variant="outline" className="text-[10px] font-black border-primary/30 text-primary">AI OPTIMIZED</Badge>
+                                                <Badge variant="outline" className="text-[10px] font-black border-primary/30 text-primary">유니클 최적화</Badge>
                                             </div>
                                             
                                             <React.Suspense fallback={<div className="h-96 w-full bg-mist animate-pulse rounded-[2rem]" />}>
@@ -560,7 +560,7 @@ export default function AiNavigatorPage() {
                                                     당신의 완벽한 회복 리듬을 완성할 유니클만의 프리미엄 큐레이션 제품들이 곧 공개됩니다.
                                                 </p>
                                                 <Badge variant="outline" className="mt-4 border-primary/20 text-primary font-bold px-4 py-1">
-                                                    COMING SOON
+                                                    공개 예정
                                                 </Badge>
                                             </CardContent>
                                         </Card>
@@ -684,8 +684,8 @@ function ForecastModal({ open, onOpenChange, forecast, userName }: { open: boole
                     <div className="p-10 space-y-8">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black tracking-widest uppercase px-2">Prediction</Badge>
-                                <div className="text-xs font-bold text-text-secondary opacity-40 uppercase tracking-widest">Energy Level</div>
+                                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black tracking-widest uppercase px-2">회복 예측</Badge>
+                                <div className="text-xs font-bold text-text-secondary opacity-40 uppercase tracking-widest">내일의 에너지 레벨</div>
                             </div>
 
                             <div className="flex items-end gap-3">

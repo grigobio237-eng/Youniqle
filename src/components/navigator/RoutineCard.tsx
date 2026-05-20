@@ -151,7 +151,7 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                                         유니클이 당신을 위한 루틴을 설계 중입니다...
                                     </p>
                                     <p className="text-mist/30 text-[10px] font-bold uppercase tracking-[0.2em]">
-                                        Analyzing Recovery Data & Environment
+                                        회복 데이터 및 환경 분석 중
                                     </p>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                                             <span className="absolute text-[10px] font-black text-mist">{progress}%</span>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[10px] font-bold text-mist/40 uppercase">Recovery Score</p>
+                                            <p className="text-[10px] font-bold text-mist/40 uppercase">회복 점수</p>
                                             <p className="text-xl font-black text-mist">{completedCount}/{tasks.length}</p>
                                         </div>
                                     </div>
@@ -231,7 +231,7 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                                         className="bg-primary/20 border border-primary/30 p-4 rounded-2xl flex items-center justify-center gap-3"
                                     >
                                         <Trophy className="w-5 h-5 text-primary" />
-                                        <p className="text-sm font-black text-primary uppercase tracking-tighter">Perfect Recovery! +10 Points Earned</p>
+                                        <p className="text-sm font-black text-primary uppercase tracking-tighter">오늘의 완벽한 회복! +10 포인트 적립</p>
                                     </motion.div>
                                 )}
                             </div>

@@ -120,34 +120,34 @@ export async function GET(req: NextRequest) {
     let enhancedCertificates = [];
     let dailyLogCount = 0;
 
+    const RecoveryScore = (await import('@/models/RecoveryScore')).default;
+    const [diagnosisCount, dailyCount] = await Promise.all([
+      user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
+      RecoveryScore.countDocuments({ userId: user._id })
+    ]);
+    dailyLogCount = dailyCount;
+    const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
+    const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
+    
+    const [consultationCount, surveyCount] = await Promise.all([
+      Promise.all([
+        PreConsultation.countDocuments({ userId: user._id }),
+        PostCareSurvey.countDocuments({ userId: user._id })
+      ]).then(([c1, c2]) => c1 + c2),
+      SurveyResponse.countDocuments({ userId: user._id })
+    ]);
+
+    assetStats = {
+      precisionDiagnosis: diagnosisCount,
+      dailyRhythmLog: dailyLogCount,
+      scannerAnalysis: scannerCount,
+      toolkitUsage: toolkitCount,
+      consultations: consultationCount,
+      reports: surveyCount,
+      totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
+    };
+
     if (!isMinimal) {
-      const RecoveryScore = (await import('@/models/RecoveryScore')).default;
-      const [diagnosisCount, dailyCount] = await Promise.all([
-        user.diagnosisResults?.filter((d: any) => d.type === 'deep' || d.type === 'free').length || 0,
-        RecoveryScore.countDocuments({ userId: user._id })
-      ]);
-      dailyLogCount = dailyCount;
-      const scannerCount = user.scanTimeline?.filter((s: any) => ['MEAL', 'SPACE', 'POSTURE'].includes(s.type)).length || 0;
-      const toolkitCount = user.scanTimeline?.filter((s: any) => ['STATE', 'POST_OP'].includes(s.type)).length || 0;
-      
-      const [consultationCount, surveyCount] = await Promise.all([
-        Promise.all([
-          PreConsultation.countDocuments({ userId: user._id }),
-          PostCareSurvey.countDocuments({ userId: user._id })
-        ]).then(([c1, c2]) => c1 + c2),
-        SurveyResponse.countDocuments({ userId: user._id })
-      ]);
-
-      assetStats = {
-        precisionDiagnosis: diagnosisCount,
-        dailyRhythmLog: dailyLogCount,
-        scannerAnalysis: scannerCount,
-        toolkitUsage: toolkitCount,
-        consultations: consultationCount,
-        reports: surveyCount,
-        totalInsights: (diagnosisCount * 10) + (dailyLogCount * 2) + (scannerCount * 5) + (toolkitCount * 5) + (consultationCount * 20)
-      };
-
       // 7. Enhance Certificate Data
       const allLogs = await RecoveryScore.find({ userId: user._id }).sort({ date: 1 }).select('date').limit(100).lean();
       enhancedCertificates = user.issuedCertificates?.map((cert: any) => {
