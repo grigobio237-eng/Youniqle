@@ -23,6 +23,7 @@ import { useRecovery } from '@/contexts/RecoveryContext';
 import { AccessControl } from '@/lib/logic/access-control';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import RecoveryNoteSection from '@/components/dashboard/RecoveryNoteSection';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // 카테고리별 상태 메시지
 const CATEGORY_STATUS_MESSAGES: Record<string, Record<string, { message: string; action: string; actionLink: string }>> = {
@@ -110,6 +111,7 @@ export default function AiNavigatorPage() {
     const [activeTab, setActiveTab] = useState('today-routine');
     const [routineData, setRoutineData] = useState<any>(null);
     const [dailyMissions, setDailyMissions] = useState<any>(null);
+    const [subActiveTab, setSubActiveTab] = useState<'diagnosis' | 'routine' | 'mission' | 'reflection'>('diagnosis');
 
 
     const userTier = AccessControl.getUserGroup(session?.user);
@@ -295,7 +297,6 @@ export default function AiNavigatorPage() {
         setBridgeDialogOpen(false);
         setSelectedProduct(null);
     };
-
     // 레이더 차트 데이터
     const radarData = categoryScores ? [
         { category: 'PHYSICAL', score: categoryScores.physical || 0, fullMark: 40 },
@@ -303,6 +304,13 @@ export default function AiNavigatorPage() {
         { category: 'SLEEP', score: categoryScores.sleep || 0, fullMark: 40 },
         { category: 'LIFESTYLE', score: categoryScores.lifestyle || 0, fullMark: 40 }
     ] : [];
+
+    // 레이더 차트 100점 만점 노멀라이즈 데이터
+    const normalizedRadarData = radarData.map(d => ({
+        category: d.category,
+        score: Math.round(d.score * 2.5),
+        fullMark: 100
+    }));
 
     // 가장 낮은 카테고리 정보
     const weakestInfo = weakestCategory ? {
@@ -322,264 +330,314 @@ export default function AiNavigatorPage() {
 
     return (
         <ChapterWrapper chapter="ai-navigator">
-            <div className="min-h-screen bg-background text-text-primary pb-20">
-                {/* 1. Analysis Header & Asset Dashboard */}
-                <section className="relative pt-12 pb-8 border-b border-line overflow-hidden">
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-
-                    <div className="container mx-auto px-4 relative z-10">
-                        <div className="max-w-5xl mx-auto">
-                            {!session && (
-                                <div className="mb-10 p-8 bg-primary/5 border-2 border-primary/20 rounded-[32px] flex flex-col md:flex-row items-center justify-between gap-8 animate-in fade-in slide-in-from-top-6 duration-700 shadow-2xl shadow-primary/5">
-                                    <div className="flex items-center gap-6 text-left">
-                                        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner">
-                                            <Lock className="w-8 h-8" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-2xl font-black text-obsidian tracking-tight">로그인이 필요한 서비스입니다</h3>
-                                            <p className="text-base font-medium text-slate opacity-70">나만의 맞춤형 회복 루틴과 기록을 확인하려면 로그인하세요.</p>
-                                        </div>
-                                    </div>
-                                    <Button asChild className="h-14 px-10 bg-primary text-background font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                        <Link href="/login">지금 바로 로그인하기</Link>
-                                    </Button>
-                                </div>
-                            )}
-
-                            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 gap-8">
-                                <div className="space-y-4">
-                                    <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase border border-primary/20">
-                                        유니클 회복 내비게이터
-                                    </div>
-                                    <h1 className="text-5xl md:text-7xl font-black text-obsidian tracking-tighter">오늘 리듬체크</h1>
-                                    <React.Suspense fallback={<div className="h-10 w-40 bg-mist animate-pulse rounded-full" />}>
-                                        <EnvironmentalStatus />
-                                    </React.Suspense>
-                                </div>
-                                
-                                {/* Real-time Asset Summary Dashboard */}
-                                <div className="w-full md:w-auto bg-white rounded-[32px] p-5 border border-obsidian/5 shadow-xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                                    <div className="flex items-center gap-6">
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">총 회복 자산</p>
-                                            <div className="flex items-end gap-1">
-                                                <span className="text-3xl font-black text-obsidian">{(assetStats?.precisionDiagnosis || 0) + (assetStats?.dailyRhythmLog || 0)}</span>
-                                                <span className="text-[10px] font-bold text-slate/40 mb-1.5">건</span>
-                                            </div>
-                                        </div>
-                                        <div className="w-px h-10 bg-line/50" />
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate/40 uppercase tracking-tighter mb-1">회복 포인트</p>
-                                            <div className="flex items-end gap-1">
-                                                <span className="text-3xl font-black text-primary">{assetStats?.totalInsights || 0}</span>
-                                                <span className="text-[10px] font-bold text-primary/40 mb-1.5">점</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <div className="h-screen md:h-auto overflow-hidden md:overflow-visible flex flex-col bg-background text-text-primary relative max-h-screen md:max-h-none select-none pb-[72px] md:pb-20">
+                {/* 1. Analysis Header & Weather (10vh) */}
+                <header className="h-[10vh] px-4 flex items-center justify-between border-b border-line/45 flex-shrink-0 bg-white/80 backdrop-blur-md relative z-20">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-[#0E3A3A] flex items-center justify-center text-white text-xs font-black shadow-inner">
+                            {userName.substring(0, 1)}
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-slate/40 uppercase tracking-widest">회복 내비게이터</p>
+                            <h2 className="text-sm font-black text-obsidian tracking-tight">오늘 리듬체크</h2>
                         </div>
                     </div>
-                </section>
- 
-                {/* 2. Main Tabbed Interface */}
-                <section className="py-8">
-                    <div className="container mx-auto px-4">
-                        <div className="max-w-3xl mx-auto">
-                            
-                            <Tabs 
-                                value={activeTab} 
-                                onValueChange={setActiveTab} 
-                                className="w-full"
+                    
+                    <div className="flex items-center gap-2">
+                        <React.Suspense fallback={<div className="h-6 w-20 bg-mist animate-pulse rounded-full" />}>
+                            <EnvironmentalStatus />
+                        </React.Suspense>
+                    </div>
+                </header>
+
+                {/* 2. Mini CGM Trend Area (20vh) */}
+                <section className="h-[20vh] md:h-[180px] bg-white/40 border-b border-line flex-shrink-0 relative overflow-hidden flex flex-col justify-between p-3">
+                    <div className="absolute inset-0 z-0 opacity-40">
+                        {scoreHistory && scoreHistory.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={scoreHistory} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
+                                    <defs>
+                                        <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#0E3A3A" stopOpacity={0.25}/>
+                                            <stop offset="95%" stopColor="#0E3A3A" stopOpacity={0.0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis 
+                                        dataKey="date" 
+                                        tickLine={false} 
+                                        axisLine={false} 
+                                        tick={{ fill: '#64748b', fontSize: 8, fontWeight: 'bold' }} 
+                                    />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="score" 
+                                        stroke="#0E3A3A" 
+                                        strokeWidth={2} 
+                                        fillOpacity={1} 
+                                        fill="url(#colorScore)" 
+                                        connectNulls
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] text-slate/40">
+                                측정 데이터 수집 중...
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="relative z-10 flex justify-between items-center w-full">
+                        <div className="flex gap-2">
+                            <div className="bg-white/80 backdrop-blur-sm border border-obsidian/5 px-2.5 py-1 rounded-xl text-center shadow-sm">
+                                <p className="text-[7px] font-black text-slate/40 uppercase">오늘 점수</p>
+                                <p className="text-xs font-black text-[#0E3A3A]">{todayScore || 0}점</p>
+                            </div>
+                            <div className="bg-white/80 backdrop-blur-sm border border-obsidian/5 px-2.5 py-1 rounded-xl text-center shadow-sm">
+                                <p className="text-[7px] font-black text-slate/40 uppercase">회복 자산</p>
+                                <p className="text-xs font-black text-primary">{(assetStats?.precisionDiagnosis || 0) + (assetStats?.dailyRhythmLog || 0)}건</p>
+                            </div>
+                        </div>
+
+                        {tomorrowForecast && (
+                            <Button 
+                                onClick={() => setIsForecastOpen(true)}
+                                className="h-7 px-2.5 bg-[#0E3A3A] hover:bg-[#0E3A3A]/90 text-white text-[9px] font-black rounded-lg flex items-center gap-1 shadow-md shadow-[#0E3A3A]/10 transition-transform active:scale-95"
                             >
-                                <TabsList className="grid w-full grid-cols-4 h-14 rounded-2xl bg-surface/50 border border-line p-1 mb-10 sticky top-4 z-50 backdrop-blur-md">
-                                    <TabsTrigger value="today-routine" className="rounded-xl text-xs md:text-sm font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-                                        오늘의 루틴
-                                    </TabsTrigger>
-                                    <TabsTrigger value="today-record" className="rounded-xl text-xs md:text-sm font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-                                        오늘의 기록
-                                    </TabsTrigger>
-                                    <TabsTrigger value="recovery-toolbox" className="rounded-xl text-xs md:text-sm font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-                                        회복 툴박스
-                                    </TabsTrigger>
-                                    <TabsTrigger value="clinic" className="rounded-xl text-xs md:text-sm font-black data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-                                        회복 클리닉
-                                    </TabsTrigger>
-                                </TabsList>
- 
-                                {/* TAB 1: 오늘의 루틴 */}
-                                <TabsContent value="today-routine" className="space-y-10 outline-none">
-                                    <div className="space-y-12">
-                                        {/* 섹션 1: 시간대별 회복 루틴 */}
-                                        <div className="space-y-6">
-                                            <div className="flex items-center justify-between">
-                                                <h2 className="text-xl font-black tracking-tight text-obsidian flex items-center gap-2">
-                                                    <Sparkles className="w-5 h-5 text-primary fill-current" />
-                                                    지금 바로 회복하세요
-                                                </h2>
-                                                <Badge variant="outline" className="text-[10px] font-black border-primary/30 text-primary">유니클 최적화</Badge>
-                                            </div>
-                                            
-                                            <React.Suspense fallback={<div className="h-96 w-full bg-mist animate-pulse rounded-[2rem]" />}>
-                                                <RoutineCard userStatus={categoryScores} initialData={routineData} />
-                                            </React.Suspense>
-                                        </div>
- 
-                                        {/* 섹션 2: 오늘 하루의 회복 미션 */}
-                                        <div>
-                                            <React.Suspense fallback={<div className="h-48 w-full bg-mist animate-pulse rounded-3xl" />}>
-                                                <DailySmallActions 
-                                                    score={
-                                                        categoryScores && Object.values(categoryScores).length > 0 
-                                                            ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
-                                                            : 50
-                                                    } 
-                                                    initialData={dailyMissions}
-                                                />
-                                            </React.Suspense>
-                                        </div>
+                                <Sparkles className="w-2.5 h-2.5 text-[#FFE066]" />
+                                <span>내일 예보</span>
+                            </Button>
+                        )}
+                    </div>
+                </section>
 
-                                        {/* 섹션 3: 데일리 회복 타임라인 */}
-                                        <div>
-                                            <React.Suspense fallback={<div className="h-32 w-full bg-mist animate-pulse rounded-3xl" />}>
-                                                <DailyFlowTimeline />
-                                            </React.Suspense>
-                                        </div>
+                {/* 3. Desktop High-Level Tab Bar (Hidden on Mobile) */}
+                <div className="hidden md:flex justify-between items-center px-6 py-4 bg-white border-b border-line flex-shrink-0">
+                    <div className="flex gap-2 bg-mist/30 p-1 rounded-2xl border border-line">
+                        <Button 
+                            variant={activeTab === 'today-routine' ? 'default' : 'ghost'} 
+                            onClick={() => { setActiveTab('today-routine'); setSubActiveTab('diagnosis'); }}
+                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'today-routine' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                        >
+                            리듬 데일리 ⚡
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'recovery-toolbox' ? 'default' : 'ghost'} 
+                            onClick={() => setActiveTab('recovery-toolbox')}
+                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'recovery-toolbox' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                        >
+                            회복 툴박스 🧰
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'clinic' ? 'default' : 'ghost'} 
+                            onClick={() => setActiveTab('clinic')}
+                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'clinic' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                        >
+                            회복 클리닉 🩺
+                        </Button>
+                    </div>
+                </div>
 
-                                        {/* 섹션 4: 오늘의 마음 기록 (대시보드 통합 버전) */}
-                                        <div className="-mx-4 md:-mx-8">
-                                            <RecoveryNoteSection />
-                                        </div>
-                                    </div>
-                                </TabsContent>
+                {/* 4. Sub-Segment Switcher (Only in Daily Loop) */}
+                {activeTab === 'today-routine' && (
+                    <div className="px-4 py-2 bg-mist/20 flex-shrink-0">
+                        <div className="flex w-full bg-slate-100 p-0.5 rounded-2xl gap-0.5 border border-line/70">
+                            {(['diagnosis', 'routine', 'mission', 'reflection'] as const).map((tab) => {
+                                const isActive = subActiveTab === tab;
+                                const labels: Record<typeof tab, string> = {
+                                    diagnosis: '진단 🩺',
+                                    routine: '루틴 ⚡',
+                                    mission: '미션 💧',
+                                    reflection: '회고 📝'
+                                };
+                                return (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setSubActiveTab(tab)}
+                                        className={`flex-1 py-2 text-[10px] md:text-xs font-black rounded-xl transition-all ${
+                                            isActive 
+                                                ? 'bg-[#0E3A3A] text-white shadow-md' 
+                                                : 'text-slate/60 hover:text-slate'
+                                        }`}
+                                    >
+                                        {labels[tab]}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
-                                {/* TAB 2: 오늘의 기록 */}
-                                <TabsContent value="today-record" className="space-y-12 outline-none pt-4">
-                                    <div className="space-y-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                                <Zap className="w-5 h-5 fill-current" />
-                                            </div>
-                                            <h2 className="text-xl font-black tracking-tight">유형 확인 및 정밀 기록</h2>
-                                        </div>
+                {/* 5. Focus Card Container (55vh) */}
+                <div className="flex-1 overflow-hidden flex flex-col bg-white p-4 md:p-6 relative rounded-t-[32px] md:rounded-[32px] shadow-2xl border-t border-line/40 md:border md:border-obsidian/5">
+                    {!session ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
+                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                                <Lock className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-black text-obsidian tracking-tight">로그인이 필요한 서비스입니다</h3>
+                            <p className="text-xs text-slate opacity-70 max-w-xs">나만의 맞춤형 회복 루틴과 기록을 시작하려면 로그인하세요.</p>
+                            <Button asChild className="h-12 px-8 bg-[#0E3A3A] text-white font-black rounded-xl shadow-lg">
+                                <Link href="/login">지금 바로 로그인하기</Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col overflow-y-auto pr-0.5">
+                            {activeTab === 'today-routine' && (
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={subActiveTab}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="flex-1 flex flex-col h-full"
+                                    >
+                                        {subActiveTab === 'diagnosis' && (
+                                            <div className="space-y-6">
+                                                <div className="h-44 relative flex items-center justify-center bg-mist/20 rounded-[24px] overflow-hidden">
+                                                    {radarData.length > 0 ? (
+                                                        <DiagnosisRadarChart data={normalizedRadarData} color="#0E3A3A" className="w-full h-full scale-105" />
+                                                    ) : (
+                                                        <div className="text-center p-4 space-y-2">
+                                                            <span className="text-3xl">🧘</span>
+                                                            <h4 className="text-sm font-black text-obsidian">오늘의 건강을 진단해 보세요</h4>
+                                                            <p className="text-[10px] text-slate opacity-70">60초 리듬체크로 맞춤 그래프가 열립니다.</p>
+                                                        </div>
+                                                    )}
+                                                </div>
 
-                                        {weakestInfo?.statusInfo ? (
-                                            <Card className={`bg-surface border-l-4 ${weakestInfo.level === 'critical' ? 'border-l-status-danger' : 'border-l-primary'} overflow-hidden shadow-xl`}>
-                                                <CardContent className="p-8 space-y-6">
-                                                    <Badge className={`${getLevelBadgeColor(weakestInfo.level)} text-[10px] font-black uppercase tracking-widest px-3 py-1`}>
-                                                        {weakestInfo.level === 'critical' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                                                        {weakestInfo.category.toUpperCase()} {weakestInfo.level.toUpperCase()}
-                                                    </Badge>
-                                                    <h3 className="text-2xl font-black text-text-primary leading-tight">
-                                                        {userName} 님, {weakestInfo.statusInfo.message}
-                                                    </h3>
-                                                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                                        <Button asChild size="lg" className="h-16 w-full sm:w-auto bg-primary text-background font-black rounded-2xl px-8 shadow-lg shadow-primary/20 transition-transform hover:scale-105">
-                                                            <Link href="/diagnosis?type=free">간단유형 확인하기 (단순)</Link>
-                                                        </Button>
-                                                        <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" size="lg" className="h-16 w-full sm:w-auto rounded-2xl px-8 font-black border-2 border-primary/20 text-primary">
-                                                            심층유형 확인하기 (정밀)
-                                                        </Button>
+                                                {weakestInfo?.statusInfo ? (
+                                                    <div className="bg-[#0E3A3A]/5 border-l-4 border-[#0E3A3A] p-4 rounded-r-[20px] space-y-1">
+                                                        <Badge className="bg-[#0E3A3A] text-white font-black text-[9px] tracking-widest px-2 py-0.5 uppercase">
+                                                            취약 리듬: {weakestInfo.category.toUpperCase()}
+                                                        </Badge>
+                                                        <p className="text-[11px] font-bold text-obsidian leading-relaxed">
+                                                            {userName} 님, {weakestInfo.statusInfo.message}
+                                                        </p>
                                                     </div>
-                                                </CardContent>
-                                            </Card>
-                                        ) : (
-                                            <Card className="bg-surface border-2 border-dashed border-primary/20 rounded-[32px]">
-                                                <CardContent className="p-10 text-center space-y-6">
-                                                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-3xl">🧘</div>
-                                                    <h3 className="text-2xl font-black text-text-primary">심층 진단이 필요합니다</h3>
-                                                    <div className="flex flex-col sm:flex-row justify-center gap-3">
-                                                        <Button asChild className="h-12 bg-primary text-background font-black rounded-xl px-6">
-                                                            <Link href="/diagnosis?type=free">간단유형 확인하기 (단순)</Link>
-                                                        </Button>
-                                                        <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" className="h-12 border-2 border-line rounded-xl px-6 font-black">
-                                                            심층유형 확인하기 (정밀)
-                                                        </Button>
+                                                ) : (
+                                                    <div className="bg-[#0E3A3A]/5 p-4 rounded-[20px] text-center">
+                                                        <p className="text-[11px] font-bold text-[#0E3A3A]">모든 회복 리듬이 매우 안정적입니다! ✨</p>
                                                     </div>
-                                                </CardContent>
-                                            </Card>
+                                                )}
+
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Button onClick={() => router.push('/?action=diagnose')} className="h-12 bg-primary text-background font-black rounded-xl flex flex-col justify-center items-center shadow-lg hover:scale-[1.01] transition-transform">
+                                                        <span className="text-xs">60초 리듬체크</span>
+                                                        <span className="text-[9px] opacity-60">사진 분석 📸</span>
+                                                    </Button>
+                                                    <Button onClick={() => router.push('/diagnosis?type=daily')} className="h-12 bg-obsidian text-mist font-black rounded-xl flex flex-col justify-center items-center hover:scale-[1.01] transition-transform">
+                                                        <span className="text-xs">정밀 리듬 측정</span>
+                                                        <span className="text-[9px] opacity-60">16가지 문항 ⚡</span>
+                                                    </Button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <Button asChild variant="outline" className="h-9 rounded-lg text-[10px] font-bold border-line text-slate">
+                                                        <Link href="/diagnosis?type=free">간단유형 확인</Link>
+                                                    </Button>
+                                                    <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" className="h-9 rounded-lg text-[10px] font-bold border-line text-primary">
+                                                        심층유형 확인
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         )}
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-6">
-                                        <Card className="bg-white border-primary/10 rounded-[32px] overflow-hidden shadow-xl hover:shadow-primary/5 cursor-pointer group transition-all" onClick={() => router.push('/?action=diagnose')}>
-                                            <CardContent className="p-8 flex items-center justify-between gap-6">
-                                                <div className="flex-1 space-y-3">
-                                                    <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">1일 루틴</Badge>
-                                                    <h3 className="text-2xl font-black text-obsidian group-hover:text-primary transition-colors">60초 리듬체크</h3>
-                                                    <p className="text-sm font-medium text-slate opacity-80">사진 한 장으로 시작하는 일상의 회복 기록</p>
-                                                </div>
-                                                <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">📸</div>
-                                            </CardContent>
-                                        </Card>
-                                        
-                                        <Card className="bg-surface border-2 border-reward-gold/20 rounded-[32px] overflow-hidden cursor-pointer hover:border-reward-gold/50 transition-all shadow-xl shadow-reward-gold/5" onClick={() => router.push('/diagnosis?type=daily')}>
-                                            <CardContent className="p-8 flex items-center justify-between gap-6">
-                                                <div className="flex-1 space-y-3">
-                                                    <Badge className="bg-reward-gold/20 text-obsidian border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">정밀 리듬 측정</Badge>
-                                                    <h3 className="text-2xl font-black text-obsidian">오늘의 회복 리듬 측정</h3>
-                                                    <p className="text-sm font-medium text-slate opacity-70">16가지 정밀 질문으로 분석하는 오늘의 에너지</p>
-                                                </div>
-                                                <div className="w-16 h-16 bg-reward-gold rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg shadow-reward-gold/20">
-                                                    ⚡
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </div>
-                                </TabsContent>
 
-                                {/* TAB 3: 회복 툴박스 */}
-                                <TabsContent value="recovery-toolbox" className="space-y-12 outline-none pt-4">
-                                    <div className="space-y-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                                <Package className="w-5 h-5" />
+                                        {subActiveTab === 'routine' && (
+                                            <div className="space-y-6 flex-1 flex flex-col">
+                                                <React.Suspense fallback={<div className="h-48 w-full bg-mist animate-pulse rounded-2xl" />}>
+                                                    <RoutineCard userStatus={categoryScores} initialData={routineData} />
+                                                </React.Suspense>
+                                                <div className="mt-2 border-t border-line/50 pt-4">
+                                                    <React.Suspense fallback={<div className="h-20 w-full bg-mist animate-pulse rounded-2xl" />}>
+                                                        <DailyFlowTimeline />
+                                                    </React.Suspense>
+                                                </div>
                                             </div>
-                                            <h2 className="text-xl font-black tracking-tight">회복 툴박스</h2>
-                                        </div>
-                                        <React.Suspense fallback={<div className="grid grid-cols-2 gap-4"><div className="h-32 bg-mist animate-pulse rounded-3xl" /></div>}>
-                                            <ToolkitGrid />
-                                        </React.Suspense>
+                                        )}
+
+                                        {subActiveTab === 'mission' && (
+                                            <div className="flex-1 flex flex-col justify-center">
+                                                <React.Suspense fallback={<div className="h-32 w-full bg-mist animate-pulse rounded-2xl" />}>
+                                                    <DailySmallActions 
+                                                        score={
+                                                            categoryScores && Object.values(categoryScores).length > 0 
+                                                                ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
+                                                                : 50
+                                                        } 
+                                                        initialData={dailyMissions}
+                                                    />
+                                                </React.Suspense>
+                                            </div>
+                                        )}
+
+                                        {subActiveTab === 'reflection' && (
+                                            <div className="flex-1 flex flex-col justify-center -mx-2">
+                                                <RecoveryNoteSection />
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                </AnimatePresence>
+                            )}
+
+                            {activeTab === 'recovery-toolbox' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2">
+                                        <Package className="w-5 h-5 text-primary" />
+                                        <h2 className="text-sm font-black tracking-tight text-obsidian">회복 툴박스</h2>
                                     </div>
-                                    <div className="space-y-8 pt-6">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                                    <Store className="w-5 h-5" />
-                                                </div>
-                                                <h2 className="text-xl font-black tracking-tight">추천 회복 도구</h2>
-                                            </div>
-                                        </div>
-                                        
-                                        <Card className="bg-surface border-2 border-dashed border-primary/10 rounded-[32px] overflow-hidden">
-                                            <CardContent className="p-12 text-center space-y-4">
-                                                <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-2">
-                                                    <Package className="w-10 h-10 text-primary/30" />
-                                                </div>
-                                                <h3 className="text-2xl font-black text-obsidian tracking-tighter">유니클 셀렉션 준비 중</h3>
-                                                <p className="text-sm font-medium text-slate/60 leading-relaxed max-w-sm mx-auto">
-                                                    당신의 완벽한 회복 리듬을 완성할 유니클만의 프리미엄 큐레이션 제품들이 곧 공개됩니다.
-                                                </p>
-                                                <Badge variant="outline" className="mt-4 border-primary/20 text-primary font-bold px-4 py-1">
+                                    <React.Suspense fallback={<div className="h-32 bg-mist animate-pulse rounded-2xl" />}>
+                                        <ToolkitGrid />
+                                    </React.Suspense>
+                                    <div className="space-y-4 pt-6 border-t border-line/50">
+                                        <h3 className="text-xs font-black tracking-tight text-[#0E3A3A]">추천 회복 도구</h3>
+                                        <Card className="bg-surface border-2 border-dashed border-primary/10 rounded-2xl">
+                                            <CardContent className="p-8 text-center space-y-2">
+                                                <h4 className="text-xs font-black text-obsidian">유니클 셀렉션 준비 중</h4>
+                                                <p className="text-[10px] text-slate opacity-60">프리미엄 큐레이션 제품이 곧 공개됩니다.</p>
+                                                <Badge variant="outline" className="mt-2 border-primary/20 text-[9px] text-primary font-bold px-2 py-0.5">
                                                     공개 예정
                                                 </Badge>
                                             </CardContent>
                                         </Card>
                                     </div>
-                                </TabsContent>
+                                </div>
+                            )}
 
-                                {/* TAB 4: 회복 클리닉 */}
-                                <TabsContent value="clinic" className="space-y-12 outline-none pt-4">
-                                    <div className="space-y-8 relative mb-16">
-                                        <div className="absolute -left-4 md:-left-20 -top-4 text-5xl md:text-[140px] font-black text-obsidian/[0.02] md:text-obsidian/[0.03] leading-none select-none pointer-events-none z-0">CLI</div>
-                                        <div className="relative z-10 -mx-6 md:-mx-12">
-                                            <ClinicConsultationSection />
-                                        </div>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
+                            {activeTab === 'clinic' && (
+                                <div className="space-y-4 -mx-2">
+                                    <React.Suspense fallback={<div className="h-48 bg-mist animate-pulse rounded-2xl" />}>
+                                        <ClinicConsultationSection />
+                                    </React.Suspense>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                </section>
+                    )}
+                </div>
+
+                {/* 6. Floating Bottom Navigation for Mobile */}
+                <div className="md:hidden border-t border-line/50 bg-white/90 backdrop-blur-lg px-6 py-2 flex justify-around items-center h-[72px] fixed bottom-0 left-0 right-0 z-50 shadow-lg">
+                    <button 
+                        onClick={() => { setActiveTab('today-routine'); setSubActiveTab('diagnosis'); }}
+                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'today-routine' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
+                    >
+                        <Zap className={`w-5 h-5 ${activeTab === 'today-routine' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
+                        <span className="text-[9px]">리듬 데일리</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('recovery-toolbox')}
+                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'recovery-toolbox' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
+                    >
+                        <Package className={`w-5 h-5 ${activeTab === 'recovery-toolbox' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
+                        <span className="text-[9px]">회복 툴박스</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('clinic')}
+                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'clinic' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
+                    >
+                        <Activity className={`w-5 h-5 ${activeTab === 'clinic' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
+                        <span className="text-[9px]">회복 클리닉</span>
+                    </button>
+                </div>
 
                 {/* Forecast Modal */}
                 <ForecastModal
@@ -596,7 +654,7 @@ export default function AiNavigatorPage() {
                             <div className="w-16 h-16 bg-[#0E3A3A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <ExternalLink className="w-8 h-8 text-[#0E3A3A]" />
                             </div>
-                            <DialogTitle className="text-xl font-black text-obsidian">파트너사 페이지로 이동</DialogTitle>
+                            <DialogTitle className="text-2xl font-black text-obsidian tracking-tighter">파트너사 이동</DialogTitle>
                             <DialogDescription className="text-slate font-medium pt-2 leading-relaxed">
                                 Youniqle이 추천하는 회복 파트너사 페이지로 이동합니다.
                              </DialogDescription>
