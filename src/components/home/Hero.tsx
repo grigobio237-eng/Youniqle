@@ -145,11 +145,11 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 </motion.div>
               )}
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-[1.3] tracking-tight">
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-[1.3] tracking-tight break-keep">
               {/* {personalMsg.title} */}
               당신의 몸이 보내는 작은 신호,<br />60초면 충분합니다.
             </h1>
-            <p className="text-base md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl">
+            <p className="text-base md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl break-keep">
               {/* {personalMsg.desc} */}
               오늘의 나를 마주하는 가장 스마트한 방법, 60초 리듬체크를 시작하세요.
             </p>
@@ -175,7 +175,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
                 <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
                 <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Youniqle LIVE</span>
               </div>
-              <p className="text-sm font-bold text-foreground/70 leading-relaxed group-hover:text-primary transition-colors">
+              <p className="text-sm font-bold text-foreground/70 leading-relaxed group-hover:text-primary transition-colors break-keep">
                 {personalMsg.nudge}
               </p>
               <div className="mt-3 flex items-center text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0">
