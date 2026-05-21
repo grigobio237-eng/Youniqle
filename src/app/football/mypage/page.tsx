@@ -593,24 +593,15 @@ export default function FootballMyPage() {
         {/* 기존 유니클 기능 바로가기 */}
         <div className="space-y-3">
           <h3 className="text-sm font-black text-slate uppercase tracking-wider px-1">Youniqle Recovery</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/utils/food-scanner?auto=true" className="block">
-              <Card className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                <CardContent className="p-4 text-center space-y-2">
-                  <span className="text-2xl">📸</span>
-                  <p className="text-sm font-bold text-obsidian">유니클 푸드 스캐너</p>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href="/football/motion-check">
-              <Card className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                <CardContent className="p-4 text-center space-y-2">
-                  <span className="text-2xl">👟</span>
-                  <p className="text-sm font-bold text-obsidian">60초 동작체크</p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
+          <Link href="/utils/food-scanner?auto=true" className="block">
+            <Card className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-all cursor-pointer bg-white">
+              <CardContent className="p-6 text-center space-y-2.5">
+                <span className="text-3xl block">📸</span>
+                <p className="text-sm font-black text-obsidian">유니클 푸드 스캐너</p>
+                <p className="text-[10px] font-bold text-slate-400">식단 사진을 촬영하거나 업로드하여 AI 분석을 받아보세요.</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>
