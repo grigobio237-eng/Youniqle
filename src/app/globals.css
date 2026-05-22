@@ -165,13 +165,20 @@
 
   /* Premium Renewal: Cinematic Hero */
   .hero-cinematic {
-    min-height: 85vh;
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 6rem 1.5rem;
+    padding: 3.5rem 1.25rem 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-cinematic {
+      min-height: 85vh;
+      padding: 6rem 1.5rem;
+    }
   }
 
   /* Premium Renewal: Staggered Fade-In Animation */

@@ -125,7 +125,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
 
 
   return (
-    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-3 pb-8 md:pt-[60px] md:pb-32">
+    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-1 pb-4 sm:pt-3 sm:pb-8 md:pt-[60px] md:pb-32">
       {/* Decorative Blur Elements - Softer */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
         <div className="absolute -top-[15%] -left-[10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[150px]" />
@@ -133,23 +133,23 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-24 items-center">
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-24 items-center">
+ 
           {/* 1. Texts */}
-          <div className="space-y-4 md:space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-primary/60 uppercase tracking-[0.5em]">RECOVERY CGM</span>
+          <div className="space-y-1.5 md:space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-[0.5em]">RECOVERY CGM</span>
               {journey && (
-                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest leading-none">
-                  <Activity className="w-3.5 h-3.5" /> {journey} MODE
+                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[9px] md:text-[11px] font-bold uppercase tracking-widest leading-none">
+                  <Activity className="w-3 h-3 md:w-3.5 md:h-3.5" /> {journey} MODE
                 </motion.div>
               )}
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-[1.3] tracking-tight break-keep">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold text-foreground leading-[1.25] tracking-tight break-keep">
               {/* {personalMsg.title} */}
               당신의 몸이 보내는 작은 신호,<br />60초면 충분합니다.
             </h1>
-            <p className="text-base md:text-2xl text-foreground/50 font-medium leading-relaxed max-w-xl break-keep">
+            <p className="text-[11px] sm:text-base md:text-2xl text-foreground/40 font-medium leading-normal max-w-xl break-keep">
               {/* {personalMsg.desc} */}
               오늘의 나를 마주하는 가장 스마트한 방법, 60초 리듬체크를 시작하세요.
             </p>

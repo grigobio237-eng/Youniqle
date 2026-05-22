@@ -228,7 +228,7 @@ export default function HomePage() {
             userNote={userNote}
             analysisData={analysisData}
             snapData={snapData}
-            onEnter={() => setViewState('INTRO')}
+            onEnter={() => router.push('/dashboard')}
             onOpenWebtoon={handleOpenWebtoon}
           />
         </div>

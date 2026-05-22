@@ -60,7 +60,28 @@ function DiagnosisContent() {
 
         try {
             let loadedQuestions = [];
-            if (type === 'daily') {
+            if (type === '60s') {
+                const res = await fetch('/api/questions/daily', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    loadedQuestions = data.question?.questions || [];
+                    setDailyTheme(data.question?.theme || '오늘의 60초 회복 리듬체크');
+                    setDailyGreeting('오늘 하루 나의 회복 에너지를 체크하고 100PT를 받으세요.');
+                } else {
+                    // Fallback to static 5 questions
+                    loadedQuestions = [
+                        { id: "f1", category: "Physical", text: "오늘 전반적인 신체 컨디션은 어떠신가요?", options: [] },
+                        { id: "f2", category: "Mindset", text: "오늘 하루를 시작하는 마음이 평온하신가요?", options: [] },
+                        { id: "f3", category: "Emotional", text: "최근 스트레스 수준은 어느 정도인가요?", options: [] },
+                        { id: "f4", category: "Social", text: "주변 사람들과의 소통에서 즐거움을 느끼시나요?", options: [] },
+                        { id: "f5", category: "Physical", text: "몸의 긴장이나 통증이 느껴지지는 않나요?", options: [] }
+                    ];
+                    setDailyTheme('60초 회복 리듬체크');
+                }
+            } else if (type === 'daily') {
                 const res = await fetch('/api/diagnosis/dynamic-questions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -152,11 +173,11 @@ function DiagnosisContent() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    type,
+                    type: type === '60s' ? 'daily' : type,
                     journey,
                     answers: finalAnswers,
                     result: calculationResult,
-                    points: type === 'daily' ? 100 : 0
+                    points: (type === 'daily' || type === '60s') ? 100 : 0
                 })
             });
 
@@ -172,7 +193,7 @@ function DiagnosisContent() {
     const progress = questions.length > 0 ? ((step + 1) / questions.length) * 100 : 0;
 
     const getThemeColors = () => {
-        if (type === 'daily') {
+        if (type === 'daily' || type === '60s') {
             return {
                 accent: 'bg-reward-gold',
                 text: 'text-obsidian',
@@ -195,7 +216,7 @@ function DiagnosisContent() {
     const theme = getThemeColors();
 
     return (
-        <div className={`min-h-screen ${type === 'daily' ? 'bg-[#F9F7F2]' : 'bg-mist'} flex flex-col items-center justify-center p-4 transition-colors duration-500`}>
+        <div className={`min-h-screen ${(type === 'daily' || type === '60s') ? 'bg-[#F9F7F2]' : 'bg-mist'} flex flex-col items-center justify-center p-4 transition-colors duration-500`}>
             <div className="max-w-2xl w-full">
                 <AnimatePresence mode="wait">
                     {step === -1 && (
@@ -208,23 +229,27 @@ function DiagnosisContent() {
                         >
                             <div className="space-y-4">
                                 <Badge className={`${theme.badge} border-none px-4 py-1.5 text-xs font-black tracking-[0.2em] uppercase`}>
-                                    {type === 'daily' ? 'DAILY RECOVERY CHECK-IN' : 'CORE PERSONALITY DIAGNOSIS'}
+                                    {type === '60s' ? '60s RECOVERY CHECK-IN' : type === 'daily' ? 'DAILY RECOVERY CHECK-IN' : 'CORE PERSONALITY DIAGNOSIS'}
                                 </Badge>
                                 <h1 className="text-5xl md:text-6xl font-black text-obsidian tracking-tighter leading-tight">
-                                    {type === 'daily' ? (
+                                    {type === '60s' ? (
+                                        <>60초 오늘의 리듬체크</>
+                                    ) : type === 'daily' ? (
                                         <>오늘의 회복 리듬 측정</>
                                     ) : (
                                         <>당신의 내면 세계를<br /><span className="text-chapter-accent">분석합니다</span></>
                                     )}
                                 </h1>
                                 <p className="text-slate font-medium text-lg max-w-md mx-auto">
-                                    {type === 'daily' 
-                                        ? (dailyGreeting || '16개의 AI 최적화 질문으로 오늘 하루의 에너지를 확인하고 100PT를 받으세요.')
-                                        : '정교한 질문을 통해 당신만의 고유한 회복 프로토콜을 설계합니다.'}
+                                    {type === '60s'
+                                        ? '사진 촬영이나 번거로운 과정 없이, 오늘 나의 몸과 마음을 직관적으로 확인하고 100PT를 받으세요.'
+                                        : type === 'daily' 
+                                            ? (dailyGreeting || '16개의 AI 최적화 질문으로 오늘 하루의 에너지를 확인하고 100PT를 받으세요.')
+                                            : '정교한 질문을 통해 당신만의 고유한 회복 프로토콜을 설계합니다.'}
                                 </p>
                             </div>
 
-                            {type === 'daily' && dailyTheme && (
+                            {(type === 'daily' || type === '60s') && dailyTheme && (
                                 <motion.div 
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}

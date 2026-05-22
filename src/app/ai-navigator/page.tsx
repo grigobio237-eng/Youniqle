@@ -533,9 +533,9 @@ export default function AiNavigatorPage() {
                                                 )}
 
                                                 <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                                    <Button onClick={() => router.push('/?action=diagnose')} className="h-10 md:h-12 bg-gradient-to-br from-emerald-500 to-teal-700 hover:from-emerald-600 hover:to-teal-800 text-white font-black rounded-lg md:rounded-xl flex flex-col justify-center items-center shadow-md shadow-emerald-500/10 hover:scale-[1.02] active:scale-95 transition-all duration-200 border-none">
+                                                    <Button onClick={() => router.push('/diagnosis?type=60s')} className="h-10 md:h-12 bg-gradient-to-br from-emerald-500 to-teal-700 hover:from-emerald-600 hover:to-teal-800 text-white font-black rounded-lg md:rounded-xl flex flex-col justify-center items-center shadow-md shadow-emerald-500/10 hover:scale-[1.02] active:scale-95 transition-all duration-200 border-none">
                                                          <span className="text-[11px] md:text-xs text-white">60초 리듬체크</span>
-                                                         <span className="text-[8px] md:text-[9px] text-white/80">사진 분석 📸</span>
+                                                         <span className="text-[8px] md:text-[9px] text-white/80">바로 시작 ⚡</span>
                                                      </Button>
                                                      <Button onClick={() => router.push('/diagnosis?type=daily')} className="h-10 md:h-12 bg-gradient-to-br from-indigo-500 to-violet-700 hover:from-indigo-600 hover:to-violet-800 text-white font-black rounded-lg md:rounded-xl flex flex-col justify-center items-center shadow-md shadow-indigo-500/10 hover:scale-[1.02] active:scale-95 transition-all duration-200 border-none">
                                                          <span className="text-[11px] md:text-xs text-white">정밀 리듬 측정</span>

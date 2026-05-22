@@ -99,7 +99,7 @@ export default function Header() {
       isMenuOpen ? 'bg-background shadow-2xl shadow-primary/5' : 'bg-background/80 backdrop-blur-xl border-b border-primary/5'
     }`}>
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 md:h-20 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
