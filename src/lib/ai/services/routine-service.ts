@@ -248,6 +248,27 @@ ${communityContext}
         context: any,
         medicationHistory?: string
     ): Promise<any[]> {
+        const categoryMap: Record<string, string> = {
+            'PLASTIC': '성형외과',
+            'ORTHOPEDIC': '정형외과',
+            'INTERNAL': '내과',
+            'DENTAL': '치과',
+            'ORIENTAL': '한의원',
+            'GENERAL': '일반',
+            'none': '일반',
+            'null': '일반'
+        };
+
+        const treatmentMap: Record<string, string> = {
+            'PROCEDURE': '시술',
+            'SURGERY': '수술',
+            'none': '관리',
+            'null': '관리'
+        };
+
+        const displayCategory = categoryMap[medicalCategory || ''] || medicalCategory || '일반';
+        const displayTreatment = treatmentMap[treatmentType || ''] || treatmentType || '관리';
+
         const prompt = `
 당신은 '유니클(Youniqle)'의 수석 리커버리 코치입니다. 사용자를 위한 **'60초 리듬체크'** 문항 5개를 생성해주세요.
 
@@ -255,9 +276,14 @@ ${communityContext}
 - 테마: ${theme}
 - 주요 키워드: ${keywords}
 - 현재 여정: ${journey}
-- 시술 정보: ${medicalCategory || '일반'} / ${treatmentType || '관리'}
+- 시술 정보: ${displayCategory} / ${displayTreatment}
 - 유저 등급: ${userTier}
 - 약물 이력: ${medicationHistory || '없음'}
+
+## 브랜드 안전성 지침 (CRITICAL)
+- **'유니클' 브랜드명은 어떠한 시술/수술 명칭과도 결합될 수 없습니다.** (예: '유니클 시술', '유니클 수술', '유니클 관리' 등은 절대 금지!)
+- 유니클(Youniqle)은 회복/웰니스 플랫폼이지 의료 기관이 아닙니다. 
+- 따라서 질문 생성 시 '유니클 시술 후...' 가 아니라, '성형외과 시술 후...', '정형외과 수술 후...' 와 같이 사용자가 실제로 진행한 의료 시술 종류를 명확한 주체로 삼아 질문을 다듬어주세요.
 
 ## 문항 구성 원칙
 1. **정확히 5개의 문항**을 생성하세요.

@@ -184,32 +184,7 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
             </motion.div>
           </div>
 
-          {/* 3. Button & checkmarks */}
-          <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500 lg:col-span-2 mt-4 lg:mt-0">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <Button
-                onClick={() => onStart()}
-                size="lg"
-                className="w-full md:w-auto px-8 md:px-12 h-14 md:h-20 text-lg md:text-xl font-bold rounded-full shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 bg-primary text-white"
-              >
-                <Sparkles className="w-6 h-6 mr-3" />
-                <span>60초 리듬체크 시작하기</span>
-              </Button>
 
-              <Button
-                asChild
-                variant="ghost"
-                size="lg"
-                className="w-full md:w-auto h-14 md:h-20 px-8 md:px-12 text-lg md:text-xl font-bold rounded-full hover:bg-primary/5"
-              >
-                <Link href="/dashboard">
-                  <Layout className="w-6 h-6 mr-3" />
-                  <span>나의 회복 흐름 보기</span>
-                </Link>
-              </Button>
-            </div>
-
-          </div>
         </div>
       </div>
     </div>

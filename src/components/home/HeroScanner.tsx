@@ -214,27 +214,127 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const renderIdleView = () => (
         <div 
             onClick={() => {
-                startWebcam();
+                onStart(); // Triggers the unified SnapInput modal instantly
             }}
-            className="relative aspect-[16/10] md:aspect-[4/3] rounded-5xl overflow-hidden bg-surface group cursor-pointer border border-primary/10 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10"
+            className="relative w-full aspect-[4/4.5] sm:aspect-[4/3] min-h-[380px] md:min-h-[420px] rounded-[40px] md:rounded-5xl overflow-hidden group cursor-pointer shadow-[0_20px_50px_rgba(112,0,255,0.25)] hover:shadow-[0_20px_60px_rgba(244,63,94,0.35)] transition-all duration-700 active:scale-98 select-none border-2 border-transparent"
         >
-            <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&q=80')] bg-cover bg-center group-hover:scale-110 transition-transform duration-[2000ms]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-background/90" />
+            {/* 1. Ultimate Hyper-Colorful Animated Neon Aura & Mesh Gradient Background */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#0F0C1B] via-[#150030] to-[#050014]" />
             
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 md:space-y-6">
-                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white/60 flex items-center justify-center backdrop-blur-xl border border-white/40 group-hover:scale-110 transition-all duration-700 shadow-lg shadow-primary/10">
-                    <Camera className="w-6 h-6 md:w-10 md:h-10 text-primary/60" />
-                </div>
-                <div className="space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/10">
-                        <Sparkles className="w-3 h-3 text-primary" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Life Snap</span>
+            {/* Glowing Liquid Blobs (Moving & rotating to create high-end mesh gradient effect) */}
+            <motion.div 
+                animate={{ 
+                    x: [-40, 40, -40],
+                    y: [-30, 40, -30],
+                    scale: [1, 1.2, 1]
+                }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle,rgba(244,63,94,0.45)_0%,transparent_60%)] blur-[50px] pointer-events-none"
+            />
+            <motion.div 
+                animate={{ 
+                    x: [50, -50, 50],
+                    y: [40, -40, 40],
+                    scale: [1.2, 0.9, 1.2]
+                }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-[-10%] right-[-10%] w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle,rgba(112,0,255,0.4)_0%,transparent_60%)] blur-[60px] pointer-events-none"
+            />
+            <motion.div 
+                animate={{ 
+                    x: [-30, 30, -30],
+                    y: [30, -30, 30],
+                    scale: [0.8, 1.1, 0.8]
+                }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                className="absolute top-[20%] right-[-10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(0,240,255,0.35)_0%,transparent_60%)] blur-[50px] pointer-events-none"
+            />
+
+            {/* Glowing Dynamic Edge Ribbon border to act as a laser trace */}
+            <div className="absolute inset-0 border-2 border-primary/20 rounded-[40px] md:rounded-5xl pointer-events-none group-hover:border-primary/50 transition-colors duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-[#00F0FF]/5 to-transparent rounded-[40px] md:rounded-5xl pointer-events-none animate-pulse" />
+
+            {/* Fine digital grid lines overlay with beautiful violet-tint glow */}
+            <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(to_right,#FF3366_1px,transparent_1px),linear-gradient(to_bottom,#7000FF_1px,transparent_1px)] bg-[size:20px_20px]" />
+            
+            {/* 2. Double Neon Pulsing Waves */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {/* Outermost pulsing neon aura */}
+                <motion.div 
+                    animate={{ scale: [0.95, 1.3, 0.95], opacity: [0.2, 0.6, 0.2] }}
+                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute w-[85%] aspect-square rounded-full border-2 border-[#FF3366]/30 blur-[2px]"
+                />
+                {/* Middle cyan aura */}
+                <motion.div 
+                    animate={{ scale: [0.98, 1.15, 0.98], opacity: [0.3, 0.7, 0.3] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                    className="absolute w-[65%] aspect-square rounded-full border border-[#00F0FF]/40 bg-gradient-to-tr from-[#7000FF]/5 to-transparent"
+                />
+            </div>
+
+            {/* 3. Immersive Interactive Elements */}
+            <div className="absolute inset-0 flex flex-col items-center justify-between text-center p-6 md:p-10 z-10 py-8 md:py-12">
+                
+                {/* Interactive Holographic 3D Crystal Camera Gear Emblem */}
+                <div className="relative mt-2 md:mt-4">
+                    {/* Glowing neon background aura for emblem */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF3366] to-[#00F0FF] opacity-30 blur-md scale-120 group-hover:scale-135 transition-transform duration-500" />
+                    
+                    {/* Ring spinning border with spectrum dash */}
+                    <div className="absolute -inset-4 rounded-full border-2 border-dashed border-[#00F0FF]/40 group-hover:rotate-90 transition-transform duration-[3000ms] ease-out animate-[spin_30s_linear_infinite]" />
+                    
+                    <div className="w-18 h-18 md:w-26 md:h-26 rounded-full bg-white/[0.08] backdrop-blur-3xl flex items-center justify-center border border-white/20 group-hover:scale-108 group-hover:border-[#00F0FF]/70 group-hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all duration-700 relative overflow-hidden">
+                        
+                        {/* Shimmer holographic overlay inside lens */}
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-[#FF3366]/30 to-[#00F0FF]/30 pointer-events-none opacity-60" />
+                        
+                        <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-b from-white/15 to-[#150030]/80 flex items-center justify-center shadow-[inset_0_2px_10px_rgba(255,255,255,0.2)] relative border border-white/10">
+                            {/* Colorful Glowing Camera Icon */}
+                            <Camera className="w-7 h-7 md:w-10 md:h-10 text-white group-hover:text-[#00F0FF] group-hover:scale-110 transition-all duration-500 relative z-10 drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
+                            
+                            <motion.div
+                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
+                                transition={{ duration: 1.8, repeat: Infinity }}
+                                className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF3366] to-[#7000FF] blur-md pointer-events-none"
+                            />
+                        </div>
                     </div>
-                    <p className="text-foreground font-bold text-xl md:text-3xl leading-snug break-keep px-4">
-                        사진 한 장으로 전하는<br />오늘 나의 회복 이야기
-                    </p>
                 </div>
-                <p className="text-foreground/40 text-sm font-medium">화면을 탭하여 시작하세요</p>
+
+                {/* Typography with Sparkling High-Contrast Gold-Prism Details */}
+                <div className="space-y-3.5 max-w-sm px-2 relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#FF3366]/20 to-[#7000FF]/20 border border-[#FF3366]/30 shadow-[0_0_15px_rgba(255,51,102,0.15)]">
+                        <Sparkles className="w-3.5 h-3.5 text-[#FF3366] animate-pulse" />
+                        <span className="text-[9px] font-black text-white uppercase tracking-[0.25em] drop-shadow-sm">One-Stop Wellness Scanner</span>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                        <p className="text-white font-extrabold text-2xl md:text-3.5xl leading-tight tracking-tight break-keep drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
+                            오늘 나의 회복 이야기
+                        </p>
+                        <p className="text-white/80 text-[10px] md:text-sm font-semibold leading-relaxed break-keep drop-shadow-[0_1px_5px_rgba(0,0,0,0.5)]">
+                            사진을 업로드하거나 오늘의 한 줄을 입력하여<br />
+                            60초 맞춤형 컨디션 케어를 시작해 보세요.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Vivid high-contrast neon green/cyan call to action guidance */}
+                <div className="flex flex-col items-center gap-1.5 pb-2 relative z-10">
+                    <span className="text-[11px] font-black text-[#00F0FF] group-hover:text-white uppercase tracking-[0.22em] transition-colors duration-300 drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                        지금 탭하여 기록 시작하기
+                    </span>
+                    <motion.div
+                        animate={{ y: [0, 4, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="flex gap-1"
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] opacity-40 shadow-[0_0_5px_#00F0FF]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF3366] opacity-80 animate-pulse shadow-[0_0_8px_#FF3366]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] opacity-40 shadow-[0_0_5px_#00F0FF]" />
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

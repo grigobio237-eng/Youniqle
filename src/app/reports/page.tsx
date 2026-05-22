@@ -26,7 +26,8 @@ import {
   Heart,
   Smile,
   ChevronRight,
-  UserCheck
+  UserCheck,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -246,14 +247,104 @@ export default function ReportsHub() {
             </div>
           </div>
 
-          {selectedLog.metrics && (
-            <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20 space-y-1.5">
-              <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">AI 디테일 성분 분석</span>
-              <div className="text-[10px] md:text-xs text-slate-600 leading-relaxed font-bold break-keep">
-                {typeof selectedLog.metrics === 'string' ? selectedLog.metrics : JSON.stringify(selectedLog.metrics)}
+          {selectedLog.metrics && (() => {
+            let parsedMetrics: any = null;
+            if (typeof selectedLog.metrics === 'string') {
+              try {
+                // Remove potential markdown block wraps if present
+                let cleanJson = selectedLog.metrics.trim();
+                if (cleanJson.startsWith('```json')) cleanJson = cleanJson.replace(/^```json/, '').replace(/```$/, '').trim();
+                else if (cleanJson.startsWith('```')) cleanJson = cleanJson.replace(/^```/, '').replace(/```$/, '').trim();
+                
+                parsedMetrics = JSON.parse(cleanJson);
+              } catch (e) {
+                console.warn("Failed to parse scanner metrics JSON:", e);
+              }
+            } else {
+              parsedMetrics = selectedLog.metrics;
+            }
+
+            if (parsedMetrics && typeof parsedMetrics === 'object') {
+              return (
+                <div className="space-y-4">
+                  {/* Ingredients Breakdown */}
+                  <div className="space-y-2">
+                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">AI 이미지 디테일 성분 분석</span>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {Object.entries(parsedMetrics).map(([key, val]: any) => {
+                        if (isNaN(Number(key))) return null;
+                        return (
+                          <div key={key} className="bg-slate-50/80 p-3 md:p-3.5 rounded-xl border border-line/30 space-y-1">
+                            <div className="flex justify-between items-center gap-2">
+                              <span className="text-[11px] md:text-xs font-black text-obsidian flex items-center gap-1.5 min-w-0">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                                <span className="truncate">{val.label}</span>
+                              </span>
+                              <Badge className="bg-primary/10 text-primary border-none text-[8px] md:text-[9px] font-black px-2 py-0.5 shrink-0">
+                                {val.value}
+                              </Badge>
+                            </div>
+                            {val.benefit && (
+                              <p className="text-[10px] md:text-xs text-slate-500 font-bold leading-relaxed break-keep pl-3">
+                                {val.benefit}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Future Recovery Direction */}
+                  {parsedMetrics.futureDirection && (
+                    <div className="bg-indigo-50/50 border border-indigo-100/40 p-4 rounded-xl space-y-2">
+                      <span className="text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-widest block">AI 맞춤형 회복 처방 가이드</span>
+                      <div className="text-[10px] md:text-xs text-slate-600 leading-relaxed font-bold space-y-2 break-keep">
+                        {parsedMetrics.futureDirection.split('\n').map((line: string, i: number) => {
+                          const cleanLine = line.replace(/\*\*/g, '').trim();
+                          if (!cleanLine) return null;
+                          
+                          // Dynamically detect bullet emojis
+                          let emoji = '✨';
+                          let displayText = cleanLine;
+                          if (cleanLine.startsWith('🚨')) {
+                            emoji = '🚨';
+                            displayText = cleanLine.replace(/^🚨/, '').trim();
+                          } else if (cleanLine.startsWith('💡')) {
+                            emoji = '💡';
+                            displayText = cleanLine.replace(/^💡/, '').trim();
+                          } else if (cleanLine.startsWith('🌲')) {
+                            emoji = '🌲';
+                            displayText = cleanLine.replace(/^🌲/, '').trim();
+                          } else if (cleanLine.startsWith('🌳')) {
+                            emoji = '🌳';
+                            displayText = cleanLine.replace(/^🌳/, '').trim();
+                          }
+
+                          return (
+                            <div key={i} className="flex items-start gap-1.5">
+                              <span className="shrink-0">{emoji}</span>
+                              <span>{displayText}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Robust fallback if parsing fails
+            return (
+              <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20 space-y-1.5">
+                <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">AI 디테일 성분 분석</span>
+                <div className="text-[10px] md:text-xs text-slate-600 leading-relaxed font-bold break-keep">
+                  {typeof selectedLog.metrics === 'string' ? selectedLog.metrics : JSON.stringify(selectedLog.metrics)}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 
@@ -617,7 +708,7 @@ export default function ReportsHub() {
                 <div className="space-y-1.5">
                   {ratio.onboarding ? (
                     <Button asChild size="sm" className="bg-primary text-obsidian hover:bg-primary/80 font-black h-7 text-[9px] rounded-xl w-full">
-                      <Link href="/routine">루틴 시작하기</Link>
+                      <Link href="/ai-navigator">루틴 시작하기</Link>
                     </Button>
                   ) : (
                     <span className="text-xl md:text-2xl font-black tracking-tight text-white block">
@@ -799,7 +890,7 @@ export default function ReportsHub() {
               </div>
 
               <Button asChild className="w-full bg-white hover:bg-white/90 text-obsidian font-black h-10 md:h-12 rounded-xl md:rounded-2xl text-xs md:text-sm">
-                <Link href="/routine">실천 완료 체크하기</Link>
+                <Link href="/ai-navigator">실천 완료 체크하기</Link>
               </Button>
             </div>
 
@@ -955,7 +1046,7 @@ export default function ReportsHub() {
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedLog(null)}
-              className="fixed inset-0 bg-black z-50 md:hidden"
+              className="fixed inset-0 bg-black z-[90] md:hidden"
             />
             {/* Drawer Container */}
             <motion.div
@@ -963,12 +1054,23 @@ export default function ReportsHub() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-slate-50 border-t border-line rounded-t-[28px] p-5 max-h-[80vh] overflow-y-auto z-50 shadow-2xl md:hidden"
+              className="fixed bottom-0 left-0 right-0 bg-slate-50 border-t border-line rounded-t-[28px] p-5 max-h-[85vh] overflow-y-auto z-[100] shadow-2xl md:hidden scrollbar-thin relative"
+              style={{
+                overscrollBehaviorY: 'contain',
+                WebkitOverflowScrolling: 'touch'
+              }}
             >
+              <button 
+                onClick={() => setSelectedLog(null)}
+                className="absolute top-4 right-4 p-2 bg-slate-200/60 hover:bg-slate-200 text-slate-500 rounded-full transition-all z-10"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
               <div className="flex justify-center mb-3">
                 <div className="w-12 h-1 bg-slate-300 rounded-full" />
               </div>
-              <div className="pb-8">
+              <div className="pb-24">
                 {detailPaneContent}
               </div>
             </motion.div>

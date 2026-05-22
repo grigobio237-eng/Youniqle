@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import WeeklyReportView from './WeeklyReportView';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -106,19 +105,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                 />
             )}
 
-            {/* Weekly Report Section */}
-            <section className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                    <h3 className="text-lg font-black text-obsidian tracking-tight flex items-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-chapter-accent" />
-                        주간 회복 리포트
-                    </h3>
-                </div>
-                <WeeklyReportView onDataLoaded={(prods, report) => {
-                    setRecommendedProducts(prods);
-                    if (report) setWeeklyReport(report);
-                }} />
-            </section>
+
 
             {/* Data-driven Insights (If available) */}
             {(insights?.posture || insights?.meal) && (

@@ -11,6 +11,7 @@ import AiManagerChat from '@/components/chat/AiManagerChat';
 import MandatoryConsentModal from '@/components/auth/MandatoryConsentModal';
 import PWARegistration from '@/components/providers/PWARegistration';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import InstallPrompt from '@/components/pwa/InstallPrompt';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -118,6 +119,7 @@ export default function RootLayout({
                   <AiManagerChat />
                   <MandatoryConsentModal />
                   <PWARegistration />
+                  <InstallPrompt />
                 </RecoveryProvider>
               </ToastProvider>
             </NudgeFeaturesProvider>

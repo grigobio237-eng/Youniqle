@@ -1,9 +1,32 @@
+const CACHE_NAME = 'youniqle-pwa-cache-v1';
+const OFFLINE_URL = '/offline';
+
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      // 오프라인 폴백 페이지 및 기본 에셋 사전 캐싱
+      return cache.addAll([
+        OFFLINE_URL,
+        '/',
+        '/character/youniqle-1.png'
+      ]);
+    })
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
@@ -18,11 +41,11 @@ self.addEventListener('fetch', (event) => {
   // 네트워크 우선 전략 (실패 시 graceful fallback)
   event.respondWith(
     fetch(event.request).catch(() => {
-      // 네비게이션 요청 실패 시 오프라인 폴백
+      // 네비게이션 요청 실패 시 오프라인 폴백 (/offline 캐시 응답)
       if (event.request.mode === 'navigate') {
-        return caches.match('/') || new Response('Offline', { status: 503 });
+        return caches.match(OFFLINE_URL) || caches.match('/') || new Response('Offline', { status: 503 });
       }
-      return new Response('Network error', { status: 503 });
+      return caches.match(event.request) || new Response('Network error', { status: 503 });
     })
   );
 });
