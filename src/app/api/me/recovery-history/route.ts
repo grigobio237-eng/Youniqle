@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/db';
 import Diagnosis from '@/models/Diagnosis';
+import RecoveryScore from '@/models/RecoveryScore';
 import User from '@/models/User';
 
 export async function GET(req: NextRequest) {
@@ -28,13 +29,60 @@ export async function GET(req: NextRequest) {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - limits.dataRetentionDays);
 
-        // Fetch diagnoses for this user with date filter, sorted by date (newest first)
-        const history = await Diagnosis.find({ 
-            userId: user._id,
-            createdAt: { $gte: cutoffDate }
-        })
-            .select('type totalScore categoryScores resultTitle aiSolution createdAt')
-            .sort({ createdAt: -1 });
+        // Fetch both diagnoses and recovery scores
+        const [diagnoses, recoveryScores] = await Promise.all([
+            Diagnosis.find({ 
+                userId: user._id,
+                createdAt: { $gte: cutoffDate }
+            })
+                .select('type totalScore categoryScores resultTitle aiSolution createdAt')
+                .lean(),
+            RecoveryScore.find({
+                userId: user._id,
+                createdAt: { $gte: cutoffDate }
+            })
+                .select('rawScore totalScore metaphor answers createdAt')
+                .lean()
+        ]);
+
+        const mappedRecoveryScores = (recoveryScores || []).map((score: any) => {
+            const categoryScores: Record<string, number> = {
+                physical: 60,
+                mental: 60,
+                sleep: 60,
+                lifestyle: 60
+            };
+
+            if (Array.isArray(score.answers)) {
+                score.answers.forEach((ans: any) => {
+                    const cat = (ans.category || '').toLowerCase();
+                    if (cat.includes('physical') || cat.includes('body')) {
+                        categoryScores.physical = Math.round(ans.score * 20);
+                    } else if (cat.includes('mental') || cat.includes('psychological')) {
+                        categoryScores.mental = Math.round(ans.score * 20);
+                    } else if (cat.includes('sleep')) {
+                        categoryScores.sleep = Math.round(ans.score * 20);
+                    } else if (cat.includes('lifestyle') || cat.includes('nutrition')) {
+                        categoryScores.lifestyle = Math.round(ans.score * 20);
+                    }
+                });
+            }
+
+            return {
+                _id: score._id.toString(),
+                type: 'RECOVERY_RHYTHM',
+                totalScore: score.totalScore,
+                categoryScores,
+                resultTitle: '60초 리듬체크',
+                aiSolution: score.metaphor,
+                createdAt: score.createdAt
+            };
+        });
+
+        // Merge and sort by createdAt descending
+        const history = [...diagnoses, ...mappedRecoveryScores].sort((a: any, b: any) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
         return NextResponse.json({
             success: true,
