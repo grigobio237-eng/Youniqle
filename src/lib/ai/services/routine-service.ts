@@ -273,12 +273,12 @@ ${communityContext}
 당신은 '유니클(Youniqle)'의 수석 리커버리 코치입니다. 사용자를 위한 **'60초 리듬체크'** 문항 5개를 생성해주세요.
 
 ## 분석 컨텍스트
-- 테마: ${theme}
-- 주요 키워드: ${keywords}
-- 현재 여정: ${journey}
-- 시술 정보: ${displayCategory} / ${displayTreatment}
-- 유저 등급: ${userTier}
-- 약물 이력: ${medicationHistory || '없음'}
+- 테마: \${theme}
+- 주요 키워드: \${keywords}
+- 현재 여정: \${journey}
+- 시술 정보: \${displayCategory} / \${displayTreatment}
+- 유저 등급: \${userTier}
+- 약물 이력: \${medicationHistory || '없음'}
 
 ## 브랜드 안전성 지침 (CRITICAL)
 - **'유니클' 브랜드명은 어떠한 시술/수술 명칭과도 결합될 수 없습니다.** (예: '유니클 시술', '유니클 수술', '유니클 관리' 등은 절대 금지!)
@@ -288,8 +288,9 @@ ${communityContext}
 ## 문항 구성 원칙
 1. **정확히 5개의 문항**을 생성하세요.
 2. 각 문항은 **리커버리(회복), 에너지, 컨디션, 심리적 안정, 신체적 불편감**을 골고루 다루어야 합니다.
-3. 질문은 부드럽고 공감적인 톤앤매너를 유지하세요. (예: "~은 어떠셨나요?", "~하게 느껴지시나요?")
-4. 답변 방식은 5점 척도(Likert)를 기본으로 합니다.
+3. **[척도 호응 호환성 보장 - CRITICAL]** 답변이 "그렇다 / 그렇지 않다" (동의 여부)이므로, 개방형 질문("어떠신가요?", "어느 정도인가요?")은 절대 생성하지 마십시오. 대신 사용자가 자신의 상태에 즉각 동의하거나 비동의할 수 있도록 **"오늘 나의 전반적인 에너지 수준은 아주 좋은 편이다.", "오늘 하루 신체 컨디션에 특별히 통증이나 불편한 부분이 느껴지지 않는다."와 같은 명확한 평서문 주장(Affirmation Statement) 형태로만 질문을 작성하십시오.**
+4. 질문은 신뢰감 있고 부드러운 톤앤매너를 유지하세요. (예: "~하는 편이다", "~하게 느껴진다")
+5. 답변 방식은 5점 척도(Likert)를 기본으로 합니다.
 
 ## 응답 형식 (JSON Array Only)
 [
@@ -317,13 +318,13 @@ ${communityContext}
             throw new Error("Invalid JSON in AI response");
         } catch (error) {
             console.error("Failed to generate daily questions:", error);
-            // Fallback: 5 simple questions
+            // Fallback: 5 simple statements aligned with Likert scale
             return [
-                { id: "f1", category: "Physical", text: "오늘 전반적인 신체 컨디션은 어떠신가요?", options: [] },
-                { id: "f2", category: "Mindset", text: "오늘 하루를 시작하는 마음이 평온하신가요?", options: [] },
-                { id: "f3", category: "Emotional", text: "최근 스트레스 수준은 어느 정도인가요?", options: [] },
-                { id: "f4", category: "Social", text: "주변 사람들과의 소통에서 즐거움을 느끼시나요?", options: [] },
-                { id: "f5", category: "Physical", text: "몸의 긴장이나 통증이 느껴지지는 않나요?", options: [] }
+                { id: "f1", category: "Physical", text: "오늘 나의 전반적인 신체 컨디션과 에너지는 아주 좋은 편이다.", options: [] },
+                { id: "f2", category: "Mindset", text: "오늘 하루를 시작할 때 내 마음은 아주 편안하고 여유로웠다.", options: [] },
+                { id: "f3", category: "Emotional", text: "최근에 스트레스나 일상적인 피로감이 거의 느껴지지 않는다.", options: [] },
+                { id: "f4", category: "Social", text: "요즘 주변 사람들과 이야기하고 소통할 때 큰 즐거움을 느낀다.", options: [] },
+                { id: "f5", category: "Physical", text: "신체적으로 특별히 통증이나 뻐근하게 굳은 부위가 없다.", options: [] }
             ];
         }
     }

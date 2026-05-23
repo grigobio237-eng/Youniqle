@@ -12,7 +12,7 @@ export function useAIProgress(active: boolean, initialProgress = 5) {
   const messages = [
     '유니클 엔진 연결 중...',
     '이미지 특징 데이터 추출 중...',
-    '회복 패턴 데이터베이스 분석 중...',
+    '유니클 회복 패턴 매칭 중...',
     '개인 맞춤형 결과 조합 중...',
     '거의 다 되었습니다...',
     '최적화된 조언 생성 중...'
@@ -29,22 +29,30 @@ export function useAIProgress(active: boolean, initialProgress = 5) {
     let currentProgress = initialProgress;
     let messageIdx = 0;
 
+    // Use a tighter interval (100ms) for ultra-smooth 60fps movement
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
-        // 95% 이상으로는 자동으로 올라가지 않음 (실제 완료 시점을 기다림)
-        if (prev >= 95) return prev;
-        
-        // 진행률이 높아질수록 증가 속도가 느려짐 (로그 비스무리한 효과)
-        const increment = Math.max(0.5, (95 - prev) / 15);
-        const next = Math.min(95, prev + increment);
-        return next;
+        if (prev >= 90) {
+          // Beyond 90%, advance extremely slowly (fine-grained sub-percent movement to avoid freeze feel)
+          const next = prev + 0.05;
+          return Math.min(99.9, next);
+        }
+
+        // 1% ~ 75%: slow and deliberate scanning feel for professional depth and trust
+        if (prev < 75) {
+          return prev + 0.8;
+        }
+
+        // 75% ~ 90%: accelerates gracefully as dynamic insights build up!
+        const acceleration = 0.8 + ((prev - 75) / 15) * 1.5; 
+        return Math.min(90, prev + acceleration);
       });
-    }, 400);
+    }, 100);
 
     const messageInterval = setInterval(() => {
       messageIdx = (messageIdx + 1) % messages.length;
       setStatusMessage(messages[messageIdx]);
-    }, 2500);
+    }, 2000);
 
     return () => {
       clearInterval(progressInterval);
@@ -53,8 +61,18 @@ export function useAIProgress(active: boolean, initialProgress = 5) {
   }, [active, initialProgress]);
 
   const finish = useCallback(() => {
-    setProgress(100);
-    setStatusMessage('완료!');
+    // When finished, rapidly fill the bar from its current progress to 100% at 60fps for maximum satisfaction
+    let increment = 4;
+    const finishInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(finishInterval);
+          setStatusMessage('완료!');
+          return 100;
+        }
+        return prev + increment;
+      });
+    }, 16);
   }, []);
 
   return { progress, statusMessage, finish };

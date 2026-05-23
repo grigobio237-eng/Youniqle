@@ -52,9 +52,17 @@ export async function POST(req: NextRequest) {
             resultData = await dailyQLock.get(lockKey);
         } else {
             const requestPromise = (async () => {
-                // Check if already exists
+                // force=true 파라미터가 들어올 경우 기존 오늘자 데이터를 삭제하고 완전히 재생성
+                const url = new URL(req.url);
+                const forceRefresh = url.searchParams.get('force') === 'true';
+
                 let question = await DailyQuestion.findOne({ userId, date });
-                if (question) return { question };
+                if (question && !forceRefresh) return { question };
+
+                if (question && forceRefresh) {
+                    console.log(`[Force Refresh] Deleting existing daily question for ${userId} to regenerate...`);
+                    await DailyQuestion.deleteOne({ _id: question._id });
+                }
 
                 // Generate new questions with Gemini
                 console.log(`[Gemini] Generating fresh daily questions for ${userId} (${date})...`);
@@ -82,10 +90,29 @@ export async function POST(req: NextRequest) {
 
                 // Save to DB
                 try {
+                    // 몽고디비 DailyQuestion 스키마의 questions[].id: Number 제약을 위해 문자열 ID를 숫자로 정제
+                    const sanitizedQuestions = (aiResult.questions || []).map((q: any, idx: number) => {
+                        let numId = idx + 1;
+                        if (q.id) {
+                            if (typeof q.id === 'number') {
+                                numId = q.id;
+                            } else if (typeof q.id === 'string') {
+                                const matched = q.id.match(/\d+/);
+                                if (matched) {
+                                    numId = parseInt(matched[0], 10);
+                                }
+                            }
+                        }
+                        return {
+                            ...q,
+                            id: numId
+                        };
+                    });
+
                     question = await DailyQuestion.create({
                         userId,
                         date,
-                        questions: aiResult.questions,
+                        questions: sanitizedQuestions,
                         theme: aiResult.theme || '오늘의 회복 리듬',
                         journey: 'WELLNESS',
                         dayOfWeek: new Date().getDay()

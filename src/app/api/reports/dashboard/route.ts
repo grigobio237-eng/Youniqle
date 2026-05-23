@@ -141,14 +141,43 @@ export async function GET(request: NextRequest) {
             physical: 0, mental: 0, sleep: 0, lifestyle: 0, 
             counts: { physical: 0, mental: 0, sleep: 0, lifestyle: 0 } 
         };
+
+        const normalizeCategory = (rawCat: string): 'physical' | 'mental' | 'sleep' | 'lifestyle' | null => {
+            const cat = (rawCat || '').trim().toLowerCase();
+            if ([
+                'physical', 'body', 'condition', 'physical discomfort', 'physical comfort',
+                '신체', '몸', '자세', '신체 긴장', '피로', '피로도', 'energy', '에너지', '에너지 레벨', '에너지 수준'
+            ].includes(cat)) {
+                return 'physical';
+            }
+            if ([
+                'mental', 'psychological', 'psychological stability', 'mind',
+                '심리', '감정', '불안 관리', '마음가짐', '집중력', '뇌 피로도', '집중', '업무 몰입'
+            ].includes(cat)) {
+                return 'mental';
+            }
+            if ([
+                'sleep', '수면', '수면 리듬'
+            ].includes(cat)) {
+                return 'sleep';
+            }
+            if ([
+                'lifestyle', 'nutrition', 'behavior', 'environment', 'drug', 'medication', 'general',
+                '영양', '행동', '환경', '약물', '내일 준비', '생산성', '일반', 'general'
+            ].includes(cat)) {
+                return 'lifestyle';
+            }
+            return null;
+        };
+
         recentScores.forEach(s => {
             if (Array.isArray(s.answers)) {
                 s.answers.forEach((ans: any) => {
-                    const cat = (ans.category || '').toLowerCase();
+                    const normalizedCat = normalizeCategory(ans.category);
                     const score100 = (ans.score || 0) * 20; // 5점 만점 답변을 100점 스케일로 승격
-                    if (cat in rhythmSums) {
-                        rhythmSums[cat as keyof typeof rhythmSums] += score100;
-                        rhythmSums.counts[cat as keyof typeof rhythmSums.counts]++;
+                    if (normalizedCat) {
+                        rhythmSums[normalizedCat] += score100;
+                        rhythmSums.counts[normalizedCat]++;
                     }
                 });
             }

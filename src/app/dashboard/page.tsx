@@ -61,29 +61,47 @@ export default function DashboardPage() {
         const timelineData = await timelineRes.json();
         const timeline = timelineData.timeline || [];
         
-        // Process timeline for the 7-day chart
+        // 1. 브라우저 타임존 및 문자열 노이즈로부터 안전하게 날짜 키(M/D)를 추출하는 헬퍼 함수
+        const getSafeDateKey = (dateInput: any) => {
+          if (!dateInput) return null;
+          try {
+            const cleanInput = typeof dateInput === 'string'
+              ? dateInput.replace(/\s*\(.*?\)\s*/g, '').trim()
+              : dateInput;
+            const d = new Date(cleanInput);
+            if (isNaN(d.getTime())) return null;
+            return `${d.getMonth() + 1}/${d.getDate()}`;
+          } catch {
+            return null;
+          }
+        };
+
         const today = new Date();
+        const todayKey = getSafeDateKey(today);
+
+        // 2. 7일 선 그래프를 위한 로컬 절대 일자 7개 생성
         const last7Days = Array.from({ length: 7 }).map((_, i) => {
           const d = new Date();
           d.setDate(today.getDate() - (6 - i));
           return {
-            date: d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
-            fullDate: d.toISOString().split('T')[0]
+            displayDate: d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+            dateKey: getSafeDateKey(d)
           };
         });
 
+        // 3. 타임라인 데이터를 날짜별 고정 키(M/D)로 맵핑 (가장 최신의 정직한 데이터 보존)
         const timelineMap = timeline.reduce((acc: any, item: any) => {
-          const d = new Date(item.createdAt);
-          const dateKey = d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-          if (!acc[dateKey] || item.score > acc[dateKey]) {
-            acc[dateKey] = item.score;
+          const key = getSafeDateKey(item.createdAt);
+          if (key && !acc[key] && item.score !== undefined && item.score !== null) {
+            acc[key] = item.score;
           }
           return acc;
         }, {});
 
+        // 4. 생성한 X축 기준에 맞춰 100% 매칭되는 실제 점수 세팅
         const dynamicHistory = last7Days.map(d => ({
-          date: d.date === today.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) ? '오늘' : d.date,
-          score: timelineMap[d.date] || null
+          date: d.dateKey === todayKey ? '오늘' : d.displayDate,
+          score: d.dateKey ? (timelineMap[d.dateKey] || null) : null
         }));
         
         setScoreHistory(dynamicHistory);
@@ -94,10 +112,10 @@ export default function DashboardPage() {
         if (diagData.metadata?.categoryScores) {
           const scores = diagData.metadata.categoryScores;
           setRadarData([
-            { category: 'PHYSICAL', score: scores.physical, fullMark: 40 },
-            { category: 'MENTAL', score: scores.mental, fullMark: 40 },
-            { category: 'SLEEP', score: scores.sleep, fullMark: 40 },
-            { category: 'LIFESTYLE', score: scores.lifestyle, fullMark: 40 }
+            { category: 'PHYSICAL', score: scores.physical, fullMark: 100 },
+            { category: 'MENTAL', score: scores.mental, fullMark: 100 },
+            { category: 'SLEEP', score: scores.sleep, fullMark: 100 },
+            { category: 'LIFESTYLE', score: scores.lifestyle, fullMark: 100 }
           ]);
         }
       }

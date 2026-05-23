@@ -20,33 +20,55 @@ export default function ClinicConsultationSection() {
     setLoadingType(type);
     setProgress(0);
     
-    // Initial text
     setLoadingText(type === 'pre' ? '사용자 회복 리듬 분석 중...' : '최근 시술 데이터 동기화 중...');
 
-    const startTime = Date.now();
-    const duration = 3000; // 3 seconds for a more thorough feel
-
+    // Smooth and realistic acceleration/deceleration simulated via an adaptive interval
     const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const newProgress = Math.min((elapsed / duration) * 100, 99);
-      setProgress(newProgress);
+      setProgress((prev) => {
+        let nextProgress = prev;
+        
+        if (prev >= 90) {
+          // Beyond 90%, slowly creep forward simulating complex clinical protocol preparation
+          nextProgress = prev + 0.1;
+          nextProgress = Math.min(99, nextProgress);
+        } else if (prev < 75) {
+          // Slow deliberative depth phase
+          nextProgress = prev + 1.2;
+        } else {
+          // Dynamic acceleration phase
+          const step = 1.2 + ((prev - 75) / 15) * 2.5;
+          nextProgress = Math.min(90, prev + step);
+        }
 
-      if (newProgress > 30 && newProgress < 60) {
-        setLoadingText(type === 'pre' ? '정밀 회복 가이드 구성 중...' : '사후 관리 프로토콜 분석 중...');
-      } else if (newProgress >= 60 && newProgress < 90) {
-        setLoadingText(type === 'pre' ? '유니클 맞춤형 문진지 생성 완료!' : '회복 로드맵 업데이트 완료!');
-      } else if (newProgress >= 90) {
-        setLoadingText('준비가 완료되었습니다!');
-      }
+        // Dynamic texts based on progress steps
+        if (nextProgress > 30 && nextProgress < 60) {
+          setLoadingText(type === 'pre' ? '정밀 회복 가이드 구성 중...' : '사후 관리 프로토콜 분석 중...');
+        } else if (nextProgress >= 60 && nextProgress < 90) {
+          setLoadingText(type === 'pre' ? '유니클 맞춤형 문진지 생성 완료!' : '회복 로드맵 업데이트 완료!');
+        } else if (nextProgress >= 90) {
+          setLoadingText('준비가 완료되었습니다!');
+        }
 
-      if (elapsed >= duration) {
-        clearInterval(interval);
-        setProgress(100);
-        setTimeout(() => {
-          // action=new 파라미터를 추가하여 게이트웨이를 건너뜁니다.
-          router.push(`${href}?action=new`);
-        }, 300);
-      }
+        // Finish threshold (e.g. close to 99%)
+        if (nextProgress >= 99) {
+          clearInterval(interval);
+          
+          // Instant super fast charge from 99% to 100%
+          let finishProgress = 99;
+          const finishInterval = setInterval(() => {
+            finishProgress += 1;
+            setProgress(finishProgress);
+            if (finishProgress >= 100) {
+              clearInterval(finishInterval);
+              setTimeout(() => {
+                router.push(`${href}?action=new`);
+              }, 300);
+            }
+          }, 16);
+        }
+
+        return nextProgress;
+      });
     }, 50);
   };
 

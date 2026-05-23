@@ -57,14 +57,7 @@ export function generateDynamicRoutines(
   const pool = [...ROUTINE_POOL[level]];
   const result: RoutineAction[] = [];
 
-  // 2. 최신 AI 스캔 결과 반영 (있을 경우 최우선 순위)
-  if (analysisData?.futureDirection) {
-    result.push({
-      text: analysisData.futureDirection,
-      // Youniqle 엔진 생성 항목 아이콘
-      category: 'AI_SCAN'
-    });
-  }
+
 
   // 3. 나머지 항목은 풀에서 랜덤하게 채우기 (중복 방지)
   // 매일 같은 루틴을 보지 않도록 날짜 기반 시드나 단순 랜덤 사용

@@ -30,22 +30,32 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
     let interval: NodeJS.Timeout;
     if (isDiagnosing) {
       setProgress(0);
-      const startTime = Date.now();
       interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        let newProgress = 0;
-        if (elapsed < 3000) newProgress = (elapsed / 3000) * 80; // 3초 동안 80%까지
-        else if (elapsed < 10000) newProgress = 80 + ((elapsed - 3000) / 7000) * 18; // 이후 10초까지 천천히
-        else newProgress = 98;
-        
-        setProgress(newProgress);
+        setProgress((prev) => {
+          let nextProgress = prev;
+          
+          if (prev >= 90) {
+            // Above 90%, slowly creep forward with fine details
+            nextProgress = prev + 0.08;
+            nextProgress = Math.min(99, nextProgress);
+          } else if (prev < 75) {
+            // 1% ~ 75%: deliberate, slow & reliable scan phase
+            nextProgress = prev + 0.9;
+          } else {
+            // 75% ~ 90%: spring acceleration phase
+            const step = 0.9 + ((prev - 75) / 15) * 1.6;
+            nextProgress = Math.min(90, prev + step);
+          }
 
-        // Dynamic loading text
-        if (newProgress < 30) setLoadingText('유니클이 이미지를 해석 중입니다...');
-        else if (newProgress < 60) setLoadingText('오늘의 회복 컨텍스트 구성 중...');
-        else if (newProgress < 90) setLoadingText('맞춤형 리듬체크 설계 중...');
-        else setLoadingText('거의 다 되었습니다...');
+          // Dynamic loading text updates based on actual progress
+          if (nextProgress < 30) setLoadingText('유니클이 이미지를 정밀 분석 중입니다...');
+          else if (nextProgress < 55) setLoadingText('유니클 회복 패턴 매칭 중...');
+          else if (nextProgress < 80) setLoadingText('오늘의 회복 컨텍스트 구성 중...');
+          else if (nextProgress < 95) setLoadingText('맞춤형 리듬체크 설계 중...');
+          else setLoadingText('거의 다 되었습니다. 결과를 정비하고 있어요...');
 
+          return nextProgress;
+        });
       }, 100);
     } else {
       setLoadingText('회복 리듬 분석 중...');

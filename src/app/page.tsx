@@ -130,12 +130,43 @@ export default function HomePage() {
   const handleOpenWebtoon = React.useCallback(() => setShowWebtoonDialog(true), []);
 
   const handleStart = async (data?: AnalysisResult, image?: string) => {
-    if (image) {
-      setScannerImage(image);
-      // Skip the SNAP view and proceed to question generation immediately
-      handleSnapComplete({ type: 'PHOTO', content: image });
+    // If we already have the Gemini analysis result data, proceed with dynamic question generation
+    if (data) {
+      setIsDiagnosing(true);
+      try {
+        const keywords = data.summary || "회복 기록 분석";
+        const medHistory = localStorage.getItem('recovery_med_history') || "";
+        
+        const res = await fetch('/api/ai/diagnosis/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            theme: "스냅 기반 맞춤형 리듬체크",
+            keywords: keywords,
+            journey: journey,
+            medicalCategory: medicalCategory,
+            treatmentType: treatmentType,
+            medicationHistory: medHistory
+          })
+        });
+        
+        const resData = await res.json();
+        if (Array.isArray(resData)) {
+          setQuestions(resData);
+          setViewState('QUESTION');
+        } else {
+          throw new Error("질문을 불러오지 못했습니다.");
+        }
+      } catch (err) {
+        console.error("Generate questions failed:", err);
+        router.push('/dashboard');
+      } finally {
+        setIsDiagnosing(false);
+      }
       return;
     }
+    
+    // Normal snap entry from home screen
     setViewState('SNAP');
   };
 
@@ -143,34 +174,50 @@ export default function HomePage() {
     setSnapData(data);
     setIsDiagnosing(true);
     try {
-      // 넥스트 넛지: 스냅 후 리듬체크로 전환
-      const keywords = typeof data.content === 'string' ? data.content : "사진 기록";
+      const contentStr = typeof data.content === 'string' ? data.content : "";
       
-      // 약물 히스토리 가져오기
-      const medHistory = localStorage.getItem('recovery_med_history') || "";
-      
-      const res = await fetch('/api/ai/diagnosis/generate', {
+      // 1. Run Gemini AI image/text analysis first
+      const response = await fetch('/api/ai/life-snap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          theme: "스냅 기반 맞춤형 리듬체크",
-          keywords: keywords,
-          journey: journey,
-          medicalCategory: medicalCategory,
-          treatmentType: treatmentType,
-          medicationHistory: medHistory
+        body: JSON.stringify({ 
+          image: contentStr, 
+          journey: journey, 
+          snapType: data.type === 'PHOTO' ? 'OTHER' : 'ROUTINE'
         })
       });
       
-      const resData = await res.json();
-      if (Array.isArray(resData)) {
-        setQuestions(resData);
-        setViewState('QUESTION');
-      } else {
-        throw new Error("질문을 불러오지 못했습니다.");
+      if (!response.ok) throw new Error('Gemini analysis failed');
+      const analysisRes = await response.json();
+      
+      // Auto save scan record
+      try {
+        await fetch('/api/scan/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: analysisRes.type || 'OTHER',
+            imageData: data.type === 'PHOTO' ? contentStr : undefined,
+            score: analysisRes.matchScore,
+            summary: analysisRes.summary,
+            metrics: { ...analysisRes.analysisTable, futureDirection: analysisRes.futureDirection }
+          })
+        });
+      } catch (saveErr) {
+        console.error("Auto save scan failed:", saveErr);
       }
+
+      // Save analysis results to state
+      setAnalysisData(analysisRes);
+      if (data.type === 'PHOTO') {
+        setScannerImage(contentStr);
+      }
+      
+      // Return to intro screen; HeroScanner will pick up initialAnalysisData and show result view!
+      setViewState('INTRO');
+      
     } catch (error) {
-      console.error("Diagnosis start error:", error);
+      console.error("Snap analysis error:", error);
       router.push('/dashboard');
     } finally {
       setIsDiagnosing(false);
@@ -237,7 +284,12 @@ export default function HomePage() {
 
     return (
       <>
-        <Hero onStart={handleStart} isDiagnosing={isDiagnosing} />
+        <Hero 
+          onStart={handleStart} 
+          isDiagnosing={isDiagnosing} 
+          initialAnalysisData={analysisData}
+          initialImage={scannerImage}
+        />
       </>
     );
   };

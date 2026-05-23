@@ -33,6 +33,41 @@ export default function ResultDisplay({
   const router = useRouter();
   const { data: session } = useSession();
 
+  // AI 가이드 텍스트의 지저분한 마크다운 기호를 지우고 이쁜 구조로 분할 파싱하는 헬퍼
+  const parseFutureDirection = (text: string) => {
+    if (!text) return [];
+    // 줄바꿈 또는 임의의 구분자로 쪼갬
+    const lines = text.split(/\n|\\n/).filter(line => line.trim().length > 0);
+    
+    return lines.map(line => {
+      // **로 둘러싸인 강조 표시 제거 및 트림
+      const cleanLine = line.replace(/\*\*/g, '').trim();
+      
+      let icon = '✨';
+      let label = '가이드';
+      let content = cleanLine;
+      
+      if (cleanLine.includes('현재 상황:')) {
+        icon = '🚨';
+        label = '현재 상황';
+        content = cleanLine.replace('현재 상황:', '').trim();
+      } else if (cleanLine.includes('권장 행동:')) {
+        icon = '💡';
+        label = '권장 행동';
+        content = cleanLine.replace('권장 행동:', '').trim();
+      } else if (cleanLine.includes('대체 루틴:')) {
+        icon = '🍵';
+        label = '대체 루틴';
+        content = cleanLine.replace('대체 루틴:', '').trim();
+      }
+      
+      // 맨 앞 이모티콘 겹침 방지 제거
+      content = content.replace(/^[🚨💡🍵✨]*/, '').trim();
+      
+      return { icon, label, content };
+    });
+  };
+
   // Context-aware UI Labels
   const getRoadmapInfo = () => {
     switch (journey) {
@@ -176,15 +211,37 @@ export default function ResultDisplay({
             {typeDescription}
           </p>
 
+          {/* AI 프리미엄 밀착 처방전 섹션 */}
+          {analysisData?.futureDirection && (
+            <div className="space-y-4 pt-6 border-t border-line">
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" /> Youniqle AI Recovery Report
+              </span>
+              <div className="grid grid-cols-1 gap-3">
+                {parseFutureDirection(analysisData.futureDirection).map((item, idx) => (
+                  <div key={idx} className="p-5 bg-primary/5 rounded-3xl border border-primary/10 hover:bg-primary/10 transition-all text-left">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-base leading-none">{item.icon}</span>
+                      <span className="text-[11px] font-black text-primary uppercase tracking-widest leading-none">{item.label}</span>
+                    </div>
+                    <p className="text-sm font-bold text-foreground/80 leading-relaxed break-keep pl-6">
+                      {item.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4 pt-6 border-t border-line">
-            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Today's Small Action</span>
+            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest block text-left">Today's Small Action</span>
             <div className="grid grid-cols-1 gap-3">
               {dailyActions.map((action, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-4 bg-mist/50 rounded-2xl border border-line/50">
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg shadow-sm">
+                <div key={idx} className="flex items-center gap-4 p-4 bg-mist/50 rounded-2xl border border-line/50 text-left">
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg shadow-sm shrink-0">
                     {action.icon}
                   </div>
-                  <span className="text-sm font-bold text-obsidian leading-tight">{action.text}</span>
+                  <span className="text-sm font-bold text-obsidian leading-tight break-keep text-left">{action.text}</span>
                 </div>
               ))}
             </div>

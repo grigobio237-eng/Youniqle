@@ -44,24 +44,51 @@ function DiagnosisContent() {
     useEffect(() => {
         // 'daily'가 아닌 경우(정적 질문)에만 즉시 로드
         if (type !== 'daily' && fetchedRef.current !== type) {
-            loadQuestions();
+            loadQuestions().catch(err => {
+                console.error("Gracefully handled loadQuestions error inside mount hook:", err);
+            });
             fetchedRef.current = type;
         }
     }, [type]);
 
+    const getLoadingText = (prog: number) => {
+        if (prog < 40) return "유니클 회복 패턴 매칭 중...";
+        if (prog < 75) return "회복 데이터를 수집하고 있습니다...";
+        if (prog < 90) return "맞춤형 리듬 질문을 생성하고 있습니다...";
+        if (prog < 99) return "진단지를 정교하게 조율하는 중...";
+        return "분석 완료! 문진을 시작합니다.";
+    };
+
     const loadQuestions = async () => {
         setLoadingQuestions(true);
-        setLoadingProgress(10); // 시작점
+        setLoadingProgress(0);
         
-        // 시뮬레이션된 프로그레스 업데이트 (API 응답 전까지 시각적 만족감 제공)
+        let currentProgress = 0;
+        let isDone = false;
+
+        // 지능형 slow-start 가속 시뮬레이션 타이머
         const progressInterval = setInterval(() => {
-            setLoadingProgress(prev => (prev < 90 ? prev + 2 : prev));
-        }, 200);
+            if (isDone) return;
+            
+            if (currentProgress < 75) {
+                currentProgress += Math.random() * 2 + 0.5; // 처음엔 신중하게 천천히
+            } else if (currentProgress < 90) {
+                currentProgress += Math.random() * 0.8 + 0.15; // 75~90% 구간 더 천천히 진행
+            } else if (currentProgress < 99) {
+                currentProgress += 0.05; // 90% 이상 대기 정체 방어선 (초미세 진행)
+            }
+            
+            const nextVal = Math.min(99, currentProgress);
+            setLoadingProgress(nextVal);
+        }, 100);
+
+        let loadedQuestions = [];
 
         try {
-            let loadedQuestions = [];
             if (type === '60s') {
-                const res = await fetch('/api/questions/daily', {
+                const isForce = searchParams?.get('force') === 'true';
+                const urlSuffix = isForce ? '?force=true' : '';
+                const res = await fetch(`/api/questions/daily${urlSuffix}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -71,15 +98,7 @@ function DiagnosisContent() {
                     setDailyTheme(data.question?.theme || '오늘의 60초 회복 리듬체크');
                     setDailyGreeting('오늘 하루 나의 회복 에너지를 체크하고 100PT를 받으세요.');
                 } else {
-                    // Fallback to static 5 questions
-                    loadedQuestions = [
-                        { id: "f1", category: "Physical", text: "오늘 전반적인 신체 컨디션은 어떠신가요?", options: [] },
-                        { id: "f2", category: "Mindset", text: "오늘 하루를 시작하는 마음이 평온하신가요?", options: [] },
-                        { id: "f3", category: "Emotional", text: "최근 스트레스 수준은 어느 정도인가요?", options: [] },
-                        { id: "f4", category: "Social", text: "주변 사람들과의 소통에서 즐거움을 느끼시나요?", options: [] },
-                        { id: "f5", category: "Physical", text: "몸의 긴장이나 통증이 느껴지지는 않나요?", options: [] }
-                    ];
-                    setDailyTheme('60초 회복 리듬체크');
+                    throw new Error('Daily questions API failed');
                 }
             } else if (type === 'daily') {
                 const res = await fetch('/api/diagnosis/dynamic-questions', {
@@ -93,31 +112,64 @@ function DiagnosisContent() {
                     setDailyTheme(data.theme || '');
                     setDailyGreeting(data.greeting || '');
                 } else {
-                    // Fallback to static set if API fails
-                    loadedQuestions = (FREE_DIAGNOSIS_QUESTIONS || []).slice(0, 16);
-                    setDailyTheme('오늘의 회복 리듬체크');
+                    throw new Error('Dynamic questions API failed');
                 }
             } else if (type === 'personality') {
                 loadedQuestions = FULL_DIAGNOSIS_QUESTIONS;
             } else {
                 loadedQuestions = FREE_DIAGNOSIS_QUESTIONS || [];
             }
-
-            const formattedQuestions = loadedQuestions.map((q: any) => ({
-                ...q,
-                options: q.options || DEFAULT_LIKERT_OPTIONS
-            }));
-            
-            setQuestions(formattedQuestions);
-            setLoadingProgress(100);
-            return formattedQuestions; // 결과 반환
         } catch (error) {
-            console.error('Failed to load questions', error);
-            return [];
-        } finally {
-            clearInterval(progressInterval);
-            setLoadingQuestions(false);
+            console.error('Failed to load questions, applying premium fallback:', error);
+            // API 500 등 실패 시에도 완벽한 5개 Fallback 질문 준비
+            if (type === '60s') {
+                loadedQuestions = [
+                    { id: "f1", category: "Physical", text: "오늘 나의 전반적인 신체 컨디션과 에너지는 아주 좋은 편이다." },
+                    { id: "f2", category: "Mindset", text: "오늘 하루를 시작할 때 내 마음은 아주 편안하고 여유로웠다." },
+                    { id: "f3", category: "Emotional", text: "최근에 스트레스나 일상적인 피로감이 거의 느껴지지 않는다." },
+                    { id: "f4", category: "Social", text: "요즘 주변 사람들과 이야기하고 소통할 때 큰 즐거움을 느낀다." },
+                    { id: "f5", category: "Physical", text: "신체적으로 특별히 통증이나 뻐근하게 굳은 부위가 없다." }
+                ];
+                setDailyTheme('60초 회복 리듬체크');
+            } else {
+                loadedQuestions = (FREE_DIAGNOSIS_QUESTIONS || []).slice(0, 16);
+                setDailyTheme('오늘의 회복 리듬체크');
+            }
         }
+
+        // 성공하든 실패하든 무조건 타이머 해제 후 60fps 초고속 피날레 가속 개시
+        isDone = true;
+        clearInterval(progressInterval);
+
+        const formattedQuestions = loadedQuestions.map((q: any) => ({
+            ...q,
+            options: (q.options && q.options.length > 0) ? q.options : DEFAULT_LIKERT_OPTIONS
+        }));
+        
+        setQuestions(formattedQuestions);
+
+        // 데이터 응답 확인/가공 직후 99% -> 100% 초고속 피날레 가시화
+        let finishVal = currentProgress;
+        await new Promise<void>((resolve) => {
+            const finishInterval = setInterval(() => {
+                finishVal += 6.5; // 빠르게 쭈욱 끌어올림
+                if (finishVal >= 100) {
+                    setLoadingProgress(100);
+                    clearInterval(finishInterval);
+                    resolve();
+                } else {
+                    setLoadingProgress(finishVal);
+                }
+            }, 16);
+        });
+
+        // 60초 리듬체크 및 일일 리듬체크 진입 시 번거로운 인트로 버튼 없이 질문지 즉시 진입!
+        if (type === '60s' || type === 'daily') {
+            setStep(0);
+        }
+        
+        setLoadingQuestions(false);
+        return formattedQuestions;
     };
 
     const handleStartDiagnosis = async () => {
@@ -216,8 +268,8 @@ function DiagnosisContent() {
     const theme = getThemeColors();
 
     return (
-        <div className={`min-h-screen ${(type === 'daily' || type === '60s') ? 'bg-[#F9F7F2]' : 'bg-mist'} flex flex-col items-center justify-center p-4 transition-colors duration-500`}>
-            <div className="max-w-2xl w-full">
+        <div className={`min-h-screen ${(type === 'daily' || type === '60s') ? 'bg-[#F9F7F2]' : 'bg-mist'} flex flex-col items-center justify-start md:justify-center p-4 pt-3 md:pt-4 transition-colors duration-500`}>
+            <div className="max-w-2xl w-full mt-2 md:mt-0">
                 <AnimatePresence mode="wait">
                     {step === -1 && (
                         <motion.div
@@ -261,12 +313,12 @@ function DiagnosisContent() {
                                 </motion.div>
                             )}
 
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-3">
                                 <Button 
                                     size="lg" 
                                     onClick={handleStartDiagnosis} 
                                     disabled={loadingQuestions}
-                                    className={`h-20 text-2xl font-black rounded-3xl ${theme.button} text-white transition-all shadow-2xl relative overflow-hidden`}
+                                    className={`h-16 md:h-20 ${loadingQuestions ? 'text-base md:text-lg' : 'text-xl md:text-2xl'} font-black rounded-2xl md:rounded-3xl ${theme.button} text-white transition-all shadow-xl relative overflow-hidden`}
                                 >
                                     {/* Progress Background Overlay */}
                                     {loadingQuestions && (
@@ -277,16 +329,17 @@ function DiagnosisContent() {
                                             transition={{ ease: "linear" }}
                                         />
                                     )}
-                                    <span className="relative z-10 flex items-center justify-center">
+                                    <span className="relative z-10 flex items-center justify-center px-4">
                                         {loadingQuestions ? (
                                             <>
-                                                <Loader2 className="animate-spin mr-3 w-6 h-6" />
-                                                질문 분석 중... {loadingProgress}%
+                                                <Loader2 className="animate-spin mr-2 w-5 h-5 shrink-0" />
+                                                <span className="tracking-tight text-white truncate max-w-[200px] sm:max-w-none">{getLoadingText(loadingProgress)}</span>
+                                                <span className="ml-1.5 font-mono bg-white/20 px-1.5 py-0.2 rounded-full text-xs shrink-0">{Math.round(loadingProgress)}%</span>
                                             </>
                                         ) : '진단 시작하기'}
                                     </span>
                                 </Button>
-                                <Button variant="ghost" asChild className="text-slate font-bold">
+                                <Button variant="ghost" asChild className="text-slate font-bold text-sm md:text-base">
                                     <Link href="/dashboard">나중에 하기</Link>
                                 </Button>
                             </div>
@@ -299,39 +352,39 @@ function DiagnosisContent() {
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -50 }}
-                            className="space-y-12"
+                            className="space-y-4 md:space-y-8"
                         >
-                            <div className="space-y-6">
+                            <div className="space-y-3 md:space-y-5">
                                 <div className="flex justify-between items-end">
-                                    <div className="space-y-1">
-                                        <span className={`text-sm font-black ${theme.text} uppercase tracking-widest`}>
+                                    <div className="space-y-0.5">
+                                        <span className={`text-[10px] md:text-xs font-black ${theme.text} uppercase tracking-widest`}>
                                             {questions[step]?.category || 'Recovery'} Analysis
                                         </span>
-                                        <h2 className="text-3xl font-black text-obsidian tracking-tight">
+                                        <h2 className="text-lg md:text-2xl font-black text-obsidian tracking-tight leading-snug">
                                             #{step + 1}. {questions[step]?.text || questions[step]?.question}
                                         </h2>
                                     </div>
-                                    <span className="font-black text-slate text-xl">{step + 1}/{questions.length}</span>
+                                    <span className="font-black text-slate text-sm md:text-lg shrink-0 ml-4">{step + 1}/{questions.length}</span>
                                 </div>
-                                <Progress value={progress} className={`h-3 rounded-full bg-white border border-line [&>div]:${theme.progress}`} />
+                                <Progress value={progress} className={`h-2 rounded-full bg-white border border-line [&>div]:${theme.progress}`} />
                             </div>
 
-                            <div className="grid gap-4">
+                            <div className="grid gap-1.5 md:gap-3">
                                 {questions[step]?.options.map((option: any, i: number) => (
                                     <button
                                         key={i}
                                         onClick={() => handleAnswer(option)}
-                                        className={`p-6 text-left bg-white border-2 border-transparent rounded-[24px] ${theme.border} hover:shadow-xl transition-all group flex items-center justify-between`}
+                                        className={`p-3.5 md:p-5 text-left bg-white border-2 border-transparent rounded-[16px] md:rounded-[24px] ${theme.border} hover:shadow-md transition-all group flex items-center justify-between`}
                                     >
-                                        <span className="text-xl font-bold text-obsidian group-hover:text-obsidian">{option.label}</span>
-                                        <ChevronRight className={`w-6 h-6 text-line group-hover:${theme.text} transition-transform group-hover:translate-x-1`} />
+                                        <span className="text-sm md:text-base font-bold text-obsidian group-hover:text-obsidian">{option.label}</span>
+                                        <ChevronRight className={`w-4 h-4 md:w-5 md:h-5 text-line group-hover:${theme.text} transition-transform group-hover:translate-x-1`} />
                                     </button>
                                 ))}
                             </div>
 
-                            <div className="flex justify-center">
-                                <Button variant="ghost" className="text-slate font-bold" onClick={() => step > 0 && setStep(step - 1)}>
-                                    <ChevronLeft className="mr-1 w-4 h-4" /> 이전 질문으로
+                            <div className="flex justify-center pt-2">
+                                <Button variant="ghost" className="text-slate font-bold text-xs md:text-sm h-8" onClick={() => step > 0 && setStep(step - 1)}>
+                                    <ChevronLeft className="mr-1 w-3.5 h-3.5" /> 이전 질문으로
                                 </Button>
                             </div>
                         </motion.div>
@@ -382,7 +435,7 @@ function DiagnosisContent() {
                             </Card>
 
                             <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-                                <Button size="lg" asChild className={`h-20 flex-1 text-xl font-black rounded-3xl ${type === 'daily' ? 'bg-obsidian hover:bg-reward-gold hover:text-obsidian' : 'bg-chapter-accent'} text-white shadow-xl transition-all`}>
+                                <Button size="lg" asChild className={`h-20 flex-1 text-xl font-black rounded-3xl ${(type === 'daily' || type === '60s') ? 'bg-obsidian hover:bg-reward-gold hover:text-obsidian text-white' : 'bg-chapter-accent text-white'} shadow-xl transition-all`}>
                                     <Link href="/dashboard">대시보드로 돌아가기</Link>
                                 </Button>
                                 <Button size="lg" variant="outline" asChild className="h-20 flex-1 text-xl font-black rounded-3xl border-2 border-line hover:border-obsidian transition-all">

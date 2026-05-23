@@ -22,7 +22,17 @@ export interface AnalysisResult {
     matchScore: number;
 }
 
-export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult, image?: string) => void, isDiagnosing?: boolean }) {
+export default function HeroScanner({ 
+    onStart, 
+    isDiagnosing = false,
+    initialAnalysisData = null,
+    initialImage
+}: { 
+    onStart: (data?: AnalysisResult, image?: string) => void;
+    isDiagnosing?: boolean;
+    initialAnalysisData?: AnalysisResult | null;
+    initialImage?: string;
+}) {
     const { journey, setJourney, medicalCategory, setMedicalCategory, treatmentType, setTreatmentType } = useRecovery();
     const [selectionStep, setSelectionStep] = useState<'JOURNEY' | 'CATEGORY' | 'STAGE' | 'TYPE' | 'READY'>('JOURNEY');
     const [isMobile, setIsMobile] = useState(false);
@@ -33,34 +43,70 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
     const [progress, setProgress] = useState(0);
     const [loadingText, setLoadingText] = useState('60초 리듬체크 시작하기');
 
+    // Sync external result (e.g. from parent's Ghibli-themed SnapInput modal analysis)
+    useEffect(() => {
+        if (initialAnalysisData) {
+            setResult(initialAnalysisData);
+            setStatus('result');
+            if (initialImage) {
+                setCapturedImage(initialImage);
+            }
+        }
+    }, [initialAnalysisData, initialImage]);
+
     // Sync with AI progress
     useEffect(() => {
         let interval: NodeJS.Timeout;
+        let finishInterval: NodeJS.Timeout;
+
         if (isDiagnosing) {
             setProgress(0);
-            const startTime = Date.now();
             interval = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                let newProgress = 0;
-                if (elapsed < 10000) newProgress = (elapsed / 10000) * 80;
-                else if (elapsed < 30000) newProgress = 80 + ((elapsed - 10000) / 20000) * 18;
-                else newProgress = 98;
-                
-                setProgress(newProgress);
-                if (newProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
-                else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
-                else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
-                else setLoadingText('거의 다 되었습니다. 마지막 정리 중...');
+                setProgress((prev) => {
+                    let nextProgress = prev;
+                    if (prev >= 90) {
+                        nextProgress = prev + 0.05;
+                        nextProgress = Math.min(99, nextProgress);
+                    } else if (prev < 75) {
+                        nextProgress = prev + 0.8;
+                    } else {
+                        const step = 0.8 + ((prev - 75) / 15) * 1.6;
+                        nextProgress = Math.min(90, prev + step);
+                    }
+
+                    if (nextProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
+                    else if (nextProgress < 55) setLoadingText('유니클 회복 패턴 매칭 중...');
+                    else if (nextProgress < 80) setLoadingText('회복 데이터를 수집하고 있습니다...');
+                    else if (nextProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
+                    else setLoadingText('거의 다 되었습니다. 마지막 정리 중...');
+
+                    return nextProgress;
+                });
             }, 100);
         } else {
-            if (progress > 0) {
-                setProgress(100);
-                setTimeout(() => setProgress(0), 500);
+            if (progress > 0 && progress < 100) {
+                // Instantly accelerate progress bar up to 100% at 60fps for snappy delight
+                let speed = 4;
+                finishInterval = setInterval(() => {
+                    setProgress((prev) => {
+                        if (prev >= 100) {
+                            clearInterval(finishInterval);
+                            setTimeout(() => setProgress(0), 600);
+                            return 100;
+                        }
+                        return prev + speed;
+                    });
+                }, 16);
+            } else {
+                setProgress(0);
             }
             setLoadingText('60초 리듬체크 시작하기');
         }
-        return () => clearInterval(interval);
-    }, [isDiagnosing]);
+        return () => {
+            clearInterval(interval);
+            clearInterval(finishInterval);
+        };
+    }, [isDiagnosing, progress]);
 
     const { progress: scanProgress, statusMessage, finish: finishProgress } = useAIProgress(loading);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -426,7 +472,7 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
             <motion.div 
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
-                className="space-y-6 fixed inset-0 z-[100] bg-mist overflow-y-auto w-full h-full p-4 md:relative md:inset-auto md:z-auto md:p-0 md:bg-transparent md:h-auto"
+                className="space-y-6 fixed inset-0 z-[100] bg-mist overflow-y-auto w-full h-full p-4 pb-32 md:relative md:inset-auto md:z-auto md:p-0 md:bg-transparent md:h-auto"
             >
                 <Card className="rounded-[40px] md:rounded-5xl border-none shadow-2xl shadow-primary/5 overflow-hidden bg-white max-w-lg mx-auto my-4 md:my-0">
                     {isDiagnosing && (
@@ -572,6 +618,9 @@ export default function HeroScanner({ onStart, isDiagnosing = false }: { onStart
                                     닫기
                                 </Button>
                             )}
+
+                            {/* Mobile Safe Area Bottom Spacer to avoid bottom cut-off */}
+                            <div className="h-16 md:hidden" />
                         </div>
                     </CardContent>
                 </Card>

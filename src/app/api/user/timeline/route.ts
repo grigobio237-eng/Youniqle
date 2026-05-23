@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import RecoveryScore from '@/models/RecoveryScore';
+import Diagnosis from '@/models/Diagnosis';
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,9 +30,9 @@ export async function GET(req: NextRequest) {
       .limit(30)
       .lean();
       
-    // 포맷팅 (프론트엔드 호환성을 위해 score 필드 매핑)
+    // 포맷팅 (프론트엔드가 요구하는 실제 백분율 점수)
     const formattedScores = recoveryScores.map((rs: any) => ({
-       score: rs.totalScore, // 프론트엔드가 요구하는 실제 백분율 점수
+       score: rs.totalScore,
        rawScore: rs.rawScore,
        createdAt: rs.date || rs.createdAt,
        type: 'RECOVERY_SCORE',
@@ -39,8 +40,29 @@ export async function GET(req: NextRequest) {
        _id: rs._id
     }));
 
-    // 3. 두 데이터 소스를 병합하고 최신순(내림차순) 정렬
-    const combinedTimeline = [...(user.scanTimeline || []), ...formattedScores].sort((a: any, b: any) => 
+    // 2b. Diagnosis 컬렉션에서 최근 DAILY 진단 점수 타임라인 가져오기 (누락 복구!)
+    const dailyDiagnoses = await Diagnosis.find({ 
+      userId: user._id,
+      type: 'DAILY'
+    })
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .lean();
+
+    const formattedDiagnoses = dailyDiagnoses.map((d: any) => ({
+      score: d.totalScore || d.score,
+      createdAt: d.createdAt,
+      type: 'DIAGNOSIS_DAILY',
+      metaphor: d.resultDescription || '오늘의 리듬 진단',
+      _id: d._id
+    }));
+
+    // 3. 모든 데이터 소스를 병합하고 최신순(내림차순) 정렬
+    const combinedTimeline = [
+      ...(user.scanTimeline || []), 
+      ...formattedScores,
+      ...formattedDiagnoses
+    ].sort((a: any, b: any) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 

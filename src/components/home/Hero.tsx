@@ -11,7 +11,17 @@ import { useState, useEffect } from 'react';
 import { useActivityTracker } from '@/hooks/useActivityTracker';
 import Link from 'next/link';
 
-export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data?: AnalysisResult, image?: string) => void, isDiagnosing?: boolean }) {
+export default function Hero({ 
+  onStart, 
+  isDiagnosing = false,
+  initialAnalysisData = null,
+  initialImage
+}: { 
+  onStart: (data?: AnalysisResult, image?: string) => void;
+  isDiagnosing?: boolean;
+  initialAnalysisData?: AnalysisResult | null;
+  initialImage?: string;
+}) {
   const { journey, resetJourney } = useRecovery();
   const { data: session } = useSession();
   const { trackEvent } = useActivityTracker();
@@ -28,45 +38,56 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
   // Advanced Progress animation logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let finishInterval: NodeJS.Timeout;
 
     if (isDiagnosing) {
       setProgress(0);
-      const startTime = Date.now();
-
       interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
+        setProgress((prev) => {
+          let nextProgress = prev;
+          if (prev >= 90) {
+            nextProgress = prev + 0.05;
+            nextProgress = Math.min(99, nextProgress);
+          } else if (prev < 75) {
+            nextProgress = prev + 0.8;
+          } else {
+            const step = 0.8 + ((prev - 75) / 15) * 1.6;
+            nextProgress = Math.min(90, prev + step);
+          }
 
-        let newProgress = 0;
-        if (elapsed < 10000) {
-          // Phase 1: 0 to 80% in 10 seconds
-          newProgress = (elapsed / 10000) * 80;
-        } else if (elapsed < 30000) {
-          // Phase 2: 80 to 98% in next 20 seconds (Very slow)
-          newProgress = 80 + ((elapsed - 10000) / 20000) * 18;
-        } else {
-          // Phase 3: Hold at 98%
-          newProgress = 98;
-        }
+          if (nextProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
+          else if (nextProgress < 55) setLoadingText('유니클 회복 패턴 매칭 중...');
+          else if (nextProgress < 80) setLoadingText('회복 데이터를 수집하고 있습니다...');
+          else if (nextProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
+          else setLoadingText('거의 다 되었습니다. 마지막 정리 중입니다...');
 
-        setProgress(newProgress);
-
-        // Dynamic text based on progress
-        if (newProgress < 30) setLoadingText('유니클이 상태를 분석 중입니다...');
-        else if (newProgress < 60) setLoadingText('회복 데이터를 수집하고 있습니다...');
-        else if (newProgress < 95) setLoadingText('맞춤형 질문을 설계 중입니다...');
-        else setLoadingText('거의 다 되었습니다. 마지막 정리 중입니다...');
-
+          return nextProgress;
+        });
       }, 100);
     } else {
-      if (progress > 0) {
-        setProgress(100);
-        setTimeout(() => setProgress(0), 500);
+      if (progress > 0 && progress < 100) {
+        let speed = 4;
+        finishInterval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 100) {
+              clearInterval(finishInterval);
+              setTimeout(() => setProgress(0), 600);
+              return 100;
+            }
+            return prev + speed;
+          });
+        }, 16);
+      } else {
+        setProgress(0);
       }
       setLoadingText('60초 리듬체크 시작');
     }
 
-    return () => clearInterval(interval);
-  }, [isDiagnosing]);
+    return () => {
+      clearInterval(interval);
+      clearInterval(finishInterval);
+    };
+  }, [isDiagnosing, progress]);
 
   useEffect(() => {
     const fetchPersonalization = async () => {
@@ -161,7 +182,12 @@ export default function Hero({ onStart, isDiagnosing = false }: { onStart: (data
             <div className="relative w-full">
               <div className="absolute -top-16 -left-16 w-40 h-40 bg-primary/5 rounded-full blur-2xl animate-pulse" />
               <div className="absolute -bottom-16 -right-16 w-56 h-56 bg-secondary-container/10 rounded-full blur-3xl animate-pulse delay-1000" />
-              <HeroScanner onStart={onStart} isDiagnosing={isDiagnosing} />
+              <HeroScanner 
+                onStart={onStart} 
+                isDiagnosing={isDiagnosing} 
+                initialAnalysisData={initialAnalysisData}
+                initialImage={initialImage}
+              />
             </div>
 
             {/* Contextual Nudge Bubble - Softer Design */}
