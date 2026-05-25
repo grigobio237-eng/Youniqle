@@ -43,6 +43,11 @@ export default function Header() {
     return () => window.removeEventListener('recovery-gate-passed', handleGatePass);
   }, []);
 
+  // 모바일 메뉴가 열려있을 때 경로가 변경되면 메뉴를 자동으로 닫습니다.
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
   useEffect(() => {
     if (session) {
       fetchCartCount();
