@@ -35,6 +35,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { Progress } from '@/components/ui/progress';
+import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
 import { 
   XAxis, 
   YAxis, 
@@ -588,19 +589,16 @@ export default function ReportsHub() {
             {/* Recharts Radar Chart */}
             <div className="lg:col-span-2 h-56 md:h-72 w-full flex items-center justify-center bg-mist/20 rounded-[24px] md:rounded-[32px] border border-line/40 p-2 md:p-4">
               {data?.categoryAnalysis?.scores ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" radius="70%" data={[
-                    { subject: '신체적 회복', score: data.categoryAnalysis.scores.physical || 0, fullMark: 100 },
-                    { subject: '정신적 회복', score: data.categoryAnalysis.scores.mental || 0, fullMark: 100 },
-                    { subject: '수면 및 휴식', score: data.categoryAnalysis.scores.sleep || 0, fullMark: 100 },
-                    { subject: '라이프스타일', score: data.categoryAnalysis.scores.lifestyle || 0, fullMark: 100 },
-                  ]}>
-                    <PolarGrid stroke="rgba(0,0,0,0.06)" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 9, fontWeight: 'bold' }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 8 }} />
-                    <Radar name="Score" dataKey="score" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.3} />
-                  </RadarChart>
-                </ResponsiveContainer>
+                <DiagnosisRadarChart 
+                  data={[
+                    { subject: 'physical', score: data.categoryAnalysis.scores.physical || 0, fullMark: 100 },
+                    { subject: 'mental', score: data.categoryAnalysis.scores.mental || 0, fullMark: 100 },
+                    { subject: 'sleep', score: data.categoryAnalysis.scores.sleep || 0, fullMark: 100 },
+                    { subject: 'lifestyle', score: data.categoryAnalysis.scores.lifestyle || 0, fullMark: 100 },
+                  ]}
+                  color="var(--primary)"
+                  className="w-full h-full"
+                />
               ) : (
                 <div className="text-center space-y-2">
                   <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />

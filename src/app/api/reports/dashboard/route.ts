@@ -174,7 +174,8 @@ export async function GET(request: NextRequest) {
             if (Array.isArray(s.answers)) {
                 s.answers.forEach((ans: any) => {
                     const normalizedCat = normalizeCategory(ans.category);
-                    const score100 = (ans.score || 0) * 20; // 5점 만점 답변을 100점 스케일로 승격
+                    // 5점 만점 답변(1~5점 척도)을 순수 100점 스케일(1->0, 5->100)로 정밀 변환
+                    const score100 = Math.max(0, Math.min(100, ((ans.score || 1) - 1) * 25));
                     if (normalizedCat) {
                         rhythmSums[normalizedCat] += score100;
                         rhythmSums.counts[normalizedCat]++;

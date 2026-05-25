@@ -103,8 +103,8 @@ export default function ResultDisplay({
   // 최근에 네비게이터(영업사원)의 QR을 스캔한 유저 = 시술/문진 집중 케어 대상 (기존 추천인 referredBy와 분리)
   const isEventUser = !!(session?.user as any)?.recentNavigator || journey?.startsWith('CLINICAL');
 
-  // Convert raw score (0-25) to 100 scale roughly
-  const recoveryScore = 100 - (score * 4);
+  // Convert raw score (5-25 scale: 5 is worst, 25 is best) to pure 100-point scale
+  const recoveryScore = Math.max(0, Math.min(100, (score - 5) * 5));
 
   // Logic for Rhythm Types (Integrated with Dynamic Engine)
   const { type: rhythmType, description: typeDescription, color: cardColor } = getRhythmTypeInfo(recoveryScore);
