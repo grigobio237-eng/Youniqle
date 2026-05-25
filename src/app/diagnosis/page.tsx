@@ -208,8 +208,10 @@ function DiagnosisContent() {
                 calculationResult = SimcheungDiagnosisEngine.calculateFreeDiagnosis(finalAnswers as any, questions);
             } else {
                 const total = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
-                const max = questions.length * 5;
-                const percentage = (total / max) * 100;
+                const min = questions.length; // 각 질문당 최저 1점 (16점)
+                const max = questions.length * 5; // 각 질문당 최고 5점 (80점)
+                // 최하점을 0점으로, 최고점을 100점으로 하는 정밀 백분율 환산식
+                const percentage = max > min ? ((total - min) / (max - min)) * 100 : 0;
                 
                 calculationResult = {
                     totalScore: Math.round(percentage),
