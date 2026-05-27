@@ -170,11 +170,47 @@ export default function HomePage() {
     setViewState('SNAP');
   };
 
+  const compressImage = (base64: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1024;
+        const MAX_HEIGHT = 1024;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/webp', 0.8));
+      };
+      img.onerror = () => {
+        resolve(base64); // Fallback to original
+      };
+    });
+  };
+
   const handleSnapComplete = async (data: { type: 'PHOTO' | 'TEXT'; content: string | File }) => {
     setSnapData(data);
     setIsDiagnosing(true);
     try {
-      const contentStr = typeof data.content === 'string' ? data.content : "";
+      let contentStr = typeof data.content === 'string' ? data.content : "";
+      
+      // Compress image on mobile/client side to avoid 413 payload limit
+      if (data.type === 'PHOTO' && contentStr) {
+        try {
+          contentStr = await compressImage(contentStr);
+        } catch (compressErr) {
+          console.error("Image compression failed, using original:", compressErr);
+        }
+      }
       
       // 1. Run Gemini AI image/text analysis first
       const response = await fetch('/api/ai/life-snap', {

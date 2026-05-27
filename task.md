@@ -2,6 +2,7 @@
 
 - [x] UI 및 안내 문구 업데이트 (HeroScanner.tsx)
 - [x] AI 분석 엔진 지능 업그레이드 (route.ts)
+- [x] 모바일 대용량 이미지 압축 기능 구현 (page.tsx)
 - [x] 최종 검증 및 테스트
 
 ## Phase 1: Social Proof & Comparative Analytics

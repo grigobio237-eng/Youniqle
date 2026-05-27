@@ -89,13 +89,13 @@ export default function Footer() {
     siteDescription: '데이터 기반 프리미엄 회복 큐레이션',
     companyInfo: {
       companyName: '주식회사 사피에넷 (Sapienet)',
-      businessNumber: '256-81-03063', // 예시 기반 실제값 (확인 필요시 업데이트 가능)
-      ceoName: '이승윤',
+      businessNumber: '838-88-02527', // 예시 기반 실제값 (확인 필요시 업데이트 가능)
+      ceoName: '장범진',
       businessType: '통신판매업 / 바이오 헬스케어',
       businessStatus: '영업중'
     },
     businessRegistration: {
-      registrationNumber: '256-81-03063',
+      registrationNumber: '838-88-02527',
       businessAddress: '서울특별시 강동구 고덕비즈밸리로 26, 7층(고덕동, 고덕비즈밸리)',
       businessAddressDetail: '',
       businessPhone: '-',
@@ -134,9 +134,9 @@ export default function Footer() {
           </div>
           <div className="w-full max-w-md space-y-4">
             <div className="flex gap-2">
-              <input 
-                type="email" 
-                placeholder="이메일 주소를 입력하세요" 
+              <input
+                type="email"
+                placeholder="이메일 주소를 입력하세요"
                 className="flex-1 h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-chapter-accent transition-all"
               />
               <button className="h-14 px-8 bg-chapter-accent text-white font-black text-sm rounded-2xl hover:bg-chapter-accent/90 transition-all shadow-lg shadow-chapter-accent/20 whitespace-nowrap">
