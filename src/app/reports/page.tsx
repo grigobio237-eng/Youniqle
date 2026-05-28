@@ -1034,7 +1034,7 @@ export default function ReportsHub() {
 
       </div>
 
-      {/* Mobile Slide-up Bottom Sheet (Drawer) */}
+      {/* Mobile Full-screen Detail Modal */}
       <AnimatePresence>
         {selectedLog && (
           <>
@@ -1046,13 +1046,13 @@ export default function ReportsHub() {
               onClick={() => setSelectedLog(null)}
               className="fixed inset-0 bg-black z-[90] md:hidden"
             />
-            {/* Drawer Container */}
+            {/* Modal Container */}
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-slate-50 border-t border-line rounded-t-[28px] p-5 max-h-[85vh] overflow-y-auto z-[100] shadow-2xl md:hidden scrollbar-thin relative"
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
+              className="fixed inset-0 bg-slate-50 overflow-y-auto z-[100] md:hidden scrollbar-thin p-6 flex flex-col"
               style={{
                 overscrollBehaviorY: 'contain',
                 WebkitOverflowScrolling: 'touch'
@@ -1060,15 +1060,12 @@ export default function ReportsHub() {
             >
               <button 
                 onClick={() => setSelectedLog(null)}
-                className="absolute top-4 right-4 p-2 bg-slate-200/60 hover:bg-slate-200 text-slate-500 rounded-full transition-all z-10"
+                className="absolute top-6 right-6 p-2 bg-slate-200/60 hover:bg-slate-200 text-slate-500 rounded-full transition-all z-10"
                 aria-label="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
-              <div className="flex justify-center mb-3">
-                <div className="w-12 h-1 bg-slate-300 rounded-full" />
-              </div>
-              <div className="pb-24">
+              <div className="pt-6 pb-20">
                 {detailPaneContent}
               </div>
             </motion.div>
