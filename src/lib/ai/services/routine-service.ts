@@ -273,12 +273,12 @@ ${communityContext}
 당신은 '유니클(Youniqle)'의 수석 리커버리 코치입니다. 사용자를 위한 **'60초 리듬체크'** 문항 5개를 생성해주세요.
 
 ## 분석 컨텍스트
-- 테마: \${theme}
-- 주요 키워드: \${keywords}
-- 현재 여정: \${journey}
-- 시술 정보: \${displayCategory} / \${displayTreatment}
-- 유저 등급: \${userTier}
-- 약물 이력: \${medicationHistory || '없음'}
+- 테마: ${theme}
+- 주요 키워드: ${keywords}
+- 현재 여정: ${journey}
+- 시술 정보: ${displayCategory} / ${displayTreatment}
+- 유저 등급: ${userTier}
+- 약물 이력: ${medicationHistory || '없음'}
 
 ## 브랜드 안전성 지침 (CRITICAL)
 - **'유니클' 브랜드명은 어떠한 시술/수술 명칭과도 결합될 수 없습니다.** (예: '유니클 시술', '유니클 수술', '유니클 관리' 등은 절대 금지!)
