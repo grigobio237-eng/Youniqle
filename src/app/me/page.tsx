@@ -63,6 +63,7 @@ import RecoveryActivityFeed from '@/components/me/RecoveryActivityFeed';
 export default function MyPage() {
   const { data: session, status } = useSession();
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'recovery' | 'pass' | 'care' | 'profile'>('recovery');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -654,850 +655,744 @@ export default function MyPage() {
           {/* Dynamic Hero Section */}
           <DynamicHero userName={session.user?.name || '유저'} />
 
-          {/* Service Progress Status Cards */}
-          {(userStatus?.concierge || userStatus?.inquiry) && (
-            <div className="flex flex-col gap-4 mb-8">
-              {/* Concierge Status */}
-              {userStatus?.concierge && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
+          {/* Glassmorphic Tab Selector */}
+          <div className="flex bg-white/80 backdrop-blur-md p-1.5 rounded-[24px] border border-slate-200/50 shadow-sm mb-8 z-30 overflow-x-auto scrollbar-none w-full gap-1">
+            {[
+              { id: 'recovery', label: '나의 회복 🌟', icon: Activity },
+              { id: 'pass', label: '디지털 패스 🎟️', icon: Ticket },
+              { id: 'care', label: '케어 & 상담 🩺', icon: MessageCircle },
+              { id: 'profile', label: '프로필 & 설정 ⚙️', icon: Settings },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-2 rounded-2xl text-[11px] sm:text-xs font-black transition-all shrink-0 ${
+                    isActive 
+                      ? 'bg-[#0E3A3A] text-white shadow-md shadow-[#0E3A3A]/15 scale-[1.01]' 
+                      : 'text-slate-400 hover:text-obsidian hover:bg-slate-100/50'
+                  }`}
                 >
-                  <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
-                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                      <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
-                          <Clock className={`w-7 h-7 ${userStatus.concierge.status === 'pending' ? 'animate-pulse' : ''}`} />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Service Status Protocol</p>
-                          <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
-                            {userStatus.concierge.painPoint} 회복 컨시어지
-                            <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                              userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                'bg-slate-50 text-slate-500 border-slate-200'
-                              }`}>
-                              {userStatus.concierge.status === 'pending' ? '검토 중' :
-                                userStatus.concierge.status === 'approved' ? '승인 완료' : '진행 중'}
-                            </Badge>
-                          </h3>
-                          <p className="text-sm font-medium text-slate mt-1">
-                            {userStatus.concierge.status === 'pending' ? '관리자가 의뢰서를 검토하고 있습니다.' :
-                              userStatus.concierge.status === 'approved' ? '회복 프로토콜이 승인되었습니다. 상세 내용을 확인하세요.' :
-                                '신청 내용을 처리 중입니다.'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="w-full md:w-auto">
-                        <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
-                          <Link href="/me/history">진행 내역 보기</Link>
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="h-1.5 w-full bg-slate-50 px-8 pb-8">
-                      <div className="h-full bg-slate-200 rounded-full relative">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: userStatus.concierge.status === 'approved' ? '100%' : '50%' }}
-                          className={`absolute left-0 top-0 h-full rounded-full ${userStatus.concierge.status === 'approved' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_10px_rgba(79,70,229,0.5)]'
-                            }`}
-                        />
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-
-              {/* Inquiry Status */}
-              {userStatus?.inquiry && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
-                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                      <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600">
-                          <MessageCircle className={`w-7 h-7 ${userStatus.inquiry.status === 'pending' ? 'animate-pulse' : ''}`} />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Support Status Protocol</p>
-                          <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
-                            [{userStatus.inquiry.type === 'product' ? '상품' : '일반'}] {userStatus.inquiry.subject}
-                            <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                              userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                'bg-slate-50 text-slate-500 border-slate-200'
-                              }`}>
-                              {userStatus.inquiry.status === 'pending' ? '답변 대기' :
-                                userStatus.inquiry.status === 'resolved' ? '해결 완료' :
-                                  userStatus.inquiry.status === 'in_progress' ? '처리 중' : '진행 중'}
-                            </Badge>
-                          </h3>
-                          <p className="text-sm font-medium text-slate mt-1">
-                            {userStatus.inquiry.status === 'pending' ? '관리자가 문의 내용을 확인하고 있습니다.' :
-                              userStatus.inquiry.status === 'resolved' ? '문의에 대한 답변이 완료되었습니다.' :
-                                '담당자가 내용을 확인 및 답변을 준비 중입니다.'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="w-full md:w-auto">
-                        <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
-                          <Link href="/me/inquiries">문의 내역 보기</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-            </div>
-          )}
-
-          {/* Badge Collection Section */}
-          {userBadges.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8"
-            >
-              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
-                <div className="p-6 md:p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
-                        <Sparkles className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-black text-obsidian tracking-tighter">회복 성취 뱃지</h3>
-                        <p className="text-xs font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
-                      </div>
-                    </div>
-                    <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">
-                      {userBadges.length}개 획득
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                    {userBadges.map((badge, idx) => (
-                      <motion.div
-                        key={idx}
-                        whileHover={{ scale: 1.1 }}
-                        className="flex flex-col items-center gap-2 group cursor-help"
-                      >
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border-2 transition-all ${
-                          badge.rarity === 'legendary' ? 'bg-purple-50 border-purple-200 shadow-purple-100' :
-                          badge.rarity === 'epic' ? 'bg-indigo-50 border-indigo-200 shadow-indigo-100' :
-                          badge.rarity === 'rare' ? 'bg-amber-50 border-amber-200 shadow-amber-100' :
-                          'bg-slate-50 border-slate-100'
-                        }`}>
-                          {badge.icon}
-                        </div>
-                        <span className="text-[10px] font-black text-slate text-center leading-tight group-hover:text-obsidian">
-                          {badge.name}
-                        </span>
-                        {/* Hover Tooltip (Simplified) */}
-                        <div className="hidden group-hover:block absolute z-10 w-40 p-2 bg-obsidian text-white text-[10px] rounded-lg mt-16 shadow-xl">
-                          <p className="font-black text-amber-400 mb-0.5">{badge.name}</p>
-                          <p className="opacity-80 leading-relaxed">{badge.description}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 mb-6">
-            {/* Membership Rewards (Left) */}
-            <div className="lg:col-span-4 transition-transform hover:scale-[1.01]">
-              <Link href="/membership" className="block h-full">
-                <MembershipProgress
-                  currentGrade={userData?.grade || 'cedar'}
-                  currentPoints={userData?.points || 0}
-                />
-              </Link>
-            </div>
-
-            {/* Recovery Growth Quote/Brief (Center) */}
-            <div className="lg:col-span-4">
-              <AILatestBrief
-                solution={history[0]?.aiSolution}
-                createdAt={history[0]?.createdAt}
-              />
-            </div>
-
-            {/* Quick Stats (Right) */}
-            <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                  <ShoppingBag className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
-                  <p className="text-xl font-black text-obsidian tracking-tighter">0</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
-                  <Ticket className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
-                  <p className="text-xl font-black text-obsidian tracking-tighter">2</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
-                  <Activity className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
-                  <p className="text-xl font-black text-obsidian tracking-tighter">{history.length}</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
-                  <p className="text-xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
-                </div>
-              </div>
-            </div>
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-            <div className="lg:col-span-8">
-              <RecoveryLeaderboard />
-            </div>
-            <div className="lg:col-span-4">
-              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100 h-full">
-                <div className="p-6 md:p-8">
-                   <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500">
-                        <Activity className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-black text-obsidian tracking-tighter">실시간 회복 리듬</h3>
-                        <p className="text-xs font-bold text-slate">다른 유저들의 지금은?</p>
-                      </div>
-                    </div>
-                   <RecoveryActivityFeed />
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-10">
-            <div className="lg:col-span-8 space-y-6 md:space-y-8">
-              {/* 축구 클럽하우스 프로토콜 카드 */}
-              <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden border border-emerald-100/30">
-                <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
-                      <Trophy className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">축구 클럽하우스 프로토콜</CardTitle>
-                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Football Clubhouse Entry & Registration</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6 md:p-10 space-y-6">
-                  {footballLoading ? (
-                    <div className="py-12 flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-                    </div>
-                  ) : footballTeamInfo ? (
-                    <div className="space-y-6">
-                      <div className="bg-emerald-50/40 p-6 md:p-8 rounded-[24px] border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 font-black text-xl">
-                            ⚽
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Active Football Team</p>
-                            <h4 className="text-xl font-black text-obsidian tracking-tight flex items-center gap-2">
-                              {footballTeamInfo.teamName}
-                              <Badge className="bg-emerald-500 text-white font-black text-[9px] px-2 py-0.5 rounded">
-                                {session.user?.footballRole === 'coach' ? '감독/코치' : 
-                                 session.user?.footballRole === 'player' ? '선수' : '보호자'}
-                              </Badge>
-                            </h4>
-                            <p className="text-xs font-bold text-slate mt-1">소속 팀의 훈련 일정과 당일 컨디션을 관리하고 분석하세요.</p>
-                          </div>
-                        </div>
-                        <Button asChild className="w-full md:w-auto h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 shadow-lg shadow-emerald-600/10">
-                          <Link href="/football/mypage" className="flex items-center gap-2">
-                            클럽하우스 대시보드 입장 <ChevronRight className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-
-                      {/* 감독/코치 전용 스쿼드 회원 초대 허브 */}
-                      {session.user?.footballRole === 'coach' && (
-                        <div className="p-6 md:p-8 rounded-[24px] bg-slate-50 border border-slate-100 space-y-4">
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-lg">📢</span>
-                            <h5 className="text-sm font-black text-obsidian tracking-tight">소속 선수 및 보호자 초대 프로토콜</h5>
-                          </div>
-                          <p className="text-xs font-bold text-slate leading-relaxed">
-                            선수와 학부모가 우리 팀 스쿼드에 등록하여 일일 웰니스와 회복 Rhythms를 연동할 수 있도록 초대 코드를 배포하십시오.
-                            회원들이 유니클 마이페이지에 합류하거나 초대 링크를 통해 즉시 등록할 수 있습니다.
-                          </p>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                            {/* 초대 코드 복사 */}
-                            <div className="p-4 bg-white rounded-xl border border-slate-200/60 flex items-center justify-between">
-                              <div className="min-w-0">
-                                <p className="text-[9px] font-black text-slate uppercase opacity-50 tracking-wider">팀 고유 초대 코드</p>
-                                <p className="text-sm font-black text-obsidian tracking-widest mt-0.5 uppercase truncate">
-                                  {footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || 'ST-CODE'}
-                                </p>
-                              </div>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => {
-                                  const code = footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode;
-                                  if (code) {
-                                    navigator.clipboard.writeText(code.toUpperCase());
-                                    alert(`팀 초대 코드 (${code.toUpperCase()})가 클립보드에 복사되었습니다!`);
-                                  }
-                                }}
-                                className="h-9 px-3 rounded-lg font-black text-xs gap-1.5 shrink-0 hover:bg-slate-50"
-                              >
-                                <Link2 className="w-3.5 h-3.5" /> 코드 복사
-                              </Button>
-                            </div>
-
-                            {/* 자동 합류 링크 복사 */}
-                            <div className="p-4 bg-white rounded-xl border border-slate-200/60 flex items-center justify-between">
-                              <div className="min-w-0">
-                                <p className="text-[9px] font-black text-slate uppercase opacity-50 tracking-wider">선수 자동 가입 링크</p>
-                                <p className="text-[10px] font-bold text-slate truncate max-w-[170px] mt-0.5">
-                                  /football/join/{(footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || '').toLowerCase()}
-                                </p>
-                              </div>
-                              <Button 
-                                size="sm" 
-                                onClick={() => {
-                                  const code = footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode;
-                                  if (code) {
-                                    const link = `${window.location.origin}/football/join/${code.toUpperCase()}`;
-                                    navigator.clipboard.writeText(link);
-                                    alert('소속 선수 전용 자동 가입/팀합류 초대 링크가 복사되었습니다! 카카오톡이나 밴드에 즉시 공유하세요.');
-                                  }
-                                }}
-                                className="h-9 px-3 rounded-lg bg-obsidian hover:bg-obsidian/90 text-white font-black text-xs gap-1.5 shrink-0"
-                              >
-                                <UserPlus className="w-3.5 h-3.5" /> 초대 링크 복사
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : footballPendingTeam ? (
-                    <div className="bg-amber-50/40 p-6 md:p-8 rounded-[24px] border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700">
-                          <Clock className="w-8 h-8 animate-pulse" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Approval Pending Protocol</p>
-                          <h4 className="text-xl font-black text-obsidian tracking-tight">
-                            {footballPendingTeam.teamName} <span className="text-amber-600 font-bold text-sm ml-2">(승인 심사 중)</span>
-                          </h4>
-                          <p className="text-xs font-medium text-slate-500 mt-1">
-                            보안 승인 심사가 진행 중입니다. 1~2영업일 이내에 승인 및 초대코드가 발급됩니다.
-                          </p>
-                        </div>
-                      </div>
-                      <Button onClick={fetchFootballStatus} className="w-full md:w-auto h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black px-6">
-                        승인 상태 새로고침
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-8">
-                      <p className="text-sm font-bold text-slate leading-relaxed">
-                        유니클 축구 클럽하우스는 감독, 코치, 선수 및 학부모들이 과학적인 회복 CGM 데이터를 기반으로 
-                        스마트하게 소통하는 커뮤니티 공간입니다. **아래 방법 중 하나를 선택하여 클럽하우스 프로토콜을 활성화하십시오.**
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                        <div className="p-6 md:p-8 rounded-[24px] bg-slate-50 border border-slate-100 space-y-4">
-                          <h4 className="text-lg font-black text-obsidian flex items-center gap-2">
-                            <span className="text-base">🔑</span> 초대 코드로 팀 합류
-                          </h4>
-                          <p className="text-xs font-bold text-slate leading-relaxed">
-                            감독/코치님에게 발급받은 팀 고유의 초대 코드를 입력하여 즉시 스쿼드로 합류하십시오.
-                          </p>
-                          <div className="flex gap-2 pt-2">
-                            <Input
-                              value={footballInviteCode}
-                              onChange={(e) => setFootballInviteCode(e.target.value)}
-                              placeholder="초대 코드 입력 (예: ST-XXXXX)"
-                              className="h-12 rounded-xl bg-white border-slate-200"
-                            />
-                            <Button 
-                              onClick={handleFootballJoin} 
-                              disabled={footballJoining}
-                              className="h-12 rounded-xl bg-obsidian text-white font-black px-6"
-                            >
-                              {footballJoining ? '합류 중...' : '합류하기'}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="p-6 md:p-8 rounded-[24px] bg-emerald-50/20 border border-emerald-100/30 space-y-4 flex flex-col justify-between">
-                          <div>
-                            <h4 className="text-lg font-black text-obsidian flex items-center gap-2">
-                              <span className="text-base">⚽</span> 감독 / 코치로 팀 창단
-                            </h4>
-                            <p className="text-xs font-bold text-slate leading-relaxed">
-                              팀을 새롭게 창단하고 감독/코치 전용 스마트 클럽하우스 플랫폼을 신청합니다. (본사 승인 필요)
-                            </p>
-                          </div>
-                          <Button 
-                            onClick={() => setFootballCreationMode(!footballCreationMode)}
-                            className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black mt-4"
-                          >
-                            {footballCreationMode ? '신청 양식 접기' : '신규 축구팀 개설 신청서 작성'}
-                          </Button>
-                        </div>
-                      </div>
-
-                      {footballCreationMode && (
-                        <div className="bg-slate-50/50 p-6 md:p-8 rounded-[24px] border border-slate-200/60 space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                          <h4 className="text-base font-black text-obsidian border-b pb-2">📋 신규 팀 개설 신청서</h4>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-xs font-black text-slate-500">팀 이름 <span className="text-rose-500">*</span></Label>
-                              <Input 
-                                value={footballNewTeamName} 
-                                onChange={(e) => setFootballNewTeamName(e.target.value)} 
-                                placeholder="예: 유니클 FC"
-                                className="h-11 rounded-lg bg-white"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="football-category-select" className="text-xs font-black text-slate-500">카테고리</Label>
-                              <select 
-                                id="football-category-select"
-                                title="팀 카테고리 선택"
-                                value={footballNewCategory}
-                                onChange={(e) => setFootballNewCategory(e.target.value)}
-                                className="w-full h-11 px-3 rounded-lg border border-input bg-white text-sm font-bold focus:outline-none focus:ring-1 focus:ring-ring"
-                              >
-                                <option value="youth">유소년 클럽</option>
-                                <option value="amateur">성인 조기 축구 / 동호회</option>
-                                <option value="school">초/중/고/대학교 엘리트 팀</option>
-                                <option value="academy">전문 사설 아카데미</option>
-                              </select>
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-xs font-black text-slate-500">주요 연령대</Label>
-                              <Input 
-                                value={footballNewAgeGroup} 
-                                onChange={(e) => setFootballNewAgeGroup(e.target.value)} 
-                                placeholder="예: 초등 U-12, 성인 일반부 등"
-                                className="h-11 rounded-lg bg-white"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-xs font-black text-slate-500">활동 지역</Label>
-                              <Input 
-                                value={footballNewRegion} 
-                                onChange={(e) => setFootballNewRegion(e.target.value)} 
-                                placeholder="예: 서울 송파구, 경기 성남시 등"
-                                className="h-11 rounded-lg bg-white"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-xs font-black text-slate-500">팀 소개 및 개설 목적</Label>
-                            <textarea 
-                              value={footballNewDescription} 
-                              onChange={(e) => setFootballNewDescription(e.target.value)} 
-                              placeholder="팀의 가입 인원 및 창단 목적을 간략하게 작성해주시면 빠른 검토와 승인에 도움이 됩니다."
-                              className="w-full min-h-[80px] p-3 rounded-lg border border-input bg-white text-sm font-medium focus:outline-none focus:ring-1 focus:ring-ring"
-                            />
-                          </div>
-
-                          {footballError && (
-                            <p className="text-xs font-bold text-rose-500 bg-rose-50 p-3 rounded-lg flex items-center gap-2">
-                              ⚠ {footballError}
-                            </p>
-                          )}
-
-                          <div className="flex justify-end gap-2 pt-2">
-                            <Button 
-                              variant="outline" 
-                              onClick={() => setFootballCreationMode(false)}
-                              className="h-11 rounded-lg px-6"
-                            >
-                              취소
-                            </Button>
-                            <Button 
-                              onClick={handleFootballCreate}
-                              disabled={footballCreationLoading}
-                              className="h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6"
-                            >
-                              {footballCreationLoading ? '제출 중...' : '신청서 제출 완료'}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* 회복 성장 곡선 위젯 (Social Proof 통합 버전) */}
-              <Card className="border-none shadow-xl rounded-[32px] md:rounded-[40px] bg-white overflow-hidden group">
-                <CardHeader className="p-6 md:p-8 pb-4 flex flex-row items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Recovery Growth Curve</p>
-                      <Badge className="bg-chapter-accent/10 text-chapter-accent border-none text-[9px] font-black uppercase px-2">Community Comparative</Badge>
-                    </div>
-                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">회복 성장 곡선</CardTitle>
-                  </div>
-                  <Button asChild variant="ghost" className="h-10 px-4 rounded-xl text-xs font-black text-slate hover:bg-mist group-hover:text-chapter-accent transition-all">
-                    <Link href="/me/history" className="flex items-center gap-2">
-                      전체 보기 <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardHeader>
-                <CardContent className="p-6 md:p-8 pt-2">
-                  {historyLoading ? (
-                    <div className="h-[200px] flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-chapter-accent"></div>
-                    </div>
-                  ) : history.length > 0 ? (
-                    <div className="space-y-6">
-                      {/* 차트 영역: 본인 vs 전체평균 vs 상위 10% */}
-                      <div className="h-[200px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={[...history].reverse().map((h, idx) => {
-                            const dateStr = new Date(h.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-                            // 커뮤니티 데이터 매칭 (예시 데이터 또는 API 연동)
-                            const commData = communityAverages?.find((c: any) => c.date === h.createdAt.split('T')[0]);
-                            return {
-                              date: dateStr,
-                              score: h.totalScore,
-                              avg: commData?.avgScore || 65 + (idx % 3), // Fallback logic
-                              top: commData?.top10Score || 88 + (idx % 2) // Fallback logic
-                            };
-                          })}>
-                            <defs>
-                              <linearGradient id="curveColor" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <XAxis 
-                              dataKey="date" 
-                              hide 
-                            />
-                            <Tooltip
-                               contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }}
-                               itemStyle={{ padding: '2px 0' }}
-                            />
-                            {/* 상위 10% 가이드 라인 */}
-                            <Area
-                               type="monotone"
-                               dataKey="top"
-                               stroke="#fbbf24"
-                               strokeWidth={1}
-                               strokeDasharray="4 4"
-                               fill="transparent"
-                               name="상위 10% 목표"
-                            />
-                            {/* 전체 평균 라인 */}
-                            <Area
-                               type="monotone"
-                               dataKey="avg"
-                               stroke="#94a3b8"
-                               strokeWidth={1}
-                               strokeDasharray="4 4"
-                               fill="transparent"
-                               name="유니클 평균"
-                            />
-                            {/* 사용자 본인 곡선 */}
-                            <Area
-                               type="monotone"
-                               dataKey="score"
-                               stroke="#10b981"
-                               strokeWidth={4}
-                               fillOpacity={1}
-                               fill="url(#curveColor)"
-                               name="나의 회복 점수"
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-
-                      {/* 소셜 프루프 요약 영역 */}
-                      <div className="flex flex-col gap-4">
-                        <div className="flex items-center justify-between p-4 bg-mist/30 rounded-2xl border border-line/5 transition-all hover:bg-mist/50">
+          {/* Active Tab Panel with Framer Motion Animation */}
+          <AnimatePresence mode="wait">
+            {activeTab === 'recovery' && (
+              <motion.div
+                key="recovery"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-6 md:space-y-8 animate-in fade-in"
+              >
+                {/* Badge Collection Section */}
+                {userBadges.length > 0 && (
+                  <div className="mb-8">
+                    <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                      <div className="p-6 md:p-8">
+                        <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-reward-gold/10 rounded-xl flex items-center justify-center text-reward-gold">
-                              <Zap className="h-5 w-5 fill-current" />
+                            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
+                              <Sparkles className="w-5 h-5" />
                             </div>
                             <div>
-                              <p className="text-[10px] font-black text-slate/60 uppercase tracking-tighter">Your Status</p>
-                              <p className="font-black text-obsidian tracking-tight">상위 <span className="text-reward-gold">15%</span> 회복 우수자</p>
+                              <h3 className="text-lg font-black text-obsidian tracking-tighter">회복 성취 뱃지</h3>
+                              <p className="text-xs font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
                             </div>
                           </div>
-                          <Badge className="bg-obsidian text-mist border-none text-[10px] font-black px-3 py-1.5 rounded-lg shadow-lg">
-                            TOP TIER
-                          </Badge>
+                          <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">
+                            {userBadges.length}개 획득
+                          </div>
                         </div>
-
-                        {/* AI 주간 리포트가 있을 경우 표시되는 소셜 프루프 피드백 */}
-                        {weeklyReport?.percentileFeedback && (
-                          <div className="bg-chapter-accent/5 p-4 rounded-2xl border border-chapter-accent/10">
-                            <p className="text-[11px] font-bold text-chapter-accent leading-relaxed">
-                              <Sparkles className="h-3 w-3 inline-block mr-1 mb-0.5" />
-                              {weeklyReport.percentileFeedback}
-                            </p>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between text-center border-t border-line/10 pt-4 px-2">
-                          <div>
-                            <p className="text-[9px] font-black text-slate uppercase opacity-40">최근 점수</p>
-                            <p className="font-black text-emerald-500">{history[0]?.totalScore || 0}점</p>
-                          </div>
-                          <div className="w-px h-6 bg-line/20" />
-                          <div>
-                            <p className="text-[9px] font-black text-slate uppercase opacity-40">전체 평균</p>
-                            <p className="font-black text-slate">68점</p>
-                          </div>
-                          <div className="w-px h-6 bg-line/20" />
-                          <div>
-                            <p className="text-[9px] font-black text-slate uppercase opacity-40">상위 10%</p>
-                            <p className="font-black text-reward-gold">89점</p>
-                          </div>
+                        
+                        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                          {userBadges.map((badge, idx) => (
+                            <motion.div
+                              key={idx}
+                              whileHover={{ scale: 1.1 }}
+                              className="flex flex-col items-center gap-2 group cursor-help relative"
+                            >
+                              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border-2 transition-all ${
+                                badge.rarity === 'legendary' ? 'bg-purple-50 border-purple-200 shadow-purple-100' :
+                                badge.rarity === 'epic' ? 'bg-indigo-50 border-indigo-200 shadow-indigo-100' :
+                                badge.rarity === 'rare' ? 'bg-amber-50 border-amber-200 shadow-amber-100' :
+                                'bg-slate-50 border-slate-100'
+                              }`}>
+                                {badge.icon}
+                              </div>
+                              <span className="text-[10px] font-black text-slate text-center leading-tight group-hover:text-obsidian">
+                                {badge.name}
+                              </span>
+                              {/* Hover Tooltip (Simplified) */}
+                              <div className="hidden group-hover:block absolute z-10 w-40 p-2 bg-obsidian text-white text-[10px] rounded-lg mt-16 shadow-xl">
+                                <p className="font-black text-amber-400 mb-0.5">{badge.name}</p>
+                                <p className="opacity-80 leading-relaxed">{badge.description}</p>
+                              </div>
+                            </motion.div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="h-[200px] flex flex-col items-center justify-center text-center bg-mist/30 rounded-3xl border-2 border-dashed border-line/50">
-                      <Activity className="h-8 w-8 text-slate/20 mb-3" />
-                      <p className="text-xs font-bold text-slate mb-4">아직 진단 기록이 관측되지 않았습니다.</p>
-                      <Button asChild size="sm" className="bg-obsidian text-mist rounded-full px-6 font-black text-[10px]">
-                        <Link href="/ai-navigator">첫 진단 시작</Link>
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    </Card>
+                  </div>
+                )}
 
-              {/* 통합 인비테이션 & 메디컬 허브 */}
-              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
-                <CardHeader className="p-8 md:p-10 pb-0 border-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
-                        <Sparkles className="h-7 w-7" />
+                {/* Membership Progress & Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
+                  {/* Membership Rewards (Left) */}
+                  <div className="lg:col-span-4 transition-transform hover:scale-[1.01]">
+                    <Link href="/membership" className="block h-full">
+                      <MembershipProgress
+                        currentGrade={userData?.grade || 'cedar'}
+                        currentPoints={userData?.points || 0}
+                      />
+                    </Link>
+                  </div>
+
+                  {/* Recovery Growth Quote/Brief (Center) */}
+                  <div className="lg:col-span-4">
+                    <AILatestBrief
+                      solution={history[0]?.aiSolution}
+                      createdAt={history[0]?.createdAt}
+                    />
+                  </div>
+
+                  {/* Quick Stats (Right) */}
+                  <div className="lg:col-span-4 grid grid-cols-2 gap-3">
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                        <ShoppingBag className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-obsidian tracking-tighter">디지털 허브</h3>
-                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Referral & medical pass</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
+                        <p className="text-xl font-black text-obsidian tracking-tighter">0</p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                        <Ticket className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
+                        <p className="text-xl font-black text-obsidian tracking-tighter">2</p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                        <Activity className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
+                        <p className="text-xl font-black text-obsidian tracking-tighter">{history.length}</p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                        <Zap className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
+                        <p className="text-xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
                       </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="p-8 md:p-10">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-2">
-                         <Badge className="bg-emerald-100 text-emerald-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Invitation</Badge>
-                      </div>
-                      <QRReferralCard 
-                        userName={session.user?.name || ''} 
-                        referralCode={userData?.referralCode || ''} 
-                      />
-                    </div>
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-2">
-                         <Badge className="bg-indigo-100 text-indigo-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Medical Pass</Badge>
-                      </div>
-                      <MedicalPassCard 
-                        userName={session.user?.name || ''} 
-                        referralCode={userData?.referralCode || ''} 
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* 나의 회복 조직도 (신규) */}
-              <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden group">
-                <CardHeader className="p-8 md:p-10 pb-4">
-                  <div>
-                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">My Recovery Network</p>
-                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter flex items-center gap-3">
-                      나의 회복 조직도
-                      <Badge className="bg-indigo-50 text-indigo-600 border-none text-[10px] font-black uppercase">Level 2</Badge>
-                    </CardTitle>
-                    <p className="text-sm font-medium text-slate mt-1">내가 소개한 친구와 친구가 소개한 사람들의 활동 현황입니다.</p>
+                {/* Leaderboard & Feed */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <div className="lg:col-span-8">
+                    <RecoveryLeaderboard />
                   </div>
-                </CardHeader>
-                <CardContent className="p-8 md:p-10 pt-2">
-                  <ReferralNetwork mode="accordion" />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* 우측 사이드바 영역 */}
-            <div className="lg:col-span-4 space-y-6 md:space-y-8">
-              {/* 프로필 정보 */}
-              <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden">
-                <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-mist rounded-2xl text-obsidian">
-                      <User className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로필 설정</CardTitle>
-                  </div>
-                  <Button variant="ghost" onClick={() => setIsEditing(!isEditing)} className="font-black text-xs text-slate hover:bg-mist h-10 px-4 rounded-xl">
-                    {isEditing ? <><X className="h-4 w-4 mr-2" /> 취소</> : <><Settings className="h-4 w-4 mr-2" /> 편집</>}
-                  </Button>
-                </CardHeader>
-                <CardContent className="p-6 md:p-10 space-y-8 md:space-y-10">
-                  <div className="bg-mist/30 p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-line/30 flex items-center gap-4 md:gap-6">
-                    <div className="relative w-20 h-20 rounded-[28px] overflow-hidden bg-slate-100 shadow-md border-4 border-white group/avatar flex-shrink-0">
-                      <Image 
-                        src={formData.avatar || session.user?.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"} 
-                        alt="" 
-                        fill 
-                        className="object-cover" 
-                      />
-                      {isEditing && (
-                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover/avatar:opacity-100 transition-opacity">
-                          <Upload className="text-white h-5 w-5" />
-                          <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} aria-label="프로필 이미지 변경" />
-                        </label>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-lg font-black text-obsidian truncate">{session.user?.name}</h3>
-                      <p className="text-xs font-bold text-slate flex items-center gap-1.5 opacity-60 truncate">
-                        <Mail className="h-3 w-3" /> {session.user?.email}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-0.5">
-                          {(session.user as any)?.provider || 'Email'}
-                        </Badge>
-                        {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
-                          <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[8px] uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
-                            <Zap className="w-2.5 h-2.5" /> FOUNDER
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">연락처</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate h-4 w-4 opacity-40" />
-                        <Input
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="010-XXXX-XXXX"
-                          className="h-14 pl-12 rounded-2xl bg-mist/50 border-line focus:ring-chapter-accent"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
-                      <div className="space-y-3">
-                        <UnifiedAddressSearch
-                          provider="google"
-                          onAddressSelect={handleAddressSelect}
-                          disabled={!isEditing}
-                        />
-                        <div className="grid grid-cols-1 gap-3">
-                          <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          <Input value={formData.address1} readOnly placeholder="주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                          <Input name="address2" value={formData.address2} onChange={handleInputChange} disabled={!isEditing} placeholder="상세 주소를 입력하세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">알림 및 동의</Label>
-                      <div className="space-y-3">
-                        <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${formData.marketingConsent ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
-                          <label htmlFor="marketing" className="text-sm font-bold text-slate cursor-pointer select-none">이벤트 수신동의</label>
-                          <Checkbox
-                            id="marketing"
-                            checked={formData.marketingConsent}
-                            onCheckedChange={(c) => setFormData(prev => ({ ...prev, marketingConsent: c as boolean }))}
-                            disabled={!isEditing}
-                            className="rounded-md"
-                          />
-                        </div>
-                        <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${notificationPermission === 'granted' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
-                          <div className="flex items-center gap-2">
-                            <Bell className={`h-4 w-4 ${notificationPermission === 'granted' ? 'text-chapter-accent' : 'text-slate opacity-40'}`} />
-                            <span className="text-sm font-bold text-slate">푸시 알림</span>
+                  <div className="lg:col-span-4">
+                    <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100 h-full">
+                      <div className="p-6 md:p-8">
+                         <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500">
+                              <Activity className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-black text-obsidian tracking-tighter">실시간 회복 리듬</h3>
+                              <p className="text-xs font-bold text-slate">다른 유저들의 지금은?</p>
+                            </div>
                           </div>
-                          <Switch 
-                            checked={notificationPermission === 'granted'}
-                            onCheckedChange={handleNotificationToggle}
-                            className="data-[state=checked]:bg-chapter-accent"
-                          />
-                        </div>
+                         <RecoveryActivityFeed />
                       </div>
-                    </div>
+                    </Card>
                   </div>
+                </div>
 
-                  {isEditing && (
-                    <Button onClick={handleSave} className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
-                      <Save className="h-5 w-5" /> 프로필 저장하기
+                {/* Recovery Growth Curve */}
+                <Card className="border-none shadow-xl rounded-[32px] md:rounded-[40px] bg-white overflow-hidden group">
+                  <CardHeader className="p-6 md:p-8 pb-4 flex flex-row items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest">Recovery Growth Curve</p>
+                        <Badge className="bg-chapter-accent/10 text-chapter-accent border-none text-[9px] font-black uppercase px-2">Community Comparative</Badge>
+                      </div>
+                      <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">회복 성장 곡선</CardTitle>
+                    </div>
+                    <Button asChild variant="ghost" className="h-10 px-4 rounded-xl text-xs font-black text-slate hover:bg-mist group-hover:text-chapter-accent transition-all">
+                      <Link href="/me/history" className="flex items-center gap-2">
+                        전체 보기 <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </Button>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* 전담 네비게이터 상담 센터 */}
-              <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-indigo-50 transition-all hover:shadow-3xl">
-                <CardHeader className="p-8 md:p-10 pb-0 border-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
-                        <MessageCircle className="h-7 w-7" />
+                  </CardHeader>
+                  <CardContent className="p-6 md:p-8 pt-2">
+                    {historyLoading ? (
+                      <div className="h-[200px] flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-chapter-accent"></div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-black text-obsidian tracking-tighter">
-                          {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
-                        </h3>
-                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
+                    ) : history.length > 0 ? (
+                      <div className="space-y-6">
+                        {/* 차트 영역 */}
+                        <div className="h-[200px] w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={[...history].reverse().map((h, idx) => {
+                              const dateStr = new Date(h.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+                              const commData = communityAverages?.find((c: any) => c.date === h.createdAt.split('T')[0]);
+                              return {
+                                date: dateStr,
+                                score: h.totalScore,
+                                avg: commData?.avgScore || 65 + (idx % 3),
+                                top: commData?.top10Score || 88 + (idx % 2)
+                              };
+                            })}>
+                              <defs>
+                                <linearGradient id="curveColor" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                              <XAxis dataKey="date" hide />
+                              <Tooltip
+                                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }}
+                                 itemStyle={{ padding: '2px 0' }}
+                              />
+                              <Area type="monotone" dataKey="top" stroke="#fbbf24" strokeWidth={1} strokeDasharray="4 4" fill="transparent" name="상위 10% 목표" />
+                              <Area type="monotone" dataKey="avg" stroke="#94a3b8" strokeWidth={1} strokeDasharray="4 4" fill="transparent" name="유니클 평균" />
+                              <Area type="monotone" dataKey="score" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#curveColor)" name="나의 회복 점수" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        {/* 소셜 프루프 요약 */}
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center justify-between p-4 bg-mist/30 rounded-2xl border border-line/5 transition-all hover:bg-mist/50">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-reward-gold/10 rounded-xl flex items-center justify-center text-reward-gold">
+                                <Zap className="h-5 w-5 fill-current" />
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate/60 uppercase tracking-tighter">Your Status</p>
+                                <p className="font-black text-obsidian tracking-tight">상위 <span className="text-reward-gold">15%</span> 회복 우수자</p>
+                              </div>
+                            </div>
+                            <Badge className="bg-obsidian text-mist border-none text-[10px] font-black px-3 py-1.5 rounded-lg shadow-lg">
+                              TOP TIER
+                            </Badge>
+                          </div>
+
+                          {weeklyReport?.percentileFeedback && (
+                            <div className="bg-chapter-accent/5 p-4 rounded-2xl border border-chapter-accent/10">
+                              <p className="text-[11px] font-bold text-chapter-accent leading-relaxed">
+                                <Sparkles className="h-3 w-3 inline-block mr-1 mb-0.5" />
+                                {weeklyReport.percentileFeedback}
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between text-center border-t border-line/10 pt-4 px-2">
+                            <div>
+                              <p className="text-[9px] font-black text-slate uppercase opacity-40">최근 점수</p>
+                              <p className="font-black text-emerald-500">{history[0]?.totalScore || 0}점</p>
+                            </div>
+                            <div className="w-px h-6 bg-line/20" />
+                            <div>
+                              <p className="text-[9px] font-black text-slate uppercase opacity-40">전체 평균</p>
+                              <p className="font-black text-slate">68점</p>
+                            </div>
+                            <div className="w-px h-6 bg-line/20" />
+                            <div>
+                              <p className="text-[9px] font-black text-slate uppercase opacity-40">상위 10%</p>
+                              <p className="font-black text-reward-gold">89점</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-[200px] flex flex-col items-center justify-center text-center bg-mist/30 rounded-3xl border-2 border-dashed border-line/50">
+                        <Activity className="h-8 w-8 text-slate/20 mb-3" />
+                        <p className="text-xs font-bold text-slate mb-4">아직 진단 기록이 관측되지 않았습니다.</p>
+                        <Button asChild size="sm" className="bg-obsidian text-mist rounded-full px-6 font-black text-[10px]">
+                          <Link href="/ai-navigator">첫 진단 시작</Link>
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'pass' && (
+              <motion.div
+                key="pass"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-6 md:space-y-8 animate-in fade-in"
+              >
+                {/* 디지털 허브 */}
+                <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
+                  <CardHeader className="p-8 md:p-10 pb-0 border-none">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
+                          <Sparkles className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-black text-obsidian tracking-tighter">디지털 허브</h3>
+                          <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Referral & medical pass</p>
+                        </div>
                       </div>
                     </div>
+                  </CardHeader>
+                  <CardContent className="p-8 md:p-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                           <Badge className="bg-emerald-100 text-emerald-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Invitation</Badge>
+                        </div>
+                        <QRReferralCard 
+                          userName={session.user?.name || ''} 
+                          referralCode={userData?.referralCode || ''} 
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                           <Badge className="bg-indigo-100 text-indigo-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Medical Pass</Badge>
+                        </div>
+                        <MedicalPassCard 
+                          userName={session.user?.name || ''} 
+                          referralCode={userData?.referralCode || ''} 
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* 나의 회복 조직도 */}
+                <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden group">
+                  <CardHeader className="p-8 md:p-10 pb-4">
+                    <div>
+                      <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">My Recovery Network</p>
+                      <CardTitle className="text-2xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                        나의 회복 조직도
+                        <Badge className="bg-indigo-50 text-indigo-600 border-none text-[10px] font-black uppercase">Level 2</Badge>
+                      </CardTitle>
+                      <p className="text-sm font-medium text-slate mt-1">내가 소개한 친구와 친구가 소개한 사람들의 활동 현황입니다.</p>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-8 md:p-10 pt-2">
+                    <ReferralNetwork mode="accordion" />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'care' && (
+              <motion.div
+                key="care"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-6 md:space-y-8 animate-in fade-in"
+              >
+                {/* Service Progress Status Cards */}
+                {(userStatus?.concierge || userStatus?.inquiry) && (
+                  <div className="flex flex-col gap-4">
+                    {/* Concierge Status */}
+                    {userStatus?.concierge && (
+                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                        <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                          <div className="flex items-center gap-5">
+                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                              <Clock className={`w-7 h-7 ${userStatus.concierge.status === 'pending' ? 'animate-pulse' : ''}`} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Service Status Protocol</p>
+                              <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                                {userStatus.concierge.painPoint} 회복 컨시어지
+                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                  userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                    'bg-slate-50 text-slate-500 border-slate-200'
+                                  }`}>
+                                  {userStatus.concierge.status === 'pending' ? '검토 중' :
+                                    userStatus.concierge.status === 'approved' ? '승인 완료' : '진행 중'}
+                                </Badge>
+                              </h3>
+                              <p className="text-sm font-medium text-slate mt-1">
+                                {userStatus.concierge.status === 'pending' ? '관리자가 의뢰서를 검토하고 있습니다.' :
+                                  userStatus.concierge.status === 'approved' ? '회복 프로토콜이 승인되었습니다. 상세 내용을 확인하세요.' :
+                                    '신청 내용을 처리 중입니다.'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="w-full md:w-auto">
+                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                              <Link href="/me/history">진행 내역 보기</Link>
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="h-1.5 w-full bg-slate-50 px-8 pb-8">
+                          <div className="h-full bg-slate-200 rounded-full relative">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: userStatus.concierge.status === 'approved' ? '100%' : '50%' }}
+                              className={`absolute left-0 top-0 h-full rounded-full ${userStatus.concierge.status === 'approved' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_10px_rgba(79,70,229,0.5)]'
+                                }`}
+                            />
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* Inquiry Status */}
+                    {userStatus?.inquiry && (
+                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                        <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                          <div className="flex items-center gap-5">
+                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600">
+                              <MessageCircle className={`w-7 h-7 ${userStatus.inquiry.status === 'pending' ? 'animate-pulse' : ''}`} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Support Status Protocol</p>
+                              <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                                [{userStatus.inquiry.type === 'product' ? '상품' : '일반'}] {userStatus.inquiry.subject}
+                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                  userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                    'bg-slate-50 text-slate-500 border-slate-200'
+                                  }`}>
+                                  {userStatus.inquiry.status === 'pending' ? '답변 대기' :
+                                    userStatus.inquiry.status === 'resolved' ? '해결 완료' :
+                                      userStatus.inquiry.status === 'in_progress' ? '처리 중' : '진행 중'}
+                                </Badge>
+                              </h3>
+                              <p className="text-sm font-medium text-slate mt-1">
+                                {userStatus.inquiry.status === 'pending' ? '관리자가 문의 내용을 확인하고 있습니다.' :
+                                  userStatus.inquiry.status === 'resolved' ? '문의에 대한 답변이 완료되었습니다.' :
+                                    '담당자가 내용을 확인 및 답변을 준비 중입니다.'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="w-full md:w-auto">
+                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                              <Link href="/me/inquiries">문의 내역 보기</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
                   </div>
-                </CardHeader>
-                <CardContent className="p-8 md:p-10">
-                  <NavigatorConsultationCenter />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                )}
+
+                {/* 전담 네비게이터 상담 센터 */}
+                <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-indigo-50 transition-all hover:shadow-3xl">
+                  <CardHeader className="p-8 md:p-10 pb-0 border-none">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
+                          <MessageCircle className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black text-obsidian tracking-tighter">
+                            {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
+                          </h3>
+                          <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-8 md:p-10">
+                    <NavigatorConsultationCenter />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'profile' && (
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-6 md:space-y-8 animate-in fade-in"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* 프로필 정보 (좌측/전체 너비) */}
+                  <div className="lg:col-span-8 space-y-6 md:space-y-8">
+                    <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden">
+                      <CardHeader className="p-6 md:p-10 pb-4 flex flex-row items-center justify-between border-b border-mist">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-mist rounded-2xl text-obsidian">
+                            <User className="h-6 w-6" />
+                          </div>
+                          <CardTitle className="text-2xl font-black text-obsidian tracking-tighter">프로필 설정</CardTitle>
+                        </div>
+                        <Button variant="ghost" onClick={() => setIsEditing(!isEditing)} className="font-black text-xs text-slate hover:bg-mist h-10 px-4 rounded-xl">
+                          {isEditing ? <><X className="h-4 w-4 mr-2" /> 취소</> : <><Settings className="h-4 w-4 mr-2" /> 편집</>}
+                        </Button>
+                      </CardHeader>
+                      <CardContent className="p-6 md:p-10 space-y-8 md:space-y-10">
+                        <div className="bg-mist/30 p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-line/30 flex items-center gap-4 md:gap-6">
+                          <div className="relative w-20 h-20 rounded-[28px] overflow-hidden bg-slate-100 shadow-md border-4 border-white group/avatar flex-shrink-0">
+                            <Image 
+                              src={formData.avatar || session.user?.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"} 
+                              alt="" 
+                              fill 
+                              className="object-cover" 
+                            />
+                            {isEditing && (
+                              <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                                <Upload className="text-white h-5 w-5" />
+                                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} aria-label="프로필 이미지 변경" />
+                              </label>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-lg font-black text-obsidian truncate">{session.user?.name}</h3>
+                            <p className="text-xs font-bold text-slate flex items-center gap-1.5 opacity-60 truncate">
+                              <Mail className="h-3 w-3" /> {session.user?.email}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-0.5">
+                                {(session.user as any)?.provider || 'Email'}
+                              </Badge>
+                              {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
+                                <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[8px] uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
+                                  <Zap className="w-2.5 h-2.5" /> FOUNDER
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <div className="space-y-3">
+                            <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">연락처</Label>
+                            <div className="relative">
+                              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate h-4 w-4 opacity-40" />
+                              <Input
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                disabled={!isEditing}
+                                placeholder="010-XXXX-XXXX"
+                                className="h-14 pl-12 rounded-2xl bg-mist/50 border-line focus:ring-chapter-accent"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">배송지 정보</Label>
+                            <div className="space-y-3">
+                              <UnifiedAddressSearch
+                                provider="google"
+                                onAddressSelect={handleAddressSelect}
+                                disabled={!isEditing}
+                              />
+                              <div className="grid grid-cols-1 gap-3">
+                                <Input value={formData.zipCode} readOnly placeholder="우편번호" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                                <Input value={formData.address1} readOnly placeholder="주소" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                                <Input name="address2" value={formData.address2} onChange={handleInputChange} disabled={!isEditing} placeholder="상세 주소를 입력하세요" className="h-14 rounded-2xl bg-mist/50 border-line" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <Label className="text-xs font-black text-slate uppercase tracking-widest ml-1">알림 및 동의</Label>
+                            <div className="space-y-3">
+                              <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${formData.marketingConsent ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                                <label htmlFor="marketing" className="text-sm font-bold text-slate cursor-pointer select-none">이벤트 수신동의</label>
+                                <Checkbox
+                                  id="marketing"
+                                  checked={formData.marketingConsent}
+                                  onCheckedChange={(c) => setFormData(prev => ({ ...prev, marketingConsent: c as boolean }))}
+                                  disabled={!isEditing}
+                                  className="rounded-md"
+                                />
+                              </div>
+                              <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border transition-all ${notificationPermission === 'granted' ? 'border-chapter-accent bg-chapter-accent/5' : 'border-line bg-mist/50'}`}>
+                                <div className="flex items-center gap-2">
+                                  <Bell className={`h-4 w-4 ${notificationPermission === 'granted' ? 'text-chapter-accent' : 'text-slate opacity-40'}`} />
+                                  <span className="text-sm font-bold text-slate">푸시 알림</span>
+                                </div>
+                                <Switch 
+                                  checked={notificationPermission === 'granted'}
+                                  onCheckedChange={handleNotificationToggle}
+                                  className="data-[state=checked]:bg-chapter-accent"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {isEditing && (
+                          <Button onClick={handleSave} className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+                            <Save className="h-5 w-5" /> 프로필 저장하기
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* 축구 클럽하우스 프로토콜 (우측/사이드바) */}
+                  <div className="lg:col-span-4">
+                    <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden border border-emerald-100/30">
+                      <CardHeader className="p-6 md:p-8 pb-4 flex flex-row items-center justify-between border-b border-mist">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                            <Trophy className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl font-black text-obsidian tracking-tighter">축구 클럽하우스</CardTitle>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-6 md:p-8 space-y-6">
+                        {footballLoading ? (
+                          <div className="py-12 flex justify-center items-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                          </div>
+                        ) : footballTeamInfo ? (
+                          <div className="space-y-6">
+                            <div className="bg-emerald-50/40 p-4 rounded-[20px] border border-emerald-100 flex flex-col gap-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-black text-base shrink-0">
+                                  ⚽
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="text-base font-black text-obsidian tracking-tight truncate flex items-center gap-1.5">
+                                    {footballTeamInfo.teamName}
+                                  </h4>
+                                  <Badge className="bg-emerald-500 text-white font-black text-[8px] px-1.5 py-0.5 rounded mt-0.5">
+                                    {session.user?.footballRole === 'coach' ? '감독/코치' : 
+                                     session.user?.footballRole === 'player' ? '선수' : '보호자'}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <Button asChild size="sm" className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 shadow-sm">
+                                <Link href="/football/mypage" className="flex items-center justify-center gap-1.5">
+                                  클럽하우스 입장 <ChevronRight className="h-3.5 w-3.5" />
+                                </Link>
+                              </Button>
+                            </div>
+
+                            {session.user?.footballRole === 'coach' && (
+                              <div className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-3 text-[11px]">
+                                <h5 className="font-black text-obsidian tracking-tight flex items-center gap-1">
+                                  <span>📢</span> 스쿼드 초대 코드
+                                </h5>
+                                <p className="text-slate font-bold leading-relaxed">선수 및 학부모 가입 코드를 배포해 주세요.</p>
+                                
+                                <div className="space-y-2">
+                                  <div className="p-3 bg-white rounded-lg border border-slate-200 flex items-center justify-between gap-1">
+                                    <span className="font-black text-obsidian uppercase tracking-wider truncate">
+                                      {footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || 'ST-CODE'}
+                                    </span>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      onClick={() => {
+                                        const code = footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode;
+                                        if (code) {
+                                          navigator.clipboard.writeText(code.toUpperCase());
+                                          alert(`팀 초대 코드 (${code.toUpperCase()})가 복사되었습니다!`);
+                                        }
+                                      }}
+                                      className="h-7 px-2 text-[10px] font-black shrink-0 hover:bg-slate-50 border border-slate-200"
+                                    >
+                                      복사
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : footballPendingTeam ? (
+                          <div className="bg-amber-50/40 p-4 rounded-[20px] border border-amber-100 space-y-2 text-xs">
+                            <h4 className="font-black text-obsidian tracking-tight flex items-center gap-1.5">
+                              <Clock className="w-4 h-4 text-amber-500 animate-pulse" />
+                              {footballPendingTeam.teamName} (심사 중)
+                            </h4>
+                            <p className="font-medium text-slate-500 leading-normal">보안 승인 심사가 진행 중입니다. 1~2영업일이 소요됩니다.</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-4 text-xs font-bold text-slate">
+                            <p className="leading-relaxed">팀 코드로 합류하거나 감독 권한으로 신규 팀 개설 신청을 진행할 수 있습니다.</p>
+                            <div className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-3">
+                              <p className="font-black text-obsidian">초대 코드로 팀 합류</p>
+                              <div className="flex gap-1.5">
+                                <Input
+                                  value={footballInviteCode}
+                                  onChange={(e) => setFootballInviteCode(e.target.value)}
+                                  placeholder="코드 입력"
+                                  className="h-10 text-xs rounded-xl bg-white border-slate-200"
+                                />
+                                <Button onClick={handleFootballJoin} disabled={footballJoining} size="sm" className="h-10 rounded-xl bg-obsidian text-white font-black px-4">
+                                  {footballJoining ? '...' : '합류'}
+                                </Button>
+                              </div>
+                            </div>
+                            <Button onClick={() => setFootballCreationMode(!footballCreationMode)} className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs">
+                              {footballCreationMode ? '신청 양식 닫기' : '신규 축구팀 창단 신청'}
+                            </Button>
+
+                            {footballCreationMode && (
+                              <div className="bg-slate-50/50 p-4 rounded-[20px] border border-slate-200 space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                                <div className="space-y-2 text-[11px]">
+                                  <Label className="font-black text-slate-500">팀 이름</Label>
+                                  <Input value={footballNewTeamName} onChange={(e) => setFootballNewTeamName(e.target.value)} placeholder="예: 유니클 FC" className="h-9 rounded-lg bg-white" />
+                                </div>
+                                <div className="space-y-2 text-[11px]">
+                                  <Label className="font-black text-slate-500">카테고리</Label>
+                                  <select value={footballNewCategory} onChange={(e) => setFootballNewCategory(e.target.value)} className="w-full h-9 px-2 rounded-lg border bg-white text-[11px] font-bold">
+                                    <option value="youth">유소년 클럽</option>
+                                    <option value="amateur">성인 조기 축구 / 동호회</option>
+                                    <option value="school">초/중/고/대학교 엘리트 팀</option>
+                                    <option value="academy">전문 사설 아카데미</option>
+                                  </select>
+                                </div>
+                                <div className="space-y-2 text-[11px]">
+                                  <Label className="font-black text-slate-500">활동 지역</Label>
+                                  <Input value={footballNewRegion} onChange={(e) => setFootballNewRegion(e.target.value)} placeholder="예: 서울 송파구" className="h-9 rounded-lg bg-white" />
+                                </div>
+                                {footballError && <p className="text-[10px] text-rose-500">⚠ {footballError}</p>}
+                                <Button onClick={handleFootballCreate} disabled={footballCreationLoading} className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl">
+                                  {footballCreationLoading ? '제출 중...' : '신청서 제출'}
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </ChapterWrapper>
