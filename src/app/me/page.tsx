@@ -47,7 +47,7 @@ import Link from 'next/link';
 import ReferralSection from '@/components/ui/ReferralSection';
 import Image from 'next/image';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import DynamicHero from '@/components/me/DynamicHero';
 import MembershipProgress from '@/components/me/MembershipProgress';
 import AILatestBrief from '@/components/me/AILatestBrief';
