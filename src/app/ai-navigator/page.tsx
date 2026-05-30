@@ -421,27 +421,39 @@ export default function AiNavigatorPage() {
                     </div>
                 </section>
 
-                {/* 3. Desktop High-Level Tab Bar (Hidden on Mobile) */}
-                <div className="hidden md:flex justify-between items-center px-6 py-4 bg-white border-b border-line flex-shrink-0">
-                    <div className="flex gap-2 bg-mist/30 p-1 rounded-2xl border border-line">
+                {/* 3. Responsive High-Level Tab Bar (Visible on both Desktop and Mobile) */}
+                <div className="flex justify-between items-center px-3.5 py-3 md:px-6 md:py-4 bg-white border-b border-line flex-shrink-0">
+                    <div className="flex gap-1 md:gap-2 bg-mist/30 p-0.5 md:p-1 rounded-2xl border border-line w-full md:w-auto">
                         <Button 
                             variant={activeTab === 'today-routine' ? 'default' : 'ghost'} 
                             onClick={() => { setActiveTab('today-routine'); setSubActiveTab('diagnosis'); }}
-                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'today-routine' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                            className={`flex-1 md:flex-initial rounded-xl h-9 md:h-10 px-2 md:px-5 text-[10px] md:text-xs font-black transition-all ${
+                                activeTab === 'today-routine' 
+                                    ? 'bg-[#0E3A3A] text-white shadow-md' 
+                                    : 'text-slate/60 hover:text-slate'
+                            }`}
                         >
                             리듬 데일리 ⚡
                         </Button>
                         <Button 
                             variant={activeTab === 'recovery-toolbox' ? 'default' : 'ghost'} 
                             onClick={() => setActiveTab('recovery-toolbox')}
-                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'recovery-toolbox' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                            className={`flex-1 md:flex-initial rounded-xl h-9 md:h-10 px-2 md:px-5 text-[10px] md:text-xs font-black transition-all ${
+                                activeTab === 'recovery-toolbox' 
+                                    ? 'bg-[#0E3A3A] text-white shadow-md' 
+                                    : 'text-slate/60 hover:text-slate'
+                            }`}
                         >
                             회복 툴박스 🧰
                         </Button>
                         <Button 
                             variant={activeTab === 'clinic' ? 'default' : 'ghost'} 
                             onClick={() => setActiveTab('clinic')}
-                            className={`rounded-xl h-10 px-5 font-bold ${activeTab === 'clinic' ? 'bg-[#0E3A3A] text-white' : 'text-slate'}`}
+                            className={`flex-1 md:flex-initial rounded-xl h-9 md:h-10 px-2 md:px-5 text-[10px] md:text-xs font-black transition-all ${
+                                activeTab === 'clinic' 
+                                    ? 'bg-[#0E3A3A] text-white shadow-md' 
+                                    : 'text-slate/60 hover:text-slate'
+                            }`}
                         >
                             회복 클리닉 🩺
                         </Button>
@@ -625,30 +637,7 @@ export default function AiNavigatorPage() {
                     )}
                 </div>
 
-                {/* 6. Floating Bottom Navigation for Mobile */}
-                <div className="md:hidden border-t border-line/50 bg-white/90 backdrop-blur-lg px-6 py-2 flex justify-around items-center h-[72px] fixed bottom-0 left-0 right-0 z-50 shadow-lg">
-                    <button 
-                        onClick={() => { setActiveTab('today-routine'); setSubActiveTab('diagnosis'); }}
-                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'today-routine' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
-                    >
-                        <Zap className={`w-5 h-5 ${activeTab === 'today-routine' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
-                        <span className="text-[9px]">리듬 데일리</span>
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('recovery-toolbox')}
-                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'recovery-toolbox' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
-                    >
-                        <Package className={`w-5 h-5 ${activeTab === 'recovery-toolbox' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
-                        <span className="text-[9px]">회복 툴박스</span>
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('clinic')}
-                        className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'clinic' ? 'text-[#0E3A3A] scale-105 font-black' : 'text-slate/40 text-[10px] font-bold'}`}
-                    >
-                        <Activity className={`w-5 h-5 ${activeTab === 'clinic' ? 'stroke-[2.5px] text-[#0E3A3A]' : 'text-slate/40'}`} />
-                        <span className="text-[9px]">회복 클리닉</span>
-                    </button>
-                </div>
+                {/* 6. Removed overlapping bottom floating bar in favor of responsive top high-level tab bar */}
 
                 {/* Forecast Modal */}
                 <ForecastModal
