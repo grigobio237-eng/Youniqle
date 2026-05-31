@@ -170,17 +170,17 @@ export default function ArtworksPage() {
 
     return (
         <div className="min-h-screen bg-white font-sans text-[#121212] overflow-x-hidden">
-            <div className="container mx-auto max-w-7xl px-4 py-20 pb-40">
+            <div className="container mx-auto max-w-7xl px-4 py-10 md:py-20 pb-20 md:pb-40">
                 <GalleryTabs activeTab="artworks" />
 
                 {/* 1. Hub Hero - Featured Section (Curated) */}
                 {curatedArtworks.length > 0 && (
-                    <section className="mt-16 mb-32">
+                    <section className="mt-8 md:mt-16 mb-16 md:mb-32">
                         <Reveal delay={0.1}>
-                            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
-                                <div className="max-w-2xl">
-                                    <span className="text-xs font-black tracking-[0.4em] text-chapter-accent uppercase mb-4 block">Selection Series</span>
-                                    <h2 className="text-6xl md:text-8xl font-light tracking-tighter font-serif italic leading-none">
+                            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 md:mb-12 text-center md:text-left gap-4 md:gap-8">
+                                <div className="max-w-2xl w-full">
+                                    <span className="text-xs font-black tracking-[0.4em] text-chapter-accent uppercase mb-2 md:mb-4 block text-center md:text-left">Selection Series</span>
+                                    <h2 className="text-4xl sm:text-6xl md:text-8xl font-light tracking-tighter font-serif italic leading-none text-center md:text-left">
                                         The Recovery <br /> Archive
                                     </h2>
                                 </div>
@@ -208,19 +208,19 @@ export default function ArtworksPage() {
                                     </Link>
                                 </Reveal>
                             </div>
-                            <div className="lg:col-span-5 flex flex-col gap-12">
+                            <div className="lg:col-span-5 flex flex-col gap-6 lg:gap-12">
                                 {curatedArtworks.slice(1, 3).map((art, idx) => (
                                     <Reveal key={art.id} delay={0.3 + idx * 0.1}>
-                                        <Link href={`/gallery/artworks/${art.id}`} className="group flex items-center gap-8 bg-gray-50 p-6 rounded-[30px] hover:bg-mist transition-colors">
-                                            <div className="relative w-32 h-32 rounded-2xl overflow-hidden shrink-0">
+                                        <Link href={`/gallery/artworks/${art.id}`} className="group flex items-center gap-4 md:gap-8 bg-gray-50 p-4 md:p-6 rounded-[20px] md:rounded-[30px] hover:bg-mist transition-colors">
+                                            <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shrink-0">
                                                 <Image src={art.image || ''} alt={art.title} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div>
                                                 <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest mb-1 block">Highlight 0{idx + 2}</span>
-                                                <h4 className="text-xl font-serif italic mb-2">{art.title}</h4>
-                                                <p className="text-xs font-bold text-slate/40 uppercase tracking-tighter">{art.artistName}</p>
+                                                <h4 className="text-base md:text-xl font-serif italic mb-1 md:mb-2">{art.title}</h4>
+                                                <p className="text-[10px] md:text-xs font-bold text-slate/40 uppercase tracking-tighter">{art.artistName}</p>
                                             </div>
-                                            <ArrowUpRight className="w-5 h-5 ml-auto text-slate/20 group-hover:text-chapter-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                                            <ArrowUpRight className="w-5 h-5 ml-auto text-slate/20 group-hover:text-chapter-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all shrink-0" />
                                         </Link>
                                     </Reveal>
                                 ))}
@@ -231,7 +231,7 @@ export default function ArtworksPage() {
 
                 {/* 2. Artist Spotlight Section */}
                 {spotlightArtist && (
-                    <section className="bg-obsidian text-white rounded-[40px] lg:rounded-[60px] p-8 sm:p-12 lg:p-24 mb-20 lg:mb-32 relative overflow-hidden">
+                    <section className="bg-obsidian text-white rounded-[40px] lg:rounded-[60px] p-8 sm:p-12 lg:p-24 mb-12 md:mb-20 lg:mb-32 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-full h-full opacity-[0.03] pointer-events-none text-[20vw] font-black italic whitespace-nowrap -translate-y-1/2 translate-x-1/4">
                             SPOTLIGHT
                         </div>
@@ -286,14 +286,14 @@ export default function ArtworksPage() {
                 {/* 3. Browse Archive (The Grid) */}
                 <section id="archive">
                     <Reveal delay={0.1}>
-                        <div className="mb-16">
-                            <span className="text-xs font-black tracking-[0.4em] text-slate/40 uppercase mb-4 block">Archive Hub</span>
-                            <h2 className="text-6xl font-light font-serif italic tracking-tighter">전체 아카이브</h2>
+                        <div className="mb-8 md:mb-16">
+                            <span className="text-xs font-black tracking-[0.4em] text-slate/40 uppercase mb-2 md:mb-4 block">Archive Hub</span>
+                            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light font-serif italic tracking-tighter">전체 아카이브</h2>
                         </div>
                     </Reveal>
 
                     {/* Filter & Search Bar */}
-                    <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl pt-4 pb-8 mb-16 border-b border-line">
+                    <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl pt-4 pb-8 mb-8 md:mb-16 border-b border-line">
                         <div className="flex flex-col space-y-8">
                             {/* Search */}
                             <div className="relative max-w-xl group">
@@ -370,7 +370,7 @@ export default function ArtworksPage() {
                     </div>
 
                     {/* Results Count */}
-                    <div className="mb-12 flex justify-between items-center text-xs font-bold text-slate/40 uppercase tracking-widest">
+                    <div className="mb-6 md:mb-12 flex justify-between items-center text-xs font-bold text-slate/40 uppercase tracking-widest">
                         <span>결과 {filteredArtworks.length}건</span>
                         <div className="flex items-center gap-4">
                             <LayoutGrid className="w-4 h-4 text-obsidian" />
@@ -395,7 +395,7 @@ export default function ArtworksPage() {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="mt-32 flex items-center justify-center gap-6 border-t border-line pt-12">
+                        <div className="mt-12 md:mt-32 flex items-center justify-center gap-6 border-t border-line pt-12">
                             <button 
                                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                 disabled={currentPage === 1}
