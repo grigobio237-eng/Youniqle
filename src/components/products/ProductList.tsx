@@ -155,7 +155,7 @@ export default function ProductList({ searchParams }: ProductListProps) {
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {products.map((product) => {
           const productLink = product.isGalleryArt 
-            ? `/gallery/artworks/${product._id.replace('ext-art-', '')}` 
+            ? `/gallery/artworks/${product._id}` 
             : `/products/${product._id}`;
             
           const categoryLabel = product.isGalleryArt 

@@ -29,7 +29,11 @@ export default function ArtworkDetailPage() {
                 let found: any;
                 for (const artist of data as any[]) {
                     if (artist.items) {
-                        const hit = (artist.items as any[]).find((item: any) => item.id === id);
+                        const hit = (artist.items as any[]).find((item: any) => 
+                            item.id === id || 
+                            item.id === `ext-art-${id}` ||
+                            (id && typeof id === 'string' && id.startsWith('ext-art-') && item.id === id.replace('ext-art-', ''))
+                        );
                         if (hit) {
                             found = { 
                                 ...hit, 

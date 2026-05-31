@@ -772,7 +772,7 @@ export default function ReportsHub() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {recommendedItems.map((art: any) => {
-                const itemLink = `/gallery/artworks/${art.id.replace('ext-art-', '')}`;
+                const itemLink = `/gallery/artworks/${art.id}`;
                 return (
                   <div key={art.id} className="bg-white border border-line/45 rounded-[24px] overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
                     <Link href={itemLink} className="block relative aspect-[4/3] bg-mist overflow-hidden">
