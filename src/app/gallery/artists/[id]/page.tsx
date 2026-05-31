@@ -55,18 +55,18 @@ export default function ArtistDetailPage() {
 
     return (
         <div className="min-h-screen bg-white pb-32">
-            <div className="container mx-auto max-w-7xl px-4 py-12">
+            <div className="container mx-auto max-w-7xl px-4 py-6 md:py-12">
                 {/* Navigation */}
                 <button 
                     onClick={() => router.back()}
-                    className="flex items-center text-slate font-bold hover:text-obsidian transition-colors mb-16 group"
+                    className="flex items-center text-slate font-bold hover:text-obsidian transition-colors mb-8 md:mb-16 group"
                 >
                     <ArrowLeft className="w-5 h-5 mr-3 group-hover:-translate-x-1 transition-transform" />
                     <span className="text-sm uppercase tracking-widest font-black">Artists Lobby</span>
                 </button>
 
                 {/* Artist Profile Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start mb-32">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start mb-16 md:mb-32">
                     <div className="lg:col-span-4 flex flex-col items-center lg:items-start">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -113,12 +113,10 @@ export default function ArtistDetailPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
-                            className="max-w-2xl border-l-2 border-line pl-8"
+                            className="max-w-2xl border-l-2 border-line pl-6 md:pl-8 w-full"
                         >
-                            <h3 className="text-xs font-black uppercase tracking-widest text-slate mb-6">Artist Statement</h3>
-                            <p className="text-slate/80 font-medium text-lg leading-relaxed italic">
-                                "{artist.bio}"
-                            </p>
+                            <h3 className="text-xs font-black uppercase tracking-widest text-slate mb-6">Biography & Statement</h3>
+                            <StructuredBio bio={artist.bio} />
                         </motion.div>
                         
                         <motion.div
@@ -137,7 +135,7 @@ export default function ArtistDetailPage() {
 
                 {/* Artworks Grid Section */}
                 <section>
-                    <div className="flex items-center justify-between mb-16">
+                    <div className="flex items-center justify-between mb-8 md:mb-16">
                         <div className="space-y-2">
                             <h2 className="text-4xl font-light text-obsidian font-serif italic">Gallery Collection</h2>
                             <p className="text-sm font-bold text-slate/40 tracking-wider">WORKS BY {artist.name.toUpperCase()}</p>
@@ -206,6 +204,50 @@ export default function ArtistDetailPage() {
                     font-family: 'Cormorant Garamond', serif;
                 }
             `}</style>
+        </div>
+    );
+}
+
+// --- Helper Components ---
+
+function StructuredBio({ bio }: { bio: string }) {
+    if (!bio) return null;
+
+    // Normalizing newlines
+    const lines = bio.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+
+    // Fallback: if lines are squashed but separated by ' / ', split them
+    let processedLines = lines;
+    if (lines.length <= 2 && bio.includes(' / ')) {
+        processedLines = bio.split(' / ').map(item => item.trim()).filter(Boolean);
+    }
+
+    return (
+        <div className="space-y-4">
+            {processedLines.map((line, idx) => {
+                // Determine if this line represents a sub-header (e.g. contains exhibition category or degree category)
+                const isHeader = line.includes('개인전') || 
+                                 line.includes('단체전') || 
+                                 line.includes('학력') || 
+                                 line.includes('경력') || 
+                                 line.includes('수상') || 
+                                 line.includes('초대전') || 
+                                 line.includes('기획전') || 
+                                 line.includes('그룹전') ||
+                                 line.includes('협회전') ||
+                                 line.includes('Artworks') ||
+                                 line.includes('Biography');
+
+                return (
+                    <div key={idx} className={`relative pl-5 ${isHeader ? 'mt-8 first:mt-0' : ''}`}>
+                        {/* Decorative bullet or timeline point */}
+                        <div className={`absolute left-0 top-2.5 w-1.5 h-1.5 rounded-full ${isHeader ? 'bg-chapter-accent scale-125' : 'bg-slate/30'}`} />
+                        <p className={`font-sans tracking-tight text-left leading-relaxed ${isHeader ? 'text-obsidian font-bold text-sm md:text-base font-serif italic' : 'text-slate/60 text-xs sm:text-sm'}`}>
+                            {line}
+                        </p>
+                    </div>
+                );
+            })}
         </div>
     );
 }
