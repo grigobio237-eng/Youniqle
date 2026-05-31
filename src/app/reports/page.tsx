@@ -547,48 +547,102 @@ export default function ReportsHub() {
             </div>
 
             {/* 7 Days Trend Mini Chart */}
-            <div className="space-y-1.5 md:space-y-2">
+            <div className="space-y-2 md:space-y-3">
               <div className="flex justify-between items-center text-[10px] md:text-xs font-bold text-slate-400 px-1">
-                <span>7일 회복 트렌드</span>
-                <span className="flex items-center gap-1">
+                <span className="text-obsidian font-black tracking-wider uppercase">7일 회복 트렌드</span>
+                <span className="flex items-center gap-1 text-[11px] font-extrabold text-slate-500">
                   {data?.highlights?.totalScoreDiff !== null && (
                     <>
                       전주 대비 
                       {data.highlights.totalScoreDiff > 0 ? (
-                        <span className="text-emerald-500 flex items-center"><ArrowUpRight className="w-3.5 h-3.5" />+{data.highlights.totalScoreDiff}pt</span>
+                        <span className="text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3" />+{data.highlights.totalScoreDiff}pt</span>
                       ) : data.highlights.totalScoreDiff < 0 ? (
-                        <span className="text-rose-500 flex items-center"><ArrowDownRight className="w-3.5 h-3.5" />{data.highlights.totalScoreDiff}pt</span>
+                        <span className="text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><ArrowDownRight className="w-3 h-3" />{data.highlights.totalScoreDiff}pt</span>
                       ) : (
-                        <span>변동 없음</span>
+                        <span className="bg-slate-100 px-2 py-0.5 rounded-full">변동 없음</span>
                       )}
                     </>
                   )}
                 </span>
               </div>
 
-              <div className="h-28 md:h-32 w-full">
+              <div className="bg-[#111315] p-4 md:p-5 rounded-[24px] border border-white/5 shadow-inner">
                 {data?.trendData && data.trendData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data.trendData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2}/>
-                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.03)" />
-                      <XAxis dataKey="date" tickLine={false} axisLine={false} style={{ fontSize: '9px', fontWeight: 'bold', fill: '#94a3b8' }} />
-                      <YAxis domain={[0, 100]} tickLine={false} axisLine={false} style={{ fontSize: '9px', fontWeight: 'bold', fill: '#94a3b8' }} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#111315', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '11px' }}
-                        labelStyle={{ fontWeight: 'black', color: '#b9ff66' }}
-                      />
-                      <Area type="monotone" dataKey="score" stroke="var(--primary)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorScore)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <div className="space-y-3">
+                    <div className="h-28 md:h-32 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={data.trendData} margin={{ top: 10, right: 15, left: -25, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/>
+                              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255, 255, 255, 0.05)" />
+                          <XAxis 
+                            dataKey="date" 
+                            tickLine={false} 
+                            axisLine={false} 
+                            style={{ fontSize: '9px', fontWeight: 'bold', fill: '#8A94A6' }} 
+                          />
+                          <YAxis 
+                            domain={[0, 100]} 
+                            tickLine={false} 
+                            axisLine={false} 
+                            style={{ fontSize: '9px', fontWeight: 'bold', fill: '#8A94A6' }} 
+                          />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1E2022', 
+                              borderRadius: '12px', 
+                              border: '1px solid rgba(255, 255, 255, 0.08)', 
+                              color: '#fff', 
+                              fontSize: '11px' 
+                            }}
+                            labelStyle={{ fontWeight: 'black', color: '#b9ff66' }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="score" 
+                            stroke="var(--primary)" 
+                            strokeWidth={3} 
+                            fillOpacity={1} 
+                            fill="url(#colorScore)"
+                            dot={{
+                              r: 5,
+                              stroke: 'var(--primary)',
+                              strokeWidth: 2.5,
+                              fill: '#111315',
+                              fillOpacity: 1
+                            }}
+                            activeDot={{
+                              r: 7,
+                              stroke: '#ffffff',
+                              strokeWidth: 2,
+                              fill: 'var(--primary)',
+                              fillOpacity: 1
+                            }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    {data.trendData.length === 1 && (
+                      <div className="flex items-center justify-between text-[10px] font-bold text-white/40 border-t border-white/5 pt-3">
+                        <span className="flex items-center gap-1.5 leading-none">
+                          <Info className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>2회 이상 측정부터 회복 추세선이 연결됩니다.</span>
+                        </span>
+                        <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black px-2 py-0.5 rounded-md">
+                          첫 기록 등록됨
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    <span className="text-[10px] font-bold text-slate-400">충분한 트렌드 데이터가 누적되지 않았습니다.</span>
+                  <div className="h-28 md:h-32 flex flex-col items-center justify-center bg-white/5 rounded-xl border border-dashed border-white/10 p-4 text-center space-y-2">
+                    <History className="w-7 h-7 text-white/20 animate-pulse" />
+                    <span className="text-[10px] font-bold text-white/40">충분한 트렌드 데이터가 누적되지 않았습니다.</span>
                   </div>
                 )}
               </div>
