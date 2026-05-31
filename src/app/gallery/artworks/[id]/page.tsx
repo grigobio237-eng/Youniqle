@@ -76,8 +76,8 @@ export default function ArtworkDetailPage() {
             <div className="container mx-auto max-w-7xl px-4 py-12 md:py-24">
                 
                 {/* Navigation Header */}
-                <div className="max-w-7xl mx-auto mb-16">
-                    <div className="flex justify-between items-center bg-gray-50/50 rounded-[40px] px-8 py-4 border border-line/10">
+                <div className="max-w-7xl mx-auto mb-6 md:mb-16">
+                    <div className="flex justify-between items-center bg-gray-50/50 rounded-[30px] md:rounded-[40px] px-5 md:px-8 py-3 md:py-4 border border-line/10">
                         <button
                             onClick={() => router.back()}
                             className="inline-flex items-center gap-3 text-slate hover:text-obsidian transition-all font-black text-[10px] tracking-[0.3em] uppercase group"
@@ -100,7 +100,7 @@ export default function ArtworkDetailPage() {
                     {/* Visual Section - Protection Enabled */}
                     <div className="space-y-8 sticky top-32">
                         <div 
-                            className="relative aspect-[3/4] rounded-[40px] overflow-hidden shadow-2xl cursor-zoom-in group select-none"
+                            className="relative aspect-[3/4] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl cursor-zoom-in group select-none"
                             onContextMenu={(e) => e.preventDefault()}
                             onClick={() => setIsZoomed(true)}
                         >
@@ -124,8 +124,8 @@ export default function ArtworkDetailPage() {
                             </div>
 
                             {/* Corner Badges */}
-                            <div className="absolute top-8 left-8">
-                                <span className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-obsidian shadow-lg">
+                            <div className="absolute top-4 left-4 md:top-8 md:left-8">
+                                <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest text-obsidian shadow-lg">
                                     {artwork.category}
                                 </span>
                             </div>
@@ -141,10 +141,10 @@ export default function ArtworkDetailPage() {
 
                     {/* Content Section */}
                     <div className="flex flex-col pt-4">
-                        <div className="border-b border-line/50 pb-12 mb-12">
+                        <div className="border-b border-line/50 pb-8 md:pb-12 mb-8 md:mb-12">
                             <Reveal delay={0.1}>
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-12 h-12 rounded-full overflow-hidden bg-mist relative border border-line/20">
+                                <div className="flex items-center gap-4 mb-4 md:mb-6">
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-mist relative border border-line/20">
                                         <Image src={artwork.artistImage || "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80"} alt={artwork.artistName} fill className="object-cover" />
                                     </div>
                                     <span className="text-xs font-black tracking-[0.4em] text-slate uppercase">{artwork.artistName}</span>
@@ -152,15 +152,15 @@ export default function ArtworkDetailPage() {
                             </Reveal>
                             
                             <Reveal delay={0.2}>
-                                <h1 className="text-5xl md:text-7xl font-serif font-light italic tracking-tighter leading-[1.1] text-obsidian mb-8">
+                                <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif font-light italic tracking-tighter leading-[1.1] text-obsidian mb-6 md:mb-8">
                                     {artwork.title}
                                 </h1>
                             </Reveal>
 
                             <Reveal delay={0.3}>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2 md:gap-3">
                                     {['정품인증', artwork.style, artwork.subject, artwork.space].filter(v => v && v !== 'None' && v !== 'All').map(tag => (
-                                        <span key={tag} className="px-3 py-1 bg-gray-50 text-[10px] font-bold text-slate/60 uppercase tracking-tighter rounded-full border border-line/5">
+                                        <span key={tag} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-gray-50 text-[9px] md:text-[10px] font-bold text-slate/60 uppercase tracking-tighter rounded-full border border-line/5">
                                             {tag}
                                         </span>
                                     ))}
@@ -200,37 +200,37 @@ export default function ArtworkDetailPage() {
 
                         {/* Description */}
                         <Reveal delay={0.5}>
-                            <div className="mb-20">
-                                <h2 className="text-[10px] uppercase tracking-[0.4em] text-slate/40 mb-6 font-black">Description</h2>
-                                <p className="font-serif italic leading-loose text-slate/80 text-lg sm:text-xl whitespace-pre-wrap max-w-xl">
+                            <div className="mb-12 md:mb-20">
+                                <h2 className="text-[10px] uppercase tracking-[0.4em] text-slate/40 mb-4 md:mb-6 font-black">Description</h2>
+                                <p className="font-serif italic leading-loose text-slate/80 text-base sm:text-lg lg:text-xl whitespace-pre-wrap max-w-xl">
                                     {artwork.description || "이 작품에 대한 상세 설명이 준비 중입니다."}
                                 </p>
                             </div>
                         </Reveal>
 
                         {/* Pricing & CTA */}
-                        <div className="bg-gray-50 rounded-[40px] p-8 lg:p-12 mb-12">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 mb-12">
+                        <div className="bg-gray-50 rounded-[30px] md:rounded-[40px] p-6 md:p-12 mb-8 md:mb-12">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mb-8 md:mb-12">
                                 <div className="space-y-2">
-                                    <span className="text-[10px] text-slate/40 font-black uppercase tracking-[0.3em] block">Estimated Value</span>
+                                    <span className="text-[10px] text-chapter-accent font-black uppercase tracking-[0.3em] block">Purchase Price (소장 가격)</span>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl font-black text-obsidian/30 tracking-tighter italic font-serif group-hover:opacity-100 transition-opacity">₩ {artwork.price}</span>
+                                        <span className="text-3xl sm:text-4xl font-black text-obsidian tracking-tighter italic font-serif">₩ {artwork.price}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-2 sm:border-l sm:border-line/20 sm:pl-12">
-                                    <span className="text-[10px] text-chapter-accent font-black uppercase tracking-[0.3em] block">Monthly Rental</span>
-                                    <span className="text-4xl font-black text-obsidian tracking-tighter italic font-serif">₩ {artwork.rental || '문의'}</span>
+                                    <span className="text-[10px] text-slate/40 font-black uppercase tracking-[0.3em] block">Monthly Rental (월 렌탈료)</span>
+                                    <span className="text-xl sm:text-2xl font-black text-obsidian/40 tracking-tighter italic font-serif">₩ {artwork.rental || '문의'}</span>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                <button className="w-full h-20 bg-obsidian text-white rounded-full font-black text-xs uppercase tracking-[0.3em] hover:bg-chapter-accent transition-all duration-500 shadow-xl flex items-center justify-center gap-4 group">
+                                <button className="w-full h-16 sm:h-20 bg-obsidian text-white rounded-full font-black text-[11px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] hover:bg-chapter-accent transition-all duration-500 shadow-xl flex items-center justify-center gap-4 group">
                                     작품 소장 및 렌탈 상담하기 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                 </button>
                                 
-                                <div className="pt-8 mt-8 border-t border-line/20">
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-obsidian mb-4 underline underline-offset-4">Notice (비고)</h3>
-                                    <ul className="text-[11px] font-bold text-slate/50 space-y-3">
+                                <div className="pt-6 md:pt-8 mt-6 md:mt-8 border-t border-line/20">
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-obsidian mb-3 md:mb-4 underline underline-offset-4">Notice (비고)</h3>
+                                    <ul className="text-[11px] font-bold text-slate/50 space-y-2 md:space-y-3">
                                         <li className="flex gap-3 leading-relaxed tracking-tight">
                                             <span className="text-obsidian">•</span> 
                                             <span>렌탈 서비스는 거치 기간 없이 3개월 단위로 큐레이션 교체가 가능합니다.</span>
