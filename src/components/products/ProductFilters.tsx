@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-const categories = [
+export const categories = [
   { name: '전체 (All)', value: '' },
   { name: '회복 키트', value: 'recovery-kit' },
   { name: '수면/안정', value: 'sleep-relax' },
@@ -15,7 +16,7 @@ const categories = [
   { name: '측정/진단', value: 'diagnostic' },
 ];
 
-const sortOptions = [
+export const sortOptions = [
   { name: '최신순', value: 'newest' },
   { name: '가격 낮은순', value: 'price_asc' },
   { name: '가격 높은순', value: 'price_desc' },
@@ -32,6 +33,7 @@ interface ProductFiltersProps {
 }
 
 export default function ProductFilters({ searchParams }: ProductFiltersProps) {
+  const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(true);
   const [showSort, setShowSort] = useState(true);
 
@@ -53,7 +55,7 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
       else params.delete(key);
     }
 
-    return `/products?${params.toString()}`;
+    return `${pathname}?${params.toString()}`;
   };
 
   return (
@@ -139,7 +141,7 @@ export default function ProductFilters({ searchParams }: ProductFiltersProps) {
       {(searchParams?.category || searchParams?.sort || searchParams?.isFunding) && (
         <div className="pt-6 border-t border-line">
           <Button variant="outline" size="sm" className="w-full rounded-xl border-line text-text-secondary hover:bg-white/5 font-bold" asChild>
-            <Link href="/products">필터 초기화</Link>
+            <Link href={pathname}>필터 초기화</Link>
           </Button>
         </div>
       )}

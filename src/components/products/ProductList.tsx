@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
@@ -38,6 +38,7 @@ interface ProductListProps {
 }
 
 export default function ProductList({ searchParams }: ProductListProps) {
+  const pathname = usePathname();
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,16 +119,16 @@ export default function ProductList({ searchParams }: ProductListProps) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {Array.from({ length: 8 }).map((_, i) => (
-          <Card key={i}>
-            <div className="aspect-square bg-gray-200 animate-pulse rounded-t-2xl" />
-            <CardContent className="p-6">
-              <div className="h-4 bg-gray-200 animate-pulse rounded mb-2" />
-              <div className="h-3 bg-gray-200 animate-pulse rounded mb-4" />
-              <div className="flex justify-between items-center">
-                <div className="h-6 bg-gray-200 animate-pulse rounded w-20" />
-                <div className="h-8 bg-gray-200 animate-pulse rounded w-16" />
+          <Card key={i} className="border-line shadow-sm overflow-hidden rounded-[24px] bg-white">
+            <div className="aspect-square bg-slate-100 animate-pulse rounded-t-[24px]" />
+            <CardContent className="p-3 sm:p-5">
+              <div className="h-4 bg-slate-100 animate-pulse rounded mb-2 w-3/4" />
+              <div className="h-3 bg-slate-100 animate-pulse rounded mb-4 w-full" />
+              <div className="flex justify-between items-center gap-2">
+                <div className="h-6 bg-slate-100 animate-pulse rounded w-16" />
+                <div className="h-8 bg-slate-100 animate-pulse rounded w-10 sm:w-16" />
               </div>
             </CardContent>
           </Card>
@@ -149,40 +150,40 @@ export default function ProductList({ searchParams }: ProductListProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {products.map((product) => (
-          <Card key={product._id} className="overflow-hidden">
+          <Card key={product._id} className="overflow-hidden border-none shadow-sm rounded-[24px] bg-white group hover:shadow-md transition-shadow">
             <Link href={`/products/${product._id}`}>
-              <div className="aspect-square relative bg-gray-100">
+              <div className="aspect-square relative bg-slate-50 overflow-hidden">
                 {product.images.length > 0 ? (
                   <Image
                     src={product.images[0].url}
                     alt={product.name}
                     fill
-                    className="object-cover hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                    <Heart className="h-12 w-12" />
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                    <Heart className="h-8 w-8" />
                   </div>
                 )}
                 {product.stock === 0 && (
-                  <Badge className="absolute top-3 left-3" variant="destructive">
-                    품절
-                  </Badge>
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                    <span className="bg-rose-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-lg">품절</span>
+                  </div>
                 )}
               </div>
             </Link>
 
-            <CardContent className="p-6">
-              <div className="mb-2">
-                <Badge variant="outline" className="text-xs">
+            <CardContent className="p-3.5 sm:p-5">
+              <div className="mb-1.5 flex items-center justify-between">
+                <Badge variant="outline" className="text-[9px] sm:text-xs font-bold text-slate-400 border-slate-100 rounded-lg px-2 py-0.5">
                   {product.category}
                 </Badge>
               </div>
 
-              <h3 className="font-semibold mb-2 line-clamp-2">
+              <h3 className="text-xs sm:text-sm font-bold text-obsidian tracking-tight mb-1.5 line-clamp-2 min-h-[32px] sm:min-h-[40px]">
                 <Link
                   href={`/products/${product._id}`}
                   className="hover:text-primary transition-colors"
@@ -191,21 +192,22 @@ export default function ProductList({ searchParams }: ProductListProps) {
                 </Link>
               </h3>
 
-              <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+              <p className="text-slate text-[10px] sm:text-xs mb-3 line-clamp-1 opacity-70">
                 {product.summary}
               </p>
 
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-primary">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
+                <span className="text-sm sm:text-base font-black text-[#0E3A3A] tracking-tighter">
                   {formatPrice(product.price)}
                 </span>
                 <Button
                   size="sm"
+                  className="w-full sm:w-auto h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs font-black rounded-lg bg-obsidian text-mist hover:bg-primary transition-colors"
                   onClick={() => handleAddToCart(product._id)}
                   disabled={product.stock === 0 || cartLoading}
                 >
-                  <ShoppingCart className="h-4 w-4 mr-1" />
-                  {product.stock === 0 ? '품절' : cartLoading ? '추가중...' : '담기'}
+                  <ShoppingCart className="h-3 w-3 mr-1" />
+                  {product.stock === 0 ? '품절' : cartLoading ? '...' : '담기'}
                 </Button>
               </div>
             </CardContent>
@@ -222,9 +224,10 @@ export default function ProductList({ searchParams }: ProductListProps) {
                 key={page}
                 variant={page === pagination.page ? 'default' : 'outline'}
                 size="sm"
+                className="rounded-xl font-bold h-9 w-9 p-0 flex items-center justify-center"
                 asChild
               >
-                <Link href={`/products?${new URLSearchParams({
+                <Link href={`${pathname}?${new URLSearchParams({
                   ...searchParams,
                   page: page.toString(),
                 }).toString()}`}>
