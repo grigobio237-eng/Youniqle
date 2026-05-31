@@ -5,6 +5,8 @@ import { connectDB } from '@/lib/db';
 import LifeSnap from '@/models/LifeSnap';
 import User from '@/models/User';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
     try {
         await connectDB();

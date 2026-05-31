@@ -120,15 +120,16 @@ export default function ReportsHub() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/reports/dashboard');
+      // 캐시 방지 헤더와 타임스탬프를 적용하여 실시간 데이터 보장
+      const res = await fetch(`/api/reports/dashboard?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('대시보드 데이터를 가져오지 못했습니다.');
       const json = await res.json();
       setData(json);
 
-      // 전체 히스토리 로드
+      // 전체 히스토리 로드 (캐시 방지 적용)
       const [diagRes, scanRes] = await Promise.all([
-        fetch('/api/diagnosis'),
-        fetch('/api/scan')
+        fetch(`/api/diagnosis?t=${Date.now()}`, { cache: 'no-store' }),
+        fetch(`/api/scan?t=${Date.now()}`, { cache: 'no-store' })
       ]);
 
       if (diagRes.ok) {

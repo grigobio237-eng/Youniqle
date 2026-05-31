@@ -9,6 +9,8 @@ import RecoveryInsight from '@/models/RecoveryInsight';
 import LifeSnap from '@/models/LifeSnap';
 import AiRoutineLog from '@/models/AiRoutineLog';
 
+export const dynamic = 'force-dynamic';
+
 // Standard deviation helper
 function standardDeviation(values: number[]): number {
     if (values.length < 2) return 0;
@@ -382,6 +384,11 @@ export async function GET(request: NextRequest) {
             return dates.length > 0 ? new Date(Math.min(...dates.map(d => d.getTime()))) : null;
         })();
 
+        // Count actual totals for cover statistics
+        const totalLifeScans = await LifeSnap.countDocuments({ userId });
+        const totalLegacyScans = user.scanTimeline?.length || 0;
+        const actualTotalScans = totalLifeScans > 0 ? totalLifeScans : totalLegacyScans;
+
         // ═══════════════════════════════════════════════════
         // Response Assembly
         // ═══════════════════════════════════════════════════
@@ -393,7 +400,7 @@ export async function GET(request: NextRequest) {
                 analysisTo: now.toISOString(),
                 totalRecoveryChecks: allScores.length,
                 totalDiagnoses: allDiagnoses.length,
-                totalScans: (latestScans.length || 0) + (userScanTimeline.length || 0),
+                totalScans: actualTotalScans,
                 generatedAt: now.toISOString(),
             },
 
