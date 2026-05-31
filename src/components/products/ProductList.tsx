@@ -25,6 +25,8 @@ interface Product {
   }>;
   summary: string;
   category: string;
+  isGalleryArt?: boolean;
+  artistName?: string;
 }
 
 interface ProductListProps {
@@ -151,68 +153,90 @@ export default function ProductList({ searchParams }: ProductListProps) {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-        {products.map((product) => (
-          <Card key={product._id} className="overflow-hidden border-none shadow-sm rounded-[24px] bg-white group hover:shadow-md transition-shadow">
-            <Link href={`/products/${product._id}`}>
-              <div className="aspect-square relative bg-slate-50 overflow-hidden">
-                {product.images.length > 0 ? (
-                  <Image
-                    src={product.images[0].url}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                    <Heart className="h-8 w-8" />
-                  </div>
-                )}
-                {product.stock === 0 && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                    <span className="bg-rose-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-lg">품절</span>
-                  </div>
-                )}
-              </div>
-            </Link>
+        {products.map((product) => {
+          const productLink = product.isGalleryArt 
+            ? `/gallery/artworks/${product._id.replace('ext-art-', '')}` 
+            : `/products/${product._id}`;
+            
+          const categoryLabel = product.isGalleryArt 
+            ? `Fine Art • ${product.category === 'sleep-relax' ? '수면/안정' : product.category === 'energy' ? '활력/에너지' : '회복 키트'}`
+            : product.category;
 
-            <CardContent className="p-3.5 sm:p-5">
-              <div className="mb-1.5 flex items-center justify-between">
-                <Badge variant="outline" className="text-[9px] sm:text-xs font-bold text-slate-400 border-slate-100 rounded-lg px-2 py-0.5">
-                  {product.category}
-                </Badge>
-              </div>
+          return (
+            <Card key={product._id} className="overflow-hidden border-none shadow-sm rounded-[24px] bg-white group hover:shadow-md transition-shadow">
+              <Link href={productLink}>
+                <div className="aspect-square relative bg-slate-50 overflow-hidden">
+                  {product.images.length > 0 ? (
+                    <Image
+                      src={product.images[0].url}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                      <Heart className="h-8 w-8" />
+                    </div>
+                  )}
+                  {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                      <span className="bg-rose-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-lg">품절</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
 
-              <h3 className="text-xs sm:text-sm font-bold text-obsidian tracking-tight mb-1.5 line-clamp-2 min-h-[32px] sm:min-h-[40px]">
-                <Link
-                  href={`/products/${product._id}`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {product.name}
-                </Link>
-              </h3>
+              <CardContent className="p-3.5 sm:p-5">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <Badge variant="outline" className={`text-[9px] sm:text-xs font-bold rounded-lg px-2 py-0.5 ${product.isGalleryArt ? 'text-chapter-accent border-chapter-accent/20 bg-chapter-accent/5' : 'text-slate-400 border-slate-100'}`}>
+                    {categoryLabel}
+                  </Badge>
+                </div>
 
-              <p className="text-slate text-[10px] sm:text-xs mb-3 line-clamp-1 opacity-70">
-                {product.summary}
-              </p>
+                <h3 className="text-xs sm:text-sm font-bold text-obsidian tracking-tight mb-1.5 line-clamp-2 min-h-[32px] sm:min-h-[40px]">
+                  <Link
+                    href={productLink}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {product.name}
+                  </Link>
+                </h3>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
-                <span className="text-sm sm:text-base font-black text-[#0E3A3A] tracking-tighter">
-                  {formatPrice(product.price)}
-                </span>
-                <Button
-                  size="sm"
-                  className="w-full sm:w-auto h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs font-black rounded-lg bg-obsidian text-mist hover:bg-primary transition-colors"
-                  onClick={() => handleAddToCart(product._id)}
-                  disabled={product.stock === 0 || cartLoading}
-                >
-                  <ShoppingCart className="h-3 w-3 mr-1" />
-                  {product.stock === 0 ? '품절' : cartLoading ? '...' : '담기'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <p className="text-slate text-[10px] sm:text-xs mb-3 line-clamp-1 opacity-70">
+                  {product.summary}
+                </p>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
+                  <span className="text-sm sm:text-base font-black text-[#0E3A3A] tracking-tighter">
+                    {product.isGalleryArt ? `₩ ${product.price.toLocaleString()}` : formatPrice(product.price)}
+                  </span>
+                  {product.isGalleryArt ? (
+                    <Button
+                      size="sm"
+                      className="w-full sm:w-auto h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs font-black rounded-lg bg-chapter-accent text-white hover:bg-obsidian transition-colors"
+                      asChild
+                    >
+                      <Link href={productLink}>
+                        상세보기
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="w-full sm:w-auto h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs font-black rounded-lg bg-obsidian text-mist hover:bg-primary transition-colors"
+                      onClick={() => handleAddToCart(product._id)}
+                      disabled={product.stock === 0 || cartLoading}
+                    >
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      {product.stock === 0 ? '품절' : cartLoading ? '...' : '담기'}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Pagination */}

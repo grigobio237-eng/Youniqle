@@ -81,6 +81,13 @@ export async function fetchGalleryData() {
             }
 
             const owner = ownersMap.get(artistId);
+            const wellnessTags = generateWellnessTags(
+                art.title || '',
+                art.description || '',
+                art.style || 'None',
+                art.subject || 'None'
+            );
+
             owner.items.push({
                 id: `ext-art-${art._id}`,
                 type: 'ARTWORK',
@@ -95,6 +102,8 @@ export async function fetchGalleryData() {
                 subject: art.subject || 'None',
                 space: art.space || 'None',
                 season: art.season || 'None',
+                wellnessCategory: wellnessTags.wellnessCategory,
+                balanceCategory: wellnessTags.balanceCategory,
                 specs: {
                     material: art.material || art.category || 'Mixed Media',
                     year: art.year || (art.createdAt ? new Date(art.createdAt).getFullYear().toString() : '2025'),
@@ -123,3 +132,41 @@ export async function fetchGalleryData() {
         }
     }
 }
+
+// --- Dynamic Wellness Art Semantic Tagging Helper ---
+
+export interface WellnessTags {
+    wellnessCategory: 'sleep-relax' | 'energy' | 'recovery-kit';
+    balanceCategory: 'Mental' | 'Sleep' | 'Physical' | 'Lifestyle';
+}
+
+export function generateWellnessTags(title: string, desc: string, style: string, subject: string): WellnessTags {
+    const combinedText = `${title} ${desc} ${subject} ${style}`.toLowerCase();
+    
+    // 1. 수면/안정 및 정신/수면 지표 감지 (차분함, 밤, 바다, 달, 숲, 휴식 등)
+    const calmKeywords = ['밤', '달', '바다', '숲', '휴식', '명상', '수면', '안정', 'sea', 'night', 'moon', 'forest', 'calm', 'sleep', 'relax', 'abstract', '추상'];
+    const isCalm = calmKeywords.some(keyword => combinedText.includes(keyword)) || subject === '풍경' || subject === '기하학';
+
+    // 2. 활력/에너지 및 신체/생활 지표 감지 (태양, 불꽃, 생명, 에너지, 꽃, 팝아트 등)
+    const energeticKeywords = ['태양', '꽃', '생명', '에너지', '활력', '도전', '빛', 'sun', 'flower', 'energy', 'vibrant', 'pop', 'active'];
+    const isEnergetic = energeticKeywords.some(keyword => combinedText.includes(keyword)) || style === '팝 아트';
+
+    if (isCalm) {
+        return {
+            wellnessCategory: 'sleep-relax',
+            balanceCategory: combinedText.includes('수면') ? 'Sleep' : 'Mental'
+        };
+    } else if (isEnergetic) {
+        return {
+            wellnessCategory: 'energy',
+            balanceCategory: 'Physical'
+        };
+    } else {
+        // 기본값: 보편적 회복 테마
+        return {
+            wellnessCategory: 'recovery-kit',
+            balanceCategory: 'Lifestyle'
+        };
+    }
+}
+

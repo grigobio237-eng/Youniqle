@@ -62,6 +62,59 @@ export default function ReportsHub() {
   const [allDiagnoses, setAllDiagnoses] = useState<any[]>([]);
   const [allScans, setAllScans] = useState<any[]>([]);
   const [selectedLog, setSelectedLog] = useState<any>(null);
+  
+  // 웰니스 명화 추천 시스템 전용 상태
+  const [recommendedArtworks, setRecommendedArtworks] = useState<any[]>([]);
+
+  // Fetch and parse all artworks
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (!res.ok) return;
+        const artists = await res.json();
+        
+        const artworks: any[] = [];
+        artists.forEach((artist: any) => {
+          if (artist.items) {
+            artist.items.forEach((item: any) => {
+              artworks.push({
+                ...item,
+                artistName: artist.name
+              });
+            });
+          }
+        });
+        setRecommendedArtworks(artworks);
+      } catch (err) {
+        console.error('Error fetching gallery recommendations:', err);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  const lowestCategory = React.useMemo(() => {
+    const scores = data?.categoryAnalysis?.scores;
+    if (!scores) {
+      return { key: 'mental', score: 50, label: 'Mental (정신적 회복)', tag: 'sleep-relax', title: '정신적 안정을 위한 명상 갤러리' };
+    }
+    const items = [
+      { key: 'physical', score: scores.physical || 0, label: 'Physical (신체적 회복)', tag: 'energy', title: '활력을 더하는 에너제틱 갤러리' },
+      { key: 'mental', score: scores.mental || 0, label: 'Mental (정신적 회복)', tag: 'sleep-relax', title: '정신적 안정을 위한 명상 갤러리' },
+      { key: 'sleep', score: scores.sleep || 0, label: 'Sleep (수면 효율)', tag: 'sleep-relax', title: '수면과 깊은 휴식을 위한 딥 슬립 갤러리' },
+      { key: 'lifestyle', score: scores.lifestyle || 0, label: 'Lifestyle (생활 습관)', tag: 'recovery-kit', title: '정갈한 라이프스타일을 위한 힐링 갤러리' }
+    ];
+    items.sort((a, b) => a.score - b.score);
+    return items[0];
+  }, [data]);
+
+  const recommendedItems = React.useMemo(() => {
+    if (!recommendedArtworks.length || !lowestCategory) return [];
+    return recommendedArtworks
+      .filter((art: any) => art.wellnessCategory === lowestCategory.tag)
+      .slice(0, 3);
+  }, [recommendedArtworks, lowestCategory]);
 
   const fetchDashboardData = async () => {
     try {
@@ -636,6 +689,76 @@ export default function ReportsHub() {
 
           </div>
         </Card>
+
+        {/* ═══════════════════════════════════════════════════
+            [NEW] SECTION 3.5: 2E 스코어 맞춤형 힐링 파인 아트 Curation
+            ═══════════════════════════════════════════════════ */}
+        {recommendedItems.length > 0 && lowestCategory && (
+          <Card className="border-none bg-[#F7F9F9] shadow-sm rounded-[24px] md:rounded-[32px] p-6 md:p-10 mb-6 md:mb-12 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-chapter-accent/5 rounded-full blur-[80px] pointer-events-none" />
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-chapter-accent/10 border border-chapter-accent/20 text-chapter-accent text-[10px] font-black uppercase tracking-widest">
+                  <Sparkles className="w-3 h-3 animate-pulse" /> 2E Score Personalized Art Therapy
+                </div>
+                <h2 className="text-xl md:text-3xl font-black text-obsidian tracking-tight font-serif italic">
+                  {lowestCategory.title}
+                </h2>
+                <p className="text-slate/60 text-xs sm:text-sm font-medium">
+                  당신의 회복 점수가 가장 취약한 <span className="text-chapter-accent font-bold">{lowestCategory.label}</span> 지표를 케어하기 위해 큐레이팅된 맞춤형 힐링 작품입니다.
+                </p>
+              </div>
+              <Button asChild variant="outline" className="rounded-xl border-line bg-white font-bold hover:bg-slate-50 transition-all text-xs self-start md:self-auto shrink-0 shadow-sm">
+                <Link href="/gallery/artworks">전체 갤러리 로비</Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedItems.map((art: any) => {
+                const itemLink = `/gallery/artworks/${art.id.replace('ext-art-', '')}`;
+                return (
+                  <div key={art.id} className="bg-white border border-line/45 rounded-[24px] overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
+                    <Link href={itemLink} className="block relative aspect-[4/3] bg-mist overflow-hidden">
+                      <Image 
+                        src={art.image || ''} 
+                        alt={art.title} 
+                        fill 
+                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                      <div className="absolute top-3 left-3">
+                        <Badge className="bg-chapter-accent text-white border-none font-black text-[9px] uppercase tracking-widest rounded-full shadow px-2.5 py-0.5">
+                          {art.wellnessCategory === 'sleep-relax' ? '수면/안정' : art.wellnessCategory === 'energy' ? '활력/에너지' : '회복'}
+                        </Badge>
+                      </div>
+                    </Link>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <div className="space-y-1 mb-4">
+                        <h4 className="text-base font-serif italic font-semibold text-obsidian line-clamp-1 group-hover:text-chapter-accent transition-colors">
+                          <Link href={itemLink}>{art.title}</Link>
+                        </h4>
+                        <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest">{art.artistName}</p>
+                        <p className="text-slate/60 text-xs line-clamp-2 leading-relaxed pt-1">{art.description || `${art.title} 작품`}</p>
+                      </div>
+                      <div className="pt-3 border-t border-line/50 flex justify-between items-center mt-auto">
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-black text-slate/30 uppercase">Rental / Purchase</span>
+                          <span className="text-sm font-black text-obsidian">₩ {art.price}</span>
+                        </div>
+                        <Button asChild size="sm" className="h-8 px-3 text-xs font-black bg-obsidian text-mist hover:bg-chapter-accent rounded-lg transition-colors">
+                          <Link href={itemLink}>
+                            작품 감상 & 렌탈
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
 
 
         {/* ═══════════════════════════════════════════════════
