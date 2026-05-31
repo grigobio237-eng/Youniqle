@@ -260,14 +260,9 @@ export default function ArtworksPage() {
                                         <h2 className="text-4xl sm:text-7xl lg:text-9xl font-serif font-light italic leading-none tracking-tighter">
                                             {spotlightArtist.name}
                                         </h2>
-                                        <Link href={`/gallery/artists/${spotlightArtist.id}`} className="block group/bio">
-                                            <p className="text-sm sm:text-base lg:text-xl text-white/50 group-hover/bio:text-white/80 transition-colors font-serif italic leading-relaxed max-w-xl line-clamp-4 lg:line-clamp-6">
-                                                {spotlightArtist.bio}
-                                            </p>
-                                            <span className="text-[10px] text-chapter-accent font-black tracking-widest uppercase mt-3 inline-flex items-center gap-1 opacity-60 group-hover/bio:opacity-100 transition-opacity">
-                                                자세히 보기 <ArrowUpRight className="w-3 h-3" />
-                                            </span>
-                                        </Link>
+                                        <p className="text-sm sm:text-base lg:text-xl text-white/50 font-serif italic leading-relaxed max-w-xl line-clamp-4 lg:line-clamp-6">
+                                            {spotlightArtist.bio}
+                                        </p>
                                     </div>
                                 </Reveal>
                                 
