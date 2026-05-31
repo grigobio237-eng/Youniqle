@@ -128,7 +128,7 @@ export default function ReportsHub() {
       // 전체 히스토리 로드
       const [diagRes, scanRes] = await Promise.all([
         fetch('/api/diagnosis'),
-        fetch('/api/scan/latest')
+        fetch('/api/scan')
       ]);
 
       if (diagRes.ok) {
@@ -137,7 +137,7 @@ export default function ReportsHub() {
       }
       if (scanRes.ok) {
         const scanJson = await scanRes.json();
-        setAllScans(scanJson ? [scanJson] : []);
+        setAllScans(scanJson.scans || []);
       }
 
     } catch (err: any) {
