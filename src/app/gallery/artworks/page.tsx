@@ -314,8 +314,8 @@ export default function ArtworksPage() {
                                 )}
                             </div>
 
-                            {/* Dropdown Filters */}
-                            <div className="flex flex-wrap items-center gap-x-8 gap-y-6">
+                            {/* Dropdown Filters (Option 1: Horizontal scrolling flex container on mobile, wraps on desktop) */}
+                            <div className="flex overflow-x-auto whitespace-nowrap scrollbar-none pb-3 lg:flex-wrap lg:overflow-x-visible items-center gap-x-6 lg:gap-x-8 gap-y-6 -mx-4 px-4 lg:mx-0 lg:px-0">
                                 <FilterControl 
                                     label="장르" 
                                     options={GENRES} 
@@ -356,7 +356,7 @@ export default function ArtworksPage() {
 
                                 <button 
                                     onClick={resetFilters}
-                                    className="text-[10px] font-black text-slate uppercase ml-auto flex items-center gap-2 hover:text-chapter-accent transition-colors"
+                                    className="text-[10px] font-black text-slate uppercase ml-auto flex items-center gap-2 hover:text-chapter-accent transition-colors shrink-0 pl-4 border-l border-line lg:border-none lg:pl-0"
                                 >
                                     <RotateCcw className="w-3 h-3" /> RESET
                                 </button>
@@ -373,9 +373,9 @@ export default function ArtworksPage() {
                         </div>
                     </div>
 
-                    {/* Grid */}
+                    {/* Grid (Optimized: grid-cols-2 on mobile viewports to prevent scrolling fatigue) */}
                     {paginatedArtworks.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-10 sm:gap-y-16">
                             {paginatedArtworks.map((art, idx) => (
                                 <ArtworkCard key={art.id} art={art} delay={idx * 0.05} />
                             ))}
@@ -475,7 +475,7 @@ function FilterControl({ label, options, value, onChange, labels }: {
     labels?: string[]
 }) {
     return (
-        <div className="flex flex-col gap-1.5 min-w-[100px] border-l border-line pl-4 first:border-none first:pl-0">
+        <div className="flex flex-col gap-1.5 min-w-[100px] shrink-0 border-l border-line/20 pl-4 first:border-none first:pl-0">
             <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest">{label}</span>
             <select 
                 value={value} 
@@ -502,44 +502,44 @@ function ArtworkCard({ art, delay }: { art: Artwork, delay: number }) {
             className="group"
         >
             <Link href={`/gallery/artworks/${art.id}`} className="block">
-                <div className="relative aspect-[3/4] mb-6 overflow-hidden rounded-[32px] bg-gray-50 shadow-sm transition-all duration-500 group-hover:shadow-2xl">
+                <div className="relative aspect-[3/4] mb-4 md:mb-6 overflow-hidden rounded-[20px] md:rounded-[32px] bg-gray-50 shadow-sm transition-all duration-500 group-hover:shadow-2xl">
                     {art.image ? (
                         <Image 
                             src={art.image} 
                             alt={art.title}
                             fill
                             className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                            sizes="(max-width: 768px) 100vw, 25vw"
+                            sizes="(max-width: 768px) 50vw, 25vw"
                         />
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-4xl opacity-20">🎨</div>
                     )}
                     
                     {/* Tags */}
-                    <div className="absolute top-6 left-6 flex flex-wrap gap-2">
+                    <div className="absolute top-3 left-3 md:top-6 md:left-6 flex flex-wrap gap-1.5">
                         {art.isCurated && (
-                            <span className="px-3 py-1 bg-chapter-accent text-white text-[9px] font-black rounded-full uppercase tracking-widest shadow-lg">Curated</span>
+                            <span className="px-2 py-0.5 md:px-3 md:py-1 bg-chapter-accent text-white text-[8px] md:text-[9px] font-black rounded-full uppercase tracking-widest shadow-lg">Curated</span>
                         )}
-                        <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-obsidian text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm translate-x-[-110%] group-hover:translate-x-0 transition-transform duration-500">{art.category}</span>
+                        <span className="px-2 py-0.5 md:px-3 md:py-1 bg-white/90 backdrop-blur-md text-obsidian text-[8px] md:text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm translate-x-[-115%] group-hover:translate-x-0 transition-transform duration-500">{art.category}</span>
                     </div>
 
                     {/* Protection Overlay / Detail Trigger */}
                     <div className="absolute inset-0 bg-obsidian/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-500 shadow-2xl">
-                            <MousePointer2 className="w-5 h-5 text-obsidian" />
+                        <div className="w-9 h-9 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-500 shadow-2xl">
+                            <MousePointer2 className="w-4 h-4 md:w-5 md:h-5 text-obsidian" />
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-2 px-2">
-                    <div className="flex justify-between items-start gap-4">
-                        <h3 className="text-xl font-serif italic text-obsidian leading-none group-hover:text-chapter-accent transition-colors">{art.title}</h3>
-                        <span className="text-[10px] font-black text-slate/30 uppercase tracking-tighter shrink-0">{art.specs?.ho || 0}호</span>
+                <div className="space-y-1.5 md:space-y-2 px-1 md:px-2">
+                    <div className="flex justify-between items-start gap-2">
+                        <h3 className="text-sm sm:text-lg md:text-xl font-serif italic text-obsidian leading-tight group-hover:text-chapter-accent transition-colors line-clamp-2">{art.title}</h3>
+                        <span className="text-[8px] md:text-[10px] font-black text-slate/30 uppercase tracking-tighter shrink-0">{art.specs?.ho || 0}호</span>
                     </div>
-                    <p className="text-[10px] text-slate/50 font-black uppercase tracking-[0.2em]">{art.artistName}</p>
-                    <div className="pt-2 flex justify-between items-center border-t border-line/50">
-                        <span className="text-[11px] font-black text-obsidian">₩ {art.rental || art.price}</span>
-                        <span className="text-[9px] font-bold text-chapter-accent uppercase">{art.rental ? 'Monthly' : 'Sale'}</span>
+                    <p className="text-[9px] md:text-[10px] text-slate/50 font-black uppercase tracking-[0.2em]">{art.artistName}</p>
+                    <div className="pt-1.5 md:pt-2 flex justify-between items-center border-t border-line/50">
+                        <span className="text-[10px] md:text-[11px] font-black text-obsidian">₩ {art.rental || art.price}</span>
+                        <span className="text-[8px] md:text-[9px] font-bold text-chapter-accent uppercase">{art.rental ? 'Monthly' : 'Sale'}</span>
                     </div>
                 </div>
             </Link>
