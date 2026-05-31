@@ -231,38 +231,43 @@ export default function ArtworksPage() {
 
                 {/* 2. Artist Spotlight Section */}
                 {spotlightArtist && (
-                    <section className="bg-obsidian text-white rounded-[60px] p-12 lg:p-24 mb-32 relative overflow-hidden">
+                    <section className="bg-obsidian text-white rounded-[40px] lg:rounded-[60px] p-8 sm:p-12 lg:p-24 mb-20 lg:mb-32 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-full h-full opacity-[0.03] pointer-events-none text-[20vw] font-black italic whitespace-nowrap -translate-y-1/2 translate-x-1/4">
                             SPOTLIGHT
                         </div>
                         
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32 items-center relative z-10">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-32 items-center relative z-10">
                             <Reveal delay={0.1}>
-                                <div className="relative max-w-md mx-auto lg:mx-0">
-                                    <div className="aspect-[3/4] rounded-[40px] overflow-hidden border border-white/10 p-4 bg-white/5 backdrop-blur-sm">
+                                <Link href={`/gallery/artists/${spotlightArtist.id}`} className="block group/img relative max-w-md mx-auto lg:mx-0">
+                                    <div className="aspect-[3/4] rounded-[30px] md:rounded-[40px] overflow-hidden border border-white/10 p-3 md:p-4 bg-white/5 backdrop-blur-sm transition-all duration-500 group-hover/img:border-chapter-accent/30 group-hover/img:shadow-chapter-accent/10">
                                         <Image 
                                             src={spotlightArtist.image || "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=2067&auto=format&fit=crop"} 
                                             alt={spotlightArtist.name} 
                                             fill 
-                                            className="object-cover rounded-[30px] grayscale-[20%] hover:grayscale-0 transition-all duration-1000" 
+                                            className="object-cover rounded-[20px] md:rounded-[30px] grayscale-[20%] group-hover/img:grayscale-0 group-hover/img:scale-[1.03] transition-all duration-1000" 
                                         />
                                     </div>
-                                    <div className="absolute -top-6 -right-6 w-40 h-40 bg-chapter-accent rounded-full flex flex-col items-center justify-center text-obsidian shadow-2xl rotate-12">
-                                        <span className="text-[10px] font-black uppercase tracking-tight text-center leading-tight">Artist <br /> Spotlight</span>
+                                    <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-32 h-32 md:w-40 md:h-40 bg-chapter-accent rounded-full flex flex-col items-center justify-center text-obsidian shadow-2xl rotate-12 transition-transform duration-500 group-hover/img:scale-105 group-hover/img:rotate-6">
+                                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-tight text-center leading-tight">Artist <br /> Spotlight</span>
                                     </div>
-                                </div>
+                                </Link>
                             </Reveal>
 
-                            <div className="space-y-12">
+                            <div className="space-y-8 lg:space-y-12">
                                 <Reveal delay={0.2}>
                                     <div className="space-y-6">
                                         <span className="text-xs font-black tracking-[0.5em] text-chapter-accent uppercase block">이달의 추천 작가</span>
-                                        <h2 className="text-7xl lg:text-9xl font-serif font-light italic leading-none tracking-tighter">
+                                        <h2 className="text-4xl sm:text-7xl lg:text-9xl font-serif font-light italic leading-none tracking-tighter">
                                             {spotlightArtist.name}
                                         </h2>
-                                        <p className="text-xl text-white/50 font-serif italic leading-relaxed max-w-xl">
-                                            {spotlightArtist.bio}
-                                        </p>
+                                        <Link href={`/gallery/artists/${spotlightArtist.id}`} className="block group/bio">
+                                            <p className="text-sm sm:text-base lg:text-xl text-white/50 group-hover/bio:text-white/80 transition-colors font-serif italic leading-relaxed max-w-xl line-clamp-4 lg:line-clamp-6">
+                                                {spotlightArtist.bio}
+                                            </p>
+                                            <span className="text-[10px] text-chapter-accent font-black tracking-widest uppercase mt-3 inline-flex items-center gap-1 opacity-60 group-hover/bio:opacity-100 transition-opacity">
+                                                자세히 보기 <ArrowUpRight className="w-3 h-3" />
+                                            </span>
+                                        </Link>
                                     </div>
                                 </Reveal>
                                 
