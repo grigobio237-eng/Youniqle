@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { 
     Loader2, Search, Heart, LayoutGrid, RotateCcw, 
     ChevronLeft, ChevronRight, Star, ArrowUpRight, 
-    X, Filter, MousePointer2 
+    X, Filter, MousePointer2, Sparkles 
 } from 'lucide-react';
 import { GalleryTabs } from '@/components/gallery/GalleryTabs';
 import Link from 'next/link';
@@ -58,6 +58,7 @@ export default function ArtworksPage() {
 
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState(true);
+    const [lowestWellnessTag, setLowestWellnessTag] = useState<string | null>(null);
     
     // Filtering State
     const [searchQuery, setSearchQuery] = useState('');
@@ -75,18 +76,54 @@ export default function ArtworksPage() {
     const itemsPerPage = 12;
 
     useEffect(() => {
-        const fetchGallery = async () => {
+        const fetchGalleryAndWellness = async () => {
             try {
+                setLoading(true);
                 const res = await fetch('/api/gallery');
                 const data = await res.json();
                 setArtists(data);
+
+                // Fetch user wellness dashboard report to prioritize artworks
+                const reportRes = await fetch('/api/reports/dashboard');
+                if (reportRes.ok) {
+                    const reportData = await reportRes.json();
+                    const scores = reportData?.categoryAnalysis?.scores;
+                    if (scores) {
+                        const scoreItems = [
+                            { key: 'physical', score: scores.physical || 0, tag: 'energy' },
+                            { key: 'mental', score: scores.mental || 0, tag: 'sleep-relax' },
+                            { key: 'sleep', score: scores.sleep || 0, tag: 'sleep-relax' },
+                            { key: 'lifestyle', score: scores.lifestyle || 0, tag: 'recovery-kit' }
+                        ];
+                        scoreItems.sort((a, b) => a.score - b.score);
+                        setLowestWellnessTag(scoreItems[0].tag);
+                    } else {
+                        // Local storage fallback
+                        const localScore = localStorage.getItem('recovery_last_score');
+                        if (localScore) {
+                            const scoreNum = parseInt(localScore);
+                            if (scoreNum < 40) setLowestWellnessTag('sleep-relax');
+                            else if (scoreNum < 70) setLowestWellnessTag('recovery-kit');
+                            else setLowestWellnessTag('energy');
+                        }
+                    }
+                } else {
+                    // Local storage fallback
+                    const localScore = localStorage.getItem('recovery_last_score');
+                    if (localScore) {
+                        const scoreNum = parseInt(localScore);
+                        if (scoreNum < 40) setLowestWellnessTag('sleep-relax');
+                        else if (scoreNum < 70) setLowestWellnessTag('recovery-kit');
+                        else setLowestWellnessTag('energy');
+                    }
+                }
             } catch (err) {
-                console.error("Failed to load gallery hub:", err);
+                console.error("Failed to load gallery hub or wellness scores:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchGallery();
+        fetchGalleryAndWellness();
     }, []);
 
     // Flatten all artworks
@@ -133,10 +170,20 @@ export default function ArtworksPage() {
         });
     }, [allArtworks, searchQuery, filters]);
 
+    // Wellness Prioritized Sorting
+    const prioritizedArtworks = useMemo(() => {
+        if (!lowestWellnessTag) return filteredArtworks;
+        return [...filteredArtworks].sort((a: any, b: any) => {
+            const aMatch = a.wellnessCategory === lowestWellnessTag ? 1 : 0;
+            const bMatch = b.wellnessCategory === lowestWellnessTag ? 1 : 0;
+            return bMatch - aMatch;
+        });
+    }, [filteredArtworks, lowestWellnessTag]);
+
     // Pagination
-    const totalPages = Math.max(1, Math.ceil(filteredArtworks.length / itemsPerPage));
+    const totalPages = Math.max(1, Math.ceil(prioritizedArtworks.length / itemsPerPage));
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedArtworks = filteredArtworks.slice(startIndex, startIndex + itemsPerPage);
+    const paginatedArtworks = prioritizedArtworks.slice(startIndex, startIndex + itemsPerPage);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -372,6 +419,20 @@ export default function ArtworksPage() {
                             <span className="opacity-20">ListView</span>
                         </div>
                     </div>
+
+                    {lowestWellnessTag && (
+                        <div className="mb-8 p-4 bg-chapter-accent/5 border border-chapter-accent/10 rounded-2xl flex items-start gap-3">
+                            <div className="p-2 rounded-xl bg-chapter-accent/10 text-chapter-accent shrink-0 mt-0.5 animate-pulse">
+                                <Sparkles className="w-4 h-4" />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-xs font-black uppercase tracking-widest text-obsidian">Personalized 2E Score Gallery Curation</h4>
+                                <p className="text-[11px] font-bold text-slate-600/70 leading-relaxed">
+                                    당신의 최근 분석 보고서 지표를 바탕으로 **{lowestWellnessTag === 'sleep-relax' ? '수면/안정' : lowestWellnessTag === 'energy' ? '활력/에너지' : '공간 회복'}**에 기여하는 미술 작품들이 갤러리 상단에 우선적으로 배치되었습니다.
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Grid (Optimized: grid-cols-2 on mobile viewports to prevent scrolling fatigue) */}
                     {paginatedArtworks.length > 0 ? (
