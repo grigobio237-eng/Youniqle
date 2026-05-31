@@ -66,13 +66,13 @@ export default function ArtistDetailPage() {
                 </button>
 
                 {/* Artist Profile Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start mb-16 md:mb-32">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-24 items-start mb-12 md:mb-32">
                     <div className="lg:col-span-4 flex flex-col items-center lg:items-start">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8 }}
-                            className="relative w-64 h-64 md:w-80 md:h-80 overflow-hidden rounded-full shadow-2xl mb-8 group"
+                            className="relative w-64 h-64 md:w-80 md:h-80 overflow-hidden rounded-full shadow-2xl mb-4 md:mb-8 group"
                         >
                             {artist.image ? (
                                 <Image
@@ -90,12 +90,12 @@ export default function ArtistDetailPage() {
                         </motion.div>
                     </div>
 
-                    <div className="lg:col-span-8 space-y-8">
+                    <div className="lg:col-span-8 space-y-6 md:space-y-8">
                         <div>
                             <motion.span 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="inline-block uppercase text-xs font-black tracking-[0.4em] text-chapter-accent mb-4"
+                                className="inline-block uppercase text-xs font-black tracking-[0.4em] text-chapter-accent mb-2 md:mb-4"
                             >
                                 {artist.role || 'Featured Artist'}
                             </motion.span>
@@ -115,7 +115,7 @@ export default function ArtistDetailPage() {
                             transition={{ delay: 0.3 }}
                             className="max-w-2xl border-l-2 border-line pl-6 md:pl-8 w-full"
                         >
-                            <h3 className="text-xs font-black uppercase tracking-widest text-slate mb-6">Biography & Statement</h3>
+                            <h3 className="text-xs font-black uppercase tracking-widest text-slate mb-3 md:mb-6">Biography & Statement</h3>
                             <StructuredBio bio={artist.bio} />
                         </motion.div>
                         
@@ -123,7 +123,7 @@ export default function ArtistDetailPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.5 }}
-                            className="pt-8 flex gap-6"
+                            className="pt-4 md:pt-8 flex gap-6"
                         >
                             <div className="flex flex-col items-center lg:items-start">
                                 <span className="text-3xl font-light font-serif text-obsidian">{artist.items?.length || 0}</span>
@@ -143,7 +143,7 @@ export default function ArtistDetailPage() {
                         <div className="h-px flex-1 bg-line mx-12 hidden md:block" />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-10 sm:gap-y-16">
                         {artist.items?.map((item: any, idx: number) => (
                             <motion.div 
                                 key={item.id}
@@ -152,35 +152,36 @@ export default function ArtistDetailPage() {
                                 transition={{ delay: idx * 0.1 }}
                                 className="group"
                             >
-                                <Link href={`/gallery/artworks/${item.id}`} className="block space-y-6">
-                                    <div className="relative aspect-[4/5] overflow-hidden rounded-[40px] shadow-lg transition-all duration-700 group-hover:shadow-2xl group-hover:-translate-y-2 bg-mist">
+                                <Link href={`/gallery/artworks/${item.id}`} className="block">
+                                    <div className="relative aspect-[3/4] mb-4 md:mb-6 overflow-hidden rounded-[20px] md:rounded-[32px] bg-mist shadow-sm transition-all duration-500 group-hover:shadow-2xl">
                                         {item.image ? (
                                             <Image 
                                                 src={item.image} 
                                                 alt={item.title}
                                                 fill
                                                 className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                sizes="(max-width: 768px) 50vw, 33vw"
                                             />
                                         ) : (
                                             <div className="absolute inset-0 flex items-center justify-center text-slate/20">
-                                                <ImageIcon className="w-12 h-12" />
+                                                <ImageIcon className="w-8 h-8 md:w-12 md:h-12" />
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-obsidian/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                                            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-obsidian scale-0 group-hover:scale-100 transition-transform duration-500">
-                                                <ExternalLink className="w-6 h-6" />
+                                        <div className="absolute inset-0 bg-obsidian/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <div className="w-9 h-9 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center text-obsidian scale-75 group-hover:scale-100 transition-transform duration-500 shadow-2xl">
+                                                <ExternalLink className="w-4 h-4 md:w-5 md:h-5 text-obsidian" />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="px-4 space-y-2">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-light font-serif italic text-obsidian line-clamp-1">{item.title}</h3>
-                                            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest pt-2">{item.specs?.year}</span>
+                                    <div className="px-1 md:px-2 space-y-1.5 md:space-y-2">
+                                        <div className="flex justify-between items-start gap-2">
+                                            <h3 className="text-sm sm:text-lg md:text-xl font-serif italic text-obsidian leading-tight group-hover:text-chapter-accent transition-colors line-clamp-2">{item.title}</h3>
+                                            <span className="text-[8px] md:text-[10px] font-black text-slate/30 uppercase tracking-tighter shrink-0 pt-1">{item.specs?.year}</span>
                                         </div>
-                                        <div className="flex items-center justify-between text-slate/60">
-                                            <span className="text-xs font-bold uppercase tracking-wider">{item.specs?.material || 'Mixed Media'}</span>
-                                            <span className="text-sm font-black text-obsidian">₩{item.price}</span>
+                                        <div className="pt-1.5 md:pt-2 flex justify-between items-center border-t border-line/50 text-[10px] md:text-xs">
+                                            <span className="text-[9px] md:text-[10px] text-slate/50 font-bold uppercase tracking-wider line-clamp-1">{item.specs?.material || 'Mixed Media'}</span>
+                                            <span className="text-[10px] md:text-[11px] font-black text-obsidian">₩ {item.price}</span>
                                         </div>
                                     </div>
                                 </Link>
