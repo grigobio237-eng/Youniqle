@@ -111,20 +111,22 @@ export default function HotlineChat() {
   return (
     <div className="flex flex-col h-[650px] bg-white rounded-[40px] border border-line shadow-sm overflow-hidden relative">
       {/* Header */}
-      <div className="px-8 py-6 bg-obsidian text-white flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
-            <Stethoscope className="w-6 h-6 text-mist" />
+      <div className="px-4 py-4 sm:px-8 sm:py-6 bg-obsidian text-white flex items-center justify-between gap-3 shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
+            <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-mist" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-serif tracking-tight">자문위 유니클 핫라인</h2>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-chapter-accent text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
-                <Brain className="w-3 h-3" />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+              <h2 className="text-base sm:text-xl font-serif tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                자문위 유니클 핫라인
+              </h2>
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-chapter-accent text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white shadow-md w-fit shrink-0">
+                <Brain className="w-2.5 h-2.5" />
                 Technical Expert
               </div>
             </div>
-            <p className="text-mist/70 text-[10px] uppercase font-bold tracking-widest mt-0.5">
+            <p className="text-mist/70 text-[8px] sm:text-[10px] uppercase font-bold tracking-widest mt-0.5 truncate">
                Consultation Assistant Engine
             </p>
           </div>
@@ -132,7 +134,7 @@ export default function HotlineChat() {
         
         <button 
           onClick={handleReset}
-          className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/70 hover:text-white"
+          className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/70 hover:text-white shrink-0"
           title="대화 초기화"
         >
           <RefreshCw className="w-4 h-4" />
