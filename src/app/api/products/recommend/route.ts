@@ -49,6 +49,7 @@ async function getRecommendations(currentProduct: any, limit: number) {
     _id: { $ne: _id },
     category: category,
     status: 'active',
+    approvalStatus: 'approved',
   })
   .sort({ featured: -1, createdAt: -1 }) // 인기 상품 우선, 최신순
   .limit(Math.ceil(limit * 0.4)) // 40% 할당
@@ -63,6 +64,7 @@ async function getRecommendations(currentProduct: any, limit: number) {
       $lte: price + priceRange 
     },
     status: 'active',
+    approvalStatus: 'approved',
   })
   .sort({ featured: -1, createdAt: -1 })
   .limit(Math.ceil(limit * 0.3)) // 30% 할당
@@ -73,6 +75,7 @@ async function getRecommendations(currentProduct: any, limit: number) {
     _id: { $ne: _id },
     featured: true,
     status: 'active',
+    approvalStatus: 'approved',
   })
   .sort({ createdAt: -1 })
   .limit(Math.ceil(limit * 0.2)) // 20% 할당
@@ -93,6 +96,7 @@ async function getRecommendations(currentProduct: any, limit: number) {
         ]
       },
       status: 'active',
+      approvalStatus: 'approved',
     })
     .sort({ createdAt: -1 })
     .limit(remainingLimit)
