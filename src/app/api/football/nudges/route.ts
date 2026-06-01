@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -9,9 +11,14 @@ export async function GET(req: NextRequest) {
     // role param을 쿼리로 임시로 받아서 테스트하기 위함 (실제로는 session.user.footballRole 사용)
     const { searchParams } = new URL(req.url);
     const roleParam = searchParams.get('role');
-    const role = roleParam || session?.user?.footballRole || 'player'; 
+    const role = roleParam || session?.user?.footballRole; 
 
     let nudges = [];
+
+    // 일반 유저: 축구 관련 역할이 없으면 축구 넛지를 리턴하지 않음
+    if (!role) {
+      return NextResponse.json({ success: true, data: [] });
+    }
 
     // 코치 권한의 넛지 (부상 알림 포함)
     if (role === 'coach') {
@@ -50,7 +57,7 @@ export async function GET(req: NextRequest) {
       });
     } 
     // 선수 권한의 넛지 (부상 알림 제외)
-    else {
+    else if (role === 'player') {
       nudges.push({
         id: 'p-1',
         type: 'MEAL_PLAN',
