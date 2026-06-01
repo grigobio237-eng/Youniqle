@@ -19,9 +19,22 @@ export const getStudioGenAI = () => {
 };
 
 export class GeminiCore {
-    private static availableTextModels: string[] = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+    private static availableTextModels: string[] = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
     private static availableImageModels: string[] = ['imagen-3.0-generate-001'];
     
+    private static sortModelsByPriority(models: string[]): string[] {
+        const getPriority = (name: string) => {
+            if (name.includes('3.5-flash')) return 0;
+            if (name.includes('3.1-flash')) return 1;
+            if (name.includes('2.5-flash')) return 2;
+            if (name.includes('2.0-flash')) return 3;
+            if (name.includes('1.5-flash')) return 4;
+            if (name.includes('pro')) return 5;
+            return 6;
+        };
+        return [...models].sort((a, b) => getPriority(a) - getPriority(b));
+    }
+
     private static get isInitialized(): boolean {
         return (global as any)._geminiInitialized || false;
     }
@@ -45,7 +58,7 @@ export class GeminiCore {
         this.initializationPromise = (async () => {
             try {
                 if (this.availableTextModels.length === 0) {
-                    this.availableTextModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                    this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
                 }
 
                 await dbConnect();
@@ -55,7 +68,7 @@ export class GeminiCore {
                 const isStale = !settings?.ai?.lastModelRefresh || settings.ai.lastModelRefresh < oneDayAgo;
 
                 if (!isStale && !forceRefresh && settings?.ai?.availableTextModels?.length > 0) {
-                    this.availableTextModels = settings.ai.availableTextModels;
+                    this.availableTextModels = this.sortModelsByPriority(settings.ai.availableTextModels);
                     this.availableImageModels = settings.ai.availableImageModels || [];
                     this.isInitialized = true;
                     return;
@@ -86,11 +99,13 @@ export class GeminiCore {
                             .map(m => m.name.replace('models/', ''))
                             .sort((a, b) => {
                                 const getPriority = (name: string) => {
-                                    if (name.includes('2.5-flash')) return 0;
-                                    if (name.includes('2.0-flash')) return 1;
-                                    if (name.includes('1.5-flash')) return 2;
-                                    if (name.includes('pro')) return 3;
-                                    return 4;
+                                    if (name.includes('3.5-flash')) return 0;
+                                    if (name.includes('3.1-flash')) return 1;
+                                    if (name.includes('2.5-flash')) return 2;
+                                    if (name.includes('2.0-flash')) return 3;
+                                    if (name.includes('1.5-flash')) return 4;
+                                    if (name.includes('pro')) return 5;
+                                    return 6;
                                 };
                                 return getPriority(a) - getPriority(b);
                             });
@@ -99,7 +114,7 @@ export class GeminiCore {
                             .filter(m => m.name.includes('imagen'))
                             .map(m => m.name.replace('models/', ''));
 
-                        if (textModels.length > 0) this.availableTextModels = textModels;
+                        if (textModels.length > 0) this.availableTextModels = this.sortModelsByPriority(textModels);
                         if (imageModels.length > 0) this.availableImageModels = imageModels;
 
                         (AdminSettings as any).findOneAndUpdate(
@@ -147,7 +162,7 @@ export class GeminiCore {
             models = await this.getTieredModels('text');
         }
 
-        const effectiveModels = models.length > 0 ? models : ['gemini-2.5-flash', 'gemini-2.0-flash'];
+        const effectiveModels = models.length > 0 ? this.sortModelsByPriority(models) : ['gemini-2.5-flash', 'gemini-2.0-flash'];
         let lastError: any;
 
         for (let i = 0; i < effectiveModels.length; i++) {

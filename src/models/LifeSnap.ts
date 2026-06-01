@@ -39,7 +39,7 @@ const LifeSnapSchema = new Schema<ILifeSnap>({
     },
     imageUrl: {
         type: String,
-        required: true
+        required: false
     },
     score: {
         type: Number

@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
 
         const { image, journey, snapType = 'AUTO' } = await request.json();
         
+        let isTextOnly = false;
         let base64Data = "";
         let mimeType = "image/png";
 
@@ -48,13 +49,23 @@ export async function POST(request: NextRequest) {
             if (match) {
                 mimeType = match[1];
                 base64Data = match[2];
-            } else {
+            } else if (image.trim().startsWith('data:') || (image.length > 500 && !image.includes(' '))) {
                 base64Data = image;
+            } else {
+                isTextOnly = true;
             }
+        } else {
+            isTextOnly = true;
         }
 
-        if (!base64Data || base64Data.length < 10) {
-            return NextResponse.json({ error: '유효한 이미지 데이터가 없습니다.' }, { status: 400 });
+        if (isTextOnly) {
+            if (!image || image.trim().length === 0) {
+                return NextResponse.json({ error: '유효한 텍스트 데이터가 없습니다.' }, { status: 400 });
+            }
+        } else {
+            if (!base64Data || base64Data.length < 10) {
+                return NextResponse.json({ error: '유효한 이미지 데이터가 없습니다.' }, { status: 400 });
+            }
         }
 
         // 사용자 컨텍스트 및 여정 정보
@@ -134,18 +145,21 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const prompt = `
+        let prompt = `
         [ROLE: Youniqle Recovery Specialist]
         당신은 프리미엄 회복 라이프스타일 브랜드 '유니클(Youniqle)'의 친절하고 전문적인 AI 전문가입니다.
         현재 분석 모드는 [${snapType}] 입니다.
+        ${isTextOnly ? '[TEXT MODE: 사용자가 텍스트/메모 기록을 올렸습니다. 이미지는 없으므로 텍스트 내용을 기반으로 분석하세요.]' : ''}
 
         ${autoClassifyInstruction}
 
         [ANALYSIS TARGET]
-        ${categoryPrompt}
+        ${categoryPrompt.replace(/이 사진/g, isTextOnly ? '이 기록 내용' : '이 사진')}
 
         [USER CONTEXT]
         ${contextInstruction}
+        
+        ${isTextOnly ? `[USER RECORDED TEXT]\n"${image}"\n` : ''}
 
         [VALIDATION RULE - CRITICAL]
         만약 사용자가 업로드한 이미지가 분석이 불가능하거나 지나치게 저화질인 경우, 억지로 분석하지 마세요!
@@ -173,15 +187,20 @@ export async function POST(request: NextRequest) {
         }
         `;
 
-        const resultText = await GeminiAIEngine.generateWithFallback([
-            prompt,
-            {
-                inlineData: {
-                    data: base64Data,
-                    mimeType: mimeType
+        let resultText = "";
+        if (isTextOnly) {
+            resultText = await GeminiAIEngine.generateWithFallback(prompt);
+        } else {
+            resultText = await GeminiAIEngine.generateWithFallback([
+                prompt,
+                {
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: mimeType
+                    }
                 }
-            }
-        ]);
+            ]);
+        }
 
         let responseText = resultText;
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();

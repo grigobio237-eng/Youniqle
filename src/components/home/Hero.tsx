@@ -65,29 +65,34 @@ export default function Hero({
         });
       }, 100);
     } else {
-      if (progress > 0 && progress < 100) {
-        let speed = 4;
-        finishInterval = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= 100) {
-              clearInterval(finishInterval);
-              setTimeout(() => setProgress(0), 600);
-              return 100;
-            }
-            return prev + speed;
-          });
-        }, 16);
-      } else {
-        setProgress(0);
-      }
+      // When isDiagnosing transitions to false, read progress state via functional update
+      // and perform the acceleration finish animation!
+      setProgress((currentProgress) => {
+        if (currentProgress > 0 && currentProgress < 100) {
+          let speed = 4;
+          finishInterval = setInterval(() => {
+            setProgress((prev) => {
+              if (prev >= 100) {
+                clearInterval(finishInterval);
+                setTimeout(() => setProgress(0), 600);
+                return 100;
+              }
+              return prev + speed;
+            });
+          }, 16);
+          return currentProgress;
+        } else {
+          return 0;
+        }
+      });
       setLoadingText('60초 리듬체크 시작');
     }
 
     return () => {
       clearInterval(interval);
-      clearInterval(finishInterval);
+      if (finishInterval) clearInterval(finishInterval);
     };
-  }, [isDiagnosing, progress]);
+  }, [isDiagnosing]);
 
   useEffect(() => {
     const fetchPersonalization = async () => {

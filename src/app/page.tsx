@@ -153,14 +153,17 @@ export default function HomePage() {
         const resData = await res.json();
         if (Array.isArray(resData)) {
           setQuestions(resData);
+          setIsDiagnosing(false);
+          // Allow progress bar to smoothly reach 100% and show completion state
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           setViewState('QUESTION');
+          return;
         } else {
           throw new Error("질문을 불러오지 못했습니다.");
         }
       } catch (err) {
         console.error("Generate questions failed:", err);
         router.push('/dashboard');
-      } finally {
         setIsDiagnosing(false);
       }
       return;

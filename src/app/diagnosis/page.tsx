@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, ChevronLeft, CheckCircle2, Sparkles, Activity, Brain, Clock, PlusCircle, ArrowRight, Loader2, Zap } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle2, Sparkles, Activity, Brain, Clock, PlusCircle, ArrowRight, Loader2, Zap, Sparkle, Heart, Flame, ShieldAlert, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -31,6 +31,12 @@ function DiagnosisContent() {
     const [dailyTheme, setDailyTheme] = useState<string>('');
     const [dailyGreeting, setDailyGreeting] = useState<string>('');
 
+    // Premium interactive selection states
+    const [selectedScore, setSelectedScore] = useState<number | null>(null);
+    const [showBridge, setShowBridge] = useState(false);
+    const [bridgeTargetStep, setBridgeTargetStep] = useState<number>(0);
+    const [simulatedAnalysisStep, setSimulatedAnalysisStep] = useState<number>(0);
+
     const DEFAULT_LIKERT_OPTIONS = [
         { label: '전혀 그렇지 않다', score: 1 },
         { label: '그렇지 않다', score: 2 },
@@ -42,10 +48,9 @@ function DiagnosisContent() {
     const fetchedRef = React.useRef<string | null>(null);
 
     useEffect(() => {
-        // 'daily'가 아닌 경우(정적 질문)에만 즉시 로드
         if (type !== 'daily' && fetchedRef.current !== type) {
             loadQuestions().catch(err => {
-                console.error("Gracefully handled loadQuestions error inside mount hook:", err);
+                console.error("loadQuestions error inside mount hook:", err);
             });
             fetchedRef.current = type;
         }
@@ -66,21 +71,20 @@ function DiagnosisContent() {
         let currentProgress = 0;
         let isDone = false;
 
-        // 지능형 slow-start 가속 시뮬레이션 타이머
         const progressInterval = setInterval(() => {
             if (isDone) return;
             
             if (currentProgress < 75) {
-                currentProgress += Math.random() * 2 + 0.5; // 처음엔 신중하게 천천히
+                currentProgress += Math.random() * 3 + 1; 
             } else if (currentProgress < 90) {
-                currentProgress += Math.random() * 0.8 + 0.15; // 75~90% 구간 더 천천히 진행
+                currentProgress += Math.random() * 1.5 + 0.3; 
             } else if (currentProgress < 99) {
-                currentProgress += 0.05; // 90% 이상 대기 정체 방어선 (초미세 진행)
+                currentProgress += 0.1; 
             }
             
             const nextVal = Math.min(99, currentProgress);
             setLoadingProgress(nextVal);
-        }, 100);
+        }, 80);
 
         let loadedQuestions = [];
 
@@ -121,7 +125,6 @@ function DiagnosisContent() {
             }
         } catch (error) {
             console.error('Failed to load questions, applying premium fallback:', error);
-            // API 500 등 실패 시에도 완벽한 5개 Fallback 질문 준비
             if (type === '60s') {
                 loadedQuestions = [
                     { id: "f1", category: "Physical", text: "오늘 나의 전반적인 신체 컨디션과 에너지는 아주 좋은 편이다." },
@@ -137,7 +140,6 @@ function DiagnosisContent() {
             }
         }
 
-        // 성공하든 실패하든 무조건 타이머 해제 후 60fps 초고속 피날레 가속 개시
         isDone = true;
         clearInterval(progressInterval);
 
@@ -148,11 +150,10 @@ function DiagnosisContent() {
         
         setQuestions(formattedQuestions);
 
-        // 데이터 응답 확인/가공 직후 99% -> 100% 초고속 피날레 가시화
         let finishVal = currentProgress;
         await new Promise<void>((resolve) => {
             const finishInterval = setInterval(() => {
-                finishVal += 6.5; // 빠르게 쭈욱 끌어올림
+                finishVal += 8.5; 
                 if (finishVal >= 100) {
                     setLoadingProgress(100);
                     clearInterval(finishInterval);
@@ -163,7 +164,6 @@ function DiagnosisContent() {
             }, 16);
         });
 
-        // 60초 리듬체크 및 일일 리듬체크 진입 시 번거로운 인트로 버튼 없이 질문지 즉시 진입!
         if (type === '60s' || type === 'daily') {
             setStep(0);
         }
@@ -183,20 +183,84 @@ function DiagnosisContent() {
         }
     };
 
-    const handleAnswer = (option: any) => {
-        const currentQuestion = questions[step];
-        const newAnswers = { ...answers, [currentQuestion.id]: option.score };
-        setAnswers(newAnswers);
+    // Calculate dynamic chapters
+    const totalQ = questions.length || 16;
+    let currentChapter = 1;
+    let totalChapters = 3;
+    let chapterName = "신체 컨디션 및 에너지 진단";
+    let bridgeText = "";
 
-        if (step < questions.length - 1) {
-            setStep(step + 1);
+    if (totalQ <= 5) {
+        // For 60s check-in
+        totalChapters = 2;
+        if (step < 3) {
+            currentChapter = 1;
+            chapterName = "오늘의 신체 및 멘탈 상태";
+            bridgeText = "훌륭합니다! 전반부 피드백을 기록했습니다. 이제 마지막 오늘의 일상 에너지 마무리를 진행해 볼까요?";
         } else {
-            calculateAndSaveResults(newAnswers);
+            currentChapter = 2;
+            chapterName = "일일 생활 리듬 체크";
         }
+    } else {
+        // For 16 questions or personality
+        totalChapters = 3;
+        const qPerChapter = Math.ceil(totalQ / 3);
+        if (step < qPerChapter) {
+            currentChapter = 1;
+            chapterName = "신체 피로도 및 활력 수준";
+            bridgeText = "수고하셨습니다! 신체 피로 점수 조정을 무사히 마쳤습니다. 이제 2장인 마음의 누적 피로와 멘탈 회복도를 가볍게 짚어볼까요?";
+        } else if (step < qPerChapter * 2) {
+            currentChapter = 2;
+            chapterName = "마음 스트레스 및 정신 탄력성";
+            bridgeText = "훌륭합니다! 멘탈 복원력 스코어 연산을 마쳤습니다. 마지막 3장인 매일의 영양 섭취 및 일상 생활 리듬 진단으로 넘어가 보겠습니다.";
+        } else {
+            currentChapter = 3;
+            chapterName = "일반 식습관 및 수면 밸런스";
+        }
+    }
+
+    const handleAnswerIndex = (score: number) => {
+        setSelectedScore(score);
+        
+        const currentQuestion = questions[step];
+        const newAnswers = { ...answers, [currentQuestion.id]: score };
+        
+        setTimeout(() => {
+            setAnswers(newAnswers);
+            setSelectedScore(null);
+
+            // Determine if chapter is transitioning to show bridge
+            const qPerChapter = Math.ceil(totalQ / 3);
+            const isTransition60s = totalQ <= 5 && step === 2;
+            const isTransition16 = totalQ > 5 && (step === qPerChapter - 1 || step === qPerChapter * 2 - 1);
+
+            if (isTransition60s || isTransition16) {
+                setBridgeTargetStep(step + 1);
+                setShowBridge(true);
+            } else if (step < questions.length - 1) {
+                setStep(step + 1);
+            } else {
+                calculateAndSaveResults(newAnswers);
+            }
+        }, 300);
+    };
+
+    const handleBridgeNext = () => {
+        setShowBridge(false);
+        setStep(bridgeTargetStep);
     };
 
     const calculateAndSaveResults = async (finalAnswers: Record<string | number, number>) => {
         setIsSaving(true);
+        setSimulatedAnalysisStep(1); // Stage 1 of checklist loader
+
+        // Simulated highly aesthetic progress stages to match premium expectation
+        await new Promise(r => setTimeout(r, 900));
+        setSimulatedAnalysisStep(2);
+        await new Promise(r => setTimeout(r, 800));
+        setSimulatedAnalysisStep(3);
+        await new Promise(r => setTimeout(r, 700));
+
         try {
             let calculationResult;
             if (type === 'personality') {
@@ -208,9 +272,8 @@ function DiagnosisContent() {
                 calculationResult = SimcheungDiagnosisEngine.calculateFreeDiagnosis(finalAnswers as any, questions);
             } else {
                 const total = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
-                const min = questions.length; // 각 질문당 최저 1점 (16점)
-                const max = questions.length * 5; // 각 질문당 최고 5점 (80점)
-                // 최하점을 0점으로, 최고점을 100점으로 하는 정밀 백분율 환산식
+                const min = questions.length; 
+                const max = questions.length * 5; 
                 const percentage = max > min ? ((total - min) / (max - min)) * 100 : 0;
                 
                 calculationResult = {
@@ -241,6 +304,7 @@ function DiagnosisContent() {
             setStep(questions.length); 
         } finally {
             setIsSaving(false);
+            setSimulatedAnalysisStep(0);
         }
     };
 
@@ -273,7 +337,134 @@ function DiagnosisContent() {
         <div className={`min-h-screen ${(type === 'daily' || type === '60s') ? 'bg-[#F9F7F2]' : 'bg-mist'} flex flex-col items-center justify-start md:justify-center p-4 pt-3 md:pt-4 transition-colors duration-500`}>
             <div className="max-w-2xl w-full mt-2 md:mt-0">
                 <AnimatePresence mode="wait">
-                    {step === -1 && (
+                    {/* A. Loading State Screen */}
+                    {isSaving && (
+                        <motion.div
+                            key="saving-analysis"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="bg-white border border-line rounded-[40px] p-8 md:p-12 shadow-2xl space-y-10 text-center relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-8 opacity-5">
+                                <Activity className="w-40 h-40 text-primary" />
+                            </div>
+
+                            <div className="space-y-3">
+                                <Badge className="bg-[#D4B06F]/15 text-[#D4B06F] border-none px-4 py-1 text-xs font-black tracking-widest uppercase">
+                                    AI Recovery Analyzer
+                                </Badge>
+                                <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter">
+                                    회복 패턴 매칭 시퀀스
+                                </h2>
+                                <p className="text-slate text-sm font-semibold max-w-sm mx-auto">
+                                    기록된 문항을 지능형 매트릭스로 분석해 고유한 바이오리듬 예측 커브를 생성하고 있습니다.
+                                </p>
+                            </div>
+
+                            {/* Sequential indicators Checklist */}
+                            <div className="max-w-md mx-auto bg-mist/20 border border-line/40 rounded-3xl p-6 text-left space-y-5">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black
+                                            ${simulatedAnalysisStep >= 1 ? 'bg-reward-gold text-obsidian' : 'bg-line/40 text-slate/40'}
+                                        `}>
+                                            {simulatedAnalysisStep > 1 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : "1"}
+                                        </div>
+                                        <span className={`text-sm font-bold ${simulatedAnalysisStep >= 1 ? 'text-obsidian' : 'text-slate/40'}`}>
+                                            신체 누적 피로지수 정량 연산
+                                        </span>
+                                    </div>
+                                    {simulatedAnalysisStep >= 1 && (
+                                        <span className="text-[10px] font-black text-reward-gold animate-pulse">
+                                            {simulatedAnalysisStep > 1 ? "완료" : "연산 중..."}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black
+                                            ${simulatedAnalysisStep >= 2 ? 'bg-reward-gold text-obsidian' : 'bg-line/40 text-slate/40'}
+                                        `}>
+                                            {simulatedAnalysisStep > 2 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : "2"}
+                                        </div>
+                                        <span className={`text-sm font-bold ${simulatedAnalysisStep >= 2 ? 'text-obsidian' : 'text-slate/40'}`}>
+                                            멘탈 회복 및 수면 스트레스 대조
+                                        </span>
+                                    </div>
+                                    {simulatedAnalysisStep >= 2 && (
+                                        <span className="text-[10px] font-black text-reward-gold animate-pulse">
+                                            {simulatedAnalysisStep > 2 ? "완료" : "대조 중..."}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black
+                                            ${simulatedAnalysisStep >= 3 ? 'bg-reward-gold text-obsidian' : 'bg-line/40 text-slate/40'}
+                                        `}>
+                                            3
+                                        </div>
+                                        <span className={`text-sm font-bold ${simulatedAnalysisStep >= 3 ? 'text-obsidian' : 'text-slate/40'}`}>
+                                            개인 맞춤형 12주 호전 기대 커브 생성
+                                        </span>
+                                    </div>
+                                    {simulatedAnalysisStep >= 3 && (
+                                        <span className="text-[10px] font-black text-reward-gold animate-pulse animate-bounce">
+                                            구축 완료
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-center gap-2 text-slate font-bold text-xs">
+                                <Loader2 className="animate-spin text-reward-gold w-4 h-4" />
+                                정밀 리포트를 바인딩하고 있습니다...
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* B. Empathetic Comfort Bridge Screen */}
+                    {showBridge && !isSaving && (
+                        <motion.div
+                            key="comfort-bridge"
+                            initial={{ opacity: 0, scale: 0.97 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="bg-white border border-line rounded-[40px] p-8 md:p-12 shadow-2xl text-center space-y-8 relative overflow-hidden"
+                        >
+                            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#D4B06F]/5 rounded-full pointer-events-none" />
+                            
+                            <div className="w-20 h-20 bg-reward-gold/10 rounded-full flex items-center justify-center mx-auto shadow-inner text-reward-gold">
+                                <Heart className="w-10 h-10 fill-current animate-pulse" />
+                            </div>
+
+                            <div className="space-y-3">
+                                <Badge className="bg-reward-gold/15 text-reward-gold border-none px-4 py-1 text-[10px] font-black tracking-widest uppercase">
+                                    Chapter Completed
+                                </Badge>
+                                <h2 className="text-3xl font-black text-obsidian tracking-tight leading-tight">
+                                    성공적으로 기록되었습니다!
+                                </h2>
+                                <p className="text-slate font-semibold text-xs md:text-sm leading-relaxed px-4 max-w-md mx-auto">
+                                    {bridgeText}
+                                </p>
+                            </div>
+
+                            <Button
+                                onClick={handleBridgeNext}
+                                className="w-full max-w-sm h-16 bg-obsidian hover:bg-reward-gold text-white hover:text-obsidian text-lg font-black rounded-2xl shadow-xl transition-all border-none"
+                            >
+                                다음 챕터로 진행하기
+                                <ArrowRight className="w-5 h-5 ml-2" />
+                            </Button>
+                        </motion.div>
+                    )}
+
+                    {/* C. Intro Screen */}
+                    {step === -1 && !isSaving && !showBridge && (
                         <motion.div
                             key="intro"
                             initial={{ opacity: 0, y: 20 }}
@@ -322,7 +513,6 @@ function DiagnosisContent() {
                                     disabled={loadingQuestions}
                                     className={`h-16 md:h-20 ${loadingQuestions ? 'text-base md:text-lg' : 'text-xl md:text-2xl'} font-black rounded-2xl md:rounded-3xl ${theme.button} text-white transition-all shadow-xl relative overflow-hidden`}
                                 >
-                                    {/* Progress Background Overlay */}
                                     {loadingQuestions && (
                                         <motion.div 
                                             className="absolute left-0 top-0 bottom-0 bg-white/20 z-0"
@@ -348,51 +538,117 @@ function DiagnosisContent() {
                         </motion.div>
                     )}
 
-                    {step >= 0 && step < questions.length && (
+                    {/* D. Questions Active Screen */}
+                    {step >= 0 && step < questions.length && !isSaving && !showBridge && (
                         <motion.div
                             key={`step-${step}`}
-                            initial={{ opacity: 0, x: 50 }}
+                            initial={{ opacity: 0, x: 40 }}
                             animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            className="space-y-4 md:space-y-8"
+                            exit={{ opacity: 0, x: -40 }}
+                            className="space-y-6 md:space-y-10"
                         >
-                            <div className="space-y-3 md:space-y-5">
+                            {/* Header progress */}
+                            <div className="space-y-4">
                                 <div className="flex justify-between items-end">
-                                    <div className="space-y-0.5">
-                                        <span className={`text-[10px] md:text-xs font-black ${theme.text} uppercase tracking-widest`}>
-                                            {questions[step]?.category || 'Recovery'} Analysis
+                                    <div className="space-y-1">
+                                        <span className={`text-[10px] md:text-xs font-black ${theme.text} uppercase tracking-widest bg-white border border-line px-3 py-1 rounded-full shadow-sm`}>
+                                            Chapter {currentChapter}/{totalChapters}: {chapterName}
                                         </span>
-                                        <h2 className="text-lg md:text-2xl font-black text-obsidian tracking-tight leading-snug">
+                                        <h2 className="text-lg md:text-2xl font-black text-obsidian tracking-tight leading-snug pt-1">
                                             #{step + 1}. {questions[step]?.text || questions[step]?.question}
                                         </h2>
                                     </div>
                                     <span className="font-black text-slate text-sm md:text-lg shrink-0 ml-4">{step + 1}/{questions.length}</span>
                                 </div>
-                                <Progress value={progress} className={`h-2 rounded-full bg-white border border-line [&>div]:${theme.progress}`} />
+                                <Progress value={progress} className={`h-2 rounded-full bg-white border border-line [&>div]:${theme.progress} transition-all`} />
                             </div>
 
-                            <div className="grid gap-1.5 md:gap-3">
-                                {questions[step]?.options.map((option: any, i: number) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleAnswer(option)}
-                                        className={`p-3.5 md:p-5 text-left bg-white border-2 border-transparent rounded-[16px] md:rounded-[24px] ${theme.border} hover:shadow-md transition-all group flex items-center justify-between`}
-                                    >
-                                        <span className="text-sm md:text-base font-bold text-obsidian group-hover:text-obsidian">{option.label}</span>
-                                        <ChevronRight className={`w-4 h-4 md:w-5 md:h-5 text-line group-hover:${theme.text} transition-transform group-hover:translate-x-1`} />
-                                    </button>
-                                ))}
+                            {/* Upgraded 5-point premium Likert selection */}
+                            <div className="space-y-8 py-8 bg-white border border-line shadow-2xl rounded-[32px] p-6 relative">
+                                <div className="absolute left-0 top-0 bottom-0 w-2 bg-reward-gold" />
+                                
+                                <div className="flex justify-between text-[10px] font-black text-slate/50 uppercase tracking-widest px-4">
+                                    <span>전혀 아니다</span>
+                                    <span>매우 그렇다</span>
+                                </div>
+
+                                <div className="relative flex items-center justify-between max-w-md mx-auto px-6">
+                                    {/* Central connecting bar */}
+                                    <div className="absolute left-10 right-10 h-[3px] bg-line z-0" />
+                                    
+                                    {[1, 2, 3, 4, 5].map((score) => {
+                                        const isSelected = selectedScore === score;
+                                        
+                                        // Dynamic sizing based on choice extreme
+                                        const sizes = {
+                                            1: 'w-10 h-10', // Strongly Disagree
+                                            2: 'w-8 h-8',   // Disagree
+                                            3: 'w-6 h-6',   // Neutral
+                                            4: 'w-8 h-8',   // Agree
+                                            5: 'w-10 h-10'  // Strongly Agree
+                                        }[score];
+
+                                        const activeColors = {
+                                            1: 'bg-red-500 border-red-500 shadow-red-500/30 text-white',
+                                            2: 'bg-orange-400 border-orange-400 shadow-orange-400/20 text-white',
+                                            3: 'bg-slate-400 border-slate-400 shadow-slate-400/20 text-white',
+                                            4: 'bg-emerald-400 border-emerald-400 shadow-emerald-400/20 text-white',
+                                            5: 'bg-emerald-600 border-emerald-600 shadow-emerald-600/30 text-white'
+                                        }[score];
+
+                                        const hoverColors = {
+                                            1: 'hover:border-red-500 hover:bg-red-50',
+                                            2: 'hover:border-orange-400 hover:bg-orange-50',
+                                            3: 'hover:border-slate-400 hover:bg-slate-50',
+                                            4: 'hover:border-emerald-400 hover:bg-emerald-50',
+                                            5: 'hover:border-emerald-600 hover:bg-emerald-50'
+                                        }[score];
+
+                                        const labels = {
+                                            1: '전혀',
+                                            2: '비동의',
+                                            3: '보통',
+                                            4: '동의',
+                                            5: '매우'
+                                        }[score];
+
+                                        return (
+                                            <div key={score} className="flex flex-col items-center gap-2 z-10">
+                                                <button
+                                                    onClick={() => handleAnswerIndex(score)}
+                                                    className={`
+                                                        rounded-full border-2 bg-white transition-all duration-300 transform hover:scale-115 flex items-center justify-center font-black text-xs shadow-md
+                                                        ${sizes}
+                                                        ${isSelected ? activeColors : `border-line ${hoverColors} text-slate/50`}
+                                                    `}
+                                                    aria-label={labels}
+                                                >
+                                                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                                                </button>
+                                                <span className={`text-[9px] font-black tracking-tight ${isSelected ? 'text-obsidian' : 'text-slate/40'}`}>
+                                                    {labels}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             <div className="flex justify-center pt-2">
-                                <Button variant="ghost" className="text-slate font-bold text-xs md:text-sm h-8" onClick={() => step > 0 && setStep(step - 1)}>
+                                <Button 
+                                    variant="ghost" 
+                                    className="text-slate font-bold text-xs md:text-sm h-8 hover:text-obsidian" 
+                                    onClick={() => step > 0 && setStep(step - 1)}
+                                    disabled={step === 0}
+                                >
                                     <ChevronLeft className="mr-1 w-3.5 h-3.5" /> 이전 질문으로
                                 </Button>
                             </div>
                         </motion.div>
                     )}
 
-                    {step === questions.length && result && (
+                    {/* E. Result Screen */}
+                    {step === questions.length && result && !isSaving && !showBridge && (
                         <motion.div
                             key="result"
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -437,7 +693,7 @@ function DiagnosisContent() {
                             </Card>
 
                             <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-                                <Button size="lg" asChild className={`h-20 flex-1 text-xl font-black rounded-3xl ${(type === 'daily' || type === '60s') ? 'bg-obsidian hover:bg-reward-gold hover:text-obsidian text-white' : 'bg-chapter-accent text-white'} shadow-xl transition-all`}>
+                                <Button size="lg" asChild className={`h-20 flex-1 text-xl font-black rounded-3xl ${(type === 'daily' || type === '60s') ? 'bg-obsidian hover:bg-reward-gold hover:text-obsidian text-white border-none' : 'bg-chapter-accent text-white border-none'} shadow-xl transition-all`}>
                                     <Link href="/dashboard">대시보드로 돌아가기</Link>
                                 </Button>
                                 <Button size="lg" variant="outline" asChild className="h-20 flex-1 text-xl font-black rounded-3xl border-2 border-line hover:border-obsidian transition-all">

@@ -29,6 +29,44 @@ export default function DashboardPage() {
   const [nudges, setNudges] = useState<AiNudge[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Dynamic loading messages to rotate and prevent user frustration
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const loadingMessages = [
+    "오늘 당신이 보낸 신호들을 조용히 모으고 있습니다...",
+    "당신만의 특별한 회복 리포트를 정성껏 준비하는 중...",
+    "가장 평온하고 따뜻한 회복 공간을 설계하고 있습니다...",
+    "오늘 하루 애쓴 당신을 위해 맞춤형 대시보드를 정비 중..."
+  ];
+
+  useEffect(() => {
+    if (!loading) return;
+    
+    // Rotate messages
+    const msgInterval = setInterval(() => {
+      setLoadingMsgIdx((prev) => (prev + 1) % loadingMessages.length);
+    }, 1800);
+
+    // Smooth progress simulation
+    setLoadingProgress(0);
+    const progressInterval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 95) {
+          // Slow down near the end to wait for actual load
+          return prev + 0.1 > 98 ? 98 : prev + 0.1;
+        }
+        // Smoothly step up
+        const step = 0.5 + Math.random() * 1.5;
+        return Math.min(95, prev + step);
+      });
+    }, 50);
+
+    return () => {
+      clearInterval(msgInterval);
+      clearInterval(progressInterval);
+    };
+  }, [loading]);
+
   const fetchedRef = React.useRef(false);
 
   const fetchDashboardData = async (isRefresh = false) => {
@@ -155,30 +193,66 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col pt-32 px-6 space-y-16">
-        {/* Skeleton Timeline Area */}
-        <div className="container mx-auto max-w-5xl space-y-8">
-          <div className="flex justify-between items-center">
-            <div className="w-40 h-5 bg-primary/5 rounded-full animate-pulse" />
-            <div className="w-24 h-8 bg-primary/5 rounded-full animate-pulse" />
-          </div>
-          <div className="w-full h-28 bg-surface/50 rounded-5xl border border-primary/5 animate-pulse flex items-center justify-around px-10">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div key={i} className="w-10 h-10 bg-primary/5 rounded-full" />
-            ))}
-          </div>
-        </div>
-        
-        {/* Skeleton Card Area */}
-        <div className="container mx-auto max-w-5xl space-y-10">
-          <div className="w-48 h-5 bg-primary/5 rounded-full animate-pulse" />
-          <div className="w-full h-80 bg-surface/50 rounded-5xl border border-primary/5 animate-pulse" />
+      <div className="min-h-screen bg-[#F4F7F2] text-[#2D3A30] flex flex-col justify-center items-center p-6 relative overflow-hidden">
+        {/* 1. Cinematic Serenity Mesh Blobs (Alive & Flowing) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(212,226,212,0.55)_0%,transparent_70%)] blur-[60px] animate-pulse" />
+          <div className="absolute -bottom-[10%] -right-[10%] w-[85%] h-[85%] rounded-full bg-[radial-gradient(circle,rgba(247,221,209,0.55)_0%,transparent_70%)] blur-[70px] animate-pulse delay-1000" />
+          <div className="absolute inset-0 opacity-[0.015] bg-black bg-[size:40px_40px]" />
         </div>
 
-        {/* Floating Sync Indicator */}
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-surface/80 backdrop-blur-2xl text-foreground/70 px-8 py-4 rounded-full shadow-2xl border border-white/20 z-50">
-          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <span className="text-xs font-bold tracking-widest">나의 기록들을 불러오는 중...</span>
+        {/* 2. Content Center Container */}
+        <div className="relative z-10 max-w-md w-full flex flex-col items-center space-y-8 sm:space-y-10 text-center px-4">
+          
+          {/* Holographic Glowing Pulse Emblem */}
+          <div className="relative">
+            {/* Pulsing Outer Aura */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#556257] to-[#A38577] opacity-35 blur-xl scale-125 animate-pulse" />
+            
+            {/* Spinning Spectrum Outline */}
+            <div className="absolute -inset-4 rounded-full border border-dashed border-[#556257]/30 animate-[spin_15s_linear_infinite]" />
+            
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/60 backdrop-blur-2xl flex items-center justify-center border border-white/40 shadow-2xl relative overflow-hidden">
+              {/* Inner Holographic Glow */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#556257]/10 to-[#A38577]/10 pointer-events-none opacity-50" />
+              
+              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-white to-[#F4F7F2] flex items-center justify-center border border-white/20 shadow-inner relative">
+                <Sparkles className="w-8 h-8 sm:w-9 sm:h-9 text-[#556257] animate-pulse drop-shadow-[0_0_8px_rgba(85,98,87,0.4)]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Encouraging Typography */}
+          <div className="space-y-3 sm:space-y-4 max-w-sm">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#2D3A30] tracking-tight leading-snug break-keep px-2">
+              오늘의 나를 마주하는 공간으로<br />이동하고 있습니다
+            </h2>
+            
+            {/* Dynamic Warm Message with Smooth Fade */}
+            <div className="h-12 flex items-center justify-center">
+              <p className="text-xs sm:text-sm font-semibold text-[#68756A] italic break-keep leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-700">
+                {loadingMessages[loadingMsgIdx]}
+              </p>
+            </div>
+          </div>
+
+          {/* Premium Progress Shimmer Bar */}
+          <div className="w-full max-w-[280px] space-y-3">
+            <div className="h-1.5 w-full bg-[#E2E6E2] rounded-full overflow-hidden relative border border-white/20">
+              <div 
+                className="absolute inset-y-0 left-0 bg-[#556257] rounded-full transition-all duration-300 ease-out" 
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-[10px] font-black text-[#556257]/40 tracking-[0.22em] uppercase">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-[#556257]/20 rounded-full animate-ping" />
+                <span>Secure Data Syncing</span>
+              </div>
+              <span className="font-mono text-[10px] tracking-tight">{Math.round(loadingProgress)}%</span>
+            </div>
+          </div>
+
         </div>
       </div>
     );

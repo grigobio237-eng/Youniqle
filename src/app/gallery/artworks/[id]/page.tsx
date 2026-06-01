@@ -163,7 +163,7 @@ export default function ArtworkDetailPage() {
 
                             <Reveal delay={0.3}>
                                 <div className="flex flex-wrap gap-2 md:gap-3">
-                                    {['정품인증', artwork.style, artwork.subject, artwork.space].filter(v => v && v !== 'None' && v !== 'All').map(tag => (
+                                    {Array.from(new Set(['정품인증', artwork.style, artwork.subject, artwork.space].filter(v => v && v !== 'None' && v !== 'All'))).map(tag => (
                                         <span key={tag} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-gray-50 text-[9px] md:text-[10px] font-bold text-slate/60 uppercase tracking-tighter rounded-full border border-line/5">
                                             {tag}
                                         </span>

@@ -112,10 +112,7 @@ export default function ResultDisplay({
 
   const scoreLevel = recoveryScore >= 70 ? '활기 회복 단계' : recoveryScore >= 40 ? '회복 진행 중' : '회복 초기 단계';
 
-  // Remove artificial 3.5s delay and redirect immediately
-  const handleStartDesign = () => {
-    navigateTo('/ai-navigator');
-  };
+
 
   useEffect(() => {
     const saveData = async () => {
@@ -164,23 +161,23 @@ export default function ResultDisplay({
 
   return (
     <>
-      <div className={`max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-12 animate-fade-in pb-20 ${isDesigning ? 'opacity-20 blur-sm pointer-events-none' : ''} transition-all duration-700`}>
-        <div className="space-y-4 text-left">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-chapter-accent/10 rounded-2xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-chapter-accent" />
+      <div className={`max-w-md mx-auto min-h-[85vh] flex flex-col justify-center px-4 text-center space-y-6 sm:space-y-12 animate-fade-in pb-20 ${isDesigning ? 'opacity-20 blur-sm pointer-events-none' : ''} transition-all duration-700`}>
+        <div className="space-y-3 sm:space-y-4 text-left">
+          <div className="flex items-center gap-3 mb-3 sm:mb-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-chapter-accent/10 rounded-2xl flex items-center justify-center">
+              <CheckCircle className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-chapter-accent" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none mb-1">Rhythm Check Complete</p>
-              <h2 className="text-2xl font-black text-obsidian italic tracking-tighter">리듬체크 완료</h2>
+              <p className="text-[9px] sm:text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none mb-1">Rhythm Check Complete</p>
+              <h2 className="text-xl sm:text-2xl font-black text-obsidian italic tracking-tighter">리듬체크 완료</h2>
             </div>
           </div>
           
-          <div className="space-y-2">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
+          <div className="space-y-1 sm:space-y-2">
+            <div className="inline-flex items-center px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-1 sm:mb-2">
               {info.badge}
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tight break-keep">{info.title}</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-obsidian tracking-tight break-keep">{info.title}</h2>
           </div>
         </div>
 
@@ -188,43 +185,43 @@ export default function ResultDisplay({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="p-10 bg-white rounded-[40px] shadow-2xl shadow-chapter-accent/5 space-y-8 border-2 border-line relative overflow-hidden text-left"
+          className="p-6 sm:p-10 bg-white rounded-[32px] sm:rounded-[40px] shadow-2xl shadow-chapter-accent/5 space-y-6 sm:space-y-8 border-2 border-line relative overflow-hidden text-left"
         >
           <div className={`absolute top-0 left-0 w-full h-3 ${cardColor}`} />
           
-          <div className="flex justify-between items-end">
-            <div>
-              <span className="text-[10px] font-black text-slate uppercase tracking-widest opacity-40 block mb-1">Today's Rhythm</span>
-              <h3 className="text-3xl font-black text-obsidian tracking-tighter italic font-serif">
+          <div className="flex justify-between items-start gap-4">
+            <div className="space-y-1">
+              <span className="text-[9px] sm:text-[10px] font-black text-slate uppercase tracking-widest opacity-40 block mb-0.5">Today's Rhythm</span>
+              <h3 className="text-xl sm:text-3xl font-black text-obsidian tracking-tighter italic font-serif break-keep leading-tight">
                 {rhythmType}
               </h3>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest block mb-1">Recovery Point</span>
-              <div className="text-5xl font-black text-chapter-accent italic tracking-tighter leading-none">
+            <div className="text-right shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-black text-slate/40 uppercase tracking-widest block mb-0.5">Recovery Point</span>
+              <div className="text-3xl sm:text-5xl font-black text-chapter-accent italic tracking-tighter leading-none">
                 {recoveryScore}
               </div>
             </div>
           </div>
 
-          <p className="text-lg text-slate font-medium leading-relaxed break-keep">
+          <p className="text-sm sm:text-lg text-slate font-medium leading-relaxed break-keep">
             {typeDescription}
           </p>
 
           {/* AI 프리미엄 밀착 처방전 섹션 */}
           {analysisData?.futureDirection && (
             <div className="space-y-4 pt-6 border-t border-line">
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
+              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" /> Youniqle AI Recovery Report
               </span>
               <div className="grid grid-cols-1 gap-3">
                 {parseFutureDirection(analysisData.futureDirection).map((item, idx) => (
-                  <div key={idx} className="p-5 bg-primary/5 rounded-3xl border border-primary/10 hover:bg-primary/10 transition-all text-left">
+                  <div key={idx} className="p-4 sm:p-5 bg-primary/5 rounded-[20px] sm:rounded-3xl border border-primary/10 hover:bg-primary/10 transition-all text-left">
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="text-base leading-none">{item.icon}</span>
-                      <span className="text-[11px] font-black text-primary uppercase tracking-widest leading-none">{item.label}</span>
+                      <span className="text-[10px] sm:text-[11px] font-black text-primary uppercase tracking-widest leading-none">{item.label}</span>
                     </div>
-                    <p className="text-sm font-bold text-foreground/80 leading-relaxed break-keep pl-6">
+                    <p className="text-xs sm:text-sm font-bold text-foreground/80 leading-relaxed break-keep pl-5 sm:pl-6">
                       {item.content}
                     </p>
                   </div>
@@ -234,7 +231,7 @@ export default function ResultDisplay({
           )}
 
           <div className="space-y-4 pt-6 border-t border-line">
-            <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest block text-left">Today's Small Action</span>
+            <span className="text-[9px] sm:text-[10px] font-black text-chapter-accent uppercase tracking-widest block text-left">Today's Small Action</span>
             <div className="grid grid-cols-1 gap-3">
               {dailyActions.map((action, idx) => (
                 <div key={idx} className="flex items-center gap-4 p-4 bg-mist/50 rounded-2xl border border-line/50 text-left">
@@ -250,32 +247,13 @@ export default function ResultDisplay({
 
           <div className="grid grid-cols-1 gap-4">
             <Button 
-              onClick={handleStartDesign} 
+              onClick={onEnter} 
               size="lg" 
-              className="w-full h-16 md:h-20 rounded-[24px] bg-obsidian text-white text-lg md:text-xl font-black shadow-2xl shadow-obsidian/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-16 md:h-20 rounded-[24px] bg-obsidian text-white text-lg md:text-xl font-black shadow-2xl shadow-obsidian/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              {info.cta} <ArrowRight className="ml-2 w-6 h-6" />
+              <span>기록 완료하고 대시보드로 이동</span>
+              <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
             </Button>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <Button 
-                onClick={onEnter} 
-                variant="outline" 
-                className="h-14 rounded-2xl border-line text-slate font-bold hover:bg-slate/5"
-              >
-                기록 마칠게요
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-14 rounded-2xl border-chapter-accent/20 text-chapter-accent font-bold hover:bg-chapter-accent/5 flex items-center justify-center gap-2"
-                onClick={() => {
-                  // TODO: Implement actual image generation or just show a modal
-                  alert('익명 공유 카드가 생성되었습니다. (준비 중)');
-                }}
-              >
-                <Gift className="w-4 h-4" /> 리듬 공유
-              </Button>
-            </div>
           </div>
       </div>
 
