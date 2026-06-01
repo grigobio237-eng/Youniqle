@@ -109,20 +109,20 @@ export default function HotlineChat() {
   };
 
   return (
-    <div className="flex flex-col h-[650px] bg-white rounded-[40px] border border-line shadow-sm overflow-hidden relative">
+    <div className="flex flex-col h-[600px] sm:h-[650px] bg-white rounded-[24px] sm:rounded-[40px] border border-line shadow-sm overflow-hidden relative z-0 isolate">
       {/* Header */}
-      <div className="px-4 py-4 sm:px-8 sm:py-6 bg-obsidian text-white flex items-center justify-between gap-3 shrink-0">
-        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
-            <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-mist" />
+      <div className="px-4 py-3 sm:px-8 sm:py-6 bg-obsidian text-white flex items-center justify-between gap-2 sm:gap-3 shrink-0 relative z-10 shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
+            <Stethoscope className="w-4.5 h-4.5 sm:w-6 sm:h-6 text-mist" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-              <h2 className="text-base sm:text-xl font-serif tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <h2 className="text-sm sm:text-xl font-serif tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
                 자문위 유니클 핫라인
               </h2>
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-chapter-accent text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white shadow-md w-fit shrink-0">
-                <Brain className="w-2.5 h-2.5" />
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-chapter-accent text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white shadow-md w-fit shrink-0">
+                <Brain className="w-2 h-2" />
                 Technical Expert
               </div>
             </div>
@@ -134,17 +134,17 @@ export default function HotlineChat() {
         
         <button 
           onClick={handleReset}
-          className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/70 hover:text-white shrink-0"
+          className="w-8 h-8 sm:w-10 sm:h-10 bg-white/5 rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-white/70 hover:text-white shrink-0"
           title="대화 초기화"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
       </div>
 
       {/* Chat Messages */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth scrollbar-hide bg-[#F8FAFC]"
+        className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 space-y-5 sm:space-y-6 md:space-y-8 scroll-smooth scrollbar-hide bg-[#F8FAFC] relative z-0"
       >
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => {
@@ -154,32 +154,32 @@ export default function HotlineChat() {
                 key={index}
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className={`flex gap-4 ${isAI ? 'justify-start' : 'justify-end'}`}
+                className={`flex gap-1.5 sm:gap-3 md:gap-4 ${isAI ? 'justify-start' : 'justify-end'}`}
               >
                 {isAI && (
-                  <div className="w-9 h-9 rounded-xl bg-obsidian flex items-center justify-center shrink-0 shadow-lg shadow-obsidian/20">
-                    <Brain className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-obsidian flex items-center justify-center shrink-0 shadow-lg shadow-obsidian/20">
+                    <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                 )}
                 
-                <div className={`max-w-[80%] space-y-1.5 ${!isAI && 'text-right'}`}>
-                   <div className={`px-6 py-4 rounded-[28px] text-[15px] leading-relaxed shadow-sm border ${
+                <div className={`max-w-[90%] sm:max-w-[82%] md:max-w-[80%] space-y-1 sm:space-y-1.5 ${!isAI && 'text-right'}`}>
+                   <div className={`px-3.5 py-2.5 sm:px-5 sm:py-3.5 md:px-6 md:py-4 rounded-[18px] sm:rounded-[24px] md:rounded-[28px] text-[12.5px] sm:text-[14px] md:text-[15px] leading-relaxed shadow-sm border ${
                      isAI 
                       ? 'bg-white border-line text-obsidian rounded-tl-none font-medium' 
                       : 'bg-chapter-accent border-chapter-accent text-white rounded-tr-none font-black'
                    }`}>
                      {msg.content.split('\n').map((line, i) => (
-                        <p key={i} className={i > 0 ? 'mt-3' : ''}>{line}</p>
+                        <p key={i} className={i > 0 ? 'mt-2' : ''}>{line}</p>
                      ))}
                    </div>
-                   <span className="text-[10px] font-black uppercase text-slate/50 tracking-widest px-2">
+                   <span className="text-[8px] sm:text-[10px] font-black uppercase text-slate/50 tracking-widest px-2">
                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                    </span>
                 </div>
 
                 {!isAI && (
-                  <div className="w-9 h-9 rounded-xl bg-mist flex items-center justify-center shrink-0 border border-line">
-                    <User className="w-5 h-5 text-obsidian" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-mist flex items-center justify-center shrink-0 border border-line">
+                    <User className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-obsidian" />
                   </div>
                 )}
               </motion.div>
@@ -191,18 +191,18 @@ export default function HotlineChat() {
           <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            className="flex gap-4 justify-start"
+            className="flex gap-1.5 sm:gap-3 md:gap-4 justify-start"
           >
-            <div className="w-9 h-9 rounded-xl bg-obsidian flex items-center justify-center shrink-0 animate-pulse">
-              <Brain className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-obsidian flex items-center justify-center shrink-0 animate-pulse">
+              <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div className="bg-white border border-line px-6 py-4 rounded-[28px] rounded-tl-none shadow-sm flex items-center gap-3">
-               <div className="flex gap-1.5">
-                  <div className="w-1.5 h-1.5 bg-slate/20 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-1.5 h-1.5 bg-slate/20 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-1.5 h-1.5 bg-slate/20 rounded-full animate-bounce" />
+            <div className="bg-white border border-line px-3.5 py-2.5 sm:px-5 sm:py-3.5 md:px-6 md:py-4 rounded-[18px] sm:rounded-[24px] md:rounded-[28px] rounded-tl-none shadow-sm flex items-center gap-2 sm:gap-3">
+               <div className="flex gap-1 sm:gap-1.5">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-slate/20 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-slate/20 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-slate/20 rounded-full animate-bounce" />
                </div>
-               <span className="text-[10px] font-black text-slate/60 uppercase tracking-widest">
+               <span className="text-[8px] sm:text-[10px] font-black text-slate/60 uppercase tracking-widest">
                   Analyzing consultation point...
                </span>
             </div>
@@ -211,34 +211,34 @@ export default function HotlineChat() {
       </div>
 
       {/* Input Area */}
-      <div className="p-8 pb-10 bg-white border-t border-line shrink-0">
+      <div className="p-4 pb-6 sm:p-8 sm:pb-10 bg-white border-t border-line shrink-0">
          <form 
           onSubmit={handleSendMessage}
-          className="flex items-center gap-4 bg-mist/30 border border-line p-2 pl-6 rounded-[32px] focus-within:ring-4 focus-within:ring-chapter-accent/5 transition-all"
+          className="flex items-center gap-2 sm:gap-4 bg-mist/30 border border-line p-1.5 pl-4 sm:p-2 sm:pl-6 rounded-[24px] sm:rounded-[32px] focus-within:ring-4 focus-within:ring-chapter-accent/5 transition-all"
         >
           <Input 
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isLoading}
             placeholder="궁금한 내용을 쉽게 물어보세요 (예: 줄기세포의 종류와 차이점)"
-            className="flex-1 border-none focus-visible:ring-0 bg-transparent font-bold placeholder:text-slate/60 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+            className="flex-1 border-none focus-visible:ring-0 bg-transparent font-bold placeholder:text-slate/60 placeholder:uppercase placeholder:text-[9px] sm:placeholder:text-[10px] placeholder:tracking-widest"
           />
           <Button 
             type="submit"
             disabled={!inputMessage.trim() || isLoading}
-            className="w-12 h-12 rounded-[24px] bg-obsidian text-white flex items-center justify-center hover:scale-105 transition-all shadow-xl shadow-obsidian/10"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-[18px] sm:rounded-[24px] bg-obsidian text-white flex items-center justify-center hover:scale-105 transition-all shadow-xl shadow-obsidian/10"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </Button>
         </form>
         
-        <div className="mt-4 flex items-center justify-center gap-6">
-           <div className="flex items-center gap-1.5 text-slate/60">
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Technical Support ID: Expert-2.0</span>
+        <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6">
+           <div className="flex items-center gap-1 sm:gap-1.5 text-slate/60">
+              <HelpCircle className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Technical Support ID: Expert-2.0</span>
            </div>
-           <div className="w-1 h-1 bg-line rounded-full" />
-           <p className="text-[10px] font-black uppercase text-slate/60 tracking-widest italic">
+           <div className="hidden sm:block w-1 h-1 bg-line rounded-full" />
+           <p className="text-[8px] sm:text-[10px] font-black uppercase text-slate/60 tracking-widest italic">
               YOUNIQLE responses are for reference only.
            </p>
         </div>

@@ -234,7 +234,7 @@ function NavigatorLoungeContent() {
           </div>
         </div>
         {/* Tab Content Area (Unified for Mobile & Desktop) */}
-        <div ref={contentRef} className="bg-white border border-line rounded-[32px] md:rounded-[40px] p-6 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden mb-12">
+        <div ref={contentRef} className="bg-white border border-line rounded-[32px] md:rounded-[40px] p-3.5 sm:p-6 md:p-12 min-h-[600px] shadow-sm relative overflow-hidden mb-12">
           {activeTab ? (
             <AnimatePresence mode="wait">
               <motion.div
