@@ -471,7 +471,7 @@ export default function ReportsHub() {
 
               <div className="space-y-2">
                 <span className="text-sm font-bold text-white/40 tracking-wider">RECOVERY AUDIT REPORT</span>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                <h1 className="text-[26px] sm:text-4xl md:text-5xl font-black tracking-tight leading-tight break-keep">
                   {data?.cover?.userName}님의<br />
                   종합 회복 분석 진단서
                 </h1>
