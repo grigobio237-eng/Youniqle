@@ -64,15 +64,15 @@ export default function RecoveryPortalPage() {
       color: 'from-blue-500/20 to-cyan-500/20'
     },
     {
-      title: '준비 중',
-      subtitle: '새로운 회복 서비스',
-      description: '더 깊은 내면의 치유와 성장을 위한 새로운 회복 서비스가 곧 공개됩니다. 기대해 주세요.',
+      title: 'SunNudge™',
+      subtitle: 'Founder Lab 1기',
+      description: '선크림은 있는데 바르지 않는 행동을 설계하는 7일 썬케어 루틴 공동개발에 참여해 보세요.',
       icon: <Sparkles className="w-6 h-6" />,
       bgImage: '/images/portal/soon-1.png',
       charImage: '',
-      link: '#',
+      link: '/founder-lab/sunnudge',
       color: 'from-amber-500/20 to-orange-500/20',
-      isComingSoon: true
+      isComingSoon: false
     }
   ];
 

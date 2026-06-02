@@ -151,18 +151,18 @@ export default function Hero({
 
 
   return (
-    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-1 pb-4 sm:pt-3 sm:pb-8 md:pt-[60px] md:pb-32">
+    <div id="scanner" className="hero-cinematic bg-background relative overflow-x-hidden pt-4 pb-6 sm:pt-6 sm:pb-12 md:pt-[60px] md:pb-32 min-h-[calc(100dvh-192px)] md:min-h-0 flex flex-col justify-center">
       {/* Decorative Blur Elements - Softer */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
         <div className="absolute -top-[15%] -left-[10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[150px]" />
         <div className="absolute -bottom-[15%] -right-[10%] w-[60%] h-[60%] bg-secondary-container/10 rounded-full blur-[150px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-24 items-center">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 flex-1 flex flex-col justify-center w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-24 items-center">
  
           {/* 1. Texts */}
-          <div className="space-y-1.5 md:space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+          <div className="space-y-2 md:space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
             <div className="flex items-center gap-2 md:gap-3">
               <span className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-[0.5em]">RECOVERY CGM</span>
               {journey && (
@@ -214,7 +214,6 @@ export default function Hero({
               </div>
             </motion.div>
           </div>
-
 
         </div>
       </div>
