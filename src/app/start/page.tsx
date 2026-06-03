@@ -12,11 +12,11 @@ export default function RecoveryStartPage() {
             <section className="bg-primary/5 py-20 px-4 text-center">
                 <div className="max-w-4xl mx-auto space-y-6">
                     <span className="text-primary font-bold tracking-wider text-sm uppercase">Recovery Philosophy</span>
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
+                    <h1 className="font-black text-gray-900 leading-tight text-4xl md:text-4xl">
                         회복은 <span className="text-primary">멈춤</span>이 아니라<br />
                         더 멀리 가기 위한 <span className="text-primary">도약</span>입니다.
                     </h1>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed text-xl">
                         Youniqle은 단순한 휴식을 넘어, <br className="md:hidden" />
                         과학적인 데이터와 맞춤형 솔루션으로<br />
                         당신의 일상을 지탱하는 에너지를 설계합니다.
@@ -104,7 +104,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
         <Card className="text-center border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="pt-8 pb-8 px-6 space-y-4">
                 <div className="flex justify-center mb-4">{icon}</div>
-                <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+                <h3 className="font-bold text-gray-900 text-xl">{title}</h3>
                 <p className="text-gray-500 leading-relaxed word-keep-all">{description}</p>
             </CardContent>
         </Card>
@@ -114,9 +114,9 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
 function StepRow({ step, title, desc }: { step: string, title: string, desc: string }) {
     return (
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center bg-white p-6 rounded-2xl shadow-sm">
-            <div className="text-4xl font-black text-gray-200">{step}</div>
+            <div className="font-black text-gray-200 text-4xl">{step}</div>
             <div className="flex-1 space-y-2">
-                <h3 className="text-xl font-bold">{title}</h3>
+                <h3 className="font-bold text-xl">{title}</h3>
                 <p className="text-gray-600 leading-relaxed word-keep-all">{desc}</p>
             </div>
         </div>

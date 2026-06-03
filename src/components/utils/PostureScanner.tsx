@@ -316,8 +316,8 @@ export default function PostureScanner() {
                             <div className="max-w-xl mx-auto space-y-8 pb-12">
                                 <div className="bg-white p-8 rounded-[40px] shadow-sm border border-line text-center space-y-4">
                                     <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black italic px-4 py-1">ANALYSIS COMPLETE</Badge>
-                                    <h2 className="text-4xl font-black italic text-obsidian leading-tight">{result.subjectName}</h2>
-                                    <div className="text-7xl font-black italic text-chapter-accent">{result.score}<span className="text-2xl opacity-30 ml-2">PTS</span></div>
+                                    <h2 className="font-black italic text-obsidian leading-tight text-4xl">{result.subjectName}</h2>
+                                    <div className="font-black italic text-chapter-accent text-xl">{result.score}<span className="text-2xl opacity-30 ml-2">PTS</span></div>
                                     <p className="text-slate/60 text-sm leading-relaxed">{result.summary}</p>
                                 </div>
 

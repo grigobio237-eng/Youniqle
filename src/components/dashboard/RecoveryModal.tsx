@@ -109,7 +109,7 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none rounded-[40px] shadow-2xl bg-surface">
                     <div className="h-80 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-                        <div className="text-8xl mb-4 animate-bounce">✅</div>
+                        <div className="mb-4 animate-bounce text-xl">✅</div>
                         <h2 className="text-2xl font-black">저장 완료!</h2>
                         <p className="text-white/70 mt-2">수면 데이터가 기록되었습니다</p>
                     </div>
@@ -130,8 +130,8 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
                     <div className="h-40 bg-gradient-to-br from-indigo-600 to-purple-700 flex flex-col items-center justify-center relative overflow-hidden">
                         <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+')]"></div>
                         <div className="relative z-10 flex flex-col items-center text-white">
-                            <div className="text-4xl mb-2">🌙</div>
-                            <h2 className="text-xl font-black tracking-tight">수면 기록</h2>
+                            <div className="mb-2 text-4xl">🌙</div>
+                            <h2 className="font-black tracking-tight text-xl">수면 기록</h2>
                             <p className="text-sm text-white/70">어젯밤 수면을 기록해주세요</p>
                         </div>
                     </div>

@@ -152,7 +152,7 @@ export default function PostCareReportPage() {
             <div className="mb-12 p-6 bg-status-danger/10 border-2 border-status-danger rounded-[30px] flex gap-4 items-start animate-pulse">
               <AlertCircle className="w-8 h-8 text-status-danger shrink-0 mt-1" />
               <div className="space-y-1">
-                <h2 className="text-xl font-black text-status-danger">[긴급 내원 권장] 상태 정밀 모니터링 필요</h2>
+                <h2 className="font-black text-status-danger text-xl">[긴급 내원 권장] 상태 정밀 모니터링 필요</h2>
                 <p className="text-sm font-medium text-status-danger/80">현재 기록된 증상 수치가 안정 범위를 벗어났습니다. 지체 없이 시술을 받은 병원이나 가까운 응급실로 연락하시기 바랍니다.</p>
                 <Button className="mt-4 bg-status-danger text-white rounded-xl" size="sm" onClick={() => window.open('tel:119')}>긴급 연락처 연결</Button>
               </div>
@@ -166,7 +166,7 @@ export default function PostCareReportPage() {
               <Sparkles className="w-5 h-5 text-primary" />
               <div className="w-12 h-1 bg-primary rounded-full" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-obsidian tracking-tighter mb-4">
+            <h1 className="font-black text-obsidian tracking-tighter mb-4 text-4xl md:text-4xl">
               <span className="text-primary italic">Recovery</span> Roadmap
             </h1>
             <p className="text-slate font-bold text-lg mb-2">{data.procedureInfo.name} | {data.procedureInfo.daysSince}일차 경과</p>
@@ -187,7 +187,7 @@ export default function PostCareReportPage() {
                 <Info className="w-12 h-12" />
               </div>
               <h3 className="text-primary text-xs font-black uppercase tracking-[0.3em] mb-4">Advisor Diagnosis</h3>
-              <p className="text-xl md:text-2xl font-bold leading-relaxed relative z-10 italic">
+              <p className="font-bold leading-relaxed relative z-10 italic text-xl md:text-2xl">
                 "{roadmap?.statusAnalysis}"
               </p>
             </div>
@@ -263,7 +263,7 @@ export default function PostCareReportPage() {
             <Button
               size="lg"
               onClick={() => setIsModalOpen(true)}
-              className="h-20 px-12 bg-obsidian text-white rounded-[24px] font-black text-xl shadow-2xl hover:scale-105 transition-all group border-none"
+              className="h-20 px-12 bg-obsidian text-white rounded-[24px] font-black shadow-2xl hover:scale-105 transition-all group border-none text-xl"
             >
               <MessageSquare className="w-6 h-6 mr-4 text-primary group-hover:rotate-12 transition-transform" />
               내비게이터에게 상담 요청

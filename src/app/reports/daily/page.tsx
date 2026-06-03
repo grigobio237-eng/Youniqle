@@ -205,7 +205,7 @@ export default function DailyHistoryPage() {
                             <Activity className="w-5 h-5 md:w-6 md:h-6 text-obsidian" />
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-2xl font-black text-obsidian tracking-tight italic">회복 흐름 분석</h2>
+                            <h2 className="font-black text-obsidian tracking-tight italic text-xl md:text-2xl">회복 흐름 분석</h2>
                             <p className="text-xs md:text-sm text-slate font-medium">당신의 컨디션 변화 추이를 확인하세요.</p>
                         </div>
                     </div>

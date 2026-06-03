@@ -442,7 +442,7 @@ export default function AdminConsultationsPage() {
             >
               <div className="p-8 overflow-y-auto space-y-6">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">상담 티켓 상세 모니터링</h3>
+                  <h3 className="font-black text-slate-900 text-xl">상담 티켓 상세 모니터링</h3>
                   <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest">{selectedConsult.ticketId}</p>
                 </div>
 

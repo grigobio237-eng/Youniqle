@@ -52,7 +52,7 @@ export function AIProgressOverlay({
             {/* Progress & Message */}
             <div className="space-y-4">
               <div className="flex justify-between items-end mb-1">
-                <h4 className="text-xl font-black italic tracking-widest uppercase text-chapter-accent">
+                <h4 className="font-black italic tracking-widest uppercase text-chapter-accent text-xl">
                   Youniqle Engine <span className="opacity-50">Analyzing</span>
                 </h4>
                 <span className="text-2xl font-black italic font-mono">{Math.round(progress)}%</span>

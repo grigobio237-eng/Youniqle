@@ -87,7 +87,7 @@ export default function ScanTimelinePage() {
                     
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div className="space-y-2">
-                            <h1 className="text-4xl md:text-5xl font-black text-obsidian tracking-tighter italic font-serif">
+                            <h1 className="font-black text-obsidian tracking-tighter italic font-serif text-4xl md:text-4xl">
                                 Recovery Timeline
                             </h1>
                             <p className="text-slate font-medium opacity-60">
@@ -137,7 +137,7 @@ export default function ScanTimelinePage() {
                                 <span className="text-[10px] font-black text-slate uppercase tracking-widest">Last Update</span>
                                 <Clock className="w-4 h-4 text-slate opacity-40" />
                              </div>
-                             <p className="text-xl font-bold text-obsidian">
+                             <p className="font-bold text-obsidian text-xl">
                                 {new Date(timeline[0].createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                              </p>
                         </div>
@@ -215,7 +215,7 @@ export default function ScanTimelinePage() {
                                                         </div>
                                                     </div>
                                                     
-                                                    <h3 className="text-xl font-black text-obsidian tracking-tight leading-snug group-hover:text-chapter-accent transition-colors">
+                                                    <h3 className="font-black text-obsidian tracking-tight leading-snug group-hover:text-chapter-accent transition-colors text-xl">
                                                         {item.summary || '상세 결과 내용을 입력 중입니다.'}
                                                     </h3>
                                                 </div>

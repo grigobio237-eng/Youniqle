@@ -476,19 +476,19 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
                       <p className="text-sm text-gray-600">참가자</p>
-                      <p className="text-xl font-bold">{variant.participants.toLocaleString()}</p>
+                      <p className="font-bold text-xl">{variant.participants.toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">전환</p>
-                      <p className="text-xl font-bold">{variant.conversions.toLocaleString()}</p>
+                      <p className="font-bold text-xl">{variant.conversions.toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">전환율</p>
-                      <p className="text-xl font-bold">{variant.conversionRate}%</p>
+                      <p className="font-bold text-xl">{variant.conversionRate}%</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">P-value</p>
-                      <p className="text-xl font-bold">{variant.pValue}</p>
+                      <p className="font-bold text-xl">{variant.pValue}</p>
                     </div>
                   </div>
                   

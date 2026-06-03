@@ -166,7 +166,7 @@ export default function PersonalityHistoryPage() {
                                 <Badge className="bg-primary/20 text-primary border-none font-black text-[10px] tracking-widest px-3 py-1">HISTORY HUB</Badge>
                             </div>
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-black italic tracking-tighter">변하지 않는 당신의 가치, <br />내면의 지도를 확인하세요.</h2>
+                                <h2 className="font-black italic tracking-tighter text-3xl md:text-4xl">변하지 않는 당신의 가치, <br />내면의 지도를 확인하세요.</h2>
                                 <p className="text-slate-400 mt-4 max-w-xl font-medium leading-relaxed">
                                     시간이 흐름에 따라 당신의 기질이 환경에 어떻게 적응하고 회복해 나가는지, <br />
                                     과거의 기록들을 통해 성장의 궤적을 발견할 수 있습니다.
@@ -184,7 +184,7 @@ export default function PersonalityHistoryPage() {
                             className="space-y-6"
                         >
                             <div className="flex items-center justify-between px-2">
-                                <h3 className="font-black text-xl text-obsidian tracking-tight flex items-center gap-2">
+                                <h3 className="font-black text-obsidian tracking-tight flex items-center gap-2 text-xl">
                                     <TrendingUp className="w-5 h-5 text-primary" />
                                     내면 변화 트렌드
                                 </h3>
@@ -246,7 +246,7 @@ export default function PersonalityHistoryPage() {
                                                 <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
                                                     <BarChart3 className="w-5 h-5 text-primary" />
                                                 </div>
-                                                <h4 className="text-xl font-black text-obsidian">성장 인사이트</h4>
+                                                <h4 className="font-black text-obsidian text-xl">성장 인사이트</h4>
                                                 <p className="text-sm text-slate-500 font-medium leading-relaxed">
                                                     {diagnoses.length >= 2 ? (
                                                         <>이전 기록 대비 <strong>{Math.abs(chartData[chartData.length-1].total - chartData[chartData.length-2].total)}레벨</strong>의 종합 회복 흐름 변화가 감지되었습니다. 주요 요인별 변화를 통해 당신의 적응 기제를 확인하세요.</>
@@ -297,7 +297,7 @@ export default function PersonalityHistoryPage() {
                     {/* List Section */}
                     <section className="space-y-6">
                         <div className="flex items-center justify-between px-2">
-                            <h3 className="font-black text-xl text-obsidian tracking-tight flex items-center gap-2">
+                            <h3 className="font-black text-obsidian tracking-tight flex items-center gap-2 text-xl">
                                 <Clock className="w-5 h-5 text-primary" />
                                 분석 타임라인
                             </h3>
@@ -393,7 +393,7 @@ export default function PersonalityHistoryPage() {
                     */}
                     <section className="bg-primary/5 rounded-[40px] p-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
                         <div className="space-y-3 text-center md:text-left">
-                            <h4 className="text-xl font-black text-obsidian flex items-center justify-center md:justify-start gap-2">
+                            <h4 className="font-black text-obsidian flex items-center justify-center md:justify-start gap-2 text-xl">
                                 <Sparkles className="w-5 h-5 text-primary" />
                                 성격은 변할 수 있을까요?
                             </h4>

@@ -153,7 +153,7 @@ export default function ShopManagement() {
               <LayoutGrid className="w-10 h-10" />
             </div>
             <div className="space-y-2">
-                <p className="text-xl font-black text-obsidian">등록된 업소가 없습니다.</p>
+                <p className="font-black text-obsidian text-xl">등록된 업소가 없습니다.</p>
                 <p className="text-slate/40 font-medium">첫 번째 업소를 등록하고 설문 링크를 발송해 보세요.</p>
             </div>
             <Button onClick={() => setIsAddingShop(true)} variant="outline" className="rounded-xl font-bold">지금 바로 등록하기</Button>
@@ -170,7 +170,7 @@ export default function ShopManagement() {
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-3">
-                        <h4 className="text-xl font-black text-obsidian">{shop.name}</h4>
+                        <h4 className="font-black text-obsidian text-xl">{shop.name}</h4>
                         <Badge className="bg-mist text-slate/60 hover:bg-mist border-none font-bold text-[10px] uppercase tracking-widest">{shop.category}</Badge>
                       </div>
                       <div className="flex items-center gap-4 text-xs font-bold text-slate/40">

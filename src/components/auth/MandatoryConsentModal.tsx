@@ -242,7 +242,7 @@ export function ConsentRow({ id, label, checked, onChange, content, isHtml }: an
           className="max-w-lg rounded-3xl p-0 overflow-hidden bg-surface max-h-[70vh] flex flex-col border-none [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5"
         >
           <DialogHeader className="p-6 bg-primary text-white">
-            <DialogTitle className="text-xl font-black">{label}</DialogTitle>
+            <DialogTitle className="font-black text-xl">{label}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6 text-base text-text-primary whitespace-pre-wrap leading-relaxed">
             {isHtml ? (

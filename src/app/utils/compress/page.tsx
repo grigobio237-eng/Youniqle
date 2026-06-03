@@ -115,7 +115,7 @@ export default function ImageConverterPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">🔄</div>
+                        <div className="mb-4 text-xl">🔄</div>
                         <CardTitle className="text-3xl font-bold">이미지 포맷 변환</CardTitle>
                         <CardDescription className="text-lg">JPG, PNG, WEBP 간 자유롭게 변환하세요</CardDescription>
                     </CardHeader>
@@ -200,11 +200,11 @@ export default function ImageConverterPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-white rounded-lg p-4 text-center">
                                         <p className="text-sm text-gray-600 mb-2">원본 크기</p>
-                                        <p className="text-xl font-bold text-gray-900">{formatSize(originalSize)}</p>
+                                        <p className="font-bold text-gray-900 text-xl">{formatSize(originalSize)}</p>
                                     </div>
                                     <div className="bg-white rounded-lg p-4 text-center">
                                         <p className="text-sm text-gray-600 mb-2">변환 후</p>
-                                        <p className="text-xl font-bold text-blue-600">{formatSize(convertedSize)}</p>
+                                        <p className="font-bold text-blue-600 text-xl">{formatSize(convertedSize)}</p>
                                     </div>
                                 </div>
 

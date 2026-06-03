@@ -87,7 +87,7 @@ export default function CurrencyPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">💱</div>
+                        <div className="mb-4 text-xl">💱</div>
                         <CardTitle className="text-3xl font-bold">환율 계산기</CardTitle>
                         <CardDescription className="text-lg">실시간 환율로 통화를 변환하세요</CardDescription>
                     </CardHeader>

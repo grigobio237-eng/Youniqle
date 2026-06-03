@@ -170,7 +170,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">로그인이 필요합니다</h2>
           <p className="text-slate font-medium mb-8">보관함 접근을 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -187,7 +187,7 @@ export default function CartPage() {
         <div className="container mx-auto max-w-4xl text-center">
           <div className="mb-16">
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 inline-block rounded-full border border-chapter-accent/10">Vault Control System</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">보관함이 비어있습니다</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">보관함이 비어있습니다</h1>
           </div>
           <Card className="border-none shadow-xl rounded-[48px] bg-white p-20">
             <div className="w-24 h-24 mx-auto mb-10 bg-mist rounded-[32px] flex items-center justify-center text-slate/20">
@@ -207,8 +207,8 @@ export default function CartPage() {
     <div className="min-h-screen bg-mist py-20 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col items-center text-center mb-16">
-          <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 text-chapter-accent rounded-full border border-chapter-accent/10">Vault | My Selection</p>
-          <h1 className="text-5xl font-black text-obsidian tracking-tighter">보관 및 할당 센터</h1>
+          <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2 p-1 px-3 bg-chapter-accent/5 rounded-full border border-chapter-accent/10">Vault | My Selection</p>
+          <h1 className="font-black text-obsidian tracking-tighter text-xl">보관 및 할당 센터</h1>
           <Badge className="mt-4 bg-obsidian text-mist border-none px-6 py-2 rounded-full font-black text-xs">
             현재 식별된 회복 프로토콜: {cart.totalItems}개
           </Badge>
@@ -267,7 +267,7 @@ export default function CartPage() {
                             </h3>
                           </Link>
                           <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
-                            <span className="text-xl font-black text-chapter-accent">
+                            <span className="font-black text-chapter-accent text-xl">
                               {item.price.toLocaleString()}원
                             </span>
                             <span className="text-[10px] font-black text-slate uppercase tracking-widest opacity-30 mt-1">Per Unit</span>
@@ -346,13 +346,13 @@ export default function CartPage() {
 
                 <div className="space-y-1">
                   <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Estimated Total Value</p>
-                  <p className="text-4xl font-black text-reward-gold tracking-tighter">
+                  <p className="font-black text-reward-gold tracking-tighter text-4xl">
                     {(getSelectedTotal() + (getSelectedTotal() >= 50000 || getSelectedTotal() === 0 ? 0 : 3000)).toLocaleString()} <span className="text-lg">원</span>
                   </p>
                 </div>
 
                 <Button
-                  className="w-full h-20 rounded-[32px] bg-reward-gold text-obsidian font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-reward-gold/20 flex items-center justify-center gap-2 disabled:opacity-20"
+                  className="w-full h-20 rounded-[32px] bg-reward-gold text-obsidian font-black hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-reward-gold/20 flex items-center justify-center gap-2 disabled:opacity-20 text-xl"
                   onClick={() => {
                     if (selectedItems.size === 0) {
                       alert('할당할 아이템을 선택해주십시오.');

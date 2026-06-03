@@ -316,7 +316,7 @@ function UtilsContent() {
                         <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-4 py-1.5 rounded-full backdrop-blur-md inline-block">
                             Utility Hub v2.0
                         </Badge>
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-tight md:leading-none italic">
+                        <h1 className="font-black tracking-tight leading-tight md:leading-none italic text-3xl sm:text-4xl md:text-4xl">
                             SUPERCHARGED<br />EXPERIENCE
                         </h1>
                         <p className="text-base md:text-xl lg:text-2xl font-medium opacity-60 leading-relaxed max-w-lg">
@@ -343,7 +343,7 @@ function UtilsContent() {
                 <div className="space-y-12">
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                         <div className="space-y-4">
-                            <h2 className="text-4xl font-black italic tracking-tighter uppercase text-obsidian">Tool Kit</h2>
+                            <h2 className="font-black italic tracking-tighter uppercase text-obsidian text-4xl">Tool Kit</h2>
                             <div className="flex flex-wrap gap-2">
                                 {categories.map((cat) => (
                                     <button
@@ -432,7 +432,7 @@ function UtilsContent() {
                 {/* Additional Content Tabs */}
                 <div className="space-y-12">
                     <div className="text-center space-y-4">
-                        <h2 className="text-4xl font-black italic tracking-tighter uppercase text-obsidian">Beyond Tools</h2>
+                        <h2 className="font-black italic tracking-tighter uppercase text-obsidian text-4xl">Beyond Tools</h2>
                         <p className="text-slate opacity-60 font-medium">유틸리티 그 이상의 가치를 경험하세요.</p>
                     </div>
 
@@ -594,10 +594,10 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                         )}
 
                         <div className="relative z-10 flex flex-col items-center text-white">
-                            <div className="text-5xl mb-3">{progress >= 100 ? '🎊' : '💧'}</div>
-                            <div className="text-5xl font-black tracking-tighter">
+                            <div className="mb-3 text-xl">{progress >= 100 ? '🎊' : '💧'}</div>
+                            <div className="font-black tracking-tighter text-xl">
                                 {intake.toLocaleString()}
-                                <span className="text-xl opacity-70 ml-1">ml</span>
+                                <span className="opacity-70 ml-1 text-xl">ml</span>
                             </div>
                             <div className="text-sm font-bold opacity-70 mt-1 uppercase tracking-widest">
                                 {Math.round(progress)}% 달성
@@ -653,7 +653,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                         onClick={() => handleAdd(drink.amount, drink.label)}
                                         className="p-2 md:p-3 rounded-2xl border-2 border-line hover:border-blue-400 bg-white transition-all flex flex-col items-center gap-0.5 md:gap-1 group active:scale-95"
                                     >
-                                        <span className="text-xl md:text-2xl group-hover:scale-110 transition-transform">{drink.icon}</span>
+                                        <span className="group-hover:scale-110 transition-transform text-xl md:text-2xl">{drink.icon}</span>
                                         <span className="text-[9px] md:text-[10px] font-bold text-slate">{drink.label}</span>
                                         <span className="text-[8px] md:text-[9px] text-slate/60">{drink.amount}ml</span>
                                     </button>
@@ -851,11 +851,11 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
 
                         <div className="h-64 bg-gradient-to-br from-green-400 to-emerald-600 flex flex-col items-center justify-center relative overflow-hidden p-8">
                             <div className="absolute inset-0 opacity-20">
-                                <div className="absolute top-10 left-10 text-6xl animate-bounce">🎉</div>
-                                <div className="absolute bottom-10 right-10 text-6xl animate-bounce delay-150">✨</div>
+                                <div className="absolute top-10 left-10 animate-bounce text-xl">🎉</div>
+                                <div className="absolute bottom-10 right-10 animate-bounce delay-150 text-xl">✨</div>
                             </div>
                             <div className="relative z-10 flex flex-col items-center text-white text-center">
-                                <div className="text-8xl mb-4">🏆</div>
+                                <div className="mb-4 text-xl">🏆</div>
                                 <h2 className="text-3xl font-black tracking-tight">완료!</h2>
                                 <p className="text-lg opacity-80 mt-2">오늘도 건강해졌어요</p>
                             </div>
@@ -956,7 +956,7 @@ function StretchModal({ open, onOpenChange }: { open: boolean, onOpenChange: (op
                     <div className="p-6 md:p-10 space-y-8">
                         {/* 타이머 */}
                         <div className="text-center">
-                            <div className="text-6xl font-black text-obsidian tabular-nums tracking-tighter">
+                            <div className="font-black text-obsidian tabular-nums tracking-tighter text-xl">
                                 {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                             </div>
                             <p className="text-[10px] font-black text-slate mt-1 uppercase tracking-[0.3em] opacity-40">Time Remaining</p>

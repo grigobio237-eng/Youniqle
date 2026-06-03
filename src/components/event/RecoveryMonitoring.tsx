@@ -245,7 +245,7 @@ export default function RecoveryMonitoring() {
                   시술 후 {day}일차
                 </div>
               </div>
-              <h2 className="text-4xl font-black tracking-tight leading-tight transition-all">
+              <h2 className="font-black tracking-tight leading-tight transition-all text-4xl">
                 {headingText}
               </h2>
             </div>
@@ -302,7 +302,7 @@ export default function RecoveryMonitoring() {
         {/* 컨디션 체크 */}
         <Card className="bg-white border-line shadow-md rounded-[32px]">
           <CardHeader>
-            <CardTitle className="text-xl font-black">실시간 콘디션 체크</CardTitle>
+            <CardTitle className="font-black text-xl">실시간 콘디션 체크</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {symptomGroups.map((q) => (
@@ -330,7 +330,7 @@ export default function RecoveryMonitoring() {
         {/* 회복 프로토콜 */}
         <Card className="bg-white border-line shadow-md rounded-[32px]">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl font-black">회복 프로토콜</CardTitle>
+            <CardTitle className="font-black text-xl">회복 프로토콜</CardTitle>
             <div className="flex gap-1">
               {[1, 2, 3].map((d) => (
                 <button
@@ -389,7 +389,7 @@ export default function RecoveryMonitoring() {
       >
         <CardContent className="p-10 flex flex-col md:flex-row items-center gap-10">
           <div
-            className={`w-24 h-24 rounded-full flex items-center justify-center text-5xl bg-white shadow-2xl shrink-0 ${status === "alert" ? "animate-pulse" : ""
+            className={`w-24 h-24 rounded-full flex items-center justify-center text-xl bg-white shadow-2xl shrink-0 ${status === "alert" ? "animate-pulse" : ""
               }`}
           >
             {status === "alert" ? "🚨" : status === "warning" ? "🤖" : "✨"}
@@ -448,7 +448,7 @@ export default function RecoveryMonitoring() {
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-black">유니클 회복 케어</DialogTitle>
+                <DialogTitle className="font-black text-xl">유니클 회복 케어</DialogTitle>
                 <DialogDescription className="text-mist/60 text-xs font-bold">
                   24시간 당신의 회복을 지원합니다
                 </DialogDescription>
@@ -533,7 +533,7 @@ export default function RecoveryMonitoring() {
             <div className="py-20 flex flex-col items-center justify-center space-y-6">
               <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
               <div className="text-center">
-                <p className="text-xl font-black text-obsidian">유니클 회복 분석 중...</p>
+                <p className="font-black text-obsidian text-xl">유니클 회복 분석 중...</p>
                 <p className="text-sm text-text-tertiary font-medium">
                   콘디션과 프로토콜 데이터를 분석 중입니다.
                 </p>

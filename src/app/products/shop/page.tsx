@@ -89,7 +89,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
               <ShoppingBag className="w-3 h-3" /> Youniqle Store
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+            <h1 className="font-black text-white tracking-tighter text-3xl md:text-4xl">
               유니클 스토어
             </h1>
             <p className="text-slate-300 text-sm md:text-base font-bold opacity-80 max-w-2xl leading-relaxed">

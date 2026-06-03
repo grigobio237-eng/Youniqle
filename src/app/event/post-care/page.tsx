@@ -68,10 +68,10 @@ export default function PostCarePage() {
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-obsidian text-primary rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
                   <Activity className="w-3 h-3" /> Post-Care Intelligence
                 </div>
-                <h1 className="text-5xl md:text-6xl font-black text-obsidian tracking-tighter leading-tight">
+                <h1 className="font-black text-obsidian tracking-tighter leading-tight text-xl md:text-4xl">
                   Recovery <span className="text-primary italic">Roadmap</span>
                 </h1>
-                <p className="text-slate font-medium text-xl max-w-2xl mx-auto leading-relaxed">
+                <p className="text-slate font-medium max-w-2xl mx-auto leading-relaxed text-xl">
                   시술은 끝났지만, 결과는 이제부터 시작입니다.<br />
                   유니클이 당신의 회복 데이터를 실시간 분석하여 최적의 경로를 설계합니다.
                 </p>
@@ -80,7 +80,7 @@ export default function PostCarePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Status Card */}
                 <div className="bg-white border border-line rounded-[40px] p-10 flex flex-col items-center text-center shadow-sm hover:shadow-xl transition-all group">
-                  <div className="w-20 h-20 bg-mist rounded-[30px] flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform">
+                  <div className="w-20 h-20 bg-mist rounded-[30px] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform text-4xl">
                     {recentRoadmap ? '🗺️' : '🔋'}
                   </div>
                   <h3 className="text-2xl font-black text-obsidian mb-4">
@@ -157,7 +157,7 @@ export default function PostCarePage() {
                  <div className="flex items-center gap-6">
                     <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl">🧘</div>
                     <div>
-                       <h4 className="font-black text-xl mb-1">프리미엄 리커버리 케어</h4>
+                       <h4 className="font-black mb-1 text-xl">프리미엄 리커버리 케어</h4>
                        <p className="text-white/70 text-sm font-medium italic">"안전한 회복은 정교한 데이터에서 시작됩니다."</p>
                     </div>
                  </div>

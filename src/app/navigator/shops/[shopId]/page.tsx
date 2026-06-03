@@ -120,7 +120,7 @@ export default function ShopAnalyticsPage() {
                 </button>
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-4xl font-black text-obsidian tracking-tighter italic font-serif">Deep Analytics</h1>
+                        <h1 className="font-black text-obsidian tracking-tighter italic font-serif text-4xl">Deep Analytics</h1>
                         <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[10px] tracking-widest uppercase">Lead Analysis</Badge>
                         {isAdmin && (
                             <Badge className="bg-amber-500 text-white border-none font-black text-[10px] tracking-widest uppercase">Admin Monitor Mode</Badge>

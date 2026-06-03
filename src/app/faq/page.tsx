@@ -204,7 +204,7 @@ export default function FAQPage() {
           <Badge variant="outline" className="px-3 py-1 text-blue-600 border-blue-200 bg-blue-50">
             FAQ Help Center
           </Badge>
-          <h1 className="text-4xl font-bold">자주 묻는 질문</h1>
+          <h1 className="font-bold text-4xl">자주 묻는 질문</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             주문, 결제, 배송 등 자주 묻는 질문을 모았습니다. 검색이나 카테고리 필터를 활용해 빠르게 답을 찾아보세요.
           </p>

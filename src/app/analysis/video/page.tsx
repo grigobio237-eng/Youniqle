@@ -206,7 +206,7 @@ export default function PostureAnalysisPage() {
                                 className="text-center space-y-8 py-20"
                             >
                                 <div className="space-y-4">
-                                    <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tight">
+                                    <h1 className="font-black text-obsidian tracking-tight text-4xl md:text-4xl">
                                         당신의 회복 자세는<br />어떤 상태인가요?
                                     </h1>
                                     <p className="text-lg text-slate/60 font-medium">
@@ -218,7 +218,7 @@ export default function PostureAnalysisPage() {
                                     <Button 
                                         onClick={startWebcam} 
                                         size="lg" 
-                                        className="relative bg-chapter-accent text-white h-20 px-12 rounded-3xl text-xl font-black shadow-2xl hover:scale-105 transition-all"
+                                        className="relative bg-chapter-accent text-white h-20 px-12 rounded-3xl font-black shadow-2xl hover:scale-105 transition-all text-xl"
                                     >
                                         <Camera className="w-6 h-6 mr-3" /> 카메라 시작하기
                                     </Button>

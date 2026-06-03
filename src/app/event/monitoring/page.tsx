@@ -13,7 +13,7 @@ export default function MonitoringPage() {
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 mb-2 text-center">
-          <h1 className="text-4xl font-black mb-4 tracking-tighter">
+          <h1 className="font-black mb-4 tracking-tighter text-4xl">
             Real-time <span className="text-primary">Recovery</span> Guard
           </h1>
           <p className="text-text-secondary font-medium max-w-xl mx-auto">

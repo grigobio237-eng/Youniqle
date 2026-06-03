@@ -23,7 +23,7 @@ export default function UserLoungePage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-xs font-black uppercase tracking-widest mb-4">
             User Lounge
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-obsidian tracking-tight mb-4">
+          <h1 className="font-serif text-obsidian tracking-tight mb-4 text-4xl md:text-4xl">
             우리들의 <span className="italic">라운지</span>
           </h1>
           <p className="text-slate/60 text-lg">

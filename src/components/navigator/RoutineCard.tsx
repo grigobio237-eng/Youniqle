@@ -166,7 +166,7 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                                                  {currentTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                              </span>
                                          </div>
-                                         <h3 className="text-xs md:text-3xl font-black text-mist tracking-tight leading-tight">
+                                         <h3 className="text-base md:text-3xl font-black text-mist tracking-tight leading-tight">
                                              {title}
                                          </h3>
                                      </div>
@@ -212,10 +212,10 @@ export default function RoutineCard({ userStatus, initialData }: { userStatus?: 
                                                  </div>
                                                  
                                                  <div className="flex-1 min-w-0">
-                                                     <h4 className={`text-[11px] md:text-lg font-black transition-colors truncate ${isDone ? 'text-primary' : 'text-mist'}`}>
+                                                     <h4 className={`text-sm md:text-lg font-black transition-colors truncate ${isDone ? 'text-primary' : 'text-mist'}`}>
                                                          {task.title}
                                                      </h4>
-                                                     <p className="text-[9px] md:text-sm font-medium text-mist/50 line-clamp-1">
+                                                     <p className="text-[11px] md:text-sm font-medium text-mist/50 line-clamp-1">
                                                          {task.desc}
                                                      </p>
                                                  </div>

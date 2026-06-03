@@ -203,7 +203,7 @@ export default function AddressesPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
           <p className="text-slate font-medium mb-8">주소 관리를 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -226,7 +226,7 @@ export default function AddressesPage() {
               </Link>
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Logistics Control</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">물류 터미널 관리</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">물류 터미널 관리</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 활성 배송 거점 목록입니다.</p>
           </div>
           {!isAdding && addresses.length < 5 && (
@@ -257,7 +257,7 @@ export default function AddressesPage() {
                         {getLabelIcon(address.label)}
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-obsidian tracking-tight">{address.label}</h3>
+                        <h3 className="font-black text-obsidian tracking-tight text-xl">{address.label}</h3>
                         {address.isDefault && <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[9px] uppercase tracking-widest px-2 mt-1">Primary Gateway</Badge>}
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function AddressesPage() {
                 </div>
               )}
 
-              <Button onClick={handleSave} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black text-xl shadow-2xl hover:scale-[1.02] transition-all">
+              <Button onClick={handleSave} className="w-full h-20 rounded-[32px] bg-obsidian text-mist font-black shadow-2xl hover:scale-[1.02] transition-all text-xl">
                 데이터 전송 및 저장
               </Button>
             </CardContent>

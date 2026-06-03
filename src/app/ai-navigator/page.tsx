@@ -112,7 +112,7 @@ export default function AiNavigatorPage() {
     const [activeTab, setActiveTab] = useState('today-routine');
     const [routineData, setRoutineData] = useState<any>(null);
     const [dailyMissions, setDailyMissions] = useState<any>(null);
-    const [subActiveTab, setSubActiveTab] = useState<'diagnosis' | 'routine' | 'mission' | 'reflection'>('diagnosis');
+    const [subActiveTab, setSubActiveTab] = useState<'diagnosis' | 'routine' | 'reflection'>('diagnosis');
 
 
     const userTier = AccessControl.getUserGroup(session?.user);
@@ -464,12 +464,11 @@ export default function AiNavigatorPage() {
                 {activeTab === 'today-routine' && (
                     <div className="px-3.5 py-1.5 md:px-4 md:py-2 bg-mist/20 flex-shrink-0">
                         <div className="flex w-full bg-slate-100 p-0.5 rounded-2xl gap-0.5 border border-line/70">
-                            {(['diagnosis', 'routine', 'mission', 'reflection'] as const).map((tab) => {
+                            {(['diagnosis', 'routine', 'reflection'] as const).map((tab) => {
                                 const isActive = subActiveTab === tab;
                                 const labels: Record<typeof tab, string> = {
                                     diagnosis: '진단 🩺',
-                                    routine: '루틴 ⚡',
-                                    mission: '미션 💧',
+                                    routine: '오늘의 케어 ⚡',
                                     reflection: '회고 📝'
                                 };
                                 return (
@@ -497,9 +496,9 @@ export default function AiNavigatorPage() {
                             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                                 <Lock className="w-8 h-8" />
                             </div>
-                            <h3 className="text-xl font-black text-obsidian tracking-tight">로그인이 필요한 서비스입니다</h3>
-                            <p className="text-xs text-slate opacity-70 max-w-xs">나만의 맞춤형 회복 루틴과 기록을 시작하려면 로그인하세요.</p>
-                            <Button asChild className="h-12 px-8 bg-[#0E3A3A] text-white font-black rounded-xl shadow-lg">
+                            <h3 className="text-base md:text-xl font-black text-obsidian tracking-tight">로그인이 필요한 서비스입니다</h3>
+                            <p className="text-[11px] md:text-sm text-slate opacity-70 max-w-xs">나만의 맞춤형 회복 루틴과 기록을 시작하려면 로그인하세요.</p>
+                            <Button asChild className="h-10 md:h-12 px-6 md:px-8 bg-[#0E3A3A] text-white font-black rounded-xl shadow-lg text-[11px] md:text-sm">
                                 <Link href="/login">지금 바로 로그인하기</Link>
                             </Button>
                         </div>
@@ -522,9 +521,9 @@ export default function AiNavigatorPage() {
                                                         <DiagnosisRadarChart data={normalizedRadarData} color="#0E3A3A" className="w-full h-full scale-105" />
                                                     ) : (
                                                         <div className="text-center p-4 space-y-2">
-                                                            <span className="text-3xl">🧘</span>
-                                                            <h4 className="text-sm font-black text-obsidian">오늘의 건강을 진단해 보세요</h4>
-                                                            <p className="text-[10px] text-slate opacity-70">60초 리듬체크로 맞춤 그래프가 열립니다.</p>
+                                                            <span className="text-2xl md:text-3xl">🧘</span>
+                                                            <h4 className="text-xs md:text-sm font-black text-obsidian">오늘의 건강을 진단해 보세요</h4>
+                                                            <p className="text-[9px] md:text-[10px] text-slate opacity-70">60초 리듬체크로 맞춤 그래프가 열립니다.</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -578,21 +577,6 @@ export default function AiNavigatorPage() {
                                             </div>
                                         )}
 
-                                        {subActiveTab === 'mission' && (
-                                            <div className="flex-1 flex flex-col justify-start">
-                                                <React.Suspense fallback={<div className="h-32 w-full bg-mist animate-pulse rounded-2xl" />}>
-                                                    <DailySmallActions 
-                                                        score={
-                                                            categoryScores && Object.values(categoryScores).length > 0 
-                                                                ? Math.round((Object.values(categoryScores) as number[]).reduce((a: number, b: number) => a + b, 0) / Object.values(categoryScores).length)
-                                                                : 50
-                                                        } 
-                                                        initialData={dailyMissions}
-                                                    />
-                                                </React.Suspense>
-                                            </div>
-                                        )}
-
                                         {subActiveTab === 'reflection' && (
                                             <div className="flex-1 flex flex-col justify-start -mx-2">
                                                 <RecoveryNoteSection />
@@ -605,19 +589,19 @@ export default function AiNavigatorPage() {
                             {activeTab === 'recovery-toolbox' && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-2">
-                                        <Package className="w-5 h-5 text-primary" />
-                                        <h2 className="text-sm font-black tracking-tight text-obsidian">회복 툴박스</h2>
+                                        <Package className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                                        <h2 className="text-xs md:text-sm font-black tracking-tight text-obsidian">회복 툴박스</h2>
                                     </div>
                                     <React.Suspense fallback={<div className="h-32 bg-mist animate-pulse rounded-2xl" />}>
                                         <ToolkitGrid />
                                     </React.Suspense>
                                     <div className="space-y-4 pt-6 border-t border-line/50">
-                                        <h3 className="text-xs font-black tracking-tight text-[#0E3A3A]">추천 회복 도구</h3>
+                                        <h3 className="text-[11px] md:text-xs font-black tracking-tight text-[#0E3A3A]">추천 회복 도구</h3>
                                         <Card className="bg-surface border-2 border-dashed border-primary/10 rounded-2xl">
-                                            <CardContent className="p-8 text-center space-y-2">
-                                                <h4 className="text-xs font-black text-obsidian">유니클 셀렉션 준비 중</h4>
-                                                <p className="text-[10px] text-slate opacity-60">프리미엄 큐레이션 제품이 곧 공개됩니다.</p>
-                                                <Badge variant="outline" className="mt-2 border-primary/20 text-[9px] text-primary font-bold px-2 py-0.5">
+                                            <CardContent className="p-6 md:p-8 text-center space-y-2">
+                                                <h4 className="text-[11px] md:text-xs font-black text-obsidian">유니클 셀렉션 준비 중</h4>
+                                                <p className="text-[9px] md:text-[10px] text-slate opacity-60">프리미엄 큐레이션 제품이 곧 공개됩니다.</p>
+                                                <Badge variant="outline" className="mt-2 border-primary/20 text-[8px] md:text-[9px] text-primary font-bold px-2 py-0.5">
                                                     공개 예정
                                                 </Badge>
                                             </CardContent>
@@ -654,8 +638,8 @@ export default function AiNavigatorPage() {
                             <div className="w-16 h-16 bg-[#0E3A3A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <ExternalLink className="w-8 h-8 text-[#0E3A3A]" />
                             </div>
-                            <DialogTitle className="text-2xl font-black text-obsidian tracking-tighter">파트너사 이동</DialogTitle>
-                            <DialogDescription className="text-slate font-medium pt-2 leading-relaxed">
+                            <DialogTitle className="font-black text-obsidian tracking-tighter text-xl md:text-2xl">파트너사 이동</DialogTitle>
+                            <DialogDescription className="text-xs md:text-sm text-slate font-medium pt-2 leading-relaxed">
                                 Youniqle이 추천하는 회복 파트너사 페이지로 이동합니다.
                              </DialogDescription>
                         </DialogHeader>
@@ -734,7 +718,7 @@ function ForecastModal({ open, onOpenChange, forecast, userName }: { open: boole
                             </svg>
                         </div>
                         <div className="relative z-10 flex flex-col items-center text-center">
-                            <div className="text-4xl mb-2">🔭</div>
+                            <div className="mb-2 text-4xl">🔭</div>
                             <h2 className="text-2xl font-black text-primary tracking-tighter uppercase">{forecast.status}</h2>
                         </div>
                     </div>
@@ -747,8 +731,8 @@ function ForecastModal({ open, onOpenChange, forecast, userName }: { open: boole
                             </div>
 
                             <div className="flex items-end gap-3">
-                                <span className="text-5xl font-black text-text-primary tracking-tighter">{forecast.energyLevel}</span>
-                                <span className="text-xl font-bold text-text-secondary opacity-40 mb-1.5">%</span>
+                                <span className="font-black text-text-primary tracking-tighter text-xl">{forecast.energyLevel}</span>
+                                <span className="font-bold text-text-secondary opacity-40 mb-1.5 text-xl">%</span>
                             </div>
 
                             <div className="h-2 bg-line rounded-full overflow-hidden">

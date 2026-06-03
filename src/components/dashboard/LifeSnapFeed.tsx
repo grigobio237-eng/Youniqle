@@ -128,11 +128,11 @@ export default function LifeSnapFeed() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border border-line flex flex-col items-center text-center space-y-6"
             >
-              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-4xl shadow-inner">
+              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center shadow-inner text-4xl">
                 🗑️
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-obsidian tracking-tight">기록을 삭제할까요?</h3>
+                <h3 className="font-black text-obsidian tracking-tight text-xl">기록을 삭제할까요?</h3>
                 <p className="text-sm text-slate/70 font-bold leading-relaxed px-4">
                   선택하신 기록은 데이터베이스에서 <span className="text-red-500">영구히 삭제</span>되며 복구할 수 없습니다.<br/>
                   또한 <span className="text-chapter-accent">7일 회복 챌린지</span> 데이터와 통계에도 즉시 반영됩니다.

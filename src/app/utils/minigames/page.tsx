@@ -24,7 +24,7 @@ export default function MinigamesPage() {
                         <Badge variant="outline" className="mb-3 text-indigo-600 border-indigo-200 bg-indigo-50">
                             Play Ground
                         </Badge>
-                        <h1 className="text-4xl font-bold text-gray-900 mb-4">휴식용 미니게임 라운지</h1>
+                        <h1 className="font-bold text-gray-900 mb-4 text-4xl">휴식용 미니게임 라운지</h1>
                         <p className="text-gray-600 text-lg">
                             잠시 머리를 식히고 동료들과 함께 즐길 수 있는 작고 재미있는 게임들을 모았습니다.
                         </p>

@@ -152,7 +152,7 @@ export default function AdminDashboard() {
       <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-[#0F172A] p-5 md:p-8 shadow-2xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
           <div>
-            <h1 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">관리자 대시보드</h1>
+            <h1 className="font-bold text-white mb-1 md:mb-2 text-xl md:text-3xl">관리자 대시보드</h1>
             <p className="text-slate-400 text-xs md:text-base max-w-lg">
               Youniqle 관리 엔진이 가동 중입니다. 오늘의 성과를 모니터링하세요.
             </p>
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   <div className={`p-2 md:p-4 rounded-xl md:rounded-2xl transition-transform group-hover:scale-110 duration-300 ${stat.color} bg-slate-50 shrink-0`}>
-                    <Icon className="h-4 w-4 md:h-6 md:h-6" />
+                    <Icon className="h-4 w-4 md:h-6" />
                   </div>
                 </div>
 
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-black">{stats?.activityMetrics?.totalDiagnoses || 0}</div>
+            <div className="font-black text-4xl">{stats?.activityMetrics?.totalDiagnoses || 0}</div>
             <p className="text-xs opacity-60 mt-1">총 누적 진단 완료 건수</p>
           </CardContent>
         </Card>
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-black">{stats?.activityMetrics?.totalAiAdvices || 0}</div>
+            <div className="font-black text-4xl">{stats?.activityMetrics?.totalAiAdvices || 0}</div>
             <p className="text-xs opacity-60 mt-1">총 상담 로그 생성 건수</p>
           </CardContent>
         </Card>
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-black">28</div>
+            <div className="font-black text-4xl">28</div>
             <p className="text-xs opacity-60 mt-1">승인 대기 및 등록 완료 솔루션</p>
           </CardContent>
         </Card>
@@ -386,31 +386,31 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
             <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all px-2">
               <Link href="/admin/products/new">
-                <Package className="h-5 w-5 md:h-6 md:h-6 text-indigo-500" />
+                <Package className="h-5 w-5 md:h-6 text-indigo-500" />
                 <span className="font-bold text-[11px] md:text-sm">상품 등록</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all px-2">
               <Link href="/admin/consultations">
-                <Layers className="h-5 w-5 md:h-6 md:h-6 text-emerald-500" />
+                <Layers className="h-5 w-5 md:h-6 text-emerald-500" />
                 <span className="font-bold text-[11px] md:text-sm text-center">회복 설계</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all px-2">
               <Link href="/admin/orders">
-                <ShoppingCart className="h-5 w-5 md:h-6 md:h-6 text-purple-500" />
+                <ShoppingCart className="h-5 w-5 md:h-6 text-purple-500" />
                 <span className="font-bold text-[11px] md:text-sm">주문 관리</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all px-2">
               <Link href="/admin/users">
-                <Users className="h-5 w-5 md:h-6 md:h-6 text-blue-500" />
+                <Users className="h-5 w-5 md:h-6 text-blue-500" />
                 <span className="font-bold text-[11px] md:text-sm">회원 관리</span>
               </Link>
             </Button>
             <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-all px-2">
               <Link href="/admin/recovery">
-                <TrendingUp className="h-5 w-5 md:h-6 md:h-6 text-orange-500" />
+                <TrendingUp className="h-5 w-5 md:h-6 text-orange-500" />
                 <span className="font-bold text-[11px] md:text-sm">현황 분석</span>
               </Link>
             </Button>

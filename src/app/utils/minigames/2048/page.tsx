@@ -199,17 +199,17 @@ export default function Office2048Page() {
 
                 <div className="flex justify-between items-end mb-8">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">2048 OFFICE</h1>
+                        <h1 className="font-black text-slate-900 tracking-tighter mb-2 text-4xl">2048 OFFICE</h1>
                         <p className="text-slate-500 font-medium">인턴에서 회장까지, 승진의 기쁨을 누리세요!</p>
                     </div>
                     <div className="flex gap-2">
                         <div className="bg-slate-900 text-white px-4 py-2 rounded-2xl flex flex-col items-center min-w-[80px]">
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Score</span>
-                            <span className="text-xl font-black">{score}</span>
+                            <span className="font-black text-xl">{score}</span>
                         </div>
                         <div className="bg-reward-gold text-white px-4 py-2 rounded-2xl flex flex-col items-center min-w-[80px]">
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Best</span>
-                            <span className="text-xl font-black">{bestScore}</span>
+                            <span className="font-black text-xl">{bestScore}</span>
                         </div>
                     </div>
                 </div>
@@ -284,7 +284,7 @@ export default function Office2048Page() {
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                             {Object.entries(POSITIONS).map(([val, info]) => (
                                 <div key={val} className={`p-2 rounded-xl border flex flex-col items-center text-center ${info.color.split(' ')[0]} border-transparent`}>
-                                    <span className="text-xl mb-1">{info.emoji}</span>
+                                    <span className="mb-1 text-xl">{info.emoji}</span>
                                     <span className="text-[10px] font-black leading-none">{info.title}</span>
                                     <span className="text-[8px] font-black opacity-30 mt-1">{val}</span>
                                 </div>

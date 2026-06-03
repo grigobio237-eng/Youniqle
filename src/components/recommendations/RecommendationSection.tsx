@@ -276,7 +276,7 @@ export default function RecommendationSection({
         <Card className="rounded-[40px] bg-mist/30 border-none shadow-inner">
           <CardContent className="text-center py-16">
             <Sparkles className="h-16 w-16 mx-auto mb-6 text-slate/20" />
-            <h3 className="text-xl font-black text-obsidian mb-2">아직 추천 드릴 상품이 없습니다</h3>
+            <h3 className="font-black text-obsidian mb-2 text-xl">아직 추천 드릴 상품이 없습니다</h3>
             <p className="text-slate font-medium">더 많은 활동을 통해 당신의 취향을 학습시켜주세요</p>
           </CardContent>
         </Card>

@@ -72,7 +72,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-xl sm:text-2xl md:text-6xl lg:text-7xl font-black text-white leading-[1.2] md:leading-tight tracking-tighter max-w-full md:max-w-3xl break-keep"
+                            className="font-black text-white leading-[1.2] md:leading-tight tracking-tighter max-w-full md:max-w-3xl break-keep text-xl md:text-4xl"
                         >
                             {greeting}, <br className="hidden md:block" /> {userName}님.
                         </motion.h1>
@@ -83,7 +83,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
                             className="flex items-center justify-center md:justify-start gap-2 md:gap-3"
                         >
                             <span className="h-[1px] w-6 md:w-12 bg-white/30" />
-                            <p className="text-white/70 text-sm md:text-2xl font-medium tracking-tight">
+                            <p className="text-white/70 text-[11px] md:text-sm font-medium tracking-tight">
                                 {timeText.charAt(0).toUpperCase() + timeText.slice(1)} Recovery Protocol Active.
                             </p>
                         </motion.div>

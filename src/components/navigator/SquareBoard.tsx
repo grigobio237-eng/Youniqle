@@ -165,7 +165,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
 
               <div className="p-8 flex-1 flex flex-col space-y-4">
                 <div className="space-y-4">
-                  <h3 className="text-xl font-serif text-obsidian line-clamp-2 leading-tight group-hover:text-chapter-accent transition-colors">
+                  <h3 className="font-serif text-obsidian line-clamp-2 leading-tight group-hover:text-chapter-accent transition-colors text-xl">
                     {post.title}
                   </h3>
                   <p className="text-sm text-slate/60 line-clamp-2 font-medium leading-relaxed">
@@ -215,7 +215,7 @@ export default function SquareBoard({ onPostSelect, onPostCreate }: SquareBoardP
         <div className="bg-white border border-line rounded-[40px] py-24 flex flex-col items-center justify-center text-center space-y-6">
           <div className="w-20 h-20 bg-mist rounded-full flex items-center justify-center text-4xl">📭</div>
           <div>
-            <h3 className="text-xl font-black text-obsidian tracking-tight">작성된 게시글이 없습니다</h3>
+            <h3 className="font-black text-obsidian tracking-tight text-xl">작성된 게시글이 없습니다</h3>
             <p className="text-slate/70 font-bold">첫 번째 노하우를 공유하는 주인공이 되어보세요!</p>
           </div>
           <Button 

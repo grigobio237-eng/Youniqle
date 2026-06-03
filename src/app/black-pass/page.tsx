@@ -85,7 +85,7 @@ export default function BlackPassDashboard() {
               </div>
               
               <div className="space-y-3">
-                <h1 className="text-3xl md:text-7xl font-black text-obsidian tracking-tighter leading-tight">
+                <h1 className="font-black text-obsidian tracking-tighter leading-tight text-3xl md:text-4xl">
                   {user?.name}님을 위한 <br/>
                   <span className="text-primary italic">Perfect Recovery</span> 허브
                 </h1>
@@ -192,7 +192,7 @@ export default function BlackPassDashboard() {
                     <Lock className="w-5 h-5 text-slate/30" />
                   </div>
                   <div className="space-y-2 md:space-y-3">
-                    <h3 className="text-xl md:text-2xl font-black text-obsidian leading-tight">안전한 데이터 자산화</h3>
+                    <h3 className="font-black text-obsidian leading-tight text-xl md:text-2xl">안전한 데이터 자산화</h3>
                     <p className="text-[13px] md:text-lg text-slate font-medium leading-relaxed opacity-70">
                       당신의 모든 회복 기록은 고도로 암호화되어 보관됩니다. <br className="hidden md:block" />
                       필요한 경우에만 의료기관과 안전하게 공유됩니다.

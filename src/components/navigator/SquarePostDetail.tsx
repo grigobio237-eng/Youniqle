@@ -242,7 +242,7 @@ export default function SquarePostDetail({ postId, onClose, onEdit, onDeleteSucc
                  조회 {post.viewCount || 0}
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif text-obsidian tracking-tight leading-[1.1]">
+            <h1 className="font-serif text-obsidian tracking-tight leading-[1.1] text-4xl md:text-4xl">
               {post.title}
             </h1>
             

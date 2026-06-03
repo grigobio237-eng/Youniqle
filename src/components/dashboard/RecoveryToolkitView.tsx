@@ -19,7 +19,7 @@ function ToolkitItem({ label, desc, icon, href, color, isLocked }: ToolkitItemPr
     return (
         <Link href={isLocked ? '#' : href} className={`group ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}>
             <div className="bg-white border border-line/80 rounded-[32px] p-6 md:p-8 shadow-xl shadow-obsidian/5 hover:shadow-2xl transition-all flex flex-col items-center text-center h-full relative overflow-hidden group-hover:border-chapter-accent/30">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-mist rounded-[20px] md:rounded-[24px] mb-4 md:mb-6 flex items-center justify-center text-3xl md:text-4xl group-hover:scale-110 transition-transform shadow-inner relative">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-mist rounded-[20px] md:rounded-[24px] mb-4 md:mb-6 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner relative text-3xl md:text-4xl">
                     {typeof icon === 'string' ? icon : icon}
                     {isLocked && (
                         <div className="absolute inset-0 bg-obsidian/40 rounded-[24px] flex items-center justify-center">

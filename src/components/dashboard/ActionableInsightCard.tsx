@@ -46,7 +46,7 @@ export default function ActionableInsightCard({ type, insight }: ActionableInsig
                     </div>
                     <div>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50 text-mist">Insight Focus</span>
-                        <h3 className="text-xl font-black tracking-tight">{insight.title}</h3>
+                        <h3 className="font-black tracking-tight text-xl">{insight.title}</h3>
                     </div>
                 </div>
 

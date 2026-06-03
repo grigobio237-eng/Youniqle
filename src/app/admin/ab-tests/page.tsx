@@ -635,7 +635,7 @@ export default function ABTestDashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-7xl h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold">고급 A/B 테스트 분석</h2>
+              <h2 className="font-semibold text-xl">고급 A/B 테스트 분석</h2>
               <Button
                 variant="ghost"
                 size="sm"

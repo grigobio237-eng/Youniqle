@@ -58,7 +58,6 @@ import MedicalPassCard from '@/components/me/MedicalPassCard';
 import ReferralNetwork from '@/components/shared/ReferralNetwork';
 import NavigatorConsultationCenter from '@/components/me/NavigatorConsultationCenter';
 import RecoveryLeaderboard from '@/components/me/RecoveryLeaderboard';
-import RecoveryActivityFeed from '@/components/me/RecoveryActivityFeed';
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -634,9 +633,9 @@ export default function MyPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
-          <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
-          <p className="text-slate font-medium mb-8">대시보드 접근을 위해 인증 프로토콜이 필요합니다.</p>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
+          <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
+          <p className="text-[11px] md:text-sm text-slate font-medium mb-8">대시보드 접근을 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
             <Link href="/auth/signin">인증 시작</Link>
           </Button>
@@ -704,8 +703,8 @@ export default function MyPage() {
                               <Sparkles className="w-5 h-5" />
                             </div>
                             <div>
-                              <h3 className="text-lg font-black text-obsidian tracking-tighter">회복 성취 뱃지</h3>
-                              <p className="text-xs font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
+                              <h3 className="text-base md:text-xl font-black text-obsidian tracking-tighter">회복 성취 뱃지</h3>
+                              <p className="text-[11px] md:text-sm font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
                             </div>
                           </div>
                           <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">
@@ -772,7 +771,7 @@ export default function MyPage() {
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
-                        <p className="text-xl font-black text-obsidian tracking-tighter">0</p>
+                        <p className="font-black text-obsidian tracking-tighter text-xl">0</p>
                       </div>
                     </div>
                     <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -781,7 +780,7 @@ export default function MyPage() {
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
-                        <p className="text-xl font-black text-obsidian tracking-tighter">2</p>
+                        <p className="font-black text-obsidian tracking-tighter text-xl">2</p>
                       </div>
                     </div>
                     <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -790,7 +789,7 @@ export default function MyPage() {
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
-                        <p className="text-xl font-black text-obsidian tracking-tighter">{history.length}</p>
+                        <p className="font-black text-obsidian tracking-tighter text-xl">{history.length}</p>
                       </div>
                     </div>
                     <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -799,33 +798,15 @@ export default function MyPage() {
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
-                        <p className="text-xl font-black text-obsidian tracking-tighter">{userData?.points?.toLocaleString() || 0}</p>
+                        <p className="font-black text-obsidian tracking-tighter text-xl">{userData?.points?.toLocaleString() || 0}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Leaderboard & Feed */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-8">
-                    <RecoveryLeaderboard />
-                  </div>
-                  <div className="lg:col-span-4">
-                    <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100 h-full">
-                      <div className="p-6 md:p-8">
-                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500">
-                              <Activity className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-black text-obsidian tracking-tighter">실시간 회복 리듬</h3>
-                              <p className="text-xs font-bold text-slate">다른 유저들의 지금은?</p>
-                            </div>
-                          </div>
-                         <RecoveryActivityFeed />
-                      </div>
-                    </Card>
-                  </div>
+                {/* Leaderboard */}
+                <div>
+                  <RecoveryLeaderboard />
                 </div>
 
                 {/* Recovery Growth Curve */}
@@ -1029,7 +1010,7 @@ export default function MyPage() {
                             </div>
                             <div>
                               <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Service Status Protocol</p>
-                              <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                              <h3 className="font-black text-obsidian tracking-tighter flex items-center gap-3 text-xl">
                                 {userStatus.concierge.painPoint} 회복 컨시어지
                                 <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                                   userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
@@ -1077,7 +1058,7 @@ export default function MyPage() {
                             </div>
                             <div>
                               <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Support Status Protocol</p>
-                              <h3 className="text-xl font-black text-obsidian tracking-tighter flex items-center gap-3">
+                              <h3 className="font-black text-obsidian tracking-tighter flex items-center gap-3 text-xl">
                                 [{userStatus.inquiry.type === 'product' ? '상품' : '일반'}] {userStatus.inquiry.subject}
                                 <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                                   userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
@@ -1115,7 +1096,7 @@ export default function MyPage() {
                           <MessageCircle className="h-7 w-7" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-black text-obsidian tracking-tighter">
+                          <h3 className="font-black text-obsidian tracking-tighter text-xl">
                             {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
                           </h3>
                           <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
@@ -1266,7 +1247,7 @@ export default function MyPage() {
                             <Trophy className="h-6 w-6" />
                           </div>
                           <div>
-                            <CardTitle className="text-xl font-black text-obsidian tracking-tighter">축구 클럽하우스</CardTitle>
+                            <CardTitle className="font-black text-obsidian tracking-tighter text-xl">축구 클럽하우스</CardTitle>
                           </div>
                         </div>
                       </CardHeader>

@@ -180,7 +180,7 @@ export default function ViewTemplateDialog({
             {/* 헤더 정보 */}
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-xl font-semibold">{template.name}</h3>
+                <h3 className="font-semibold text-xl">{template.name}</h3>
                 {template.description && (
                   <p className="text-gray-600 mt-1">{template.description}</p>
                 )}

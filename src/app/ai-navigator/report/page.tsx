@@ -195,7 +195,7 @@ export default function WeeklyReportPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-4xl font-black tracking-tighter leading-tight"
+              className="font-black tracking-tighter leading-tight text-3xl md:text-4xl"
             >
               당신의 7일은<br />
               <span className="text-primary underline decoration-primary/30 underline-offset-8">하나의 흐름</span>이 되었습니다.
@@ -214,7 +214,7 @@ export default function WeeklyReportPage() {
           {/* 1. 7-Day Visual Evidence (The Snapshots) */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+              <h3 className="font-black tracking-tight flex items-center gap-2 text-xl">
                 <ImageIcon className="w-5 h-5 text-primary" />
                 7일의 자기인식 타임라인
               </h3>
@@ -289,7 +289,7 @@ export default function WeeklyReportPage() {
           {/* 2. Rhythm Interpretation Chart */}
           <section className="space-y-6 bg-surface p-8 rounded-[40px] border border-line shadow-xl">
             <div className="space-y-1">
-              <h3 className="text-xl font-black tracking-tight">주간 리듬 해석</h3>
+              <h3 className="font-black tracking-tight text-xl">주간 리듬 해석</h3>
               <p className="text-sm text-slate font-medium opacity-60">지난 7일간 {userName} 님의 회복 에너지 흐름입니다.</p>
             </div>
 
@@ -398,7 +398,7 @@ export default function WeeklyReportPage() {
           {/* 3. Deep Insight: Disruption Factors & Routines */}
           <section className="space-y-8">
             <div className="space-y-4">
-              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+              <h3 className="font-black tracking-tight flex items-center gap-2 text-xl">
                 <Zap className="w-5 h-5 text-primary" />
                 이번 주 나를 가장 많이 흔든 것
               </h3>
@@ -420,7 +420,7 @@ export default function WeeklyReportPage() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+              <h3 className="font-black tracking-tight flex items-center gap-2 text-xl">
                 <Clock className="w-5 h-5 text-primary" />
                 다음 주 작은 실천 루틴
               </h3>
@@ -447,7 +447,7 @@ export default function WeeklyReportPage() {
           {/* 4. Anonymous Share Card Preview */}
           <section className="space-y-6">
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-black tracking-tight flex items-center justify-center gap-2">
+              <h3 className="font-black tracking-tight flex items-center justify-center gap-2 text-xl">
                 <Share2 className="w-5 h-5 text-primary" />
                 나의 발견 카드
               </h3>
@@ -462,7 +462,7 @@ export default function WeeklyReportPage() {
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-[80px] -ml-24 -mb-24" />
               
               <div className="relative z-10 space-y-8 w-full">
-                <div className="text-6xl animate-bounce-slow">🌃</div>
+                <div className="animate-bounce-slow text-xl">🌃</div>
                 <div className="space-y-3">
                   <p className="text-xs font-black text-primary uppercase tracking-[0.4em]">Rhythm Identity</p>
                   <h4 className="text-3xl font-black text-white leading-tight tracking-tighter">
@@ -492,7 +492,7 @@ export default function WeeklyReportPage() {
           {/* 5. Value Transition: Storage & Detailed Interpretation */}
           <section className="pt-8 space-y-6">
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-black tracking-tight">이 흐름을 계속 이어가고 싶다면</h3>
+              <h3 className="font-black tracking-tight text-xl">이 흐름을 계속 이어가고 싶다면</h3>
               <p className="text-sm text-slate font-medium opacity-60">기록은 쌓이면 나를 이해하는 가장 강력한 자산이 됩니다.</p>
             </div>
 
@@ -503,7 +503,7 @@ export default function WeeklyReportPage() {
                     {isAdmin || isPremium ? '🔓' : '📦'}
                   </div>
                   <div className="flex-1 space-y-1">
-                    <h4 className="text-xl font-black text-white">
+                    <h4 className="font-black text-white text-xl">
                       {isAdmin || isPremium ? '리듬 보관함 활성화됨' : '리듬 보관함 시작하기'}
                     </h4>
                     <p className="text-xs text-white/40 font-medium leading-relaxed">

@@ -88,7 +88,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
       <div className="flex-1 flex flex-col justify-start md:justify-center">
         {/* Header Section */}
         <div className="mb-4 md:mb-16 text-center space-y-2 md:space-y-4">
-          <h1 className="text-xl md:text-5xl font-bold tracking-tight leading-tight break-keep">{header.title}</h1>
+          <h1 className="font-bold tracking-tight leading-tight break-keep text-xl md:text-4xl">{header.title}</h1>
           <p className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-[0.3em]">{header.sub}</p>
         </div>
 
@@ -98,7 +98,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
             <span className="text-[10px] md:text-[11px] font-bold text-foreground/20 uppercase tracking-[0.3em]">
               STEP {step + 1} / {questions.length}
             </span>
-            <span className="text-2xl md:text-4xl font-bold text-primary tabular-nums tracking-tighter">
+            <span className="font-bold text-primary tabular-nums tracking-tighter text-2xl md:text-4xl">
               {Math.round(progress)}%
             </span>
           </div>
@@ -126,7 +126,7 @@ export default function DiagnosisForm({ questions, onComplete }: { questions: Qu
                 <Activity className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
                 <span className="text-[10px] md:text-[11px] font-bold text-foreground/40 uppercase tracking-[0.2em]">{currentQ.category}</span>
               </div>
-              <h2 className="text-lg md:text-4xl font-bold text-foreground leading-tight tracking-tight break-keep">
+              <h2 className="text-lg md:text-3xl font-bold text-foreground leading-tight tracking-tight break-keep">
                 {currentQ.text}
               </h2>
             </div>

@@ -41,7 +41,7 @@ export default function PrincipalLounge({ data }: PrincipalLoungeProps) {
                 
                 <div className="absolute bottom-12 left-12 right-12">
                     <div className="space-y-1">
-                        <h2 className="text-white text-4xl font-black italic tracking-tighter">The Orchestrator</h2>
+                        <h2 className="text-white font-black italic tracking-tighter text-4xl">The Orchestrator</h2>
                         <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.3em]">CUSTOM ARCHITECT</p>
                     </div>
                 </div>
@@ -65,13 +65,13 @@ export default function PrincipalLounge({ data }: PrincipalLoungeProps) {
                         <div className="w-12 h-[2px] bg-[#D4AF37]" />
                         <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.4em]">원장 전용 프라이빗 라운지</span>
                     </div>
-                    <h1 className="text-7xl font-black text-[#0B0D10] tracking-tighter leading-[0.9]">
+                    <h1 className="font-black text-[#0B0D10] tracking-tighter leading-[0.9] text-xl">
                         Secret Recovery <br /> Lab
                     </h1>
                 </div>
 
                 <div className="space-y-6">
-                    <p className="text-[#0B0D10] text-xl font-bold leading-relaxed">
+                    <p className="text-[#0B0D10] font-bold leading-relaxed text-xl">
                         당신만의 완벽한 회복 여정을 위한 모든 아이템을 조율합니다.
                     </p>
                     <p className="text-[#0B0D10]/40 text-sm leading-relaxed font-medium">
@@ -84,8 +84,8 @@ export default function PrincipalLounge({ data }: PrincipalLoungeProps) {
                     <div>
                         <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-[0.3em] mb-2">이번 달 수용량</p>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-black text-[#0B0D10]">{data.specs.occupiedSlots}</span>
-                            <span className="text-xl font-black text-[#0B0D10]/20">/ {data.specs.totalSlots}</span>
+                            <span className="font-black text-[#0B0D10] text-4xl">{data.specs.occupiedSlots}</span>
+                            <span className="font-black text-[#0B0D10]/20 text-xl">/ {data.specs.totalSlots}</span>
                         </div>
                     </div>
                     

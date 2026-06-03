@@ -40,7 +40,7 @@ export default function RecoveryCertificate({
             <Award className="w-8 h-8 sm:w-10 sm:h-10 text-reward-gold" />
           </div>
           <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.5em] text-chapter-accent mb-2">Recovery CGM Certificate</span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif-display text-obsidian tracking-tighter leading-tight italic">
+          <h1 className="font-serif-display text-obsidian tracking-tighter leading-tight italic text-3xl sm:text-4xl md:text-4xl">
             7일의 회복 여정,<br />완주를 증명합니다
           </h1>
         </div>

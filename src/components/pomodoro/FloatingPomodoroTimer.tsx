@@ -187,7 +187,7 @@ export default function FloatingPomodoroTimer({
 
                                 {/* Time Display */}
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-4xl font-black text-obsidian tracking-tighter">
+                                    <span className="font-black text-obsidian tracking-tighter text-4xl">
                                         {formatTime(timeRemaining)}
                                     </span>
                                     <span className="text-xs text-slate font-medium mt-1">

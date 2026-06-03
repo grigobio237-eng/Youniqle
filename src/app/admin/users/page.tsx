@@ -295,7 +295,7 @@ export default function AdminUsersPage() {
                   <p className="text-lg md:text-2xl font-bold text-text-primary">{users.length}</p>
                 </div>
                 <div className="p-1.5 md:p-3 rounded-full bg-blue-100 text-blue-600 hidden xs:block">
-                  <Users className="h-4 w-4 md:h-6 md:h-6" />
+                  <Users className="h-4 w-4 md:h-6" />
                 </div>
               </div>
             </CardContent>
@@ -311,7 +311,7 @@ export default function AdminUsersPage() {
                   </p>
                 </div>
                 <div className="p-1.5 md:p-3 rounded-full bg-green-100 text-green-600 hidden xs:block">
-                  <TrendingUp className="h-4 w-4 md:h-6 md:h-6" />
+                  <TrendingUp className="h-4 w-4 md:h-6" />
                 </div>
               </div>
             </CardContent>
@@ -327,7 +327,7 @@ export default function AdminUsersPage() {
                   </p>
                 </div>
                 <div className="p-1.5 md:p-3 rounded-full bg-purple-100 text-purple-600 hidden xs:block">
-                  <Shield className="h-4 w-4 md:h-6 md:h-6" />
+                  <Shield className="h-4 w-4 md:h-6" />
                 </div>
               </div>
             </CardContent>
@@ -343,7 +343,7 @@ export default function AdminUsersPage() {
                   </p>
                 </div>
                 <div className="p-1.5 md:p-3 rounded-full bg-yellow-100 text-yellow-600 hidden xs:block">
-                  <Star className="h-4 w-4 md:h-6 md:h-6" />
+                  <Star className="h-4 w-4 md:h-6" />
                 </div>
               </div>
             </CardContent>
@@ -440,7 +440,7 @@ export default function AdminUsersPage() {
                 <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-gray-50 transition-colors gap-4 shadow-sm bg-white">
                   <div className="flex items-start sm:items-center space-x-3 md:space-x-4">
                     <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                      <Users className="h-5 w-5 md:h-6 md:h-6 text-primary" />
+                      <Users className="h-5 w-5 md:h-6 text-primary" />
                     </div>
 
                     <div className="min-w-0 flex-1">

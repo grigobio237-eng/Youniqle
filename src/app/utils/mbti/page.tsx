@@ -157,7 +157,7 @@ export default function MBTIPage() {
                     <Badge className="bg-[#5c3e9c]/15 text-[#5c3e9c] border-none font-black text-xs px-4 py-1.5 rounded-full tracking-[0.2em] uppercase">
                         Self Discovery
                     </Badge>
-                    <h1 className="text-4xl md:text-5xl font-black text-obsidian tracking-tighter leading-tight">나를 깊이 알아보는 시간</h1>
+                    <h1 className="font-black text-obsidian tracking-tighter leading-tight text-4xl md:text-4xl">나를 깊이 알아보는 시간</h1>
                     <p className="text-slate font-semibold max-w-md mx-auto text-sm md:text-base leading-relaxed">
                         성격부터 내면의 피부 장벽 상태까지,<br />
                         당신만의 독창적인 리듬을 찾아 솔루션을 큐레이션합니다.
@@ -258,7 +258,7 @@ export default function MBTIPage() {
                             <RotateCcw className="h-5 w-5" />
                         </Button>
                         <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                            <div className="w-24 h-24 bg-white rounded-3xl p-1.5 shadow-xl flex items-center justify-center text-4xl transform -rotate-3 hover:rotate-0 transition-transform">
+                            <div className="w-24 h-24 bg-white rounded-3xl p-1.5 shadow-xl flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-transform text-4xl">
                                 {category.icon}
                             </div>
                         </div>
@@ -267,7 +267,7 @@ export default function MBTIPage() {
                     <div className="pt-16 pb-10 px-8 text-center space-y-8">
                         <div className="space-y-2">
                             <Badge className="bg-slate/10 text-slate border-none font-bold text-xs px-3 py-1 rounded-full">{category.title} 결과</Badge>
-                            <h2 className={`text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r ${category.color} tracking-tighter leading-none`}>
+                            <h2 className={`text-xl font-black text-transparent bg-clip-text bg-gradient-to-r ${category.color} tracking-tighter leading-none`}>
                                 {result.code}
                             </h2>
                             <h3 className="text-2xl font-black text-obsidian tracking-tight">{result.title}</h3>
@@ -346,7 +346,7 @@ export default function MBTIPage() {
                 {/* Question card */}
                 <Card className="p-8 border border-line shadow-xl rounded-[32px] bg-white min-h-[160px] flex items-center justify-center text-center relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-indigo-500 to-purple-500" />
-                    <h2 className="text-xl md:text-2xl font-black text-obsidian leading-relaxed tracking-tight px-4">
+                    <h2 className="font-black text-obsidian leading-relaxed tracking-tight px-4 text-xl md:text-2xl">
                         {question.text}
                     </h2>
                 </Card>

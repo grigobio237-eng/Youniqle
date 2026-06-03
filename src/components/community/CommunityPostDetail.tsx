@@ -180,7 +180,7 @@ export default function CommunityPostDetail({ postId, onClose, onEdit, onDeleteS
                   {new Date(post.createdAt).toLocaleDateString()}
                 </div>
               </div>
-              <h1 className="text-3xl md:text-5xl font-serif text-obsidian leading-tight tracking-tight mb-8">
+              <h1 className="font-serif text-obsidian leading-tight tracking-tight mb-8 text-3xl md:text-4xl">
                 {post.title}
               </h1>
               

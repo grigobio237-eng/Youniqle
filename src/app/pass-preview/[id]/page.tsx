@@ -104,7 +104,7 @@ function CustomerPassPreviewContent() {
             </Badge>
           </motion.div>
           
-          <h1 className={`text-4xl md:text-6xl font-black tracking-tighter leading-tight break-keep ${isBlack ? 'text-white' : 'text-obsidian'}`}>
+          <h1 className={`text-4xl md:text-4xl font-black tracking-tighter leading-tight break-keep ${isBlack ? 'text-white' : 'text-obsidian'}`}>
             {spec.title}
           </h1>
           
@@ -176,13 +176,13 @@ function CustomerPassPreviewContent() {
                 <div className="flex flex-col items-center justify-center gap-1">
                   <span className="text-[10px] font-black tracking-widest text-mist/40 uppercase">Membership Price</span>
                   <div className="flex items-baseline justify-center gap-3">
-                    <span className={`text-5xl md:text-7xl font-black ${spec.id === 'black' ? 'text-chapter-accent' : 'text-white'} drop-shadow-sm`}>
+                    <span className={`text-xl md:text-4xl font-black ${spec.id === 'black' ? 'text-chapter-accent' : 'text-white'} drop-shadow-sm`}>
                       ₩{spec.price}
                     </span>
                     <span className="text-2xl font-bold opacity-40">/ {spec.period}</span>
                   </div>
                 </div>
-                <p className="text-xl font-bold text-mist/90">{spec.position}</p>
+                <p className="font-bold text-mist/90 text-xl">{spec.position}</p>
               </div>
               
               <div className="pt-8">

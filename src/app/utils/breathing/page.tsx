@@ -210,7 +210,7 @@ export default function BreathingPage() {
                                 className={`h-16 px-8 rounded-full shadow-lg bg-gradient-to-r ${pattern.color} hover:opacity-90 transition-opacity flex items-center gap-2`}
                             >
                                 <Play className="h-6 w-6 text-white fill-current" />
-                                <span className="text-xl font-bold text-white">시작</span>
+                                <span className="font-bold text-white text-xl">시작</span>
                             </Button>
                         ) : (
                             <Button
@@ -220,7 +220,7 @@ export default function BreathingPage() {
                                 className="h-16 px-8 rounded-full border-2 flex items-center gap-2"
                             >
                                 <Pause className="h-6 w-6 text-gray-600 fill-current" />
-                                <span className="text-xl font-bold text-gray-600">정지</span>
+                                <span className="font-bold text-gray-600 text-xl">정지</span>
                             </Button>
                         )}
                     </div>

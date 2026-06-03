@@ -497,7 +497,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-xs font-medium text-gray-500">총 주문 (결제)</p>
-                    <p className="text-xl font-bold">{stats.totalOrders}</p>
+                    <p className="font-bold text-xl">{stats.totalOrders}</p>
                   </div>
                 </div>
               </CardContent>
@@ -511,7 +511,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-xs font-medium text-gray-500">주문 시도</p>
-                    <p className="text-xl font-bold">{stats.totalAttempts || 0}</p>
+                    <p className="font-bold text-xl">{stats.totalAttempts || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -525,7 +525,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-xs font-medium text-gray-500">총 매출</p>
-                    <p className="text-xl font-bold">₩{stats.totalRevenue.toLocaleString()}</p>
+                    <p className="font-bold text-xl">₩{stats.totalRevenue.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
@@ -539,7 +539,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-xs font-medium text-gray-500">처리 대기</p>
-                    <p className="text-xl font-bold">{stats.pendingOrders}</p>
+                    <p className="font-bold text-xl">{stats.pendingOrders}</p>
                   </div>
                 </div>
               </CardContent>
@@ -553,7 +553,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-xs font-medium text-gray-500">완료된 주문</p>
-                    <p className="text-xl font-bold">{stats.completedOrders}</p>
+                    <p className="font-bold text-xl">{stats.completedOrders}</p>
                   </div>
                 </div>
               </CardContent>

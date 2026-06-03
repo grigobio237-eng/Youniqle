@@ -44,7 +44,7 @@ export default function MyConditionPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full rounded-[32px] border-none shadow-2xl">
           <CardContent className="p-10 text-center space-y-6">
-            <div className="text-6xl">📊</div>
+            <div className="text-xl">📊</div>
             <h1 className="text-2xl font-black text-obsidian">아직 데이터가 없습니다</h1>
             <p className="text-slate">웰니스 체크를 먼저 기록해 주세요!</p>
             <Button asChild className="w-full h-12 rounded-2xl font-black bg-green-600 hover:bg-green-700">
@@ -177,7 +177,7 @@ export default function MyConditionPage() {
                 </div>
               </div>
               <div className="text-center space-y-1">
-                <div className="text-5xl font-black">{acwr.acwr}</div>
+                <div className="font-black text-xl">{acwr.acwr}</div>
                 <Badge className="bg-white/50 border-none font-bold">{acwr.zoneLabel}</Badge>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">

@@ -35,13 +35,15 @@ export async function POST(req: Request) {
     const newConsultation = new PreConsultation({
       user: (session.user as any).id,
       navigator: navigatorCode,
-      expectation: data.expectation,
+      medicalCategory: data.medicalCategory,
+      chiefComplaint: data.chiefComplaint,
+      dynamicAnswers: data.dynamicAnswers,
       medicalHistory: data.medicalHistory,
-      anxiety: data.anxiety,
+      lifestyle: data.lifestyle,
+      expectation: data.expectation,
       visitPlan: data.visitPlan,
       investment: data.investment,
-      medicalCategory: data.medicalCategory,
-      aiGuide: aiGuide // 분석 결과 즉시 저장 (실패 시 null)
+      aiGuide: aiGuide
     });
 
     await newConsultation.save();

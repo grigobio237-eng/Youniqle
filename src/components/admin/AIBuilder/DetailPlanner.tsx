@@ -1005,11 +1005,11 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
             {
                 step === 5 && (
                     <div className="text-center py-12 space-y-8 animate-in zoom-in duration-500">
-                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4">
+                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
                             ✅
                         </div>
                         <div className="space-y-2">
-                            <h2 className="text-4xl font-extrabold text-slate-900">상품 등록 완료!</h2>
+                            <h2 className="font-extrabold text-slate-900 text-4xl">상품 등록 완료!</h2>
                             <p className="text-slate-500 text-lg">유니클이 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
                         </div>
 

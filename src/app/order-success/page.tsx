@@ -25,7 +25,7 @@ function OrderSuccessContent() {
         <CardHeader className="text-center pt-16 pb-8">
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="w-32 h-32 bg-mist rounded-[40px] flex items-center justify-center text-6xl shadow-inner animate-pulse">
+              <div className="w-32 h-32 bg-mist rounded-[40px] flex items-center justify-center shadow-inner animate-pulse text-xl">
                 🌱
               </div>
               <div className="absolute -bottom-2 -right-2 bg-chapter-accent rounded-full p-3 shadow-lg ring-4 ring-white">
@@ -34,7 +34,7 @@ function OrderSuccessContent() {
             </div>
           </div>
           <p className="text-slate font-black uppercase tracking-[0.2em] text-[10px] mb-2">Success Verification Complete</p>
-          <CardTitle className="text-4xl font-black text-obsidian tracking-tighter">
+          <CardTitle className="font-black text-obsidian tracking-tighter text-4xl">
             결제가 완료되었습니다!
           </CardTitle>
           <p className="mt-4 text-slate font-medium px-8 leading-relaxed">

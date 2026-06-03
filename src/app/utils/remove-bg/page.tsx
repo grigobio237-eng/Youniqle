@@ -27,8 +27,8 @@ export default function BackgroundRemovalPage() {
 
                 <Card className="shadow-2xl border-0">
                     <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-xl">
-                        <div className="text-6xl mb-4">✨</div>
-                        <CardTitle className="text-4xl font-bold">유니클 배경 제거</CardTitle>
+                        <div className="mb-4 text-xl">✨</div>
+                        <CardTitle className="font-bold text-4xl">유니클 배경 제거</CardTitle>
                         <CardDescription className="text-blue-100 text-lg mt-2">
                             브라우저에서 바로 처리되는 무료 유니클 배경 제거 도구
                         </CardDescription>

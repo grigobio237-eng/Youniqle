@@ -23,7 +23,7 @@ export default function PartnerPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-obsidian text-mist rounded-full text-[10px] font-black uppercase tracking-widest">
               Partner Partnership
             </div>
-            <h1 className="text-3xl md:text-6xl lg:text-7xl font-black text-obsidian leading-[1.1] tracking-tighter">
+            <h1 className="font-black text-obsidian leading-[1.1] tracking-tighter text-3xl md:text-4xl">
               Youniqle은 <br />
               <span className="text-chapter-accent">더 맞는 고객</span>을 연결합니다.
             </h1>
@@ -58,7 +58,7 @@ export default function PartnerPage() {
                 <BarChart className="w-6 h-6" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-obsidian tracking-tight">사전 진단 가치</h3>
+                <h3 className="font-black text-obsidian tracking-tight text-xl">사전 진단 가치</h3>
                 <p className="text-slate/60 leading-relaxed text-[13px] md:text-sm font-medium">
                   고객이 센터에 방문하기 전, 60초 진단을 통해 이미 본인의 상태를 인지하고 있습니다. 상담 시간을 70% 이상 단축시키고 상담의 질을 높입니다.
                 </p>
@@ -69,7 +69,7 @@ export default function PartnerPage() {
                 <Zap className="w-6 h-6" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-obsidian tracking-tight">정밀 매칭 시스템</h3>
+                <h3 className="font-black text-obsidian tracking-tight text-xl">정밀 매칭 시스템</h3>
                 <p className="text-slate/60 leading-relaxed text-[13px] md:text-sm font-medium">
                   리듬/집중/프리미엄 3가지 회복 경로에 근거하여, 파트너사가 보유한 특화 프로그램에 가장 적합한 타겟 고객만을 매칭해 드립니다.
                 </p>
@@ -80,7 +80,7 @@ export default function PartnerPage() {
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-obsidian tracking-tight">브랜드 신뢰도</h3>
+                <h3 className="font-black text-obsidian tracking-tight text-xl">브랜드 신뢰도</h3>
                 <p className="text-slate/60 leading-relaxed text-[13px] md:text-sm font-medium">
                   유니클의 프리미엄 브랜드 아이덴티티와 데이터 리포트는 파트너사의 솔루션에 객관적인 근거와 높은 신뢰성을 더해줍니다.
                 </p>
@@ -96,7 +96,7 @@ export default function PartnerPage() {
           <div className="flex flex-col lg:flex-row items-center gap-12 md:gap-20">
             <div className="flex-1 space-y-8 md:space-y-10">
               <div className="space-y-4">
-                <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tight">파트너 전용 <br />데이터 대시보드 제공</h2>
+                <h2 className="font-black text-obsidian tracking-tight text-3xl md:text-4xl">파트너 전용 <br />데이터 대시보드 제공</h2>
                 <p className="text-lg text-slate/60">연결된 고객의 진단 이력, 회복 변화 추이, 서비스 만족도를 한눈에 분석하고 관리할 수 있는 도구를 제공합니다.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -132,8 +132,8 @@ export default function PartnerPage() {
       <section className="py-8 md:py-16 border-t border-line">
         <div className="container mx-auto px-6 text-center space-y-8 md:space-y-10">
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tighter">함께 성장할 파트너를 기다립니다.</h2>
-            <p className="text-xl text-slate/60">당신의 전문성이 더 빛날 수 있도록, 유니클이 가장 좋은 무대와 관객을 설계하겠습니다.</p>
+            <h2 className="font-black text-obsidian tracking-tighter text-3xl md:text-4xl">함께 성장할 파트너를 기다립니다.</h2>
+            <p className="text-slate/60 text-xl">당신의 전문성이 더 빛날 수 있도록, 유니클이 가장 좋은 무대와 관객을 설계하겠습니다.</p>
           </div>
           <div className="flex justify-center">
             <Button 

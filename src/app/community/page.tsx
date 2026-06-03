@@ -50,7 +50,7 @@ export default function CommunityPortalPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-serif text-obsidian tracking-tight"
+            className="font-serif text-obsidian tracking-tight text-xl md:text-4xl"
           >
             우리들의 <span className="italic">회복 광장</span>
           </motion.h1>
@@ -114,7 +114,7 @@ export default function CommunityPortalPage() {
           className="mt-20 p-12 bg-obsidian rounded-[48px] text-center space-y-8 relative overflow-hidden"
         >
           <div className="relative z-10 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">당신의 이야기를 들려주세요</h2>
+            <h2 className="font-serif text-white tracking-tight text-3xl md:text-4xl">당신의 이야기를 들려주세요</h2>
             <p className="text-mist/40 max-w-xl mx-auto font-medium">따뜻한 말 한마디가 누군가의 오늘을 바꿀 수 있습니다. 지금 바로 라운지에서 대화를 시작해 보세요.</p>
             <div className="pt-4">
               <Link href="/community/lounge">

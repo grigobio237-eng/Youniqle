@@ -65,14 +65,14 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 md:right-12 text-white space-y-1 md:space-y-2">
                         <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Master Architect</p>
-                        <h2 className="text-xl md:text-4xl font-black tracking-tighter italic">{data.name}</h2>
+                        <h2 className="font-black tracking-tighter italic text-xl md:text-4xl">{data.name}</h2>
                     </div>
                 </div>
 
                 <div className="space-y-6 md:space-y-10">
                     <div className="space-y-4 md:space-y-6">
                         <Quote className="w-8 h-8 md:w-12 md:h-12 text-[#D4AF37] opacity-20" />
-                        <h3 className="text-2xl md:text-5xl font-black text-[#0B0D10] tracking-tighter leading-tight italic">
+                        <h3 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-2xl md:text-4xl">
                             "{data.bio}"
                         </h3>
                     </div>
@@ -117,7 +117,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                 <div className="max-w-7xl mx-auto px-6 space-y-10 md:space-y-20">
                     <div className="text-center space-y-4">
                         <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.5em] block">Core Philosophy</span>
-                        <h2 className="text-3xl md:text-5xl font-black text-[#0B0D10] italic tracking-tighter">
+                        <h2 className="font-black text-[#0B0D10] italic tracking-tighter text-3xl md:text-4xl">
                             Why <span className="text-[#D4AF37] tracking-normal">Recovery</span> First?
                         </h2>
                     </div>
@@ -129,7 +129,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                                 whileHover={{ y: -10 }}
                                 className="bg-white p-6 sm:p-10 md:p-12 rounded-[28px] md:rounded-[48px] shadow-[0_30px_80px_rgba(0,0,0,0.02)] border border-[#0B0D10]/5 space-y-6 md:space-y-8"
                             >
-                                <div className="text-4xl md:text-6xl">{card.emoji}</div>
+                                <div className="text-4xl md:text-4xl">{card.emoji}</div>
                                 <div className="space-y-3 md:space-y-4">
                                     <h3 className="text-lg sm:text-2xl font-black text-[#0B0D10] tracking-tight leading-tight italic">{card.title}</h3>
                                     <p className="text-xs sm:text-sm font-medium text-[#0B0D10]/50 leading-relaxed word-keep-all">{card.desc}</p>
@@ -144,7 +144,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
             <section className="max-w-4xl mx-auto px-6 space-y-10 md:space-y-20">
                 <div className="text-center space-y-4">
                     <span className="text-[10px] font-black text-[#0B0D10]/20 uppercase tracking-[0.5em] block">Resources</span>
-                    <h2 className="text-3xl md:text-4xl font-black text-[#0B0D10] italic tracking-tighter">자주 묻는 질문 (FAQ)</h2>
+                    <h2 className="font-black text-[#0B0D10] italic tracking-tighter text-3xl md:text-4xl">자주 묻는 질문 (FAQ)</h2>
                 </div>
                 <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
                     {data.faqs.map((faq, i) => (
@@ -167,7 +167,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                         <MessageCircle className="w-8 h-8 md:w-10 md:h-10 text-[#D4AF37]" />
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-2xl md:text-4xl font-black text-[#0B0D10] tracking-tighter italic">Still have questions?</h3>
+                        <h3 className="font-black text-[#0B0D10] tracking-tighter italic text-2xl md:text-4xl">Still have questions?</h3>
                         <p className="text-sm sm:text-lg text-[#0B0D10]/40 font-bold">원장 김미정 혹은 유니클 어시스턴트와 1:1로 직접 대화하세요.</p>
                     </div>
                 </div>

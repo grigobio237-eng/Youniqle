@@ -143,7 +143,7 @@ export default function PostOpSurveyPage() {
                 <Heart className="w-10 h-10 text-chapter-accent fill-chapter-accent" />
               </div>
               <div className="space-y-4">
-                <h1 className="text-3xl md:text-5xl font-black text-obsidian tracking-tight">
+                <h1 className="font-black text-obsidian tracking-tight text-3xl md:text-4xl">
                   {session?.user?.name}님을 위한<br />정밀 사후 케어
                 </h1>
                 <p className="text-slate/60 font-bold text-lg px-4 break-keep">
@@ -153,7 +153,7 @@ export default function PostOpSurveyPage() {
               <Button 
                 onClick={() => setStep('questions')} 
                 size="lg" 
-                className="w-full h-20 bg-obsidian text-white rounded-3xl text-xl font-black shadow-2xl hover:scale-[1.02] transition-all"
+                className="w-full h-20 bg-obsidian text-white rounded-3xl font-black shadow-2xl hover:scale-[1.02] transition-all text-xl"
               >
                 문진 시작하기 <ChevronRight className="ml-2 w-6 h-6" />
               </Button>
@@ -231,7 +231,7 @@ export default function PostOpSurveyPage() {
                   onClick={submitAnalysis} 
                   size="lg" 
                   disabled={isSubmitting}
-                  className="w-full h-20 bg-chapter-accent text-white rounded-3xl text-xl font-black shadow-2xl"
+                  className="w-full h-20 bg-chapter-accent text-white rounded-3xl font-black shadow-2xl text-xl"
                 >
                   분석 완료 및 저장 <Sparkles className="ml-2 w-6 h-6" />
                 </Button>
@@ -272,7 +272,7 @@ export default function PostOpSurveyPage() {
                     <ShieldCheck className="w-4 h-4 text-chapter-accent" />
                     <span className="text-[10px] font-black uppercase text-chapter-accent tracking-widest">Premium Care Log</span>
                   </div>
-                  <h3 className="text-4xl font-black text-white italic">Recovery Score: {analysisResult.recoveryScore}</h3>
+                  <h3 className="font-black text-white italic text-4xl">Recovery Score: {analysisResult.recoveryScore}</h3>
                   <p className="text-white/60 font-medium px-8 break-keep italic">
                     &quot;{analysisResult.summary}&quot;
                   </p>

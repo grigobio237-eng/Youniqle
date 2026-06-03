@@ -159,10 +159,10 @@ export default function CheckoutPage({ params }: PageProps) {
               <Check className="w-12 h-12 text-obsidian stroke-[4]" />
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">
+              <h1 className="font-black text-white tracking-tighter uppercase text-4xl md:text-4xl">
                 Lifecare OS Upgraded
               </h1>
-              <p className="text-primary font-bold text-xl uppercase tracking-widest">
+              <p className="text-primary font-bold uppercase tracking-widest text-xl">
                 {pass.name} v2.5 ACTIVATED
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function CheckoutPage({ params }: PageProps) {
                 <p className="text-lg font-black text-obsidian">{pass.name}</p>
                 <p className="text-xs text-slate/60 font-bold">{pass.position}</p>
               </div>
-              <p className="text-xl font-black text-obsidian">{pass.price}원</p>
+              <p className="font-black text-obsidian text-xl">{pass.price}원</p>
             </div>
             <div className="flex justify-between items-center py-4 border-t border-line mt-4">
               <p className="text-sm font-bold text-slate/60">이용 기간</p>
@@ -311,7 +311,7 @@ export default function CheckoutPage({ params }: PageProps) {
           <button 
             disabled={isProcessing || !isAgreed}
             onClick={handlePayment}
-            className="w-full py-6 bg-obsidian text-white rounded-[24px] font-black text-xl tracking-tight hover:bg-primary hover:text-obsidian transition-all shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group"
+            className="w-full py-6 bg-obsidian text-white rounded-[24px] font-black tracking-tight hover:bg-primary hover:text-obsidian transition-all shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group text-xl"
           >
             {isProcessing ? (
               <>

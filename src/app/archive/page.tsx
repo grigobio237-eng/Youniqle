@@ -84,8 +84,8 @@ export default function ArchivePage() {
           <Archive className="w-4 h-4 mr-2 text-primary" />
           Rhythm Archive
         </div>
-        <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter">7일 챌린지 보관함</h1>
-        <p className="text-lg text-slate/60 leading-relaxed font-bold break-keep">
+        <h1 className="font-black text-obsidian tracking-tighter text-xl md:text-4xl">7일 챌린지 보관함</h1>
+        <p className="text-[11px] md:text-sm text-slate/60 leading-relaxed font-bold break-keep">
           완주한 7일의 여정들은 흩어지지 않고<br />
           당신의 회복 정체성을 증명하는 기록이 됩니다.
         </p>
@@ -105,10 +105,10 @@ export default function ArchivePage() {
               </div>
               
               <div className="space-y-4">
-                <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+                <h2 className="text-lg md:text-3xl font-black text-white tracking-tighter">
                   과거의 기록이<br />잠겨있습니다
                 </h2>
-                <p className="text-white/40 text-sm md:text-lg font-bold leading-relaxed break-keep max-w-md mx-auto">
+                <p className="text-white/40 text-[11px] md:text-sm font-bold leading-relaxed break-keep max-w-md mx-auto">
                   유니클 라이프 패스로 보관함을 활성화하고,<br />
                   매주 누적되는 당신만의 회복 OS를 완성하세요.
                 </p>
@@ -146,8 +146,8 @@ export default function ArchivePage() {
                 <div className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black tracking-widest uppercase">
                   Data Asset Inventory
                 </div>
-                <h3 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter">나의 회복 자산 인벤토리</h3>
-                <p className="text-slate/60 font-bold text-sm">다양한 경로로 수집된 당신만의 회복 데이터를 관리하세요.</p>
+                <h3 className="text-base md:text-xl font-black text-obsidian tracking-tighter">나의 회복 자산 인벤토리</h3>
+                <p className="text-slate/60 font-bold text-[11px] md:text-sm">다양한 경로로 수집된 당신만의 회복 데이터를 관리하세요.</p>
               </div>
               <div className="flex items-center gap-4 bg-mist/50 p-4 md:p-6 rounded-[32px] border border-line/50 w-full md:w-auto">
                 <div className="text-right flex-1">

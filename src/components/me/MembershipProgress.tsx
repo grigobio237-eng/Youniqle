@@ -53,10 +53,10 @@ export default function MembershipProgress({ currentGrade, currentPoints }: Memb
                         <Badge className={`${gradeColors[grade] || gradeColors.cedar} mb-2 border`}>
                             {currentGrade.toUpperCase()}
                         </Badge>
-                        <h3 className="text-lg md:text-xl font-black text-obsidian tracking-tight">멤버십 리워드</h3>
+                        <h3 className="text-base md:text-xl font-black text-obsidian tracking-tight">멤버십 리워드</h3>
                     </div>
                     <div className="text-right">
-                        <span className="text-2xl md:text-3xl font-black text-primary">{currentPoints.toLocaleString()}</span>
+                        <span className="font-black text-primary text-xl md:text-3xl">{currentPoints.toLocaleString()}</span>
                         <span className="text-[10px] md:text-xs font-bold text-slate block uppercase tracking-widest mt-1">Points</span>
                     </div>
                 </div>

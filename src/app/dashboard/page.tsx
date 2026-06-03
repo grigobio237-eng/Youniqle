@@ -224,13 +224,13 @@ export default function DashboardPage() {
 
           {/* Encouraging Typography */}
           <div className="space-y-3 sm:space-y-4 max-w-sm">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-[#2D3A30] tracking-tight leading-snug break-keep px-2">
+            <h2 className="text-lg md:text-3xl font-extrabold text-[#2D3A30] tracking-tight leading-snug break-keep px-2">
               오늘의 나를 마주하는 공간으로<br />이동하고 있습니다
             </h2>
             
             {/* Dynamic Warm Message with Smooth Fade */}
             <div className="h-12 flex items-center justify-center">
-              <p className="text-xs sm:text-sm font-semibold text-[#68756A] italic break-keep leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-700">
+              <p className="text-[11px] md:text-sm font-semibold text-[#68756A] italic break-keep leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-700">
                 {loadingMessages[loadingMsgIdx]}
               </p>
             </div>
@@ -265,10 +265,10 @@ export default function DashboardPage() {
     if (localScore) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 text-center space-y-6">
-          <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <h2 className="text-2xl font-bold text-foreground">회복 데이터를 정리하고 있어요</h2>
-          <p className="text-lg text-foreground/50 leading-relaxed">최근 기록하신 {localScore}점의 진단 결과를 토대로<br />오늘의 회복 리듬을 분석하고 있습니다.</p>
-          <Button variant="ghost" onClick={() => window.location.reload()} className="rounded-full">잠시만 기다려주세요</Button>
+          <div className="w-16 h-16 md:w-20 md:h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <h2 className="text-lg md:text-3xl font-bold text-foreground">회복 데이터를 정리하고 있어요</h2>
+          <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed">최근 기록하신 {localScore}점의 진단 결과를 토대로<br />오늘의 회복 리듬을 분석하고 있습니다.</p>
+          <Button variant="ghost" onClick={() => window.location.reload()} className="rounded-full text-[11px] md:text-sm">잠시만 기다려주세요</Button>
         </div>
       );
     }
@@ -284,11 +284,11 @@ export default function DashboardPage() {
             <Sparkles className="w-14 h-14 text-primary" />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-6 leading-tight">
+          <h1 className="font-bold text-foreground tracking-tight mb-4 md:mb-6 leading-tight text-xl md:text-4xl">
             나만을 위한<br />회복의 시간을 가져볼까요?
           </h1>
           
-          <p className="text-foreground/50 font-medium text-lg md:text-xl mb-12 leading-relaxed">
+          <p className="text-[11px] md:text-sm text-foreground/50 font-medium mb-8 md:mb-12 leading-relaxed">
             오늘 당신의 몸과 마음이 보내는 신호에 귀를 기울여보세요.<br />
             가벼운 체크만으로도 당신에게 필요한 위로를 전해드릴게요.
           </p>
@@ -299,22 +299,22 @@ export default function DashboardPage() {
                 localStorage.removeItem('recovery_last_score');
                 window.location.href = '/diagnosis?type=daily';
               }}
-              className="w-full py-8 bg-primary text-white rounded-full font-bold text-2xl tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 group"
+              className="w-full py-5 md:py-8 bg-primary text-white rounded-full font-bold text-[11px] md:text-sm tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 md:gap-4 group"
             >
               오늘의 회복 리듬 측정 시작하기
-              <ArrowRight className="w-8 h-8 group-hover:translate-x-1.5 transition-transform" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
             
-            <div className="flex items-center justify-center gap-8 pt-6">
-              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-4 md:pt-6">
+              <div className="flex items-center gap-1.5 md:gap-2.5 text-[10px] md:text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
                 <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 Youniqle Analysis
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-1.5 md:gap-2.5 text-[10px] md:text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
                 <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 Custom Protocol
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-1.5 md:gap-2.5 text-[10px] md:text-xs font-bold text-foreground/30 uppercase tracking-[0.2em]">
                 <div className="w-1.5 h-1.5 bg-primary/30 rounded-full" />
                 Daily Rewards
               </div>

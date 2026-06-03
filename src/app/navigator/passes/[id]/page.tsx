@@ -91,10 +91,10 @@ export default function NavigatorPassDetailPage() {
               >
                 {spec.name}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight break-keep">
+              <h1 className="font-black tracking-tighter leading-tight break-keep text-3xl md:text-4xl">
                 {spec.title}
               </h1>
-              <p className="text-xl font-bold italic opacity-80">
+              <p className="font-bold italic opacity-80 text-xl">
                 {spec.subtitle}
               </p>
               <p className="text-lg font-medium opacity-70 max-w-2xl leading-relaxed break-keep">
@@ -105,8 +105,8 @@ export default function NavigatorPassDetailPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-8 border-t border-current/10">
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl md:text-6xl font-black">₩{spec.price}</span>
-                  <span className="text-xl font-bold opacity-60">/ {spec.period}</span>
+                  <span className="font-black text-4xl md:text-4xl">₩{spec.price}</span>
+                  <span className="font-bold opacity-60 text-xl">/ {spec.period}</span>
                 </div>
                 <p className="text-sm font-bold opacity-50">{spec.position}</p>
               </div>
@@ -144,7 +144,7 @@ export default function NavigatorPassDetailPage() {
                     <Check className="w-7 h-7" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <h3 className="text-xl font-black text-obsidian">{benefit.title}</h3>
+                    <h3 className="font-black text-obsidian text-xl">{benefit.title}</h3>
                     <p className="text-slate/90 text-sm font-bold leading-relaxed break-keep">{benefit.desc}</p>
                     
                     {benefit.navigatorNote && (
@@ -202,10 +202,10 @@ export default function NavigatorPassDetailPage() {
               
               {spec.roadmap?.map((step: any, idx: number) => (
                 <div key={step.step} className="relative space-y-4 text-center md:text-left">
-                  <div className="w-14 h-14 bg-white text-obsidian rounded-full flex items-center justify-center text-xl font-black mx-auto md:mx-0 shadow-lg relative z-10">
+                  <div className="w-14 h-14 bg-white text-obsidian rounded-full flex items-center justify-center font-black mx-auto md:mx-0 shadow-lg relative z-10 text-xl">
                     {step.step}
                   </div>
-                  <h4 className="text-xl font-bold">{step.title}</h4>
+                  <h4 className="font-bold text-xl">{step.title}</h4>
                   <p className="text-sm text-mist/90 font-medium leading-relaxed break-keep">{step.desc}</p>
                 </div>
               ))}

@@ -386,7 +386,7 @@ export default function AutoVideoPage() {
             </Card>
 
             {/* Project List */}
-            <h2 className="text-xl font-semibold mt-8">내 프로젝트 ({projects.length})</h2>
+            <h2 className="font-semibold mt-8 text-xl">내 프로젝트 ({projects.length})</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (
                     <Card

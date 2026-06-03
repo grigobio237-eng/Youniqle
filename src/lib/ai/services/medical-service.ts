@@ -67,17 +67,31 @@ export class MedicalService {
     }
 
     static async generateMedicalInterviewGuide(data: any): Promise<MedicalInterviewGuideOutput> {
-        const prompt = `유니클 수석 코디네이터로서 사용자의 사전 문진 데이터를 정밀 분석하여 면담 가이드를 작성하세요. 데이터: ${JSON.stringify(data)}`;
+        const prompt = `유니클 수석 코디네이터로서 다음 사전 문진 데이터를 정밀 분석하여 면담 가이드를 작성하세요. 
+데이터: ${JSON.stringify(data)}
+
+[응답 형식: 반드시 아래 JSON 형식만 반환하세요]
+{
+  "analysis": "사용자의 증상과 상태에 대한 종합적인 분석 코멘트 (2~3문장)",
+  "mustAskQuestions": [
+    { "question": "환자가 의사에게 꼭 물어봐야 할 질문", "rationale": "이 질문을 해야 하는 의학적/안전상 이유" }
+  ],
+  "hospitalTips": ["진료/상담 시 유의사항이나 팁 1", "팁 2"]
+}`;
         try {
             const text = await GeminiCore.generateWithFallback(prompt, "유니클 수석 코디네이터 모드", 0.7);
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             if (jsonMatch) return JSON.parse(jsonMatch[0]);
             throw new Error('Parsing failed');
         } catch (error) {
+            console.error('generateMedicalInterviewGuide error:', error);
             return {
-                analysis: "필수 면담 항목을 정리해 드립니다.",
-                mustAskQuestions: [{ question: "예상되는 통증과 관리법은?", rationale: "안전한 관리 필수" }],
-                hospitalTips: ["사소한 병력도 말씀하세요"]
+                analysis: "환자분의 문진 데이터를 바탕으로 필수 면담 항목을 정리했습니다.",
+                mustAskQuestions: [
+                  { question: "현재 증상에 대한 가장 효과적인 치료 방법은 무엇인가요?", rationale: "정확한 치료 방향 설정" },
+                  { question: "과거 병력이 이번 치료에 미칠 수 있는 영향이 있나요?", rationale: "안전한 치료 계획 수립" }
+                ],
+                hospitalTips: ["사소한 병력이라도 꼭 말씀해 주세요.", "의료진의 질문에 최대한 구체적으로 답변해 주시면 큰 도움이 됩니다."]
             };
         }
     }
@@ -121,9 +135,14 @@ export class MedicalService {
     }
 
     static async generateDynamicQuestions(symptom: string, category: string): Promise<any> {
+        const symptomText = symptom ? `증상("${symptom}")과 ` : '';
         const prompt = `
-        사용자의 증상("${symptom}")과 진료 분야("${category}")를 바탕으로 최적화된 유니클(YOUNIQLE) 맞춤형 문진 질문 세트를 생성하세요.
+        사용자의 ${symptomText}진료 분야("${category}")를 바탕으로 최적화된 유니클(YOUNIQLE) 맞춤형 문진 질문 세트를 생성하세요.
         유니클의 톤앤매너(프리미엄, 전문적, 따뜻함)를 유지하세요.
+        
+        [매우 중요: 분야별 용어 변환]
+        내과, 한방, 치과 등에서는 '시술 후 일상 복귀' 같은 성형외과적 표현을 피하고, '집중 치료 기간', '내원 희망 주기' 등으로 적절히 용어를 변환하여 라벨(downtimeLabel 등)을 작성하세요.
+        downtimeOptions의 value는 무조건 "1일", "3일", "7일", "14일 이상"을 유지하되, label만 분야에 맞게 바꾸세요.
 
         [응답 형식: JSON]
         {
@@ -133,9 +152,17 @@ export class MedicalService {
               "sub": "문자열",
               "label": "문자열 (주요 변화/기대치 관련 질문)",
               "options": [
-                { "label": "옵션1", "value": "값1" },
-                { "label": "옵션2", "value": "값2" },
-                { "label": "옵션3", "value": "값3" }
+                { "label": "옵션1", "value": "자연스러운 변화" },
+                { "label": "옵션2", "value": "세련된 변화" },
+                { "label": "옵션3", "value": "드라마틱한 변화" }
+              ],
+              "downtimeLabel": "문자열 (기간/복귀/회복 주기에 대한 라벨)",
+              "downtimeSub": "문자열 (서브 설명)",
+              "downtimeOptions": [
+                { "label": "문자열 (예: 바로 복귀/당일 치료)", "value": "1일" },
+                { "label": "문자열 (예: 단기 휴식/단기 치료)", "value": "3일" },
+                { "label": "문자열 (예: 충분한 회복/중기 치료)", "value": "7일" },
+                { "label": "문자열 (예: 완벽한 복구/장기 치료)", "value": "14일 이상" }
               ],
               "eventLabel": "문자열 (일정 관련)",
               "eventSub": "문자열",
@@ -144,17 +171,23 @@ export class MedicalService {
             "step2": {
               "title": "문자열",
               "sub": "문자열",
-              "label": "문자열 (과거 경험 관련)",
+              "label": "문자열 (과거 치료/수술 경험 관련)",
               "subLabel": "문자열",
-              "placeholder": "문자열"
+              "placeholder": "문자열",
+              "medicationLabel": "문자열 (복용 약품 확인 라벨)",
+              "medicationSub": "문자열 (약품 확인 서브 설명)",
+              "healthIssueLabel": "문자열 (최근 건강 상태 확인 라벨)",
+              "healthIssueSub": "문자열 (건강 상태 서브 설명)"
             },
             "step3": {
               "title": "문자열",
               "sub": "문자열",
               "label": "문자열 (우려 사항 관련)",
               "options": [
-                { "id": "id1", "label": "우려1", "value": "값1" },
-                { "id": "id2", "label": "우려2", "value": "값2" }
+                { "id": "a-pain", "label": "통증/불편함", "value": "통증" },
+                { "id": "a-swelling", "label": "부기/일상지장", "value": "붓기/멍" },
+                { "id": "a-scar", "label": "치료 효과/결과", "value": "효과걱정" },
+                { "id": "a-privacy", "label": "프라이버시 노출", "value": "프라이버시" }
               ]
             },
             "step4": {
@@ -167,7 +200,7 @@ export class MedicalService {
             "step5": {
               "title": "문자열",
               "sub": "문자열",
-              "label": "문자열 (투자/예산 관련)",
+              "label": "문자열 (투자/예산/다짐 관련)",
               "type": "budget 또는 text",
               "placeholder": "문자열"
             }

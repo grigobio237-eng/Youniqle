@@ -124,7 +124,7 @@ export default function HealingCenterPage() {
                                     <Badge className="bg-[#D4AF37] text-black border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
                                         Ultimate Edition
                                     </Badge>
-                                    <h2 className="text-4xl font-serif text-white tracking-tighter leading-tight">{selectedProduct.name}</h2>
+                                    <h2 className="font-serif text-white tracking-tighter leading-tight text-4xl">{selectedProduct.name}</h2>
                                 </div>
                             </div>
 

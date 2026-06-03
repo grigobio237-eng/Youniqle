@@ -138,7 +138,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08 }}
-            className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight break-keep px-2 text-[#2D3A30] font-serif-display leading-tight"
+            className="font-extrabold tracking-tight break-keep px-2 text-[#2D3A30] font-serif-display leading-tight text-2xl sm:text-4xl md:text-4xl"
           >
             사진은 평가가 아니라 기록입니다.<br />
             <span className="text-[#556257] italic">얼굴이 아니어도 괜찮아요.</span>

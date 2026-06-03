@@ -169,7 +169,7 @@ export default function ResultDisplay({
             </div>
             <div>
               <p className="text-[9px] sm:text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none mb-1">Rhythm Check Complete</p>
-              <h2 className="text-xl sm:text-2xl font-black text-obsidian italic tracking-tighter">리듬체크 완료</h2>
+              <h2 className="font-black text-obsidian italic tracking-tighter text-xl sm:text-2xl">리듬체크 완료</h2>
             </div>
           </div>
           
@@ -177,7 +177,7 @@ export default function ResultDisplay({
             <div className="inline-flex items-center px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-1 sm:mb-2">
               {info.badge}
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-obsidian tracking-tight break-keep">{info.title}</h2>
+            <h2 className="font-black text-obsidian tracking-tight break-keep text-2xl sm:text-3xl md:text-4xl">{info.title}</h2>
           </div>
         </div>
 
@@ -192,13 +192,13 @@ export default function ResultDisplay({
           <div className="flex justify-between items-start gap-4">
             <div className="space-y-1">
               <span className="text-[9px] sm:text-[10px] font-black text-slate uppercase tracking-widest opacity-40 block mb-0.5">Today's Rhythm</span>
-              <h3 className="text-xl sm:text-3xl font-black text-obsidian tracking-tighter italic font-serif break-keep leading-tight">
+              <h3 className="font-black text-obsidian tracking-tighter italic font-serif break-keep leading-tight text-xl sm:text-3xl">
                 {rhythmType}
               </h3>
             </div>
             <div className="text-right shrink-0">
               <span className="text-[9px] sm:text-[10px] font-black text-slate/40 uppercase tracking-widest block mb-0.5">Recovery Point</span>
-              <div className="text-3xl sm:text-5xl font-black text-chapter-accent italic tracking-tighter leading-none">
+              <div className="font-black text-chapter-accent italic tracking-tighter leading-none text-xl">
                 {recoveryScore}
               </div>
             </div>

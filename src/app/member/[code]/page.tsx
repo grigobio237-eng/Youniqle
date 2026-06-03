@@ -250,7 +250,7 @@ export default function MemberVerifyPage() {
                 <Button key={i} variant="ghost" onClick={() => {
                   if (num === 'back') setPinInput(p => p.slice(0, -1));
                   else if (num !== '' && pinInput.length < 4) setPinInput(p => p + num);
-                }} className="h-16 text-xl font-black text-slate-700 hover:bg-slate-100 rounded-2xl">
+                }} className="h-16 font-black text-slate-700 hover:bg-slate-100 rounded-2xl text-xl">
                   {num === 'back' ? '←' : num}
                 </Button>
               ))}
@@ -422,7 +422,7 @@ export default function MemberVerifyPage() {
                           <div className="relative z-10 space-y-6">
                             <p className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.3em]">Recovery Score Dashboard</p>
                             <div className="flex items-baseline gap-2">
-                              <span className="text-7xl font-black tracking-tighter">{currentReport.totalScore}</span>
+                              <span className="font-black tracking-tighter text-xl">{currentReport.totalScore}</span>
                               <span className="text-2xl font-bold opacity-40">/ 100</span>
                             </div>
                             <h3 className="text-2xl font-black tracking-tight leading-none">{currentReport.resultTitle}</h3>

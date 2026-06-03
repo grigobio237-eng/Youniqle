@@ -342,7 +342,7 @@ export default function DiagnosisBasedRecommendations({
                                         />
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center">
-                                            <span className="text-6xl mb-2 group-hover:scale-125 transition-transform duration-300">
+                                            <span className="mb-2 group-hover:scale-125 transition-transform duration-300 text-xl">
                                                 {item.icon || '✨'}
                                             </span>
                                             <span className="text-slate/20 font-black text-lg italic tracking-tighter">
@@ -367,7 +367,7 @@ export default function DiagnosisBasedRecommendations({
                                     {/* 가격 (상품인 경우) */}
                                     {item.price && (
                                         <div className="mt-4 pt-4 border-t border-line">
-                                            <span className="text-xl font-black text-obsidian">
+                                            <span className="font-black text-obsidian text-xl">
                                                 {item.price}
                                             </span>
                                         </div>
@@ -495,7 +495,7 @@ export default function DiagnosisBasedRecommendations({
                         <div className="w-16 h-16 bg-[#0E3A3A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                             <ExternalLink className="w-8 h-8 text-[#0E3A3A]" />
                         </div>
-                        <DialogTitle className="text-xl font-black text-obsidian">
+                        <DialogTitle className="font-black text-obsidian text-xl">
                             파트너사 페이지로 이동
                         </DialogTitle>
                         <DialogDescription className="text-slate font-medium pt-2 leading-relaxed">

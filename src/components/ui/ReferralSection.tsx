@@ -163,11 +163,11 @@ export default function ReferralSection({ referralCode }: { referralCode?: strin
                     <div className="grid grid-cols-2 gap-4 mb-6">
                         <div className="bg-gray-50 p-4 rounded-lg text-center">
                             <div className="text-gray-500 text-xs mb-1">총 초대한 친구</div>
-                            <div className="text-xl font-bold text-gray-900">{stats.referralCount}명</div>
+                            <div className="font-bold text-gray-900 text-xl">{stats.referralCount}명</div>
                         </div>
                         <div className="bg-indigo-50 p-4 rounded-lg text-center">
                             <div className="text-indigo-600 text-xs mb-1">누적 초대 보상</div>
-                            <div className="text-xl font-bold text-indigo-700">{stats.totalEarned.toLocaleString()}P</div>
+                            <div className="font-bold text-indigo-700 text-xl">{stats.totalEarned.toLocaleString()}P</div>
                         </div>
                     </div>
 

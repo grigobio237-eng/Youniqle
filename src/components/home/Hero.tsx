@@ -171,7 +171,7 @@ export default function Hero({
                 </motion.div>
               )}
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold text-foreground leading-[1.25] tracking-tight break-keep">
+            <h1 className="font-extrabold text-foreground leading-[1.25] tracking-tight break-keep text-xl sm:text-2xl md:text-4xl">
               {/* {personalMsg.title} */}
               당신의 몸이 보내는 작은 신호,<br />60초면 충분합니다.
             </h1>

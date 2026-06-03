@@ -132,7 +132,7 @@ export default function SpotTheDifferencePage() {
                                 미니게임 돌아가기
                             </Button>
                         </Link>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter">틀린그림 찾기</h1>
+                        <h1 className="font-black text-slate-900 tracking-tighter text-4xl">틀린그림 찾기</h1>
                         <p className="text-slate-500 font-medium">두 사무실 사이의 미묘한 차이를 발견하고 집중력을 높이세요!</p>
                     </div>
 
@@ -177,7 +177,7 @@ export default function SpotTheDifferencePage() {
                         </ul>
                         <Button
                             onClick={initGame}
-                            className="h-16 px-12 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xl shadow-xl shadow-slate-200"
+                            className="h-16 px-12 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black shadow-xl shadow-slate-200 text-xl"
                         >
                             게임 시작하기 🚀
                         </Button>
@@ -278,12 +278,12 @@ export default function SpotTheDifferencePage() {
                             >
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-rose-100/50 blur-[80px] -z-10"></div>
 
-                                <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center text-5xl mb-2 ${isWinner ? 'bg-amber-100 text-amber-500' : 'bg-slate-100 text-slate-400'}`}>
+                                <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center text-xl mb-2 ${isWinner ? 'bg-amber-100 text-amber-500' : 'bg-slate-100 text-slate-400'}`}>
                                     {isWinner ? '🏆' : '⏰'}
                                 </div>
 
                                 <div>
-                                    <h2 className="text-4xl font-black text-slate-900 mb-2 tracking-tighter">
+                                    <h2 className="font-black text-slate-900 mb-2 tracking-tighter text-4xl">
                                         {isWinner ? '완벽한 관찰력입니다!' : '시간이 부족했어요...'}
                                     </h2>
                                     <p className="text-slate-500 font-medium">

@@ -522,7 +522,7 @@ const ArchiveContent = () => {
           <Star className="w-3.5 h-3.5 fill-current" />
           Navigator Core Philosophy
         </div>
-        <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-obsidian tracking-tighter leading-[1.1]">
+        <h2 className="text-lg md:text-3xl font-serif text-obsidian tracking-tighter leading-[1.1]">
           &quot;우리는 주사를 파는 게 <span className="italic text-slate">아닙니다</span>&quot;
         </h2>
         <p className="text-slate/60 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
@@ -609,7 +609,7 @@ const ArchiveContent = () => {
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest">
                     {activeTopic.icon && <activeTopic.icon className="w-3 h-3" />} Navigator Deep Dive
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif text-obsidian tracking-tighter">
+                  <h3 className="text-base md:text-xl font-serif text-obsidian tracking-tighter">
                     {activeTopic.details.title}
                   </h3>
                 </div>
@@ -627,7 +627,7 @@ const ArchiveContent = () => {
 
               {/* Modal Content */}
               <div className="flex-1 overflow-y-auto p-6 md:p-12 custom-scrollbar space-y-6 md:space-y-12">
-                <p className="text-xl md:text-2xl font-serif text-slate/80 leading-relaxed italic border-l-4 border-chapter-accent pl-4 md:pl-8">
+                <p className="font-serif text-slate/80 leading-relaxed italic border-l-4 border-chapter-accent pl-4 md:pl-8 text-xl md:text-2xl">
                   &quot;{activeTopic.details.intro}&quot;
                 </p>
 
@@ -638,7 +638,7 @@ const ArchiveContent = () => {
                          {/* @ts-ignore */}
                         <point.icon className="w-7 h-7" />
                       </div>
-                      <h4 className="text-xl font-black text-obsidian">
+                      <h4 className="font-black text-obsidian text-xl">
                         {point.title}
                       </h4>
                       <ul className="space-y-3">
@@ -675,7 +675,7 @@ const ArchiveContent = () => {
       <section className="space-y-4 md:space-y-16">
         <div className="space-y-1.5 md:space-y-4 text-center">
           <h3 className="text-[10px] md:text-xs font-black text-obsidian tracking-[0.3em] uppercase opacity-30">Sales Master Guide</h3>
-          <h2 className="text-xl md:text-3xl font-serif text-obsidian">영업 자료의 4단계 구성 (초보자용)</h2>
+          <h2 className="font-serif text-obsidian text-xl md:text-3xl">영업 자료의 4단계 구성 (초보자용)</h2>
         </div>
 
         <motion.div 
@@ -687,9 +687,9 @@ const ArchiveContent = () => {
         >
           {/* Step 1 */}
           <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-4 md:gap-8 items-center bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm hover:shadow-xl transition-all">
-             <div className="md:col-span-1 text-4xl md:text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">01</div>
+             <div className="md:col-span-1 font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors text-4xl md:text-4xl">01</div>
              <div className="md:col-span-5 space-y-2 md:space-y-4">
-                <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"사람들은 왜 무서워할까요?"</h4>
+                <h4 className="font-black text-obsidian tracking-tight text-xl md:text-2xl">"사람들은 왜 무서워할까요?"</h4>
                 <p className="text-xs md:text-sm text-slate/60 font-medium">고객의 마음을 열기 위해 가장 먼저 알아야 할 '불편한 진실' (문제 정의)</p>
              </div>
              <div className="md:col-span-6 grid grid-cols-1 gap-3 md:gap-4 mt-2 md:mt-0">
@@ -725,9 +725,9 @@ const ArchiveContent = () => {
 
           {/* Step 2 */}
           <motion.div variants={item} className="group relative grid md:grid-cols-12 gap-4 md:gap-8 items-center bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm hover:shadow-xl transition-all">
-             <div className="md:col-span-1 text-4xl md:text-5xl font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors">02</div>
+             <div className="md:col-span-1 font-serif italic text-line group-hover:text-chapter-accent/20 transition-colors text-4xl md:text-4xl">02</div>
              <div className="md:col-span-5 space-y-2 md:space-y-4">
-                <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"유니클은 이렇게 해결합니다"</h4>
+                <h4 className="font-black text-obsidian tracking-tight text-xl md:text-2xl">"유니클은 이렇게 해결합니다"</h4>
                 <p className="text-xs md:text-sm text-slate/60 font-medium">우리가 가진 무기(기술)를 아주 쉽게 설명하기 (해결책)</p>
              </div>
              <div className="md:col-span-6 grid grid-cols-1 gap-4">
@@ -768,8 +768,8 @@ const ArchiveContent = () => {
           <motion.div variants={item} className="bg-white border border-line p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-sm space-y-4 md:space-y-8">
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="text-4xl md:text-5xl font-serif italic text-line">03</div>
-                  <h4 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">"상대방에 따라 다르게 말해요"</h4>
+                  <div className="font-serif italic text-line text-4xl md:text-4xl">03</div>
+                  <h4 className="font-black text-obsidian tracking-tight text-xl md:text-2xl">"상대방에 따라 다르게 말해요"</h4>
                 </div>
                 <div className="px-4 py-1.5 rounded-full bg-mist text-[10px] font-black uppercase text-slate/60 tracking-widest">맞춤형 화법</div>
              </div>
@@ -795,8 +795,8 @@ const ArchiveContent = () => {
           {/* Step 4 */}
           <motion.div variants={item} className="bg-obsidian p-6 md:p-10 rounded-[24px] md:rounded-[40px] shadow-2xl text-white space-y-4 md:space-y-8">
              <div className="flex items-center gap-3 md:gap-4">
-                <div className="text-4xl md:text-5xl font-serif italic text-white/10">04</div>
-                <h4 className="text-xl md:text-2xl font-black tracking-tight">"우리는 병원과 싸우지 않아요"</h4>
+                <div className="font-serif italic text-white/10 text-4xl md:text-4xl">04</div>
+                <h4 className="font-black tracking-tight text-xl md:text-2xl">"우리는 병원과 싸우지 않아요"</h4>
              </div>
              <div className="grid md:grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-4 border-l-2 border-chapter-accent/40 pl-6">
@@ -826,7 +826,7 @@ const ArchiveContent = () => {
                   <Lightbulb className="w-3 h-3 md:w-4 md:h-4 text-chapter-accent" />
                    The Magic Sentence
                 </div>
-                <h2 className="text-xl md:text-3xl font-serif leading-snug">
+                <h2 className="font-serif leading-snug text-xl md:text-3xl">
                   초보 네비게이터를 위한 '필살' 문장
                 </h2>
               </div>

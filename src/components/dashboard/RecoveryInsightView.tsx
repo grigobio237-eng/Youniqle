@@ -141,7 +141,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                             <Lock className="w-8 h-8 text-slate/40" />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-xl font-black text-obsidian/40">정밀 예측 분석 잠금</h3>
+                            <h3 className="font-black text-obsidian/40 text-xl">정밀 예측 분석 잠금</h3>
                             <p className="text-xs text-slate/50 font-medium">바이오 리듬 예측, 장기 회복 트렌드, 전문 의료진 가이드 등의 고도화된 기능은<br />RESTART 등급 이상의 멤버십에서 제공됩니다.</p>
                         </div>
                         <Link 

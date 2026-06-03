@@ -169,7 +169,7 @@ export default function MemoryGamePage() {
                                 <div className="w-24 h-24 bg-violet-100 rounded-3xl flex items-center justify-center mx-auto text-violet-600 mb-6">
                                     <Brain className="w-12 h-12" />
                                 </div>
-                                <h1 className="text-4xl font-black text-gray-900 tracking-tighter">기억력 카드 뒤집기</h1>
+                                <h1 className="font-black text-gray-900 tracking-tighter text-4xl">기억력 카드 뒤집기</h1>
                                 <p className="text-gray-500 font-medium">유니클의 회복 아이콘을 매칭하여 당신의 집중력을 테스트하세요.</p>
                             </div>
 
@@ -188,7 +188,7 @@ export default function MemoryGamePage() {
 
                             <Button
                                 onClick={() => shuffleCards(difficulty)}
-                                className="w-full h-16 text-xl font-black rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 shadow-xl shadow-violet-200 transform hover:scale-[1.02] transition-all"
+                                className="w-full h-16 font-black rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 shadow-xl shadow-violet-200 transform hover:scale-[1.02] transition-all text-xl"
                             >
                                 게임 시작하기
                             </Button>
@@ -247,7 +247,7 @@ export default function MemoryGamePage() {
                                 <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-500 mb-6 shadow-xl animate-bounce">
                                     <Trophy className="w-12 h-12" />
                                 </div>
-                                <h2 className="text-4xl font-black text-gray-900 tracking-tighter">완벽한 매칭입니다! 🏆</h2>
+                                <h2 className="font-black text-gray-900 tracking-tighter text-4xl">완벽한 매칭입니다! 🏆</h2>
                                 <p className="text-gray-500 font-medium">당신의 회복 집중력이 최고조에 달했습니다.</p>
                             </div>
 

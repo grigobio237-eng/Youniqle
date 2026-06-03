@@ -81,7 +81,7 @@ export default function UnitConverterPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">📏</div>
+                        <div className="mb-4 text-xl">📏</div>
                         <CardTitle className="text-3xl font-bold">단위 변환기</CardTitle>
                         <CardDescription className="text-lg">길이, 무게, 온도를 쉽게 변환하세요</CardDescription>
                     </CardHeader>

@@ -132,7 +132,7 @@ function DeepIntroView({ onStart, onClose }: { onStart: () => void, onClose: () 
 
                 <div>
                     <Badge variant="outline" className="text-primary border-primary mb-4 px-3 py-1">PREMIUM ANALYSIS</Badge>
-                    <h2 className="text-4xl font-black mb-4 tracking-tight">IPIP-NEO-60 심층 진단</h2>
+                    <h2 className="font-black mb-4 tracking-tight text-4xl">IPIP-NEO-60 심층 진단</h2>
                     <p className="text-white/60 leading-relaxed max-w-sm mx-auto">
                         단순 성향 파악을 넘어, 30가지 세부 심리 국면과<br />
                         요인 간 상호작용을 유니클 알고리즘으로 분석합니다.
@@ -156,7 +156,7 @@ function DeepIntroView({ onStart, onClose }: { onStart: () => void, onClose: () 
             </div>
 
             <div className="p-10 bg-white/5 border-t border-white/10">
-                <Button onClick={onStart} className="w-full h-16 rounded-2xl bg-primary text-background font-black text-xl hover:scale-[1.02] transition-transform shadow-2xl shadow-primary/20">
+                <Button onClick={onStart} className="w-full h-16 rounded-2xl bg-primary text-background font-black hover:scale-[1.02] transition-transform shadow-2xl shadow-primary/20 text-xl">
                     심층 분석 시작하기
                 </Button>
             </div>
@@ -277,7 +277,7 @@ function DeepResultView({ result, onClose }: { result: IPIP60Result, onClose: ()
                     <X />
                 </Button>
                 <Badge className="bg-primary text-background border-none mb-4 font-black tracking-widest">DEPTH ANALYSIS COMPLETE</Badge>
-                <h2 className="text-4xl font-black mb-2 italic">Your Core Persona</h2>
+                <h2 className="font-black mb-2 italic text-4xl">Your Core Persona</h2>
                 <p className="text-white/60 font-medium">60개의 문항으로 분석된 당신의 심층 성격 프로파일입니다.</p>
             </div>
 
@@ -322,7 +322,7 @@ function DeepResultView({ result, onClose }: { result: IPIP60Result, onClose: ()
                         <Brain className="w-32 h-32" />
                     </div>
                     <div className="relative z-10">
-                        <h3 className="text-xl font-black mb-2">30개 하위 국면 상세 리포트</h3>
+                        <h3 className="font-black mb-2 text-xl">30개 하위 국면 상세 리포트</h3>
                         <p className="text-white/60 text-sm mb-6 leading-relaxed">
                             각 요인별 6가지 상세 국면(불안, 주장성, 도덕성 등)에 대한<br />
                             수치화된 분석과 맞춤형 개선 가이드를 확인하세요.

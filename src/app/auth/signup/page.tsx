@@ -143,10 +143,10 @@ function SignupContent() {
               <Check className="w-12 h-12 text-obsidian stroke-[4]" />
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">
+              <h1 className="font-black text-white tracking-tighter uppercase text-4xl md:text-4xl">
                 Welcome to Youniqle
               </h1>
-              <p className="text-primary font-bold text-xl uppercase tracking-widest">
+              <p className="text-primary font-bold uppercase tracking-widest text-xl">
                 회원가입이 완료되었습니다
               </p>
             </div>
@@ -466,7 +466,7 @@ function ConsentItem({
         </DialogTrigger>
         <DialogContent className="max-w-lg rounded-3xl p-0 overflow-hidden border-none bg-surface max-h-[80vh] flex flex-col [&>button]:!text-white [&>button]:!opacity-100 [&>button_svg]:!h-5 [&>button_svg]:!w-5">
           <DialogHeader className="p-6 bg-primary text-white">
-            <DialogTitle className="text-xl font-black tracking-tight">{label}</DialogTitle>
+            <DialogTitle className="font-black tracking-tight text-xl">{label}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
             <div className="prose prose-sm max-w-none">

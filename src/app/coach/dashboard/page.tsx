@@ -91,7 +91,7 @@ export default function CoachDashboardPage() {
       <section className="pt-32 pb-10 px-4">
         <div className="container mx-auto max-w-5xl">
           <div className="space-y-2">
-            <h1 className="text-4xl font-serif text-obsidian tracking-tight">Coach Dashboard</h1>
+            <h1 className="font-serif text-obsidian tracking-tight text-4xl">Coach Dashboard</h1>
             <p className="text-slate/60 font-medium">유니클 FC 팀원들의 실시간 회복 및 훈련 준비 상태입니다.</p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function CoachDashboardPage() {
 
         {/* 상세 관리 및 상태 업데이트 시뮬레이션 */}
         <div className="space-y-4 pt-8">
-          <h3 className="text-xl font-serif text-obsidian tracking-tight flex items-center gap-2">
+          <h3 className="font-serif text-obsidian tracking-tight flex items-center gap-2 text-xl">
             선수별 빠른 상태 업데이트
           </h3>
           <p className="text-xs text-slate/50">코치님이 아래의 '상태 업데이트' 버튼을 누르면 부모님께 자동으로 넛지 알림이 전송됩니다.</p>

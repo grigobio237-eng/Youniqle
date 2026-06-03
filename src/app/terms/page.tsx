@@ -25,7 +25,7 @@ export default function TermsPage() {
                 서비스 이용약관
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h1 className="font-bold text-gray-900 mb-6 text-4xl md:text-4xl">
                 이용약관
               </h1>
               
@@ -252,10 +252,10 @@ export default function TermsPage() {
       <section className="py-16 bg-blue-600">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="font-bold text-white mb-6 text-3xl md:text-4xl">
               더 궁금한 점이 있으신가요?
             </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
+            <p className="text-white/90 mb-8 max-w-3xl mx-auto text-xl">
               이용약관에 대한 문의사항이 있으시면 언제든지 연락해 주세요.
             </p>
             

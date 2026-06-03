@@ -103,7 +103,7 @@ export default function ArtistDetailPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="text-5xl md:text-7xl font-light text-obsidian tracking-tight font-serif italic"
+                                className="font-light text-obsidian tracking-tight font-serif italic text-xl md:text-4xl"
                             >
                                 {artist.name}
                             </motion.h1>
@@ -137,7 +137,7 @@ export default function ArtistDetailPage() {
                 <section>
                     <div className="flex items-center justify-between mb-8 md:mb-16">
                         <div className="space-y-2">
-                            <h2 className="text-4xl font-light text-obsidian font-serif italic">Gallery Collection</h2>
+                            <h2 className="font-light text-obsidian font-serif italic text-4xl">Gallery Collection</h2>
                             <p className="text-sm font-bold text-slate/40 tracking-wider">WORKS BY {artist.name.toUpperCase()}</p>
                         </div>
                         <div className="h-px flex-1 bg-line mx-12 hidden md:block" />

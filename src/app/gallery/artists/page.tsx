@@ -53,7 +53,7 @@ export default function ArtistsPage() {
                 <div className="mb-10 md:mb-20 mt-6 md:mt-12">
                     <div className="max-w-4xl">
                         <span className="text-xs md:text-sm font-black tracking-[0.3em] uppercase text-slate/60 mb-2 md:mb-4 block text-center md:text-left">Meet Our Creators</span>
-                        <h1 className="text-4xl md:text-7xl font-light mb-4 md:mb-8 tracking-tight font-serif italic text-center md:text-left">참여 작가</h1>
+                        <h1 className="font-light mb-4 md:mb-8 tracking-tight font-serif italic text-center md:text-left text-4xl md:text-4xl">참여 작가</h1>
                         <p className="text-sm sm:text-base md:text-lg text-slate/70 font-medium max-w-2xl leading-relaxed italic text-center md:text-left mx-auto md:mx-0">
                             "Youniqle 프로젝트를 함께 만들어가는 특별한 아티스트들의 스토리와 철학을 만나보세요."
                         </p>

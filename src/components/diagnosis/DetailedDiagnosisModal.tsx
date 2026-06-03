@@ -246,7 +246,7 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
                     </Button>
                 )}
 
-                <h3 className="text-xl md:text-2xl font-bold text-obsidian leading-snug mb-12 text-center text-balance">
+                <h3 className="font-bold text-obsidian leading-snug mb-12 text-center text-balance text-xl md:text-2xl">
                     {question.text}
                 </h3>
 
@@ -331,7 +331,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                 <div className="flex justify-between items-start mb-6 text-white">
                     <div>
                         <div className="text-xs font-bold opacity-60 uppercase tracking-widest mb-1">{userName} 님의 실시간 점수</div>
-                        <div className="text-4xl font-black tracking-tighter">{result.totalScore}<span className="text-lg opacity-50">/100</span></div>
+                        <div className="font-black tracking-tighter text-4xl">{result.totalScore}<span className="text-lg opacity-50">/100</span></div>
                     </div>
                 </div>
 

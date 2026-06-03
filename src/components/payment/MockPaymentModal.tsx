@@ -121,7 +121,7 @@ export function MockPaymentModal({ open, onOpenChange, price, productName, onSuc
                                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
                                 <Loader2 className="w-16 h-16 text-primary animate-spin relative z-10" />
                             </div>
-                            <h3 className="text-xl font-bold text-text-primary animate-pulse">결제를 안전하게 처리 중입니다...</h3>
+                            <h3 className="font-bold text-text-primary animate-pulse text-xl">결제를 안전하게 처리 중입니다...</h3>
                             <p className="text-sm text-text-secondary">잠시만 기다려주세요.</p>
                         </motion.div>
                     )}

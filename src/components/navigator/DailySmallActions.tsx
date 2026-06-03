@@ -101,7 +101,7 @@ export default function DailySmallActions({ score = 50, initialData }: { score?:
                     <p className="text-[10px] md:text-xs font-medium text-slate/60">오늘 하루 꼭 실천해야 할 3가지 루틴</p>
                 </div>
                 <div className="text-right leading-none">
-                    <span className="text-xl md:text-2xl font-black text-primary italic">{completedCount}</span>
+                    <span className="font-black text-primary italic text-xl md:text-2xl">{completedCount}</span>
                     <span className="text-[10px] md:text-xs font-black text-slate/30 uppercase ml-0.5">/ {missions.length || 3}</span>
                 </div>
             </div>

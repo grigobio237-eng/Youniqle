@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback || (
         <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">
+          <h2 className="font-semibold text-red-600 mb-4 text-xl">
             문제가 발생했습니다
           </h2>
           <p className="text-gray-600 mb-4">

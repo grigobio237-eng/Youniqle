@@ -168,7 +168,7 @@ export default function AiAdvicePage() {
                             <Sparkles className="w-3.5 h-3.5 mr-2" />
                             Dynamic Recovery Coach
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-obsidian">오늘의 맞춤 행동 조언</h1>
+                        <h1 className="font-black tracking-tighter text-obsidian text-4xl md:text-4xl">오늘의 맞춤 행동 조언</h1>
                         <p className="text-lg text-slate font-medium max-w-md mx-auto leading-relaxed">
                             &quot;{advice?.aiComment}&quot;
                         </p>
@@ -233,7 +233,7 @@ export default function AiAdvicePage() {
                                 <Sparkles className="w-32 h-32 text-primary" />
                             </div>
                             <div className="relative z-10 space-y-6">
-                                <div className="w-20 h-20 bg-primary/20 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-2">🏆</div>
+                                <div className="w-20 h-20 bg-primary/20 rounded-3xl mx-auto flex items-center justify-center mb-2 text-4xl">🏆</div>
                                 <h3 className="text-3xl font-black tracking-tight">회복 프로토콜 완수!</h3>
                                 <p className="text-mist/70 font-medium leading-relaxed">
                                     오늘의 모든 행동을 실천하셨습니다.<br />이 작은 실천들이 모여 당신의 완전한 회복을 만듭니다.

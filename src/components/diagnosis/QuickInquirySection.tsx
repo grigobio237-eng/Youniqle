@@ -148,7 +148,7 @@ export default function QuickInquirySection({ userId, reportId }: QuickInquirySe
           <Button 
             onClick={handleSubmit}
             disabled={isSending || !question.trim()}
-            className="w-full h-20 bg-obsidian text-white rounded-[24px] font-black text-xl group hover:scale-[1.02] active:scale-95 transition-all"
+            className="w-full h-20 bg-obsidian text-white rounded-[24px] font-black group hover:scale-[1.02] active:scale-95 transition-all text-xl"
           >
             {isSending ? (
               <Loader2 className="w-6 h-6 animate-spin" />

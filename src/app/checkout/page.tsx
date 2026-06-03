@@ -542,7 +542,7 @@ function CheckoutPageContent() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center px-4">
         <div className="text-center bg-white p-12 rounded-[40px] shadow-xl max-w-md w-full">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🛒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🛒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">장바구니가 비어있습니다</h2>
           <p className="text-slate font-medium mb-8">상품을 장바구니에 담아주세요.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black shadow-lg">
@@ -569,7 +569,7 @@ function CheckoutPageContent() {
                   장바구니로 돌아가기
                 </Link>
               </Button>
-              <h1 className="text-4xl font-black text-obsidian tracking-tighter">CHECKOUT</h1>
+              <h1 className="font-black text-obsidian tracking-tighter text-4xl">CHECKOUT</h1>
               <p className="text-slate font-bold uppercase tracking-widest text-xs mt-1">Order Execution Protocol</p>
             </div>
             <div className="flex items-center gap-3">
@@ -596,7 +596,7 @@ function CheckoutPageContent() {
             {/* 배송 정보 */}
             <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white hover:shadow-md transition-shadow">
               <CardHeader className="p-8 pb-4">
-                <CardTitle className="flex items-center text-xl font-black text-obsidian">
+                <CardTitle className="flex items-center font-black text-obsidian text-xl">
                   <MapPin className="h-5 w-5 mr-3 text-chapter-accent" />
                   배송 정보
                 </CardTitle>
@@ -701,7 +701,7 @@ function CheckoutPageContent() {
             {/* 결제 방법 */}
             <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white">
               <CardHeader className="p-8 pb-4">
-                <CardTitle className="flex items-center text-xl font-black text-obsidian">
+                <CardTitle className="flex items-center font-black text-obsidian text-xl">
                   <CreditCard className="h-5 w-5 mr-3 text-chapter-accent" />
                   결제 방법
                 </CardTitle>
@@ -743,7 +743,7 @@ function CheckoutPageContent() {
                         <Button variant="ghost" size="sm" onClick={handleRemoveCoupon} className="h-6 px-2 text-[10px] font-bold text-status-danger hover:bg-status-danger/10">제거</Button>
                       </div>
                       <p className="font-bold text-obsidian leading-tight">{appliedCoupon.name}</p>
-                      <p className="text-xl font-black text-status-good">-{couponDiscount.toLocaleString()}원</p>
+                      <p className="font-black text-status-good text-xl">-{couponDiscount.toLocaleString()}원</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -816,7 +816,7 @@ function CheckoutPageContent() {
             {/* 주문 요약 */}
             <Card className="border-none shadow-2xl rounded-[40px] overflow-hidden bg-obsidian text-mist">
               <CardHeader className="p-8 pb-4">
-                <CardTitle className="flex items-center text-xl font-black">
+                <CardTitle className="flex items-center font-black text-xl">
                   <Package className="h-5 w-5 mr-3 text-reward-gold" />
                   최종 주문 확인
                 </CardTitle>
@@ -910,7 +910,7 @@ function CheckoutPageContent() {
                   <Button
                     onClick={handleOrder}
                     disabled={submitting}
-                    className="w-full h-18 rounded-2xl bg-reward-gold text-obsidian font-black text-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-reward-gold/10"
+                    className="w-full h-18 rounded-2xl bg-reward-gold text-obsidian font-black hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-reward-gold/10 text-xl"
                   >
                     {submitting ? (
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-obsidian"></div>

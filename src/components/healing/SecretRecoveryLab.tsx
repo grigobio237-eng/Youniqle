@@ -112,7 +112,7 @@ export default function SecretRecoveryLab() {
                         <Badge className="bg-[#D4AF37] text-black border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
                             Limited Access
                         </Badge>
-                        <h1 className="px-2 text-[2rem] sm:text-[3rem] md:text-8xl font-black text-[#0B0D10] tracking-tight leading-[1.1] md:leading-none italic break-words">
+                        <h1 className="px-2 text-[2rem] sm:text-[3rem] font-black text-[#0B0D10] tracking-tight leading-[1.1] md:leading-none italic break-words md:text-4xl">
                             Secret <br className="sm:hidden" /> <span className="text-[#D4AF37] tracking-normal">Recovery</span> Lab
                         </h1>
                         <p className="text-base sm:text-xl text-[#0B0D10]/60 font-medium max-w-2xl mx-auto leading-relaxed">
@@ -217,7 +217,7 @@ export default function SecretRecoveryLab() {
                                     <div className="space-y-3 md:space-y-4">
                                         <div className="flex justify-between items-end">
                                             <Label className="text-xs sm:text-sm font-black text-[#0B0D10] uppercase tracking-widest opacity-40">평균 스트레스 지수</Label>
-                                            <span className="text-xl sm:text-2xl font-black text-[#0B0D10]">{formData.stress}%</span>
+                                            <span className="font-black text-[#0B0D10] text-xl sm:text-2xl">{formData.stress}%</span>
                                         </div>
                                         <input 
                                             type="range" 
@@ -230,7 +230,7 @@ export default function SecretRecoveryLab() {
                                     <div className="space-y-3 md:space-y-4">
                                         <div className="flex justify-between items-end">
                                             <Label className="text-xs sm:text-sm font-black text-[#0B0D10] uppercase tracking-widest opacity-40">평균 수면 시간</Label>
-                                            <span className="text-xl sm:text-2xl font-black text-[#0B0D10]">{formData.sleep}시간</span>
+                                            <span className="font-black text-[#0B0D10] text-xl sm:text-2xl">{formData.sleep}시간</span>
                                         </div>
                                         <input 
                                             type="range" 
@@ -303,7 +303,7 @@ export default function SecretRecoveryLab() {
                 <div className="max-w-6xl mx-auto space-y-12 md:space-y-20">
                     <div className="text-center space-y-4 md:space-y-6">
                         <Badge className="bg-[#D4AF37]/10 text-[#D4AF37] border-none px-4 py-1.5 font-black uppercase tracking-widest text-[9px] md:text-[10px]">Analysis Result</Badge>
-                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-[#0B0D10] tracking-tighter leading-tight italic">
+                        <h1 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-xl md:text-4xl">
                             Private <span className="text-[#D4AF37] tracking-normal">Solutions</span> for You
                         </h1>
                         <p className="text-sm sm:text-xl text-[#0B0D10]/60 max-w-3xl mx-auto font-medium leading-relaxed">{youniqlePlans.analysis}</p>
@@ -382,7 +382,7 @@ export default function SecretRecoveryLab() {
                     <ShieldCheck className="w-8 h-8 sm:w-12 sm:h-12 text-[#D4AF37]" />
                 </div>
                 <div className="space-y-4 sm:space-y-6">
-                    <h2 className="text-2xl sm:text-4xl md:text-6xl font-black text-[#0B0D10] tracking-tighter leading-none italic">
+                    <h2 className="font-black text-[#0B0D10] tracking-tighter leading-none italic text-2xl sm:text-4xl md:text-4xl">
                         Protocol <span className="text-[#D4AF37] tracking-normal">Accepted.</span>
                     </h2>
                     <p className="text-base sm:text-xl text-[#0B0D10]/40 font-medium max-w-xl mx-auto leading-relaxed">

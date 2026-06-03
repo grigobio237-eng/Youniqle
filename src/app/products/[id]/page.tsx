@@ -515,22 +515,22 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <div className="flex items-baseline space-x-3 mb-6">
                   {product.category === 'stem-cell' && (product.minPrice || (product as any).minPrice) && (product.maxPrice || (product as any).maxPrice) ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-4xl font-black text-primary">
+                      <span className="font-black text-primary text-4xl">
                         ₩{formatPrice(product.minPrice || (product as any).minPrice)}
                       </span>
                       <span className="text-slate-300 font-bold text-2xl">~</span>
-                      <span className="text-4xl font-black text-primary">
+                      <span className="font-black text-primary text-4xl">
                         ₩{formatPrice(product.maxPrice || (product as any).maxPrice)}
                       </span>
                     </div>
                   ) : (
                     <>
                       {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-xl text-text-secondary line-through">
+                        <span className="text-text-secondary line-through text-xl">
                           {formatPrice(product.originalPrice)}원
                         </span>
                       )}
-                      <span className="text-4xl font-bold text-primary">
+                      <span className="font-bold text-primary text-4xl">
                         {formatPrice(product.price)}원
                       </span>
                     </>

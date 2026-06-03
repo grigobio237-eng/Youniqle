@@ -393,7 +393,7 @@ export default function HeroScanner({
         <div className="w-full h-full md:relative md:aspect-[4/3] md:rounded-5xl overflow-hidden bg-white group cursor-pointer md:border md:border-primary/10 md:shadow-2xl flex flex-col">
             <div className="flex items-center justify-between p-8 border-b border-line bg-mist/30">
                 <div>
-                    <h3 className="text-xl font-bold text-foreground tracking-tight">어떤 스냅을 기록할까요?</h3>
+                    <h3 className="font-bold text-foreground tracking-tight text-xl">어떤 스냅을 기록할까요?</h3>
                     <p className="text-sm font-medium text-foreground/40 mt-1">기록의 성격에 맞춰 카테고리를 선택해주세요.</p>
                 </div>
                 <button 
@@ -504,7 +504,7 @@ export default function HeroScanner({
                             </div>
                             <div className="text-right">
                                 <span className="text-[10px] font-bold uppercase tracking-widest block mb-1 text-foreground/40">MATCH SCORE</span>
-                                <span className="text-4xl md:text-5xl font-black tracking-tighter text-primary">{result.matchScore}<span className="text-lg opacity-30">/100</span></span>
+                                <span className="font-black tracking-tighter text-primary text-4xl md:text-4xl">{result.matchScore}<span className="text-lg opacity-30">/100</span></span>
                             </div>
                         </div>
                         <button 

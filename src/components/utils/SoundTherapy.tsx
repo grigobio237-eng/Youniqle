@@ -326,7 +326,7 @@ export default function SoundTherapy() {
                   <AnimatePresence mode="wait">
                       {isPlaying ? (
                           <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                              <p className="text-6xl font-serif italic text-white tracking-tighter drop-shadow-2xl">{formatTime(timeLeft)}</p>
+                              <p className="font-serif italic text-white tracking-tighter drop-shadow-2xl text-xl">{formatTime(timeLeft)}</p>
                               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-chapter-accent mt-4">Harmonizing Now</p>
                           </motion.div>
                       ) : (
@@ -334,7 +334,7 @@ export default function SoundTherapy() {
                               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Moon className="w-8 h-8 text-white/20" />
                               </div>
-                              <h2 className="text-4xl font-serif italic font-light tracking-tight text-white mb-2">Deep Recovery</h2>
+                              <h2 className="font-serif italic font-light tracking-tight text-white mb-2 text-4xl">Deep Recovery</h2>
                               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">심층 사운드 테라피</p>
                           </motion.div>
                       )}

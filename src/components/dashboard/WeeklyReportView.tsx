@@ -95,7 +95,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                     <div className="w-16 h-16 bg-mist/50 rounded-full flex items-center justify-center mx-auto shadow-inner border border-line">
                         <Lock className="w-6 h-6 text-obsidian/40 animate-pulse" />
                     </div>
-                    <h3 className="text-xl md:text-2xl font-black text-obsidian tracking-tight mt-4">7일 회복 리포트 잠김</h3>
+                    <h3 className="font-black text-obsidian tracking-tight mt-4 text-xl md:text-2xl">7일 회복 리포트 잠김</h3>
                 </div>
 
                 {/* Timeline Progress */}
@@ -168,7 +168,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
                 </div>
                 <div className="space-y-1.5 text-left">
                     <span className="text-[10px] font-black text-slate/40 uppercase tracking-widest block">REPORT HEADER</span>
-                    <h3 className="text-xl md:text-2xl font-black text-obsidian tracking-tight">당신의 7일 회복 흐름이 정리되었습니다.</h3>
+                    <h3 className="font-black text-obsidian tracking-tight text-xl md:text-2xl">당신의 7일 회복 흐름이 정리되었습니다.</h3>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-line text-left">

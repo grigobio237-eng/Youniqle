@@ -39,7 +39,7 @@ export default function MemoPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">📝</div>
+                        <div className="mb-4 text-xl">📝</div>
                         <CardTitle className="text-3xl font-bold">간편 메모장</CardTitle>
                         <CardDescription className="text-lg">빠르게 메모하고 자동 저장하세요</CardDescription>
                     </CardHeader>

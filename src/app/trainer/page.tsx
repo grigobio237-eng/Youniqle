@@ -92,7 +92,7 @@ export default function TrainerPage() {
             <Badge variant="outline" className="px-4 py-1 border-obsidian/20 text-obsidian/60 font-medium tracking-[0.2em] uppercase rounded-full">
               Recovery Experts
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-serif text-obsidian tracking-tight">
+            <h1 className="font-serif text-obsidian tracking-tight text-xl md:text-4xl">
               Meet Our <br /> <span className="italic">Master Curators</span>
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-slate font-medium leading-relaxed">
@@ -206,7 +206,7 @@ export default function TrainerPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent lg:hidden" />
                 <div className="absolute bottom-8 left-8 text-white lg:hidden">
-                  <h2 className="text-4xl font-serif">{selectedTrainer.name}</h2>
+                  <h2 className="font-serif text-4xl">{selectedTrainer.name}</h2>
                   <p className="text-sm font-black uppercase tracking-widest opacity-80">{selectedTrainer.title}</p>
                 </div>
                 
@@ -241,7 +241,7 @@ export default function TrainerPage() {
               <div className="lg:w-3/5 p-8 lg:p-14 overflow-y-auto space-y-12">
                 <div className="hidden lg:block space-y-2">
                   <p className="text-xs font-black text-chapter-accent uppercase tracking-widest">{selectedTrainer.title}</p>
-                  <h2 className="text-5xl font-serif text-obsidian tracking-tight">{selectedTrainer.name}</h2>
+                  <h2 className="font-serif text-obsidian tracking-tight text-xl">{selectedTrainer.name}</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -399,7 +399,7 @@ export default function TrainerPage() {
                 <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[10px] uppercase tracking-widest rounded-full px-3 py-1">
                   Reservation Form
                 </Badge>
-                <h2 className="text-4xl font-serif text-obsidian">Request Session</h2>
+                <h2 className="font-serif text-obsidian text-4xl">Request Session</h2>
                 <p className="text-slate/60 text-sm font-medium">선택하신 일정으로 {selectedTrainer?.name} 마스터에게 코칭을 의뢰합니다.</p>
               </div>
 

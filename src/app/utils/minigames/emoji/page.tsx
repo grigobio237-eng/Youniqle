@@ -136,7 +136,7 @@ export default function EmojiQuizPage() {
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ type: "spring", bounce: 0.5 }}
-                            className="text-6xl md:text-7xl mb-8 tracking-[0.2em] text-center leading-relaxed"
+                            className="mb-8 tracking-[0.2em] text-center leading-relaxed text-xl md:text-4xl"
                         >
                             {currentQuiz.emoji}
                         </motion.div>
@@ -174,7 +174,7 @@ export default function EmojiQuizPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="bg-green-50 border border-green-200 rounded-xl p-6 text-center"
                             >
-                                <div className="text-green-600 font-bold text-xl mb-2">정답입니다! 🎉</div>
+                                <div className="text-green-600 font-bold mb-2 text-xl">정답입니다! 🎉</div>
                                 <div className="text-2xl font-black text-gray-800 mb-2">{currentQuiz.displayAnswer}</div>
                                 <p className="text-gray-600 text-sm mb-6">{currentQuiz.meaning}</p>
 

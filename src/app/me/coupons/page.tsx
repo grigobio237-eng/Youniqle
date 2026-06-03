@@ -114,7 +114,7 @@ export default function MyCouponsPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
           <p className="text-slate font-medium mb-8">인벤토리 확인을 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -137,7 +137,7 @@ export default function MyCouponsPage() {
               </Link>
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Inventory Analysis</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">쿠폰 인벤토리</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">쿠폰 인벤토리</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저가 보유한 활성 혜택입니다.</p>
           </div>
           <Button variant="outline" onClick={fetchCoupons} className="h-12 px-6 rounded-xl border-line text-slate font-black flex gap-2 hover:bg-white transition-all">
@@ -204,7 +204,7 @@ export default function MyCouponsPage() {
                 {coupons.length === 0 ? (
                   <div className="text-center py-24 bg-mist/30 rounded-[32px] border-2 border-dashed border-line/50">
                     <Ticket className="h-12 w-12 mx-auto text-slate opacity-20 mb-4" />
-                    <h3 className="text-xl font-black text-obsidian tracking-tight mb-2">기록된 데이터가 없습니다</h3>
+                    <h3 className="font-black text-obsidian tracking-tight mb-2 text-xl">기록된 데이터가 없습니다</h3>
                     <p className="text-slate font-medium text-sm mb-8 opacity-60 italic">선택하신 카테고리에 해당하는 쿠폰이 존재하지 않습니다.</p>
                     <Button asChild variant="outline" className="rounded-xl border-line font-black text-xs hover:bg-white px-8">
                       <Link href="/coupons">쿠폰함 채우기</Link>
@@ -228,7 +228,7 @@ export default function MyCouponsPage() {
                           </div>
 
                           <div>
-                            <h3 className="text-xl font-black text-obsidian tracking-tight line-clamp-1">{coupon.couponId.name}</h3>
+                            <h3 className="font-black text-obsidian tracking-tight line-clamp-1 text-xl">{coupon.couponId.name}</h3>
                             <p className="text-3xl font-black text-chapter-accent tracking-tighter mt-1">
                               {coupon.couponId.type === 'percentage' ? `${coupon.couponId.value}%` : coupon.couponId.type === 'fixed' ? `${coupon.couponId.value.toLocaleString()}원` : 'FREE'}
                               <span className="text-xs font-bold text-slate ml-2 opacity-60">DISCOUNT</span>

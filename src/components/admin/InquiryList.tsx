@@ -346,7 +346,7 @@ export default function InquiryList({
                 <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0 gap-0 overflow-hidden bg-white rounded-2xl">
                     <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                         <div>
-                            <DialogTitle className="text-xl font-bold text-slate-900">문의 상세 정보</DialogTitle>
+                            <DialogTitle className="font-bold text-slate-900 text-xl">문의 상세 정보</DialogTitle>
                             <DialogDescription className="text-slate-500 mt-1">
                                 접수된 문의 내용을 확인하고 답변을 작성해주세요.
                             </DialogDescription>

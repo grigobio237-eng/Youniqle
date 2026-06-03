@@ -149,7 +149,7 @@ export default function ChildDashboardPage() {
             </div>
             {todayCheck ? (
               <div className="text-center space-y-3">
-                <div className={`text-5xl font-black ${
+                <div className={`text-xl font-black ${
                   todayCheck.wellnessScore >= 4 ? 'text-green-600' :
                   todayCheck.wellnessScore >= 3 ? 'text-yellow-600' : 'text-red-600'
                 }`}>{todayCheck.wellnessScore}</div>

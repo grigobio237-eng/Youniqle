@@ -119,11 +119,11 @@ export default function LandingContent({ onStart, onStartTherapy, isDiagnosing =
                 <Music className="w-4 h-4 text-primary" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Deep Sound Therapy</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight">
+              <h2 className="text-lg md:text-3xl font-bold leading-tight tracking-tight">
                 당신의 깊은 이완을 돕는<br />
                 회복 주파수를 경험해보세요
               </h2>
-              <p className="text-xl text-white/60 leading-relaxed font-medium">
+              <p className="text-[11px] md:text-sm text-white/60 leading-relaxed font-medium">
                 일상의 소음에서 벗어나 오직 당신만을 위한<br />
                 평온한 사운드스케이프 속으로 초대합니다.
               </p>
@@ -153,8 +153,8 @@ export default function LandingContent({ onStart, onStartTherapy, isDiagnosing =
       <section className="px-6 py-24 md:py-32">
         <div className="max-w-6xl mx-auto text-center space-y-20">
           <div className="space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">전문적인 회복 파트너를 만나보세요</h2>
-            <p className="text-xl text-foreground/40 font-medium">유니클이 엄선한 최고의 전문가들이 당신의 여정을 함께합니다.</p>
+            <h2 className="text-lg md:text-3xl font-bold tracking-tight">전문적인 회복 파트너를 만나보세요</h2>
+            <p className="text-[11px] md:text-sm text-foreground/40 font-medium">유니클이 엄선한 최고의 전문가들이 당신의 여정을 함께합니다.</p>
           </div>
           
           <ClinicConsultationSection onStart={onStart} isDiagnosing={isDiagnosing} />

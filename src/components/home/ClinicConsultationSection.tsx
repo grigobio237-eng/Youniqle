@@ -95,11 +95,11 @@ export default function ClinicConsultationSection() {
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-2xl md:text-5xl font-black text-white leading-tight tracking-tight italic"
+              className="text-lg md:text-3xl font-black text-white leading-tight tracking-tight italic"
             >
               The Design for <span className="text-chapter-accent">Perfect Recovery</span>
             </motion.h2>
-            <p className="text-mist/70 text-sm md:text-lg font-medium break-keep">
+            <p className="text-mist/70 text-[11px] md:text-sm font-medium break-keep">
               시술은 결과만 보는 것이 아니라 과정을 설계하는 것입니다.<br />
               현재 당신의 상황에 맞는 정밀 케어를 선택하세요.
             </p>

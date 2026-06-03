@@ -331,8 +331,8 @@ export default function MyRefundsPage() {
               />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">내 환불 내역</h1>
-          <p className="text-xl text-gray-600">
+          <h1 className="font-bold text-gray-900 mb-4 text-4xl">내 환불 내역</h1>
+          <p className="text-gray-600 text-xl">
             {session.user?.name}님의 환불/교환 신청 내역입니다
           </p>
         </div>
@@ -385,7 +385,7 @@ export default function MyRefundsPage() {
               <div className="flex justify-center mb-6">
                 <RotateCcw className="h-16 w-16 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              <h3 className="font-semibold text-gray-700 mb-2 text-xl">
                 환불 내역이 없습니다
               </h3>
               <p className="text-gray-600 mb-6">

@@ -176,7 +176,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
                 <Sparkles className="w-10 h-10 text-reward-gold" />
               </div>
               <div className="space-y-4">
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+                <h2 className="font-bold tracking-tight leading-tight text-3xl md:text-4xl">
                   7일간의 아름다운 여정을<br />완주하셨네요!
                 </h2>
                 <p className="text-foreground/50 font-medium max-w-md mx-auto leading-relaxed text-lg">
@@ -261,7 +261,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
             <div className="absolute top-0 right-0 w-32 h-32 bg-reward-gold/10 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
             <div className="relative z-10">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-reward-gold mb-2">Membership</p>
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-1">멤버십 혜택 관리</h3>
+              <h3 className="font-bold text-white tracking-tight mb-1 text-xl md:text-2xl">멤버십 혜택 관리</h3>
               <p className="text-[11px] font-bold text-white/50 uppercase tracking-widest">MY GRADE: {(user?.grade || 'GATE')}</p>
             </div>
             <div className="w-12 h-12 shrink-0 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-reward-gold group-hover:text-obsidian transition-colors relative z-10 shadow-inner">
@@ -274,7 +274,7 @@ export default function DashboardPreview({ unifiedData, onOpenWebtoon, onRefresh
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mb-16 pointer-events-none" />
             <div className="relative z-10">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Recovery Report</p>
-              <h3 className="text-xl md:text-2xl font-bold text-obsidian tracking-tight mb-1">내 회복 리포트</h3>
+              <h3 className="font-bold text-obsidian tracking-tight mb-1 text-xl md:text-2xl">내 회복 리포트</h3>
               <p className="text-[11px] font-bold text-obsidian/40 uppercase tracking-widest">TOTAL {(unifiedData.assetStats?.totalInsights || 0)} INSIGHTS</p>
             </div>
             <div className="w-12 h-12 shrink-0 bg-obsidian rounded-full flex items-center justify-center text-white group-hover:bg-primary transition-colors relative z-10 shadow-sm">

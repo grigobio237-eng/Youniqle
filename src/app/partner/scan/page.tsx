@@ -105,7 +105,7 @@ export default function PartnerScanPage() {
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2 text-xl font-bold">
+                <CardTitle className="flex items-center gap-2 font-bold text-xl">
                   <QrCode className="h-5 w-5 text-primary" />
                   Scanner
                 </CardTitle>

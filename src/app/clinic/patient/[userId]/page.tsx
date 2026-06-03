@@ -203,7 +203,7 @@ export default function ClinicPatientDetail() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black text-obsidian">{user?.name} 님</h1>
+                <h1 className="font-black text-obsidian text-xl">{user?.name} 님</h1>
                 <Badge className="bg-primary/10 text-primary border-none text-[10px] px-2">BLACK PASS</Badge>
               </div>
               <p className="text-xs text-slate/50 font-bold">{user?.email}</p>

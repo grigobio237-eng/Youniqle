@@ -117,7 +117,7 @@ export default function WishlistPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
           <p className="text-slate font-medium mb-8">취향 관측을 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -137,7 +137,7 @@ export default function WishlistPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div className="text-center md:text-left">
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Interest Inventory</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">관심 상품 리스트</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">관심 상품 리스트</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 위시리스트입니다.</p>
           </div>
           <div className="flex gap-2">
@@ -157,7 +157,7 @@ export default function WishlistPage() {
         {wishlist.length === 0 ? (
           <Card className="border-dashed border-2 border-line bg-transparent rounded-[40px] p-24 text-center">
             <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6 shadow-sm">❤️</div>
-            <h3 className="text-xl font-black text-obsidian tracking-tight mb-2">리스트가 비어있습니다</h3>
+            <h3 className="font-black text-obsidian tracking-tight mb-2 text-xl">리스트가 비어있습니다</h3>
             <p className="text-slate font-medium mb-8">마음에 드는 장비를 발견하면 하트를 눌러 기록해두세요.</p>
             <Button asChild className="h-14 px-10 rounded-2xl bg-obsidian text-mist font-black shadow-lg">
               <Link href="/products" className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function WishlistPage() {
                       </div>
                       <CardContent className="p-8">
                         <h3 className="text-lg font-black text-obsidian tracking-tight line-clamp-1 mb-1">{item.productId?.name || '정보 없음'}</h3>
-                        <p className="text-xl font-black text-obsidian tracking-tighter mb-6">{(item.productId?.price || 0).toLocaleString()}원</p>
+                        <p className="font-black text-obsidian tracking-tighter mb-6 text-xl">{(item.productId?.price || 0).toLocaleString()}원</p>
                         <div className="flex gap-2">
                           <Button asChild variant="outline" className="flex-1 h-12 rounded-xl border-line font-black text-xs hover:bg-mist">
                             <Link href={`/products/${item.productId._id}`}>
@@ -220,7 +220,7 @@ export default function WishlistPage() {
 
             {inactiveItems.length > 0 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-black text-slate tracking-tight flex items-center gap-2 opacity-50">
+                <h2 className="font-black text-slate tracking-tight flex items-center gap-2 opacity-50 text-xl">
                   공급 중단 상품
                   <span className="text-xs bg-line/30 px-2 py-0.5 rounded-full">{inactiveItems.length}</span>
                 </h2>

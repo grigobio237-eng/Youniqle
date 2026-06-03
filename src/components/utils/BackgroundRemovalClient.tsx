@@ -188,7 +188,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                         <div className="w-20 h-20 mb-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                             <Upload className="h-10 w-10" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">인물 사진을 업로드하세요</h3>
+                        <h3 className="font-bold text-gray-900 mb-2 text-xl">인물 사진을 업로드하세요</h3>
                         <p className="text-gray-600 mb-4">JPG, PNG (최대 10MB)</p>
                         <Button size="lg" className="mt-2" disabled={modelLoading}>
                             {modelLoading ? '유니클 모델 로딩 중...' : '파일 선택'}

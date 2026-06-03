@@ -63,7 +63,7 @@ export default function BMICalculatorPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">🧮</div>
+                        <div className="mb-4 text-xl">🧮</div>
                         <CardTitle className="text-3xl font-bold">BMI 계산기</CardTitle>
                         <CardDescription className="text-lg">신장과 체중으로 건강 지수를 계산해보세요</CardDescription>
                     </CardHeader>
@@ -107,7 +107,7 @@ export default function BMICalculatorPage() {
                             <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6 text-center space-y-4">
                                 <div>
                                     <p className="text-sm text-gray-600 mb-2">당신의 BMI</p>
-                                    <p className="text-5xl font-bold text-gray-900">{bmi}</p>
+                                    <p className="font-bold text-gray-900 text-xl">{bmi}</p>
                                 </div>
 
                                 <div>

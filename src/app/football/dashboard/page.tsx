@@ -241,7 +241,7 @@ export default function CoachDashboardPage() {
 
                 {/* 웰니스 점수 */}
                 <div className="text-center">
-                  <div className={`text-5xl font-black ${
+                  <div className={`text-xl font-black ${
                     selectedPlayer.todayCheck.wellnessScore >= 4 ? 'text-green-600' :
                     selectedPlayer.todayCheck.wellnessScore >= 3 ? 'text-yellow-600' : 'text-red-600'
                   }`}>{selectedPlayer.todayCheck.wellnessScore}</div>
@@ -273,7 +273,7 @@ export default function CoachDashboardPage() {
                 {selectedPlayer.todayCheck.sessionLoad && (
                   <div className="bg-blue-50 rounded-xl p-3 text-center">
                     <p className="text-xs text-blue-600 font-bold">세션 부하</p>
-                    <p className="text-xl font-black text-blue-700">{selectedPlayer.todayCheck.sessionLoad} AU</p>
+                    <p className="font-black text-blue-700 text-xl">{selectedPlayer.todayCheck.sessionLoad} AU</p>
                     <p className="text-xs text-blue-500">RPE {selectedPlayer.todayCheck.rpe}</p>
                   </div>
                 )}

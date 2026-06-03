@@ -23,11 +23,11 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                         </div>
                         <div>
                             <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">YOUNIQLE Navigator</p>
-                            <h3 className="text-lg font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
+                            <h3 className="text-base md:text-xl font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
                         </div>
                     </div>
 
-                    <p className="text-xs font-bold text-slate-300 leading-relaxed">
+                    <p className="text-[11px] md:text-sm font-bold text-slate-300 leading-relaxed">
                         아직 기록된 회복 솔루션이 존재하지 않습니다.<br />
                         매일 60초 리듬 체크와 유니클 진단을 통해 나에게 딱 맞는 1:1 맞춤 회복 처방 솔루션을 확인해보세요!
                     </p>
@@ -63,7 +63,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                     </div>
                     <div>
                         <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">YOUNIQLE Weekly Brief</p>
-                        <h3 className="text-xl font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
+                        <h3 className="text-base md:text-xl font-black tracking-tight">유니클 맞춤 리커버리 요약</h3>
                     </div>
                 </div>
                 {createdAt && (
@@ -73,7 +73,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                 )}
             </div>
 
-            <p className="text-sm font-medium text-slate-300 leading-relaxed mb-8 relative z-10 line-clamp-2">
+            <p className="text-[11px] md:text-sm font-medium text-slate-300 leading-relaxed mb-8 relative z-10 line-clamp-2">
                 {solution.analysis}
             </p>
 

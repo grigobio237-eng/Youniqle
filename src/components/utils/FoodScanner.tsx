@@ -290,7 +290,7 @@ export default function FoodScanner({
                                 <Camera className="w-8 h-8 text-white/50" />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Ready to Scan</h3>
+                                <h3 className="font-black text-white tracking-tight uppercase italic text-xl">Ready to Scan</h3>
                                 <p className="text-white/60 text-xs font-bold leading-relaxed break-keep px-4">
                                     클릭하여 카메라로 음식을 촬영하거나 사진을 선택하세요.<br />
                                     제미나이 유니클 엔진이 영양과 칼로리를 정밀 분석합니다.
@@ -346,7 +346,7 @@ export default function FoodScanner({
                         <div className="relative z-10 flex flex-col items-center gap-6">
                             <div className="w-16 h-16 border-4 border-chapter-accent border-t-transparent rounded-full animate-spin" />
                             <div className="text-center">
-                                <h3 className="text-xl font-black italic uppercase tracking-widest text-white">Analyzing...</h3>
+                                <h3 className="font-black italic uppercase tracking-widest text-white text-xl">Analyzing...</h3>
                                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-2">Classifying recovery data</p>
                             </div>
                         </div>
@@ -387,7 +387,7 @@ export default function FoodScanner({
                                     <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate/60">
                                         <Brain className="w-4 h-4 text-reward-gold" /> Vision Insight
                                     </div>
-                                    <p className="text-xl font-black leading-tight text-obsidian bg-mist/30 p-6 rounded-[32px] border border-line/30 italic">
+                                    <p className="font-black leading-tight text-obsidian bg-mist/30 p-6 rounded-[32px] border border-line/30 italic text-xl">
                                         "{result.summary}"
                                     </p>
                                 </div>

@@ -185,7 +185,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                     <div className="relative group">
                         <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-60 rounded-full" />
                         <div className="w-24 h-24 bg-white/50 backdrop-blur-md border border-white/60 rounded-3xl flex items-center justify-center shadow-xl relative z-10 transform rotate-6 group-hover:rotate-0 transition-all duration-500">
-                            <span className="text-5xl drop-shadow-sm">💎</span>
+                            <span className="drop-shadow-sm text-xl">💎</span>
                         </div>
                     </div>
 
@@ -202,7 +202,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                     transition={{ delay: 0.1 }}
                     className="space-y-6"
                 >
-                    <h2 className="text-4xl md:text-5xl font-black text-obsidian leading-tight tracking-tight">
+                    <h2 className="font-black text-obsidian leading-tight tracking-tight text-4xl md:text-4xl">
                         당신의 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">진짜 잠재력</span>을<br />
                         데이터로 마주하세요
                     </h2>
@@ -357,13 +357,13 @@ function CompleteView({ onCheckResult }: { onCheckResult: () => void }) {
                 </div>
             </div>
 
-            <h2 className="text-4xl font-black text-obsidian mb-6 relative z-10">분석이 완료되었습니다</h2>
+            <h2 className="font-black text-obsidian mb-6 relative z-10 text-4xl">분석이 완료되었습니다</h2>
             <p className="text-gray-500 text-lg mb-12 max-w-sm mx-auto relative z-10 leading-relaxed font-medium">
                 상위 1% 정밀도의 <span className="text-primary font-bold">프리미엄 리포트</span>가<br />
                 지금 막 생성되었습니다.
             </p>
 
-            <Button onClick={onCheckResult} className="w-full max-w-sm h-16 bg-obsidian text-white font-bold rounded-full text-xl hover:scale-[1.02] hover:shadow-xl transition-all relative z-10">
+            <Button onClick={onCheckResult} className="w-full max-w-sm h-16 bg-obsidian text-white font-bold rounded-full hover:scale-[1.02] hover:shadow-xl transition-all relative z-10 text-xl">
                 리포트 확인하러 가기 <ArrowRight className="ml-2" />
             </Button>
         </motion.div>

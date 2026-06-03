@@ -211,7 +211,7 @@ export default function SubscriptionPage() {
         {!data?.hasSubscription && (
           <>
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-black text-obsidian">플랜을 선택하세요</h2>
+              <h2 className="font-black text-obsidian text-xl">플랜을 선택하세요</h2>
               <p className="text-sm text-slate">모든 플랜 14일 무료 체험 가능</p>
             </div>
 
@@ -232,7 +232,7 @@ export default function SubscriptionPage() {
                         <h3 className="font-black text-obsidian text-lg">{plan.label}</h3>
                       </div>
                       <div className="text-right">
-                        <p className="text-xl font-black text-obsidian">₩{plan.price.toLocaleString()}</p>
+                        <p className="font-black text-obsidian text-xl">₩{plan.price.toLocaleString()}</p>
                         <p className="text-xs text-slate">/월</p>
                       </div>
                     </div>

@@ -159,7 +159,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 평균 별점 */}
             <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">
+              <div className="font-bold text-gray-900 mb-2 text-4xl">
                 {stats.averageRating.toFixed(1)}
               </div>
               {renderStars(Math.round(stats.averageRating), 'lg')}

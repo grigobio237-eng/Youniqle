@@ -150,7 +150,7 @@ function NavigatorLoungeContent() {
             <Lock className="w-3 h-3" />
             Navigator Only
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-obsidian tracking-tight mb-4">
+          <h1 className="font-serif text-obsidian tracking-tight mb-4 text-4xl md:text-4xl">
             Navigator <span className="italic">Lounge</span>
           </h1>
           <p className="text-slate/60 text-lg">

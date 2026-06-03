@@ -114,7 +114,7 @@ export default function ReportsHub() {
     if (!recommendedArtworks.length || !lowestCategory) return [];
     return recommendedArtworks
       .filter((art: any) => art.wellnessCategory === lowestCategory.tag)
-      .slice(0, 3);
+      .slice(0, 4);
   }, [recommendedArtworks, lowestCategory]);
 
   const fetchDashboardData = async () => {
@@ -203,7 +203,7 @@ export default function ReportsHub() {
               <div className="inline-flex p-4 bg-primary/10 text-primary rounded-full mb-2">
                 <Sparkles className="w-12 h-12 animate-pulse" />
               </div>
-              <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tight">
+              <h2 className="font-black text-obsidian tracking-tight text-3xl md:text-4xl">
                 나만을 위한 프리미엄<br />회복 보고서가 비어 있습니다
               </h2>
               <p className="text-slate/60 text-base md:text-lg max-w-xl mx-auto leading-relaxed break-keep">
@@ -261,11 +261,11 @@ export default function ReportsHub() {
           <div className="grid grid-cols-2 gap-3 md:gap-4">
             <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20">
               <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">종합 점수</span>
-              <p className="text-xl md:text-2xl font-black text-obsidian">{selectedLog.totalScore || 0}pt</p>
+              <p className="font-black text-obsidian text-xl md:text-2xl">{selectedLog.totalScore || 0}pt</p>
             </div>
             <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20">
               <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">감정 온도</span>
-              <p className="text-xl md:text-2xl font-black text-obsidian">{selectedLog.metaphor || '양호'}</p>
+              <p className="font-black text-obsidian text-xl md:text-2xl">{selectedLog.metaphor || '양호'}</p>
             </div>
           </div>
 
@@ -471,7 +471,7 @@ export default function ReportsHub() {
 
               <div className="space-y-2">
                 <span className="text-sm font-bold text-white/40 tracking-wider">RECOVERY AUDIT REPORT</span>
-                <h1 className="text-[26px] sm:text-4xl md:text-5xl font-black tracking-tight leading-tight break-keep">
+                <h1 className="text-[26px] font-black tracking-tight leading-tight break-keep sm:text-4xl md:text-4xl">
                   {data?.cover?.userName}님의<br />
                   종합 회복 분석 진단서
                 </h1>
@@ -526,7 +526,7 @@ export default function ReportsHub() {
                 <div className="space-y-0.5 md:space-y-1">
                   <h3 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">CURRENT RECOVERY SCORE</h3>
                   <div className="flex items-baseline gap-1 md:gap-2">
-                    <span className="text-4xl md:text-6xl font-black tracking-tighter text-obsidian">
+                    <span className="font-black tracking-tighter text-obsidian text-4xl md:text-4xl">
                       {data?.highlights?.latestScore?.totalScore || 0}
                     </span>
                     <span className="text-sm md:text-lg font-bold text-slate-400">/ 100 pt</span>
@@ -758,7 +758,7 @@ export default function ReportsHub() {
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-chapter-accent/10 border border-chapter-accent/20 text-chapter-accent text-[10px] font-black uppercase tracking-widest">
                   <Sparkles className="w-3 h-3 animate-pulse" /> 2E Score Personalized Art Therapy
                 </div>
-                <h2 className="text-xl md:text-3xl font-black text-obsidian tracking-tight font-serif italic">
+                <h2 className="font-black text-obsidian tracking-tight font-serif italic text-xl md:text-3xl">
                   {lowestCategory.title}
                 </h2>
                 <p className="text-slate/60 text-xs sm:text-sm font-medium">
@@ -770,46 +770,31 @@ export default function ReportsHub() {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {recommendedItems.map((art: any) => {
                 const itemLink = `/gallery/artworks/${art.id}`;
                 return (
-                  <div key={art.id} className="bg-white border border-line/45 rounded-[24px] overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
-                    <Link href={itemLink} className="block relative aspect-[4/3] bg-mist overflow-hidden">
+                  <Link key={art.id} href={itemLink} className="bg-white border border-line/45 rounded-[16px] md:rounded-[24px] overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300 flex flex-col cursor-pointer">
+                    <div className="block relative aspect-[4/3] bg-mist overflow-hidden">
                       <Image 
                         src={art.image || ''} 
                         alt={art.title} 
                         fill 
                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        sizes="(max-width: 768px) 50vw, 25vw"
                       />
-                      <div className="absolute top-3 left-3">
-                        <Badge className="bg-chapter-accent text-white border-none font-black text-[9px] uppercase tracking-widest rounded-full shadow px-2.5 py-0.5">
+                      <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                        <Badge className="bg-chapter-accent text-white border-none font-black text-[8px] md:text-[9px] uppercase tracking-widest rounded-full shadow px-2 py-0.5 md:px-2.5">
                           {art.wellnessCategory === 'sleep-relax' ? '수면/안정' : art.wellnessCategory === 'energy' ? '활력/에너지' : '회복'}
                         </Badge>
                       </div>
-                    </Link>
-                    <div className="p-4 flex-1 flex flex-col">
-                      <div className="space-y-1 mb-4">
-                        <h4 className="text-base font-serif italic font-semibold text-obsidian line-clamp-1 group-hover:text-chapter-accent transition-colors">
-                          <Link href={itemLink}>{art.title}</Link>
-                        </h4>
-                        <p className="text-[10px] font-bold text-slate/40 uppercase tracking-widest">{art.artistName}</p>
-                        <p className="text-slate/60 text-xs line-clamp-2 leading-relaxed pt-1">{art.description || `${art.title} 작품`}</p>
-                      </div>
-                      <div className="pt-3 border-t border-line/50 flex justify-between items-center mt-auto">
-                        <div className="flex flex-col">
-                          <span className="text-[8px] font-black text-slate/30 uppercase">Rental / Purchase</span>
-                          <span className="text-sm font-black text-obsidian">₩ {art.price}</span>
-                        </div>
-                        <Button asChild size="sm" className="h-8 px-3 text-xs font-black bg-obsidian text-mist hover:bg-chapter-accent rounded-lg transition-colors">
-                          <Link href={itemLink}>
-                            작품 감상 & 렌탈
-                          </Link>
-                        </Button>
-                      </div>
                     </div>
-                  </div>
+                    <div className="p-3 md:p-4 flex-1 flex flex-col items-center justify-center text-center">
+                      <h4 className="text-[11px] md:text-sm font-serif italic font-bold text-obsidian line-clamp-2 group-hover:text-chapter-accent transition-colors leading-snug">
+                        {art.title}
+                      </h4>
+                    </div>
+                  </Link>
                 );
               })}
             </div>
@@ -888,7 +873,7 @@ export default function ReportsHub() {
                       <Link href="/ai-navigator">루틴 시작하기</Link>
                     </Button>
                   ) : (
-                    <span className="text-xl md:text-2xl font-black tracking-tight text-white block">
+                    <span className="font-black tracking-tight text-white block text-xl md:text-2xl">
                       {ratio.value}
                     </span>
                   )}

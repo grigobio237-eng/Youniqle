@@ -123,7 +123,7 @@ export default function PostCareForm() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 rounded-full text-xs font-black text-primary tracking-widest uppercase mb-4">
              Digital Recovery Roadmap
           </div>
-          <CardTitle className="text-4xl font-black tracking-tight text-obsidian">
+          <CardTitle className="font-black tracking-tight text-obsidian text-4xl">
             {step === 1 ? "언제 시술을 받으셨나요?" : step === 2 ? "현재 어떤 증상이 있나요?" : "생활 습관과 고민"}
           </CardTitle>
           <CardDescription className="text-slate font-medium text-lg">

@@ -60,7 +60,7 @@ export default function PrivateReportRequestPage() {
           <ShieldCheck className="w-4 h-4 mr-2" />
           Private & Secure
         </div>
-        <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter">조용한 정리 신청</h1>
+        <h1 className="font-black text-obsidian tracking-tighter text-4xl md:text-4xl">조용한 정리 신청</h1>
         <p className="text-lg text-slate/60 leading-relaxed font-bold break-keep">
           숫자와 그래프만으로는 알 수 없는 당신만의 회복 기준.<br />
           네비게이터가 비공개로 분석하여 맞춤 리포트를 설계해 드립니다.
@@ -71,7 +71,7 @@ export default function PrivateReportRequestPage() {
         {/* Left: Info */}
         <div className="space-y-12">
           <section className="space-y-6">
-            <h2 className="text-xl font-black text-obsidian tracking-tight">리포트 포함 내용</h2>
+            <h2 className="font-black text-obsidian tracking-tight text-xl">리포트 포함 내용</h2>
             <div className="space-y-4">
               {[
                 { title: '상태 요약', desc: '데이터에 나타난 현재의 핵심 흔들림 진단' },

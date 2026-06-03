@@ -77,7 +77,7 @@ export default function SitemapPage() {
       {/* Header Section */}
       <div className="bg-obsidian pt-32 pb-20 px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
+          <h1 className="font-black text-white tracking-tight mb-4 text-4xl md:text-4xl">
             사이트맵
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl font-medium leading-relaxed">
@@ -99,7 +99,7 @@ export default function SitemapPage() {
                 <div className="w-10 h-10 rounded-2xl bg-obsidian flex items-center justify-center text-white shadow-lg shadow-obsidian/10">
                   {section.icon}
                 </div>
-                <h2 className="text-xl font-bold text-obsidian tracking-tight">
+                <h2 className="font-bold text-obsidian tracking-tight text-xl">
                   {section.title}
                 </h2>
               </div>

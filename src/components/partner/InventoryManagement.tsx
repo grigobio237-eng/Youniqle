@@ -464,7 +464,7 @@ export default function InventoryManagement() {
                   {/* 재고 정보 */}
                   <div className="text-center min-w-[80px]">
                     <p className="text-xs text-gray-500">현재 재고</p>
-                    <p className="text-xl font-bold">{item.currentStock}<span className="text-sm font-normal text-gray-500">개</span></p>
+                    <p className="font-bold text-xl">{item.currentStock}<span className="text-sm font-normal text-gray-500">개</span></p>
                   </div>
                   <div className="text-center min-w-[60px]">
                     <p className="text-xs text-gray-500">예약</p>

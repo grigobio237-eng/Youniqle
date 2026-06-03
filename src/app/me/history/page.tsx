@@ -98,7 +98,7 @@ export default function RecoveryHistoryPage() {
                             <ChevronLeft className="w-4 h-4 mr-1" />
                             Back to Dashboard
                         </Button>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Recovery Journey</h1>
+                        <h1 className="font-black text-gray-900 tracking-tight text-4xl">Recovery Journey</h1>
                         <p className="text-gray-500 font-medium">시간에 따른 당신의 회복 성장 궤적입니다.</p>
                     </div>
                     <div className="hidden md:block">
@@ -118,7 +118,7 @@ export default function RecoveryHistoryPage() {
                 >
                     <Card className="border-none shadow-xl rounded-[40px] overflow-hidden bg-white">
                         <CardHeader className="p-8 pb-0">
-                            <CardTitle className="text-xl font-bold flex items-center">
+                            <CardTitle className="font-bold flex items-center text-xl">
                                 <Activity className="w-5 h-5 mr-3 text-primary" />
                                 회복 스코어 트렌드
                             </CardTitle>

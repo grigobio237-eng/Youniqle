@@ -652,7 +652,7 @@ export default function AdminFAQPage() {
                   {previewFAQ.status === 'active' ? '활성' : '숨김'}
                 </Badge>
               </div>
-              <h3 className="text-xl font-semibold">{previewFAQ.question}</h3>
+              <h3 className="font-semibold text-xl">{previewFAQ.question}</h3>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
                 {previewFAQ.answer}
               </p>

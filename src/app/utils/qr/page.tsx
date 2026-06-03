@@ -86,7 +86,7 @@ export default function QRCodePage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">📱</div>
+                        <div className="mb-4 text-xl">📱</div>
                         <CardTitle className="text-3xl font-bold">QR 코드 생성</CardTitle>
                         <CardDescription className="text-lg">URL이나 텍스트를 QR 코드로 변환하세요</CardDescription>
                     </CardHeader>

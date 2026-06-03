@@ -82,7 +82,7 @@ export default function AboutPage() {
               <Sparkles className="w-4 h-4 text-chapter-accent animate-pulse" />
               <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-[0.5em]">The Lifecare OS</span>
             </span>
-            <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter italic leading-[0.9] text-white drop-shadow-2xl">
+            <h1 className="font-black tracking-tighter italic leading-[0.9] text-white drop-shadow-2xl text-xl md:text-4xl">
               RECORD IS <br />
               <span className="text-chapter-accent italic">LIFECARE.</span>
             </h1>
@@ -113,11 +113,11 @@ export default function AboutPage() {
               className="space-y-8 md:space-y-10"
             >
               <div className="space-y-6">
-                <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter italic leading-tight text-obsidian">
+                <h2 className="font-black tracking-tighter italic leading-tight text-obsidian text-xl md:text-4xl">
                   나를 먼저<br />
                   <span className="text-chapter-accent">이해하는 습관.</span>
                 </h2>
-                <p className="text-xl md:text-2xl text-slate/70 leading-relaxed font-medium word-keep-all">
+                <p className="text-slate/70 leading-relaxed font-medium word-keep-all text-xl md:text-2xl">
                   유니클(Youniqle)은 고객의 하루를 데이터로 자산화하여<br />
                   맞춤형 솔루션을 제안하는 <span className="text-obsidian font-black">통합 회복관리 플랫폼</span>입니다. 유니클이 제안하는 새로운 회복의 기준을 만나보세요.
                 </p>
@@ -179,8 +179,8 @@ export default function AboutPage() {
                   <Fingerprint className="w-4 h-4 text-chapter-accent" />
                   <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 01</span>
                 </div>
-                <h3 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Record</h3>
-                <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
+                <h3 className="font-black tracking-tighter italic text-obsidian uppercase text-xl md:text-4xl">Record</h3>
+                <p className="font-black tracking-tight leading-tight text-obsidian italic text-2xl md:text-4xl">
                   기록: <br /> 일상을 남기는 가장 쉬운 방법
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
@@ -227,8 +227,8 @@ export default function AboutPage() {
                   <Activity className="w-4 h-4 text-reward-gold" />
                   <span className="text-[10px] font-black text-reward-gold uppercase tracking-widest leading-none">Step 02</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Analysis</h3>
-                <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
+                <h3 className="font-black tracking-tighter italic text-obsidian uppercase text-xl md:text-4xl">Analysis</h3>
+                <p className="font-black tracking-tight leading-tight text-obsidian italic text-2xl md:text-4xl">
                   분석: <br /> 생활 흐름을 꿰뚫는 통찰
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
@@ -251,8 +251,8 @@ export default function AboutPage() {
                   <Zap className="w-4 h-4 text-chapter-accent" />
                   <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 03</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Routine</h3>
-                <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
+                <h3 className="font-black tracking-tighter italic text-obsidian uppercase text-xl md:text-4xl">Routine</h3>
+                <p className="font-black tracking-tight leading-tight text-obsidian italic text-2xl md:text-4xl">
                   약속: <br /> 당신을 위한 최적의 루틴
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
@@ -299,8 +299,8 @@ export default function AboutPage() {
                   <ShieldCheck className="w-4 h-4 text-chapter-accent" />
                   <span className="text-[10px] font-black text-chapter-accent uppercase tracking-widest leading-none">Step 04</span>
                 </div>
-                <h3 className="text-5xl md:text-8xl font-black tracking-tighter italic text-obsidian uppercase">Care</h3>
-                <p className="text-2xl md:text-4xl font-black tracking-tight leading-tight text-obsidian italic">
+                <h3 className="font-black tracking-tighter italic text-obsidian uppercase text-xl md:text-4xl">Care</h3>
+                <p className="font-black tracking-tight leading-tight text-obsidian italic text-2xl md:text-4xl">
                   케어: <br /> 당신만을 위한 프라이빗 연결
                 </p>
                 <p className="text-lg text-slate/70 leading-relaxed font-medium">
@@ -321,7 +321,7 @@ export default function AboutPage() {
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-chapter-accent/10 text-chapter-accent text-[10px] font-black uppercase tracking-widest mb-2">
                 Recovery Tools
               </div>
-              <h2 className="text-3xl md:text-5xl font-black text-obsidian tracking-tight">다른 유용한 도구도 확인해 보세요</h2>
+              <h2 className="font-black text-obsidian tracking-tight text-3xl md:text-4xl">다른 유용한 도구도 확인해 보세요</h2>
               <p className="text-slate/60 text-base md:text-lg leading-relaxed">환경부터 사운드까지, 당신의 모든 감각을 분석하는 유니클의 정밀 도구들입니다.</p>
             </div>
 
@@ -351,7 +351,7 @@ export default function AboutPage() {
           {/* 2. Path Preview */}
           <div className="space-y-8">
             <div className="text-center space-y-4">
-              <h2 className="text-xl md:text-4xl font-black text-obsidian tracking-tight uppercase italic">Recovery Paths</h2>
+              <h2 className="font-black text-obsidian tracking-tight uppercase italic text-xl md:text-4xl">Recovery Paths</h2>
               <p className="text-slate/60 font-medium">당신의 결과에 따라 활성화되는 3가지 정밀 로드맵</p>
             </div>
 
@@ -435,11 +435,11 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-10"
             >
-              <h2 className="text-4xl xs:text-5xl sm:text-7xl md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian uppercase">
+              <h2 className="md:text-[140px] font-black tracking-tight leading-[0.8] italic block text-obsidian uppercase text-xl">
                 Life Starts <br />
                 <span className="text-chapter-accent">With Record.</span>
               </h2>
-              <p className="text-2xl md:text-5xl text-slate/40 font-black tracking-tight italic">나를 먼저 이해하는 습관. 유니클이 제안하는 새로운 회복의 기준입니다.</p>
+              <p className="text-slate/40 font-black tracking-tight italic text-2xl md:text-4xl">나를 먼저 이해하는 습관. 유니클이 제안하는 새로운 회복의 기준입니다.</p>
             </motion.div>
 
             <motion.div 
@@ -450,7 +450,7 @@ export default function AboutPage() {
             >
               <Button 
                 onClick={() => window.location.href = '/?action=diagnose'} 
-                className="h-24 md:h-32 px-12 md:px-24 bg-obsidian text-white rounded-full font-black text-xl md:text-3xl uppercase tracking-[0.2em] shadow-2xl hover:scale-105 active:scale-95 transition-all group flex items-center gap-8 md:gap-16 border-8 border-white"
+                className="h-24 md:h-32 px-12 md:px-24 bg-obsidian text-white rounded-full font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-105 active:scale-95 transition-all group flex items-center gap-8 md:gap-16 border-8 border-white text-xl md:text-3xl"
               >
                 Start Rhythm Check
                 <div className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-chapter-accent flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

@@ -98,10 +98,10 @@ export default function RecoveryPortalPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-2xl sm:text-3xl md:text-7xl font-black text-text-primary tracking-tighter leading-[1.15]"
+            className="font-black text-text-primary tracking-tighter leading-[1.15] text-2xl sm:text-3xl md:text-4xl"
           >
             완전한 휴식과 회복, <br className="block md:hidden" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 text-xl sm:text-2xl md:text-6xl font-black">나만의 힐링 라운지</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 font-black text-xl sm:text-2xl md:text-4xl">나만의 힐링 라운지</span>
           </motion.h1>
 
           <motion.p

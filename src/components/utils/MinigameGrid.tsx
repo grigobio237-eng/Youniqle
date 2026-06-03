@@ -93,7 +93,7 @@ export default function MinigameGrid() {
                             <div className={`w-16 h-16 rounded-2xl mb-6 flex items-center justify-center bg-gradient-to-br ${game.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                                 {game.icon}
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                            <h3 className="font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors text-xl">
                                 {game.title}
                             </h3>
                             <p className="text-gray-500 text-sm mb-6 line-clamp-2 h-10">

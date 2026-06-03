@@ -215,7 +215,7 @@ export default function TypingPage() {
                                 className="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center"
                             >
                                 <div className="mb-2 text-gray-400 font-bold tracking-widest uppercase">Result Report</div>
-                                <h2 className="text-5xl font-black text-gray-900 mb-6">
+                                <h2 className="font-black text-gray-900 mb-6 text-xl">
                                     {gameState.wpm} <span className="text-2xl font-normal text-gray-500">CPM</span>
                                 </h2>
 

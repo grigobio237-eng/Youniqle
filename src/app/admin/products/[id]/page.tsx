@@ -194,7 +194,7 @@ export default function ProductDetailPage() {
                         <CardContent className="space-y-4">
                             <div className="flex justify-between items-center pb-2 border-b">
                                 <span className="text-gray-500">판매가</span>
-                                <span className="text-xl font-bold text-primary">{formatPrice(product.price)}</span>
+                                <span className="font-bold text-primary text-xl">{formatPrice(product.price)}</span>
                             </div>
                             {product.originalPrice && product.originalPrice > product.price && (
                                 <div className="flex justify-between items-center pb-2 border-b">

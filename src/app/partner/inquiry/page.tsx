@@ -137,10 +137,10 @@ export default function PartnerInquiryPage() {
             {/* 왼쪽: 안내 정보 */}
             <div className="space-y-8">
               <div className="text-center lg:text-left">
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                <h1 className="font-bold text-gray-900 mb-4 text-4xl">
                   파트너십 문의
                 </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed text-xl">
                   Youniqle과 함께 성장할 파트너가 되어주세요.
                   <br />
                   브랜드, 유통사, 크리에이터 등 다양한 파트너십을 기다리고 있습니다.

@@ -52,7 +52,7 @@ export default function DDayPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">📅</div>
+                        <div className="mb-4 text-xl">📅</div>
                         <CardTitle className="text-3xl font-bold">D-Day 계산기</CardTitle>
                         <CardDescription className="text-lg">중요한 날까지 며칠 남았는지 확인하세요</CardDescription>
                     </CardHeader>
@@ -100,11 +100,11 @@ export default function DDayPage() {
                                 )}
 
                                 <div>
-                                    <p className={`text-7xl font-bold ${getDDayColor()}`}>{getDDayText()}</p>
+                                    <p className={`text-xl font-bold ${getDDayColor()}`}>{getDDayText()}</p>
                                 </div>
 
                                 <div className="text-gray-600">
-                                    {dday === 0 && <p className="text-xl font-semibold">오늘이 바로 그날입니다! 🎉</p>}
+                                    {dday === 0 && <p className="font-semibold text-xl">오늘이 바로 그날입니다! 🎉</p>}
                                     {dday > 0 && (
                                         <p className="text-lg">
                                             목표일까지 <span className="font-bold text-blue-600">{dday}일</span> 남았습니다

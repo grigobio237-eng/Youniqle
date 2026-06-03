@@ -197,7 +197,7 @@ export default function TeamJoinPage() {
         {/* 역할 선택 */}
         <Card className="rounded-[32px] border-none shadow-xl">
           <CardContent className="p-8 space-y-6">
-            <h2 className="text-xl font-black text-obsidian">합류 정보 입력</h2>
+            <h2 className="font-black text-obsidian text-xl">합류 정보 입력</h2>
 
             {/* 역할 */}
             <div className="space-y-3">

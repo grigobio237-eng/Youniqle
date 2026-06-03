@@ -100,7 +100,7 @@ function PlayersContent() {
             }`}>
               <CardContent className="p-6 text-center space-y-2">
                 <p className="text-sm font-bold opacity-70">ACWR (부하 비율)</p>
-                <p className="text-5xl font-black">{acwr.acwr}</p>
+                <p className="font-black text-xl">{acwr.acwr}</p>
                 <Badge className="bg-white/50 border-none font-bold">{acwr.zoneLabel}</Badge>
                 <div className="grid grid-cols-2 gap-3 pt-2 text-sm">
                   <div className="bg-white/40 rounded-xl p-2">

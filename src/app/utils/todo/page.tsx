@@ -91,7 +91,7 @@ export default function TodoPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">✅</div>
+                        <div className="mb-4 text-xl">✅</div>
                         <CardTitle className="text-3xl font-bold">할 일 관리</CardTitle>
                         <CardDescription className="text-lg">오늘의 할 일을 체크하세요</CardDescription>
                     </CardHeader>

@@ -174,7 +174,7 @@ export default function RoulettePage() {
                     <Card className="p-6 h-fit lg:col-span-1">
                         <div className="flex items-center space-x-2 mb-6">
                             <Utensils className="w-6 h-6 text-green-600" />
-                            <h2 className="text-xl font-bold">메뉴 후보</h2>
+                            <h2 className="font-bold text-xl">메뉴 후보</h2>
                         </div>
 
                         <div className="space-y-4">
@@ -276,8 +276,8 @@ export default function RoulettePage() {
                                         onClick={() => setWinner(null)}
                                     >
                                         <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm mx-4 transform animate-bounce-in">
-                                            <h3 className="text-xl text-gray-500 mb-2">오늘의 메뉴는</h3>
-                                            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-6">
+                                            <h3 className="text-gray-500 mb-2 text-xl">오늘의 메뉴는</h3>
+                                            <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-6 text-4xl">
                                                 {winner}
                                             </div>
                                             <Button onClick={() => setWinner(null)} variant="outline" className="w-full">

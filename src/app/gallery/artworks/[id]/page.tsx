@@ -156,7 +156,7 @@ export default function ArtworkDetailPage() {
                             </Reveal>
                             
                             <Reveal delay={0.2}>
-                                <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif font-light italic tracking-tighter leading-[1.1] text-obsidian mb-6 md:mb-8">
+                                <h1 className="font-serif font-light italic tracking-tighter leading-[1.1] text-obsidian mb-6 md:mb-8 text-xl md:text-4xl">
                                     {artwork.title}
                                 </h1>
                             </Reveal>
@@ -178,7 +178,7 @@ export default function ArtworkDetailPage() {
                                 <div>
                                     <h2 className="text-[10px] uppercase tracking-[0.4em] text-slate/40 mb-4 font-black">Dimensions</h2>
                                     <div className="space-y-1">
-                                        <p className="font-black text-xl text-obsidian tracking-tighter italic font-serif">
+                                        <p className="font-black text-obsidian tracking-tighter italic font-serif text-xl">
                                             {artwork.canvasSize}
                                         </p>
                                         <p className="text-[11px] font-bold text-slate/40 tracking-widest">{artwork.specs?.ho || 0}호</p>
@@ -223,7 +223,7 @@ export default function ArtworkDetailPage() {
                                 </div>
                                 <div className="space-y-2 sm:border-l sm:border-line/20 sm:pl-12">
                                     <span className="text-[10px] text-slate/40 font-black uppercase tracking-[0.3em] block">Monthly Rental (월 렌탈료)</span>
-                                    <span className="text-xl sm:text-2xl font-black text-obsidian/40 tracking-tighter italic font-serif">₩ {artwork.rental || '문의'}</span>
+                                    <span className="font-black text-obsidian/40 tracking-tighter italic font-serif text-xl sm:text-2xl">₩ {artwork.rental || '문의'}</span>
                                 </div>
                             </div>
 

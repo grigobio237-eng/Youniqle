@@ -113,7 +113,7 @@ export default function MyInquiriesPage() {
                             <ChevronLeft className="w-4 h-4 mr-1" />
                             Back to Dashboard
                         </Button>
-                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                        <h1 className="font-black text-slate-900 tracking-tighter flex items-center gap-3 text-3xl md:text-4xl">
                             <MessageSquare className="w-8 h-8 md:w-10 md:h-10 text-rose-500" />
                             My Inquiries
                         </h1>
@@ -135,7 +135,7 @@ export default function MyInquiriesPage() {
                             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-300">
                                 <MessageSquare className="w-8 h-8" />
                             </div>
-                            <h3 className="text-xl font-black text-slate-900 mb-2">접수된 문의 내역이 없습니다.</h3>
+                            <h3 className="font-black text-slate-900 mb-2 text-xl">접수된 문의 내역이 없습니다.</h3>
                             <p className="text-slate-500 font-medium text-sm mb-8">
                                 궁금한 점이나 도움이 필요하신가요? 언제든지 문의해주세요.
                             </p>
@@ -209,7 +209,7 @@ export default function MyInquiriesPage() {
                                             {new Date(selectedInquiry.createdAt).toLocaleString()}
                                         </span>
                                     </div>
-                                    <DialogTitle className="text-xl font-black text-slate-900 leading-tight">
+                                    <DialogTitle className="font-black text-slate-900 leading-tight text-xl">
                                         {selectedInquiry.subject}
                                     </DialogTitle>
                                 </div>

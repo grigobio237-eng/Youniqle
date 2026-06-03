@@ -354,10 +354,10 @@ function DiagnosisContent() {
                                 <Badge className="bg-[#D4B06F]/15 text-[#D4B06F] border-none px-4 py-1 text-xs font-black tracking-widest uppercase">
                                     AI Recovery Analyzer
                                 </Badge>
-                                <h2 className="text-3xl md:text-4xl font-black text-obsidian tracking-tighter">
+                                <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tighter">
                                     회복 패턴 매칭 시퀀스
                                 </h2>
-                                <p className="text-slate text-sm font-semibold max-w-sm mx-auto">
+                                <p className="text-[11px] md:text-sm text-slate font-semibold max-w-sm mx-auto">
                                     기록된 문항을 지능형 매트릭스로 분석해 고유한 바이오리듬 예측 커브를 생성하고 있습니다.
                                 </p>
                             </div>
@@ -445,7 +445,7 @@ function DiagnosisContent() {
                                 <Badge className="bg-reward-gold/15 text-reward-gold border-none px-4 py-1 text-[10px] font-black tracking-widest uppercase">
                                     Chapter Completed
                                 </Badge>
-                                <h2 className="text-3xl font-black text-obsidian tracking-tight leading-tight">
+                                <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tight leading-tight">
                                     성공적으로 기록되었습니다!
                                 </h2>
                                 <p className="text-slate font-semibold text-xs md:text-sm leading-relaxed px-4 max-w-md mx-auto">
@@ -476,7 +476,7 @@ function DiagnosisContent() {
                                 <Badge className={`${theme.badge} border-none px-4 py-1.5 text-xs font-black tracking-[0.2em] uppercase`}>
                                     {type === '60s' ? '60s RECOVERY CHECK-IN' : type === 'daily' ? 'DAILY RECOVERY CHECK-IN' : 'CORE PERSONALITY DIAGNOSIS'}
                                 </Badge>
-                                <h1 className="text-5xl md:text-6xl font-black text-obsidian tracking-tighter leading-tight">
+                                <h1 className="font-black text-obsidian tracking-tighter leading-tight text-xl md:text-4xl">
                                     {type === '60s' ? (
                                         <>60초 오늘의 리듬체크</>
                                     ) : type === 'daily' ? (
@@ -485,7 +485,7 @@ function DiagnosisContent() {
                                         <>당신의 내면 세계를<br /><span className="text-chapter-accent">분석합니다</span></>
                                     )}
                                 </h1>
-                                <p className="text-slate font-medium text-lg max-w-md mx-auto">
+                                <p className="text-[11px] md:text-sm text-slate font-medium max-w-md mx-auto">
                                     {type === '60s'
                                         ? '사진 촬영이나 번거로운 과정 없이, 오늘 나의 몸과 마음을 직관적으로 확인하고 100PT를 받으세요.'
                                         : type === 'daily' 
@@ -659,8 +659,8 @@ function DiagnosisContent() {
                                 <div className={`w-24 h-24 ${type === 'daily' ? 'bg-reward-gold' : 'bg-chapter-accent'} rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl`}>
                                     <CheckCircle2 className="w-12 h-12 text-white" />
                                 </div>
-                                <h2 className="text-4xl font-black text-obsidian tracking-tighter">진단이 완료되었습니다!</h2>
-                                <p className="text-slate font-medium">분석된 데이터를 바탕으로 개인화 솔루션을 구성했습니다.</p>
+                                <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tighter">진단이 완료되었습니다!</h2>
+                                <p className="text-[11px] md:text-sm text-slate font-medium">분석된 데이터를 바탕으로 개인화 솔루션을 구성했습니다.</p>
                             </div>
 
                             <Card className={`bg-white ${type === 'daily' ? 'border-reward-gold/30 shadow-reward-gold/5' : 'border-line'} border-2 rounded-[40px] p-10 shadow-2xl text-center space-y-8 relative overflow-hidden`}>
@@ -668,12 +668,12 @@ function DiagnosisContent() {
                                 
                                 <div className="space-y-2 relative z-10">
                                     <div className="text-sm font-black text-slate uppercase tracking-widest opacity-40">Total Recovery Score</div>
-                                    <div className={`text-8xl font-black ${type === 'daily' ? 'text-reward-gold' : 'text-chapter-accent'} tracking-tighter`}>
+                                    <div className={`text-xl font-black ${type === 'daily' ? 'text-reward-gold' : 'text-chapter-accent'} tracking-tighter`}>
                                         {result.totalScore}
                                     </div>
                                 </div>
 
-                                <p className="text-2xl font-bold text-obsidian leading-tight relative z-10">
+                                <p className="text-lg md:text-2xl font-bold text-obsidian leading-tight relative z-10">
                                     {result.summary || "훌륭한 회복 리듬을 보여주고 계십니다."}
                                 </p>
 
@@ -684,7 +684,7 @@ function DiagnosisContent() {
                                         transition={{ type: 'spring', damping: 12, delay: 0.5 }}
                                         className="relative z-10"
                                     >
-                                        <Badge className="bg-reward-gold text-obsidian text-xl px-8 py-3 rounded-2xl font-black shadow-[0_10px_30px_rgba(212,175,55,0.3)] border-none">
+                                        <Badge className="bg-reward-gold text-obsidian px-8 py-3 rounded-2xl font-black shadow-[0_10px_30px_rgba(212,175,55,0.3)] border-none text-xl">
                                             <Sparkles className="w-5 h-5 mr-2 fill-current" />
                                             +{result.reward} PT 획득!
                                         </Badge>
@@ -696,7 +696,7 @@ function DiagnosisContent() {
                                 <Button size="lg" asChild className={`h-20 flex-1 text-xl font-black rounded-3xl ${(type === 'daily' || type === '60s') ? 'bg-obsidian hover:bg-reward-gold hover:text-obsidian text-white border-none' : 'bg-chapter-accent text-white border-none'} shadow-xl transition-all`}>
                                     <Link href="/dashboard">대시보드로 돌아가기</Link>
                                 </Button>
-                                <Button size="lg" variant="outline" asChild className="h-20 flex-1 text-xl font-black rounded-3xl border-2 border-line hover:border-obsidian transition-all">
+                                <Button size="lg" variant="outline" asChild className="h-20 flex-1 font-black rounded-3xl border-2 border-line hover:border-obsidian transition-all text-xl">
                                     <Link href="/ai-navigator">AI 네비게이터 확인</Link>
                                 </Button>
                             </div>

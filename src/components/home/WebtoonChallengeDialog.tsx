@@ -453,7 +453,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     {genres.map(g => (
                       <SelectItem key={g.id} value={g.id} className="focus:bg-primary/5 rounded-xl py-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl shrink-0">{g.icon}</span>
+                          <span className="shrink-0 text-xl">{g.icon}</span>
                           <div className="min-w-0">
                             <div className="font-bold text-obsidian text-sm md:text-base">{g.label}</div>
                             <div className="text-[9px] md:text-[10px] text-slate font-medium truncate">{g.desc}</div>
@@ -479,7 +479,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     {styles.map(s => (
                       <SelectItem key={s.id} value={s.id} className="focus:bg-primary/5 rounded-xl py-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl shrink-0">{s.icon}</span>
+                          <span className="shrink-0 text-xl">{s.icon}</span>
                           <div className="min-w-0">
                             <div className="font-bold text-obsidian text-sm md:text-base">{s.label}</div>
                             <div className="text-[9px] md:text-[10px] text-slate font-medium truncate">{s.desc}</div>
@@ -646,7 +646,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
           {step === 'CHARACTER' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 pb-10">
               <div className="space-y-1">
-                <h3 className="text-xl font-black text-obsidian flex items-center gap-2">
+                <h3 className="font-black text-obsidian flex items-center gap-2 text-xl">
                   <UserCircle2 className="w-6 h-6 text-primary" /> 웹툰 캐릭터 완성하기
                 </h3>
                 <p className="text-xs font-bold text-slate">사진과 설명을 바탕으로 두 가지 캐릭터를 만들어 드려요. 마음에 드는 것을 선택하세요!</p>
@@ -947,7 +947,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
 
           {step === 'POSTED' && (
             <div className="py-12 text-center space-y-6 animate-in zoom-in-95">
-              <div className="w-24 h-24 bg-status-good/10 text-status-good rounded-full flex items-center justify-center mx-auto text-5xl shadow-inner border border-status-good/20">
+              <div className="w-24 h-24 bg-status-good/10 text-status-good rounded-full flex items-center justify-center mx-auto shadow-inner border border-status-good/20 text-xl">
                 ✨
               </div>
               <div className="space-y-2">

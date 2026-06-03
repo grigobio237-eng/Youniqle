@@ -120,7 +120,7 @@ export default function OfficeBingoPage() {
                     <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 px-4 py-1 rounded-full font-bold">
                         Office Sympathy Bingo
                     </Badge>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter">팀별 대항 공감 빙고</h1>
+                    <h1 className="font-black text-slate-900 tracking-tighter text-4xl">팀별 대항 공감 빙고</h1>
                     <p className="text-slate-500 font-medium">우리 팀은 얼마나 많은 오피스 빌런... 아니, 에피소드를 가지고 있을까요?</p>
                 </div>
 
@@ -136,8 +136,8 @@ export default function OfficeBingoPage() {
                                     <span className="text-xs font-black uppercase tracking-widest">Bingo Status</span>
                                 </div>
 
-                                <div className="text-6xl font-black text-slate-900 tabular-nums">
-                                    {bingoCount} <span className="text-xl text-slate-400">Lines</span>
+                                <div className="font-black text-slate-900 tabular-nums text-xl">
+                                    {bingoCount} <span className="text-slate-400 text-xl">Lines</span>
                                 </div>
 
                                 <div className="space-y-1">
@@ -165,7 +165,7 @@ export default function OfficeBingoPage() {
                                     type="text"
                                     value={teamName}
                                     onChange={(e) => setTeamName(e.target.value)}
-                                    className="bg-transparent border-b border-white/20 w-full text-xl font-black focus:outline-none focus:border-emerald-400 transition-colors"
+                                    className="bg-transparent border-b border-white/20 w-full font-black focus:outline-none focus:border-emerald-400 transition-colors text-xl"
                                     placeholder="팀 이름을 입력하세요"
                                 />
                                 <p className="text-xs text-white/40 leading-relaxed italic">
@@ -205,7 +205,7 @@ export default function OfficeBingoPage() {
                                         className="absolute inset-0 z-20 bg-emerald-900/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 m-4 rounded-[36px]"
                                     >
                                         <Sparkles className="w-20 h-20 text-yellow-400 mb-6 animate-pulse" />
-                                        <h2 className="text-4xl font-black text-white mb-2 tracking-tighter">BINGO! 🎉</h2>
+                                        <h2 className="font-black text-white mb-2 tracking-tighter text-4xl">BINGO! 🎉</h2>
                                         <p className="text-emerald-100 font-medium mb-10 max-w-xs">
                                             {teamName}의 단합력이 증명되었습니다. 모든 팀원들에게 커피 한 잔의 휴식을 선물하세요!
                                         </p>

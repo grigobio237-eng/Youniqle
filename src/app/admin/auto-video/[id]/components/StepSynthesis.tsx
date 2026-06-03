@@ -148,7 +148,7 @@ export default function StepSynthesis({ project, onUpdate }: { project: any, onU
                             <p className="text-muted-foreground text-lg">
                                 선택하신 전환 효과로 최종 영상을 완성할 준비가 되었습니다.
                             </p>
-                            <Button size="lg" onClick={handleGenerate} disabled={generating} className="px-12 py-8 text-xl h-auto shadow-lg hover:shadow-xl transition-all">
+                            <Button size="lg" onClick={handleGenerate} disabled={generating} className="px-12 py-8 h-auto shadow-lg hover:shadow-xl transition-all text-xl">
                                 {generating ? (
                                     <>
                                         <Loader2 className="animate-spin mr-3 h-8 w-8" />

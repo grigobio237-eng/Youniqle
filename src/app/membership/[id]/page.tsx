@@ -57,10 +57,10 @@ export default function PassDetailPage({ params }: PageProps) {
             <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">
               {pass.name}
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter leading-tight break-keep">
+            <h1 className="font-black text-obsidian tracking-tighter leading-tight break-keep text-4xl md:text-4xl">
               {pass.title}
             </h1>
-            <p className="text-xl md:text-2xl text-slate/70 font-bold italic">
+            <p className="text-slate/70 font-bold italic text-xl md:text-2xl">
               {pass.subtitle}
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function PassDetailPage({ params }: PageProps) {
                 <div className="bg-mist/30 p-8 rounded-[32px] border border-line flex flex-col justify-center items-center text-center">
                   <p className="text-xs font-black text-slate/40 uppercase tracking-[0.2em] mb-2">Membership Price</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-obsidian">{pass.price === '별도 문의' ? pass.price : `${pass.price}원`}</span>
+                    <span className="font-black text-obsidian text-4xl">{pass.price === '별도 문의' ? pass.price : `${pass.price}원`}</span>
                     {pass.period !== '개별' && <span className="text-slate/60 font-bold">/{pass.period}</span>}
                   </div>
                 </div>
@@ -114,7 +114,7 @@ export default function PassDetailPage({ params }: PageProps) {
             <div className="grid grid-cols-1 gap-8">
               {pass.keyBenefits.map((benefit: any, i: number) => (
                 <div key={i} className="group bg-white p-8 md:p-12 rounded-[40px] border border-line/50 flex flex-col md:flex-row items-center gap-10 hover:border-primary/30 transition-all shadow-lg hover:shadow-2xl">
-                  <div className="w-20 h-20 md:w-24 md:h-24 bg-mist rounded-[32px] flex items-center justify-center text-4xl shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-inner">
+                  <div className="w-20 h-20 md:w-24 md:h-24 bg-mist rounded-[32px] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-inner text-4xl">
                     {benefit.id === 1 ? <Archive className="w-10 h-10 text-primary" /> : 
                      benefit.id === 2 ? <BarChart3 className="w-10 h-10 text-primary" /> : 
                      <Zap className="w-10 h-10 text-primary" />}

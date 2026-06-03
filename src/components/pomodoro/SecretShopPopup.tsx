@@ -110,7 +110,7 @@ export default function SecretShopPopup({ open, onOpenChange }: SecretShopPopupP
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', delay: 0.2 }}
-                        className="absolute -top-2 -right-2 text-6xl opacity-30"
+                        className="absolute -top-2 -right-2 opacity-30 text-xl"
                     >
                         ✨
                     </motion.div>
@@ -124,7 +124,7 @@ export default function SecretShopPopup({ open, onOpenChange }: SecretShopPopupP
                                 <Badge className="bg-white/20 text-white border-none text-[10px] font-bold mb-1">
                                     휴식 시간 특별 혜택
                                 </Badge>
-                                <DialogTitle className="text-xl font-black">
+                                <DialogTitle className="font-black text-xl">
                                     비밀 회복 상점 🎁
                                 </DialogTitle>
                             </div>

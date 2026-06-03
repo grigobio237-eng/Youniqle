@@ -4,21 +4,31 @@ import { GeminiAIEngine } from '@/lib/ai/gemini-engine';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { symptom } = body;
+        const { symptom, category: reqCategory } = body;
 
-        if (!symptom) {
-            return NextResponse.json({ error: 'Symptom is required' }, { status: 400 });
+        if (!symptom && !reqCategory) {
+            return NextResponse.json({ error: 'Symptom or Category is required' }, { status: 400 });
         }
 
-        console.log('🤖 유니클 증상 분석 시작:', symptom);
-        const result = await GeminiAIEngine.analyzeSymptom(symptom);
+        let category = reqCategory;
+        let reason = '직접 선택한 분야입니다.';
+
+        if (symptom) {
+            console.log('🤖 유니클 증상 분석 시작:', symptom);
+            const result = await GeminiAIEngine.analyzeSymptom(symptom);
+            category = result.category;
+            reason = result.reason;
+        } else {
+            console.log(`🤖 유니클 분야(${category}) 동적 문진 생성 시작`);
+        }
         
         // 실시간 맞춤형 문진지 생성
-        const dynamicQuestions = await GeminiAIEngine.generateDynamicQuestions(symptom, result.category);
+        const dynamicQuestions = await GeminiAIEngine.generateDynamicQuestions(symptom || '', category);
         console.log('✅ 유니클 분석 및 질문지 생성 완료');
 
         return NextResponse.json({
-            ...result,
+            category,
+            reason,
             dynamicQuestions
         });
     } catch (error: any) {

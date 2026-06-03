@@ -156,7 +156,7 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">🔒</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">🔒</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">접근 권한 제한</h2>
           <p className="text-slate font-medium mb-8">주문 내역 검토를 위해 인증 프로토콜이 필요합니다.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -173,7 +173,7 @@ export default function OrdersPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
             <p className="text-slate font-black uppercase tracking-[0.2em] text-[10px] mb-2 text-chapter-accent">Transaction Ledger</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">주문 인벤토리</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">주문 인벤토리</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session.user?.name} 유저의 최근 보급 현황입니다.</p>
           </div>
           <Button variant="ghost" onClick={fetchOrders} className="h-12 px-6 rounded-xl hover:bg-white text-slate font-black flex gap-2">
@@ -185,7 +185,7 @@ export default function OrdersPage() {
         {orders.length === 0 ? (
           <Card className="border-dashed border-2 border-line bg-transparent rounded-[40px] p-24 text-center">
             <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6 shadow-sm">📦</div>
-            <h3 className="text-xl font-black text-obsidian tracking-tight mb-2">보급 이력이 없습니다</h3>
+            <h3 className="font-black text-obsidian tracking-tight mb-2 text-xl">보급 이력이 없습니다</h3>
             <p className="text-slate font-medium mb-8">아직 유니클레의 장비를 배정받지 않으셨습니다.</p>
             <Button asChild className="h-14 px-10 rounded-2xl bg-obsidian text-mist font-black shadow-lg">
               <Link href="/products" className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function OrdersPage() {
                         {order?.items?.[0]?.productId?.name || order?.items?.[0]?.name || '정보 없음'} {order?.items && order.items.length > 1 ? `외 ${order.items.length - 1}건` : ''}
                       </h4>
                       <div className="flex items-center justify-center md:justify-start gap-4 mt-1">
-                        <span className="text-xl font-black text-obsidian tracking-tighter">{(order?.totalAmount || 0).toLocaleString()}원</span>
+                        <span className="font-black text-obsidian tracking-tighter text-xl">{(order?.totalAmount || 0).toLocaleString()}원</span>
                         <span className="h-4 w-px bg-line" />
                         <span className="text-xs font-bold text-slate">{(order?.items || []).reduce((acc, curr) => acc + (curr?.quantity || 0), 0)} items</span>
                       </div>
@@ -373,7 +373,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-black uppercase opacity-60">Total Cost</span>
-                        <span className="text-xl font-black tracking-tighter text-reward-gold">{selectedOrder.totalAmount.toLocaleString()}원</span>
+                        <span className="font-black tracking-tighter text-reward-gold text-xl">{selectedOrder.totalAmount.toLocaleString()}원</span>
                       </div>
                     </div>
                   </div>

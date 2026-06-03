@@ -127,7 +127,7 @@ export default function PointHistoryPage() {
     return (
       <div className="min-h-screen bg-mist flex items-center justify-center p-6">
         <Card className="w-full max-w-md border-none shadow-2xl rounded-[40px] bg-white text-center p-12">
-          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">⚠️</div>
+          <div className="w-20 h-20 bg-mist rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl">⚠️</div>
           <h2 className="text-2xl font-black text-obsidian tracking-tight mb-2">데이터 오류</h2>
           <p className="text-slate font-medium mb-8">{error || '정보를 조회할 수 없습니다.'}</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-obsidian text-mist font-black">
@@ -150,12 +150,12 @@ export default function PointHistoryPage() {
               </Link>
             </Button>
             <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Rewards Ledger</p>
-            <h1 className="text-5xl font-black text-obsidian tracking-tighter">리워드 원장</h1>
+            <h1 className="font-black text-obsidian tracking-tighter text-xl">리워드 원장</h1>
             <p className="text-slate font-bold tracking-tight mt-1">{session?.user?.name} 유저의 포인트 유입 및 유출 기록입니다.</p>
           </div>
           <div className="bg-white p-6 rounded-[32px] shadow-sm border border-mist flex flex-col items-end min-w-[200px]">
             <p className="text-[10px] font-black text-slate uppercase tracking-widest mb-1 opacity-60">Available Points</p>
-            <p className="text-4xl font-black text-reward-gold tracking-tighter">{data.currentBalance.toLocaleString()} <span className="text-lg">P</span></p>
+            <p className="font-black text-reward-gold tracking-tighter text-4xl">{data.currentBalance.toLocaleString()} <span className="text-lg">P</span></p>
           </div>
         </div>
 

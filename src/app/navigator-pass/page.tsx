@@ -140,7 +140,7 @@ export default function NavigatorPassPage() {
                     <Badge className="mb-6 bg-obsidian text-white px-4 py-1.5 text-sm font-bold">
                         NAVIGATOR PASS 2026
                     </Badge>
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-obsidian leading-tight tracking-tight mb-6">
+                    <h1 className="font-black text-obsidian leading-tight tracking-tight mb-6 text-3xl md:text-4xl">
                         유니클 생태계에 들어오는<br />
                         <span className="bg-gradient-to-r from-violet-600 to-amber-500 bg-clip-text text-transparent">
                             단 하나의 입장권
@@ -192,7 +192,7 @@ export default function NavigatorPassPage() {
                                                 {tier.name}
                                             </h3>
                                             <div className="mt-4">
-                                                <span className="text-4xl font-black text-obsidian">
+                                                <span className="font-black text-obsidian text-4xl">
                                                     {formatPrice(tier.price)}
                                                 </span>
                                                 <span className="text-slate-500 ml-1">원</span>
@@ -309,7 +309,7 @@ export default function NavigatorPassPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h3 className="text-xl font-bold mb-2">운영 정보</h3>
+                            <h3 className="font-bold mb-2 text-xl">운영 정보</h3>
                             <div className="text-slate-400 text-sm space-y-1">
                                 <p>상호: 주식회사 사피에넷</p>
                                 <p>대표: 장범진</p>

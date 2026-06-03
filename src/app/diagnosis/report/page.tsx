@@ -376,7 +376,7 @@ export default function DeepDiagnosisReportPage() {
                                 <Badge variant="outline" className={`${hasAccess ? 'border-reward-gold text-reward-gold bg-reward-gold/5' : 'border-slate-300 text-slate-500 bg-slate-50'} uppercase tracking-widest text-[10px] font-black px-3 py-1 rounded-full mb-3`}>
                                     {hasAccess ? 'Premium Analysis' : 'Basic Analysis'}
                                 </Badge>
-                                <h2 className="text-2xl md:text-5xl font-black text-obsidian tracking-tighter break-keep">
+                                <h2 className="font-black text-obsidian tracking-tighter break-keep text-2xl md:text-4xl">
                                     {result?.title}
                                 </h2>
                                 <p className="mt-3 text-slate-600 text-base md:text-lg leading-relaxed max-w-lg">
@@ -385,7 +385,7 @@ export default function DeepDiagnosisReportPage() {
                             </div>
                             <div className="bg-white shadow-xl border border-slate-100 p-4 md:p-6 rounded-[24px] md:rounded-[32px] flex flex-col items-center min-w-[140px] md:min-w-[160px]">
                                 <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Score</span>
-                                <span className="text-4xl md:text-5xl font-black text-obsidian tracking-tighter">{result?.totalScore || 0}</span>
+                                <span className="font-black text-obsidian tracking-tighter text-4xl md:text-4xl">{result?.totalScore || 0}</span>
                             </div>
                         </div>
 
@@ -403,7 +403,7 @@ export default function DeepDiagnosisReportPage() {
                                         </p>
                                     </div>
                                     <div className="space-y-3">
-                                        {chartData.map(d => (
+                                        {chartData.length > 0 ? chartData.map(d => (
                                             <div key={d.subject} className="flex items-center justify-between group">
                                                 <span className="text-xs md:text-sm font-medium text-slate-500 group-hover:text-obsidian">{d.subject}</span>
                                                 <div className="flex items-center gap-2">
@@ -411,7 +411,11 @@ export default function DeepDiagnosisReportPage() {
                                                     <span className="text-xs md:text-sm font-bold text-obsidian w-8 text-right">{d.score}</span>
                                                 </div>
                                             </div>
-                                        ))}
+                                        )) : (
+                                            <div className="text-center py-4 bg-white/50 rounded-2xl border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-400">데이터가 없습니다.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>
@@ -443,7 +447,7 @@ export default function DeepDiagnosisReportPage() {
                                                         <span className="text-lg md:text-xl font-black text-center break-keep">{domain.subject.split(' ')[0]}</span>
                                                     </div>
                                                     <div className="md:mt-4 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl px-3 py-1 md:px-4 md:py-2">
-                                                        <span className="text-xl md:text-2xl font-black">{domain.score}</span>
+                                                        <span className="font-black text-xl md:text-2xl">{domain.score}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex-1 p-5 md:p-8">
@@ -473,7 +477,7 @@ export default function DeepDiagnosisReportPage() {
                                 <Card className="border-none shadow-inner bg-slate-50/50 p-12 text-center relative overflow-hidden group cursor-pointer" onClick={handleUnlockClick}>
                                     <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
                                         <Lock className="w-6 h-6 text-chapter-accent mb-4" />
-                                        <h3 className="text-xl font-bold text-obsidian mb-2">프리미엄 리포트 잠금</h3>
+                                        <h3 className="font-bold text-obsidian mb-2 text-xl">프리미엄 리포트 잠금</h3>
                                         <p className="text-slate-500 mb-6">5대 성격 요인과 30개 세부 국면을 확인하세요.</p>
                                         <Button className="bg-obsidian text-white rounded-full px-8">지금 확인하기</Button>
                                     </div>

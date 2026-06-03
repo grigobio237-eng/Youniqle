@@ -12,10 +12,10 @@ export default function ContentPage() {
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6">
+            <h1 className="font-bold text-text-primary mb-6 text-4xl md:text-4xl">
               Youniqle 콘텐츠
             </h1>
-            <p className="text-xl text-text-secondary mb-8">
+            <p className="text-text-secondary mb-8 text-xl">
               동영상, 블로그 등 다양한 미디어 콘텐츠를 만나보세요
             </p>
             
@@ -57,7 +57,7 @@ export default function ContentPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+            <h2 className="font-bold text-text-primary mb-4 text-3xl md:text-4xl">
               콘텐츠 카테고리
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
@@ -72,7 +72,7 @@ export default function ContentPage() {
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Play className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">동영상</h3>
+                <h3 className="font-semibold mb-4 text-xl">동영상</h3>
                 <p className="text-text-secondary mb-6">
                   제품 리뷰, 사용법 가이드, 브랜드 스토리
                 </p>
@@ -101,7 +101,7 @@ export default function ContentPage() {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ExternalLink className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">블로그</h3>
+                <h3 className="font-semibold mb-4 text-xl">블로그</h3>
                 <p className="text-text-secondary mb-6">
                   상세한 제품 정보, 사용 후기, 브랜드 뉴스
                 </p>
@@ -131,7 +131,7 @@ export default function ContentPage() {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+            <h2 className="font-bold text-text-primary mb-4 text-3xl md:text-4xl">
               인기 콘텐츠
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
@@ -223,10 +223,10 @@ export default function ContentPage() {
       {/* CTA Section */}
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="font-bold mb-4 text-3xl md:text-4xl">
             더 많은 콘텐츠를 만나보세요
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="mb-8 opacity-90 text-xl">
             다양한 플랫폼에서 Youniqle의 콘텐츠를 확인하세요
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -200,7 +200,7 @@ export default function WeatherPage() {
 
                 <Card className="shadow-2xl">
                     <CardHeader className="text-center">
-                        <div className="text-6xl mb-4">🌦️</div>
+                        <div className="mb-4 text-xl">🌦️</div>
                         <CardTitle className="text-3xl font-bold">날씨 정보</CardTitle>
                         <CardDescription className="text-lg">한국 및 전 세계 도시의 날씨를 확인하세요</CardDescription>
                     </CardHeader>
@@ -264,9 +264,9 @@ export default function WeatherPage() {
                                 </div>
 
                                 <div className="text-center">
-                                    <div className="text-9xl mb-4">{getWeatherIcon(weather.icon)}</div>
-                                    <p className="text-6xl font-bold text-gray-900">{weather.temp}°C</p>
-                                    <p className="text-xl text-gray-600 mt-2 capitalize">{weather.description}</p>
+                                    <div className="mb-4 text-xl">{getWeatherIcon(weather.icon)}</div>
+                                    <p className="font-bold text-gray-900 text-xl">{weather.temp}°C</p>
+                                    <p className="text-gray-600 mt-2 capitalize text-xl">{weather.description}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

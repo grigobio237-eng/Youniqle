@@ -278,7 +278,7 @@ export default function ExternalProductCuration({
                         <div className="w-16 h-16 bg-[#0E3A3A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                             <ExternalLink className="w-8 h-8 text-[#0E3A3A]" />
                         </div>
-                        <DialogTitle className="text-xl font-black text-obsidian">
+                        <DialogTitle className="font-black text-obsidian text-xl">
                             파트너사 페이지로 이동
                         </DialogTitle>
                         <DialogDescription className="text-slate font-medium pt-2 leading-relaxed">

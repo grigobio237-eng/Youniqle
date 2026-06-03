@@ -73,7 +73,7 @@ export default function MindRecord() {
             <div className="space-y-2 px-2">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-primary" />
-                    <h3 className="text-xl font-black text-obsidian tracking-tight">지금 이 순간의 마음</h3>
+                    <h3 className="font-black text-obsidian tracking-tight text-xl">지금 이 순간의 마음</h3>
                 </div>
                 <p className="text-xs font-medium text-slate/50">오늘의 감정과 생각들을 자유롭게 남겨보세요.</p>
             </div>

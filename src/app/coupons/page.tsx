@@ -143,7 +143,7 @@ export default function CouponsPage() {
       <div className="container mx-auto max-w-5xl">
         <div className="flex flex-col items-center text-center mb-16">
           <p className="text-chapter-accent font-black uppercase tracking-[0.2em] text-[10px] mb-2">Benefit Procurement</p>
-          <h1 className="text-5xl font-black text-obsidian tracking-tighter mb-4">쿠폰 인벤토리 센터</h1>
+          <h1 className="font-black text-obsidian tracking-tighter mb-4 text-xl">쿠폰 인벤토리 센터</h1>
           <p className="max-w-md text-slate font-medium leading-relaxed">
             유니클레의 회복 프로토콜을 지원하는 다양한 혜택을 확인하십시오.
           </p>
@@ -159,7 +159,7 @@ export default function CouponsPage() {
                     <Ticket className="h-8 w-8" />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl font-black tracking-tight mb-1">시크릿 코드 활성화</h3>
+                    <h3 className="font-black tracking-tight mb-1 text-xl">시크릿 코드 활성화</h3>
                     <p className="text-xs font-medium opacity-50 mb-6 md:mb-0">보유하신 특수 할인 코드를 입력하십시오.</p>
                   </div>
                   <div className="flex w-full md:w-auto gap-2">
@@ -213,7 +213,7 @@ export default function CouponsPage() {
                           </div>
 
                           <div>
-                            <h3 className="text-xl font-black text-obsidian tracking-tight line-clamp-1">{coupon.name}</h3>
+                            <h3 className="font-black text-obsidian tracking-tight line-clamp-1 text-xl">{coupon.name}</h3>
                             <p className="text-3xl font-black text-chapter-accent tracking-tighter mt-1">
                               {coupon.type === 'percentage' ? `${coupon.value}%` : coupon.type === 'fixed' ? `${coupon.value.toLocaleString()}원` : 'FREE'}
                               <span className="text-xs font-bold text-slate ml-2 opacity-60">OFF</span>

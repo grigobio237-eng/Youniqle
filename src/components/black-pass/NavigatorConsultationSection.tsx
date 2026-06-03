@@ -102,7 +102,7 @@ export default function NavigatorConsultationSection() {
                     )}
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-obsidian">{navigatorInfo?.name || '유니클 네비게이터'}</h3>
+                    <h3 className="font-black text-obsidian text-xl">{navigatorInfo?.name || '유니클 네비게이터'}</h3>
                     <p className="text-xs text-indigo-600 font-bold uppercase tracking-widest">Personal Curator</p>
                   </div>
                 </div>

@@ -149,7 +149,7 @@ export default function WellnessCheckPage() {
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-2xl font-black text-obsidian">컨디션 기록 완료!</h1>
-            <div className={`text-6xl font-black ${getScoreColor(score)}`}>{score}</div>
+            <div className={`text-xl font-black ${getScoreColor(score)}`}>{score}</div>
             <p className="text-slate">오늘의 웰니스 점수 (5점 만점)</p>
             {result.sessionLoad && (
               <Badge className="bg-blue-100 text-blue-700 border-none font-bold text-sm px-4 py-2">

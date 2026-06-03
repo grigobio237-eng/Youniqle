@@ -307,7 +307,7 @@ export default function PartnerSurveyPage() {
                             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mist text-slate font-black uppercase tracking-widest text-[9px]">
                                 {currentQ.category}
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-black text-obsidian leading-tight tracking-tighter break-keep">
+                            <h2 className="font-black text-obsidian leading-tight tracking-tighter break-keep text-3xl md:text-4xl">
                                 {currentQ.text}
                             </h2>
                         </div>
@@ -376,7 +376,7 @@ export default function PartnerSurveyPage() {
                             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
                                 <Sparkles className="w-3 h-3" /> Final Step
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-black text-obsidian leading-tight tracking-tighter break-keep">
+                            <h2 className="font-black text-obsidian leading-tight tracking-tighter break-keep text-3xl md:text-4xl">
                                 이런 조건이면 바로 시작해볼 수 있다 싶은 요소를 적어주세요.
                             </h2>
                         </div>
@@ -399,7 +399,7 @@ export default function PartnerSurveyPage() {
                             <Button 
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="flex-1 h-20 bg-primary text-white rounded-[28px] font-black text-xl shadow-2xl shadow-primary/20"
+                                className="flex-1 h-20 bg-primary text-white rounded-[28px] font-black shadow-2xl shadow-primary/20 text-xl"
                             >
                                 {isSubmitting ? '전송 중...' : '맞춤 솔루션 분석 요청하기'}
                             </Button>

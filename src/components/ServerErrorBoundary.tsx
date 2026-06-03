@@ -100,7 +100,7 @@ export class ServerErrorBoundary extends Component<ServerErrorBoundaryProps, Ser
                 </svg>
               </div>
               
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="font-semibold text-gray-900 mb-2 text-xl">
                 서버 오류가 발생했습니다
               </h2>
               

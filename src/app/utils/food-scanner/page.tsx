@@ -25,10 +25,10 @@ export default function FoodScannerPage() {
                                 Youniqle Vision v2.1
                             </Badge>
                         </div>
-                        <h1 className="text-5xl md:text-8xl font-black text-obsidian tracking-tighter leading-none italic uppercase">
+                        <h1 className="font-black text-obsidian tracking-tighter leading-none italic uppercase text-xl md:text-4xl">
                             Youniqle<br />Food Scanner
                         </h1>
-                        <p className="text-xl md:text-2xl text-slate font-medium max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-slate font-medium max-w-2xl mx-auto leading-relaxed text-xl md:text-2xl">
                             선수들이 하루 동안 먹는 음식을 카메라로 찍고 분석하는<br />
                             유니클의 실시간 비전 영양 분석 카메라입니다.
                         </p>

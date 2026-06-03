@@ -117,7 +117,7 @@ export default function SunNudgeFounderLabPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-slate-900 leading-[1.1] break-keep"
+            className="font-black tracking-tight text-slate-900 leading-[1.1] break-keep text-xl md:text-4xl"
           >
             선크림은 있는데, <br className="md:hidden" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-emerald-600 to-sky-500">
@@ -167,7 +167,7 @@ export default function SunNudgeFounderLabPage() {
       <section className="py-8 md:py-28 bg-white/40 backdrop-blur-md">
         <div className="container mx-auto px-4 max-w-4xl text-center space-y-4 md:space-y-6">
           <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">The Problem</span>
-          <h2 className="text-xl sm:text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight break-keep">
+          <h2 className="font-black text-slate-900 tracking-tight leading-tight break-keep text-xl sm:text-3xl md:text-4xl">
             자외선 차단 지수(SPF)가 아무리 높아도,<br />
             중간에 다시 바르지 않으면 효과가 사라집니다.
           </h2>
@@ -199,7 +199,7 @@ export default function SunNudgeFounderLabPage() {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center space-y-4 mb-6 md:mb-16">
             <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">The Solution</span>
-            <h2 className="text-2xl md:text-5xl font-black text-slate-900 tracking-tight break-keep">
+            <h2 className="font-black text-slate-900 tracking-tight break-keep text-2xl md:text-4xl">
               행동 변화를 유도하는 7-Day SunNudge™ 루틴 키트
             </h2>
             <p className="text-xs md:text-lg text-slate-600 max-w-xl mx-auto break-keep font-medium">
@@ -218,7 +218,7 @@ export default function SunNudgeFounderLabPage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-lg mb-6">
                   0{idx + 1}
                 </div>
-                <h4 className="text-slate-900 font-extrabold text-xl mb-3 group-hover:text-emerald-600 transition-colors">{item.title}</h4>
+                <h4 className="text-slate-900 font-extrabold mb-3 group-hover:text-emerald-600 transition-colors text-xl">{item.title}</h4>
                 <p className="text-slate-500 text-xs leading-relaxed font-semibold">{item.desc}</p>
               </div>
             ))}
@@ -257,7 +257,7 @@ export default function SunNudgeFounderLabPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center space-y-4 mb-8 md:mb-16">
             <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1 rounded-full">Founder Value</span>
-            <h2 className="text-2xl md:text-5xl font-black text-slate-900 tracking-tight break-keep">
+            <h2 className="font-black text-slate-900 tracking-tight break-keep text-2xl md:text-4xl">
               1기 Founder 공동개발 혜택안
             </h2>
             <p className="text-xs md:text-lg text-slate-600 max-w-xl mx-auto break-keep font-medium">
@@ -442,7 +442,7 @@ export default function SunNudgeFounderLabPage() {
           <Card className="bg-white border border-slate-100 p-5 md:p-10 rounded-[36px] space-y-6 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                <h3 className="font-black text-slate-900 tracking-tight text-xl md:text-2xl">
                   함께할수록 커지는 혜택 (Benefit Unlock)
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold mt-1">현재 1기 공동개발 희망 인원: <span className="text-emerald-600 font-black text-base">142명</span> 신청 완료!</p>
@@ -702,7 +702,7 @@ export default function SunNudgeFounderLabPage() {
                         exit={{ opacity: 0 }}
                         className="text-center py-6 space-y-4"
                       >
-                        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold animate-bounce shadow-sm">
+                        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto font-bold animate-bounce shadow-sm text-xl">
                           ✓
                         </div>
                         <h4 className="text-slate-800 text-base font-black">오늘의 썬케어 기록 완료!</h4>
@@ -746,7 +746,7 @@ export default function SunNudgeFounderLabPage() {
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <div className="space-y-4 mb-6 md:mb-16">
             <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">7-Day Journey</span>
-            <h2 className="text-2xl md:text-5xl font-black text-slate-900 tracking-tight break-keep">
+            <h2 className="font-black text-slate-900 tracking-tight break-keep text-2xl md:text-4xl">
               7일 챌린지 습관 형성 디자인
             </h2>
             <p className="text-xs md:text-lg text-slate-600 max-w-xl mx-auto break-keep font-medium">
@@ -789,7 +789,7 @@ export default function SunNudgeFounderLabPage() {
               <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-700 text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm">
                 <ShieldAlert className="w-3.5 h-3.5 text-amber-500" /> 100% Risk Reversal
               </div>
-              <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight break-keep">
+              <h2 className="font-black text-slate-900 tracking-tight leading-tight break-keep text-2xl md:text-4xl">
                 공동개발단의 참여금은 <br />
                 100% 전액 안전하게 보호됩니다.
               </h2>
@@ -812,7 +812,7 @@ export default function SunNudgeFounderLabPage() {
 
             {/* FAQ (이탈 방지용 자주 묻는 질문) */}
             <div className="space-y-4 text-left">
-              <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+              <h3 className="font-black text-slate-900 mb-6 flex items-center gap-2 text-xl">
                 <HelpCircle className="w-5 h-5 text-emerald-600" /> 자주 묻는 질문 (FAQ)
               </h3>
               {[
@@ -847,7 +847,7 @@ export default function SunNudgeFounderLabPage() {
       {/* 🚀 Zone 5: Bottom CTA (최종 신청/결제 유도) */}
       <section className="py-12 md:py-32 bg-gradient-to-b from-[#FDFBF7] to-[#FAF8F2] text-center border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-3xl space-y-6">
-          <h2 className="text-3xl md:text-6xl font-black text-slate-900 tracking-tight break-keep">
+          <h2 className="font-black text-slate-900 tracking-tight break-keep text-3xl md:text-4xl">
             자외선 아래서도 완전하게 보호받는 <br />
             나만의 7일 습관을 만들어가세요.
           </h2>

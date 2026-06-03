@@ -80,7 +80,7 @@ export default function MyConsultationsPage() {
                     <div className="flex items-center gap-6">
                       <div className="flex flex-col items-center justify-center w-16 h-16 bg-mist rounded-2xl text-slate text-sm font-black border border-line">
                         <span>{new Date(c.createdAt).getMonth() + 1}월</span>
-                        <span className="text-xl text-obsidian">{new Date(c.createdAt).getDate()}일</span>
+                        <span className="text-obsidian text-xl">{new Date(c.createdAt).getDate()}일</span>
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">

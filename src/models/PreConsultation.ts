@@ -2,74 +2,57 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IPreConsultation extends Document {
   user: mongoose.Types.ObjectId;
-  navigator: string; // 추천인 코드 (recentNavigator 저장 값)
-  
-  // 1. 기대치 (Expectation)
-  expectation: {
-    changeScale: string; // '자연스러운 변화' vs '확실한 변화'
-    downtime: string; // 예상 회복 기간 (1d, 3d, 7d, 14d)
-    importantEvent: {
-      hasEvent: boolean;
-      details?: string;
-    };
+  navigator: string; // 추천인 코드
+  medicalCategory?: string; // PLASTIC, ORTHOPEDIC, INTERNAL, GENERAL, REGENERATIVE
+
+  // Step 1: 내원 목적 및 주요 증상
+  chiefComplaint: {
+    symptom: string;
+    duration: string; // 며칠 전, 몇 주 전, 수개월 이상 만성 등
+    vasScore: number; // 1~10
   };
 
-  // 2. 과거 경험과 안전 (Medical History)
+  // Step 2: 과별 특화 동적 분기 답변
+  dynamicAnswers: {
+    q1: string;
+    a1: string;
+    q2: string;
+    a2: string;
+  };
+
+  // Step 3: 필수 건강 정보 및 병력
   medicalHistory: {
-    pastExperience: {
-      hasExperience: boolean;
-      details?: string;
-    };
-    currentMedication: {
-      taking: boolean;
-      details?: string;
-    };
-    healthStatus: {
-      isIssue: boolean;
-      details?: string;
-    };
+    pastSurgery: { has: boolean; details?: string };
+    currentMedication: { taking: boolean; details?: string };
+    allergies: { has: boolean; details?: string };
   };
 
-  // 3. 불안 체크 (Anxiety)
-  anxiety: {
-    points: string[]; // 통증, 붓기, 흉터, 남들의 시선 등
-    privacyDetails?: string; 
-    classifiedType?: string; // 시스템 자동 분류 혹은 수동 분류 (예: 빠른복귀형)
+  // Step 4: 라이프스타일 및 컨디션
+  lifestyle: {
+    dailyImpact: string; // 일상생활 지장 정도
+    conditionDrops: string; // 최근 컨디션 저하 요소
   };
 
-  // 4. 방문 환경 (VIP 맞춤)
+  // Step 5: 치료 기대치 및 우려 사항
+  expectation: {
+    preferredTreatment: string; // 대증치료 vs 근본치료
+    concerns: string[]; // 부작용, 기간, 통증 등
+  };
+
+  // Step 6: 내원 환경 및 특별 요청 사항
   visitPlan: {
-    companion: {
-      hasCompanion: boolean;
-      details?: string;
-    };
-    transportation: {
-      needsHelp: boolean;
-      details?: string;
-    };
-    privacyRoute: {
-      wantsPrivacy: boolean;
-      details?: string;
-    };
+    companion: { has: boolean; details?: string };
+    specialRequest?: string; // 진료실 전달 사항 (자유 기재)
   };
 
-  // 5. 투자 예산
+  // 프리미엄 예산 (공통)
   investment: {
-    budgetRange: string;
-    customBudget?: string;
-    focusServices: {
-      needsDedicatedManager: boolean;
-      needsPremiumKit: boolean;
-    };
+    premiumBudget: string; // ESSENCE, SIGNATURE, MIRACLE, COUNSELING
   };
 
-  medicalCategory?: string; // PLASTIC, ORTHOPEDIC, INTERNAL, GENERAL
   aiGuide?: {
     analysis: string;
-    mustAskQuestions: {
-      question: string;
-      rationale: string;
-    }[];
+    mustAskQuestions: { question: string; rationale: string; }[];
     hospitalTips: string[];
   };
 
@@ -81,62 +64,46 @@ const PreConsultationSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     navigator: { type: String, default: '' },
+    medicalCategory: { type: String },
 
-    expectation: {
-      changeScale: { type: String, required: true },
-      downtime: { type: String, required: true },
-      importantEvent: {
-        hasEvent: { type: Boolean, required: true },
-        details: { type: String },
-      },
+    chiefComplaint: {
+      symptom: { type: String, required: true },
+      duration: { type: String, required: true },
+      vasScore: { type: Number, required: true, min: 1, max: 10 },
+    },
+
+    dynamicAnswers: {
+      q1: { type: String },
+      a1: { type: String },
+      q2: { type: String },
+      a2: { type: String },
     },
 
     medicalHistory: {
-      pastExperience: {
-        hasExperience: { type: Boolean, required: true },
-        details: { type: String },
-      },
-      currentMedication: {
-        taking: { type: Boolean, required: true },
-        details: { type: String },
-      },
-      healthStatus: {
-        isIssue: { type: Boolean, required: true },
-        details: { type: String },
-      },
+      pastSurgery: { has: { type: Boolean, required: true }, details: { type: String } },
+      currentMedication: { taking: { type: Boolean, required: true }, details: { type: String } },
+      allergies: { has: { type: Boolean, required: true }, details: { type: String } },
     },
 
-    anxiety: {
-      points: [{ type: String }],
-      privacyDetails: { type: String },
-      classifiedType: { type: String },
+    lifestyle: {
+      dailyImpact: { type: String, required: true },
+      conditionDrops: { type: String, required: true },
+    },
+
+    expectation: {
+      preferredTreatment: { type: String, required: true },
+      concerns: [{ type: String }],
     },
 
     visitPlan: {
-      companion: {
-        hasCompanion: { type: Boolean, required: true },
-        details: { type: String },
-      },
-      transportation: {
-        needsHelp: { type: Boolean, required: true },
-        details: { type: String },
-      },
-      privacyRoute: {
-        wantsPrivacy: { type: Boolean, required: true },
-        details: { type: String },
-      },
+      companion: { has: { type: Boolean, required: true }, details: { type: String } },
+      specialRequest: { type: String },
     },
 
     investment: {
-      budgetRange: { type: String, required: true },
-      customBudget: { type: String },
-      focusServices: {
-        needsDedicatedManager: { type: Boolean, required: true, default: false },
-        needsPremiumKit: { type: Boolean, required: true, default: false },
-      },
+      premiumBudget: { type: String, required: true },
     },
 
-    medicalCategory: { type: String },
     aiGuide: {
       analysis: { type: String },
       mustAskQuestions: [{
@@ -149,7 +116,10 @@ const PreConsultationSchema = new Schema(
   { timestamps: true }
 );
 
-// Prevent overwrite in development
-const PreConsultation = mongoose.models.PreConsultation || mongoose.model<IPreConsultation>('PreConsultation', PreConsultationSchema);
+// Prevent overwrite in development, but force recreate if schema changed
+if (mongoose.models.PreConsultation) {
+  delete mongoose.models.PreConsultation;
+}
+const PreConsultation = mongoose.model<IPreConsultation>('PreConsultation', PreConsultationSchema);
 
 export default PreConsultation;

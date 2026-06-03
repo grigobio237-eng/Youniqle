@@ -151,13 +151,13 @@ export default function RecoveryStatusHero({
                             
                             {/* 콤팩트 가이드라인 및 조언 */}
                             <div className="flex-1 min-w-0">
-                                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/5 text-primary rounded-full text-[9px] font-black tracking-wider uppercase mb-1.5">
+                                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/5 text-primary rounded-full text-[9px] md:text-[10px] font-black tracking-wider uppercase mb-1.5">
                                     <Sparkles className="w-2.5 h-2.5" /> CGM Active
                                 </div>
-                                <h1 className="text-base font-black text-obsidian tracking-tight truncate leading-tight">
+                                <h1 className="font-black text-obsidian tracking-tight truncate leading-tight text-xl md:text-3xl">
                                     {cleanName(userName)}님, {info.headline} {info.emoji}
                                 </h1>
-                                <p className="text-xs text-slate font-semibold leading-relaxed mt-1 text-slate/70">
+                                <p className="text-xs md:text-sm text-slate font-semibold leading-relaxed mt-1 text-slate/70">
                                     {info.advice}
                                 </p>
                             </div>
@@ -193,10 +193,10 @@ export default function RecoveryStatusHero({
                         {activeHeroTab === 'asset' && (
                             <div className="space-y-4 animate-fade-in">
                                 <div className="flex justify-between items-center pb-2 border-b border-line/40">
-                                    <span className="text-xs font-black text-obsidian">누적 회복 자산</span>
+                                    <span className="text-xs md:text-base font-black text-obsidian">누적 회복 자산</span>
                                     <div className="flex items-baseline gap-0.5">
-                                        <span className="text-lg font-black text-primary">{totalAssets}</span>
-                                        <span className="text-[10px] font-bold text-slate/40">건의 분석</span>
+                                        <span className="text-lg md:text-2xl font-black text-primary">{totalAssets}</span>
+                                        <span className="text-[10px] md:text-xs font-bold text-slate/40">건의 분석</span>
                                     </div>
                                 </div>
                                 
@@ -209,9 +209,9 @@ export default function RecoveryStatusHero({
                                         <div key={i} className="flex-1 flex items-center justify-between px-3.5 py-2.5 bg-mist/30 border border-line/30 rounded-2xl text-center">
                                             <div className="flex items-center gap-1.5">
                                                 <span className={`w-1.5 h-1.5 rounded-full ${item.dot}`} />
-                                                <span className="text-[10px] font-black text-slate/75">{item.label}</span>
+                                                <span className="text-[10px] md:text-xs font-black text-slate/75">{item.label}</span>
                                             </div>
-                                            <span className="text-xs font-black text-obsidian">{item.count}</span>
+                                            <span className="text-xs md:text-sm font-black text-obsidian">{item.count}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -222,11 +222,11 @@ export default function RecoveryStatusHero({
                                     className="w-full flex items-center justify-between px-4 py-3 bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/50 rounded-2xl transition-all group"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <span className="text-base animate-pulse">😴</span>
-                                        <span className="text-xs font-black text-obsidian/90">오늘 밤 최상의 회복을 위해 수면 기록하기</span>
+                                        <span className="text-base md:text-xl animate-pulse">😴</span>
+                                        <span className="text-xs md:text-sm font-black text-obsidian/90">오늘 밤 최상의 회복을 위해 수면 기록하기</span>
                                     </div>
-                                    <div className="flex items-center text-[10px] font-black text-indigo-600">
-                                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                                    <div className="flex items-center text-[10px] md:text-xs font-black text-indigo-600">
+                                        <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-0.5 transition-transform" />
                                     </div>
                                 </button>
                             </div>

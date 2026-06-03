@@ -120,7 +120,7 @@ export default function Header() {
                 priority
               />
             </div>
-            <span className="text-xl md:text-2xl font-bold text-foreground tracking-tight">Youniqle</span>
+            <span className="font-bold text-foreground tracking-tight text-xl md:text-2xl">Youniqle</span>
           </Link>
 
           {/* Nav */}
@@ -204,7 +204,7 @@ export default function Header() {
                     className="flex flex-col gap-1 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span className="text-xl font-bold text-foreground group-active:text-primary transition-colors">
+                    <span className="font-bold text-foreground group-active:text-primary transition-colors text-xl">
                       {item.label}
                     </span>
                     <span className="text-xs font-medium text-foreground/40">
@@ -215,7 +215,7 @@ export default function Header() {
               ))}
               {!session && (
                 <Link href="/auth/signin" className="group flex flex-col gap-1 pt-4" onClick={() => setIsMenuOpen(false)}>
-                  <span className="text-xl font-bold text-primary">로그인</span>
+                  <span className="font-bold text-primary text-xl">로그인</span>
                   <span className="text-xs font-medium text-foreground/40">회원 서비스 이용을 위한 로그인</span>
                 </Link>
               )}

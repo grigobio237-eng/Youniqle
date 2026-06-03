@@ -133,7 +133,7 @@ export default function ScannerReportPage() {
                                         <div className="flex items-center justify-between">
                                             <div className="text-xs font-black text-primary uppercase tracking-[0.3em]">Youniqle Analysis Score</div>
                                             <div className="flex items-baseline gap-1">
-                                                <span className="text-4xl font-black text-obsidian">{latestScan.score || 0}</span>
+                                                <span className="font-black text-obsidian text-4xl">{latestScan.score || 0}</span>
                                                 <span className="text-sm font-bold text-slate">pt</span>
                                             </div>
                                         </div>

@@ -178,7 +178,7 @@ export default function AdminHospitalsPage() {
             {/* Add Form */}
             <Card className="lg:col-span-1 shadow-xl border-line">
               <CardHeader>
-                <CardTitle className="text-xl font-black flex items-center gap-2 text-obsidian">
+                <CardTitle className="font-black flex items-center gap-2 text-obsidian text-xl">
                   {editingId ? <History className="w-5 h-5 text-chapter-accent" /> : <Plus className="w-5 h-5 text-chapter-accent" />}
                   {editingId ? '병원 정보 수정' : '새 병원 등록'}
                 </CardTitle>
@@ -336,7 +336,7 @@ export default function AdminHospitalsPage() {
           <Card className="shadow-xl border-line">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-xl font-black text-obsidian">실시간 방문 로그</CardTitle>
+                <CardTitle className="font-black text-obsidian text-xl">실시간 방문 로그</CardTitle>
                 <CardDescription>유저가 병원에 방문하여 QR 코드를 통해 정보를 열람한 기록입니다.</CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={fetchData} className="font-bold">

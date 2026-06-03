@@ -46,7 +46,7 @@ export default function CertificateArchivePage() {
                     <Trophy className="w-3 h-3" />
                     My Achievement Collection
                 </div>
-                <h1 className="text-4xl md:text-6xl font-black text-obsidian tracking-tighter">완주 증명서 보관함</h1>
+                <h1 className="font-black text-obsidian tracking-tighter text-4xl md:text-4xl">완주 증명서 보관함</h1>
                 <p className="text-lg text-slate/60 font-bold max-w-xl break-keep">
                     차곡차곡 쌓아온 당신의 성실함이<br />
                     변하지 않는 데이터 자산으로 기록되었습니다.
@@ -59,7 +59,7 @@ export default function CertificateArchivePage() {
                         <Award className="w-10 h-10" />
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-xl font-black text-obsidian">아직 수집된 증명서가 없습니다</h3>
+                        <h3 className="font-black text-obsidian text-xl">아직 수집된 증명서가 없습니다</h3>
                         <p className="text-slate/40 font-bold">7일간의 리듬체크를 완주하고 첫 번째 증명서를 받아보세요!</p>
                     </div>
                     <Link href="/dashboard" className="inline-flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest hover:gap-3 transition-all pt-4">
@@ -87,7 +87,7 @@ export default function CertificateArchivePage() {
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[8px] font-black text-reward-gold uppercase tracking-[0.3em]">Recovery Complete</p>
-                                                    <h4 className="text-white font-black text-xl italic font-serif">Certificate</h4>
+                                                    <h4 className="text-white font-black italic font-serif text-xl">Certificate</h4>
                                                     <p className="text-white/40 text-[10px] font-bold">#{cert.cycleNumber} Cycle</p>
                                                 </div>
                                             </div>

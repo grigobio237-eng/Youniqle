@@ -103,7 +103,7 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
                 </div>
                 <span className="text-[9px] md:text-[10px] font-black text-[#F9F7F2]/40 uppercase tracking-[0.4em]">Youniqle ?</span>
               </div>
-              <h3 className="text-xl md:text-2xl font-black text-[#F9F7F2] tracking-tighter italic leading-none break-keep">
+              <h3 className="font-black text-[#F9F7F2] tracking-tighter italic leading-none break-keep text-xl md:text-2xl">
                 PRIVATE <br /> <span className="text-[#D4AF37]">INVITATION</span>
               </h3>
             </div>

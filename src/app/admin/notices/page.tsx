@@ -368,7 +368,7 @@ export default function AdminNoticesPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-gray-500">검색어</p>
-            <p className="text-xl font-semibold mt-2 truncate">{search ? `"${search}"` : '전체'}</p>
+            <p className="font-semibold mt-2 truncate text-xl">{search ? `"${search}"` : '전체'}</p>
             <p className="text-xs text-gray-400 mt-1">필터 적용: {typeFilter || '전체 유형'}</p>
           </CardContent>
         </Card>

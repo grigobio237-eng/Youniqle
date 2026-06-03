@@ -227,7 +227,7 @@ export default function ArtworksPage() {
                             <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 md:mb-12 text-center md:text-left gap-4 md:gap-8">
                                 <div className="max-w-2xl w-full">
                                     <span className="text-xs font-black tracking-[0.4em] text-chapter-accent uppercase mb-2 md:mb-4 block text-center md:text-left">Selection Series</span>
-                                    <h2 className="text-4xl sm:text-6xl md:text-8xl font-light tracking-tighter font-serif italic leading-none text-center md:text-left">
+                                    <h2 className="font-light tracking-tighter font-serif italic leading-none text-center md:text-left text-xl md:text-4xl">
                                         The Recovery <br /> Archive
                                     </h2>
                                 </div>
@@ -249,7 +249,7 @@ export default function ArtworksPage() {
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex flex-col justify-end p-12">
                                                 <span className="text-xs font-bold text-white/60 mb-2 uppercase tracking-[0.2em]">Featured Artwork</span>
-                                                <h3 className="text-4xl font-serif italic text-white">{curatedArtworks[0].title}</h3>
+                                                <h3 className="font-serif italic text-white text-4xl">{curatedArtworks[0].title}</h3>
                                             </div>
                                         </div>
                                     </Link>
@@ -304,7 +304,7 @@ export default function ArtworksPage() {
                                 <Reveal delay={0.2}>
                                     <div className="space-y-6">
                                         <span className="text-xs font-black tracking-[0.5em] text-chapter-accent uppercase block">이달의 추천 작가</span>
-                                        <h2 className="text-4xl sm:text-7xl lg:text-9xl font-serif font-light italic leading-none tracking-tighter">
+                                        <h2 className="font-serif font-light italic leading-none tracking-tighter text-xl md:text-4xl">
                                             {spotlightArtist.name}
                                         </h2>
                                         <p className="text-sm sm:text-base lg:text-xl text-white/50 font-serif italic leading-relaxed max-w-xl line-clamp-4 lg:line-clamp-6">
@@ -330,7 +330,7 @@ export default function ArtworksPage() {
                     <Reveal delay={0.1}>
                         <div className="mb-8 md:mb-16">
                             <span className="text-xs font-black tracking-[0.4em] text-slate/40 uppercase mb-2 md:mb-4 block">Archive Hub</span>
-                            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light font-serif italic tracking-tighter">전체 아카이브</h2>
+                            <h2 className="font-light font-serif italic tracking-tighter text-xl md:text-4xl">전체 아카이브</h2>
                         </div>
                     </Reveal>
 
@@ -444,7 +444,7 @@ export default function ArtworksPage() {
                     ) : (
                         <div className="py-32 flex flex-col items-center justify-center bg-gray-50 rounded-[40px] border border-dashed border-slate/10">
                             <Search className="w-12 h-12 text-slate/20 mb-6" />
-                            <p className="text-xl font-serif italic text-slate/40">검색 조건과 일치하는 작품이 없습니다.</p>
+                            <p className="font-serif italic text-slate/40 text-xl">검색 조건과 일치하는 작품이 없습니다.</p>
                             <button onClick={resetFilters} className="mt-6 text-sm font-black text-chapter-accent underline">필터 초기화</button>
                         </div>
                     )}
@@ -573,7 +573,7 @@ function ArtworkCard({ art, delay }: { art: Artwork, delay: number }) {
                             sizes="(max-width: 768px) 50vw, 25vw"
                         />
                     ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-4xl opacity-20">🎨</div>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-20 text-4xl">🎨</div>
                     )}
                     
                     {/* Tags */}
