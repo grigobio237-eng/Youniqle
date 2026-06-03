@@ -695,7 +695,7 @@ export default function MyPage() {
                 {/* Badge Collection Section */}
                 {userBadges.length > 0 && (
                   <div className="mb-8">
-                    <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                    <Card className="border-none shadow-sm rounded-[32px] bg-white border border-slate-100">
                       <div className="p-6 md:p-8">
                         <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center gap-3">
