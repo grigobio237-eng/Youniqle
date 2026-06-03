@@ -29,17 +29,17 @@ async function connectDB() {
 
   if (!cached!.promise) {
     const opts = {
-      bufferCommands: true,
-      maxPoolSize: 20,
-      minPoolSize: 1,
-      maxIdleTimeMS: 10000,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
-      connectTimeoutMS: 5000,
+      bufferCommands: false,
+      maxPoolSize: 50,
+      minPoolSize: 5,
+      maxIdleTimeMS: 30000,
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,
       retryWrites: true,
       retryReads: true,
       heartbeatFrequencyMS: 10000,
-      maxStalenessSeconds: 90,
+      family: 4, // IPv4 우선 접속
     };
 
     console.log('Creating new MongoDB connection promise...');
