@@ -68,7 +68,7 @@ export default function ArtistsPage() {
                             placeholder="작가 이름을 검색해보세요..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-gray-50 border-none rounded-[30px] h-16 pl-16 pr-8 text-base md:text-lg font-serif italic focus:ring-0 focus:outline-none placeholder:text-slate/30"
+                            className="w-full bg-surface border-none rounded-[30px] h-16 pl-16 pr-8 text-base md:text-lg font-serif italic focus:ring-0 focus:outline-none placeholder:text-slate/30"
                         />
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export default function ArtistsPage() {
                                                 className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                             />
                                         ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-slate/20">
+                                            <div className="absolute inset-0 flex items-center justify-center bg-surface text-slate/20">
                                                 <Palette className="w-24 h-24" />
                                             </div>
                                         )}

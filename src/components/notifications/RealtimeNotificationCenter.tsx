@@ -67,14 +67,14 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
       case 'error':
         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Info className="h-4 w-4 text-blue-500" />;
+        return <Info className="h-4 w-4 text-primary" />;
     }
   };
 
   const getNotificationColor = (type: string) => {
     switch (type) {
       case 'order':
-        return 'border-blue-200 bg-blue-50';
+        return 'border-primary/30 bg-blue-50';
       case 'payment':
         return 'border-green-200 bg-green-50';
       case 'shipping':
@@ -82,7 +82,7 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
       case 'promotion':
         return 'border-orange-200 bg-orange-50';
       case 'system':
-        return 'border-gray-200 bg-gray-50';
+        return 'border-line bg-surface';
       case 'success':
         return 'border-green-200 bg-green-50';
       case 'warning':
@@ -90,7 +90,7 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
       case 'error':
         return 'border-red-200 bg-red-50';
       default:
-        return 'border-gray-200 bg-gray-50';
+        return 'border-line bg-surface';
     }
   };
 
@@ -101,11 +101,11 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
       case 'high':
         return 'bg-orange-500 text-white';
       case 'medium':
-        return 'bg-blue-500 text-white';
+        return 'bg-primary text-white';
       case 'low':
-        return 'bg-gray-500 text-white';
+        return 'bg-surface0 text-white';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-surface0 text-white';
     }
   };
 
@@ -159,9 +159,9 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
 
       {/* 알림 패널 */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute right-0 top-12 w-80 bg-white border border-line rounded-lg shadow-lg z-50">
           {/* 헤더 */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-line">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold">알림</h3>
               <div className="flex items-center space-x-2">
@@ -234,7 +234,7 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
           {/* 알림 목록 */}
           <div className="max-h-96 overflow-y-auto">
             {filteredNotifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-foreground/70">
                 <Bell className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                 <p>알림이 없습니다</p>
               </div>
@@ -243,7 +243,7 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
                 {filteredNotifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${
+                    className={`p-4 hover:bg-surface transition-colors ${
                       !notification.read ? 'bg-blue-50' : ''
                     }`}
                   >
@@ -256,7 +256,7 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-1">
-                              <h4 className="text-sm font-medium text-gray-900 truncate">
+                              <h4 className="text-sm font-medium text-obsidian truncate">
                                 {notification.title}
                               </h4>
                               <Badge 
@@ -266,17 +266,17 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
                                 {notification.priority}
                               </Badge>
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">
+                            <p className="text-sm text-obsidian mb-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-foreground/70">
                               {formatTime(notification.createdAt)}
                             </p>
                           </div>
                           
                           <div className="flex items-center space-x-1 ml-2">
                             {!notification.read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <div className="w-2 h-2 bg-primary rounded-full"></div>
                             )}
                             <Button
                               variant="ghost"
@@ -316,8 +316,8 @@ export default function RealtimeNotificationCenter({ className = '' }: Notificat
           </div>
 
           {/* 푸터 */}
-          <div className="p-3 border-t border-gray-200 bg-gray-50">
-            <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="p-3 border-t border-line bg-surface">
+            <div className="flex items-center justify-between text-xs text-foreground/70">
               <span>총 {notifications.length}개 알림</span>
               <span>읽지 않음 {unreadCount}개</span>
             </div>

@@ -277,7 +277,7 @@ export default function AdminFAQPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">FAQ 관리</h1>
-          <p className="text-gray-600 mt-1">자주 묻는 질문을 관리하세요</p>
+          <p className="text-obsidian mt-1">자주 묻는 질문을 관리하세요</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="h-4 w-4 mr-2" />
@@ -288,18 +288,18 @@ export default function AdminFAQPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">전체 FAQ</p>
+            <p className="text-sm text-foreground/70">전체 FAQ</p>
             <p className="text-2xl font-semibold mt-2">
               {(analytics?.totalCount ?? faqs.length).toLocaleString()}건
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-foreground/70 mt-1">
               활성 {analytics?.statusBreakdown?.active ?? 0} / 숨김 {analytics?.statusBreakdown?.hidden ?? 0}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">많이 찾는 카테고리</p>
+            <p className="text-sm text-foreground/70">많이 찾는 카테고리</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {analytics?.categoryBreakdown
                 ? Object.entries(analytics.categoryBreakdown)
@@ -310,22 +310,22 @@ export default function AdminFAQPage() {
                         {categoryLabels[key as keyof typeof categoryLabels] || key} {count}
                       </Badge>
                     ))
-                : <span className="text-xs text-gray-400">집계 데이터 없음</span>}
+                : <span className="text-xs text-foreground/70">집계 데이터 없음</span>}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 space-y-2">
-            <p className="text-sm text-gray-500">도움이 많이 된 질문</p>
+            <p className="text-sm text-foreground/70">도움이 많이 된 질문</p>
             {analytics?.topHelpful && analytics.topHelpful.length > 0 ? (
               analytics.topHelpful.map((item) => (
-                <div key={String(item._id)} className="flex items-center justify-between text-xs text-gray-600">
+                <div key={String(item._id)} className="flex items-center justify-between text-xs text-obsidian">
                   <span className="truncate max-w-[160px]">{item.question}</span>
                   <span className="text-green-600 font-medium">+{item.helpful}</span>
                 </div>
               ))
             ) : (
-              <span className="text-xs text-gray-400">집계 데이터 없음</span>
+              <span className="text-xs text-foreground/70">집계 데이터 없음</span>
             )}
           </CardContent>
         </Card>
@@ -337,7 +337,7 @@ export default function AdminFAQPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="FAQ 검색..."
                   value={searchQuery}
@@ -388,8 +388,8 @@ export default function AdminFAQPage() {
             <div className="text-center py-8">로딩 중...</div>
           ) : faqs.length === 0 ? (
             <div className="text-center py-8">
-              <HelpCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600">FAQ가 없습니다.</p>
+              <HelpCircle className="h-12 w-12 mx-auto text-foreground/70 mb-4" />
+              <p className="text-obsidian">FAQ가 없습니다.</p>
             </div>
           ) : (
             <Table>
@@ -448,12 +448,12 @@ export default function AdminFAQPage() {
                     <TableCell>
                       <div className="max-w-md space-y-1">
                         <p className="font-medium truncate">{faq.question}</p>
-                        <p className="text-sm text-gray-500 line-clamp-2 whitespace-pre-wrap">{faq.answer}</p>
+                        <p className="text-sm text-foreground/70 line-clamp-2 whitespace-pre-wrap">{faq.answer}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4 text-gray-400" />
+                        <Eye className="h-4 w-4 text-foreground/70" />
                         {faq.views}
                       </div>
                     </TableCell>
@@ -472,7 +472,7 @@ export default function AdminFAQPage() {
                         {faq.status === 'active' ? '활성' : '숨김'}
                       </Button>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-500">
+                    <TableCell className="text-sm text-foreground/70">
                       {new Date(faq.createdAt).toLocaleDateString('ko-KR')}
                     </TableCell>
                     <TableCell>
@@ -653,7 +653,7 @@ export default function AdminFAQPage() {
                 </Badge>
               </div>
               <h3 className="font-semibold text-xl">{previewFAQ.question}</h3>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-obsidian">
                 {previewFAQ.answer}
               </p>
               {previewFAQ.tags && previewFAQ.tags.length > 0 && (
@@ -665,7 +665,7 @@ export default function AdminFAQPage() {
                   ))}
                 </div>
               )}
-              <div className="flex items-center gap-4 text-xs text-gray-500 border-t pt-3">
+              <div className="flex items-center gap-4 text-xs text-foreground/70 border-t pt-3">
                 <span>조회 {previewFAQ.views}</span>
                 <span>도움이 됨 {previewFAQ.helpful}</span>
                 <span>도움이 안 됨 {previewFAQ.notHelpful}</span>

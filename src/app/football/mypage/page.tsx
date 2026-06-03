@@ -208,7 +208,7 @@ export default function FootballMyPage() {
                 </p>
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-2xl text-left text-xs space-y-2 text-slate font-medium">
+              <div className="p-4 bg-surface rounded-2xl text-left text-xs space-y-2 text-slate font-medium">
                 <p>• <strong>카테고리:</strong> {pendingTeam.category === 'youth' ? '유소년' : pendingTeam.category === 'pro' ? '프로' : '동호회'}</p>
                 {pendingTeam.region && <p>• <strong>지역:</strong> {pendingTeam.region}</p>}
                 {pendingTeam.ageGroup && <p>• <strong>연령대:</strong> {pendingTeam.ageGroup}</p>}
@@ -269,7 +269,7 @@ export default function FootballMyPage() {
                   value={inviteCode}
                   onChange={(e) => setInviteCode(e.target.value)}
                   placeholder="초대 코드 입력 (예: FCXXXX)"
-                  className="flex-1 h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold uppercase"
+                  className="flex-1 h-12 px-4 rounded-2xl border border-line text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold uppercase"
                 />
                 <Button
                   onClick={handleJoinByCode}
@@ -287,8 +287,8 @@ export default function FootballMyPage() {
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center justify-between cursor-pointer" onClick={() => setCreationMode(!creationMode)}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-secondary-container rounded-2xl flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
                     <h3 className="font-black text-obsidian">👨‍🏫 감독 / 코치로 팀 창단</h3>
@@ -313,7 +313,7 @@ export default function FootballMyPage() {
                       value={newTeamName}
                       onChange={(e) => setNewTeamName(e.target.value)}
                       placeholder="예: 강남 FC 유소년클럽"
-                      className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                      className="w-full h-12 px-4 rounded-2xl border border-line text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
                     />
                   </div>
 
@@ -324,7 +324,7 @@ export default function FootballMyPage() {
                       title="카테고리 선택"
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
-                      className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm bg-white font-bold"
+                      className="w-full h-12 px-4 rounded-2xl border border-line text-sm bg-white font-bold"
                     >
                       <option value="youth">유소년 클럽</option>
                       <option value="pro">엘리트 / 프로</option>
@@ -340,7 +340,7 @@ export default function FootballMyPage() {
                         value={newAgeGroup}
                         onChange={(e) => setNewAgeGroup(e.target.value)}
                         placeholder="예: U-12"
-                        className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                        className="w-full h-12 px-4 rounded-2xl border border-line text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -350,7 +350,7 @@ export default function FootballMyPage() {
                         value={newRegion}
                         onChange={(e) => setNewRegion(e.target.value)}
                         placeholder="예: 서울 강남구"
-                        className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
+                        className="w-full h-12 px-4 rounded-2xl border border-line text-sm focus:outline-none focus:ring-2 focus:ring-green-400 font-bold"
                       />
                     </div>
                   </div>
@@ -361,14 +361,14 @@ export default function FootballMyPage() {
                       value={newDescription}
                       onChange={(e) => setNewDescription(e.target.value)}
                       placeholder="팀에 대한 간단한 소개를 적어주세요."
-                      className="w-full h-20 p-3 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                      className="w-full h-20 p-3 rounded-2xl border border-line text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                     />
                   </div>
 
                   <Button
                     onClick={handleCreateTeam}
                     disabled={creationLoading}
-                    className="w-full h-12 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-black text-sm text-white"
+                    className="w-full h-12 rounded-2xl bg-secondary hover:bg-secondary font-black text-sm text-white"
                   >
                     {creationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : '팀 개설 신청하기'}
                   </Button>
@@ -383,10 +383,10 @@ export default function FootballMyPage() {
 
   // 코치/감독용 메뉴
   const coachMenus = [
-    { label: '코치 대시보드', desc: '스쿼드 컨디션 오버뷰', href: '/football/dashboard', icon: Activity, color: 'bg-emerald-500' },
-    { label: '공지사항 관리', desc: '팀 공지사항 작성 및 관리', href: '/football/announcements', icon: Megaphone, color: 'bg-blue-500' },
-    { label: '팀 스케줄', desc: '훈련/경기 일정 관리', href: '/football/schedule', icon: Calendar, color: 'bg-purple-500' },
-    { label: '팀 커뮤니티', desc: '팀원 전용 소통 게시판', href: '/football/community', icon: MessageSquare, color: 'bg-indigo-500' },
+    { label: '코치 대시보드', desc: '스쿼드 컨디션 오버뷰', href: '/football/dashboard', icon: Activity, color: 'bg-secondary' },
+    { label: '공지사항 관리', desc: '팀 공지사항 작성 및 관리', href: '/football/announcements', icon: Megaphone, color: 'bg-primary' },
+    { label: '팀 스케줄', desc: '훈련/경기 일정 관리', href: '/football/schedule', icon: Calendar, color: 'bg-secondary' },
+    { label: '팀 커뮤니티', desc: '팀원 전용 소통 게시판', href: '/football/community', icon: MessageSquare, color: 'bg-secondary' },
     { label: '선수 명단', desc: '팀 선수 현황 관리', href: '/football/players', icon: Users, color: 'bg-orange-500' },
     { label: '구독 관리', desc: '플랜 및 결제 관리', href: '/football/subscription', icon: Crown, color: 'bg-yellow-500' },
   ];
@@ -394,18 +394,18 @@ export default function FootballMyPage() {
   // 선수용 메뉴
   const playerMenus = [
     { label: '오늘의 컨디션 체크', desc: '데일리 웰니스 기록', href: '/football/wellness', icon: Heart, color: 'bg-green-500', highlight: !wellness?.todayCheck },
-    { label: '나의 컨디션 분석', desc: 'ACWR & 웰니스 트렌드', href: '/football/my-condition', icon: Activity, color: 'bg-emerald-500' },
-    { label: '팀 공지사항', desc: '코치의 공지 확인', href: '/football/announcements', icon: Megaphone, color: 'bg-blue-500' },
-    { label: '팀 스케줄', desc: '훈련/경기 일정 확인', href: '/football/schedule', icon: Calendar, color: 'bg-purple-500' },
-    { label: '팀 커뮤니티', desc: '조언 및 논의 스레드', href: '/football/community', icon: MessageSquare, color: 'bg-indigo-500' },
+    { label: '나의 컨디션 분석', desc: 'ACWR & 웰니스 트렌드', href: '/football/my-condition', icon: Activity, color: 'bg-secondary' },
+    { label: '팀 공지사항', desc: '코치의 공지 확인', href: '/football/announcements', icon: Megaphone, color: 'bg-primary' },
+    { label: '팀 스케줄', desc: '훈련/경기 일정 확인', href: '/football/schedule', icon: Calendar, color: 'bg-secondary' },
+    { label: '팀 커뮤니티', desc: '조언 및 논의 스레드', href: '/football/community', icon: MessageSquare, color: 'bg-secondary' },
   ];
 
   // 보호자용 메뉴
   const guardianMenus = [
     { label: '자녀 컨디션 열람', desc: '자녀의 웰니스 데이터 확인', href: '/football/child', icon: Heart, color: 'bg-pink-500' },
-    { label: '팀 공지사항', desc: '코치의 공지 확인', href: '/football/announcements', icon: Megaphone, color: 'bg-blue-500' },
-    { label: '팀 스케줄', desc: '훈련/경기 일정 확인', href: '/football/schedule', icon: Calendar, color: 'bg-purple-500' },
-    { label: '팀 커뮤니티', desc: '팀원 소통 및 의견 제안', href: '/football/community', icon: MessageSquare, color: 'bg-indigo-500' },
+    { label: '팀 공지사항', desc: '코치의 공지 확인', href: '/football/announcements', icon: Megaphone, color: 'bg-primary' },
+    { label: '팀 스케줄', desc: '훈련/경기 일정 확인', href: '/football/schedule', icon: Calendar, color: 'bg-secondary' },
+    { label: '팀 커뮤니티', desc: '팀원 소통 및 의견 제안', href: '/football/community', icon: MessageSquare, color: 'bg-secondary' },
   ];
 
   const menus = footballRole === 'coach'
@@ -424,7 +424,7 @@ export default function FootballMyPage() {
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
                 </span>
                 <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
                   👑 Master Operator Mode
@@ -441,8 +441,8 @@ export default function FootballMyPage() {
                 onClick={() => setActiveViewRole('coach')}
                 className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
                   activeViewRole === 'coach'
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                    ? 'bg-secondary text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-foreground/70 hover:text-slate-200 hover:bg-slate-900'
                 }`}
               >
                 <span className="text-base">👨‍🏫</span>
@@ -453,8 +453,8 @@ export default function FootballMyPage() {
                 onClick={() => setActiveViewRole('player')}
                 className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
                   activeViewRole === 'player'
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                    ? 'bg-secondary text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-foreground/70 hover:text-slate-200 hover:bg-slate-900'
                 }`}
               >
                 <span className="text-base">⚽</span>
@@ -465,8 +465,8 @@ export default function FootballMyPage() {
                 onClick={() => setActiveViewRole('guardian')}
                 className={`py-2.5 rounded-xl text-xs font-black transition-all flex flex-col items-center gap-1.5 ${
                   activeViewRole === 'guardian'
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                    ? 'bg-secondary text-white shadow-lg shadow-emerald-600/20'
+                    : 'text-foreground/70 hover:text-slate-200 hover:bg-slate-900'
                 }`}
               >
                 <span className="text-base">👨‍👩‍👦</span>
@@ -494,11 +494,11 @@ export default function FootballMyPage() {
                       <Badge className="bg-green-100 text-green-700 border-none font-black text-[10px] md:text-xs px-2 py-0.5 whitespace-nowrap">
                         {teamInfo.team.teamName}
                       </Badge>
-                      <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-slate-200 text-slate-600 whitespace-nowrap">
+                      <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-line text-obsidian whitespace-nowrap">
                         {getRoleLabel(teamInfo.membership.role)}
                       </Badge>
                       {teamInfo.membership.position && (
-                        <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-slate-200 text-slate-600 whitespace-nowrap">
+                        <Badge variant="outline" className="font-black text-[10px] md:text-xs px-2 py-0.5 border-line text-obsidian whitespace-nowrap">
                           {getPositionLabel(teamInfo.membership.position)}
                           {teamInfo.membership.playerNumber && ` #${teamInfo.membership.playerNumber}`}
                         </Badge>
@@ -598,7 +598,7 @@ export default function FootballMyPage() {
               <CardContent className="p-6 text-center space-y-2.5">
                 <span className="text-3xl block">📸</span>
                 <p className="text-sm font-black text-obsidian">유니클 푸드 스캐너</p>
-                <p className="text-[10px] font-bold text-slate-400">식단 사진을 촬영하거나 업로드하여 AI 분석을 받아보세요.</p>
+                <p className="text-[10px] font-bold text-foreground/70">식단 사진을 촬영하거나 업로드하여 AI 분석을 받아보세요.</p>
               </CardContent>
             </Card>
           </Link>

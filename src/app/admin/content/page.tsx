@@ -223,7 +223,7 @@ export default function AdminContentPage() {
                 <p className="text-sm font-medium text-text-secondary">총 콘텐츠</p>
                 <p className="text-2xl font-bold text-text-primary">{contents.length}</p>
               </div>
-              <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <div className="p-3 rounded-full bg-primary-container text-primary">
                 <FileText className="h-6 w-6" />
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function AdminContentPage() {
                   {totalViews.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+              <div className="p-3 rounded-full bg-secondary-container text-secondary">
                 <Eye className="h-6 w-6" />
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function AdminContentPage() {
             {/* Search */}
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="제목 또는 설명으로 검색..."
@@ -385,7 +385,7 @@ export default function AdminContentPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <TypeIcon className="h-8 w-8 text-gray-400" />
+                        <TypeIcon className="h-8 w-8 text-foreground/70" />
                       </div>
                     )}
                   </div>
@@ -395,9 +395,9 @@ export default function AdminContentPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <PlatformIcon className="h-4 w-4 text-gray-500" />
-                          <TypeIcon className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">
+                          <PlatformIcon className="h-4 w-4 text-foreground/70" />
+                          <TypeIcon className="h-4 w-4 text-foreground/70" />
+                          <span className="text-sm text-foreground/70">
                             {platforms.find(p => p.value === content.platform)?.label}
                           </span>
                           {getStatusBadge(content.status)}
@@ -414,7 +414,7 @@ export default function AdminContentPage() {
                           {content.description}
                         </p>
                         
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-4 text-sm text-foreground/70">
                           <div className="flex items-center space-x-1">
                             <Eye className="h-3 w-3" />
                             <span>{content.views.toLocaleString()}</span>
@@ -485,7 +485,7 @@ export default function AdminContentPage() {
       {filteredContents.length === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <FileText className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-text-primary mb-2">
               콘텐츠가 없습니다
             </h3>

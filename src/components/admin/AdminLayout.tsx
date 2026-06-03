@@ -579,7 +579,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             href={subItem.href}
                             className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isSubActive
                               ? 'text-primary bg-primary/5'
-                              : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
+                              : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                               }`}
                             onClick={() => setSidebarOpen(false)}
                           >

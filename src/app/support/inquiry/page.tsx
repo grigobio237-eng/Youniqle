@@ -204,15 +204,15 @@ export default function SupportInquiryPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10">
       <div className="container max-w-4xl mx-auto px-4">
         <div className="mb-10 text-center space-y-3">
-          <Badge className="px-4 py-1 bg-blue-100 text-blue-800">고객센터</Badge>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">1:1 문의 접수</h1>
+          <Badge className="px-4 py-1 bg-primary-container text-blue-800">고객센터</Badge>
+          <h1 className="text-3xl sm:text-4xl font-bold text-obsidian">1:1 문의 접수</h1>
           <p className="text-muted-foreground">
             궁금하신 점이나 도움이 필요하신 내용을 작성해주시면 빠르게 답변드리겠습니다.
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Card className="shadow-xl border border-slate-100">
+          <Card className="shadow-xl border border-line">
             <CardHeader>
               <CardTitle>문의 내용 작성</CardTitle>
               <CardDescription>아래 정보를 작성해주시면 담당자가 확인 후 답변드립니다.</CardDescription>
@@ -305,7 +305,7 @@ export default function SupportInquiryPage() {
                     {attachments.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between rounded-md border border-dashed border-slate-200 bg-white px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-md border border-dashed border-line bg-white px-3 py-2 text-sm"
                       >
                         <div>
                           <p className="font-medium">{file.filename}</p>
@@ -328,7 +328,7 @@ export default function SupportInquiryPage() {
                 )}
               </div>
 
-              <div className="flex items-start space-x-3 rounded-md border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-start space-x-3 rounded-md border border-line bg-surface p-4">
                 <Checkbox
                   id="agree-policy"
                   checked={agreePolicy}
@@ -346,7 +346,7 @@ export default function SupportInquiryPage() {
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
+                  <AlertCircle className="h-4 w-4 text-primary" />
                   영업일 기준 24시간 이내 답변을 드립니다.
                 </div>
                 <Button type="submit" disabled={isSubmitting || isUploading} className="w-full sm:w-auto">
@@ -358,9 +358,9 @@ export default function SupportInquiryPage() {
         </form>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <Card className="flex-1 border-slate-200">
+          <Card className="flex-1 border-line">
             <CardContent className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-blue-600">
+              <div className="flex items-center gap-2 text-primary">
                 <CheckCircle className="h-5 w-5" />
                 <h2 className="font-semibold">문의 접수 전 체크사항</h2>
               </div>
@@ -371,9 +371,9 @@ export default function SupportInquiryPage() {
               </ul>
             </CardContent>
           </Card>
-          <Card className="flex-1 border-slate-200 bg-white/80">
+          <Card className="flex-1 border-line bg-white/80">
             <CardContent className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-slate-700">
+              <div className="flex items-center gap-2 text-obsidian">
                 <AlertCircle className="h-5 w-5" />
                 <h2 className="font-semibold">답변 확인 방법</h2>
               </div>

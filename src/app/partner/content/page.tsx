@@ -713,10 +713,10 @@ function PartnerContentPageContent() {
               <label className="block text-sm font-medium mb-2">이미지</label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 <div className="text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <Upload className="mx-auto h-12 w-12 text-foreground/70" />
                   <div className="mt-4">
                     <label htmlFor="image-upload" className="cursor-pointer">
-                      <span className="mt-2 block text-sm font-medium text-gray-900">
+                      <span className="mt-2 block text-sm font-medium text-obsidian">
                         이미지를 선택하거나 드래그하세요
                       </span>
                       <input
@@ -728,7 +728,7 @@ function PartnerContentPageContent() {
                         className="sr-only"
                       />
                     </label>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-foreground/70">
                       PNG, JPG, GIF, WebP, AVIF 파일 (최대 10MB)
                     </p>
                   </div>

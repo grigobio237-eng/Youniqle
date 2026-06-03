@@ -63,7 +63,7 @@ export default function ReferralNetwork({ userId, mode }: ReferralNetworkProps) 
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+      <div className="flex flex-col items-center justify-center py-12 text-foreground/70">
         <Loader2 className="h-8 w-8 animate-spin mb-4" />
         <p className="text-sm">조직도 데이터를 분석 중입니다...</p>
       </div>
@@ -72,9 +72,9 @@ export default function ReferralNetwork({ userId, mode }: ReferralNetworkProps) 
 
   if (!data || (data.level1.length === 0)) {
     return (
-      <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
+      <div className="text-center py-12 bg-surface rounded-2xl border-2 border-dashed border-line">
         <Users className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-        <p className="text-gray-400 text-sm">초대한 회원이 아직 없습니다.</p>
+        <p className="text-foreground/70 text-sm">초대한 회원이 아직 없습니다.</p>
       </div>
     );
   }
@@ -117,14 +117,14 @@ export default function ReferralNetwork({ userId, mode }: ReferralNetworkProps) 
       {/* Level 0: 내 추천인 정보 (관리자 페이지에서 페이지 주인의 상위) */}
       {data.referrer && (
         <div className="mb-8">
-          <h4 className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider flex items-center gap-1">
+          <h4 className="text-xs font-bold text-foreground/70 mb-3 uppercase tracking-wider flex items-center gap-1">
             <ChevronRight className="h-3 w-3" /> 소개한 사람 (Referrer)
           </h4>
-          <div className="bg-gray-50/50 p-4 rounded-xl border border-dashed border-gray-200 flex items-center gap-3">
+          <div className="bg-surface/50 p-4 rounded-xl border border-dashed border-line flex items-center gap-3">
             <UserCircle className="h-6 w-6 text-gray-300" />
             <div>
-               <p className="text-sm font-bold text-gray-700">{data.referrer.name}</p>
-               <p className="text-[10px] text-gray-400">{data.referrer.email}</p>
+               <p className="text-sm font-bold text-obsidian">{data.referrer.name}</p>
+               <p className="text-[10px] text-foreground/70">{data.referrer.email}</p>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function ReferralNetwork({ userId, mode }: ReferralNetworkProps) 
               <div className="relative">
                 <ReferralTreeItem {...l1} />
                 {l1.children.length > 0 && (
-                  <div className="absolute left-5 top-full h-4 w-px bg-indigo-100" />
+                  <div className="absolute left-5 top-full h-4 w-px bg-secondary-container" />
                 )}
               </div>
 

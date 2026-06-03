@@ -83,7 +83,7 @@ export default function ArtistDetailPage() {
                                     priority
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-slate/20">
+                                <div className="absolute inset-0 flex items-center justify-center bg-surface text-slate/20">
                                     <Palette className="w-32 h-32" />
                                 </div>
                             )}

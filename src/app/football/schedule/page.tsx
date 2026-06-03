@@ -227,10 +227,10 @@ export default function SchedulePage() {
 
   const getEventTypeColors = (t?: string) => {
     const map: Record<string, { bg: string; border: string; text: string; dot: string }> = {
-      training: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+      training: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-secondary', dot: 'bg-secondary' },
       match: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', dot: 'bg-rose-500' },
-      meeting: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', dot: 'bg-purple-500' },
-      other: { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', dot: 'bg-slate-400' },
+      meeting: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-secondary', dot: 'bg-secondary' },
+      other: { bg: 'bg-surface', border: 'border-line', text: 'text-obsidian', dot: 'bg-slate-400' },
     };
     return map[t || ''] || map.other;
   };
@@ -242,7 +242,7 @@ export default function SchedulePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
       </div>
     );
   }
@@ -281,7 +281,7 @@ export default function SchedulePage() {
             {/* 요일 행 */}
             <div className="grid grid-cols-7 text-center gap-1 text-xs font-bold text-slate">
               {weekDays.map((day, idx) => (
-                <div key={idx} className={idx === 0 ? 'text-red-500' : idx === 6 ? 'text-blue-500' : ''}>
+                <div key={idx} className={idx === 0 ? 'text-red-500' : idx === 6 ? 'text-primary' : ''}>
                   {day}
                 </div>
               ))}
@@ -305,13 +305,13 @@ export default function SchedulePage() {
                     onClick={() => setSelectedDate(cell.date)}
                     className={`h-12 relative flex flex-col items-center justify-between py-1.5 rounded-2xl transition-all ${
                       isSelected
-                        ? 'bg-purple-600 text-white font-bold shadow-lg shadow-purple-200'
+                        ? 'bg-secondary text-white font-bold shadow-lg shadow-purple-200'
                         : cell.isCurrentMonth
                         ? 'text-obsidian hover:bg-purple-50'
-                        : 'text-gray-300 hover:bg-gray-50'
+                        : 'text-gray-300 hover:bg-surface'
                     }`}
                   >
-                    <span className={`text-sm ${isToday && !isSelected ? 'text-purple-600 font-extrabold border-b-2 border-purple-500' : ''}`}>
+                    <span className={`text-sm ${isToday && !isSelected ? 'text-secondary font-extrabold border-b-2 border-purple-500' : ''}`}>
                       {cell.date.getDate()}
                     </span>
                     {/* 일정이 있는 경우 닷 뱃지 표시 */}
@@ -331,7 +331,7 @@ export default function SchedulePage() {
             <h3 className="text-sm font-black text-slate uppercase tracking-wider">
               {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 일정
             </h3>
-            <span className="text-xs text-slate font-medium bg-purple-100/60 text-purple-700 px-2 py-0.5 rounded-full">
+            <span className="text-xs text-slate font-medium bg-secondary-container/60 text-secondary px-2 py-0.5 rounded-full">
               총 {activeEvents.length}개
             </span>
           </div>
@@ -382,7 +382,7 @@ export default function SchedulePage() {
                       </div>
 
                       {event.eventLocation && (
-                        <div className="flex items-center gap-1 text-xs text-slate font-medium bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 w-fit">
+                        <div className="flex items-center gap-1 text-xs text-slate font-medium bg-surface border border-line rounded-xl px-3 py-2 w-fit">
                           <MapPin className="w-3.5 h-3.5 text-slate/60" /> {event.eventLocation}
                         </div>
                       )}
@@ -401,7 +401,7 @@ export default function SchedulePage() {
           onClick={() => setShowModal(true)}
           title="스케줄 등록"
           aria-label="스케줄 등록"
-          className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-700 hover:scale-105 active:scale-95 text-white rounded-full flex items-center justify-center shadow-xl shadow-purple-300 transition-all duration-200 z-40"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-secondary hover:bg-secondary hover:scale-105 active:scale-95 text-white rounded-full flex items-center justify-center shadow-xl shadow-purple-300 transition-all duration-200 z-40"
         >
           <Plus className="w-7 h-7" />
         </button>
@@ -435,7 +435,7 @@ export default function SchedulePage() {
                           className={`py-2 rounded-xl text-xs font-black border transition-all ${
                             isSelected
                               ? `${colors.bg} ${colors.text} border-purple-500 ring-2 ring-purple-100`
-                              : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                              : 'bg-white text-foreground/70 border-line hover:bg-surface'
                           }`}
                         >
                           {getEventTypeLabel(et)}
@@ -454,7 +454,7 @@ export default function SchedulePage() {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="예: 오전 체력 단련 훈련"
                     required
-                    className="w-full h-11 px-3.5 rounded-2xl border border-gray-200 text-sm font-bold focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
+                    className="w-full h-11 px-3.5 rounded-2xl border border-line text-sm font-bold focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
                   />
                 </div>
 
@@ -469,7 +469,7 @@ export default function SchedulePage() {
                       value={eventDateStr}
                       onChange={(e) => setEventDateStr(e.target.value)}
                       required
-                      className="w-full h-11 px-3 rounded-2xl border border-gray-200 text-sm font-bold focus:border-purple-500 focus:outline-none transition-all"
+                      className="w-full h-11 px-3 rounded-2xl border border-line text-sm font-bold focus:border-purple-500 focus:outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -480,7 +480,7 @@ export default function SchedulePage() {
                       title="일정 시간"
                       value={eventTime}
                       onChange={(e) => setEventTime(e.target.value)}
-                      className="w-full h-11 px-3 rounded-2xl border border-gray-200 text-sm font-bold focus:border-purple-500 focus:outline-none transition-all"
+                      className="w-full h-11 px-3 rounded-2xl border border-line text-sm font-bold focus:border-purple-500 focus:outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export default function SchedulePage() {
                     value={eventLocation}
                     onChange={(e) => setEventLocation(e.target.value)}
                     placeholder="예: 파주 종합운동장 B코트"
-                    className="w-full h-11 px-3.5 rounded-2xl border border-gray-200 text-sm font-bold focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
+                    className="w-full h-11 px-3.5 rounded-2xl border border-line text-sm font-bold focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
                   />
                 </div>
 
@@ -506,7 +506,7 @@ export default function SchedulePage() {
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="일정 세부 내용이나 훈련 전 지참할 준비물을 적어주세요."
                     required
-                    className="w-full h-24 px-3.5 py-2.5 rounded-2xl border border-gray-200 text-sm resize-none focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
+                    className="w-full h-24 px-3.5 py-2.5 rounded-2xl border border-line text-sm resize-none focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all text-text-primary"
                   />
                 </div>
 
@@ -515,7 +515,7 @@ export default function SchedulePage() {
                   <Button
                     type="submit"
                     disabled={!title || !content || formLoading}
-                    className="flex-1 h-12 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold shadow-lg shadow-purple-100 transition-all"
+                    className="flex-1 h-12 rounded-2xl bg-secondary hover:bg-secondary text-white font-extrabold shadow-lg shadow-purple-100 transition-all"
                   >
                     {formLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : '스케줄 업로드'}
                   </Button>
@@ -523,7 +523,7 @@ export default function SchedulePage() {
                     type="button"
                     variant="outline"
                     onClick={closeModal}
-                    className="h-12 rounded-2xl hover:bg-gray-50 border-gray-200 font-bold"
+                    className="h-12 rounded-2xl hover:bg-surface border-line font-bold"
                   >
                     취소
                   </Button>

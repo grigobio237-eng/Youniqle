@@ -151,7 +151,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                         value={options.category}
                                         onValueChange={(value: string) => setOptions(prev => ({ ...prev, category: value }))}
                                     >
-                                        <SelectTrigger id="category" className="h-10 border-slate-200">
+                                        <SelectTrigger id="category" className="h-10 border-line">
                                             <SelectValue placeholder="카테고리" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -174,7 +174,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-2 border p-3 rounded-lg bg-slate-50 border-slate-100">
+                            <div className="flex items-center space-x-2 border p-3 rounded-lg bg-surface border-line">
                                 <Checkbox
                                     id="isFundingThumb"
                                     checked={options.isFunding}
@@ -196,7 +196,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1 text-xs font-bold"
+                                        className="h-7 text-primary hover:text-primary hover:bg-blue-50 gap-1 text-xs font-bold"
                                         onClick={handleSuggestFeatures}
                                         disabled={suggestingFeatures}
                                     >
@@ -215,7 +215,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
 
                             <div className="space-y-3">
                                 <Label className="flex items-center gap-2">
-                                    <Palette className="h-4 w-4 text-slate-400" />
+                                    <Palette className="h-4 w-4 text-foreground/70" />
                                     디자인 스타일
                                 </Label>
                                 <div className="grid grid-cols-2 gap-2">
@@ -232,9 +232,9 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                            <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                                 <Label htmlFor="includeModel" className="flex items-center gap-2 cursor-pointer">
-                                    <UserCircle2 className="h-4 w-4 text-slate-400" />
+                                    <UserCircle2 className="h-4 w-4 text-foreground/70" />
                                     <span className="text-sm font-medium">모델(사람) 포함</span>
                                 </Label>
                                 <Checkbox
@@ -244,9 +244,9 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                            <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                                 <Label htmlFor="addText" className="flex items-center gap-2 cursor-pointer">
-                                    <Type className="h-4 w-4 text-slate-400" />
+                                    <Type className="h-4 w-4 text-foreground/70" />
                                     <span className="text-sm font-medium">텍스트 오버레이</span>
                                 </Label>
                                 <Checkbox
@@ -259,7 +259,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                             <div className="space-y-2 pt-4">
                                 <Label htmlFor="refImage">참조 이미지 (선택)</Label>
                                 <div
-                                    className={`border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all ${refImage ? 'bg-blue-50 border-blue-200' : 'border-slate-200'
+                                    className={`border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all ${refImage ? 'bg-blue-50 border-primary/30' : 'border-line'
                                         }`}
                                 >
                                     {refImage ? (
@@ -276,7 +276,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                                     ) : (
                                         <label htmlFor="refImage" className="cursor-pointer flex flex-col items-center">
                                             <Upload className="h-6 w-6 text-slate-300 mb-2" />
-                                            <span className="text-xs text-slate-400">파일 업로드</span>
+                                            <span className="text-xs text-foreground/70">파일 업로드</span>
                                             <input id="refImage" type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
                                         </label>
                                     )}
@@ -302,7 +302,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                             <>
                                 <Image src={resultImage} alt="Result" fill className="object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <Button className="bg-white text-slate-900 hover:bg-slate-100">
+                                    <Button className="bg-white text-obsidian hover:bg-slate-100">
                                         <Download className="h-4 w-4 mr-2" />
                                         고화질 다운로드
                                     </Button>
@@ -311,9 +311,9 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                         ) : (
                             <div className="text-center space-y-4">
                                 <div className="p-6 bg-slate-800 rounded-full inline-block">
-                                    <ImageIcon className="h-10 w-10 text-slate-600" />
+                                    <ImageIcon className="h-10 w-10 text-obsidian" />
                                 </div>
-                                <p className="text-slate-500 font-medium">설정을 완료하고 생성을 시작하세요</p>
+                                <p className="text-foreground/70 font-medium">설정을 완료하고 생성을 시작하세요</p>
                             </div>
                         )}
                     </Card>
@@ -321,7 +321,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
                     {resultImage && (
                         <div className="grid grid-cols-4 gap-2">
                             {[1, 2, 3, 4].map(v => (
-                                <div key={v} className="aspect-square bg-slate-100 rounded-lg overflow-hidden border cursor-pointer hover:border-blue-500 transition-all opacity-50 hover:opacity-100">
+                                <div key={v} className="aspect-square bg-slate-100 rounded-lg overflow-hidden border cursor-pointer hover:border-primary/30 transition-all opacity-50 hover:opacity-100">
                                     <Image src={`https://picsum.photos/seed/${v}/200/200`} alt="variant" width={200} height={200} />
                                 </div>
                             ))}
@@ -333,7 +333,7 @@ export default function ThumbnailGenerator({ partnerType = 'commerce' }: Thumbna
             <footer className="text-center py-10 space-y-4">
                 <div className="h-px bg-slate-200 w-32 mx-auto" />
                 <div className="space-y-2">
-                    <p className="text-sm text-slate-500 font-medium italic">이 앱은 유니클 싱크클럽의 지침으로 만들어졌습니다.</p>
+                    <p className="text-sm text-foreground/70 font-medium italic">이 앱은 유니클 싱크클럽의 지침으로 만들어졌습니다.</p>
                 </div>
             </footer>
         </div>

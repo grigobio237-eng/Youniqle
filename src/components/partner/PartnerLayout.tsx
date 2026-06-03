@@ -284,11 +284,11 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
       case 'stock':
         return 'text-orange-600';
       case 'payment':
-        return 'text-blue-600';
+        return 'text-primary';
       case 'system':
-        return 'text-purple-600';
+        return 'text-secondary';
       default:
-        return 'text-gray-600';
+        return 'text-obsidian';
     }
   };
 
@@ -551,7 +551,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-text-primary truncate">{notification.title}</p>
                             <p className="text-xs text-text-secondary line-clamp-2">{notification.message}</p>
-                            <p className="text-xs text-gray-400 mt-1">{formatTimeAgo(notification.createdAt)}</p>
+                            <p className="text-xs text-foreground/70 mt-1">{formatTimeAgo(notification.createdAt)}</p>
                           </div>
                         </div>
                       </div>

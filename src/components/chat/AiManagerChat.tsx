@@ -120,7 +120,7 @@ export default function AiManagerChat() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 50, scale: 0.9 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-[60] w-full md:w-[380px] h-[100dvh] md:h-[600px] md:max-h-[80vh] bg-white md:rounded-[28px] shadow-2xl flex flex-col overflow-hidden border-t md:border border-slate-200"
+                        className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-[60] w-full md:w-[380px] h-[100dvh] md:h-[600px] md:max-h-[80vh] bg-white md:rounded-[28px] shadow-2xl flex flex-col overflow-hidden border-t md:border border-line"
                     >
                         {/* Header */}
                         <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 md:p-5 flex items-center justify-between shrink-0">
@@ -149,7 +149,7 @@ export default function AiManagerChat() {
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-surface">
                             {messages.map((msg) => (
                                 <div
                                     key={msg.id}
@@ -157,8 +157,8 @@ export default function AiManagerChat() {
                                 >
                                     <div
                                         className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
-                                            ? 'bg-emerald-500 text-white rounded-br-md'
-                                            : 'bg-white text-slate-700 shadow-sm border border-slate-100 rounded-bl-md'
+                                            ? 'bg-secondary text-white rounded-br-md'
+                                            : 'bg-white text-obsidian shadow-sm border border-line rounded-bl-md'
                                             }`}
                                     >
                                         {msg.content}
@@ -167,19 +167,19 @@ export default function AiManagerChat() {
                             ))}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-slate-100 flex flex-col gap-2 min-w-[200px]">
-                                        <div className="flex justify-between items-center text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                    <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-line flex flex-col gap-2 min-w-[200px]">
+                                        <div className="flex justify-between items-center text-[10px] font-black text-secondary uppercase tracking-widest">
                                             <span>Uni is Thinking</span>
                                             <span>{Math.round(progress)}%</span>
                                         </div>
-                                        <div className="h-1 bg-emerald-100 rounded-full overflow-hidden">
+                                        <div className="h-1 bg-secondary-container rounded-full overflow-hidden">
                                             <motion.div 
-                                                className="h-full bg-emerald-500"
+                                                className="h-full bg-secondary"
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progress}%` }}
                                             />
                                         </div>
-                                        <p className="text-[10px] text-slate-400 italic">{statusMessage}</p>
+                                        <p className="text-[10px] text-foreground/70 italic">{statusMessage}</p>
                                     </div>
                                 </div>
                             )}
@@ -188,12 +188,12 @@ export default function AiManagerChat() {
 
                         {/* Quick Actions */}
                         {messages.length <= 2 && (
-                            <div className="px-4 py-2 bg-white border-t border-slate-100 flex gap-2 flex-wrap">
+                            <div className="px-4 py-2 bg-white border-t border-line flex gap-2 flex-wrap">
                                 {quickActions.map((action) => (
                                     <button
                                         key={action}
                                         onClick={() => handleQuickAction(action)}
-                                        className="text-[11px] px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 rounded-full font-medium transition-colors"
+                                        className="text-[11px] px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 hover:text-secondary text-obsidian rounded-full font-medium transition-colors"
                                     >
                                         {action}
                                     </button>
@@ -202,19 +202,19 @@ export default function AiManagerChat() {
                         )}
 
                         {/* Input */}
-                        <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-slate-100">
+                        <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-line">
                             <div className="flex gap-2">
                                 <Input
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder="궁금한 점을 물어보세요..."
-                                    className="flex-1 h-11 rounded-xl border-slate-200 focus:ring-emerald-500 text-sm"
+                                    className="flex-1 h-11 rounded-xl border-line focus:ring-emerald-500 text-sm"
                                     disabled={isLoading}
                                 />
                                 <Button
                                     type="submit"
                                     disabled={isLoading || !inputValue.trim()}
-                                    className="w-11 h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 p-0"
+                                    className="w-11 h-11 rounded-xl bg-secondary hover:bg-secondary p-0"
                                 >
                                     <Send className="w-4 h-4" />
                                 </Button>

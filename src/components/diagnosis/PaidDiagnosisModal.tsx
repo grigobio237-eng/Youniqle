@@ -127,7 +127,7 @@ export function PaidDiagnosisModal({ open, onOpenChange }: PaidDiagnosisModalPro
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl h-[85vh] p-0 overflow-hidden bg-white/60 backdrop-blur-xl text-slate-900 border-white/80 shadow-2xl flex flex-col sm:rounded-[32px]">
+            <DialogContent className="max-w-4xl h-[85vh] p-0 overflow-hidden bg-white/60 backdrop-blur-xl text-obsidian border-white/80 shadow-2xl flex flex-col sm:rounded-[32px]">
                 {/* Accessibility: Persistent Title */}
                 <DialogTitle className="sr-only">심층 상태 분석 (Premium)</DialogTitle>
                 <DialogDescription className="sr-only">60문항으로 구성된 유료 심층 상태 분석 모달입니다.</DialogDescription>
@@ -172,7 +172,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
             <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-sky-200/40 rounded-full blur-[100px] pointer-events-none mix-blend-multiply" />
 
-            <Button variant="ghost" size="icon" className="absolute top-6 right-6 text-gray-400 hover:text-obsidian hover:bg-black/5 z-50 rounded-full transition-colors" onClick={onClose}><X className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="absolute top-6 right-6 text-foreground/70 hover:text-obsidian hover:bg-black/5 z-50 rounded-full transition-colors" onClick={onClose}><X className="w-6 h-6" /></Button>
 
             <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-14 text-center space-y-12 relative z-10 max-w-3xl mx-auto">
 
@@ -206,7 +206,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                         당신의 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">진짜 잠재력</span>을<br />
                         데이터로 마주하세요
                     </h2>
-                    <p className="text-gray-600 text-lg font-medium leading-relaxed max-w-lg mx-auto">
+                    <p className="text-obsidian text-lg font-medium leading-relaxed max-w-lg mx-auto">
                         표면적인 진단을 넘어섭니다.<br />
                         <span className="text-primary font-bold text-glow-cream">30가지 심층 국면</span>과 <span className="text-primary font-bold text-glow-cream">5대 성격 요인</span>을 정밀 분석하여<br />
                         가장 나다운 성장의 길을 제시합니다.
@@ -221,13 +221,13 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                     className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
                 >
                     {[
-                        { title: 'Big 5 Standard', desc: '과학적 표준 모델', color: 'bg-indigo-50/50 hover:bg-indigo-100/50' },
-                        { title: 'Hyper Detail', desc: '30개 정밀 국면', color: 'bg-purple-50/50 hover:bg-purple-100/50' },
-                        { title: 'Youniqle Solution', desc: '맞춤형 성장 전략', color: 'bg-emerald-50/50 hover:bg-emerald-100/50' }
+                        { title: 'Big 5 Standard', desc: '과학적 표준 모델', color: 'bg-indigo-50/50 hover:bg-secondary-container/50' },
+                        { title: 'Hyper Detail', desc: '30개 정밀 국면', color: 'bg-purple-50/50 hover:bg-secondary-container/50' },
+                        { title: 'Youniqle Solution', desc: '맞춤형 성장 전략', color: 'bg-emerald-50/50 hover:bg-secondary-container/50' }
                     ].map((item, i) => (
                         <div key={i} className={`${item.color} border border-white/50 rounded-2xl p-5 text-left transition-all backdrop-blur-md group hover:shadow-md`}>
                             <div className="text-obsidian text-base font-bold mb-1 group-hover:translate-x-1 transition-transform">{item.title}</div>
-                            <div className="text-gray-500 text-xs font-semibold">{item.desc}</div>
+                            <div className="text-foreground/70 text-xs font-semibold">{item.desc}</div>
                         </div>
                     ))}
                 </motion.div>
@@ -246,7 +246,7 @@ function IntroView({ onNext, onClose }: { onNext: () => void, onClose: () => voi
                         심층 분석 시작하기 <ArrowRight className="w-5 h-5 ml-1" />
 
                     </Button>
-                    <p className="mt-4 text-gray-400 text-xs font-medium">약 5-10분 소요됩니다</p>
+                    <p className="mt-4 text-foreground/70 text-xs font-medium">약 5-10분 소요됩니다</p>
                 </motion.div>
             </div>
         </motion.div>
@@ -265,10 +265,10 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
                         <span className="text-[10px] font-black text-primary/70 tracking-[0.2em] mb-1">DEEP ANALYSIS</span>
                         <div className="flex items-baseline gap-1">
                             <span className="text-3xl font-black text-obsidian">{String(index + 1).padStart(2, '0')}</span>
-                            <span className="text-sm font-bold text-gray-400">/ {total}</span>
+                            <span className="text-sm font-bold text-foreground/70">/ {total}</span>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-400 hover:text-obsidian hover:bg-black/5 rounded-full w-10 h-10" onClick={onClose}><X className="w-5 h-5" /></Button>
+                    <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-obsidian hover:bg-black/5 rounded-full w-10 h-10" onClick={onClose}><X className="w-5 h-5" /></Button>
                 </div>
 
                 {/* Progress Bar */}
@@ -288,7 +288,7 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute top-0 left-6 md:left-10 text-gray-400 hover:text-primary -mt-8 pl-0 hover:bg-transparent"
+                        className="absolute top-0 left-6 md:left-10 text-foreground/70 hover:text-primary -mt-8 pl-0 hover:bg-transparent"
                         onClick={onPrevious}
                     >
                         &lt; 이전 질문
@@ -303,17 +303,17 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
                     {[
                         { label: '매우 그렇다', score: 5, activeClass: 'border-primary bg-primary/5 text-primary' },
                         { label: '그렇다', score: 4, activeClass: 'border-primary/50 bg-primary/5 text-primary' },
-                        { label: '보통이다', score: 3, activeClass: 'border-gray-300 bg-white text-gray-700' },
-                        { label: '아니다', score: 2, activeClass: 'border-gray-300 bg-white text-gray-700' },
-                        { label: '전혀 아니다', score: 1, activeClass: 'border-gray-300 bg-white text-gray-700' },
+                        { label: '보통이다', score: 3, activeClass: 'border-gray-300 bg-white text-obsidian' },
+                        { label: '아니다', score: 2, activeClass: 'border-gray-300 bg-white text-obsidian' },
+                        { label: '전혀 아니다', score: 1, activeClass: 'border-gray-300 bg-white text-obsidian' },
                     ].map((opt) => (
                         <button
                             key={opt.score}
                             onClick={() => onAnswer(opt.score)}
-                            className={`w-full p-4 md:p-5 rounded-2xl border border-transparent bg-white shadow-sm text-gray-500 font-bold transition-all text-center md:text-left flex justify-between items-center group hover:border-primary/30 hover:shadow-md hover:text-obsidian hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 duration-200`}
+                            className={`w-full p-4 md:p-5 rounded-2xl border border-transparent bg-white shadow-sm text-foreground/70 font-bold transition-all text-center md:text-left flex justify-between items-center group hover:border-primary/30 hover:shadow-md hover:text-obsidian hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 duration-200`}
                         >
                             <span className="text-lg transition-colors">{opt.label}</span>
-                            <span className="hidden md:flex w-6 h-6 rounded-full border border-gray-200 group-hover:border-primary items-center justify-center transition-colors">
+                            <span className="hidden md:flex w-6 h-6 rounded-full border border-line group-hover:border-primary items-center justify-center transition-colors">
                                 <motion.div className="w-3 h-3 rounded-full bg-primary" initial={{ scale: 0 }} animate={{ scale: 0 }} whileHover={{ scale: 1 }} />
                             </span>
                         </button>
@@ -333,7 +333,7 @@ function AnalyzingView() {
             </div>
 
             <h2 className="text-3xl font-black mb-4 relative z-10 text-obsidian">데이터 정밀 분석 중</h2>
-            <p className="text-gray-500 text-lg relative z-10 font-medium">
+            <p className="text-foreground/70 text-lg relative z-10 font-medium">
                 60개의 응답을 30가지 차원으로<br />
                 재구성하고 있습니다.
             </p>
@@ -347,7 +347,7 @@ function CompleteView({ onCheckResult }: { onCheckResult: () => void }) {
 
             {/* Success Animation Background */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] animate-pulse" />
             </div>
 
             <div className="relative mb-10 group">
@@ -358,7 +358,7 @@ function CompleteView({ onCheckResult }: { onCheckResult: () => void }) {
             </div>
 
             <h2 className="font-black text-obsidian mb-6 relative z-10 text-4xl">분석이 완료되었습니다</h2>
-            <p className="text-gray-500 text-lg mb-12 max-w-sm mx-auto relative z-10 leading-relaxed font-medium">
+            <p className="text-foreground/70 text-lg mb-12 max-w-sm mx-auto relative z-10 leading-relaxed font-medium">
                 상위 1% 정밀도의 <span className="text-primary font-bold">프리미엄 리포트</span>가<br />
                 지금 막 생성되었습니다.
             </p>

@@ -162,7 +162,7 @@ export default function NotificationDashboard() {
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">대기중</Badge>;
       case 'sent':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800">전송됨</Badge>;
+        return <Badge variant="default" className="bg-primary-container text-blue-800">전송됨</Badge>;
       case 'delivered':
         return <Badge variant="default" className="bg-green-100 text-green-800">전달됨</Badge>;
       case 'failed':
@@ -177,7 +177,7 @@ export default function NotificationDashboard() {
   const getCategoryBadge = (category: string) => {
     switch (category) {
       case 'info':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800">정보</Badge>;
+        return <Badge variant="outline" className="bg-primary-container text-blue-800">정보</Badge>;
       case 'success':
         return <Badge variant="outline" className="bg-green-100 text-green-800">성공</Badge>;
       case 'warning':
@@ -280,7 +280,7 @@ export default function NotificationDashboard() {
           <div className="text-red-500 mb-4">
             <Bell className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">알림 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchNotificationData} variant="outline">
             다시 시도
@@ -295,8 +295,8 @@ export default function NotificationDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">알림 관리</h1>
-          <p className="text-gray-600 mt-1">알림 전송, 관리 및 성과 분석</p>
+          <h1 className="text-3xl font-bold text-obsidian">알림 관리</h1>
+          <p className="text-obsidian mt-1">알림 전송, 관리 및 성과 분석</p>
         </div>
         <div className="flex space-x-2">
           <Button asChild>
@@ -340,10 +340,10 @@ export default function NotificationDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">전송됨</CardTitle>
-              <Send className="h-4 w-4 text-blue-500" />
+              <Send className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.sent?.toLocaleString() || '0'}</div>
+              <div className="text-2xl font-bold text-primary">{stats.sent?.toLocaleString() || '0'}</div>
             </CardContent>
           </Card>
 
@@ -370,10 +370,10 @@ export default function NotificationDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">성공률</CardTitle>
-              <BarChart3 className="h-4 w-4 text-purple-500" />
+              <BarChart3 className="h-4 w-4 text-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.successRate?.toFixed(1) || '0.0'}%</div>
+              <div className="text-2xl font-bold text-secondary">{stats.successRate?.toFixed(1) || '0.0'}%</div>
             </CardContent>
           </Card>
         </div>
@@ -385,7 +385,7 @@ export default function NotificationDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="제목, 메시지로 검색..."
                   value={searchTerm}
@@ -472,7 +472,7 @@ export default function NotificationDashboard() {
                   <TableCell>
                     <div>
                       <div className="font-medium">{notification.title}</div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                      <div className="text-sm text-foreground/70 truncate max-w-xs">
                         {notification.message}
                       </div>
                     </div>
@@ -511,7 +511,7 @@ export default function NotificationDashboard() {
                     <div className="text-sm">
                       <div>{formatDate(notification.createdAt)}</div>
                       {notification.sentAt && (
-                        <div className="text-gray-500">
+                        <div className="text-foreground/70">
                           전송: {formatDate(notification.sentAt)}
                         </div>
                       )}
@@ -520,7 +520,7 @@ export default function NotificationDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{notification.createdBy.name}</div>
-                      <div className="text-gray-500">{notification.createdBy.email}</div>
+                      <div className="text-foreground/70">{notification.createdBy.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -541,7 +541,7 @@ export default function NotificationDashboard() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground/70">
                 페이지 {currentPage} / {totalPages}
               </div>
               <div className="flex space-x-2">

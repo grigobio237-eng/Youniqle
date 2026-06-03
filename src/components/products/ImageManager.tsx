@@ -153,19 +153,19 @@ export default function ImageManager({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center text-lg">
-          <ImageIcon className="h-5 w-5 mr-2 text-blue-600" />
+          <ImageIcon className="h-5 w-5 mr-2 text-primary" />
           상품 이미지 관리
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* 업로드 섹션 */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+          <Upload className="h-8 w-8 mx-auto text-foreground/70 mb-2" />
           <Label htmlFor="image-upload" className="cursor-pointer">
-            <span className="text-sm font-medium text-blue-600 hover:text-blue-500">
+            <span className="text-sm font-medium text-primary hover:text-primary">
               이미지 업로드
             </span>
-            <span className="text-xs text-gray-500 block mt-1">
+            <span className="text-xs text-foreground/70 block mt-1">
               클릭하거나 드래그하여 업로드 (최대 {maxImages}개, 5MB 이하)
             </span>
           </Label>
@@ -184,21 +184,21 @@ export default function ImageManager({
         {uploading && (
           <div className="text-center py-4">
             <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <p className="text-sm text-gray-600 mt-2">이미지 업로드 중...</p>
+            <p className="text-sm text-obsidian mt-2">이미지 업로드 중...</p>
           </div>
         )}
 
         {/* 이미지 목록 */}
         {images.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-700">
+            <h4 className="text-sm font-medium text-obsidian">
               업로드된 이미지 ({images.length}/{maxImages})
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className="relative group border rounded-lg overflow-hidden bg-gray-50"
+                  className="relative group border rounded-lg overflow-hidden bg-surface"
                   draggable
                   onDragStart={(e) => handleDragStart(e, index)}
                   onDragOver={handleDragOver}
@@ -206,7 +206,7 @@ export default function ImageManager({
                 >
                   {/* 드래그 핸들 */}
                   <div className="absolute top-1 left-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <GripVertical className="h-4 w-4 text-gray-500 cursor-move" />
+                    <GripVertical className="h-4 w-4 text-foreground/70 cursor-move" />
                   </div>
 
                   {/* 이미지 */}
@@ -240,7 +240,7 @@ export default function ImageManager({
 
         {/* 안내 메시지 */}
         {images.length === 0 && !uploading && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-foreground/70">
             <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">아직 업로드된 이미지가 없습니다.</p>
             <p className="text-xs mt-1">위의 업로드 영역을 클릭하여 이미지를 추가하세요.</p>

@@ -151,7 +151,7 @@ export default function ViewTemplateDialog({
     };
 
     return (
-      <Badge className={colors[priority] || 'bg-gray-100 text-gray-800'}>
+      <Badge className={colors[priority] || 'bg-gray-100 text-obsidian'}>
         {priority}
       </Badge>
     );
@@ -182,18 +182,18 @@ export default function ViewTemplateDialog({
               <div>
                 <h3 className="font-semibold text-xl">{template.name}</h3>
                 {template.description && (
-                  <p className="text-gray-600 mt-1">{template.description}</p>
+                  <p className="text-obsidian mt-1">{template.description}</p>
                 )}
               </div>
               {getStatusBadge(template.status)}
             </div>
 
             {/* 기본 정보 */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-surface rounded-lg">
               <div className="flex items-center gap-2">
                 {getTypeIcon(template.type)}
                 <div>
-                  <p className="text-sm text-gray-600">타입</p>
+                  <p className="text-sm text-obsidian">타입</p>
                   <p className="font-medium capitalize">{template.type}</p>
                 </div>
               </div>
@@ -201,7 +201,7 @@ export default function ViewTemplateDialog({
               <div className="flex items-center gap-2">
                 <Tag className="h-5 w-5" />
                 <div>
-                  <p className="text-sm text-gray-600">카테고리</p>
+                  <p className="text-sm text-obsidian">카테고리</p>
                   <p className="font-medium">{template.category}</p>
                 </div>
               </div>
@@ -209,13 +209,13 @@ export default function ViewTemplateDialog({
               <div className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
                 <div>
-                  <p className="text-sm text-gray-600">언어</p>
+                  <p className="text-sm text-obsidian">언어</p>
                   <p className="font-medium">{template.language.toUpperCase()}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-sm text-gray-600">우선순위</p>
+                <p className="text-sm text-obsidian">우선순위</p>
                 <div className="mt-1">{getPriorityBadge(template.priority)}</div>
               </div>
             </div>
@@ -224,14 +224,14 @@ export default function ViewTemplateDialog({
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold mb-2">제목</h4>
-                <div className="p-3 bg-gray-50 rounded-md">
+                <div className="p-3 bg-surface rounded-md">
                   <p>{template.title}</p>
                 </div>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">내용</h4>
-                <div className="p-3 bg-gray-50 rounded-md whitespace-pre-wrap">
+                <div className="p-3 bg-surface rounded-md whitespace-pre-wrap">
                   <p>{template.content}</p>
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function ViewTemplateDialog({
                     </Badge>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm">태그가 없습니다.</p>
+                  <p className="text-foreground/70 text-sm">태그가 없습니다.</p>
                 )}
               </div>
             </div>
@@ -258,20 +258,20 @@ export default function ViewTemplateDialog({
               <h4 className="font-semibold mb-3">사용 통계</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">총 전송</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-sm text-obsidian">총 전송</p>
+                  <p className="text-2xl font-bold text-primary">
                     {template.stats?.totalSent?.toLocaleString() || '0'}
                   </p>
                 </div>
                 <div className="p-3 bg-green-50 rounded-lg">
-                  <p className="text-sm text-gray-600">전달률</p>
+                  <p className="text-sm text-obsidian">전달률</p>
                   <p className="text-2xl font-bold text-green-600">
                     {template.stats?.averageDeliveryRate?.toFixed(1) || '0.0'}%
                   </p>
                 </div>
                 <div className="p-3 bg-purple-50 rounded-lg">
-                  <p className="text-sm text-gray-600">열람률</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-sm text-obsidian">열람률</p>
+                  <p className="text-2xl font-bold text-secondary">
                     {template.stats?.averageOpenRate?.toFixed(1) || '0.0'}%
                   </p>
                 </div>
@@ -280,15 +280,15 @@ export default function ViewTemplateDialog({
 
             {/* 메타 정보 */}
             <div className="space-y-2 pt-4 border-t">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-obsidian">
                 <User className="h-4 w-4" />
                 <span>생성자: {template.createdBy.name} ({template.createdBy.email})</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-obsidian">
                 <Calendar className="h-4 w-4" />
                 <span>생성일: {new Date(template.createdAt).toLocaleString('ko-KR')}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-obsidian">
                 <Clock className="h-4 w-4" />
                 <span>수정일: {new Date(template.updatedAt).toLocaleString('ko-KR')}</span>
               </div>

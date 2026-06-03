@@ -45,7 +45,7 @@ function RecoveryAnalyticsContent() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">회복 현황 분석</h1>
-                    <p className="text-gray-500 mt-1">사용자들의 회복 점수 트렌드와 주요 지표를 분석합니다.</p>
+                    <p className="text-foreground/70 mt-1">사용자들의 회복 점수 트렌드와 주요 지표를 분석합니다.</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant={period === 'week' ? 'default' : 'outline'} size="sm" onClick={() => setPeriod('week')}>주간</Button>
@@ -59,7 +59,7 @@ function RecoveryAnalyticsContent() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">평균 회복 점수</p>
+                                <p className="text-sm text-foreground/70">평균 회복 점수</p>
                                 <p className="text-3xl font-bold">78점</p>
                                 <p className="text-xs text-green-500 flex items-center mt-1">
                                     <TrendingUp className="w-3 h-3 mr-1" /> +5% vs 지난주
@@ -73,7 +73,7 @@ function RecoveryAnalyticsContent() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">일일 체크 사용자</p>
+                                <p className="text-sm text-foreground/70">일일 체크 사용자</p>
                                 <p className="text-3xl font-bold">58명</p>
                                 <p className="text-xs text-green-500 flex items-center mt-1">
                                     <TrendingUp className="w-3 h-3 mr-1" /> +12% vs 지난주
@@ -87,9 +87,9 @@ function RecoveryAnalyticsContent() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">연속 체크 기록</p>
+                                <p className="text-sm text-foreground/70">연속 체크 기록</p>
                                 <p className="text-3xl font-bold">7일</p>
-                                <p className="text-xs text-gray-400 mt-1">최고 기록 보유자</p>
+                                <p className="text-xs text-foreground/70 mt-1">최고 기록 보유자</p>
                             </div>
                             <Calendar className="w-10 h-10 text-primary/30" />
                         </div>
@@ -99,9 +99,9 @@ function RecoveryAnalyticsContent() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">유니클 조언 제공</p>
+                                <p className="text-sm text-foreground/70">유니클 조언 제공</p>
                                 <p className="text-3xl font-bold">342회</p>
-                                <p className="text-xs text-gray-400 mt-1">이번 주 누적</p>
+                                <p className="text-xs text-foreground/70 mt-1">이번 주 누적</p>
                             </div>
                             <Activity className="w-10 h-10 text-primary/30" />
                         </div>
@@ -169,11 +169,11 @@ function RecoveryAnalyticsContent() {
                 <CardContent className="space-y-4">
                     <div className="p-4 bg-white rounded-lg border">
                         <p className="font-medium mb-1">📉 주말 수면 점수 하락 패턴 감지</p>
-                        <p className="text-sm text-gray-600">금요일~일요일 사이 수면 점수가 평균 15% 하락합니다. 주말 수면 관리 콘텐츠 푸시를 권장합니다.</p>
+                        <p className="text-sm text-obsidian">금요일~일요일 사이 수면 점수가 평균 15% 하락합니다. 주말 수면 관리 콘텐츠 푸시를 권장합니다.</p>
                     </div>
                     <div className="p-4 bg-white rounded-lg border">
                         <p className="font-medium mb-1">📈 연속 체크 유저의 회복 속도 2배</p>
-                        <p className="text-sm text-gray-600">3일 이상 연속 체크한 사용자는 평균 회복 점수 상승률이 2배 높습니다. 리마인더 기능 강화를 권장합니다.</p>
+                        <p className="text-sm text-obsidian">3일 이상 연속 체크한 사용자는 평균 회복 점수 상승률이 2배 높습니다. 리마인더 기능 강화를 권장합니다.</p>
                     </div>
                 </CardContent>
             </Card>

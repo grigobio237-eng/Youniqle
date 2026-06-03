@@ -246,7 +246,7 @@ export function ConsentRow({ id, label, checked, onChange, content, isHtml }: an
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6 text-base text-text-primary whitespace-pre-wrap leading-relaxed">
             {isHtml ? (
-               <div dangerouslySetInnerHTML={{ __html: content }} className="prose prose-sm max-w-none text-gray-800" />
+               <div dangerouslySetInnerHTML={{ __html: content }} className="prose prose-sm max-w-none text-obsidian" />
             ) : (
                <>{content}</>
             )}

@@ -69,7 +69,7 @@ const statusLabels: Record<
   },
   in_progress: {
     label: '진행 중',
-    color: 'bg-blue-100 text-blue-800',
+    color: 'bg-primary-container text-blue-800',
     description: '담당자가 답변을 준비 중입니다.',
   },
   resolved: {
@@ -79,7 +79,7 @@ const statusLabels: Record<
   },
   closed: {
     label: '종료',
-    color: 'bg-gray-100 text-gray-700',
+    color: 'bg-gray-100 text-obsidian',
     description: '문의가 마무리되었습니다.',
   },
 };
@@ -189,7 +189,7 @@ export default function MyInquiriesPage() {
       <div className="container max-w-5xl mx-auto px-4 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-slate-900">내 문의 내역</h1>
+            <h1 className="text-3xl font-bold text-obsidian">내 문의 내역</h1>
             <p className="text-muted-foreground">
               현재까지 접수한 문의와 답변 진행 상황을 확인할 수 있습니다.
             </p>
@@ -208,7 +208,7 @@ export default function MyInquiriesPage() {
           </div>
         </div>
 
-        <Card className="border border-slate-200 shadow-sm">
+        <Card className="border border-line shadow-sm">
           <CardContent className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
@@ -244,7 +244,7 @@ export default function MyInquiriesPage() {
               </div>
               <div className="space-y-1">
                 <LabelWithHelper label="문의 수" helper="필터 결과 총 건수" />
-                <div className="h-10 rounded-md border border-slate-200 bg-slate-50 flex items-center px-3 text-sm text-slate-700">
+                <div className="h-10 rounded-md border border-line bg-surface flex items-center px-3 text-sm text-obsidian">
                   총 {filteredInquiries.length}건
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function MyInquiriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 shadow">
+        <Card className="border border-line shadow">
           <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle>문의 목록</CardTitle>
@@ -289,7 +289,7 @@ export default function MyInquiriesPage() {
                 <TableBody>
                   {filteredInquiries.map((inquiry) => (
                     <TableRow key={inquiry._id}>
-                      <TableCell className="font-mono text-xs text-slate-600">
+                      <TableCell className="font-mono text-xs text-obsidian">
                         {inquiry.inquiryId}
                       </TableCell>
                       <TableCell>
@@ -338,7 +338,7 @@ export default function MyInquiriesPage() {
             <div className="space-y-6">
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoBox title="문의번호">
-                  <span className="font-mono text-sm text-slate-600">
+                  <span className="font-mono text-sm text-obsidian">
                     {selectedInquiry.inquiryId}
                   </span>
                 </InfoBox>
@@ -361,16 +361,16 @@ export default function MyInquiriesPage() {
               </section>
 
               <section className="space-y-3">
-                <h3 className="font-semibold text-lg text-slate-900">문의 내용</h3>
-                <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+                <h3 className="font-semibold text-lg text-obsidian">문의 내용</h3>
+                <div className="rounded-md border border-line bg-surface p-4">
                   <p className="text-sm font-semibold mb-2">{selectedInquiry.subject}</p>
-                  <p className="whitespace-pre-wrap text-sm text-slate-700">
+                  <p className="whitespace-pre-wrap text-sm text-obsidian">
                     {selectedInquiry.content}
                   </p>
                 </div>
                 {selectedInquiry.attachments && selectedInquiry.attachments.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-slate-900">첨부 파일</h4>
+                    <h4 className="text-sm font-semibold text-obsidian">첨부 파일</h4>
                     <div className="grid gap-2">
                       {selectedInquiry.attachments.map((file, index) => (
                         <a
@@ -378,10 +378,10 @@ export default function MyInquiriesPage() {
                           href={file.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 transition"
+                          className="flex items-center justify-between rounded-md border border-line bg-white px-3 py-2 text-sm hover:bg-surface transition"
                         >
                           <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 text-blue-600" />
+                            <Paperclip className="h-4 w-4 text-primary" />
                             <span>{file.filename}</span>
                           </div>
                           <span className="text-xs text-muted-foreground">
@@ -395,12 +395,12 @@ export default function MyInquiriesPage() {
               </section>
 
               <section className="space-y-3">
-                <h3 className="font-semibold text-lg text-slate-900 flex items-center gap-2">
+                <h3 className="font-semibold text-lg text-obsidian flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   관리자 답변
                 </h3>
                 {selectedInquiry.adminAnswer ? (
-                  <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm leading-relaxed text-slate-700">
+                  <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm leading-relaxed text-obsidian">
                     <p className="whitespace-pre-wrap">{selectedInquiry.adminAnswer}</p>
                     {selectedInquiry.answeredAt && (
                       <p className="text-xs text-muted-foreground mt-3">
@@ -409,14 +409,14 @@ export default function MyInquiriesPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="rounded-md border border-slate-200 bg-white p-4 text-sm text-muted-foreground flex items-center gap-2">
+                  <div className="rounded-md border border-line bg-white p-4 text-sm text-muted-foreground flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     답변을 준비 중입니다. 조금만 기다려주세요.
                   </div>
                 )}
               </section>
 
-              <section className="rounded-md border border-slate-200 bg-slate-50 p-4 text-xs text-muted-foreground space-y-2">
+              <section className="rounded-md border border-line bg-surface p-4 text-xs text-muted-foreground space-y-2">
                 <p>
                   - 추가 문의가 필요하거나 답변 내용이 만족스럽지 않다면 고객센터(1588-0000)로 연락주시기 바랍니다.
                 </p>
@@ -433,7 +433,7 @@ export default function MyInquiriesPage() {
 function LabelWithHelper({ label, helper }: { label: string; helper?: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-sm font-medium text-slate-700">{label}</p>
+      <p className="text-sm font-medium text-obsidian">{label}</p>
       {helper && <p className="text-xs text-muted-foreground">{helper}</p>}
     </div>
   );
@@ -441,9 +441,9 @@ function LabelWithHelper({ label, helper }: { label: string; helper?: string }) 
 
 function InfoBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-white p-3 space-y-1">
+    <div className="rounded-md border border-line bg-white p-3 space-y-1">
       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{title}</p>
-      <div className="text-sm text-slate-800">{children}</div>
+      <div className="text-sm text-obsidian">{children}</div>
     </div>
   );
 }

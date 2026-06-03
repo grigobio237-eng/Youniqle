@@ -152,7 +152,7 @@ export default function UnifiedAddressSearch({
             className="pr-10"
           />
           {provider === 'google' && (
-            <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/70" />
           )}
         </div>
         <Button onClick={() => performSearch(searchQuery)} disabled={disabled || isLoading}>
@@ -168,10 +168,10 @@ export default function UnifiedAddressSearch({
       )}
 
       {showResults && (
-        <div className="absolute z-50 mt-1 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-2 bg-gray-50 border-b flex justify-between items-center">
-            <span className="text-[10px] font-bold text-gray-400">ADDRESS RESULTS</span>
-            <span className="flex items-center gap-1 text-[10px] text-gray-400">
+        <div className="absolute z-50 mt-1 w-full max-w-md bg-white border border-line rounded-lg shadow-xl overflow-hidden">
+          <div className="p-2 bg-surface border-b flex justify-between items-center">
+            <span className="text-[10px] font-bold text-foreground/70">ADDRESS RESULTS</span>
+            <span className="flex items-center gap-1 text-[10px] text-foreground/70">
               {actualMethod === 'api' ? <Wifi className="h-2 w-2" /> : <WifiOff className="h-2 w-2" />}
               {actualMethod === 'api' ? 'CONNECTED' : 'LOCAL DB'}
             </span>
@@ -183,11 +183,11 @@ export default function UnifiedAddressSearch({
                   onClick={() => handleSelect(res)}
                   className="w-full text-left p-3 hover:bg-blue-50 transition-colors flex items-start gap-3"
                 >
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="h-4 w-4 text-foreground/70 mt-0.5 flex-shrink-0" />
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{res.address}</div>
-                    <div className="text-xs text-gray-500 line-clamp-1">{res.addressEnglish || res.bname}</div>
-                    <div className="text-[10px] text-blue-500 mt-1 font-mono">{res.zipCode}</div>
+                    <div className="text-sm font-medium text-obsidian">{res.address}</div>
+                    <div className="text-xs text-foreground/70 line-clamp-1">{res.addressEnglish || res.bname}</div>
+                    <div className="text-[10px] text-primary mt-1 font-mono">{res.zipCode}</div>
                   </div>
                 </button>
               </li>

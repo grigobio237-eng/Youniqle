@@ -16,10 +16,10 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
     if (!solution) return null;
 
     const cards = [
-        { icon: Dumbbell, title: "EXERCISE", color: "text-blue-500", bg: "bg-blue-50", content: solution.exercise },
+        { icon: Dumbbell, title: "EXERCISE", color: "text-primary", bg: "bg-blue-50", content: solution.exercise },
         { icon: Utensils, title: "NUTRITION", color: "text-green-500", bg: "bg-green-50", content: solution.nutrition },
-        { icon: Brain, title: "MINDSET", color: "text-purple-500", bg: "bg-purple-50", content: solution.mindset },
-        { icon: Moon, title: "SLEEP", color: "text-indigo-500", bg: "bg-indigo-50", content: solution.sleep },
+        { icon: Brain, title: "MINDSET", color: "text-secondary", bg: "bg-purple-50", content: solution.mindset },
+        { icon: Moon, title: "SLEEP", color: "text-secondary", bg: "bg-indigo-50", content: solution.sleep },
     ];
 
     const renderContent = (content: any) => {
@@ -35,8 +35,8 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
     return (
         <section className="py-12 w-full max-w-4xl mx-auto px-6">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-black text-gray-900 mb-4">YOUNIQLE PERSONAL SOLUTION</h2>
-                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                <h2 className="text-3xl font-black text-obsidian mb-4">YOUNIQLE PERSONAL SOLUTION</h2>
+                <p className="text-obsidian text-lg max-w-2xl mx-auto">
                     {renderContent(solution.analysis)}
                 </p>
             </div>
@@ -48,7 +48,7 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white rounded-[24px] md:rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                        className="bg-white rounded-[24px] md:rounded-3xl p-6 md:p-8 shadow-sm border border-line hover:shadow-md transition-shadow"
                     >
                         <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0 mb-4 md:mb-6">
                             <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl ${card.bg} ${card.color} flex items-center justify-center`}>
@@ -56,7 +56,7 @@ export function AISolutionSection({ diagnosisResult }: AISolutionSectionProps) {
                             </div>
                             <h3 className={`text-[10px] md:text-xs font-black tracking-widest md:mt-3 ${card.color}`}>{card.title}</h3>
                         </div>
-                        <div className="text-gray-700 text-sm md:text-base font-medium leading-relaxed break-keep">
+                        <div className="text-obsidian text-sm md:text-base font-medium leading-relaxed break-keep">
                             {renderContent(card.content)}
                         </div>
                     </motion.div>

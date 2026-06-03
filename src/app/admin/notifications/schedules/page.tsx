@@ -152,15 +152,15 @@ const NotificationSchedulesPage = () => {
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'sending':
-        return <Zap className="h-4 w-4 text-blue-500" />;
+        return <Zap className="h-4 w-4 text-primary" />;
       case 'completed':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'failed':
         return <XCircle className="h-4 w-4 text-red-500" />;
       case 'cancelled':
-        return <Square className="h-4 w-4 text-gray-500" />;
+        return <Square className="h-4 w-4 text-foreground/70" />;
       default:
-        return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+        return <AlertTriangle className="h-4 w-4 text-foreground/70" />;
     }
   };
 
@@ -192,7 +192,7 @@ const NotificationSchedulesPage = () => {
       case 'low':
         return 'bg-green-100 text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -202,15 +202,15 @@ const NotificationSchedulesPage = () => {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'sending':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-container text-blue-800';
       case 'completed':
         return 'bg-green-100 text-green-800';
       case 'failed':
         return 'bg-red-100 text-red-800';
       case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -271,7 +271,7 @@ const NotificationSchedulesPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">알림 스케줄 관리</h1>
-          <p className="text-gray-600">알림 발송 스케줄을 생성하고 관리하세요</p>
+          <p className="text-obsidian">알림 발송 스케줄을 생성하고 관리하세요</p>
         </div>
         <Button onClick={() => setShowCreateDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -287,7 +287,7 @@ const NotificationSchedulesPage = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-foreground/70" />
               <Input
                 placeholder="스케줄 검색..."
                 value={searchTerm}
@@ -345,11 +345,11 @@ const NotificationSchedulesPage = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-primary-container rounded-lg">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">총 스케줄</p>
+                <p className="text-sm font-medium text-obsidian">총 스케줄</p>
                 <p className="text-2xl font-bold">{schedules.length}</p>
               </div>
             </div>
@@ -362,7 +362,7 @@ const NotificationSchedulesPage = () => {
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">대기중</p>
+                <p className="text-sm font-medium text-obsidian">대기중</p>
                 <p className="text-2xl font-bold">
                   {schedules.filter(s => s.status === 'pending').length}
                 </p>
@@ -377,7 +377,7 @@ const NotificationSchedulesPage = () => {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">완료</p>
+                <p className="text-sm font-medium text-obsidian">완료</p>
                 <p className="text-2xl font-bold">
                   {schedules.filter(s => s.status === 'completed').length}
                 </p>
@@ -388,11 +388,11 @@ const NotificationSchedulesPage = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
+              <div className="p-2 bg-secondary-container rounded-lg">
+                <TrendingUp className="h-6 w-6 text-secondary" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">총 전송</p>
+                <p className="text-sm font-medium text-obsidian">총 전송</p>
                 <p className="text-2xl font-bold">
                   {schedules.reduce((sum, s) => sum + s.stats.sent, 0)}
                 </p>
@@ -436,7 +436,7 @@ const NotificationSchedulesPage = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium">{schedule.name}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground/70">
                           {schedule.description}
                         </div>
                       </div>
@@ -450,7 +450,7 @@ const NotificationSchedulesPage = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium">{schedule.templateId.name}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground/70">
                           {schedule.templateId.type} • {schedule.templateId.category}
                         </div>
                       </div>
@@ -458,7 +458,7 @@ const NotificationSchedulesPage = () => {
                     <TableCell>
                       <div className="text-sm">
                         <div>{schedule.target.type}</div>
-                        <div className="text-gray-500">{schedule.target.count}명</div>
+                        <div className="text-foreground/70">{schedule.target.count}명</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -479,7 +479,7 @@ const NotificationSchedulesPage = () => {
                         <div>전송: {schedule.stats.sent}/{schedule.stats.totalTargets}</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                           <div
-                            className="bg-blue-600 h-2 rounded-full"
+                            className="bg-primary h-2 rounded-full"
                             style={{
                               width: `${schedule.stats.totalTargets > 0 ? (schedule.stats.sent / schedule.stats.totalTargets) * 100 : 0}%`
                             }}
@@ -488,7 +488,7 @@ const NotificationSchedulesPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-foreground/70">
                         {new Date(schedule.createdAt).toLocaleDateString()}
                       </div>
                     </TableCell>
@@ -556,7 +556,7 @@ const NotificationSchedulesPage = () => {
           >
             이전
           </Button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-obsidian">
             {page} / {totalPages}
           </span>
           <Button

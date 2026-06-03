@@ -30,9 +30,9 @@ const tiers = [
         price: 3300000,
         color: 'from-blue-500 to-indigo-600',
         bgColor: 'bg-blue-50',
-        borderColor: 'border-blue-200',
-        iconBg: 'bg-blue-100',
-        textColor: 'text-blue-700',
+        borderColor: 'border-primary/30',
+        iconBg: 'bg-primary-container',
+        textColor: 'text-primary',
         description: '처음 시작하는 사람을 위한 입문형 회복 패스',
         coreFeatures: [
             { icon: BarChart3, text: '개인별 맞춤형 회복 방향 안내 리포트 (1회)' },
@@ -74,7 +74,7 @@ const tiers = [
         subtitle: 'Private Concierge VIP',
         price: 33000000,
         color: 'from-slate-700 to-obsidian',
-        bgColor: 'bg-slate-50',
+        bgColor: 'bg-surface',
         borderColor: 'border-slate-300',
         iconBg: 'bg-slate-200',
         textColor: 'text-obsidian',
@@ -146,17 +146,17 @@ export default function NavigatorPassPage() {
                             단 하나의 입장권
                         </span>
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
+                    <p className="text-lg md:text-xl text-obsidian max-w-2xl mx-auto leading-relaxed mb-8">
                         회복을 '관리'가 아닌 '시스템'으로.<br />
                         Navigator Pass와 함께 당신만의 회복 OS를 구축하세요.
                     </p>
-                    <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
+                    <div className="flex flex-wrap justify-center gap-4 text-sm text-foreground/70">
                         <div className="flex items-center gap-2">
                             <Shield className="w-4 h-4 text-green-500" />
                             <span>7일 이내 100% 환불 보장</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <RefreshCw className="w-4 h-4 text-blue-500" />
+                            <RefreshCw className="w-4 h-4 text-primary" />
                             <span>평생 멤버십 유지</span>
                         </div>
                     </div>
@@ -185,7 +185,7 @@ export default function NavigatorPassPage() {
 
                                     <CardHeader className={`${tier.bgColor} rounded-t-lg pb-6`}>
                                         <div className="text-center">
-                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                            <p className="text-xs font-bold text-foreground/70 uppercase tracking-wider mb-1">
                                                 {tier.subtitle}
                                             </p>
                                             <h3 className={`text-2xl font-black ${tier.textColor}`}>
@@ -195,9 +195,9 @@ export default function NavigatorPassPage() {
                                                 <span className="font-black text-obsidian text-4xl">
                                                     {formatPrice(tier.price)}
                                                 </span>
-                                                <span className="text-slate-500 ml-1">원</span>
+                                                <span className="text-foreground/70 ml-1">원</span>
                                             </div>
-                                            <p className="text-sm text-slate-600 mt-2">
+                                            <p className="text-sm text-obsidian mt-2">
                                                 {tier.description}
                                             </p>
                                         </div>
@@ -206,7 +206,7 @@ export default function NavigatorPassPage() {
                                     <CardContent className="pt-6 pb-8 flex-1 flex flex-col">
                                         {/* Core Features */}
                                         <div className="space-y-3 mb-6">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                            <p className="text-xs font-bold text-foreground/70 uppercase tracking-wider">
                                                 핵심 혜택
                                             </p>
                                             {tier.coreFeatures.map((feature, i) => (
@@ -214,7 +214,7 @@ export default function NavigatorPassPage() {
                                                     <div className={`${tier.iconBg} p-1.5 rounded-lg flex-shrink-0`}>
                                                         <feature.icon className={`w-4 h-4 ${tier.textColor}`} />
                                                     </div>
-                                                    <span className="text-sm text-slate-700 leading-relaxed">
+                                                    <span className="text-sm text-obsidian leading-relaxed">
                                                         {feature.text}
                                                     </span>
                                                 </div>
@@ -222,14 +222,14 @@ export default function NavigatorPassPage() {
                                         </div>
 
                                         {/* Economic Benefits */}
-                                        <div className="space-y-2 mb-8 pt-4 border-t border-slate-100">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                                        <div className="space-y-2 mb-8 pt-4 border-t border-line">
+                                            <p className="text-xs font-bold text-foreground/70 uppercase tracking-wider mb-3">
                                                 경제적 혜택
                                             </p>
                                             {tier.economicBenefits.map((benefit, i) => (
                                                 <div key={i} className="flex items-center gap-2">
                                                     <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                                    <span className="text-sm text-slate-600">{benefit}</span>
+                                                    <span className="text-sm text-obsidian">{benefit}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -253,13 +253,13 @@ export default function NavigatorPassPage() {
             </section>
 
             {/* Membership Relationship Notice */}
-            <section className="py-12 px-4 bg-slate-50">
+            <section className="py-12 px-4 bg-surface">
                 <div className="max-w-3xl mx-auto text-center">
                     <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm mb-4">
-                        <Crown className="w-5 h-5 text-amber-500" />
-                        <span className="text-sm font-bold text-slate-700">멤버십 관계 안내</span>
+                        <Crown className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-bold text-obsidian">멤버십 관계 안내</span>
                     </div>
-                    <p className="text-slate-600 leading-relaxed">
+                    <p className="text-obsidian leading-relaxed">
                         Navigator Pass는 기존 멤버십의 <strong className="text-obsidian">상위 등급</strong>입니다.<br />
                         가입 시 모든 멤버십 혜택이 자동으로 포함되며, 별도 구독료가 필요 없습니다.
                     </p>
@@ -282,17 +282,17 @@ export default function NavigatorPassPage() {
                             >
                                 <button
                                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                                    className="w-full text-left bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors"
+                                    className="w-full text-left bg-white border border-line rounded-xl p-5 hover:border-slate-300 transition-colors"
                                 >
                                     <div className="flex items-center justify-between gap-4">
                                         <span className="font-bold text-obsidian">{faq.q}</span>
-                                        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
+                                        <ChevronDown className={`w-5 h-5 text-foreground/70 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
                                     </div>
                                     {openFaq === index && (
                                         <motion.p
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
-                                            className="text-slate-600 mt-4 pt-4 border-t border-slate-100 leading-relaxed"
+                                            className="text-obsidian mt-4 pt-4 border-t border-line leading-relaxed"
                                         >
                                             {faq.a}
                                         </motion.p>
@@ -310,13 +310,13 @@ export default function NavigatorPassPage() {
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
                             <h3 className="font-bold mb-2 text-xl">운영 정보</h3>
-                            <div className="text-slate-400 text-sm space-y-1">
+                            <div className="text-foreground/70 text-sm space-y-1">
                                 <p>상호: 주식회사 사피에넷</p>
                                 <p>대표: 장범진</p>
                                 <p>사업자등록번호: 838-88-02527</p>
                             </div>
                         </div>
-                        <div className="text-sm text-slate-400">
+                        <div className="text-sm text-foreground/70">
                             <p className="mb-2">
                                 Youniqle은 의료 행위를 제공하지 않는 정보·연결·설계 플랫폼입니다.
                             </p>

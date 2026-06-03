@@ -170,8 +170,8 @@ export default function CreateCouponPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">쿠폰 생성</h1>
-            <p className="text-gray-600 mt-1">새로운 쿠폰을 생성합니다</p>
+            <h1 className="text-3xl font-bold text-obsidian">쿠폰 생성</h1>
+            <p className="text-obsidian mt-1">새로운 쿠폰을 생성합니다</p>
           </div>
         </div>
       </div>
@@ -185,7 +185,7 @@ export default function CreateCouponPage() {
                 <Tag className="h-5 w-5 mr-2" />
                 기본 정보
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰의 기본적인 식별 정보를 입력합니다. 쿠폰 코드는 영문 대문자와 숫자로만 구성되어야 하며, 
                 쿠폰명과 설명은 사용자가 보게 될 정보입니다.
               </p>
@@ -200,7 +200,7 @@ export default function CreateCouponPage() {
                   placeholder="WELCOME10"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">영문 대문자와 숫자로 입력하세요</p>
+                <p className="text-xs text-foreground/70 mt-1">영문 대문자와 숫자로 입력하세요</p>
               </div>
 
               <div>
@@ -234,7 +234,7 @@ export default function CreateCouponPage() {
                 {getCouponIcon(formData.type)}
                 <span className="ml-2">할인 정보</span>
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰의 할인 유형과 금액을 설정합니다. 퍼센트 할인은 비율로, 고정 금액 할인은 원화로 입력하며, 
                 최소 주문 금액과 최대 할인 금액을 통해 사용 조건을 제한할 수 있습니다.
               </p>
@@ -314,7 +314,7 @@ export default function CreateCouponPage() {
                 <Users className="h-5 w-5 mr-2" />
                 사용 제한
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰의 사용 횟수와 대상 고객을 제한합니다. 총 사용 횟수는 전체 사용 가능 횟수이며, 
                 사용자당 사용 횟수는 한 명의 사용자가 사용할 수 있는 횟수입니다. 0 또는 비워두면 무제한입니다.
               </p>
@@ -330,7 +330,7 @@ export default function CreateCouponPage() {
                   placeholder="1000"
                   min="1"
                 />
-                <p className="text-xs text-gray-500 mt-1">비워두면 무제한</p>
+                <p className="text-xs text-foreground/70 mt-1">비워두면 무제한</p>
               </div>
 
               <div>
@@ -371,7 +371,7 @@ export default function CreateCouponPage() {
                 <Calendar className="h-5 w-5 mr-2" />
                 유효기간
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰의 유효기간을 설정합니다. 고정 기간은 관리자가 직접 시작일과 종료일을 지정하고, 
                 다운로드 시점부터는 사용자가 쿠폰을 다운로드한 시점부터 일정 기간 동안 유효합니다.
               </p>
@@ -430,7 +430,7 @@ export default function CreateCouponPage() {
                     min="1"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-foreground/70 mt-1">
                     사용자가 쿠폰을 다운로드한 시점부터 계산됩니다
                   </p>
                 </div>
@@ -445,7 +445,7 @@ export default function CreateCouponPage() {
                 <Package className="h-5 w-5 mr-2" />
                 적용 카테고리
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰이 적용될 상품 카테고리를 선택합니다. 하나 이상의 카테고리를 선택할 수 있으며, 
                 선택하지 않으면 모든 카테고리에 적용됩니다. 체크박스를 클릭하여 선택/해제할 수 있습니다.
               </p>
@@ -464,7 +464,7 @@ export default function CreateCouponPage() {
                     <Label htmlFor={category}>{category}</Label>
                   </div>
                 ))}
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-foreground/70 mt-2">
                   선택하지 않으면 모든 카테고리에 적용됩니다
                 </p>
               </div>
@@ -475,7 +475,7 @@ export default function CreateCouponPage() {
           <Card>
             <CardHeader>
               <CardTitle>추가 조건</CardTitle>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-obsidian mt-2">
                 쿠폰 사용을 위한 추가적인 조건을 설정합니다. 사용자의 주문 횟수, 총 구매 금액, 
                 사용자 등급 등을 기준으로 쿠폰 사용 자격을 제한할 수 있습니다. 비워두면 해당 조건이 적용되지 않습니다.
               </p>

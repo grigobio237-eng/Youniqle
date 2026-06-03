@@ -79,13 +79,13 @@ interface RefundItem {
 
 const statusLabels: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: '검토 중', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  approved: { label: '승인됨', color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
+  approved: { label: '승인됨', color: 'bg-primary-container text-blue-800', icon: CheckCircle },
   rejected: { label: '거부됨', color: 'bg-red-100 text-red-800', icon: XCircle },
   completed: { label: '완료됨', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  pickup_requested: { label: '수거 요청', color: 'bg-purple-100 text-purple-800', icon: Clock },
-  pickup_completed: { label: '수거 완료', color: 'bg-indigo-100 text-indigo-800', icon: Clock },
+  pickup_requested: { label: '수거 요청', color: 'bg-secondary-container text-purple-800', icon: Clock },
+  pickup_completed: { label: '수거 완료', color: 'bg-secondary-container text-indigo-800', icon: Clock },
   inspecting: { label: '검수 중', color: 'bg-orange-100 text-orange-800', icon: Clock },
-  cancelled: { label: '취소됨', color: 'bg-gray-100 text-gray-800', icon: XCircle },
+  cancelled: { label: '취소됨', color: 'bg-gray-100 text-obsidian', icon: XCircle },
 };
 
 const refundReasons: Record<string, string> = {
@@ -303,7 +303,7 @@ export default function MyRefundsPage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               환불 내역을 확인하려면 로그인해주세요.
             </p>
             <Button asChild>
@@ -331,8 +331,8 @@ export default function MyRefundsPage() {
               />
             </div>
           </div>
-          <h1 className="font-bold text-gray-900 mb-4 text-4xl">내 환불 내역</h1>
-          <p className="text-gray-600 text-xl">
+          <h1 className="font-bold text-obsidian mb-4 text-4xl">내 환불 내역</h1>
+          <p className="text-obsidian text-xl">
             {session.user?.name}님의 환불/교환 신청 내역입니다
           </p>
         </div>
@@ -341,7 +341,7 @@ export default function MyRefundsPage() {
         <div className="mb-6 flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground/70" />
               <Input
                 placeholder="주문번호 또는 내용으로 검색..."
                 value={searchQuery}
@@ -383,12 +383,12 @@ export default function MyRefundsPage() {
           <Card className="shadow-lg">
             <CardContent className="p-12 text-center">
               <div className="flex justify-center mb-6">
-                <RotateCcw className="h-16 w-16 text-gray-400" />
+                <RotateCcw className="h-16 w-16 text-foreground/70" />
               </div>
-              <h3 className="font-semibold text-gray-700 mb-2 text-xl">
+              <h3 className="font-semibold text-obsidian mb-2 text-xl">
                 환불 내역이 없습니다
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-obsidian mb-6">
                 아직 환불/교환 신청 내역이 없습니다.
               </p>
               <Button asChild>
@@ -409,7 +409,7 @@ export default function MyRefundsPage() {
                           <RotateCcw className="h-5 w-5 mr-2" />
                           {refund.type === 'refund' ? '환불' : '교환'} 신청
                         </CardTitle>
-                        <div className="flex items-center mt-2 space-x-4 text-sm text-gray-600">
+                        <div className="flex items-center mt-2 space-x-4 text-sm text-obsidian">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
                             {new Date(refund.createdAt).toLocaleDateString('ko-KR')}
@@ -430,9 +430,9 @@ export default function MyRefundsPage() {
                     {/* 주문 상품 목록 */}
                     {typeof refund.orderId === 'object' && refund.orderId.items && (
                     <div className="space-y-3 mb-4">
-                      <h4 className="font-semibold text-gray-700">주문 상품</h4>
+                      <h4 className="font-semibold text-obsidian">주문 상품</h4>
                       {refund.orderId.items.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center space-x-3 p-3 bg-surface rounded-lg">
                           <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                             {item.productId.images && item.productId.images.length > 0 ? (
                               <Image
@@ -443,22 +443,22 @@ export default function MyRefundsPage() {
                                 className="w-full h-full object-cover rounded-lg"
                               />
                             ) : (
-                              <Package className="h-8 w-8 text-gray-400" />
+                              <Package className="h-8 w-8 text-foreground/70" />
                             )}
                           </div>
                           <div className="flex-1">
                             <Link 
                               href={`/products/${item.productId._id}`} 
-                              className="font-medium text-gray-900 hover:text-blue-600"
+                              className="font-medium text-obsidian hover:text-primary"
                             >
                               {item.productId.name}
                             </Link>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-obsidian">
                               {item.quantity}개 × {item.price.toLocaleString()}원
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-obsidian">
                               {(item.quantity * item.price).toLocaleString()}원
                             </p>
                           </div>
@@ -470,19 +470,19 @@ export default function MyRefundsPage() {
                     {/* 환불 정보 */}
                     <div className="space-y-2 mb-4 p-4 bg-blue-50 rounded-lg">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">환불 사유</span>
+                        <span className="text-sm text-obsidian">환불 사유</span>
                         <span className="text-sm font-medium">
                           {refundReasons[refund.reason] || refund.reason}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">환불 금액</span>
-                        <span className="text-sm font-semibold text-blue-600">
+                        <span className="text-sm text-obsidian">환불 금액</span>
+                        <span className="text-sm font-semibold text-primary">
                           {(refund.finalRefundAmount || refund.refundAmount || 0).toLocaleString()}원
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">환불 방법</span>
+                        <span className="text-sm text-obsidian">환불 방법</span>
                         <span className="text-sm font-medium">
                           {refund.refundMethod === 'card' || refund.refundMethod === 'credit_card' 
                             ? '원결제 수단으로 환불' 
@@ -490,12 +490,12 @@ export default function MyRefundsPage() {
                         </span>
                       </div>
                       {refund.bankAccount && (
-                        <div className="mt-2 pt-2 border-t border-blue-200">
-                          <p className="text-xs text-gray-600">환불 계좌</p>
+                        <div className="mt-2 pt-2 border-t border-primary/30">
+                          <p className="text-xs text-obsidian">환불 계좌</p>
                           <p className="text-sm font-medium">
                             {refund.bankAccount.bankName || refund.bankAccount.bank} {refund.bankAccount.accountNumber}
                           </p>
-                          <p className="text-xs text-gray-600">예금주: {refund.bankAccount.accountHolder}</p>
+                          <p className="text-xs text-obsidian">예금주: {refund.bankAccount.accountHolder}</p>
                         </div>
                       )}
                       {refund.rejectionReason && (
@@ -514,14 +514,14 @@ export default function MyRefundsPage() {
                     {/* 상세 사유 및 이미지 */}
                     {(refund.details || refund.reasonDetail) && (
                       <div className="mb-4">
-                        <p className="text-sm font-semibold text-gray-700 mb-1">상세 사유</p>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{refund.details || refund.reasonDetail}</p>
+                        <p className="text-sm font-semibold text-obsidian mb-1">상세 사유</p>
+                        <p className="text-sm text-obsidian whitespace-pre-wrap">{refund.details || refund.reasonDetail}</p>
                       </div>
                     )}
 
                     {refund.images && refund.images.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-sm font-semibold text-gray-700 mb-2">증빙 이미지</p>
+                        <p className="text-sm font-semibold text-obsidian mb-2">증빙 이미지</p>
                         <div className="grid grid-cols-3 gap-2">
                           {refund.images.map((image, index) => (
                             <div key={index} className="relative">
@@ -540,7 +540,7 @@ export default function MyRefundsPage() {
 
                     {/* 환불 진행 상태 타임라인 */}
                     <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">환불 진행 상태</h4>
+                      <h4 className="text-sm font-semibold text-obsidian mb-3">환불 진행 상태</h4>
                       <div className="space-y-3">
                         {generateRefundTimeline(refund).map((item, index) => {
                           const isActive = index === generateRefundTimeline(refund).length - 1;
@@ -548,22 +548,22 @@ export default function MyRefundsPage() {
                           
                           return (
                             <div key={index} className="flex items-start space-x-3">
-                              <div className={`flex-shrink-0 mt-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}>
+                              <div className={`flex-shrink-0 mt-1 ${isActive ? 'text-primary' : 'text-foreground/70'}`}>
                                 <ItemIcon className="h-5 w-5" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
-                                  <p className={`text-sm font-semibold ${isActive ? 'text-blue-900' : 'text-gray-700'}`}>
+                                  <p className={`text-sm font-semibold ${isActive ? 'text-blue-900' : 'text-obsidian'}`}>
                                     {item.label}
                                   </p>
                                   {item.date && (
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-foreground/70">
                                       {new Date(item.date).toLocaleString('ko-KR')}
                                     </p>
                                   )}
                                 </div>
                                 {item.description && (
-                                  <p className="text-xs text-gray-600">{item.description}</p>
+                                  <p className="text-xs text-obsidian">{item.description}</p>
                                 )}
                                 {index < generateRefundTimeline(refund).length - 1 && (
                                   <div className="mt-2 ml-2.5 h-6 w-0.5 bg-gray-200"></div>
@@ -579,7 +579,7 @@ export default function MyRefundsPage() {
                     {refund.pickupAddress && (refund.status === 'pickup_requested' || refund.status === 'pickup_completed' || refund.status === 'inspecting') && (
                       <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Truck className="h-4 w-4 text-blue-600" />
+                          <Truck className="h-4 w-4 text-primary" />
                           <span className="text-sm font-semibold text-blue-900">수거지 정보</span>
                         </div>
                         <div className="text-sm text-blue-800">
@@ -588,10 +588,10 @@ export default function MyRefundsPage() {
                           <p>연락처: {refund.pickupAddress.phone}</p>
                         </div>
                         {refund.trackingNumber && (
-                          <div className="mt-2 pt-2 border-t border-blue-200">
-                            <p className="text-xs text-blue-700">송장번호: {refund.trackingNumber}</p>
+                          <div className="mt-2 pt-2 border-t border-primary/30">
+                            <p className="text-xs text-primary">송장번호: {refund.trackingNumber}</p>
                             {refund.courierCompany && (
-                              <p className="text-xs text-blue-700">택배사: {refund.courierCompany}</p>
+                              <p className="text-xs text-primary">택배사: {refund.courierCompany}</p>
                             )}
                           </div>
                         )}
@@ -600,7 +600,7 @@ export default function MyRefundsPage() {
 
                     {/* 처리 일시 */}
                     {refund.processedAt && (
-                      <div className="text-xs text-gray-500 mb-4">
+                      <div className="text-xs text-foreground/70 mb-4">
                         처리 일시: {new Date(refund.processedAt).toLocaleString('ko-KR')}
                       </div>
                     )}
@@ -662,23 +662,23 @@ export default function MyRefundsPage() {
                   <h4 className="font-semibold mb-2">환불 정보</h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600">신청 번호</p>
+                      <p className="text-obsidian">신청 번호</p>
                       <p className="font-medium">{selectedRefund._id}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">신청일</p>
+                      <p className="text-obsidian">신청일</p>
                       <p className="font-medium">
                         {new Date(selectedRefund.createdAt).toLocaleString('ko-KR')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600">상태</p>
+                      <p className="text-obsidian">상태</p>
                       <Badge className={statusLabels[selectedRefund.status].color}>
                         {statusLabels[selectedRefund.status].label}
                       </Badge>
                     </div>
                     <div>
-                      <p className="text-gray-600">환불 금액</p>
+                      <p className="text-obsidian">환불 금액</p>
                       <p className="font-medium text-lg">{(selectedRefund.finalRefundAmount || selectedRefund.refundAmount || 0).toLocaleString()}원</p>
                     </div>
                   </div>
@@ -686,11 +686,11 @@ export default function MyRefundsPage() {
                 
                 <div>
                   <h4 className="font-semibold mb-2">환불 사유</h4>
-                  <p className="text-sm text-gray-700 mb-1">
+                  <p className="text-sm text-obsidian mb-1">
                     {refundReasons[selectedRefund.reason] || selectedRefund.reason}
                   </p>
                   {(selectedRefund.details || selectedRefund.reasonDetail) && (
-                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{selectedRefund.details || selectedRefund.reasonDetail}</p>
+                    <p className="text-sm text-obsidian whitespace-pre-wrap">{selectedRefund.details || selectedRefund.reasonDetail}</p>
                   )}
                 </div>
 

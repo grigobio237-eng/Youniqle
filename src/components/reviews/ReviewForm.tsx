@@ -157,10 +157,10 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <h3 className="text-lg font-semibold text-obsidian mb-2">
             리뷰를 작성하려면 로그인이 필요합니다
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-obsidian mb-4">
             로그인 후 {productName}에 대한 리뷰를 작성해보세요.
           </p>
           <Button asChild>
@@ -182,14 +182,14 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 상품 정보 */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-medium text-gray-900">{productName}</h4>
-            <p className="text-sm text-gray-600">리뷰를 작성할 상품입니다.</p>
+          <div className="bg-surface p-4 rounded-lg">
+            <h4 className="font-medium text-obsidian">{productName}</h4>
+            <p className="text-sm text-obsidian">리뷰를 작성할 상품입니다.</p>
           </div>
 
           {/* 별점 평가 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-obsidian">
               별점 평가 <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center space-x-1">
@@ -211,7 +211,7 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
                   />
                 </button>
               ))}
-              <span className="ml-3 text-sm text-gray-600">
+              <span className="ml-3 text-sm text-obsidian">
                 {getRatingText(hoveredRating || rating)}
               </span>
             </div>
@@ -219,7 +219,7 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
 
           {/* 리뷰 제목 (선택사항) */}
           <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="text-sm font-medium text-obsidian">
               리뷰 제목 (선택사항)
             </label>
             <Input
@@ -229,12 +229,12 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
               placeholder="리뷰 제목을 입력해주세요"
               maxLength={100}
             />
-            <p className="text-xs text-gray-500">{title.length}/100자</p>
+            <p className="text-xs text-foreground/70">{title.length}/100자</p>
           </div>
 
           {/* 리뷰 내용 */}
           <div className="space-y-2">
-            <label htmlFor="content" className="text-sm font-medium text-gray-700">
+            <label htmlFor="content" className="text-sm font-medium text-obsidian">
               리뷰 내용 <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -242,15 +242,15 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="상품에 대한 솔직한 리뷰를 작성해주세요. (10자 이상)"
-              className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-primary/30"
               maxLength={1000}
             />
-            <p className="text-xs text-gray-500">{content.length}/1000자</p>
+            <p className="text-xs text-foreground/70">{content.length}/1000자</p>
           </div>
 
           {/* 이미지 업로드 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-obsidian">
               리뷰 이미지 (선택사항)
             </label>
             <div className="space-y-3">
@@ -275,8 +275,8 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
                     ) : (
                       <>
-                        <Camera className="h-6 w-6 text-gray-400" />
-                        <span className="text-sm text-gray-600">
+                        <Camera className="h-6 w-6 text-foreground/70" />
+                        <span className="text-sm text-obsidian">
                           사진을 업로드하세요 (최대 5장)
                         </span>
                       </>
@@ -306,7 +306,7 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-foreground/70">
               • 상품과 관련된 사진을 업로드해주세요
               • 최대 5장까지 업로드 가능합니다
               • 각 이미지는 10MB 이하로 제한됩니다

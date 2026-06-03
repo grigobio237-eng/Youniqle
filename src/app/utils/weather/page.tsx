@@ -193,7 +193,7 @@ export default function WeatherPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50 py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -246,7 +246,7 @@ export default function WeatherPage() {
                                         <Navigation className="h-5 w-5" />
                                     </Button>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">💡 한글(서울, 부산) 또는 영문(Seoul, Tokyo)으로 검색 가능</p>
+                                <p className="text-xs text-foreground/70 mt-1">💡 한글(서울, 부산) 또는 영문(Seoul, Tokyo)으로 검색 가능</p>
                             </div>
                         </form>
 
@@ -255,34 +255,34 @@ export default function WeatherPage() {
                         {weather && !error && (
                             <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-lg p-8 space-y-6">
                                 <div className="text-center">
-                                    <p className="text-2xl font-bold text-gray-900">
+                                    <p className="text-2xl font-bold text-obsidian">
                                         {weather.city}, {weather.country}
                                     </p>
-                                    <p className="text-gray-600 mt-1">
+                                    <p className="text-obsidian mt-1">
                                         {new Date().toLocaleDateString('ko-KR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                                     </p>
                                 </div>
 
                                 <div className="text-center">
                                     <div className="mb-4 text-xl">{getWeatherIcon(weather.icon)}</div>
-                                    <p className="font-bold text-gray-900 text-xl">{weather.temp}°C</p>
-                                    <p className="text-gray-600 mt-2 capitalize text-xl">{weather.description}</p>
+                                    <p className="font-bold text-obsidian text-xl">{weather.temp}°C</p>
+                                    <p className="text-obsidian mt-2 capitalize text-xl">{weather.description}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-white rounded-lg p-4 text-center">
-                                        <p className="text-sm text-gray-600 mb-1">체감 온도</p>
-                                        <p className="text-2xl font-bold text-gray-900">{weather.feels_like}°C</p>
+                                        <p className="text-sm text-obsidian mb-1">체감 온도</p>
+                                        <p className="text-2xl font-bold text-obsidian">{weather.feels_like}°C</p>
                                     </div>
                                     <div className="bg-white rounded-lg p-4 text-center">
-                                        <p className="text-sm text-gray-600 mb-1">습도</p>
-                                        <p className="text-2xl font-bold text-gray-900">{weather.humidity}%</p>
+                                        <p className="text-sm text-obsidian mb-1">습도</p>
+                                        <p className="text-2xl font-bold text-obsidian">{weather.humidity}%</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 사용 팁</p>
                             <ul className="list-disc list-inside space-y-1">
                                 <li>한글로 검색 가능 (서울, 부산, 제주 등)</li>

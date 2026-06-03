@@ -199,19 +199,19 @@ export default function AutomationDashboard() {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'marketing':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-container text-blue-800';
       case 'sales':
         return 'bg-green-100 text-green-800';
       case 'support':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-secondary-container text-purple-800';
       case 'retention':
         return 'bg-orange-100 text-orange-800';
       case 'acquisition':
         return 'bg-pink-100 text-pink-800';
       case 'engagement':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'bg-secondary-container text-indigo-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -245,7 +245,7 @@ export default function AutomationDashboard() {
           <div className="text-red-500 mb-4">
             <Bot className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">자동화 규칙을 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchRules} variant="outline">
             다시 시도
@@ -260,8 +260,8 @@ export default function AutomationDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">마케팅 자동화</h1>
-          <p className="text-gray-600 mt-1">규칙 기반 마케팅 자동화 관리</p>
+          <h1 className="text-3xl font-bold text-obsidian">마케팅 자동화</h1>
+          <p className="text-obsidian mt-1">규칙 기반 마케팅 자동화 관리</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -339,7 +339,7 @@ export default function AutomationDashboard() {
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-64">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="규칙 이름 또는 설명 검색..."
                   value={searchTerm}
@@ -394,13 +394,13 @@ export default function AutomationDashboard() {
                     </Badge>
                   </div>
                   
-                  <p className="text-gray-600 mb-4">{rule.description}</p>
+                  <p className="text-obsidian mb-4">{rule.description}</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">트리거</h4>
+                      <h4 className="text-sm font-medium text-obsidian mb-2">트리거</h4>
                       <div className="flex items-center space-x-2">
-                        <Target className="h-4 w-4 text-gray-400" />
+                        <Target className="h-4 w-4 text-foreground/70" />
                         <span className="text-sm">
                           {rule.triggers.type === 'event' ? '이벤트' : 
                            rule.triggers.type === 'schedule' ? '스케줄' : 
@@ -416,7 +416,7 @@ export default function AutomationDashboard() {
                     </div>
                     
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">액션</h4>
+                      <h4 className="text-sm font-medium text-obsidian mb-2">액션</h4>
                       <div className="flex flex-wrap gap-1">
                         {rule.actions.map((action, index) => (
                           <div key={index} className="flex items-center space-x-1">
@@ -428,12 +428,12 @@ export default function AutomationDashboard() {
                     </div>
                     
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">통계</h4>
+                      <h4 className="text-sm font-medium text-obsidian mb-2">통계</h4>
                       <div className="text-sm space-y-1">
                         <div>총 실행: {rule.stats.totalExecutions}</div>
                         <div>성공률: {rule.stats.successRate.toFixed(1)}%</div>
                         {rule.stats.lastExecutedAt && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-foreground/70">
                             마지막 실행: {formatDate(rule.stats.lastExecutedAt)}
                           </div>
                         )}
@@ -441,7 +441,7 @@ export default function AutomationDashboard() {
                     </div>
                   </div>
                   
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-foreground/70">
                     생성자: {rule.metadata.createdBy.name} • 
                     생성일: {formatDate(rule.metadata.createdAt)}
                   </div>
@@ -499,9 +499,9 @@ export default function AutomationDashboard() {
       {rules.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <Bot className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">자동화 규칙이 없습니다</h3>
-            <p className="text-gray-500 mb-4">새로운 자동화 규칙을 생성하여 마케팅을 자동화해보세요.</p>
+            <Bot className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+            <h3 className="text-lg font-medium text-obsidian mb-2">자동화 규칙이 없습니다</h3>
+            <p className="text-foreground/70 mb-4">새로운 자동화 규칙을 생성하여 마케팅을 자동화해보세요.</p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               첫 번째 규칙 생성

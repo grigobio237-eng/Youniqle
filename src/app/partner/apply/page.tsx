@@ -20,8 +20,8 @@ export default function PartnerApplyPage() {
     <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-background to-primary/10 flex items-center justify-center p-4">
       <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur max-w-md w-full">
         <CardContent className="p-8 text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Store className="h-8 w-8 text-blue-600" />
+          <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
+            <Store className="h-8 w-8 text-primary" />
           </div>
           <h2 className="text-2xl font-bold text-text-primary mb-4">
             파트너 신청은 마이페이지에서 가능합니다

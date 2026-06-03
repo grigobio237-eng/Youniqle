@@ -11,7 +11,7 @@ const BackgroundRemovalClient = dynamic(() => import('@/components/utils/Backgro
     loading: () => (
         <div className="flex items-center justify-center p-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">유니클 모델 로딩 중...</span>
+            <span className="ml-3 text-obsidian">유니클 모델 로딩 중...</span>
         </div>
     ),
 });
@@ -20,7 +20,7 @@ export default function BackgroundRemovalPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-12">
             <div className="container mx-auto px-4 max-w-6xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -40,7 +40,7 @@ export default function BackgroundRemovalPage() {
                 </Card>
 
                 {/* Footer */}
-                <div className="mt-8 text-center text-sm text-gray-600">
+                <div className="mt-8 text-center text-sm text-obsidian">
                     <p className="font-semibold">🎁 무료 & 무제한 for Professionals</p>
                     <p className="mt-1">서버 업로드 없이 브라우저에서 안전하게 처리됩니다</p>
                 </div>

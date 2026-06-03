@@ -190,7 +190,7 @@ function PartnerAnalyticsContent() {
             <CardTitle className="text-sm font-medium text-text-secondary">
               총 매출
             </CardTitle>
-            <DollarSign className="h-5 w-5 text-purple-600" />
+            <DollarSign className="h-5 w-5 text-secondary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-text-primary">
@@ -246,7 +246,7 @@ function PartnerAnalyticsContent() {
             <CardTitle className="text-sm font-medium text-text-secondary">
               평균 주문 금액
             </CardTitle>
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+            <BarChart3 className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-text-primary">
@@ -393,7 +393,7 @@ function PartnerAnalyticsContent() {
             {analytics.topProducts.map((product, index) => (
               <div 
                 key={product.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-surface transition-colors"
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">

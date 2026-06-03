@@ -77,14 +77,14 @@ interface User {
 }
 
 const gradeColors = {
-  cedar: 'bg-gray-100 text-gray-800',
+  cedar: 'bg-gray-100 text-obsidian',
   rooter: 'bg-green-100 text-green-800',
-  bloomer: 'bg-blue-100 text-blue-800',
-  glower: 'bg-purple-100 text-purple-800',
+  bloomer: 'bg-primary-container text-blue-800',
+  glower: 'bg-secondary-container text-purple-800',
   ecosoul: 'bg-yellow-100 text-yellow-800',
-  essence: 'bg-emerald-100 text-emerald-800',
+  essence: 'bg-secondary-container text-emerald-800',
   balance: 'bg-violet-100 text-violet-800',
-  miracle: 'bg-amber-100 text-amber-800'
+  miracle: 'bg-primary-container/50 text-amber-800'
 };
 
 const gradeIcons = {
@@ -213,7 +213,7 @@ export default function AdminUsersPage() {
 
   const getGradeDisplay = (grade: string) => {
     const GradeIcon = gradeIcons[grade as keyof typeof gradeIcons] || Shield; // 기본값으로 Shield 사용
-    const colorClass = gradeColors[grade as keyof typeof gradeColors] || 'bg-gray-100 text-gray-800'; // 기본값으로 gray 사용
+    const colorClass = gradeColors[grade as keyof typeof gradeColors] || 'bg-gray-100 text-obsidian'; // 기본값으로 gray 사용
 
     return (
       <Badge className={`${colorClass} flex items-center gap-1 shadow-sm uppercase tracking-tighter text-[10px]`}>
@@ -227,13 +227,13 @@ export default function AdminUsersPage() {
     if (!passInfo || passInfo.type === 'NONE') return null;
     
     const colors = {
-      START: 'bg-blue-600 text-white',
+      START: 'bg-primary text-white',
       SIGNATURE: 'bg-chapter-accent text-white font-black',
       BLACK: 'bg-obsidian text-chapter-accent border border-chapter-accent/50 group-hover:bg-black'
     };
     
     return (
-      <Badge className={`${colors[passInfo.type as keyof typeof colors] || 'bg-gray-500'} flex items-center gap-1 shadow-sm uppercase tracking-tighter text-[10px]`}>
+      <Badge className={`${colors[passInfo.type as keyof typeof colors] || 'bg-surface0'} flex items-center gap-1 shadow-sm uppercase tracking-tighter text-[10px]`}>
         <Zap className="h-3 w-3" />
         {passInfo.type} PASS
       </Badge>
@@ -294,7 +294,7 @@ export default function AdminUsersPage() {
                   <p className="text-[10px] md:text-sm font-medium text-text-secondary">총 회원</p>
                   <p className="text-lg md:text-2xl font-bold text-text-primary">{users.length}</p>
                 </div>
-                <div className="p-1.5 md:p-3 rounded-full bg-blue-100 text-blue-600 hidden xs:block">
+                <div className="p-1.5 md:p-3 rounded-full bg-primary-container text-primary hidden xs:block">
                   <Users className="h-4 w-4 md:h-6" />
                 </div>
               </div>
@@ -326,7 +326,7 @@ export default function AdminUsersPage() {
                     {users.filter(u => u.role === 'partner').length}
                   </p>
                 </div>
-                <div className="p-1.5 md:p-3 rounded-full bg-purple-100 text-purple-600 hidden xs:block">
+                <div className="p-1.5 md:p-3 rounded-full bg-secondary-container text-secondary hidden xs:block">
                   <Shield className="h-4 w-4 md:h-6" />
                 </div>
               </div>
@@ -357,7 +357,7 @@ export default function AdminUsersPage() {
               {/* Search */}
               <form onSubmit={handleSearch} className="sm:col-span-2 lg:col-span-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                   <Input
                     type="text"
                     placeholder="이름/이메일 검색..."
@@ -437,7 +437,7 @@ export default function AdminUsersPage() {
           <CardContent>
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-gray-50 transition-colors gap-4 shadow-sm bg-white">
+                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-surface transition-colors gap-4 shadow-sm bg-white">
                   <div className="flex items-start sm:items-center space-x-3 md:space-x-4">
                     <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                       <Users className="h-5 w-5 md:h-6 text-primary" />
@@ -448,9 +448,9 @@ export default function AdminUsersPage() {
                         <h3 className="font-bold text-text-primary text-sm md:text-base truncate max-w-[120px] sm:max-w-none">{user.name}</h3>
                         <div className="flex flex-wrap gap-1">
                           {getGradeDisplay(user.grade || 'cedar')}
-                          <Badge className={`text-[9px] px-1.5 py-0 h-4 ${user.tier === 'RESTART' ? 'bg-purple-100 text-purple-800' :
-                            user.tier === 'REBORN' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
+                          <Badge className={`text-[9px] px-1.5 py-0 h-4 ${user.tier === 'RESTART' ? 'bg-secondary-container text-purple-800' :
+                            user.tier === 'REBORN' ? 'bg-primary-container text-blue-800' :
+                              'bg-gray-100 text-obsidian'
                             }`}>
                             {user.tier || 'RESET'}
                           </Badge>
@@ -461,7 +461,7 @@ export default function AdminUsersPage() {
                             <Badge className="bg-red-600 text-white text-[9px] px-1.5 py-0 h-4">최고 관리자</Badge>
                           )}
                           {user.isNavigator && (
-                            <Badge className="bg-amber-500 text-white border-none text-[9px] px-1.5 py-0 h-4 flex items-center gap-0.5">
+                            <Badge className="bg-primary text-white border-none text-[9px] px-1.5 py-0 h-4 flex items-center gap-0.5">
                               <Sparkles className="h-2 w-2" />
                               <span>NAV</span>
                             </Badge>
@@ -493,7 +493,7 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-2">
                           <div className={`px-2 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 ${
                             (user.recoveryStats?.lastScore || 0) >= 80 ? 'bg-green-100 text-green-700' :
-                            (user.recoveryStats?.lastScore || 0) >= 50 ? 'bg-amber-100 text-amber-700' :
+                            (user.recoveryStats?.lastScore || 0) >= 50 ? 'bg-primary-container/50 text-primary' :
                             'bg-red-100 text-red-700'
                           }`}>
                             <Brain className="w-3.5 h-3.5" />
@@ -504,7 +504,7 @@ export default function AdminUsersPage() {
 
                         {/* Recent Activity Badge */}
                         <div className="flex items-center gap-2">
-                          <div className="px-2 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs flex items-center gap-1.5">
+                          <div className="px-2 py-1 rounded-lg bg-blue-50 text-primary font-bold text-xs flex items-center gap-1.5">
                             <Activity className="w-3.5 h-3.5" />
                             <span>{user.recoveryStats?.latestActivityType || '없음'}</span>
                           </div>

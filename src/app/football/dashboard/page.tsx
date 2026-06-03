@@ -130,7 +130,7 @@ export default function CoachDashboardPage() {
           <div className="h-2 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500" />
           <CardContent className="p-4 sm:p-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-              <div className="bg-gray-50 rounded-xl p-3">
+              <div className="bg-surface rounded-xl p-3">
                 <p className="text-3xl font-black text-obsidian">{summary?.total || 0}</p>
                 <p className="text-xs text-slate font-bold mt-1">전체 선수</p>
               </div>
@@ -143,8 +143,8 @@ export default function CoachDashboardPage() {
                 <p className="text-xs text-yellow-700 font-bold mt-1">미체크</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-3">
-                <p className="text-3xl font-black text-blue-600">{summary?.avgWellness || '-'}</p>
-                <p className="text-xs text-blue-700 font-bold mt-1">평균 점수</p>
+                <p className="text-3xl font-black text-primary">{summary?.avgWellness || '-'}</p>
+                <p className="text-xs text-primary font-bold mt-1">평균 점수</p>
               </div>
             </div>
           </CardContent>
@@ -189,21 +189,21 @@ export default function CoachDashboardPage() {
         {/* 미체크 선수 */}
         {unchecked.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm font-black text-gray-400 uppercase flex items-center gap-1">
+            <h3 className="text-sm font-black text-foreground/70 uppercase flex items-center gap-1">
               ⬜ 미체크 ({unchecked.length})
             </h3>
             {unchecked.map((player) => (
               <Card key={player.memberId} className="rounded-2xl border-none shadow-md opacity-60">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 font-bold text-sm">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-foreground/70 font-bold text-sm">
                       {player.playerNumber || '?'}
                     </div>
                     <div className="flex-1">
                       <p className="font-bold text-obsidian">{player.name}</p>
                       <p className="text-xs text-slate">{getPositionLabel(player.position)}</p>
                     </div>
-                    <Badge className="bg-gray-100 text-gray-500 border-none text-xs">미제출</Badge>
+                    <Badge className="bg-gray-100 text-foreground/70 border-none text-xs">미제출</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -272,9 +272,9 @@ export default function CoachDashboardPage() {
 
                 {selectedPlayer.todayCheck.sessionLoad && (
                   <div className="bg-blue-50 rounded-xl p-3 text-center">
-                    <p className="text-xs text-blue-600 font-bold">세션 부하</p>
-                    <p className="font-black text-blue-700 text-xl">{selectedPlayer.todayCheck.sessionLoad} AU</p>
-                    <p className="text-xs text-blue-500">RPE {selectedPlayer.todayCheck.rpe}</p>
+                    <p className="text-xs text-primary font-bold">세션 부하</p>
+                    <p className="font-black text-primary text-xl">{selectedPlayer.todayCheck.sessionLoad} AU</p>
+                    <p className="text-xs text-primary">RPE {selectedPlayer.todayCheck.rpe}</p>
                   </div>
                 )}
 
@@ -332,7 +332,7 @@ function PlayerCard({ player, onSelect }: { player: SquadMember; onSelect: (p: S
           {/* 세션 부하 */}
           {player.todayCheck.sessionLoad && (
             <div className="text-right">
-              <p className="text-sm font-bold text-blue-600">{player.todayCheck.sessionLoad}</p>
+              <p className="text-sm font-bold text-primary">{player.todayCheck.sessionLoad}</p>
               <p className="text-[10px] text-slate">부하</p>
             </div>
           )}

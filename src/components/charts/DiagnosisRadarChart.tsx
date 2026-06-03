@@ -54,8 +54,8 @@ export function DiagnosisRadarChart({ data, color = '#2563eb', className }: Diag
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                     <span className="text-lg md:text-xl">📊</span>
                 </div>
-                <p className="text-xs md:text-sm font-bold text-slate-500 mb-1">분석 데이터가 부족합니다</p>
-                <p className="text-[10px] md:text-xs text-slate-400 break-keep">정밀 진단을 완료하시면 4가지 핵심 영역의<br/>회복 탄력성 밸런스를 확인할 수 있습니다.</p>
+                <p className="text-xs md:text-sm font-bold text-foreground/70 mb-1">분석 데이터가 부족합니다</p>
+                <p className="text-[10px] md:text-xs text-foreground/70 break-keep">정밀 진단을 완료하시면 4가지 핵심 영역의<br/>회복 탄력성 밸런스를 확인할 수 있습니다.</p>
             </div>
         );
     }

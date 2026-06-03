@@ -185,7 +185,7 @@ export default function RecoveryMonitoring() {
     status === "alert"
       ? "bg-status-danger text-white"
       : status === "warning"
-        ? "bg-amber-400 text-amber-950 ring-2 ring-amber-500 ring-offset-1"
+        ? "bg-amber-400 text-amber-950 ring-2 ring-primary ring-offset-1"
         : "bg-status-good text-white";
 
   const headingText =

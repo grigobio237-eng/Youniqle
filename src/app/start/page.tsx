@@ -12,11 +12,11 @@ export default function RecoveryStartPage() {
             <section className="bg-primary/5 py-20 px-4 text-center">
                 <div className="max-w-4xl mx-auto space-y-6">
                     <span className="text-primary font-bold tracking-wider text-sm uppercase">Recovery Philosophy</span>
-                    <h1 className="font-black text-gray-900 leading-tight text-4xl md:text-4xl">
+                    <h1 className="font-black text-obsidian leading-tight text-4xl md:text-4xl">
                         회복은 <span className="text-primary">멈춤</span>이 아니라<br />
                         더 멀리 가기 위한 <span className="text-primary">도약</span>입니다.
                     </h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed text-xl">
+                    <p className="text-obsidian max-w-2xl mx-auto leading-relaxed text-xl">
                         Youniqle은 단순한 휴식을 넘어, <br className="md:hidden" />
                         과학적인 데이터와 맞춤형 솔루션으로<br />
                         당신의 일상을 지탱하는 에너지를 설계합니다.
@@ -35,12 +35,12 @@ export default function RecoveryStartPage() {
                             description="억지로 채우는 것이 아니라, 비워내고 순환시킴으로써 몸이 스스로 회복하는 힘을 기릅니다."
                         />
                         <FeatureCard
-                            icon={<Shield className="w-12 h-12 text-blue-500" />}
+                            icon={<Shield className="w-12 h-12 text-primary" />}
                             title="데이터 기반 설계"
                             description="감에 의존하지 않고, 당신의 수면, 활동, 컨디션 데이터를 분석하여 가장 필요한 솔루션을 제안합니다."
                         />
                         <FeatureCard
-                            icon={<UserCheck className="w-12 h-12 text-purple-500" />}
+                            icon={<UserCheck className="w-12 h-12 text-secondary" />}
                             title="지속 가능한 습관"
                             description="일시적인 처방이 아닌, 평생 가져갈 수 있는 건강한 회복 루틴을 당신의 삶에 심어드립니다."
                         />
@@ -49,7 +49,7 @@ export default function RecoveryStartPage() {
             </section>
 
             {/* How It Works */}
-            <section className="bg-gray-50 py-20 px-4">
+            <section className="bg-surface py-20 px-4">
                 <div className="container mx-auto max-w-4xl">
                     <h2 className="text-3xl font-bold text-center mb-16">어떻게 시작하나요?</h2>
 
@@ -77,7 +77,7 @@ export default function RecoveryStartPage() {
             <section className="py-24 px-4 text-center">
                 <div className="max-w-2xl mx-auto space-y-8">
                     <h2 className="text-3xl font-bold">지금, 당신의 회복을 시작하세요</h2>
-                    <p className="text-gray-600">
+                    <p className="text-obsidian">
                         준비물은 가벼운 마음뿐입니다. <br />
                         나를 위한 투자를 더 이상 미루지 마세요.
                     </p>
@@ -87,7 +87,7 @@ export default function RecoveryStartPage() {
                                 오늘의 상태 체크하기 <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                         </Button>
-                        <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-blue-500 text-blue-500 hover:bg-blue-50" asChild>
+                        <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-primary/30 text-primary hover:bg-blue-50" asChild>
                             <Link href="/therapy/sound">
                                 <Heart className="mr-2 w-5 h-5" /> 사운드 테라피 체험하기
                             </Link>
@@ -104,8 +104,8 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
         <Card className="text-center border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="pt-8 pb-8 px-6 space-y-4">
                 <div className="flex justify-center mb-4">{icon}</div>
-                <h3 className="font-bold text-gray-900 text-xl">{title}</h3>
-                <p className="text-gray-500 leading-relaxed word-keep-all">{description}</p>
+                <h3 className="font-bold text-obsidian text-xl">{title}</h3>
+                <p className="text-foreground/70 leading-relaxed word-keep-all">{description}</p>
             </CardContent>
         </Card>
     );
@@ -117,7 +117,7 @@ function StepRow({ step, title, desc }: { step: string, title: string, desc: str
             <div className="font-black text-gray-200 text-4xl">{step}</div>
             <div className="flex-1 space-y-2">
                 <h3 className="font-bold text-xl">{title}</h3>
-                <p className="text-gray-600 leading-relaxed word-keep-all">{desc}</p>
+                <p className="text-obsidian leading-relaxed word-keep-all">{desc}</p>
             </div>
         </div>
     );

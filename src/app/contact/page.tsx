@@ -103,11 +103,11 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-surface py-12">
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('contact.title')}</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-obsidian mb-4">{t('contact.title')}</h1>
+          <p className="text-obsidian">
             {t('contact.subtitle')}
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="userName" className="block text-sm font-medium text-obsidian mb-2">
                     <User className="h-4 w-4 inline mr-1" />
                     {t('contact.name')} *
                   </label>
@@ -140,7 +140,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="userEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="userEmail" className="block text-sm font-medium text-obsidian mb-2">
                     <Mail className="h-4 w-4 inline mr-1" />
                     {t('contact.email')} *
                   </label>
@@ -156,7 +156,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="type" className="block text-sm font-medium text-obsidian mb-2">
                   {t('contact.type')} *
                 </label>
                 <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
@@ -176,7 +176,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium text-obsidian mb-2">
                   <FileText className="h-4 w-4 inline mr-1" />
                   {t('contact.subject')} *
                 </label>
@@ -191,7 +191,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="content" className="block text-sm font-medium text-obsidian mb-2">
                   {t('contact.content')} *
                 </label>
                 <Textarea
@@ -232,7 +232,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-foreground/70">
           <p>{t('contact.responseTime')}</p>
           <p>{t('contact.urgentContact')}</p>
         </div>

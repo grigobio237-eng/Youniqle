@@ -153,17 +153,17 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-center gap-2 text-sm text-emerald-600 bg-emerald-50 px-4 py-2 rounded-lg">
+            <div className="flex items-center justify-center gap-2 text-sm text-secondary bg-emerald-50 px-4 py-2 rounded-lg">
                 <Shield className="h-4 w-4" />
                 <span className="font-medium">프라이버시 보호: 이미지는 서버로 전송되지 않습니다</span>
             </div>
 
             {/* Info Alert: Portrait Only */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-                <Info className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+            <div className="bg-blue-50 border border-primary/30 rounded-lg p-4 flex items-start gap-3">
+                <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                 <div>
                     <h4 className="font-bold text-blue-800 text-sm">인물 사진 전용 도구입니다</h4>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-sm text-primary mt-1">
                         이 도구는 사람을 인식하여 배경을 제거하도록 최적화되어 있습니다. <br />
                         제품, 동물, 자동차 등의 사물 사진은 배경 제거가 제대로 되지 않을 수 있습니다.
                     </p>
@@ -176,7 +176,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
-                    className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${isDragging ? 'border-blue-500 bg-blue-50 scale-[1.02]' : 'border-gray-300 bg-gray-50 hover:border-gray-400'}`}
+                    className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${isDragging ? 'border-primary/30 bg-blue-50 scale-[1.02]' : 'border-gray-300 bg-surface hover:border-gray-400'}`}
                 >
                     <input
                         type="file"
@@ -186,11 +186,11 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <div className="flex flex-col items-center justify-center text-center">
-                        <div className="w-20 h-20 mb-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <div className="w-20 h-20 mb-4 rounded-full bg-primary-container text-primary flex items-center justify-center">
                             <Upload className="h-10 w-10" />
                         </div>
-                        <h3 className="font-bold text-gray-900 mb-2 text-xl">인물 사진을 업로드하세요</h3>
-                        <p className="text-gray-600 mb-4">JPG, PNG (최대 10MB)</p>
+                        <h3 className="font-bold text-obsidian mb-2 text-xl">인물 사진을 업로드하세요</h3>
+                        <p className="text-obsidian mb-4">JPG, PNG (최대 10MB)</p>
                         <Button size="lg" className="mt-2" disabled={modelLoading}>
                             {modelLoading ? '유니클 모델 로딩 중...' : '파일 선택'}
                         </Button>
@@ -223,11 +223,11 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                             {processedImage ? (
                                 <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
                             ) : (
-                                <div className="text-center text-gray-400">
+                                <div className="text-center text-foreground/70">
                                     {loading ? (
                                         <div className="space-y-4">
-                                            <RefreshCw className="h-12 w-12 animate-spin mx-auto text-blue-500" />
-                                            <p className="text-gray-600 font-medium">인물 인식 중...</p>
+                                            <RefreshCw className="h-12 w-12 animate-spin mx-auto text-primary" />
+                                            <p className="text-obsidian font-medium">인물 인식 중...</p>
                                         </div>
                                     ) : (
                                         <p>아래 버튼을 클릭하세요</p>
@@ -273,7 +273,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                 </div>
             )}
 
-            <div className="bg-gray-50 p-4 rounded-lg text-xs text-gray-500 text-center">
+            <div className="bg-surface p-4 rounded-lg text-xs text-foreground/70 text-center">
                 Powered by TensorFlow.js (BodyPix) • Free & Secure • Portrait Only
             </div>
         </div>

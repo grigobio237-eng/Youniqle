@@ -129,7 +129,7 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
-                <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                <MapPin className="h-5 w-5 mr-2 text-primary" />
                 원산지 및 보관법
               </CardTitle>
             </CardHeader>
@@ -137,25 +137,25 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
               <div className="space-y-3 text-sm">
                 {product.originInfo?.origin && (
                   <div>
-                    <span className="font-medium text-gray-700">원산지:</span>
+                    <span className="font-medium text-obsidian">원산지:</span>
                     <span className="ml-2">{product.originInfo.origin}</span>
                   </div>
                 )}
                 {product.originInfo?.storageMethod && (
                   <div>
-                    <span className="font-medium text-gray-700">보관법:</span>
+                    <span className="font-medium text-obsidian">보관법:</span>
                     <span className="ml-2">{product.originInfo.storageMethod}</span>
                   </div>
                 )}
                 {product.originInfo?.shelfLife && (
                   <div>
-                    <span className="font-medium text-gray-700">유통기한:</span>
+                    <span className="font-medium text-obsidian">유통기한:</span>
                     <span className="ml-2">{product.originInfo.shelfLife}</span>
                   </div>
                 )}
                 {product.originInfo?.packagingMethod && (
                   <div>
-                    <span className="font-medium text-gray-700">포장방법:</span>
+                    <span className="font-medium text-obsidian">포장방법:</span>
                     <span className="ml-2">{product.originInfo.packagingMethod}</span>
                   </div>
                 )}
@@ -186,15 +186,15 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
-                <Ruler className="h-5 w-5 mr-2 text-purple-600" />
+                <Ruler className="h-5 w-5 mr-2 text-secondary" />
                 사이즈 가이드
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="text-sm">
-                  <p className="font-medium text-gray-700 mb-2">사이즈 정보</p>
-                  <div className="whitespace-pre-line text-sm text-gray-600">
+                  <p className="font-medium text-obsidian mb-2">사이즈 정보</p>
+                  <div className="whitespace-pre-line text-sm text-obsidian">
                     {product.clothingInfo.sizeGuide}
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
-                <Shirt className="h-5 w-5 mr-2 text-blue-600" />
+                <Shirt className="h-5 w-5 mr-2 text-primary" />
                 소재 및 관리
               </CardTitle>
             </CardHeader>
@@ -223,14 +223,14 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
               <div className="space-y-3 text-sm">
                 {product.clothingInfo?.material && (
                   <div>
-                    <span className="font-medium text-gray-700">소재:</span>
+                    <span className="font-medium text-obsidian">소재:</span>
                     <span className="ml-2">{product.clothingInfo.material}</span>
                   </div>
                 )}
                 {product.clothingInfo?.careInstructions && (
                   <div>
-                    <span className="font-medium text-gray-700">관리 방법:</span>
-                    <div className="mt-1 whitespace-pre-line text-gray-600">
+                    <span className="font-medium text-obsidian">관리 방법:</span>
+                    <div className="mt-1 whitespace-pre-line text-obsidian">
                       {product.clothingInfo.careInstructions}
                     </div>
                   </div>
@@ -262,12 +262,12 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
-                <Cpu className="h-5 w-5 mr-2 text-blue-600" />
+                <Cpu className="h-5 w-5 mr-2 text-primary" />
                 기술 사양
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="whitespace-pre-line text-sm text-gray-600">
+              <div className="whitespace-pre-line text-sm text-obsidian">
                 {product.electronicsInfo.specifications}
               </div>
             </CardContent>
@@ -287,16 +287,16 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
               <div className="space-y-3 text-sm">
                 {product.electronicsInfo?.includedItems && (
                   <div>
-                    <span className="font-medium text-gray-700">포함 사항:</span>
-                    <div className="mt-1 whitespace-pre-line text-gray-600">
+                    <span className="font-medium text-obsidian">포함 사항:</span>
+                    <div className="mt-1 whitespace-pre-line text-obsidian">
                       {product.electronicsInfo.includedItems}
                     </div>
                   </div>
                 )}
                 {product.electronicsInfo?.warranty && (
                   <div>
-                    <span className="font-medium text-gray-700">보증 정보:</span>
-                    <div className="mt-1 whitespace-pre-line text-gray-600">
+                    <span className="font-medium text-obsidian">보증 정보:</span>
+                    <div className="mt-1 whitespace-pre-line text-obsidian">
                       {product.electronicsInfo.warranty}
                     </div>
                   </div>
@@ -313,20 +313,20 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center text-lg">
-          <Info className="h-5 w-5 mr-2 text-blue-600" />
+          <Info className="h-5 w-5 mr-2 text-primary" />
           상품 정보
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3 text-sm">
           <div>
-            <span className="font-medium text-gray-700">카테고리:</span>
+            <span className="font-medium text-obsidian">카테고리:</span>
             <Badge variant="outline" className="ml-2">
               {product.category}
             </Badge>
           </div>
           <div>
-            <span className="font-medium text-gray-700">재고:</span>
+            <span className="font-medium text-obsidian">재고:</span>
             <span className="ml-2">{product.stock}개</span>
           </div>
 
@@ -356,10 +356,10 @@ export default function CategorySpecificInfo({ product }: CategorySpecificInfoPr
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-obsidian mb-2">
           상품 상세 정보
         </h2>
-        <p className="text-gray-600">
+        <p className="text-obsidian">
           {product.name}에 대한 자세한 정보를 확인하세요
         </p>
       </div>

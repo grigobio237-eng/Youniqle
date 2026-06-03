@@ -221,7 +221,7 @@ const NotificationAnalyticsPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">알림 분석</h1>
-          <p className="text-gray-600">알림 성과를 분석하고 최적화하세요</p>
+          <p className="text-obsidian">알림 성과를 분석하고 최적화하세요</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={fetchAnalytics}>
@@ -243,7 +243,7 @@ const NotificationAnalyticsPage = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">시작일</label>
+              <label className="text-sm font-medium text-obsidian">시작일</label>
               <Input
                 type="date"
                 value={startDate}
@@ -252,7 +252,7 @@ const NotificationAnalyticsPage = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">종료일</label>
+              <label className="text-sm font-medium text-obsidian">종료일</label>
               <Input
                 type="date"
                 value={endDate}
@@ -312,11 +312,11 @@ const NotificationAnalyticsPage = () => {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Mail className="h-6 w-6 text-blue-600" />
+                <div className="p-2 bg-primary-container rounded-lg">
+                  <Mail className="h-6 w-6 text-primary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">총 전송</p>
+                  <p className="text-sm font-medium text-obsidian">총 전송</p>
                   <p className="text-2xl font-bold">{metrics.totalSent.toLocaleString()}</p>
                 </div>
               </div>
@@ -329,7 +329,7 @@ const NotificationAnalyticsPage = () => {
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">전달률</p>
+                  <p className="text-sm font-medium text-obsidian">전달률</p>
                   <p className="text-2xl font-bold">{metrics.deliveryRate.toFixed(1)}%</p>
                 </div>
               </div>
@@ -338,11 +338,11 @@ const NotificationAnalyticsPage = () => {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Target className="h-6 w-6 text-purple-600" />
+                <div className="p-2 bg-secondary-container rounded-lg">
+                  <Target className="h-6 w-6 text-secondary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">열람률</p>
+                  <p className="text-sm font-medium text-obsidian">열람률</p>
                   <p className="text-2xl font-bold">{metrics.openRate.toFixed(1)}%</p>
                 </div>
               </div>
@@ -355,7 +355,7 @@ const NotificationAnalyticsPage = () => {
                   <TrendingUp className="h-6 w-6 text-orange-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">전환률</p>
+                  <p className="text-sm font-medium text-obsidian">전환률</p>
                   <p className="text-2xl font-bold">{metrics.conversionRate.toFixed(1)}%</p>
                 </div>
               </div>
@@ -467,8 +467,8 @@ const NotificationAnalyticsPage = () => {
                           <span className="ml-2 font-medium capitalize">{device.deviceType}</span>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-gray-600">{device.count}개</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-obsidian">{device.count}개</div>
+                          <div className="text-sm text-obsidian">
                             열람률: {device.openRate.toFixed(1)}%
                           </div>
                         </div>
@@ -501,13 +501,13 @@ const NotificationAnalyticsPage = () => {
                       </span>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-obsidian">
                         {location.count}개 ({location.percentage}%)
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-obsidian">
                         열람률: {location.openRate.toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-obsidian">
                         전환률: {location.conversionRate.toFixed(1)}%
                       </div>
                     </div>

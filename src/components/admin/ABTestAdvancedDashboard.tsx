@@ -168,10 +168,10 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'running': return 'bg-green-500';
-      case 'completed': return 'bg-blue-500';
+      case 'completed': return 'bg-primary';
       case 'paused': return 'bg-yellow-500';
-      case 'draft': return 'bg-gray-500';
-      default: return 'bg-gray-500';
+      case 'draft': return 'bg-surface0';
+      default: return 'bg-surface0';
     }
   };
 
@@ -180,7 +180,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
       case 'low': return 'text-green-600';
       case 'medium': return 'text-yellow-600';
       case 'high': return 'text-red-600';
-      default: return 'text-gray-600';
+      default: return 'text-obsidian';
     }
   };
 
@@ -217,7 +217,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
 
   if (!stats) {
     return (
-      <div className="text-center text-gray-600">
+      <div className="text-center text-obsidian">
         <p>통계 데이터가 없습니다.</p>
       </div>
     );
@@ -255,10 +255,10 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
             <Badge className={`${getStatusColor(stats.status)} text-white`}>
               {stats.status}
             </Badge>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-obsidian">
               {stats.overallStats.testDuration}일 진행
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-obsidian">
               {stats.overallStats.totalParticipants}명 참여
             </span>
           </div>
@@ -302,7 +302,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
                   신뢰도 {Math.round(stats.recommendations.confidence * 100)}%
                 </Badge>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-obsidian mb-3">
                 {stats.recommendations.reason}
               </p>
               <div className="flex space-x-2">
@@ -322,10 +322,10 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-primary">
                 {Math.round(stats.recommendations.expectedImpact * 100) / 100}%
               </div>
-              <div className="text-sm text-gray-600">예상 개선율</div>
+              <div className="text-sm text-obsidian">예상 개선율</div>
             </div>
           </div>
         </CardContent>
@@ -336,9 +336,9 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-600" />
+              <Users className="h-8 w-8 text-primary" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">총 참가자</p>
+                <p className="text-sm font-medium text-obsidian">총 참가자</p>
                 <p className="text-2xl font-bold">{stats.overallStats.totalParticipants.toLocaleString()}</p>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
             <div className="flex items-center">
               <Target className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">전체 전환율</p>
+                <p className="text-sm font-medium text-obsidian">전체 전환율</p>
                 <p className="text-2xl font-bold">
                   {Math.round(stats.overallStats.overallConversionRate * 100) / 100}%
                 </p>
@@ -364,7 +364,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
             <div className="flex items-center">
               <Zap className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">통계적 검정력</p>
+                <p className="text-sm font-medium text-obsidian">통계적 검정력</p>
                 <p className="text-2xl font-bold">
                   {Math.round(stats.overallStats.statisticalPower * 100)}%
                 </p>
@@ -376,9 +376,9 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Activity className="h-8 w-8 text-purple-600" />
+              <Activity className="h-8 w-8 text-secondary" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">최소 검출 효과</p>
+                <p className="text-sm font-medium text-obsidian">최소 검출 효과</p>
                 <p className="text-2xl font-bold">
                   {Math.round(stats.overallStats.minimumDetectableEffect * 100) / 100}%
                 </p>
@@ -475,19 +475,19 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
-                      <p className="text-sm text-gray-600">참가자</p>
+                      <p className="text-sm text-obsidian">참가자</p>
                       <p className="font-bold text-xl">{variant.participants.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">전환</p>
+                      <p className="text-sm text-obsidian">전환</p>
                       <p className="font-bold text-xl">{variant.conversions.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">전환율</p>
+                      <p className="text-sm text-obsidian">전환율</p>
                       <p className="font-bold text-xl">{variant.conversionRate}%</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">P-value</p>
+                      <p className="text-sm text-obsidian">P-value</p>
                       <p className="font-bold text-xl">{variant.pValue}</p>
                     </div>
                   </div>
@@ -593,7 +593,7 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
                   </div>
                   
                   {stats.overallStats.estimatedCompletionTime && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-obsidian">
                       <Clock className="h-4 w-4 inline mr-1" />
                       예상 완료: {new Date(stats.overallStats.estimatedCompletionTime).toLocaleDateString()}
                     </div>
@@ -610,10 +610,10 @@ export default function ABTestAdvancedDashboard({ testId }: ABTestAdvancedDashbo
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                  <div className="text-3xl font-bold text-primary mb-2">
                     {Math.round(stats.overallStats.minimumDetectableEffect * 100) / 100}%
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-obsidian">
                     이 값보다 큰 효과만 통계적으로 검출할 수 있습니다.
                   </p>
                 </div>

@@ -119,7 +119,7 @@ export default function HotlineChat() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
               <h2 className="text-sm sm:text-xl font-serif tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
-                자문위 유니클 핫라인
+                유니클 자문위 핫라인
               </h2>
               <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-chapter-accent text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white shadow-md w-fit shrink-0">
                 <Brain className="w-2 h-2" />
@@ -166,7 +166,7 @@ export default function HotlineChat() {
                    <div className={`px-3.5 py-2.5 sm:px-5 sm:py-3.5 md:px-6 md:py-4 rounded-[18px] sm:rounded-[24px] md:rounded-[28px] text-[12.5px] sm:text-[14px] md:text-[15px] leading-relaxed shadow-sm border ${
                      isAI 
                       ? 'bg-white border-line text-obsidian rounded-tl-none font-medium' 
-                      : 'bg-chapter-accent border-chapter-accent text-white rounded-tr-none font-black'
+                      : 'bg-chapter-accent border-chapter-accent text-obsidian rounded-tr-none font-black'
                    }`}>
                      {msg.content.split('\n').map((line, i) => (
                         <p key={i} className={i > 0 ? 'mt-2' : ''}>{line}</p>

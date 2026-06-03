@@ -98,8 +98,8 @@ export default function ContentPage() {
             {/* 블로그 */}
             <Card className="text-center p-8 hover:shadow-lg transition-shadow relative">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <ExternalLink className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
+                  <ExternalLink className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-4 text-xl">블로그</h3>
                 <p className="text-text-secondary mb-6">

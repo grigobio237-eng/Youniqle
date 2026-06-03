@@ -188,16 +188,16 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 {user.role === 'admin' && <Badge variant="default">관리자</Badge>}
                 {user.role === 'superadmin' && <Badge className="bg-red-600 text-white">최고 관리자</Badge>}
               </div>
-              <p className="text-gray-500">{user.email}</p>
+              <p className="text-foreground/70">{user.email}</p>
             </div>
           </div>
           <div className="flex gap-2">
              {user.isNavigator && (
-              <Badge className="bg-amber-500 text-white hover:bg-amber-600 px-3 py-1 flex items-center gap-1 text-xs">
+              <Badge className="bg-primary text-white hover:bg-primary px-3 py-1 flex items-center gap-1 text-xs">
                 <Sparkles className="h-3 w-3" /> 네비게이터 유저
               </Badge>
             )}
-             <Badge variant="outline" className={`px-3 py-1 ${user.emailVerified ? 'text-green-600 border-green-200' : 'text-gray-400'}`}>
+             <Badge variant="outline" className={`px-3 py-1 ${user.emailVerified ? 'text-green-600 border-green-200' : 'text-foreground/70'}`}>
                {user.emailVerified ? 'Email 인증됨' : 'Email 미인증'}
              </Badge>
           </div>
@@ -209,15 +209,15 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         {/* Left Column: Operation & Points */}
         <div className="lg:col-span-1 space-y-6">
           <Card>
-            <CardHeader className="pb-3 border-b border-gray-100">
+            <CardHeader className="pb-3 border-b border-line">
               <CardTitle className="text-lg flex items-center gap-2">
-                 <Shield className="h-5 w-5 text-gray-400" />
+                 <Shield className="h-5 w-5 text-foreground/70" />
                  운영 권한 설정
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5 space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500">역할 (Role)</label>
+                <label className="text-xs font-bold text-foreground/70">역할 (Role)</label>
                 <Select value={opForm.role} onValueChange={(val) => setOpForm(p => ({ ...p, role: val }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -229,7 +229,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500">회원 등급 (Grade)</label>
+                <label className="text-xs font-bold text-foreground/70">회원 등급 (Grade)</label>
                 <Select value={opForm.grade} onValueChange={(val) => setOpForm(p => ({ ...p, grade: val }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -242,7 +242,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500">접근 등급 (Tier)</label>
+                <label className="text-xs font-bold text-foreground/70">접근 등급 (Tier)</label>
                 <Select value={opForm.tier} onValueChange={(val) => setOpForm(p => ({ ...p, tier: val }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -262,16 +262,16 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           </Card>
 
           <Card>
-            <CardHeader className="pb-3 border-b border-gray-100">
+            <CardHeader className="pb-3 border-b border-line">
               <CardTitle className="text-lg flex items-center gap-2">
-                 <Zap className="h-5 w-5 text-amber-500" />
+                 <Zap className="h-5 w-5 text-primary" />
                  패스 및 멤버십 관리
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5 space-y-4">
               <div className="space-y-3">
-                <div className="text-xs font-bold text-gray-500">현재 보유 패스: 
-                  <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-700">
+                <div className="text-xs font-bold text-foreground/70">현재 보유 패스: 
+                  <Badge variant="secondary" className="ml-2 bg-gray-100 text-obsidian">
                     {user.passInfo?.type || 'NONE'}
                   </Badge>
                 </div>
@@ -282,7 +282,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     className="w-full justify-start h-9"
                     onClick={() => handleGrantPass('START')}
                   >
-                    <Badge className="bg-blue-600 mr-2">REBORN</Badge>
+                    <Badge className="bg-primary mr-2">REBORN</Badge>
                     START PASS 지급
                   </Button>
                   <Button 
@@ -309,9 +309,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           </Card>
 
           <Card>
-             <CardHeader className="pb-3 border-b border-gray-100">
+             <CardHeader className="pb-3 border-b border-line">
               <CardTitle className="text-lg flex items-center gap-2">
-                 <Star className="h-5 w-5 text-gray-400" />
+                 <Star className="h-5 w-5 text-foreground/70" />
                  포인트 관리 (잔여: {user.points?.toLocaleString() || 0}P)
               </CardTitle>
             </CardHeader>
@@ -333,30 +333,30 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         {/* Right Column: Information & Monitoring Tabs */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader className="bg-gray-50 pb-3">
-              <CardTitle className="text-sm font-bold text-gray-600">개인 정보 (Read-Only)</CardTitle>
+            <CardHeader className="bg-surface pb-3">
+              <CardTitle className="text-sm font-bold text-obsidian">개인 정보 (Read-Only)</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x border-b">
                  <div className="p-4 flex items-center gap-3">
-                   <Phone className="h-5 w-5 text-gray-400" />
+                   <Phone className="h-5 w-5 text-foreground/70" />
                    <div>
-                     <p className="text-xs text-gray-500">연락처</p>
+                     <p className="text-xs text-foreground/70">연락처</p>
                      <p className="font-medium">{user.phone || '미등록'}</p>
                    </div>
                  </div>
                  <div className="p-4 flex items-center gap-3">
-                   <Calendar className="h-5 w-5 text-gray-400" />
+                   <Calendar className="h-5 w-5 text-foreground/70" />
                    <div>
-                     <p className="text-xs text-gray-500">가입일</p>
+                     <p className="text-xs text-foreground/70">가입일</p>
                      <p className="font-medium">{new Date(user.createdAt).toLocaleDateString()}</p>
                    </div>
                  </div>
                </div>
                
                {/* 배송지 목록 */}
-               <div className="p-4 bg-gray-50/50">
-                 <h4 className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-1"><MapPin className="h-4 w-4" /> 등록된 배송지 목록 ({user.addresses?.length || 0}/5)</h4>
+               <div className="p-4 bg-surface/50">
+                 <h4 className="text-xs font-bold text-foreground/70 mb-3 flex items-center gap-1"><MapPin className="h-4 w-4" /> 등록된 배송지 목록 ({user.addresses?.length || 0}/5)</h4>
                  <div className="space-y-3">
                     {user.addresses && user.addresses.length > 0 ? (
                       user.addresses.map((addr: any, idx: number) => (
@@ -366,13 +366,13 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                                {addr.label}
                                {addr.isDefault && <Badge variant="secondary" className="text-[10px]">기본</Badge>}
                              </div>
-                             <p className="text-gray-600 mt-1">{addr.recipient} ({addr.phone})</p>
-                             <p className="text-gray-500 text-xs mt-0.5">[{addr.zip}] {addr.addr1} {addr.addr2}</p>
+                             <p className="text-obsidian mt-1">{addr.recipient} ({addr.phone})</p>
+                             <p className="text-foreground/70 text-xs mt-0.5">[{addr.zip}] {addr.addr1} {addr.addr2}</p>
                            </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500">등록된 배송지가 없습니다.</p>
+                      <p className="text-sm text-foreground/70">등록된 배송지가 없습니다.</p>
                     )}
                  </div>
                </div>
@@ -391,7 +391,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 구매 및 포인트 이력
               </TabsTrigger>
               {user.isNavigator && (
-                <TabsTrigger value="shops" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-amber-600 font-bold">
+                <TabsTrigger value="shops" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-primary font-bold">
                   네비게이터 관리 업소
                 </TabsTrigger>
               )}
@@ -406,18 +406,18 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                    <div className="divide-y relative">
                       {behaviors.length > 0 ? (
                         behaviors.map((beh: any, idx: number) => (
-                          <div key={idx} className="p-4 flex gap-4 hover:bg-gray-50 transition-colors">
+                          <div key={idx} className="p-4 flex gap-4 hover:bg-surface transition-colors">
                               <div className="mt-1">
-                                {beh.eventType === 'view' ? <SwitchCamera className="h-4 w-4 text-gray-400" /> :
+                                {beh.eventType === 'view' ? <SwitchCamera className="h-4 w-4 text-foreground/70" /> :
                                  beh.eventType === 'click' ? <Activity className="h-4 w-4 text-blue-400" /> :
                                  <ShoppingBag className="h-4 w-4 text-green-400" />}
                               </div>
                               <div className="flex-1">
                                 <div className="flex justify-between items-start">
                                   <p className="text-sm font-bold capitalize">{beh.eventType.replace(/_/g, ' ')}</p>
-                                  <p className="text-xs text-gray-400">{new Date(beh.timestamp).toLocaleString()}</p>
+                                  <p className="text-xs text-foreground/70">{new Date(beh.timestamp).toLocaleString()}</p>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1 truncate" title={beh.context?.pageUrl}>
+                                <p className="text-xs text-foreground/70 mt-1 truncate" title={beh.context?.pageUrl}>
                                   Action at: {beh.context?.pageUrl}
                                 </p>
                                 {beh.itemData?.name && <p className="text-xs font-semibold mt-1 bg-gray-100 inline-block px-2 py-0.5 rounded">Target: {beh.itemData.name}</p>}
@@ -425,7 +425,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                           </div>
                         ))
                       ) : (
-                        <div className="p-8 text-center text-gray-500">활동 기록이 없습니다.</div>
+                        <div className="p-8 text-center text-foreground/70">활동 기록이 없습니다.</div>
                       )}
                    </div>
                    {behaviorHasMore && (
@@ -449,14 +449,14 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                          <div className="flex-1">
                            <div className="flex justify-between">
                              <p className="font-bold">{diag.resultTitle}</p>
-                             <p className="text-xs text-gray-400">{new Date(diag.createdAt).toLocaleDateString()}</p>
+                             <p className="text-xs text-foreground/70">{new Date(diag.createdAt).toLocaleDateString()}</p>
                            </div>
-                           <p className="text-sm text-gray-600 mt-1">Total Score: <span className="font-bold text-primary">{Math.round(diag.totalScore)}</span></p>
+                           <p className="text-sm text-obsidian mt-1">Total Score: <span className="font-bold text-primary">{Math.round(diag.totalScore)}</span></p>
                          </div>
                        </div>
                      ))
                    ) : (
-                     <div className="p-8 text-center text-gray-500">진단 이력이 없습니다.</div>
+                     <div className="p-8 text-center text-foreground/70">진단 이력이 없습니다.</div>
                    )}
                 </CardContent>
               </Card>
@@ -467,21 +467,21 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 <CardContent className="p-0 divide-y">
                    {user.pointHistories && user.pointHistories.length > 0 ? (
                      user.pointHistories.map((tx: any, idx: number) => (
-                       <div key={idx} className="p-4 flex justify-between items-center hover:bg-gray-50">
+                       <div key={idx} className="p-4 flex justify-between items-center hover:bg-surface">
                          <div>
                             <p className="text-sm font-bold">{tx.description}</p>
-                            <p className="text-xs text-gray-400">{new Date(tx.createdAt).toLocaleString()}</p>
+                            <p className="text-xs text-foreground/70">{new Date(tx.createdAt).toLocaleString()}</p>
                          </div>
                          <div className="text-right">
                            <p className={`text-sm font-bold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
                              {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} P
                            </p>
-                           <p className="text-xs text-gray-500">잔액: {tx.balance?.toLocaleString() || 0} P</p>
+                           <p className="text-xs text-foreground/70">잔액: {tx.balance?.toLocaleString() || 0} P</p>
                          </div>
                        </div>
                      ))
                    ) : (
-                     <div className="p-8 text-center text-gray-500">포인트 거래 내역이 없습니다.</div>
+                     <div className="p-8 text-center text-foreground/70">포인트 거래 내역이 없습니다.</div>
                    )}
                 </CardContent>
               </Card>
@@ -492,7 +492,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   shops.map((shop: any, idx: number) => (
                     <Card key={idx} className="overflow-hidden border-amber-100 hover:shadow-md transition-shadow">
                       <div className="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
-                        <Badge className="bg-white text-amber-600 border-amber-200">Shop ID: {shop.shopCode}</Badge>
+                        <Badge className="bg-white text-primary border-primary/30">Shop ID: {shop.shopCode}</Badge>
                         <Badge variant={shop.isActive ? "default" : "secondary"}>{shop.isActive ? '운영중' : '중지'}</Badge>
                       </div>
                       <CardContent className="p-5 space-y-4">

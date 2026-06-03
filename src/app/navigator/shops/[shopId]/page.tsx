@@ -123,7 +123,7 @@ export default function ShopAnalyticsPage() {
                         <h1 className="font-black text-obsidian tracking-tighter italic font-serif text-4xl">Deep Analytics</h1>
                         <Badge className="bg-chapter-accent/10 text-chapter-accent border-none font-black text-[10px] tracking-widest uppercase">Lead Analysis</Badge>
                         {isAdmin && (
-                            <Badge className="bg-amber-500 text-white border-none font-black text-[10px] tracking-widest uppercase">Admin Monitor Mode</Badge>
+                            <Badge className="bg-primary text-white border-none font-black text-[10px] tracking-widest uppercase">Admin Monitor Mode</Badge>
                         )}
                     </div>
                     <p className="text-slate/60 text-lg font-medium">수집된 사용자 응답을 바탕으로 정밀한 제안 상품을 설계하세요.</p>
@@ -263,7 +263,7 @@ export default function ShopAnalyticsPage() {
                                 {/* Lite Tier */}
                                 <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <Badge className="bg-slate-500/20 text-slate-300 border-none font-bold text-[9px] uppercase tracking-widest">Lite Tier</Badge>
+                                        <Badge className="bg-surface0/20 text-slate-300 border-none font-bold text-[9px] uppercase tracking-widest">Lite Tier</Badge>
                                         <Plus className="w-4 h-4 text-mist/20" />
                                     </div>
                                     <div className="space-y-3">
@@ -305,10 +305,10 @@ export default function ShopAnalyticsPage() {
                                 </div>
 
                                 {/* Black Tier */}
-                                <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-500/20 space-y-4">
+                                <div className="p-6 rounded-3xl bg-primary/10 border border-primary/30/20 space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <Badge className="bg-amber-500/20 text-amber-500 border-none font-bold text-[9px] uppercase tracking-widest">Black Tier</Badge>
-                                        <Zap className="w-4 h-4 text-amber-500/50" />
+                                        <Badge className="bg-primary/20 text-primary border-none font-bold text-[9px] uppercase tracking-widest">Black Tier</Badge>
+                                        <Zap className="w-4 h-4 text-primary/50" />
                                     </div>
                                     <div className="space-y-3">
                                         <input 

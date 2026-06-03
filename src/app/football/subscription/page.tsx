@@ -116,9 +116,9 @@ export default function SubscriptionPage() {
 
   const getStatusBadge = (status: string) => {
     const map: Record<string, { label: string; className: string }> = {
-      trial: { label: '무료 체험', className: 'bg-blue-100 text-blue-700' },
+      trial: { label: '무료 체험', className: 'bg-primary-container text-primary' },
       active: { label: '활성', className: 'bg-green-100 text-green-700' },
-      expired: { label: '만료', className: 'bg-gray-100 text-gray-700' },
+      expired: { label: '만료', className: 'bg-gray-100 text-obsidian' },
       cancelled: { label: '취소됨', className: 'bg-red-100 text-red-700' },
     };
     const s = map[status] || { label: status, className: 'bg-gray-100' };
@@ -166,7 +166,7 @@ export default function SubscriptionPage() {
                   <p className="text-xs text-slate">선수 현원</p>
                 </div>
                 <div className="bg-blue-50 rounded-xl p-3 text-center">
-                  <Calendar className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                  <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
                   <p className="text-sm font-black text-obsidian">
                     {data.subscription.status === 'trial' && data.subscription.trialEndsAt
                       ? new Date(data.subscription.trialEndsAt).toLocaleDateString('ko-KR')
@@ -179,9 +179,9 @@ export default function SubscriptionPage() {
               </div>
 
               {data.subscription.status === 'trial' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center mb-4">
-                  <p className="text-sm font-bold text-blue-700">🎉 14일 무료 체험 중</p>
-                  <p className="text-xs text-blue-600 mt-1">체험 기간 종료 전 정기결제를 등록해 주세요</p>
+                <div className="bg-blue-50 border border-primary/30 rounded-xl p-3 text-center mb-4">
+                  <p className="text-sm font-bold text-primary">🎉 14일 무료 체험 중</p>
+                  <p className="text-xs text-primary mt-1">체험 기간 종료 전 정기결제를 등록해 주세요</p>
                 </div>
               )}
 

@@ -45,15 +45,15 @@ export default function CoachDecisionCard({ teamName, players, onPlayerClick }: 
         {/* 신호등 요약 */}
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
-            <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-2" />
-            <span className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest mb-1">Optimal</span>
-            <span className="text-2xl font-black text-emerald-600">{greenCount}명</span>
+            <CheckCircle2 className="w-8 h-8 text-secondary mb-2" />
+            <span className="text-[10px] font-black text-secondary/60 uppercase tracking-widest mb-1">Optimal</span>
+            <span className="text-2xl font-black text-secondary">{greenCount}명</span>
           </div>
           
           <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
-            <AlertCircle className="w-8 h-8 text-amber-500 mb-2" />
-            <span className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest mb-1">Warning</span>
-            <span className="text-2xl font-black text-amber-600">{yellowCount}명</span>
+            <AlertCircle className="w-8 h-8 text-primary mb-2" />
+            <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest mb-1">Warning</span>
+            <span className="text-2xl font-black text-primary">{yellowCount}명</span>
           </div>
 
           <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
@@ -78,7 +78,7 @@ export default function CoachDecisionCard({ teamName, players, onPlayerClick }: 
                   className="flex items-center justify-between p-4 bg-white border border-line/10 rounded-2xl hover:border-obsidian/20 transition-all cursor-pointer group shadow-sm"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-full ${player.status === 'RED' ? 'bg-rose-500' : 'bg-amber-500'} shadow-sm`} />
+                    <div className={`w-3 h-3 rounded-full ${player.status === 'RED' ? 'bg-rose-500' : 'bg-primary'} shadow-sm`} />
                     <span className="font-bold text-obsidian">{player.name}</span>
                     <Badge variant="outline" className="border-line/10 bg-mist/30 text-slate/60 text-[10px]">
                       {player.reason || '회복 필요'}

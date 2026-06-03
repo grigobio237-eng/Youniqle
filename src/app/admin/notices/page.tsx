@@ -332,7 +332,7 @@ export default function AdminNoticesPage() {
             <Megaphone className="w-8 h-8" />
             공지사항 관리
           </h1>
-          <p className="text-gray-500 mt-1">공지사항을 작성하고 관리합니다</p>
+          <p className="text-foreground/70 mt-1">공지사항을 작성하고 관리합니다</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setShowCreateDialog(true)}>
@@ -349,27 +349,27 @@ export default function AdminNoticesPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">총 공지</p>
+            <p className="text-sm text-foreground/70">총 공지</p>
             <p className="text-2xl font-semibold mt-2">{total.toLocaleString()}건</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-foreground/70 mt-1">
               게시 {statusSummary.published} · 임시 {statusSummary.draft} · 보관 {statusSummary.archived}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">고정/팝업 공지</p>
+            <p className="text-sm text-foreground/70">고정/팝업 공지</p>
             <p className="text-2xl font-semibold mt-2">
               {notices.filter(n => n.isPinned).length} / {notices.filter(n => n.isPopup).length}
             </p>
-            <p className="text-xs text-gray-400 mt-1">고정된 공지와 팝업 공지 수</p>
+            <p className="text-xs text-foreground/70 mt-1">고정된 공지와 팝업 공지 수</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">검색어</p>
+            <p className="text-sm text-foreground/70">검색어</p>
             <p className="font-semibold mt-2 truncate text-xl">{search ? `"${search}"` : '전체'}</p>
-            <p className="text-xs text-gray-400 mt-1">필터 적용: {typeFilter || '전체 유형'}</p>
+            <p className="text-xs text-foreground/70 mt-1">필터 적용: {typeFilter || '전체 유형'}</p>
           </CardContent>
         </Card>
       </div>
@@ -456,7 +456,7 @@ export default function AdminNoticesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Eye className="w-4 h-4 text-gray-400" />
+                          <Eye className="w-4 h-4 text-foreground/70" />
                           {notice.viewCount}
                         </div>
                       </TableCell>
@@ -626,7 +626,7 @@ export default function AdminNoticesPage() {
                   <SelectItem value="admin">관리자만</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-foreground/70 mt-1">
                 팝업 공지의 경우 선택한 대상에게만 표시됩니다
               </p>
             </div>
@@ -640,14 +640,14 @@ export default function AdminNoticesPage() {
               />
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-              <Label className="text-slate-900 font-bold flex items-center gap-2">
+            <div className="bg-surface p-4 rounded-xl border border-line space-y-3">
+              <Label className="text-obsidian font-bold flex items-center gap-2">
                 📅 게시 기간 설정
-                <span className="text-[10px] font-normal text-slate-400">(미입력 시 상시 게시)</span>
+                <span className="text-[10px] font-normal text-foreground/70">(미입력 시 상시 게시)</span>
               </Label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-startDate" className="text-xs text-slate-500">시작일</Label>
+                  <Label htmlFor="create-startDate" className="text-xs text-foreground/70">시작일</Label>
                   <Input
                     id="create-startDate"
                     type="date"
@@ -657,7 +657,7 @@ export default function AdminNoticesPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-endDate" className="text-xs text-slate-500">종료일</Label>
+                  <Label htmlFor="create-endDate" className="text-xs text-foreground/70">종료일</Label>
                   <Input
                     id="create-endDate"
                     type="date"
@@ -800,19 +800,19 @@ export default function AdminNoticesPage() {
                   <SelectItem value="admin">관리자만</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-foreground/70 mt-1">
                 팝업 공지의 경우 선택한 대상에게만 표시됩니다
               </p>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-              <Label className="text-slate-900 font-bold flex items-center gap-2">
+            <div className="bg-surface p-4 rounded-xl border border-line space-y-3">
+              <Label className="text-obsidian font-bold flex items-center gap-2">
                 📅 게시 기간 설정
-                <span className="text-[10px] font-normal text-slate-400">(미입력 시 상시 게시)</span>
+                <span className="text-[10px] font-normal text-foreground/70">(미입력 시 상시 게시)</span>
               </Label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-startDate" className="text-xs text-slate-500">시작일</Label>
+                  <Label htmlFor="edit-startDate" className="text-xs text-foreground/70">시작일</Label>
                   <Input
                     id="edit-startDate"
                     type="date"
@@ -822,7 +822,7 @@ export default function AdminNoticesPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-endDate" className="text-xs text-slate-500">종료일</Label>
+                  <Label htmlFor="edit-endDate" className="text-xs text-foreground/70">종료일</Label>
                   <Input
                     id="edit-endDate"
                     type="date"
@@ -922,9 +922,9 @@ export default function AdminNoticesPage() {
               <div>
                 <h2 className="text-2xl font-semibold mb-2">{previewNotice.title}</h2>
                 {previewNotice.summary && (
-                  <p className="text-sm text-gray-500 mb-3">{previewNotice.summary}</p>
+                  <p className="text-sm text-foreground/70 mb-3">{previewNotice.summary}</p>
                 )}
-                <div className="prose max-w-none whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                <div className="prose max-w-none whitespace-pre-wrap text-sm leading-relaxed text-obsidian">
                   {previewNotice.content}
                 </div>
               </div>
@@ -937,7 +937,7 @@ export default function AdminNoticesPage() {
                   ))}
                 </div>
               )}
-              <div className="flex items-center gap-4 text-xs text-gray-500 border-t pt-3">
+              <div className="flex items-center gap-4 text-xs text-foreground/70 border-t pt-3">
                 <span>조회 {previewNotice.viewCount}</span>
                 {previewNotice.publishedAt && (
                   <span>게시일 {new Date(previewNotice.publishedAt).toLocaleString('ko-KR')}</span>

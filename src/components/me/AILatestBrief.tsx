@@ -36,7 +36,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                 <div className="relative z-10 mt-6 space-y-3">
                     <div className="p-4 rounded-[20px] bg-white/5 border border-white/5 flex items-center gap-3">
                         <span className="text-base">💡</span>
-                        <p className="text-[11px] font-bold text-slate-400">CGM 분석을 통해 수면, 영양, 운동 맞춤 추천 처방</p>
+                        <p className="text-[11px] font-bold text-foreground/70">CGM 분석을 통해 수면, 영양, 운동 맞춤 추천 처방</p>
                     </div>
                     <Link href="/ai-navigator" className="w-full py-3.5 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
                         유니클 진단 시작하기 <ArrowRight className="w-4 h-4" />
@@ -47,9 +47,9 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
     }
 
     const items = [
-        { icon: Dumbbell, title: "Exercise", content: solution.exercise, color: "text-blue-500", bg: "bg-blue-50" },
+        { icon: Dumbbell, title: "Exercise", content: solution.exercise, color: "text-primary", bg: "bg-blue-50" },
         { icon: Utensils, title: "Nutrition", content: solution.nutrition, color: "text-green-500", bg: "bg-green-50" },
-        { icon: Moon, title: "Sleep", content: solution.sleep, color: "text-indigo-500", bg: "bg-indigo-50" },
+        { icon: Moon, title: "Sleep", content: solution.sleep, color: "text-secondary", bg: "bg-indigo-50" },
     ];
 
     return (

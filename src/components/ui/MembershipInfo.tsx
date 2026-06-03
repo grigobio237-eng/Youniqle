@@ -18,7 +18,7 @@ const gradeInfo = {
     name: 'CEDAR',
     emoji: '🌲',
     color: 'amber',
-    bgColor: 'bg-amber-100',
+    bgColor: 'bg-primary-container/50',
     textColor: 'text-amber-800',
     description: '새싹이 돋아나는 첫 걸음',
     benefits: [
@@ -33,7 +33,7 @@ const gradeInfo = {
     name: 'ROOTER',
     emoji: '🌱',
     color: 'blue',
-    bgColor: 'bg-blue-100',
+    bgColor: 'bg-primary-container',
     textColor: 'text-blue-800',
     description: '뿌리를 내리며 성장하는 단계',
     benefits: [
@@ -83,7 +83,7 @@ const gradeInfo = {
     name: 'ECOSOUL',
     emoji: '🌿',
     color: 'purple',
-    bgColor: 'bg-purple-100',
+    bgColor: 'bg-secondary-container',
     textColor: 'text-purple-800',
     description: '자연과 하나된 최고의 단계',
     benefits: [
@@ -206,8 +206,8 @@ export default function MembershipInfo({ currentGrade, currentPoints }: Membersh
                 <h3 className={`text-2xl font-bold mb-2 ${currentInfo.textColor}`}>
                   {currentInfo.name}
                 </h3>
-                <p className="text-gray-600 mb-4">{currentInfo.description}</p>
-                <p className="text-sm text-gray-500">현재 포인트: {currentPoints.toLocaleString()}P</p>
+                <p className="text-obsidian mb-4">{currentInfo.description}</p>
+                <p className="text-sm text-foreground/70">현재 포인트: {currentPoints.toLocaleString()}P</p>
               </div>
 
               {/* 다음 등급까지 진행률 */}
@@ -219,11 +219,11 @@ export default function MembershipInfo({ currentGrade, currentPoints }: Membersh
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-foreground/70 text-center">
                     {nextGradeInfo.requiredPoints && nextGradeInfo.requiredPoints > currentPoints
                       ? `${(nextGradeInfo.requiredPoints - currentPoints).toLocaleString()}P 더 필요`
                       : '최고 등급 달성!'
@@ -260,8 +260,8 @@ export default function MembershipInfo({ currentGrade, currentPoints }: Membersh
                       key={grade}
                       className={`p-3 rounded-lg border-2 ${
                         grade === currentGrade 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200'
+                          ? 'border-primary/30 bg-blue-50' 
+                          : 'border-line'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -279,9 +279,9 @@ export default function MembershipInfo({ currentGrade, currentPoints }: Membersh
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600">{info.description}</p>
+                          <p className="text-sm text-obsidian">{info.description}</p>
                           {info.requiredPoints && info.requiredPoints > 0 && (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-foreground/70">
                               필요 포인트: {info.requiredPoints.toLocaleString()}P
                             </p>
                           )}
@@ -293,7 +293,7 @@ export default function MembershipInfo({ currentGrade, currentPoints }: Membersh
               </div>
 
               {/* 포인트 적립 안내 */}
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-surface p-4 rounded-lg">
                 <h4 className="font-semibold mb-2 flex items-center">
                   <Zap className="h-4 w-4 mr-2" />
                   포인트 적립 방법

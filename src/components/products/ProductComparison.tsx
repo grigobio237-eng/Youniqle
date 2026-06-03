@@ -138,11 +138,11 @@ export default function ProductComparison({ currentProductId }: ProductCompariso
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <GitCompare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <GitCompare className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-obsidian mb-2">
             비교할 상품이 없습니다
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-obsidian mb-4">
             다른 상품 페이지에서 비교 버튼을 눌러 상품을 추가해보세요.
           </p>
           <Button asChild>
@@ -179,8 +179,8 @@ export default function ProductComparison({ currentProductId }: ProductCompariso
               <div className="grid grid-cols-4 gap-4">
                 {/* 헤더 */}
                 <div className="space-y-4">
-                  <div className="h-32 flex items-center justify-center bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">비교 항목</span>
+                  <div className="h-32 flex items-center justify-center bg-surface rounded-lg">
+                    <span className="text-sm text-obsidian">비교 항목</span>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="font-medium">상품명</div>
@@ -206,7 +206,7 @@ export default function ProductComparison({ currentProductId }: ProductCompariso
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-foreground/70">
                             <Heart className="h-12 w-12" />
                           </div>
                         )}
@@ -226,17 +226,17 @@ export default function ProductComparison({ currentProductId }: ProductCompariso
                       <div>
                         <Link 
                           href={`/products/${product._id}`}
-                          className="font-medium text-blue-600 hover:underline line-clamp-2"
+                          className="font-medium text-primary hover:underline line-clamp-2"
                         >
                           {product.name}
                         </Link>
                       </div>
                       <div>
-                        <div className="font-bold text-blue-600">
+                        <div className="font-bold text-primary">
                           {formatPrice(product.price)}
                         </div>
                         {product.originalPrice && product.originalPrice > product.price && (
-                          <div className="text-xs text-gray-500 line-through">
+                          <div className="text-xs text-foreground/70 line-through">
                             {formatPrice(product.originalPrice)}
                           </div>
                         )}

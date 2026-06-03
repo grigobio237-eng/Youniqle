@@ -190,15 +190,15 @@ function DeepTestView({ question, index, total, onAnswer, onPrevious }: any) {
                     <h3 className="text-2xl md:text-3xl font-bold text-obsidian leading-tight mb-4 min-h-[4em] flex items-center justify-center">
                         {question.text}
                     </h3>
-                    <p className="text-slate-400 italic text-sm font-medium">{question.textEn}</p>
+                    <p className="text-foreground/70 italic text-sm font-medium">{question.textEn}</p>
                 </div>
 
                 <div className="flex flex-col gap-3 max-w-md mx-auto w-full">
                     {[
                         { label: '매우 그렇다', score: 5, color: 'hover:bg-primary/10 hover:border-primary hover:text-primary' },
                         { label: '그렇다', score: 4, color: 'hover:bg-primary/5' },
-                        { label: '보통이다', score: 3, color: 'hover:bg-slate-50' },
-                        { label: '아니다', score: 2, color: 'hover:bg-slate-50' },
+                        { label: '보통이다', score: 3, color: 'hover:bg-surface' },
+                        { label: '아니다', score: 2, color: 'hover:bg-surface' },
                         { label: '전혀 아니다', score: 1, color: 'hover:bg-red-50 hover:border-red-200 hover:text-red-500' },
                     ].map((opt) => (
                         <button
@@ -217,7 +217,7 @@ function DeepTestView({ question, index, total, onAnswer, onPrevious }: any) {
 
             {index > 0 && (
                 <div className="px-10 pb-6">
-                    <button onClick={onPrevious} className="text-xs font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1">
+                    <button onClick={onPrevious} className="text-xs font-bold text-foreground/70 hover:text-primary transition-colors flex items-center gap-1">
                         ← 이전 질문으로 돌아가기
                     </button>
                 </div>
@@ -301,7 +301,7 @@ function DeepResultView({ result, onClose }: { result: IPIP60Result, onClose: ()
 
                 {/* 2. Key Interpretations */}
                 <div className="space-y-4">
-                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Expert Insights</h4>
+                    <h4 className="text-xs font-black text-foreground/70 uppercase tracking-[0.2em] ml-2">Expert Insights</h4>
                     {result.interpretations.map((text, idx) => (
                         <motion.div
                             key={idx}

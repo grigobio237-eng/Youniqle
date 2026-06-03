@@ -84,7 +84,7 @@ export default function TodoPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -98,11 +98,11 @@ export default function TodoPage() {
 
                     <CardContent className="space-y-6">
                         <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-4 text-center">
-                            <p className="text-sm text-gray-600 mb-1">진행 상황</p>
-                            <p className="text-3xl font-bold text-gray-900">
+                            <p className="text-sm text-obsidian mb-1">진행 상황</p>
+                            <p className="text-3xl font-bold text-obsidian">
                                 {completedCount} / {todos.length}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-obsidian mt-1">
                                 {todos.length > 0 ? `${Math.round((completedCount / todos.length) * 100)}% 완료` : '할 일을 추가하세요'}
                             </p>
                         </div>
@@ -123,7 +123,7 @@ export default function TodoPage() {
 
                         <div className="space-y-2">
                             {todos.length === 0 ? (
-                                <div className="text-center py-12 text-gray-400">
+                                <div className="text-center py-12 text-foreground/70">
                                     <p className="text-lg">아직 할 일이 없습니다</p>
                                     <p className="text-sm">위에서 새로운 할 일을 추가해보세요!</p>
                                 </div>
@@ -131,7 +131,7 @@ export default function TodoPage() {
                                 todos.map((todo) => (
                                     <div key={todo.id} className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
                                         <Checkbox checked={todo.completed} onCheckedChange={() => toggleTodo(todo.id)} />
-                                        <span className={`flex-1 ${todo.completed ? 'line-through text-gray-400' : ''}`}>{todo.text}</span>
+                                        <span className={`flex-1 ${todo.completed ? 'line-through text-foreground/70' : ''}`}>{todo.text}</span>
                                         <Button variant="ghost" size="sm" onClick={() => deleteTodo(todo.id)}>
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>

@@ -81,7 +81,7 @@ export default function ArtworkDetailPage() {
                 
                 {/* Navigation Header */}
                 <div className="max-w-7xl mx-auto mb-6 md:mb-16">
-                    <div className="flex justify-between items-center bg-gray-50/50 rounded-[30px] md:rounded-[40px] px-5 md:px-8 py-3 md:py-4 border border-line/10">
+                    <div className="flex justify-between items-center bg-surface/50 rounded-[30px] md:rounded-[40px] px-5 md:px-8 py-3 md:py-4 border border-line/10">
                         <button
                             onClick={() => router.back()}
                             className="inline-flex items-center gap-3 text-slate hover:text-obsidian transition-all font-black text-[10px] tracking-[0.3em] uppercase group"
@@ -164,7 +164,7 @@ export default function ArtworkDetailPage() {
                             <Reveal delay={0.3}>
                                 <div className="flex flex-wrap gap-2 md:gap-3">
                                     {Array.from(new Set(['정품인증', artwork.style, artwork.subject, artwork.space].filter(v => v && v !== 'None' && v !== 'All'))).map(tag => (
-                                        <span key={tag} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-gray-50 text-[9px] md:text-[10px] font-bold text-slate/60 uppercase tracking-tighter rounded-full border border-line/5">
+                                        <span key={tag} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-surface text-[9px] md:text-[10px] font-bold text-slate/60 uppercase tracking-tighter rounded-full border border-line/5">
                                             {tag}
                                         </span>
                                     ))}
@@ -213,7 +213,7 @@ export default function ArtworkDetailPage() {
                         </Reveal>
 
                         {/* Pricing & CTA */}
-                        <div className="bg-gray-50 rounded-[30px] md:rounded-[40px] p-6 md:p-12 mb-8 md:mb-12">
+                        <div className="bg-surface rounded-[30px] md:rounded-[40px] p-6 md:p-12 mb-8 md:mb-12">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mb-8 md:mb-12">
                                 <div className="space-y-2">
                                     <span className="text-[10px] text-chapter-accent font-black uppercase tracking-[0.3em] block">Purchase Price (소장 가격)</span>

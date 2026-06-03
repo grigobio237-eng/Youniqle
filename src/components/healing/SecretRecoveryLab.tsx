@@ -123,9 +123,9 @@ export default function SecretRecoveryLab() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                         {[
-                            { icon: <Activity className="w-6 h-6" />, label: 'Active Protocols', value: '12', color: 'bg-emerald-50 text-emerald-600' },
-                            { icon: <BrainCircuit className="w-6 h-6" />, label: 'Youniqle Accuracy', value: '99.4%', color: 'bg-blue-50 text-blue-600' },
-                            { icon: <Zap className="w-6 h-6" />, label: 'Waitlist', value: 'Premium', color: 'bg-amber-50 text-amber-600' },
+                            { icon: <Activity className="w-6 h-6" />, label: 'Active Protocols', value: '12', color: 'bg-emerald-50 text-secondary' },
+                            { icon: <BrainCircuit className="w-6 h-6" />, label: 'Youniqle Accuracy', value: '99.4%', color: 'bg-blue-50 text-primary' },
+                            { icon: <Zap className="w-6 h-6" />, label: 'Waitlist', value: 'Premium', color: 'bg-amber-50 text-primary' },
                         ].map((stat, i) => (
                             <motion.div 
                                 key={i}

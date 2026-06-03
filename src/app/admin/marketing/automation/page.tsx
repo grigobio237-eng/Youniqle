@@ -133,9 +133,9 @@ export default function MarketingAutomationDashboard() {
       case 'paused':
         return <Pause className="h-4 w-4 text-yellow-500" />;
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-blue-500" />;
+        return <CheckCircle className="h-4 w-4 text-primary" />;
       case 'draft':
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-foreground/70" />;
       default:
         return <AlertCircle className="h-4 w-4 text-red-500" />;
     }
@@ -148,9 +148,9 @@ export default function MarketingAutomationDashboard() {
       case 'paused':
         return 'bg-yellow-100 text-yellow-800';
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-container text-blue-800';
       case 'draft':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
       default:
         return 'bg-red-100 text-red-800';
     }
@@ -170,7 +170,7 @@ export default function MarketingAutomationDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">마케팅 자동화</h1>
-          <p className="text-gray-600">고급 마케팅 자동화 시스템 관리</p>
+          <p className="text-obsidian">고급 마케팅 자동화 시스템 관리</p>
         </div>
         <div className="flex space-x-2">
           <Button>
@@ -424,19 +424,19 @@ export default function MarketingAutomationDashboard() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold">12,345</div>
-                      <div className="text-sm text-gray-600">발송</div>
+                      <div className="text-sm text-obsidian">발송</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold">28.3%</div>
-                      <div className="text-sm text-gray-600">오픈율</div>
+                      <div className="text-sm text-obsidian">오픈율</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold">4.2%</div>
-                      <div className="text-sm text-gray-600">클릭율</div>
+                      <div className="text-sm text-obsidian">클릭율</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold">₩1,234,567</div>
-                      <div className="text-sm text-gray-600">수익</div>
+                      <div className="text-sm text-obsidian">수익</div>
                     </div>
                   </div>
                 </CardContent>
@@ -488,7 +488,7 @@ export default function MarketingAutomationDashboard() {
                       <span className="font-medium">95%</span>
                     </div>
                     <Progress value={75} className="mt-2" />
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-obsidian">
                       예상 완료: 3일 후
                     </div>
                   </div>

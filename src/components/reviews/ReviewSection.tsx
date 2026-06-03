@@ -160,11 +160,11 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 평균 별점 */}
             <div className="text-center">
-              <div className="font-bold text-gray-900 mb-2 text-4xl">
+              <div className="font-bold text-obsidian mb-2 text-4xl">
                 {stats.averageRating.toFixed(1)}
               </div>
               {renderStars(Math.round(stats.averageRating), 'lg')}
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-obsidian mt-1">
                 총 {totalReviews}개의 리뷰
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
                 return (
                   <div key={rating} className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600 w-2">{rating}</span>
+                    <span className="text-sm text-obsidian w-2">{rating}</span>
                     <Star className="h-3 w-3 text-yellow-400 fill-current" />
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div className="bg-yellow-400 h-2 rounded-full rating-bar" />
@@ -187,7 +187,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                         }
                       `}</style>
                     </div>
-                    <span className="text-sm text-gray-600 w-8">{count}</span>
+                    <span className="text-sm text-obsidian w-8">{count}</span>
                   </div>
                 );
               })}
@@ -201,7 +201,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
         <CardContent className="p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-500" />
+              <Filter className="h-4 w-4 text-foreground/70" />
               <span className="text-sm font-medium">정렬:</span>
               <select
                 value={sortBy}
@@ -254,9 +254,9 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
         ) : reviews.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">아직 작성된 리뷰가 없습니다.</p>
-              <p className="text-sm text-gray-500 mt-2">
+              <MessageCircle className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+              <p className="text-obsidian">아직 작성된 리뷰가 없습니다.</p>
+              <p className="text-sm text-foreground/70 mt-2">
                 첫 번째 리뷰를 작성해보세요!
               </p>
             </CardContent>
@@ -276,7 +276,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                           className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
-                        <span className="text-sm font-medium text-gray-600">
+                        <span className="text-sm font-medium text-obsidian">
                           {review.userId.name.charAt(0)}
                         </span>
                       )}
@@ -292,7 +292,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                       </div>
                       <div className="flex items-center space-x-2">
                         {renderStars(review.rating, 'sm')}
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-foreground/70">
                           {new Date(review.createdAt).toLocaleDateString('ko-KR')}
                         </span>
                       </div>
@@ -302,9 +302,9 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
                 {/* 리뷰 내용 */}
                 {review.title && (
-                  <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>
+                  <h4 className="font-semibold text-obsidian mb-2">{review.title}</h4>
                 )}
-                <p className="text-gray-700 mb-4 whitespace-pre-line">{review.content}</p>
+                <p className="text-obsidian mb-4 whitespace-pre-line">{review.content}</p>
 
                 {/* 리뷰 이미지 */}
                 {review.images.length > 0 && (
@@ -329,10 +329,10 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                           <span className="font-medium text-blue-900">
                             {reply.userId.name}
                           </span>
-                          <Badge className="bg-blue-100 text-blue-800 text-xs">
+                          <Badge className="bg-primary-container text-blue-800 text-xs">
                             {reply.userId.role === 'admin' ? '관리자' : '파트너'}
                           </Badge>
-                          <span className="text-sm text-blue-600">
+                          <span className="text-sm text-primary">
                             {new Date(reply.createdAt).toLocaleDateString('ko-KR')}
                           </span>
                         </div>

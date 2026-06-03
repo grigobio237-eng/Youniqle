@@ -109,7 +109,7 @@ export default function ImageConverterPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 py-12">
             <div className="container mx-auto px-4 max-w-4xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -130,14 +130,14 @@ export default function ImageConverterPage() {
                                 <div className="mt-2">
                                     <label
                                         htmlFor="upload"
-                                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-surface hover:bg-gray-100"
                                     >
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                                            <p className="mb-2 text-sm text-gray-500">
+                                            <Upload className="w-10 h-10 mb-3 text-foreground/70" />
+                                            <p className="mb-2 text-sm text-foreground/70">
                                                 <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
                                             </p>
-                                            <p className="text-xs text-gray-500">JPG, PNG, WEBP (최대 10MB)</p>
+                                            <p className="text-xs text-foreground/70">JPG, PNG, WEBP (최대 10MB)</p>
                                         </div>
                                         <input id="upload" type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                                     </label>
@@ -149,7 +149,7 @@ export default function ImageConverterPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <Label className="text-base font-semibold">원본 포맷</Label>
-                                            <div className="mt-2 bg-gray-50 rounded-lg p-3 text-center">
+                                            <div className="mt-2 bg-surface rounded-lg p-3 text-center">
                                                 <span className="text-2xl mr-2">{getFormatIcon(originalFormat)}</span>
                                                 <span className="text-lg font-bold">{originalFormat}</span>
                                             </div>
@@ -171,7 +171,7 @@ export default function ImageConverterPage() {
                                     </div>
 
                                     {previewUrl && (
-                                        <div className="bg-gray-50 rounded-lg p-4">
+                                        <div className="bg-surface rounded-lg p-4">
                                             <Label className="text-base font-semibold mb-2 block">미리보기</Label>
                                             <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={previewUrl} alt="Preview" className="max-w-full max-h-64 mx-auto rounded-lg" />
                                         </div>
@@ -200,17 +200,17 @@ export default function ImageConverterPage() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-white rounded-lg p-4 text-center">
-                                        <p className="text-sm text-gray-600 mb-2">원본 크기</p>
-                                        <p className="font-bold text-gray-900 text-xl">{formatSize(originalSize)}</p>
+                                        <p className="text-sm text-obsidian mb-2">원본 크기</p>
+                                        <p className="font-bold text-obsidian text-xl">{formatSize(originalSize)}</p>
                                     </div>
                                     <div className="bg-white rounded-lg p-4 text-center">
-                                        <p className="text-sm text-gray-600 mb-2">변환 후</p>
-                                        <p className="font-bold text-blue-600 text-xl">{formatSize(convertedSize)}</p>
+                                        <p className="text-sm text-obsidian mb-2">변환 후</p>
+                                        <p className="font-bold text-primary text-xl">{formatSize(convertedSize)}</p>
                                     </div>
                                 </div>
 
                                 <div className="bg-white rounded-lg p-4 text-center">
-                                    <p className="text-sm text-gray-600 mb-2">포맷</p>
+                                    <p className="text-sm text-obsidian mb-2">포맷</p>
                                     <p className="text-2xl font-bold">
                                         {getFormatIcon(originalFormat)} {originalFormat} → {getFormatIcon(targetFormat)} {targetFormat.toUpperCase()}
                                     </p>
@@ -225,7 +225,7 @@ export default function ImageConverterPage() {
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 사용 팁</p>
                             <ul className="list-disc list-inside space-y-1">
                                 <li>

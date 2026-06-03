@@ -404,9 +404,9 @@ export default function WeeklyReportPage() {
               </h3>
               <div className="grid gap-3">
                 {[
-                  { icon: '🌙', label: '수면 부족', desc: '새벽 1시 이후 취침이 3회 관찰되었습니다.', color: 'bg-indigo-500' },
-                  { icon: '☕', label: '카페인 과부하', desc: '오후 4시 이후 카페인 섭취가 리듬을 깨뜨렸습니다.', color: 'bg-amber-500' },
-                  { icon: '🏃', label: '불규칙한 활동', desc: '갑작스러운 고강도 활동 후 피로도가 급증했습니다.', color: 'bg-emerald-500' }
+                  { icon: '🌙', label: '수면 부족', desc: '새벽 1시 이후 취침이 3회 관찰되었습니다.', color: 'bg-secondary' },
+                  { icon: '☕', label: '카페인 과부하', desc: '오후 4시 이후 카페인 섭취가 리듬을 깨뜨렸습니다.', color: 'bg-primary' },
+                  { icon: '🏃', label: '불규칙한 활동', desc: '갑작스러운 고강도 활동 후 피로도가 급증했습니다.', color: 'bg-secondary' }
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-4 p-5 bg-white rounded-3xl border border-line shadow-sm">
                     <div className="text-2xl">{item.icon}</div>

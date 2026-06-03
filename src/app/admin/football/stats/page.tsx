@@ -50,8 +50,8 @@ export default function AdminFootballStatsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: '전체 팀 수', value: stats?.totalTeams || 0, icon: Trophy, color: 'text-green-600', bg: 'bg-green-50' },
-            { label: '활성 팀', value: stats?.activeTeams || 0, icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-            { label: '전체 선수', value: stats?.totalPlayers || 0, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+            { label: '활성 팀', value: stats?.activeTeams || 0, icon: Activity, color: 'text-primary', bg: 'bg-blue-50' },
+            { label: '전체 선수', value: stats?.totalPlayers || 0, icon: Users, color: 'text-secondary', bg: 'bg-purple-50' },
             { label: '활성 구독', value: stats?.activeSubscriptions || 0, icon: CreditCard, color: 'text-orange-600', bg: 'bg-orange-50' },
           ].map((item) => {
             const Icon = item.icon;
@@ -83,7 +83,7 @@ export default function AdminFootballStatsPage() {
                 <p className="text-xs text-text-secondary mt-1">오늘 체크 수</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4">
-                <p className="text-3xl font-bold text-blue-600">{stats?.todayAvgWellness || '-'}</p>
+                <p className="text-3xl font-bold text-primary">{stats?.todayAvgWellness || '-'}</p>
                 <p className="text-xs text-text-secondary mt-1">평균 웰니스</p>
               </div>
               <div className="bg-red-50 rounded-xl p-4">

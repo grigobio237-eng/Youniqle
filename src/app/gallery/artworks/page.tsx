@@ -258,7 +258,7 @@ export default function ArtworksPage() {
                             <div className="lg:col-span-5 flex flex-col gap-6 lg:gap-12">
                                 {curatedArtworks.slice(1, 3).map((art, idx) => (
                                     <Reveal key={art.id} delay={0.3 + idx * 0.1}>
-                                        <Link href={`/gallery/artworks/${art.id}`} className="group flex items-center gap-4 md:gap-8 bg-gray-50 p-4 md:p-6 rounded-[20px] md:rounded-[30px] hover:bg-mist transition-colors">
+                                        <Link href={`/gallery/artworks/${art.id}`} className="group flex items-center gap-4 md:gap-8 bg-surface p-4 md:p-6 rounded-[20px] md:rounded-[30px] hover:bg-mist transition-colors">
                                             <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shrink-0">
                                                 <Image src={art.image || ''} alt={art.title} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
@@ -347,7 +347,7 @@ export default function ArtworksPage() {
                                     placeholder="작품명 또는 작가명을 검색해보세요..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-gray-50 border-none rounded-[32px] h-16 pl-16 pr-12 text-lg font-serif italic focus:ring-2 focus:ring-obsidian/5 focus:bg-white focus:outline-none transition-all placeholder:text-slate/30"
+                                    className="w-full bg-surface border-none rounded-[32px] h-16 pl-16 pr-12 text-lg font-serif italic focus:ring-2 focus:ring-obsidian/5 focus:bg-white focus:outline-none transition-all placeholder:text-slate/30"
                                 />
                                 {searchQuery && (
                                     <button 
@@ -427,7 +427,7 @@ export default function ArtworksPage() {
                             </div>
                             <div className="space-y-1">
                                 <h4 className="text-xs font-black uppercase tracking-widest text-obsidian">Personalized 2E Score Gallery Curation</h4>
-                                <p className="text-[11px] font-bold text-slate-600/70 leading-relaxed">
+                                <p className="text-[11px] font-bold text-obsidian/70 leading-relaxed">
                                     당신의 최근 분석 보고서 지표를 바탕으로 **{lowestWellnessTag === 'sleep-relax' ? '수면/안정' : lowestWellnessTag === 'energy' ? '활력/에너지' : '공간 회복'}**에 기여하는 미술 작품들이 갤러리 상단에 우선적으로 배치되었습니다.
                                 </p>
                             </div>
@@ -442,7 +442,7 @@ export default function ArtworksPage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="py-32 flex flex-col items-center justify-center bg-gray-50 rounded-[40px] border border-dashed border-slate/10">
+                        <div className="py-32 flex flex-col items-center justify-center bg-surface rounded-[40px] border border-dashed border-slate/10">
                             <Search className="w-12 h-12 text-slate/20 mb-6" />
                             <p className="font-serif italic text-slate/40 text-xl">검색 조건과 일치하는 작품이 없습니다.</p>
                             <button onClick={resetFilters} className="mt-6 text-sm font-black text-chapter-accent underline">필터 초기화</button>
@@ -563,7 +563,7 @@ function ArtworkCard({ art, delay }: { art: Artwork, delay: number }) {
             className="group"
         >
             <Link href={`/gallery/artworks/${art.id}`} className="block">
-                <div className="relative aspect-[3/4] mb-4 md:mb-6 overflow-hidden rounded-[20px] md:rounded-[32px] bg-gray-50 shadow-sm transition-all duration-500 group-hover:shadow-2xl">
+                <div className="relative aspect-[3/4] mb-4 md:mb-6 overflow-hidden rounded-[20px] md:rounded-[32px] bg-surface shadow-sm transition-all duration-500 group-hover:shadow-2xl">
                     {art.image ? (
                         <Image 
                             src={art.image} 

@@ -24,7 +24,7 @@ function ProductListSkeleton() {
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className="border-line shadow-sm overflow-hidden rounded-[24px] bg-white">
-          <Skeleton className="aspect-square w-full rounded-t-[24px] bg-slate-50 animate-shimmer" />
+          <Skeleton className="aspect-square w-full rounded-t-[24px] bg-surface animate-shimmer" />
           <CardContent className="p-3 sm:p-5">
             <Skeleton className="h-4 w-3/4 mb-2 bg-slate-100 animate-pulse rounded" />
             <Skeleton className="h-3 w-full mb-4 bg-slate-100 animate-pulse rounded" />
@@ -82,11 +82,11 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
       
       {/* Premium Boutique Header Banner */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 p-6 md:p-12 mb-8 md:mb-12 border border-slate-800/80 shadow-lg">
-        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
               <ShoppingBag className="w-3 h-3" /> Youniqle Store
             </div>
             <h1 className="font-black text-white tracking-tighter text-3xl md:text-4xl">
@@ -104,7 +104,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
       </div>
 
       {/* Mobile Horizontal Category Pills (lg:hidden, Sticky at top-[56px] for premium mobile experience) */}
-      <div className="block lg:hidden sticky top-[56px] z-20 bg-white/95 backdrop-blur-md pb-3 border-b border-slate-100 mb-6 -mx-4 px-4 overflow-x-auto whitespace-nowrap scrollbar-none flex gap-2 items-center">
+      <div className="block lg:hidden sticky top-[56px] z-20 bg-white/95 backdrop-blur-md pb-3 border-b border-line mb-6 -mx-4 px-4 overflow-x-auto whitespace-nowrap scrollbar-none flex gap-2 items-center">
         {categories.map((cat) => {
           let isActive = false;
           if (cat.value === 'funding') {
@@ -126,7 +126,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
               className={`inline-flex items-center h-9 px-4 rounded-full text-xs font-black transition-all shrink-0 border ${
                 isActive 
                   ? 'bg-[#0E3A3A] text-white border-[#0E3A3A] shadow-sm' 
-                  : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
+                  : 'bg-white text-foreground/70 border-line hover:border-slate-300'
               }`}
             >
               {cat.name}
@@ -137,12 +137,12 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
         {/* Mobile Filters Drawer Trigger */}
         <Sheet>
           <SheetTrigger asChild>
-            <button className="h-9 px-3.5 rounded-full text-slate border border-slate-100 bg-white hover:border-slate-300 transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm ml-auto">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+            <button className="h-9 px-3.5 rounded-full text-slate border border-line bg-white hover:border-slate-300 transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm ml-auto">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-foreground/70" />
               <span className="text-xs font-black">필터</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-[32px] p-0 bg-white max-h-[85vh] overflow-y-auto border-t border-slate-100">
+          <SheetContent side="bottom" className="rounded-t-[32px] p-0 bg-white max-h-[85vh] overflow-y-auto border-t border-line">
             <div className="p-6">
               <SheetHeader className="mb-4">
                 <SheetTitle className="text-lg font-black text-obsidian tracking-tighter text-left">스토어 필터 및 정렬</SheetTitle>

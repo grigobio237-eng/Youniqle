@@ -223,7 +223,7 @@ function NavigatorLoungeContent() {
                       navigator.clipboard.writeText(link);
                       alert('네비게이터 전용 초대 링크가 복사되었습니다.');
                     }}
-                    className="w-full py-4 bg-chapter-accent text-obsidian rounded-xl font-black text-sm hover:bg-white transition-all flex items-center justify-center gap-2 group"
+                    className="w-full py-4 bg-white text-obsidian rounded-xl font-black text-sm hover:bg-primary transition-all flex items-center justify-center gap-2 group"
                   >
                     초대 링크 복사하기
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

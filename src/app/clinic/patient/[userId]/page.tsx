@@ -320,7 +320,7 @@ export default function ClinicPatientDetail() {
 
             {/* Anxiety */}
             <DetailCard 
-              icon={<AlertCircle className="w-5 h-5 text-amber-500" />} 
+              icon={<AlertCircle className="w-5 h-5 text-primary" />} 
               title="불안 요소 및 요청"
               items={[
                 { label: '집중 케어 포인트', value: anxiety?.points?.join(', ') || '없음' },
@@ -331,7 +331,7 @@ export default function ClinicPatientDetail() {
 
             {/* Visit Plan */}
             <DetailCard 
-              icon={<Zap className="w-5 h-5 text-blue-500" />} 
+              icon={<Zap className="w-5 h-5 text-primary" />} 
               title="방문 및 프라이버시"
               items={[
                 { label: '동반인 여부', value: visitPlan?.companion?.hasCompanion ? visitPlan.companion.details : '혼자 방문' },
@@ -342,7 +342,7 @@ export default function ClinicPatientDetail() {
 
             {/* Investment */}
             <DetailCard 
-              icon={<FileText className="w-5 h-5 text-emerald-500" />} 
+              icon={<FileText className="w-5 h-5 text-secondary" />} 
               title="회복 투자 규모"
               items={[
                 { label: '예상 예산 범위', value: investment?.budgetRange === 'large' ? '100만원 이상' : investment?.budgetRange === 'medium' ? '50-100만원' : '50만원 미만' },
@@ -369,7 +369,7 @@ function DetailCard({ icon, title, items, highlight = false }: { icon: React.Rea
     <Card className={`rounded-[32px] border-none shadow-sm overflow-hidden ${highlight ? 'bg-red-50/30 ring-1 ring-red-100' : 'bg-white'}`}>
       <CardHeader className="p-6 border-b border-slate/5">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-xl ${highlight ? 'bg-red-100 text-red-50' : 'bg-slate-50 text-obsidian'}`}>
+          <div className={`p-2 rounded-xl ${highlight ? 'bg-red-100 text-red-50' : 'bg-surface text-obsidian'}`}>
             {icon}
           </div>
           <CardTitle className="text-sm font-black text-obsidian">{title}</CardTitle>

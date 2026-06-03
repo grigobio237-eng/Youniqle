@@ -199,8 +199,8 @@ export default function AutoVideoPage() {
 
     const projectTypes = [
         { id: 'shortform', label: '1. 숏폼 생성', icon: <Film className="w-5 h-5 mr-3" />, color: 'bg-primary hover:bg-primary/90', desc: '현재 완성된 자동영상 제작' },
-        { id: 'product_promo', label: '2. 상품 홍보 숏폼', icon: <ShoppingBag className="w-5 h-5 mr-3" />, color: 'bg-blue-600 hover:bg-blue-700', desc: '이미지로 상품을 효과적으로 홍보' },
-        { id: 'influencer_promo', label: '3. 인플루언서 상품 홍보', icon: <Users className="w-5 h-5 mr-3" />, color: 'bg-purple-600 hover:bg-purple-700', desc: '만들어 놓은 인플루언서의 상품 홍보' },
+        { id: 'product_promo', label: '2. 상품 홍보 숏폼', icon: <ShoppingBag className="w-5 h-5 mr-3" />, color: 'bg-primary hover:bg-primary', desc: '이미지로 상품을 효과적으로 홍보' },
+        { id: 'influencer_promo', label: '3. 인플루언서 상품 홍보', icon: <Users className="w-5 h-5 mr-3" />, color: 'bg-secondary hover:bg-secondary', desc: '만들어 놓은 인플루언서의 상품 홍보' },
         { id: 'influencer_vlog', label: '4. 인플루언서 브이로그', icon: <Camera className="w-5 h-5 mr-3" />, color: 'bg-orange-600 hover:bg-orange-700', desc: '인플루언서의 일상 숏폼 제작' },
         { id: 'influencer_long', label: '5. 인플루언서 롱폼', icon: <Tv className="w-5 h-5 mr-3" />, color: 'bg-red-600 hover:bg-red-700', desc: '인플루언서의 전문적인 긴 영상' },
     ];
@@ -271,18 +271,18 @@ export default function AutoVideoPage() {
                             {selectedType === 'product_promo' && (
                                 <div className="space-y-8">
                                     <div className="space-y-4">
-                                        <label className="text-sm font-bold block ml-1 text-blue-600">상품명 (품명) 정확히 입력 *</label>
+                                        <label className="text-sm font-bold block ml-1 text-primary">상품명 (품명) 정확히 입력 *</label>
                                         <Input
                                             placeholder="예: 갤럭시 S24 울트라 티타늄 그레이"
                                             value={productName}
                                             onChange={(e) => setProductName(e.target.value)}
-                                            className="text-lg py-6 px-5 border-2 focus-visible:ring-blue-500 shadow-sm"
+                                            className="text-lg py-6 px-5 border-2 focus-visible:ring-primary shadow-sm"
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-3">
-                                            <label className="text-sm font-bold flex items-center text-blue-600">
+                                            <label className="text-sm font-bold flex items-center text-primary">
                                                 <ShoppingBag className="w-4 h-4 mr-2" /> 상품 사진 업로드 *
                                             </label>
                                             <div className="aspect-square bg-muted/20 border-2 border-dashed rounded-xl flex items-center justify-center relative overflow-hidden hover:bg-muted/40 transition-colors group">
@@ -317,7 +317,7 @@ export default function AutoVideoPage() {
                                         </div>
 
                                         <div className="space-y-3">
-                                            <label className="text-sm font-bold flex items-center text-purple-600">
+                                            <label className="text-sm font-bold flex items-center text-secondary">
                                                 <Users className="w-4 h-4 mr-2" /> 배경/모델 사진 업로드 (선택)
                                             </label>
                                             <div className="aspect-square bg-muted/20 border-2 border-dashed rounded-xl flex items-center justify-center relative overflow-hidden hover:bg-muted/40 transition-colors group">
@@ -423,7 +423,7 @@ export default function AutoVideoPage() {
                                     {project.status === 'completed' && <Badge className="bg-green-500">완료</Badge>}
                                     {project.status === 'pending' && <Badge variant="secondary">기획 중</Badge>}
                                     {project.status === 'failed' && <Badge variant="destructive">실패</Badge>}
-                                    {project.status === 'running' && <Badge className="bg-blue-500">제작 중</Badge>}
+                                    {project.status === 'running' && <Badge className="bg-primary">제작 중</Badge>}
                                 </div>
                             </div>
                             <CardDescription className="text-xs">

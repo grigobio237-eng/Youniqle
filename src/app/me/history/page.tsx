@@ -78,7 +78,7 @@ export default function RecoveryHistoryPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="min-h-screen bg-surface flex items-center justify-center">
                 <Activity className="w-10 h-10 text-primary animate-pulse" />
             </div>
         );
@@ -93,16 +93,16 @@ export default function RecoveryHistoryPage() {
                         <Button
                             variant="ghost"
                             onClick={() => router.push('/me')}
-                            className="p-0 hover:bg-transparent text-gray-500 mb-2"
+                            className="p-0 hover:bg-transparent text-foreground/70 mb-2"
                         >
                             <ChevronLeft className="w-4 h-4 mr-1" />
                             Back to Dashboard
                         </Button>
-                        <h1 className="font-black text-gray-900 tracking-tight text-4xl">Recovery Journey</h1>
-                        <p className="text-gray-500 font-medium">시간에 따른 당신의 회복 성장 궤적입니다.</p>
+                        <h1 className="font-black text-obsidian tracking-tight text-4xl">Recovery Journey</h1>
+                        <p className="text-foreground/70 font-medium">시간에 따른 당신의 회복 성장 궤적입니다.</p>
                     </div>
                     <div className="hidden md:block">
-                        <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 px-4 py-2 rounded-full font-bold">
+                        <Badge className="bg-emerald-50 text-secondary border-emerald-100 px-4 py-2 rounded-full font-bold">
                             <TrendingUp className="w-4 h-4 mr-2" />
                             최근 회복세 안정적
                         </Badge>
@@ -172,23 +172,23 @@ export default function RecoveryHistoryPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                     <Card className="border-none shadow-md rounded-3xl bg-blue-50/50">
                         <CardContent className="p-6 flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 rounded-2xl text-blue-600">
+                            <div className="p-3 bg-primary-container rounded-2xl text-primary">
                                 <Calendar className="w-6 h-6" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-blue-500 uppercase tracking-widest">Total Sessions</p>
-                                <p className="text-2xl font-black text-gray-900">{history.length}</p>
+                                <p className="text-xs font-bold text-primary uppercase tracking-widest">Total Sessions</p>
+                                <p className="text-2xl font-black text-obsidian">{history.length}</p>
                             </div>
                         </CardContent>
                     </Card>
                     <Card className="border-none shadow-md rounded-3xl bg-amber-50/50">
                         <CardContent className="p-6 flex items-center gap-4">
-                            <div className="p-3 bg-amber-100 rounded-2xl text-amber-600">
+                            <div className="p-3 bg-primary-container/50 rounded-2xl text-primary">
                                 <Zap className="w-6 h-6" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-amber-500 uppercase tracking-widest">Current Streak</p>
-                                <p className="text-2xl font-black text-gray-900">3 Days</p>
+                                <p className="text-xs font-bold text-primary uppercase tracking-widest">Current Streak</p>
+                                <p className="text-2xl font-black text-obsidian">3 Days</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -199,7 +199,7 @@ export default function RecoveryHistoryPage() {
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-rose-500 uppercase tracking-widest">Avg. Score</p>
-                                <p className="text-2xl font-black text-gray-900">
+                                <p className="text-2xl font-black text-obsidian">
                                     {history.length > 0
                                         ? Math.round(history.reduce((a, b) => a + b.totalScore, 0) / history.length)
                                         : 0}
@@ -211,8 +211,8 @@ export default function RecoveryHistoryPage() {
 
                 {/* History List */}
                 <div className="space-y-6">
-                    <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
-                        <FileText className="w-6 h-6 mr-3 text-gray-400" />
+                    <h3 className="text-2xl font-black text-obsidian mb-6 flex items-center">
+                        <FileText className="w-6 h-6 mr-3 text-foreground/70" />
                         진단 이력 리스트
                     </h3>
                     {history.map((item, idx) => (
@@ -223,25 +223,25 @@ export default function RecoveryHistoryPage() {
                             transition={{ delay: idx * 0.05 }}
                         >
                             <Card
-                                className="border border-slate-100 shadow-sm hover:shadow-md transition-all rounded-[32px] overflow-hidden bg-white cursor-pointer group"
+                                className="border border-line shadow-sm hover:shadow-md transition-all rounded-[32px] overflow-hidden bg-white cursor-pointer group"
                                 onClick={() => router.push('/diagnosis/report')}
                             >
                                 <CardContent className="p-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black ${item.type === 'PAID' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black ${item.type === 'PAID' ? 'bg-primary-container/50 text-primary' : 'bg-slate-100 text-foreground/70'
                                             }`}>
                                             {item.type === 'PAID' ? 'P' : 'F'}
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors">
+                                                <h4 className="font-bold text-obsidian group-hover:text-primary transition-colors">
                                                     {item.resultTitle || '회복 진단 리포트'}
                                                 </h4>
                                                 {item.type === 'PAID' && (
-                                                    <Badge className="bg-amber-50 text-amber-600 border-none text-[10px] font-bold">PREMIUM</Badge>
+                                                    <Badge className="bg-amber-50 text-primary border-none text-[10px] font-bold">PREMIUM</Badge>
                                                 )}
                                             </div>
-                                            <p className="text-xs text-gray-400 font-medium">
+                                            <p className="text-xs text-foreground/70 font-medium">
                                                 {new Date(item.createdAt).toLocaleDateString('ko-KR', {
                                                     year: 'numeric',
                                                     month: 'long',
@@ -261,17 +261,17 @@ export default function RecoveryHistoryPage() {
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">Mental</p>
-                                                <p className="text-sm font-black text-amber-500">{item.categoryScores?.mental || 0}</p>
+                                                <p className="text-sm font-black text-primary">{item.categoryScores?.mental || 0}</p>
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">Sleep</p>
-                                                <p className="text-sm font-black text-blue-500">{item.categoryScores?.sleep || 0}</p>
+                                                <p className="text-sm font-black text-primary">{item.categoryScores?.sleep || 0}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3 border-l border-slate-100 pl-8">
+                                        <div className="flex items-center gap-3 border-l border-line pl-8">
                                             <div className="text-right">
                                                 <p className="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">Total</p>
-                                                <p className="text-2xl font-black text-gray-900">{item.totalScore}</p>
+                                                <p className="text-2xl font-black text-obsidian">{item.totalScore}</p>
                                             </div>
                                             <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                                         </div>
@@ -282,9 +282,9 @@ export default function RecoveryHistoryPage() {
                     ))}
 
                     {history.length === 0 && (
-                        <div className="py-20 text-center bg-white rounded-[40px] border-2 border-dashed border-slate-200">
+                        <div className="py-20 text-center bg-white rounded-[40px] border-2 border-dashed border-line">
                             <Activity className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                            <p className="text-slate-400 font-bold">아직 진단 기록이 없습니다.</p>
+                            <p className="text-foreground/70 font-bold">아직 진단 기록이 없습니다.</p>
                             <Button
                                 onClick={() => router.push('/ai-navigator')}
                                 className="mt-6 bg-primary text-white rounded-full px-8"

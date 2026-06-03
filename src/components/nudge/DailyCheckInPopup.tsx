@@ -127,7 +127,7 @@ export default function DailyCheckInPopup() {
                     {/* Decorative Header */}
                     <div className="h-32 bg-gradient-to-br from-chapter-accent/20 to-purple-100 relative overflow-hidden">
                         <div className="absolute -right-10 -top-10 w-40 h-40 bg-chapter-accent/20 rounded-full blur-2xl" />
-                        <div className="absolute left-10 bottom-10 w-20 h-20 bg-blue-100 rounded-full blur-xl" />
+                        <div className="absolute left-10 bottom-10 w-20 h-20 bg-primary-container rounded-full blur-xl" />
 
                         <button
                             onClick={handleClose}

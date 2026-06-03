@@ -198,7 +198,7 @@ export default function FunnelAnalysisDashboard() {
       case 'low':
         return 'bg-green-500 text-white';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-surface0 text-white';
     }
   };
 
@@ -249,7 +249,7 @@ export default function FunnelAnalysisDashboard() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">퍼널 분석을 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchFunnels} variant="outline">
             다시 시도
@@ -264,8 +264,8 @@ export default function FunnelAnalysisDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">퍼널 분석</h1>
-          <p className="text-gray-600 mt-1">사용자 전환 경로 분석 및 최적화</p>
+          <h1 className="text-3xl font-bold text-obsidian">퍼널 분석</h1>
+          <p className="text-obsidian mt-1">사용자 전환 경로 분석 및 최적화</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -286,7 +286,7 @@ export default function FunnelAnalysisDashboard() {
                       {funnel.isActive ? '활성' : '비활성'}
                     </Badge>
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">{funnel.description}</p>
+                  <p className="text-sm text-obsidian mt-1">{funnel.description}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -333,7 +333,7 @@ export default function FunnelAnalysisDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">전체 사용자</span>
-                  <span className="text-gray-600">{funnel.metrics.totalUsers.toLocaleString()}명</span>
+                  <span className="text-obsidian">{funnel.metrics.totalUsers.toLocaleString()}명</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">전체 전환율</span>
@@ -343,7 +343,7 @@ export default function FunnelAnalysisDashboard() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">평균 전환 시간</span>
-                  <span className="text-gray-600">
+                  <span className="text-obsidian">
                     {formatTime(funnel.metrics.avgTimeToConversion)}
                   </span>
                 </div>
@@ -354,7 +354,7 @@ export default function FunnelAnalysisDashboard() {
                     <div key={step.stepId} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-medium">{step.stepName}</span>
-                        <span className="text-gray-500">
+                        <span className="text-foreground/70">
                           {step.users.toLocaleString()}명 ({formatPercentage(step.conversionRate)})
                         </span>
                       </div>
@@ -376,14 +376,14 @@ export default function FunnelAnalysisDashboard() {
                 {/* 인사이트 */}
                 {funnel.insights && funnel.insights.length > 0 && (
                   <div className="mt-4 space-y-2">
-                    <h4 className="text-sm font-medium text-gray-700">주요 인사이트</h4>
+                    <h4 className="text-sm font-medium text-obsidian">주요 인사이트</h4>
                     {funnel.insights.slice(0, 2).map((insight, index) => (
-                      <div key={index} className="flex items-start space-x-2 p-2 bg-gray-50 rounded">
+                      <div key={index} className="flex items-start space-x-2 p-2 bg-surface rounded">
                         <div className="flex-shrink-0 mt-0.5">
                           {getInsightIcon(insight.type)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-600 line-clamp-2">
+                          <p className="text-xs text-obsidian line-clamp-2">
                             {insight.message}
                           </p>
                           <Badge 
@@ -405,9 +405,9 @@ export default function FunnelAnalysisDashboard() {
       {funnels.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">퍼널 분석이 없습니다</h3>
-            <p className="text-gray-500 mb-4">새로운 퍼널 분석을 생성하여 사용자 전환 경로를 분석해보세요.</p>
+            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+            <h3 className="text-lg font-medium text-obsidian mb-2">퍼널 분석이 없습니다</h3>
+            <p className="text-foreground/70 mb-4">새로운 퍼널 분석을 생성하여 사용자 전환 경로를 분석해보세요.</p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               첫 번째 퍼널 생성
@@ -422,7 +422,7 @@ export default function FunnelAnalysisDashboard() {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{selectedFunnel.name}</h2>
+                <h2 className="text-2xl font-bold text-obsidian">{selectedFunnel.name}</h2>
                 <Button
                   variant="ghost"
                   onClick={() => setSelectedFunnel(null)}
@@ -437,9 +437,9 @@ export default function FunnelAnalysisDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card>
                     <CardContent className="p-4 text-center">
-                      <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                      <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
                       <div className="text-2xl font-bold">{selectedFunnel.metrics.totalUsers.toLocaleString()}</div>
-                      <div className="text-sm text-gray-600">전체 사용자</div>
+                      <div className="text-sm text-obsidian">전체 사용자</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -448,14 +448,14 @@ export default function FunnelAnalysisDashboard() {
                       <div className="text-2xl font-bold text-green-600">
                         {formatPercentage(selectedFunnel.metrics.overallConversionRate)}
                       </div>
-                      <div className="text-sm text-gray-600">전체 전환율</div>
+                      <div className="text-sm text-obsidian">전체 전환율</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
-                      <Clock className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                      <Clock className="h-8 w-8 mx-auto mb-2 text-secondary" />
                       <div className="text-2xl font-bold">{formatTime(selectedFunnel.metrics.avgTimeToConversion)}</div>
-                      <div className="text-sm text-gray-600">평균 전환 시간</div>
+                      <div className="text-sm text-obsidian">평균 전환 시간</div>
                     </CardContent>
                   </Card>
                 </div>
@@ -472,7 +472,7 @@ export default function FunnelAnalysisDashboard() {
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold">{step.stepName}</h4>
                             <div className="flex items-center space-x-4 text-sm">
-                              <span className="text-gray-600">{step.users.toLocaleString()}명</span>
+                              <span className="text-obsidian">{step.users.toLocaleString()}명</span>
                               <span className="text-green-600 font-semibold">
                                 {formatPercentage(step.conversionRate)}
                               </span>
@@ -484,7 +484,7 @@ export default function FunnelAnalysisDashboard() {
                               style={{ width: `${step.conversionRate}%` }}
                             ></div>
                           </div>
-                          <div className="flex items-center justify-between text-xs text-gray-500">
+                          <div className="flex items-center justify-between text-xs text-foreground/70">
                             <span>평균 도달 시간: {formatTime(step.avgTimeToStep)}</span>
                             {step.dropOffRate > 0 && (
                               <span className="text-red-500">
@@ -507,7 +507,7 @@ export default function FunnelAnalysisDashboard() {
                     <CardContent>
                       <div className="space-y-4">
                         {selectedFunnel.insights.map((insight, index) => (
-                          <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                          <div key={index} className="border-l-4 border-primary/30 pl-4 py-2">
                             <div className="flex items-start space-x-2">
                               {getInsightIcon(insight.type)}
                               <div className="flex-1">
@@ -517,8 +517,8 @@ export default function FunnelAnalysisDashboard() {
                                 </Badge>
                                 {insight.recommendations && insight.recommendations.length > 0 && (
                                   <div className="mt-2">
-                                    <p className="text-sm font-medium text-gray-700 mb-1">권장사항:</p>
-                                    <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+                                    <p className="text-sm font-medium text-obsidian mb-1">권장사항:</p>
+                                    <ul className="text-sm text-obsidian list-disc list-inside space-y-1">
                                       {insight.recommendations.map((rec, recIndex) => (
                                         <li key={recIndex}>{rec}</li>
                                       ))}

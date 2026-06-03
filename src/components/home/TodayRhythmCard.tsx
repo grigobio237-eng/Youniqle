@@ -34,7 +34,7 @@ export default function TodayRhythmCard({ score, userName }: TodayRhythmCardProp
     if (score < 40) return { 
       type: "수면 리듬 주의형", 
       description: "오늘 저녁에는 따뜻하게 일찍 이완을 시작해보세요.",
-      icon: <Moon className="w-4 h-4 text-amber-500" />
+      icon: <Moon className="w-4 h-4 text-primary" />
     };
     if (score < 70) return { 
       type: "회복 성장형", 
@@ -44,7 +44,7 @@ export default function TodayRhythmCard({ score, userName }: TodayRhythmCardProp
     return { 
       type: "에너지 충전형", 
       description: "안정적인 리듬입니다. 나만의 건강 루틴을 지켜보세요.",
-      icon: <Zap className="w-4 h-4 text-emerald-500" />
+      icon: <Zap className="w-4 h-4 text-secondary" />
     };
   };
 

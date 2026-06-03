@@ -82,10 +82,10 @@ export default function PartnerInquiryPage() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-obsidian mb-4">
               문의가 성공적으로 전송되었습니다!
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               파트너십 문의를 검토하여 2-3일 내에 연락드리겠습니다.
               <br />
               감사합니다.
@@ -111,7 +111,7 @@ export default function PartnerInquiryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       {/* 헤더 */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-line">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -123,8 +123,8 @@ export default function PartnerInquiryPage() {
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <Building className="h-5 w-5 text-blue-600" />
-              <span className="text-lg font-semibold text-gray-900">파트너십 문의</span>
+              <Building className="h-5 w-5 text-primary" />
+              <span className="text-lg font-semibold text-obsidian">파트너십 문의</span>
             </div>
           </div>
         </div>
@@ -137,10 +137,10 @@ export default function PartnerInquiryPage() {
             {/* 왼쪽: 안내 정보 */}
             <div className="space-y-8">
               <div className="text-center lg:text-left">
-                <h1 className="font-bold text-gray-900 mb-4 text-4xl">
+                <h1 className="font-bold text-obsidian mb-4 text-4xl">
                   파트너십 문의
                 </h1>
-                <p className="text-gray-600 leading-relaxed text-xl">
+                <p className="text-obsidian leading-relaxed text-xl">
                   Youniqle과 함께 성장할 파트너가 되어주세요.
                   <br />
                   브랜드, 유통사, 크리에이터 등 다양한 파트너십을 기다리고 있습니다.
@@ -148,7 +148,7 @@ export default function PartnerInquiryPage() {
               </div>
 
               {/* 파트너십 혜택 */}
-              <Card className="bg-gradient-to-br from-blue-50 to-emerald-50 border-blue-200">
+              <Card className="bg-gradient-to-br from-blue-50 to-emerald-50 border-primary/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-blue-800">
                     <CheckCircle className="h-5 w-5 mr-2" />
@@ -157,53 +157,53 @@ export default function PartnerInquiryPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700">투명한 수수료 정책</span>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span className="text-obsidian">투명한 수수료 정책</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700">전문적인 마케팅 지원</span>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span className="text-obsidian">전문적인 마케팅 지원</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700">빠른 정산 시스템</span>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span className="text-obsidian">빠른 정산 시스템</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700">1:1 담당자 지원</span>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span className="text-obsidian">1:1 담당자 지원</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700">데이터 분석 및 인사이트 제공</span>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span className="text-obsidian">데이터 분석 및 인사이트 제공</span>
                   </div>
                 </CardContent>
               </Card>
 
               {/* 연락처 정보 */}
-              <Card className="bg-white border-gray-200">
+              <Card className="bg-white border-line">
                 <CardHeader>
-                  <CardTitle className="text-gray-800">연락처 정보</CardTitle>
+                  <CardTitle className="text-obsidian">연락처 정보</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-3">
-                    <Mail className="h-5 w-5 text-blue-600" />
+                    <Mail className="h-5 w-5 text-primary" />
                     <div>
-                      <p className="font-medium text-gray-900">이메일</p>
-                      <p className="text-gray-600">partner@youniqle.co.kr</p>
+                      <p className="font-medium text-obsidian">이메일</p>
+                      <p className="text-obsidian">partner@youniqle.co.kr</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Phone className="h-5 w-5 text-blue-600" />
+                    <Phone className="h-5 w-5 text-primary" />
                     <div>
-                      <p className="font-medium text-gray-900">전화</p>
-                      <p className="text-gray-600">02-1234-5678</p>
+                      <p className="font-medium text-obsidian">전화</p>
+                      <p className="text-obsidian">02-1234-5678</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <MapPin className="h-5 w-5 text-blue-600" />
+                    <MapPin className="h-5 w-5 text-primary" />
                     <div>
-                      <p className="font-medium text-gray-900">주소</p>
-                      <p className="text-gray-600">서울특별시 강남구 테헤란로 123</p>
+                      <p className="font-medium text-obsidian">주소</p>
+                      <p className="text-obsidian">서울특별시 강남구 테헤란로 123</p>
                     </div>
                   </div>
                 </CardContent>
@@ -224,7 +224,7 @@ export default function PartnerInquiryPage() {
             {/* 오른쪽: 문의 폼 */}
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur">
               <CardHeader>
-                <CardTitle className="flex items-center text-gray-900">
+                <CardTitle className="flex items-center text-obsidian">
                   <FileText className="h-5 w-5 mr-2" />
                   문의하기
                 </CardTitle>
@@ -336,7 +336,7 @@ export default function PartnerInquiryPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
+                    className="w-full bg-primary hover:bg-primary text-white py-3 text-lg font-semibold"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (

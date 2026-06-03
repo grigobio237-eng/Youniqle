@@ -169,26 +169,26 @@ export default function AdminConsultationsPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <TabsList className="bg-slate-100 p-1 rounded-xl">
             <TabsTrigger value="nav-consult" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <MessageSquare className="w-4 h-4 mr-2 text-indigo-500" />
+              <MessageSquare className="w-4 h-4 mr-2 text-secondary" />
               네비게이터 상담 ({filteredNavConsults.length})
             </TabsTrigger>
             <TabsTrigger value="consultation" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <ClipboardList className="w-4 h-4 mr-2 text-blue-500" />
+              <ClipboardList className="w-4 h-4 mr-2 text-primary" />
               일반 사전 문진 ({filteredConsultations.length})
             </TabsTrigger>
             <TabsTrigger value="omakase" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Zap className="w-4 h-4 mr-2 text-amber-500" />
+              <Zap className="w-4 h-4 mr-2 text-primary" />
               심층 회복 설계 ({filteredOmakase.length})
             </TabsTrigger>
           </TabsList>
 
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/70" />
             <Input
               placeholder="이름, 이메일, 티켓 번호..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-11 border-slate-200 rounded-xl focus:ring-indigo-500"
+              className="pl-9 h-11 border-line rounded-xl focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -204,12 +204,12 @@ export default function AdminConsultationsPage() {
               ) : filteredNavConsults.length === 0 ? (
                 <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <MessageSquare className="h-12 w-12 text-slate-200" />
-                  <p className="text-lg font-bold text-slate-400">접수된 상담 티켓이 없습니다</p>
+                  <p className="text-lg font-bold text-foreground/70">접수된 상담 티켓이 없습니다</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader className="bg-slate-50/50">
+                    <TableHeader className="bg-surface/50">
                       <TableRow>
                         <TableHead>티켓 ID</TableHead>
                         <TableHead>고객 정보</TableHead>
@@ -221,12 +221,12 @@ export default function AdminConsultationsPage() {
                     </TableHeader>
                     <TableBody>
                       {filteredNavConsults.map((item) => (
-                        <TableRow key={item._id} className="cursor-default group hover:bg-slate-50/80 transition-colors">
-                          <TableCell className="text-xs font-black text-slate-400 uppercase">{item.ticketId}</TableCell>
+                        <TableRow key={item._id} className="cursor-default group hover:bg-surface/80 transition-colors">
+                          <TableCell className="text-xs font-black text-foreground/70 uppercase">{item.ticketId}</TableCell>
                           <TableCell>
                             <div>
-                              <p className="font-bold text-slate-900">{item.userName}</p>
-                              <p className="text-xs text-slate-500">{item.userEmail}</p>
+                              <p className="font-bold text-obsidian">{item.userName}</p>
+                              <p className="text-xs text-foreground/70">{item.userEmail}</p>
                             </div>
                           </TableCell>
                           <TableCell>
@@ -235,13 +235,13 @@ export default function AdminConsultationsPage() {
                                 본사 직접 관리
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="font-bold text-indigo-600 bg-indigo-50 border-indigo-100 italic">
+                              <Badge variant="outline" className="font-bold text-secondary bg-indigo-50 border-indigo-100 italic">
                                 {item.navigatorId}
                               </Badge>
                             )}
                           </TableCell>
                           <TableCell className="max-w-[200px]">
-                            <p className="text-sm text-slate-600 line-clamp-1 italic">"{item.question}"</p>
+                            <p className="text-sm text-obsidian line-clamp-1 italic">"{item.question}"</p>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
@@ -261,7 +261,7 @@ export default function AdminConsultationsPage() {
                                  variant="ghost" 
                                  size="sm" 
                                  onClick={() => handleNudge(item._id)}
-                                 className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                 className="text-primary hover:text-primary hover:bg-amber-50"
                                  title="네비게이터 독촉"
                                >
                                  <BellRing className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function AdminConsultationsPage() {
                                variant="ghost" 
                                size="sm" 
                                onClick={() => setSelectedConsult(item)}
-                               className="text-indigo-600 hover:bg-indigo-50"
+                               className="text-secondary hover:bg-indigo-50"
                                title="상세 및 개입"
                              >
                                <ChevronRight className="w-5 h-5" />
@@ -298,12 +298,12 @@ export default function AdminConsultationsPage() {
               ) : filteredConsultations.length === 0 ? (
                 <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <FileText className="h-12 w-12 text-slate-200" />
-                  <p className="text-lg font-bold text-slate-400">접수된 문진표가 없습니다</p>
+                  <p className="text-lg font-bold text-foreground/70">접수된 문진표가 없습니다</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader className="bg-slate-50/50 font-bold">
+                    <TableHeader className="bg-surface/50 font-bold">
                       <TableRow>
                         <TableHead>접수일</TableHead>
                         <TableHead>고객 정보</TableHead>
@@ -315,33 +315,33 @@ export default function AdminConsultationsPage() {
                     </TableHeader>
                     <TableBody>
                       {filteredConsultations.map((item) => (
-                        <TableRow key={item._id} className="cursor-pointer hover:bg-slate-50/80 transition-colors" onClick={() => router.push(`/event/consultation/report/${item._id}`)}>
-                          <TableCell className="font-medium text-slate-600">
+                        <TableRow key={item._id} className="cursor-pointer hover:bg-surface/80 transition-colors" onClick={() => router.push(`/event/consultation/report/${item._id}`)}>
+                          <TableCell className="font-medium text-obsidian">
                             {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                              <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-secondary">
                                 <UserCircle className="w-5 h-5" />
                               </div>
                               <div>
-                                <p className="font-bold text-slate-900">{item.user?.name || '익명'}</p>
-                                <p className="text-xs text-slate-500">{item.user?.email}</p>
+                                <p className="font-bold text-obsidian">{item.user?.name || '익명'}</p>
+                                <p className="text-xs text-foreground/70">{item.user?.email}</p>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 whitespace-nowrap">
+                            <Badge variant="outline" className="bg-white border-line text-obsidian whitespace-nowrap">
                               {item.anxiety?.classifiedType || '맞춤 회복형'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-sm font-medium text-slate-600">
+                          <TableCell className="text-sm font-medium text-obsidian">
                             {item.navigator || '-'}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
                               {item.expectation?.importantEvent?.hasEvent && (
-                                <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700">일정 있음</Badge>
+                                <Badge variant="secondary" className="text-[10px] bg-amber-50 text-primary">일정 있음</Badge>
                               )}
                               {item.anxiety?.points?.includes('프라이버시') && (
                                 <Badge variant="secondary" className="text-[10px] bg-rose-50 text-rose-700">VIP 프라이버시</Badge>
@@ -350,7 +350,7 @@ export default function AdminConsultationsPage() {
                           </TableCell>
                           <TableCell className="text-right">
                              <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-                               <ChevronRight className="w-5 h-5 text-slate-400" />
+                               <ChevronRight className="w-5 h-5 text-foreground/70" />
                              </Button>
                           </TableCell>
                         </TableRow>
@@ -374,12 +374,12 @@ export default function AdminConsultationsPage() {
               ) : filteredOmakase.length === 0 ? (
                 <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Zap className="h-12 w-12 text-slate-200" />
-                  <p className="text-lg font-bold text-slate-400">아직 심층 설계 요청이 없습니다</p>
+                  <p className="text-lg font-bold text-foreground/70">아직 심층 설계 요청이 없습니다</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader className="bg-slate-50/50">
+                    <TableHeader className="bg-surface/50">
                       <TableRow>
                         <TableHead>요청일</TableHead>
                         <TableHead>고객 정보</TableHead>
@@ -391,27 +391,27 @@ export default function AdminConsultationsPage() {
                     </TableHeader>
                     <TableBody>
                       {filteredOmakase.map((item) => (
-                        <TableRow key={item._id} className="hover:bg-slate-50/80 transition-colors">
-                          <TableCell className="font-medium text-slate-600">
+                        <TableRow key={item._id} className="hover:bg-surface/80 transition-colors">
+                          <TableCell className="font-medium text-obsidian">
                             {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                           </TableCell>
                           <TableCell>
                             <div>
-                              <p className="font-bold text-slate-900">{item.userName || '익명'}</p>
-                              <p className="text-xs text-slate-500">{item.userEmail}</p>
+                              <p className="font-bold text-obsidian">{item.userName || '익명'}</p>
+                              <p className="text-xs text-foreground/70">{item.userEmail}</p>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="max-w-xs text-xs line-clamp-2 text-slate-700">
+                            <div className="max-w-xs text-xs line-clamp-2 text-obsidian">
                               {item.painPoint}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
+                            <Badge variant="secondary" className="bg-indigo-50 text-secondary">
                               {item.goal}
                             </Badge>
                           </TableCell>
-                          <TableCell className="font-bold text-emerald-600">
+                          <TableCell className="font-bold text-secondary">
                             {item.budget}
                           </TableCell>
                           <TableCell>
@@ -442,24 +442,24 @@ export default function AdminConsultationsPage() {
             >
               <div className="p-8 overflow-y-auto space-y-6">
                 <div>
-                  <h3 className="font-black text-slate-900 text-xl">상담 티켓 상세 모니터링</h3>
-                  <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest">{selectedConsult.ticketId}</p>
+                  <h3 className="font-black text-obsidian text-xl">상담 티켓 상세 모니터링</h3>
+                  <p className="text-xs text-foreground/70 mt-1 uppercase tracking-widest">{selectedConsult.ticketId}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl">
+                <div className="grid grid-cols-2 gap-4 bg-surface p-4 rounded-2xl">
                    <div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase">고객</p>
+                     <p className="text-[10px] font-black text-foreground/70 uppercase">고객</p>
                      <p className="font-bold">{selectedConsult.userName}</p>
                    </div>
                    <div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase">담당 네비게이터</p>
-                     <p className="font-bold text-indigo-600">{selectedConsult.navigatorId}</p>
+                     <p className="text-[10px] font-black text-foreground/70 uppercase">담당 네비게이터</p>
+                     <p className="font-bold text-secondary">{selectedConsult.navigatorId}</p>
                    </div>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">상담 내용</p>
-                  <div className="p-5 bg-mist/30 rounded-2xl text-slate-700 text-sm leading-relaxed italic">
+                  <p className="text-xs font-black text-foreground/70 uppercase tracking-widest">상담 내용</p>
+                  <div className="p-5 bg-mist/30 rounded-2xl text-obsidian text-sm leading-relaxed italic">
                     "{selectedConsult.question}"
                   </div>
                 </div>
@@ -474,22 +474,22 @@ export default function AdminConsultationsPage() {
                 )}
 
                 {selectedConsult.status === 'pending' && (
-                  <div className="space-y-3 pt-4 border-t border-slate-100">
+                  <div className="space-y-3 pt-4 border-t border-line">
                     <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
-                      <p className="text-sm font-black text-slate-700">관리자 직접 답변 및 개입</p>
+                      <Zap className="w-4 h-4 text-primary fill-amber-500" />
+                      <p className="text-sm font-black text-obsidian">관리자 직접 답변 및 개입</p>
                     </div>
                     <textarea 
                       value={adminAnswer}
                       onChange={(e) => setAdminAnswer(e.target.value)}
                       placeholder="네비게이터가 바쁘거나 응대가 늦을 경우 대신 답변할 수 있습니다."
-                      className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                      className="w-full h-32 p-4 bg-surface border border-line rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none"
                     />
                   </div>
                 )}
               </div>
 
-              <div className="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
+              <div className="p-8 bg-surface border-t border-line flex gap-4">
                 <Button variant="ghost" className="flex-1 rounded-xl font-bold" onClick={() => setSelectedConsult(null)}>닫기</Button>
                 {selectedConsult.status === 'pending' && (
                   <Button 

@@ -116,9 +116,9 @@ export default function NoticesPage() {
 
   const getTypeBadge = (type: string) => {
     const config: Record<string, { variant: any; label: string; color: string }> = {
-      general: { variant: 'secondary', label: '일반', color: 'text-gray-600' },
+      general: { variant: 'secondary', label: '일반', color: 'text-obsidian' },
       important: { variant: 'destructive', label: '중요', color: 'text-red-600' },
-      event: { variant: 'default', label: '이벤트', color: 'text-blue-600' },
+      event: { variant: 'default', label: '이벤트', color: 'text-primary' },
       maintenance: { variant: 'outline', label: '점검', color: 'text-orange-600' },
       update: { variant: 'default', label: '업데이트', color: 'text-green-600' },
     };
@@ -147,17 +147,17 @@ export default function NoticesPage() {
                 {notice.isPopup && <Badge variant="outline">팝업</Badge>}
               </div>
               
-              <h3 className="text-lg font-semibold mb-2 hover:text-blue-600">
+              <h3 className="text-lg font-semibold mb-2 hover:text-primary">
                 {notice.title}
               </h3>
               
               {notice.summary && (
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-obsidian text-sm mb-3 line-clamp-2">
                   {notice.summary}
                 </p>
               )}
               
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-foreground/70">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {formatDate(notice.publishedAt || notice.createdAt)}
@@ -174,7 +174,7 @@ export default function NoticesPage() {
               </div>
             </div>
             
-            <ChevronRight className="w-5 h-5 text-gray-400 ml-4" />
+            <ChevronRight className="w-5 h-5 text-foreground/70 ml-4" />
           </div>
         </CardContent>
       </Card>
@@ -186,28 +186,28 @@ export default function NoticesPage() {
       {/* 헤더 */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Megaphone className="w-10 h-10 text-blue-600" />
+          <Megaphone className="w-10 h-10 text-primary" />
           <h1 className="font-bold text-4xl">{t('notices.title')}</h1>
         </div>
-        <p className="text-gray-600">{t('notices.subtitle')}</p>
+        <p className="text-obsidian">{t('notices.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">총 공지사항</p>
+            <p className="text-sm text-foreground/70">총 공지사항</p>
             <p className="text-2xl font-semibold mt-2">{formatNumber(total)}</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-foreground/70 mt-1">
               고정 {pinnedNotices.length}건 · 일반 {Math.max(total - pinnedNotices.length, 0)}건
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">유형별 비중</p>
+            <p className="text-sm text-foreground/70">유형별 비중</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {typeBreakdown.length === 0 ? (
-                <span className="text-xs text-gray-400">통계 준비 중</span>
+                <span className="text-xs text-foreground/70">통계 준비 중</span>
               ) : (
                 typeBreakdown.slice(0, 4).map((item) => (
                   <Badge key={item.key} variant="outline" className="text-xs font-medium">
@@ -220,7 +220,7 @@ export default function NoticesPage() {
         </Card>
         <Card>
           <CardContent className="p-4 space-y-2">
-            <p className="text-sm text-gray-500">빠른 안내</p>
+            <p className="text-sm text-foreground/70">빠른 안내</p>
             <Button
               variant="outline"
               className="w-full"
@@ -292,7 +292,7 @@ export default function NoticesPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">{t('notices.loading')}</p>
+          <p className="mt-4 text-obsidian">{t('notices.loading')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -317,7 +317,7 @@ export default function NoticesPage() {
               <h2 className="font-bold mb-4 text-xl">{t('notices.allNotices')}</h2>
             )}
             {notices.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-foreground/70">
                 {t('notices.noNotices')}
               </div>
             ) : (

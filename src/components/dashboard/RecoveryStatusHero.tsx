@@ -42,7 +42,7 @@ export default function RecoveryStatusHero({
         if (validated >= 80) {
             return {
                 grade: '최적',
-                color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+                color: 'text-secondary bg-secondary/10 border-emerald-500/20',
                 gradient: 'from-emerald-400 to-teal-500',
                 circleBg: 'stroke-emerald-500/10',
                 circleProgress: 'stroke-emerald-500',
@@ -53,7 +53,7 @@ export default function RecoveryStatusHero({
         } else if (validated >= 60) {
             return {
                 grade: '안정',
-                color: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+                color: 'text-secondary bg-secondary/10 border-secondary/30/20',
                 gradient: 'from-indigo-400 to-purple-500',
                 circleBg: 'stroke-indigo-500/10',
                 circleProgress: 'stroke-indigo-500',
@@ -64,7 +64,7 @@ export default function RecoveryStatusHero({
         } else if (validated >= 40) {
             return {
                 grade: '주의',
-                color: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+                color: 'text-primary bg-primary/10 border-primary/30/20',
                 gradient: 'from-amber-400 to-orange-500',
                 circleBg: 'stroke-amber-500/10',
                 circleProgress: 'stroke-amber-500',
@@ -107,7 +107,7 @@ export default function RecoveryStatusHero({
         <section className="relative pt-4 pb-2 overflow-hidden bg-background">
             {/* 은은한 배경 그라데이션 데코 */}
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className="max-w-xl mx-auto space-y-4">
@@ -202,9 +202,9 @@ export default function RecoveryStatusHero({
                                 
                                 <div className="flex gap-2">
                                     {[
-                                        { count: assetStats?.precisionDiagnosis || 0, label: '정밀 문진', dot: 'bg-indigo-500' },
-                                        { count: assetStats?.scannerAnalysis || 0, label: '피부 스캔', dot: 'bg-emerald-500' },
-                                        { count: assetStats?.reports || 0, label: '발행 리포트', dot: 'bg-amber-500' }
+                                        { count: assetStats?.precisionDiagnosis || 0, label: '정밀 문진', dot: 'bg-secondary' },
+                                        { count: assetStats?.scannerAnalysis || 0, label: '피부 스캔', dot: 'bg-secondary' },
+                                        { count: assetStats?.reports || 0, label: '발행 리포트', dot: 'bg-primary' }
                                     ].map((item, i) => (
                                         <div key={i} className="flex-1 flex items-center justify-between px-3.5 py-2.5 bg-mist/30 border border-line/30 rounded-2xl text-center">
                                             <div className="flex items-center gap-1.5">
@@ -225,7 +225,7 @@ export default function RecoveryStatusHero({
                                         <span className="text-base md:text-xl animate-pulse">😴</span>
                                         <span className="text-xs md:text-sm font-black text-obsidian/90">오늘 밤 최상의 회복을 위해 수면 기록하기</span>
                                     </div>
-                                    <div className="flex items-center text-[10px] md:text-xs font-black text-indigo-600">
+                                    <div className="flex items-center text-[10px] md:text-xs font-black text-secondary">
                                         <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-0.5 transition-transform" />
                                     </div>
                                 </button>
@@ -271,7 +271,7 @@ export default function RecoveryStatusHero({
                             <div className="space-y-2 animate-fade-in h-[150px] flex flex-col justify-between">
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-black text-slate/40 uppercase tracking-wider">회복 리듬 추이</span>
-                                    <div className="flex items-center gap-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                    <div className="flex items-center gap-1 text-[9px] font-black text-secondary bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                                         <TrendingUp className="w-3 h-3" />
                                         <span>7일 실시간 트렌드</span>
                                     </div>

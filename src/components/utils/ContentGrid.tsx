@@ -70,7 +70,7 @@ export default function ContentGrid() {
                         <div className="w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                             <Play className="w-8 h-8 text-white fill-white ml-1" />
                         </div>
-                        <Badge className="absolute top-4 left-4 bg-white/90 text-gray-900 hover:bg-white">{content.tag}</Badge>
+                        <Badge className="absolute top-4 left-4 bg-white/90 text-obsidian hover:bg-white">{content.tag}</Badge>
                         <Badge className="absolute bottom-4 right-4 bg-black/60 text-white hover:bg-black/70 flex items-center gap-1">
                             <Clock className="w-3 h-3" /> {content.duration}
                         </Badge>
@@ -78,14 +78,14 @@ export default function ContentGrid() {
 
                     {/* Content Info */}
                     <div className="p-5">
-                        <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        <h3 className="font-bold text-obsidian text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">
                             {content.title}
                         </h3>
 
-                        <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center justify-between text-sm text-foreground/70">
                             <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <User className="w-3 h-3 text-gray-400" />
+                                    <User className="w-3 h-3 text-foreground/70" />
                                 </div>
                                 <span className="line-clamp-1 max-w-[100px]">{content.author}</span>
                             </div>
@@ -99,13 +99,13 @@ export default function ContentGrid() {
             ))}
 
             {/* Upload CTA Card */}
-            <Card className="border-dashed border-2 border-gray-300 bg-gray-50 flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all min-h-[300px]">
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4 text-blue-500">
+            <Card className="border-dashed border-2 border-gray-300 bg-surface flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:border-primary/30 hover:bg-blue-50 transition-all min-h-[300px]">
+                <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-4 text-primary">
                     <User className="w-8 h-8" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">파트너 크리에이터 신청</h3>
-                <p className="text-gray-500 text-sm mb-4">나만의 노하우를 공유하고 수익을 창출하세요</p>
-                <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-100">신청하기</Button>
+                <h3 className="font-bold text-obsidian mb-1">파트너 크리에이터 신청</h3>
+                <p className="text-foreground/70 text-sm mb-4">나만의 노하우를 공유하고 수익을 창출하세요</p>
+                <Button variant="outline" className="text-primary border-primary/30 hover:bg-primary-container">신청하기</Button>
             </Card>
         </div>
     );

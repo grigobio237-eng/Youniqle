@@ -28,19 +28,19 @@ export function ProductConciergeCard({ productConcept, onRequestCustom }: Produc
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-pink-500" />
 
                 {/* Icon */}
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 text-indigo-500 mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 text-secondary mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
                     <Sparkles className="w-8 h-8" />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-sm font-bold text-indigo-500 uppercase tracking-widest mb-2">YOUNIQLE PRODUCT CONCIERGE</h3>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-3">
+                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest mb-2">YOUNIQLE PRODUCT CONCIERGE</h3>
+                <h2 className="text-2xl md:text-3xl font-black text-obsidian mb-3">
                     "{typeof productConcept.name === 'object' ? (productConcept.name as any).title || (productConcept.name as any).name || JSON.stringify(productConcept.name) : productConcept.name}"
                 </h2>
-                <div className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+                <div className="text-obsidian mb-8 max-w-md mx-auto leading-relaxed">
                     {typeof productConcept.reason === 'object' ? (productConcept.reason as any).description || (productConcept.reason as any).reason || JSON.stringify(productConcept.reason) : productConcept.reason}
                     <br />
-                    <span className="text-gray-400 text-sm mt-2 block">
+                    <span className="text-foreground/70 text-sm mt-2 block">
                         추천 성분/요소: {Array.isArray(productConcept.ingredients) ? productConcept.ingredients.join(', ') : String(productConcept.ingredients)}
                     </span>
                 </div>
@@ -49,7 +49,7 @@ export function ProductConciergeCard({ productConcept, onRequestCustom }: Produc
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Button
                         variant="outline"
-                        className="w-full sm:w-auto h-12 rounded-full border-gray-200 hover:bg-gray-50 text-gray-700 font-bold px-8"
+                        className="w-full sm:w-auto h-12 rounded-full border-line hover:bg-surface text-obsidian font-bold px-8"
                         onClick={() => window.open('/products', '_blank')}
                     >
                         <ShoppingBag className="w-4 h-4 mr-2" />
@@ -64,7 +64,7 @@ export function ProductConciergeCard({ productConcept, onRequestCustom }: Produc
                     </Button>
                 </div>
 
-                <p className="text-xs text-gray-400 mt-6 font-medium">실제 요청이 많으면 유니클 연구소에서 개발을 시작합니다.</p>
+                <p className="text-xs text-foreground/70 mt-6 font-medium">실제 요청이 많으면 유니클 연구소에서 개발을 시작합니다.</p>
             </div>
         </motion.div>
     );

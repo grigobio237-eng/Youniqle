@@ -105,7 +105,7 @@ export default function RealTimeChat() {
   if (!session) {
     return (
         <Card className="w-full max-w-2xl mx-auto p-12 text-center">
-            <p className="text-slate-500 font-bold">채팅을 이용하시려면 로그인이 필요합니다.</p>
+            <p className="text-foreground/70 font-bold">채팅을 이용하시려면 로그인이 필요합니다.</p>
         </Card>
     );
   }

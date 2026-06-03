@@ -208,7 +208,7 @@ export default function TeamJoinPage() {
                   className={`p-4 rounded-2xl border-2 text-left transition-all ${
                     role === 'player'
                       ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'border-line hover:border-gray-300'
                   }`}
                 >
                   <span className="text-2xl">⚽</span>
@@ -219,8 +219,8 @@ export default function TeamJoinPage() {
                   onClick={() => setRole('guardian')}
                   className={`p-4 rounded-2xl border-2 text-left transition-all ${
                     role === 'guardian'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary/30 bg-blue-50'
+                      : 'border-line hover:border-gray-300'
                   }`}
                 >
                   <span className="text-2xl">👨‍👩‍👦</span>
@@ -242,7 +242,7 @@ export default function TeamJoinPage() {
                       className={`p-3 rounded-xl border-2 text-left transition-all ${
                         position === pos.value
                           ? 'border-primary bg-primary/5'
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-line hover:border-gray-300'
                       }`}
                     >
                       <span className="text-lg">{pos.emoji}</span>
@@ -263,7 +263,7 @@ export default function TeamJoinPage() {
                   value={playerNumber}
                   onChange={(e) => setPlayerNumber(e.target.value)}
                   placeholder="예: 10"
-                  className="w-full h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none font-bold text-lg"
+                  className="w-full h-12 px-4 rounded-xl border-2 border-line focus:border-primary focus:outline-none font-bold text-lg"
                   min="1"
                   max="99"
                 />

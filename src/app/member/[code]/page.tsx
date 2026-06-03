@@ -232,15 +232,15 @@ export default function MemberVerifyPage() {
         <div className="min-h-screen bg-white flex items-center justify-center px-6">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm space-y-8 text-center">
             <div className="space-y-4">
-              <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto text-indigo-600 shadow-inner">
+              <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto text-secondary shadow-inner">
                 <ShieldCheck className="w-10 h-10" />
               </div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tighter italic">MEDICAL PASS</h1>
-              <p className="text-slate-500 text-sm font-medium">데이터 보호를 위해 환자의 <br />보안 PIN 번호 4자리를 입력해주세요.</p>
+              <h1 className="text-3xl font-black text-obsidian tracking-tighter italic">MEDICAL PASS</h1>
+              <p className="text-foreground/70 text-sm font-medium">데이터 보호를 위해 환자의 <br />보안 PIN 번호 4자리를 입력해주세요.</p>
             </div>
             <div className="flex justify-center gap-4">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className={`w-14 h-16 border-2 rounded-2xl flex items-center justify-center text-2xl font-black transition-all ${pinInput.length > i ? 'border-indigo-600 bg-indigo-50 text-indigo-900' : 'border-slate-100 bg-slate-50 text-slate-300'}`}>
+                <div key={i} className={`w-14 h-16 border-2 rounded-2xl flex items-center justify-center text-2xl font-black transition-all ${pinInput.length > i ? 'border-indigo-600 bg-indigo-50 text-indigo-900' : 'border-line bg-surface text-slate-300'}`}>
                   {pinInput[i] ? '●' : ''}
                 </div>
               ))}
@@ -250,12 +250,12 @@ export default function MemberVerifyPage() {
                 <Button key={i} variant="ghost" onClick={() => {
                   if (num === 'back') setPinInput(p => p.slice(0, -1));
                   else if (num !== '' && pinInput.length < 4) setPinInput(p => p + num);
-                }} className="h-16 font-black text-slate-700 hover:bg-slate-100 rounded-2xl text-xl">
+                }} className="h-16 font-black text-obsidian hover:bg-slate-100 rounded-2xl text-xl">
                   {num === 'back' ? '←' : num}
                 </Button>
               ))}
             </div>
-            <Button onClick={() => window.location.reload()} disabled={pinInput.length < 4} className="w-full h-14 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest shadow-xl shadow-indigo-100">보고서 열람하기</Button>
+            <Button onClick={() => window.location.reload()} disabled={pinInput.length < 4} className="w-full h-14 rounded-2xl bg-secondary text-white font-black uppercase tracking-widest shadow-xl shadow-indigo-100">보고서 열람하기</Button>
           </motion.div>
         </div>
       );
@@ -271,18 +271,18 @@ export default function MemberVerifyPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-indigo-600">
+              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm border border-line flex items-center justify-center text-secondary">
                 <Activity className="w-7 h-7" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tighter italic">DIGITAL MEDICAL PASS</h2>
+                <h2 className="text-2xl font-black text-obsidian tracking-tighter italic">DIGITAL MEDICAL PASS</h2>
                 <div className="flex items-center gap-2 mt-1">
-                   <Badge className="bg-emerald-100 text-emerald-600 border-none text-[10px] font-black uppercase">Verified Patient</Badge>
-                   <span className="text-slate-400 text-xs font-bold">{member.name} • {member.referralCode}</span>
+                   <Badge className="bg-secondary-container text-secondary border-none text-[10px] font-black uppercase">Verified Patient</Badge>
+                   <span className="text-foreground/70 text-xs font-bold">{member.name} • {member.referralCode}</span>
                 </div>
               </div>
             </div>
-            <div className="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-100 font-bold text-xs uppercase tracking-widest">
+            <div className="bg-secondary text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-100 font-bold text-xs uppercase tracking-widest">
               <ShieldCheck className="w-4 h-4" /> Auth Success
             </div>
           </div>
@@ -291,13 +291,13 @@ export default function MemberVerifyPage() {
           <div className="flex bg-slate-100 p-1.5 rounded-[24px] w-full max-w-md">
             <button 
               onClick={() => setActiveTab('clinical')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'clinical' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'clinical' ? 'bg-white text-secondary shadow-sm' : 'text-foreground/70 hover:text-obsidian'}`}
             >
               <ShieldCheck className="w-4 h-4" /> 사전 문진 리포트
             </button>
             <button 
               onClick={() => setActiveTab('psychology')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'psychology' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-black transition-all ${activeTab === 'psychology' ? 'bg-white text-secondary shadow-sm' : 'text-foreground/70 hover:text-obsidian'}`}
             >
               <Activity className="w-4 h-4" /> 회복 성향 분석
             </button>
@@ -310,26 +310,26 @@ export default function MemberVerifyPage() {
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Medical History Card */}
-                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 space-y-6">
-                        <h4 className="flex items-center gap-3 text-lg font-black text-slate-900 tracking-tighter uppercase italic">
-                          <Activity className="w-5 h-5 text-indigo-600" /> Medical History
+                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-line space-y-6">
+                        <h4 className="flex items-center gap-3 text-lg font-black text-obsidian tracking-tighter uppercase italic">
+                          <Activity className="w-5 h-5 text-secondary" /> Medical History
                         </h4>
                         <div className="space-y-4">
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">과거 경험</p>
-                            <p className="text-sm font-bold text-slate-700">
+                          <div className="p-4 bg-surface rounded-2xl border border-line">
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">과거 경험</p>
+                            <p className="text-sm font-bold text-obsidian">
                               {clinicalData.medicalHistory.pastExperience.hasExperience ? `있음: ${clinicalData.medicalHistory.pastExperience.details}` : '없음'}
                             </p>
                           </div>
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">현재 복용 약물</p>
-                            <p className="text-sm font-bold text-slate-700">
+                          <div className="p-4 bg-surface rounded-2xl border border-line">
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">현재 복용 약물</p>
+                            <p className="text-sm font-bold text-obsidian">
                               {clinicalData.medicalHistory.currentMedication.taking ? `있음: ${clinicalData.medicalHistory.currentMedication.details}` : '없음'}
                             </p>
                           </div>
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">기타 건강 이슈</p>
-                            <p className="text-sm font-bold text-slate-700">
+                          <div className="p-4 bg-surface rounded-2xl border border-line">
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">기타 건강 이슈</p>
+                            <p className="text-sm font-bold text-obsidian">
                               {clinicalData.medicalHistory.healthStatus.isIssue ? `있음: ${clinicalData.medicalHistory.healthStatus.details}` : '특이사항 없음'}
                             </p>
                           </div>
@@ -337,25 +337,25 @@ export default function MemberVerifyPage() {
                       </div>
 
                       {/* Anxiety & Concerns Card */}
-                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 space-y-6">
-                        <h4 className="flex items-center gap-3 text-lg font-black text-slate-900 tracking-tighter uppercase italic">
-                          <ShieldCheck className="w-5 h-5 text-emerald-600" /> Focus Point
+                      <div className="bg-white rounded-[40px] p-8 shadow-sm border border-line space-y-6">
+                        <h4 className="flex items-center gap-3 text-lg font-black text-obsidian tracking-tighter uppercase italic">
+                          <ShieldCheck className="w-5 h-5 text-secondary" /> Focus Point
                         </h4>
                         <div className="space-y-4">
                           <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">집중 중점 관리 및 불안 지점</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-2">집중 중점 관리 및 불안 지점</p>
                             <div className="flex flex-wrap gap-2">
                               {(clinicalData.anxiety.points || []).map((p: string, i: number) => (
-                                <Badge key={i} className="bg-white text-emerald-600 border-emerald-100 font-bold px-3 py-1">{p}</Badge>
+                                <Badge key={i} className="bg-white text-secondary border-emerald-100 font-bold px-3 py-1">{p}</Badge>
                               ))}
                             </div>
                           </div>
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">상세 안내 요청 및 보안</p>
-                            <p className="text-sm font-bold text-slate-700">{clinicalData.anxiety.privacyDetails || '특이사항 없음'}</p>
+                          <div className="p-4 bg-surface rounded-2xl border border-line">
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">상세 안내 요청 및 보안</p>
+                            <p className="text-sm font-bold text-obsidian">{clinicalData.anxiety.privacyDetails || '특이사항 없음'}</p>
                           </div>
                           <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-                            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">환자 성향 분류</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">환자 성향 분류</p>
                             <p className="text-sm font-black text-indigo-900">{clinicalData.anxiety.classifiedType || '미분류'}</p>
                           </div>
                         </div>
@@ -388,11 +388,11 @@ export default function MemberVerifyPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="bg-white rounded-[40px] p-20 text-center shadow-sm border border-slate-100 flex flex-col items-center gap-6">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                  <div className="bg-white rounded-[40px] p-20 text-center shadow-sm border border-line flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center text-slate-200">
                       <ShieldCheck className="w-10 h-10" />
                     </div>
-                    <p className="text-slate-400 font-bold">작성된 사전 문진 데이터가 없습니다.</p>
+                    <p className="text-foreground/70 font-bold">작성된 사전 문진 데이터가 없습니다.</p>
                   </div>
                 )}
               </motion.div>
@@ -400,13 +400,13 @@ export default function MemberVerifyPage() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   <div className="lg:col-span-4 space-y-4">
-                    <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
+                    <div className="bg-white rounded-[32px] p-6 shadow-sm border border-line">
                       <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-6 px-1">Consultation History</h4>
                       <div className="space-y-2">
                         {history.map((h: any, idx: number) => (
-                          <button key={idx} onClick={() => setSelectedReportIdx(idx)} className={`w-full text-left p-4 rounded-2xl transition-all ${selectedReportIdx === idx ? 'bg-indigo-50 border-2 border-indigo-200' : 'bg-slate-50 border-2 border-transparent hover:bg-slate-100'}`}>
-                            <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-slate-600'}`}>{h.type === 'PRECISION' ? '정밀 진단' : '간편 진단'}</p>
-                            <p className="text-[10px] font-bold text-slate-400 mt-1">{new Date(h.createdAt).toLocaleDateString()}</p>
+                          <button key={idx} onClick={() => setSelectedReportIdx(idx)} className={`w-full text-left p-4 rounded-2xl transition-all ${selectedReportIdx === idx ? 'bg-indigo-50 border-2 border-secondary/30' : 'bg-surface border-2 border-transparent hover:bg-slate-100'}`}>
+                            <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-obsidian'}`}>{h.type === 'PRECISION' ? '정밀 진단' : '간편 진단'}</p>
+                            <p className="text-[10px] font-bold text-foreground/70 mt-1">{new Date(h.createdAt).toLocaleDateString()}</p>
                           </button>
                         ))}
                       </div>
@@ -433,9 +433,9 @@ export default function MemberVerifyPage() {
                         {/* Category Scores */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {currentReport.categoryScores && Object.entries(currentReport.categoryScores).map(([key, value]: any) => (
-                            <div key={key} className="bg-white p-6 rounded-[28px] shadow-sm border border-slate-100 text-center">
+                            <div key={key} className="bg-white p-6 rounded-[28px] shadow-sm border border-line text-center">
                               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">{key}</p>
-                              <p className={`text-2xl font-black ${value < 50 ? 'text-rose-500' : 'text-indigo-600'}`}>{value}</p>
+                              <p className={`text-2xl font-black ${value < 50 ? 'text-rose-500' : 'text-secondary'}`}>{value}</p>
                             </div>
                           ))}
                         </div>
@@ -443,7 +443,7 @@ export default function MemberVerifyPage() {
                         {/* AI Solution */}
                         {currentReport.aiSolution && (
                           <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[40px] space-y-4">
-                             <h4 className="flex items-center gap-2 text-emerald-600 text-lg font-black tracking-tighter">
+                             <h4 className="flex items-center gap-2 text-secondary text-lg font-black tracking-tighter">
                                 <Sparkles className="w-5 h-5" /> 성향 분석 솔루션 요약
                              </h4>
                              <p className="text-sm font-medium text-emerald-900/80 leading-relaxed">{currentReport.aiSolution.analysis}</p>
@@ -451,16 +451,16 @@ export default function MemberVerifyPage() {
                         )}
 
                         {/* Standard Answers (Collapsible) */}
-                        <div className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100">
-                          <h4 className="text-lg font-black text-slate-900 tracking-tighter mb-8">상세 성향 분석 항목</h4>
+                        <div className="bg-white rounded-[40px] p-10 shadow-sm border border-line">
+                          <h4 className="text-lg font-black text-obsidian tracking-tighter mb-8">상세 성향 분석 항목</h4>
                           <div className="space-y-6">
                             {(currentReport.answers || []).map((ans: any, i: number) => (
                               <div key={i} className="flex gap-6 pb-6 border-b border-slate-50 last:border-none">
                                 <div className="w-2 h-2 rounded-full bg-indigo-200 mt-2 shrink-0" />
                                 <div className="space-y-1">
-                                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{ans.category}</p>
-                                  <p className="text-sm font-black text-slate-800">{ans.question}</p>
-                                  <p className="text-sm font-bold text-indigo-600 mt-1">답변: {ans.answer}</p>
+                                  <p className="text-xs font-bold text-foreground/70 uppercase tracking-widest">{ans.category}</p>
+                                  <p className="text-sm font-black text-obsidian">{ans.question}</p>
+                                  <p className="text-sm font-bold text-secondary mt-1">답변: {ans.answer}</p>
                                 </div>
                               </div>
                             ))}
@@ -468,7 +468,7 @@ export default function MemberVerifyPage() {
                         </div>
                       </div>
                     ) : (
-                      <p className="text-center py-20 text-slate-400">분석 데이터를 선택해 주세요.</p>
+                      <p className="text-center py-20 text-foreground/70">분석 데이터를 선택해 주세요.</p>
                     )}
                   </div>
                 </div>

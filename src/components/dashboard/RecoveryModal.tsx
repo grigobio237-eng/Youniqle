@@ -32,7 +32,7 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
         { id: 'poor', icon: '😫', label: '나쁨', color: 'border-red-400 bg-red-50' },
         { id: 'fair', icon: '😑', label: '보통', color: 'border-yellow-400 bg-yellow-50' },
         { id: 'good', icon: '🙂', label: '좋음', color: 'border-green-400 bg-green-50' },
-        { id: 'great', icon: '🤩', label: '완벽', color: 'border-blue-400 bg-blue-50' }
+        { id: 'great', icon: '🤩', label: '완벽', color: 'border-primary/30 bg-blue-50' }
     ];
 
     // 수면 시간 계산
@@ -97,7 +97,7 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
 
     const getSleepAdvice = () => {
         if (sleepDuration.hours >= 8) return { text: "충분한 수면 시간이에요! 👍", color: "text-green-600" };
-        if (sleepDuration.hours >= 7) return { text: "적정 수면 시간이에요.", color: "text-blue-600" };
+        if (sleepDuration.hours >= 7) return { text: "적정 수면 시간이에요.", color: "text-primary" };
         if (sleepDuration.hours >= 6) return { text: "조금 더 자면 좋겠어요.", color: "text-yellow-600" };
         return { text: "수면이 많이 부족해요! 😴", color: "text-red-600" };
     };
@@ -194,9 +194,9 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
                         </div>
 
                         {/* 총 수면 시간 */}
-                        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-indigo-600 font-bold uppercase tracking-widest mb-1">총 수면 시간</p>
-                            <p className="text-3xl font-black text-indigo-700">
+                        <div className="bg-indigo-50 border border-secondary/30 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">총 수면 시간</p>
+                            <p className="text-3xl font-black text-secondary">
                                 {sleepDuration.hours}시간 {sleepDuration.mins > 0 && `${sleepDuration.mins}분`}
                             </p>
                             <p className={`text-sm font-medium mt-1 ${advice.color}`}>{advice.text}</p>
@@ -246,7 +246,7 @@ export default function RecoveryModal({ open, onOpenChange }: RecoveryModalProps
 
                         {/* 저장 버튼 */}
                         <Button
-                            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl"
+                            className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary text-white font-black shadow-xl"
                             onClick={handleSave}
                         >
                             🌙 수면 기록 저장하기

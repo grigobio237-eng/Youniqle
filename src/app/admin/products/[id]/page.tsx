@@ -123,7 +123,7 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className="text-center py-12">
-                <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <AlertCircle className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
                 <h3 className="text-lg font-medium">상품을 찾을 수 없습니다</h3>
                 <Button onClick={() => router.push('/admin/products')} className="mt-4" variant="outline">
                     목록으로 돌아가기
@@ -151,7 +151,7 @@ export default function ProductDetailPage() {
                             </Badge>
                             {getApprovalBadge(product.approvalStatus)}
                         </div>
-                        <p className="text-gray-500 text-sm">Product ID: {id}</p>
+                        <p className="text-foreground/70 text-sm">Product ID: {id}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
@@ -179,7 +179,7 @@ export default function ProductDetailPage() {
                                     crossOrigin="anonymous"
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                                <div className="absolute inset-0 flex items-center justify-center text-foreground/70">
                                     <Package className="h-16 w-16" />
                                 </div>
                             )}
@@ -193,18 +193,18 @@ export default function ProductDetailPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex justify-between items-center pb-2 border-b">
-                                <span className="text-gray-500">판매가</span>
+                                <span className="text-foreground/70">판매가</span>
                                 <span className="font-bold text-primary text-xl">{formatPrice(product.price)}</span>
                             </div>
                             {product.originalPrice && product.originalPrice > product.price && (
                                 <div className="flex justify-between items-center pb-2 border-b">
-                                    <span className="text-gray-500">정상가</span>
-                                    <span className="text-gray-400 line-through">{formatPrice(product.originalPrice)}</span>
+                                    <span className="text-foreground/70">정상가</span>
+                                    <span className="text-foreground/70 line-through">{formatPrice(product.originalPrice)}</span>
                                 </div>
                             )}
                             <div className="flex justify-between items-center pt-2">
-                                <span className="text-gray-500">재고</span>
-                                <div className={`font-semibold ${product.stock < 10 ? 'text-red-500' : 'text-gray-900'}`}>
+                                <span className="text-foreground/70">재고</span>
+                                <div className={`font-semibold ${product.stock < 10 ? 'text-red-500' : 'text-obsidian'}`}>
                                     {product.stock.toLocaleString()}개
                                     {product.stock === 0 && <Badge variant="destructive" className="ml-2">품절</Badge>}
                                 </div>
@@ -214,23 +214,23 @@ export default function ProductDetailPage() {
 
                     {/* Partner Info Card */}
                     {(product.partnerName || product.partnerEmail) && (
-                        <Card className="bg-gray-50 border-blue-100">
+                        <Card className="bg-surface border-blue-100">
                             <CardHeader>
                                 <CardTitle className="text-base flex items-center gap-2">
-                                    <User className="h-4 w-4 text-blue-500" />
+                                    <User className="h-4 w-4 text-primary" />
                                     파트너 정보
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 {product.partnerName && (
                                     <div className="flex justify-between">
-                                        <span className="text-sm text-gray-500">이름</span>
+                                        <span className="text-sm text-foreground/70">이름</span>
                                         <span className="font-medium">{product.partnerName}</span>
                                     </div>
                                 )}
                                 {product.partnerEmail && (
                                     <div className="flex justify-between">
-                                        <span className="text-sm text-gray-500">이메일</span>
+                                        <span className="text-sm text-foreground/70">이메일</span>
                                         <span className="font-medium text-sm">{product.partnerEmail}</span>
                                     </div>
                                 )}
@@ -275,21 +275,21 @@ export default function ProductDetailPage() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div>
-                                <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-                                    <Tag className="h-4 w-4 text-gray-500" /> 카테고리
+                                <h4 className="font-medium text-obsidian mb-2 flex items-center gap-2">
+                                    <Tag className="h-4 w-4 text-foreground/70" /> 카테고리
                                 </h4>
-                                <p className="text-gray-600 pl-6">{getCategoryLabel(product.category)}</p>
+                                <p className="text-obsidian pl-6">{getCategoryLabel(product.category)}</p>
                             </div>
 
                             <div>
-                                <h4 className="font-medium text-gray-900 mb-2">요약</h4>
-                                <p className="text-gray-600 bg-gray-50 p-3 rounded-lg border">{product.summary}</p>
+                                <h4 className="font-medium text-obsidian mb-2">요약</h4>
+                                <p className="text-obsidian bg-surface p-3 rounded-lg border">{product.summary}</p>
                             </div>
 
                             <div>
-                                <h4 className="font-medium text-gray-900 mb-2">상세 설명</h4>
+                                <h4 className="font-medium text-obsidian mb-2">상세 설명</h4>
                                 <div
-                                    className="prose max-w-none bg-white p-6 rounded-lg border min-h-[150px] text-sm text-gray-700"
+                                    className="prose max-w-none bg-white p-6 rounded-lg border min-h-[150px] text-sm text-obsidian"
                                     dangerouslySetInnerHTML={{ __html: product.description }}
                                 />
                             </div>
@@ -303,8 +303,8 @@ export default function ProductDetailPage() {
                             <CardContent>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {Object.entries(product.nutritionInfo).map(([key, val]: [string, any]) => val && (
-                                        <div key={key} className="bg-gray-50 p-2 rounded">
-                                            <span className="text-xs text-gray-500 capitalize">{key}</span>
+                                        <div key={key} className="bg-surface p-2 rounded">
+                                            <span className="text-xs text-foreground/70 capitalize">{key}</span>
                                             <p className="font-medium">{val}</p>
                                         </div>
                                     ))}

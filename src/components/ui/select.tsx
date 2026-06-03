@@ -131,7 +131,7 @@ export function SelectValue({ placeholder }: { placeholder?: string }) {
 
   const { value } = context;
 
-  return <span className={value ? '' : 'text-gray-500'}>{value || placeholder}</span>;
+  return <span className={value ? '' : 'text-foreground/70'}>{value || placeholder}</span>;
 }
 
 

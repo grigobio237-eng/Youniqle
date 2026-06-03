@@ -80,7 +80,7 @@ export default function CurrencyPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-12">
             <div className="container mx-auto px-4 max-w-2xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -94,7 +94,7 @@ export default function CurrencyPage() {
 
                     <CardContent className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-obsidian">
                                 {lastUpdate && `마지막 업데이트: ${lastUpdate.toLocaleTimeString('ko-KR')}`}
                             </p>
                             <Button variant="ghost" size="sm" onClick={fetchRates} disabled={loading}>
@@ -140,7 +140,7 @@ export default function CurrencyPage() {
                             <div>
                                 <Label className="text-base font-semibold">변환 결과</Label>
                                 <div className="flex gap-2 mt-2">
-                                    <Input type="text" value={result !== null ? result.toFixed(2) : ''} readOnly className="flex-1 bg-gray-50 text-lg font-bold" />
+                                    <Input type="text" value={result !== null ? result.toFixed(2) : ''} readOnly className="flex-1 bg-surface text-lg font-bold" />
                                     <Select value={toCurrency} onValueChange={setToCurrency}>
                                         <SelectTrigger className="w-40">
                                             <SelectValue />
@@ -163,16 +163,16 @@ export default function CurrencyPage() {
 
                         {result !== null && (
                             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-6 text-center">
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-2xl font-bold text-obsidian">
                                     {amount} {fromCurrency} = {result.toFixed(2)} {toCurrency}
                                 </p>
-                                <p className="text-sm text-gray-600 mt-2">
+                                <p className="text-sm text-obsidian mt-2">
                                     환율: 1 {fromCurrency} = {rates[toCurrency]?.toFixed(4)} {toCurrency}
                                 </p>
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 지원 통화</p>
                             <div className="grid grid-cols-2 gap-2">
                                 {currencies.map((curr) => (

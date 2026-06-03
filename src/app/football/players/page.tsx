@@ -96,7 +96,7 @@ function PlayersContent() {
             <Card className={`rounded-2xl border-2 shadow-xl ${
               acwr.zone === 'optimal' ? 'border-green-300 bg-green-50' :
               acwr.zone === 'caution' ? 'border-yellow-300 bg-yellow-50' :
-              acwr.zone === 'danger' ? 'border-red-300 bg-red-50' : 'border-blue-300 bg-blue-50'
+              acwr.zone === 'danger' ? 'border-red-300 bg-red-50' : 'border-primary/30 bg-blue-50'
             }`}>
               <CardContent className="p-6 text-center space-y-2">
                 <p className="text-sm font-bold opacity-70">ACWR (부하 비율)</p>
@@ -125,11 +125,11 @@ function PlayersContent() {
                   <p className="text-xs text-slate font-bold">기록 일수</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-blue-600">{stats?.avgWellness || 0}</p>
+                  <p className="text-2xl font-black text-primary">{stats?.avgWellness || 0}</p>
                   <p className="text-xs text-slate font-bold">평균 웰니스</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-purple-600">{stats?.avgLoad || 0}</p>
+                  <p className="text-2xl font-black text-secondary">{stats?.avgLoad || 0}</p>
                   <p className="text-xs text-slate font-bold">평균 부하</p>
                 </div>
               </div>
@@ -167,13 +167,13 @@ function PlayersContent() {
                     ))}
                   </div>
                   {check.sessionLoad && (
-                    <p className="text-xs text-blue-600 font-bold mt-2">부하: {check.sessionLoad} AU (RPE {check.rpe})</p>
+                    <p className="text-xs text-primary font-bold mt-2">부하: {check.sessionLoad} AU (RPE {check.rpe})</p>
                   )}
                   {check.injuryNote && (
                     <p className="text-xs text-red-500 mt-1">⚠️ {check.injuryNote}</p>
                   )}
                   {check.notes && Object.values(check.notes).some(v => v) && (
-                    <div className="mt-2.5 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
+                    <div className="mt-2.5 pt-2 border-t border-line flex flex-wrap gap-1.5">
                       {Object.entries(check.notes).map(([key, val]) => {
                         if (!val) return null;
                         const labels: Record<string, string> = {
@@ -184,7 +184,7 @@ function PlayersContent() {
                           mood: '기분'
                         };
                         return (
-                          <div key={key} className="text-[10px] bg-slate-50 border border-slate-100 text-obsidian px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold">
+                          <div key={key} className="text-[10px] bg-surface border border-line text-obsidian px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold">
                             <span className="text-[9px] text-green-600 font-black">[{labels[key] || key}]</span>
                             <span className="line-clamp-1">{val as string}</span>
                           </div>
@@ -252,7 +252,7 @@ function PlayersContent() {
                             score >= 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                           }`}>{score}/5</Badge>
                         ) : (
-                          <Badge className="bg-gray-100 text-gray-400 border-none text-xs">미체크</Badge>
+                          <Badge className="bg-gray-100 text-foreground/70 border-none text-xs">미체크</Badge>
                         )}
                       </div>
                     </CardContent>

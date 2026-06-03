@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 // react-quill-new은 SSR 환경(Next.js)에서 document 객체 오류를 뿜을 수 있으므로 클라이언트 로드 처리
 const ReactQuill = dynamic(() => import('react-quill-new'), { 
   ssr: false, 
-  loading: () => <div className="h-96 w-full flex items-center justify-center bg-gray-50 border rounded-xl animate-pulse text-gray-400 font-bold">에디터를 불러오는 중입니다...</div>
+  loading: () => <div className="h-96 w-full flex items-center justify-center bg-surface border rounded-xl animate-pulse text-foreground/70 font-bold">에디터를 불러오는 중입니다...</div>
 });
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -108,14 +108,14 @@ function PolicyEditor() {
         <div className="flex items-center">
           <Button variant="ghost" size="icon" asChild className="mr-4 h-10 w-10 shrink-0">
             <Link href="/admin/settings/policies">
-              <ArrowLeft className="w-5 h-5 text-gray-500" />
+              <ArrowLeft className="w-5 h-5 text-foreground/70" />
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-black text-obsidian tracking-tight">
               {editType ? '새로운 버전 발급' : '신규 약관 생성'}
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-foreground/70 mt-1">
               {editType 
                 ? '워드(Word)에서 수정된 최신 버전을 붙여넣고 저장하면 버전이 자동으로 스펙업됩니다.'
                 : '새로 필요한 동의서나 약관을 타입에 맞게 생성할 수 있습니다.'
@@ -123,7 +123,7 @@ function PolicyEditor() {
             </p>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={loading || saving} className="bg-indigo-600 hover:bg-indigo-700 h-12 px-6 rounded-xl font-bold">
+        <Button onClick={handleSave} disabled={loading || saving} className="bg-secondary hover:bg-secondary h-12 px-6 rounded-xl font-bold">
           {saving ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />}
           저장하고 실시간 반영
         </Button>
@@ -133,23 +133,23 @@ function PolicyEditor() {
         <CardContent className="p-8 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
              <div className="space-y-3">
-               <Label className="text-sm font-bold text-gray-700">식별 코드 (Type) <span className="text-red-500">*</span></Label>
+               <Label className="text-sm font-bold text-obsidian">식별 코드 (Type) <span className="text-red-500">*</span></Label>
                <Input 
                  placeholder="예: EVENT_CONSENT" 
                  value={formData.type}
                  onChange={(e) => setFormData({...formData, type: e.target.value.toUpperCase()})}
                  disabled={!!editType} // 수정 시 타입 변경 불가
-                 className="h-12 uppercase font-mono bg-gray-50 text-gray-800 rounded-xl"
+                 className="h-12 uppercase font-mono bg-surface text-obsidian rounded-xl"
                />
                {!editType && (
-                 <p className="text-xs text-gray-500 font-medium flex items-center">
+                 <p className="text-xs text-foreground/70 font-medium flex items-center">
                    <Info className="w-3 h-3 mr-1" /> 영문자와 언더바(_)만 사용. 시스템이 이 코드로 프론트엔드와 연결합니다.
                  </p>
                )}
              </div>
 
              <div className="space-y-3">
-               <Label className="text-sm font-bold text-gray-700">약관 표시명 <span className="text-red-500">*</span></Label>
+               <Label className="text-sm font-bold text-obsidian">약관 표시명 <span className="text-red-500">*</span></Label>
                <Input 
                  placeholder="예: 2026 프로모션 수집동의서" 
                  value={formData.title}
@@ -173,16 +173,16 @@ function PolicyEditor() {
 
           <div className="space-y-3 pt-2">
              <div className="flex justify-between items-end">
-               <Label className="text-sm font-bold text-gray-700">내용 에디터 <span className="text-red-500">*</span></Label>
-               <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">WYSIWYG Word 호환</span>
+               <Label className="text-sm font-bold text-obsidian">내용 에디터 <span className="text-red-500">*</span></Label>
+               <span className="text-xs font-semibold text-secondary bg-indigo-50 px-3 py-1 rounded-full">WYSIWYG Word 호환</span>
              </div>
              
              {loading ? (
-                <div className="h-96 w-full flex items-center justify-center bg-gray-50 border rounded-xl">
-                  <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                <div className="h-96 w-full flex items-center justify-center bg-surface border rounded-xl">
+                  <Loader2 className="w-8 h-8 text-secondary animate-spin" />
                 </div>
              ) : (
-                <div className="bg-white rounded-xl overflow-hidden [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-gray-200 [&_.ql-toolbar]:bg-gray-50/50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-gray-200 [&_.ql-container]:text-base [&_.ql-editor]:min-h-[500px]">
+                <div className="bg-white rounded-xl overflow-hidden [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-line [&_.ql-toolbar]:bg-surface/50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-line [&_.ql-container]:text-base [&_.ql-editor]:min-h-[500px]">
                   <ReactQuill 
                     theme="snow" 
                     value={formData.content} 

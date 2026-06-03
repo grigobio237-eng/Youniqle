@@ -32,7 +32,7 @@ export default function MemoPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 py-12">
             <div className="container mx-auto px-4 max-w-4xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -63,7 +63,7 @@ export default function MemoPage() {
                             </Button>
                         </div>
 
-                        <div className="bg-blue-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-blue-50 rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 자동 저장 기능</p>
                             <p>작성한 메모는 브라우저에 저장되어 다음 방문 시에도 유지됩니다.</p>
                         </div>

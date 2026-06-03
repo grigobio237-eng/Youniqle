@@ -150,7 +150,7 @@ export default function TrackingPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
+          <p className="text-obsidian">로딩 중...</p>
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ export default function TrackingPage() {
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">배송 추적 정보가 없습니다</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               아직 배송이 시작되지 않았거나 배송 정보가 등록되지 않았습니다.
             </p>
             <div className="flex space-x-4">
@@ -201,8 +201,8 @@ export default function TrackingPage() {
 
   const statusLabels = {
     pending: { label: '주문 대기', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    confirmed: { label: '주문 확인', color: 'text-blue-600', bgColor: 'bg-blue-100' },
-    shipped: { label: '배송 중', color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    confirmed: { label: '주문 확인', color: 'text-primary', bgColor: 'bg-primary-container' },
+    shipped: { label: '배송 중', color: 'text-secondary', bgColor: 'bg-secondary-container' },
     delivered: { label: '배송 완료', color: 'text-green-600', bgColor: 'bg-green-100' },
   };
 
@@ -212,14 +212,14 @@ export default function TrackingPage() {
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'in_transit':
       case 'shipped':
-        return <Truck className="h-5 w-5 text-blue-600" />;
+        return <Truck className="h-5 w-5 text-primary" />;
       default:
-        return <Clock className="h-5 w-5 text-gray-400" />;
+        return <Clock className="h-5 w-5 text-foreground/70" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-surface py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* 헤더 */}
         <div className="mb-8">
@@ -232,7 +232,7 @@ export default function TrackingPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">배송 추적</h1>
-              <p className="text-gray-600 mt-2">주문번호: {order.orderNumber}</p>
+              <p className="text-obsidian mt-2">주문번호: {order.orderNumber}</p>
             </div>
             {currentStatus && statusLabels[currentStatus as keyof typeof statusLabels] && (
               <div className={`px-4 py-2 rounded-full ${statusLabels[currentStatus as keyof typeof statusLabels].bgColor}`}>
@@ -321,10 +321,10 @@ export default function TrackingPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="text-sm font-semibold text-gray-900">{event.description}</p>
-                          <p className="text-xs text-gray-500">{event.time}</p>
+                          <p className="text-sm font-semibold text-obsidian">{event.description}</p>
+                          <p className="text-xs text-foreground/70">{event.time}</p>
                         </div>
-                        <div className="flex items-center space-x-2 text-xs text-gray-600">
+                        <div className="flex items-center space-x-2 text-xs text-obsidian">
                           <MapPin className="h-3 w-3" />
                           <span>{event.location}</span>
                         </div>
@@ -347,17 +347,17 @@ export default function TrackingPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">받는 사람</p>
+                  <p className="text-sm text-obsidian mb-1">받는 사람</p>
                   <p className="font-medium">{order.shippingAddress.recipient}</p>
                 </div>
                 {order.shippingAddress.phone && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">연락처</p>
+                    <p className="text-sm text-obsidian mb-1">연락처</p>
                     <p className="font-medium">{order.shippingAddress.phone}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">주소</p>
+                  <p className="text-sm text-obsidian mb-1">주소</p>
                   <p className="font-medium">
                     ({order.shippingAddress.zipCode})<br />
                     {order.shippingAddress.address1}<br />
@@ -371,7 +371,7 @@ export default function TrackingPage() {
               <CardHeader>
                 <CardTitle>안내사항</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-gray-600 space-y-2">
+              <CardContent className="text-sm text-obsidian space-y-2">
                 <p>• 배송 추적 정보는 택배사 시스템과 실시간으로 연동됩니다.</p>
                 <p>• 배송 상태 업데이트에 약간의 지연이 있을 수 있습니다.</p>
                 <p>• 배송 관련 문의는 고객센터로 연락주시기 바랍니다.</p>

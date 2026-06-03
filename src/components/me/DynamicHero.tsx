@@ -16,7 +16,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
     let Icon = Sun;
     let iconColor = "text-amber-400";
     let bgGradient = "from-[#0F172A] via-[#1E293B] to-[#0F172A]"; // Default Dark Premium
-    let accentColor = "bg-amber-500/20";
+    let accentColor = "bg-primary/20";
     let timeText = "morning";
 
     if (hour >= 5 && hour < 12) {
@@ -45,7 +45,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
         Icon = Moon;
         iconColor = "text-purple-400";
         bgGradient = "from-[#020617] via-[#0f172a] to-[#020617]";
-        accentColor = "bg-indigo-500/20";
+        accentColor = "bg-secondary/20";
         timeText = "night";
     }
 
@@ -54,7 +54,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
             {/* Background Atmosphere */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className={`absolute -top-1/4 -right-1/4 w-3/4 h-3/4 rounded-full blur-[80px] md:blur-[120px] ${accentColor} opacity-50`} />
-                <div className={`absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full blur-[60px] md:blur-[100px] bg-blue-500/10 opacity-30`} />
+                <div className={`absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full blur-[60px] md:blur-[100px] bg-primary/10 opacity-30`} />
             </div>
 
             <div className="container mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12 px-1 md:px-0">

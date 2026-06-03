@@ -178,7 +178,7 @@ function PartnerProductsContent() {
       case 'fresh-food':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">신선식품 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">신선식품 정보</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="calories">칼로리</Label>
@@ -270,7 +270,7 @@ function PartnerProductsContent() {
       case 'clothing':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">의류 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">의류 정보</h4>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="sizeGuide">사이즈 가이드</Label>
@@ -307,7 +307,7 @@ function PartnerProductsContent() {
       case 'electronics':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">전자제품 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">전자제품 정보</h4>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="specifications">기술 사양</Label>
@@ -648,7 +648,7 @@ function PartnerProductsContent() {
                     placeholder={labels.queryPlaceholder}
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-foreground/70 mt-1">
                     URL에 사용되는 식별자입니다. 필요시 수정 가능합니다.
                   </p>
                 </div>
@@ -720,7 +720,7 @@ function PartnerProductsContent() {
               {formData.category && getCategorySpecificFields(formData.category)}
 
               {/* Funding Fields */}
-              <div className="flex items-center space-x-2 border p-4 rounded-lg bg-gray-50 my-4">
+              <div className="flex items-center space-x-2 border p-4 rounded-lg bg-surface my-4">
                 <Checkbox
                   id="isFunding"
                   checked={formData.isFunding}
@@ -728,7 +728,7 @@ function PartnerProductsContent() {
                 />
                 <div className="space-y-1">
                   <Label htmlFor="isFunding" className="font-semibold">{labels.fundingLabel}</Label>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-foreground/70">
                     {labels.fundingDesc}
                   </p>
                 </div>
@@ -772,12 +772,12 @@ function PartnerProductsContent() {
                 <Label htmlFor="description">{labels.descLabel}</Label>
                 <div className="flex items-center space-x-2 mb-2">
                   <Link href="/partner/ai-builder">
-                    <Button type="button" variant="outline" size="sm" className="text-blue-600 border-blue-200 bg-blue-50">
+                    <Button type="button" variant="outline" size="sm" className="text-primary border-primary/30 bg-blue-50">
                       <Sparkles className="h-4 w-4 mr-2" />
                       {labels.aiBuilderBtn}
                     </Button>
                   </Link>
-                  <p className="text-xs text-gray-500">{labels.aiBuilderDesc}</p>
+                  <p className="text-xs text-foreground/70">{labels.aiBuilderDesc}</p>
                 </div>
                 <ProductDescriptionEditor
                   value={formData.description}
@@ -817,9 +817,9 @@ function PartnerProductsContent() {
           <div className="col-span-full">
             <Card>
               <CardContent className="text-center py-8">
-                <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <Upload className="h-12 w-12 mx-auto text-foreground/70 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">{labels.emptyTitle}</h3>
-                <p className="text-gray-600 mb-4">{labels.emptyDesc}</p>
+                <p className="text-obsidian mb-4">{labels.emptyDesc}</p>
                 <Button onClick={resetForm}>
                   <Plus className="h-4 w-4 mr-2" />
                   {labels.addBtn}
@@ -839,7 +839,7 @@ function PartnerProductsContent() {
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Upload className="h-8 w-8 text-gray-400" />
+                    <Upload className="h-8 w-8 text-foreground/70" />
                   </div>
                 )}
 
@@ -874,7 +874,7 @@ function PartnerProductsContent() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 bg-white/80 hover:bg-white rounded-full text-gray-700"
+                      className="h-6 w-6 bg-white/80 hover:bg-white rounded-full text-obsidian"
                       onClick={() => handleEdit(product)}
                     >
                       <Edit className="h-3 w-3" />
@@ -894,25 +894,25 @@ function PartnerProductsContent() {
               <CardContent className="p-3">
                 <div className="space-y-2">
                   <div>
-                    <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
+                    <h3 className="font-semibold text-sm text-obsidian line-clamp-1">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                    <p className="text-xs text-foreground/70 line-clamp-1 mt-0.5">
                       {product.summary}
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-1">
-                      <span className="text-sm font-bold text-gray-900">
+                      <span className="text-sm font-bold text-obsidian">
                         ₩{product.price.toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center justify-between text-xs text-foreground/70">
                     <span>재고: {product.stock}</span>
-                    <span className="text-[10px] px-1 bg-gray-100 rounded text-gray-600">
+                    <span className="text-[10px] px-1 bg-gray-100 rounded text-obsidian">
                       {categories.find(c => c.value === product.category)?.label || product.category}
                     </span>
                   </div>

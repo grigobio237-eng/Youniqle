@@ -593,13 +593,13 @@ function DiagnosisContent() {
                                             2: 'bg-orange-400 border-orange-400 shadow-orange-400/20 text-white',
                                             3: 'bg-slate-400 border-slate-400 shadow-slate-400/20 text-white',
                                             4: 'bg-emerald-400 border-emerald-400 shadow-emerald-400/20 text-white',
-                                            5: 'bg-emerald-600 border-emerald-600 shadow-emerald-600/30 text-white'
+                                            5: 'bg-secondary border-emerald-600 shadow-emerald-600/30 text-white'
                                         }[score];
 
                                         const hoverColors = {
                                             1: 'hover:border-red-500 hover:bg-red-50',
                                             2: 'hover:border-orange-400 hover:bg-orange-50',
-                                            3: 'hover:border-slate-400 hover:bg-slate-50',
+                                            3: 'hover:border-slate-400 hover:bg-surface',
                                             4: 'hover:border-emerald-400 hover:bg-emerald-50',
                                             5: 'hover:border-emerald-600 hover:bg-emerald-50'
                                         }[score];

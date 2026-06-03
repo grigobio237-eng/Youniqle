@@ -79,9 +79,9 @@ const statusLabels = {
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800',
+  confirmed: 'bg-primary-container text-blue-800',
   preparing: 'bg-orange-100 text-orange-800',
-  shipped: 'bg-purple-100 text-purple-800',
+  shipped: 'bg-secondary-container text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800'
 };
@@ -97,7 +97,7 @@ const paymentStatusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-green-100 text-green-800',
   failed: 'bg-red-100 text-red-800',
-  refunded: 'bg-gray-100 text-gray-800'
+  refunded: 'bg-gray-100 text-obsidian'
 };
 
 export default function PartnerOrdersPage() {
@@ -393,7 +393,7 @@ export default function PartnerOrdersPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">주문 관리</h1>
-            <p className="text-gray-600 mt-1">파트너 상품의 주문을 관리하고 처리하세요</p>
+            <p className="text-obsidian mt-1">파트너 상품의 주문을 관리하고 처리하세요</p>
           </div>
           <Button variant="outline" onClick={() => setIsDownloadDialogOpen(true)}>
             <Download className="h-4 w-4 mr-2" />
@@ -403,9 +403,9 @@ export default function PartnerOrdersPage() {
 
         {/* Bulk Action Bar */}
         {selectedOrders.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-blue-50 border border-primary/30 rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CheckSquare className="h-5 w-5 text-blue-600" />
+              <CheckSquare className="h-5 w-5 text-primary" />
               <span className="font-medium text-blue-900">
                 {selectedOrders.length}개 주문 선택됨
               </span>
@@ -421,7 +421,7 @@ export default function PartnerOrdersPage() {
               <Button
                 size="sm"
                 onClick={() => setIsBulkDialogOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary"
               >
                 일괄 상태 변경
               </Button>
@@ -435,7 +435,7 @@ export default function PartnerOrdersPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                   <Input
                     placeholder="주문번호, 고객명, 이메일로 검색..."
                     value={searchQuery}
@@ -484,9 +484,9 @@ export default function PartnerOrdersPage() {
           {filteredOrders.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
-                <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <Package className="h-12 w-12 mx-auto text-foreground/70 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">주문이 없습니다</h3>
-                <p className="text-gray-600">아직 주문된 상품이 없습니다.</p>
+                <p className="text-obsidian">아직 주문된 상품이 없습니다.</p>
               </CardContent>
             </Card>
           ) : (
@@ -504,7 +504,7 @@ export default function PartnerOrdersPage() {
               </div>
 
               {filteredOrders.map((order) => (
-                <Card key={order._id} className={`transition-all ${selectedOrders.includes(order._id) ? 'ring-2 ring-blue-500 bg-blue-50/50' : ''}`}>
+                <Card key={order._id} className={`transition-all ${selectedOrders.includes(order._id) ? 'ring-2 ring-primary bg-blue-50/50' : ''}`}>
                   <CardContent className="p-6">
                     <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                       {/* Checkbox */}
@@ -530,16 +530,16 @@ export default function PartnerOrdersPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
-                            <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
-                            <p className="text-sm text-gray-600">{order.customer.name}</p>
-                            <p className="text-sm text-gray-600">{order.customer.email}</p>
-                            <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                            <h4 className="font-medium text-obsidian mb-2">고객 정보</h4>
+                            <p className="text-sm text-obsidian">{order.customer.name}</p>
+                            <p className="text-sm text-obsidian">{order.customer.email}</p>
+                            <p className="text-sm text-obsidian">{order.customer.phone}</p>
                           </div>
                           <div>
-                            <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
-                            <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
-                            <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
-                            <p className="text-sm text-gray-600">
+                            <h4 className="font-medium text-obsidian mb-2">배송지</h4>
+                            <p className="text-sm text-obsidian">{order.shippingAddress.name}</p>
+                            <p className="text-sm text-obsidian">{order.shippingAddress.phone}</p>
+                            <p className="text-sm text-obsidian">
                               {order.shippingAddress.address} {order.shippingAddress.detail}
                             </p>
                           </div>
@@ -547,10 +547,10 @@ export default function PartnerOrdersPage() {
 
                         {/* Order Items */}
                         <div className="mb-4">
-                          <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
+                          <h4 className="font-medium text-obsidian mb-2">주문 상품</h4>
                           <div className="space-y-2">
                             {order.items.map((item, index) => (
-                              <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                              <div key={index} className="flex items-center gap-3 p-3 bg-surface rounded-lg">
                                 <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                                   src={item.image}
                                   alt={item.productName}
                                   crossOrigin="anonymous"
@@ -558,7 +558,7 @@ export default function PartnerOrdersPage() {
                                 />
                                 <div className="flex-1">
                                   <p className="font-medium">{item.productName}</p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-sm text-obsidian">
                                     {item.quantity}개 × ₩{item.price.toLocaleString()}
                                   </p>
                                 </div>
@@ -571,14 +571,14 @@ export default function PartnerOrdersPage() {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-obsidian">
                             <div>주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}</div>
                             {order.trackingNumber && (
                               <div className="mt-1">
                                 <span className="font-medium">송장번호: </span>
                                 <span>{order.trackingNumber}</span>
                                 {order.courierCompany && (
-                                  <span className="text-gray-500"> ({order.courierCompany})</span>
+                                  <span className="text-foreground/70"> ({order.courierCompany})</span>
                                 )}
                               </div>
                             )}
@@ -695,7 +695,7 @@ export default function PartnerOrdersPage() {
                 <Label>주문 상품</Label>
                 <div className="mt-2 space-y-2">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center gap-3 p-3 bg-surface rounded-lg">
                       <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                         src={item.image}
                         alt={item.productName}
                         crossOrigin="anonymous"
@@ -703,7 +703,7 @@ export default function PartnerOrdersPage() {
                       />
                       <div className="flex-1">
                         <p className="font-medium">{item.productName}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-obsidian">
                           {item.quantity}개 × ₩{item.price.toLocaleString()}
                         </p>
                       </div>

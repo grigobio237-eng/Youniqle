@@ -26,7 +26,7 @@ export default function EnvironmentalStatus() {
         humidity: 50,
         dust: '보통',
         city: '서울',
-        icon: <Cloud className="w-5 h-5 text-slate-400" />
+        icon: <Cloud className="w-5 h-5 text-foreground/70" />
       });
       setLoading(false);
     };

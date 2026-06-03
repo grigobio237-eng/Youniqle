@@ -100,10 +100,10 @@ export default function StepTrend({ project, onUpdate, onNext }: { project: any,
                                 </div>
                             ) : (
                                 <div className="space-y-6">
-                                    <Alert className="bg-blue-50 border-blue-200">
-                                        <Wand2 className="h-4 w-4 text-blue-500" />
-                                        <AlertTitle className="text-blue-700 font-semibold">AI 분석 결과</AlertTitle>
-                                        <AlertDescription className="text-blue-600">
+                                    <Alert className="bg-blue-50 border-primary/30">
+                                        <Wand2 className="h-4 w-4 text-primary" />
+                                        <AlertTitle className="text-primary font-semibold">AI 분석 결과</AlertTitle>
+                                        <AlertDescription className="text-primary">
                                             {trendData.analysis || "분석 완료"}
                                         </AlertDescription>
                                     </Alert>

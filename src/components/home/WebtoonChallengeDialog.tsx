@@ -553,11 +553,11 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                         variant="secondary"
                         onClick={handleSuggestTopics}
                         disabled={isLoadingTopics}
-                        className="h-12 w-12 rounded-xl bg-amber-100 hover:bg-amber-200"
+                        className="h-12 w-12 rounded-xl bg-primary-container/50 hover:bg-amber-200"
                         title="유니클 주제 추천받기"
                       >
                         {isLoadingTopics ? (
-                          <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
                         ) : (
                           <span className="text-xl">💡</span>
                         )}
@@ -575,7 +575,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                             <button
                               key={idx}
                               onClick={() => setFreeTopic(idea)}
-                              className="px-4 py-2 bg-white rounded-full border border-amber-200 hover:border-amber-400 hover:bg-amber-50 text-xs text-amber-900 font-bold transition-all shadow-sm"
+                              className="px-4 py-2 bg-white rounded-full border border-primary/30 hover:border-primary/30 hover:bg-amber-50 text-xs text-amber-900 font-bold transition-all shadow-sm"
                             >
                               {idea}
                             </button>
@@ -888,7 +888,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                   <div className="space-y-2">
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-purple-700">설명</span>
+                        <span className="text-xs font-bold text-secondary">설명</span>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -905,7 +905,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     </div>
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-purple-700">해시태그</span>
+                        <span className="text-xs font-bold text-secondary">해시태그</span>
                         <Button
                           size="sm"
                           variant="ghost"

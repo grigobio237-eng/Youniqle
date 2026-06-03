@@ -75,12 +75,12 @@ export default function NavigatorConsultationSection() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+          <div className="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center text-secondary">
             <MessageCircle className="w-5 h-5" />
           </div>
           <h2 className="text-2xl font-black tracking-tight text-obsidian">전담 네비게이터 문의</h2>
         </div>
-        <Button variant="ghost" asChild className="text-xs font-black text-slate hover:text-indigo-600 hover:bg-indigo-50 rounded-xl px-4">
+        <Button variant="ghost" asChild className="text-xs font-black text-slate hover:text-secondary hover:bg-indigo-50 rounded-xl px-4">
           <Link href="/me" className="flex items-center gap-1">
             답변 확인 <ChevronRight className="w-4 h-4" />
           </Link>
@@ -93,7 +93,7 @@ export default function NavigatorConsultationSection() {
             {/* Left: Navigator Info */}
             <div className="lg:col-span-4 bg-indigo-50/50 p-8 md:p-10 border-b lg:border-b-0 lg:border-r border-indigo-100/50 space-y-8">
               <div className="space-y-4">
-                <Badge className="bg-indigo-600 text-white border-none font-black text-[10px] tracking-widest px-3 py-1">YOUR NAVIGATOR</Badge>
+                <Badge className="bg-secondary text-white border-none font-black text-[10px] tracking-widest px-3 py-1">YOUR NAVIGATOR</Badge>
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md border border-indigo-100 overflow-hidden">
                     {navigatorInfo?.avatar ? (
@@ -104,7 +104,7 @@ export default function NavigatorConsultationSection() {
                   </div>
                   <div>
                     <h3 className="font-black text-obsidian text-xl">{navigatorInfo?.name || '유니클 네비게이터'}</h3>
-                    <p className="text-xs text-indigo-600 font-bold uppercase tracking-widest">Personal Curator</p>
+                    <p className="text-xs text-secondary font-bold uppercase tracking-widest">Personal Curator</p>
                   </div>
                 </div>
               </div>
@@ -114,7 +114,7 @@ export default function NavigatorConsultationSection() {
                   블랙 패스 멤버십 전담 네비게이터입니다. <br/>
                   회복 리포트, 데이터 분석, 맞춤 솔루션에 대해 무엇이든 물어보세요. 24시간 내에 답변해 드립니다.
                 </p>
-                <div className="flex items-center gap-2 text-indigo-600">
+                <div className="flex items-center gap-2 text-secondary">
                   <Sparkles className="w-4 h-4" />
                   <span className="text-xs font-black uppercase tracking-wider">Expert Guidance v2.0</span>
                 </div>
@@ -131,7 +131,7 @@ export default function NavigatorConsultationSection() {
                     exit={{ opacity: 0 }}
                     className="absolute inset-0 z-10 bg-white flex flex-col items-center justify-center text-center p-10 space-y-4"
                   >
-                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mb-2">
+                    <div className="w-20 h-20 bg-secondary-container rounded-full flex items-center justify-center text-secondary mb-2">
                       <CheckCircle2 className="w-10 h-10" />
                     </div>
                     <h3 className="text-2xl font-black text-obsidian">문의가 정상적으로 접수되었습니다.</h3>
@@ -151,7 +151,7 @@ export default function NavigatorConsultationSection() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-black text-slate uppercase tracking-widest ml-1">Message to Navigator</label>
-                    <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-500 uppercase tracking-tight">
+                    <div className="flex items-center gap-1.5 text-[10px] font-black text-primary uppercase tracking-tight">
                       <Clock className="w-3 h-3" />
                       Avg. Response: 2~4 Hours
                     </div>
@@ -160,7 +160,7 @@ export default function NavigatorConsultationSection() {
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     placeholder="리포트 내용 중 궁금한 점이나, 현재 회복 상태에 대해 네비게이터에게 상담을 요청하세요."
-                    className="w-full h-40 p-6 rounded-3xl bg-mist/50 border-2 border-transparent focus:border-indigo-200 focus:bg-white transition-all outline-none resize-none font-bold text-obsidian placeholder:text-slate/30"
+                    className="w-full h-40 p-6 rounded-3xl bg-mist/50 border-2 border-transparent focus:border-secondary/30 focus:bg-white transition-all outline-none resize-none font-bold text-obsidian placeholder:text-slate/30"
                   />
                 </div>
 
@@ -172,7 +172,7 @@ export default function NavigatorConsultationSection() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting || !question.trim()}
-                    className="h-16 px-10 rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg shadow-xl shadow-indigo-600/20 flex items-center gap-2 group transition-all"
+                    className="h-16 px-10 rounded-[20px] bg-secondary hover:bg-secondary text-white font-black text-lg shadow-xl shadow-indigo-600/20 flex items-center gap-2 group transition-all"
                   >
                     {isSubmitting ? (
                       <Loader2 className="w-6 h-6 animate-spin" />

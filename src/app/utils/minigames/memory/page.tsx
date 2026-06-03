@@ -152,7 +152,7 @@ export default function MemoryGamePage() {
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="mb-4">
                     <Link href="/utils/minigames">
-                        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+                        <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             미니게임 돌아가기
                         </Button>
@@ -169,8 +169,8 @@ export default function MemoryGamePage() {
                                 <div className="w-24 h-24 bg-violet-100 rounded-3xl flex items-center justify-center mx-auto text-violet-600 mb-6">
                                     <Brain className="w-12 h-12" />
                                 </div>
-                                <h1 className="font-black text-gray-900 tracking-tighter text-4xl">기억력 카드 뒤집기</h1>
-                                <p className="text-gray-500 font-medium">유니클의 회복 아이콘을 매칭하여 당신의 집중력을 테스트하세요.</p>
+                                <h1 className="font-black text-obsidian tracking-tighter text-4xl">기억력 카드 뒤집기</h1>
+                                <p className="text-foreground/70 font-medium">유니클의 회복 아이콘을 매칭하여 당신의 집중력을 테스트하세요.</p>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
@@ -179,7 +179,7 @@ export default function MemoryGamePage() {
                                         key={d}
                                         variant={difficulty === d ? 'default' : 'outline'}
                                         onClick={() => setDifficulty(d)}
-                                        className={`h-16 rounded-2xl font-black tracking-widest ${difficulty === d ? 'bg-violet-600 shadow-lg shadow-violet-200' : 'border-gray-200'}`}
+                                        className={`h-16 rounded-2xl font-black tracking-widest ${difficulty === d ? 'bg-violet-600 shadow-lg shadow-violet-200' : 'border-line'}`}
                                     >
                                         {d}
                                     </Button>
@@ -198,16 +198,16 @@ export default function MemoryGamePage() {
                     {/* Stage 2: Playing */}
                     {stage === 'playing' && (
                         <div className="space-y-8">
-                            <div className="flex justify-between items-center bg-gray-50 p-6 rounded-3xl">
+                            <div className="flex justify-between items-center bg-surface p-6 rounded-3xl">
                                 <div className="flex gap-8">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Moves</span>
+                                        <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest">Moves</span>
                                         <span className="text-2xl font-black text-violet-600">{moves}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Time</span>
-                                        <div className="flex items-center gap-2 text-2xl font-black text-gray-900">
-                                            <Timer className="w-5 h-5 text-gray-400" />
+                                        <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest">Time</span>
+                                        <div className="flex items-center gap-2 text-2xl font-black text-obsidian">
+                                            <Timer className="w-5 h-5 text-foreground/70" />
                                             {formatTime(timeLeft)}
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@ export default function MemoryGamePage() {
                                 <Button
                                     variant="ghost"
                                     onClick={() => setStage('setup')}
-                                    className="text-gray-400 hover:text-gray-900 bg-white shadow-sm rounded-xl"
+                                    className="text-foreground/70 hover:text-obsidian bg-white shadow-sm rounded-xl"
                                 >
                                     <RefreshCw className="w-4 h-4 mr-2" />
                                     Restart
@@ -247,18 +247,18 @@ export default function MemoryGamePage() {
                                 <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-500 mb-6 shadow-xl animate-bounce">
                                     <Trophy className="w-12 h-12" />
                                 </div>
-                                <h2 className="font-black text-gray-900 tracking-tighter text-4xl">완벽한 매칭입니다! 🏆</h2>
-                                <p className="text-gray-500 font-medium">당신의 회복 집중력이 최고조에 달했습니다.</p>
+                                <h2 className="font-black text-obsidian tracking-tighter text-4xl">완벽한 매칭입니다! 🏆</h2>
+                                <p className="text-foreground/70 font-medium">당신의 회복 집중력이 최고조에 달했습니다.</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-                                <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Final Moves</span>
+                                <div className="bg-surface p-6 rounded-3xl border border-line">
+                                    <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest block mb-2">Final Moves</span>
                                     <span className="text-3xl font-black text-violet-600">{moves}</span>
                                 </div>
-                                <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Total Time</span>
-                                    <span className="text-3xl font-black text-gray-900">{formatTime(timeLeft)}</span>
+                                <div className="bg-surface p-6 rounded-3xl border border-line">
+                                    <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest block mb-2">Total Time</span>
+                                    <span className="text-3xl font-black text-obsidian">{formatTime(timeLeft)}</span>
                                 </div>
                             </div>
 
@@ -272,7 +272,7 @@ export default function MemoryGamePage() {
                                 <Button
                                     variant="outline"
                                     onClick={() => setStage('setup')}
-                                    className="w-full h-14 rounded-2xl border-gray-200 font-bold"
+                                    className="w-full h-14 rounded-2xl border-line font-bold"
                                 >
                                     난이도 선택으로 돌아가기
                                 </Button>

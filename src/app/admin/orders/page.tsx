@@ -86,9 +86,9 @@ const statusLabels = {
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800',
+  confirmed: 'bg-primary-container text-blue-800',
   preparing: 'bg-orange-100 text-orange-800',
-  shipped: 'bg-purple-100 text-purple-800',
+  shipped: 'bg-secondary-container text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800'
 };
@@ -104,7 +104,7 @@ const paymentStatusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-green-100 text-green-800',
   failed: 'bg-red-100 text-red-800',
-  refunded: 'bg-gray-100 text-gray-800'
+  refunded: 'bg-gray-100 text-obsidian'
 };
 
 export default function AdminOrdersPage() {
@@ -433,7 +433,7 @@ export default function AdminOrdersPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">주문 관리</h1>
-          <p className="text-gray-600 mt-1">전체 주문을 관리하고 처리하세요</p>
+          <p className="text-obsidian mt-1">전체 주문을 관리하고 처리하세요</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -493,11 +493,11 @@ export default function AdminOrdersPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <ShoppingCart className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 bg-primary-container rounded-lg">
+                    <ShoppingCart className="h-5 w-5 text-primary" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-xs font-medium text-gray-500">총 주문 (결제)</p>
+                    <p className="text-xs font-medium text-foreground/70">총 주문 (결제)</p>
                     <p className="font-bold text-xl">{stats.totalOrders}</p>
                   </div>
                 </div>
@@ -511,7 +511,7 @@ export default function AdminOrdersPage() {
                     <Clock className="h-5 w-5 text-orange-600" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-xs font-medium text-gray-500">주문 시도</p>
+                    <p className="text-xs font-medium text-foreground/70">주문 시도</p>
                     <p className="font-bold text-xl">{stats.totalAttempts || 0}</p>
                   </div>
                 </div>
@@ -525,7 +525,7 @@ export default function AdminOrdersPage() {
                     <DollarSign className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-xs font-medium text-gray-500">총 매출</p>
+                    <p className="text-xs font-medium text-foreground/70">총 매출</p>
                     <p className="font-bold text-xl">₩{stats.totalRevenue.toLocaleString()}</p>
                   </div>
                 </div>
@@ -539,7 +539,7 @@ export default function AdminOrdersPage() {
                     <Clock className="h-5 w-5 text-yellow-600" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-xs font-medium text-gray-500">처리 대기</p>
+                    <p className="text-xs font-medium text-foreground/70">처리 대기</p>
                     <p className="font-bold text-xl">{stats.pendingOrders}</p>
                   </div>
                 </div>
@@ -549,11 +549,11 @@ export default function AdminOrdersPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-purple-600" />
+                  <div className="p-2 bg-secondary-container rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-secondary" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-xs font-medium text-gray-500">완료된 주문</p>
+                    <p className="text-xs font-medium text-foreground/70">완료된 주문</p>
                     <p className="font-bold text-xl">{stats.completedOrders}</p>
                   </div>
                 </div>
@@ -566,7 +566,7 @@ export default function AdminOrdersPage() {
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                   <Input
                     placeholder="주문번호, 고객명, 이메일로 검색..."
                     value={searchQuery}
@@ -626,7 +626,7 @@ export default function AdminOrdersPage() {
                           )}
                           전체 선택
                         </Button>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-obsidian">
                           {selectedOrders.size}개 선택됨
                         </span>
                       </div>
@@ -648,9 +648,9 @@ export default function AdminOrdersPage() {
               filteredOrders.length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-12">
-                    <ShoppingCart className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <ShoppingCart className="h-12 w-12 mx-auto text-foreground/70 mb-4" />
                     <h3 className="text-lg font-semibold mb-2">주문이 없습니다</h3>
-                    <p className="text-gray-600">아직 주문된 상품이 없습니다.</p>
+                    <p className="text-obsidian">아직 주문된 상품이 없습니다.</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -681,16 +681,16 @@ export default function AdminOrdersPage() {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
-                              <h4 className="font-medium text-gray-900 mb-2">고객 정보</h4>
-                              <p className="text-sm text-gray-600">{order.customer.name}</p>
-                              <p className="text-sm text-gray-600">{order.customer.email}</p>
-                              <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                              <h4 className="font-medium text-obsidian mb-2">고객 정보</h4>
+                              <p className="text-sm text-obsidian">{order.customer.name}</p>
+                              <p className="text-sm text-obsidian">{order.customer.email}</p>
+                              <p className="text-sm text-obsidian">{order.customer.phone}</p>
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-900 mb-2">배송지</h4>
-                              <p className="text-sm text-gray-600">{order.shippingAddress.name}</p>
-                              <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
-                              <p className="text-sm text-gray-600">
+                              <h4 className="font-medium text-obsidian mb-2">배송지</h4>
+                              <p className="text-sm text-obsidian">{order.shippingAddress.name}</p>
+                              <p className="text-sm text-obsidian">{order.shippingAddress.phone}</p>
+                              <p className="text-sm text-obsidian">
                                 {order.shippingAddress.address} {order.shippingAddress.detail}
                               </p>
                             </div>
@@ -698,21 +698,21 @@ export default function AdminOrdersPage() {
 
                           {/* Order Items */}
                           <div className="mb-4">
-                            <h4 className="font-medium text-gray-900 mb-2">주문 상품</h4>
+                            <h4 className="font-medium text-obsidian mb-2">주문 상품</h4>
                             <div className="space-y-2">
                               {order.items.map((item, index) => (
-                                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                <div key={index} className="flex items-center gap-3 p-3 bg-surface rounded-lg">
                                   <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                                     src={item.image}
                                     alt={item.productName}
                                     className="w-12 h-12 object-cover rounded"
                                   />
                                   <div className="flex-1">
                                     <p className="font-medium">{item.productName}</p>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-obsidian">
                                       {item.quantity}개 × ₩{item.price.toLocaleString()}
                                     </p>
                                     {item.partnerName && (
-                                      <p className="text-xs text-blue-600">파트너: {item.partnerName}</p>
+                                      <p className="text-xs text-primary">파트너: {item.partnerName}</p>
                                     )}
                                   </div>
                                   <p className="font-semibold">
@@ -724,7 +724,7 @@ export default function AdminOrdersPage() {
                           </div>
 
                           <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-obsidian">
                               주문일: {new Date(order.createdAt).toLocaleDateString('ko-KR')}
                             </div>
                             <div className="text-lg font-bold text-primary">
@@ -737,7 +737,7 @@ export default function AdminOrdersPage() {
                         {(order.status === 'shipped' || order.status === 'delivered') && (
                           <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
-                              <Truck className="h-4 w-4 text-blue-600" />
+                              <Truck className="h-4 w-4 text-primary" />
                               <span className="text-sm font-semibold text-blue-900">배송 정보</span>
                             </div>
                             {order.trackingNumber ? (
@@ -745,13 +745,13 @@ export default function AdminOrdersPage() {
                                 <p>택배사: {order.courierCompany || '미입력'}</p>
                                 <p>송장번호: {order.trackingNumber}</p>
                                 {order.shippedAt && (
-                                  <p className="text-xs text-gray-600">
+                                  <p className="text-xs text-obsidian">
                                     배송일: {new Date(order.shippedAt).toLocaleDateString('ko-KR')}
                                   </p>
                                 )}
                               </div>
                             ) : (
-                              <p className="text-sm text-blue-700">송장 정보가 등록되지 않았습니다.</p>
+                              <p className="text-sm text-primary">송장 정보가 등록되지 않았습니다.</p>
                             )}
                           </div>
                         )}
@@ -883,14 +883,14 @@ export default function AdminOrdersPage() {
                 <h4 className="font-semibold mb-4">주문 상품</h4>
                 <div className="space-y-2">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center gap-3 p-3 bg-surface rounded-lg">
                       <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                         src={item.image}
                         alt={item.productName}
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div className="flex-1">
                         <p className="font-medium">{item.productName}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-obsidian">
                           {item.quantity}개 × ₩{item.price.toLocaleString()}
                         </p>
                       </div>
@@ -907,15 +907,15 @@ export default function AdminOrdersPage() {
                 <h4 className="font-semibold mb-4">고객 정보</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">이름</p>
+                    <p className="text-sm text-obsidian">이름</p>
                     <p className="font-medium">{selectedOrder.customer.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">이메일</p>
+                    <p className="text-sm text-obsidian">이메일</p>
                     <p className="font-medium">{selectedOrder.customer.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">전화번호</p>
+                    <p className="text-sm text-obsidian">전화번호</p>
                     <p className="font-medium">{selectedOrder.customer.phone}</p>
                   </div>
                 </div>

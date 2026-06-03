@@ -180,7 +180,7 @@ export default function ReportsHub() {
             transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
             className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
           />
-          <p className="text-sm font-bold text-slate-500">당신의 모든 회복 로그를 분석하여 보고서를 작성 중입니다...</p>
+          <p className="text-sm font-bold text-foreground/70">당신의 모든 회복 로그를 분석하여 보고서를 작성 중입니다...</p>
         </div>
       </ChapterWrapper>
     );
@@ -227,9 +227,9 @@ export default function ReportsHub() {
 
   // HSL Status Colors Map
   const badgeColors: Record<string, { bg: string, text: string, border: string, label: string }> = {
-    EXCELLENT: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', border: 'border-emerald-500/20', label: '매우 양호' },
-    GOOD: { bg: 'bg-indigo-500/10', text: 'text-indigo-500', border: 'border-indigo-500/20', label: '양호' },
-    CAUTION: { bg: 'bg-amber-500/10', text: 'text-amber-500', border: 'border-amber-500/20', label: '주의 필요' },
+    EXCELLENT: { bg: 'bg-secondary/10', text: 'text-secondary', border: 'border-emerald-500/20', label: '매우 양호' },
+    GOOD: { bg: 'bg-secondary/10', text: 'text-secondary', border: 'border-secondary/30/20', label: '양호' },
+    CAUTION: { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/30/20', label: '주의 필요' },
     RISK: { bg: 'bg-rose-500/10', text: 'text-rose-500', border: 'border-rose-500/20', label: '위험 수준' },
   };
 
@@ -246,7 +246,7 @@ export default function ReportsHub() {
              : historyTab === 'scanner' ? '유니클 스마트 이미지 스캔 결과'
              : '내면 기질 (Big 5) 프로파일'}
           </h4>
-          <span className="text-[10px] md:text-xs font-bold text-slate-400">
+          <span className="text-[10px] md:text-xs font-bold text-foreground/70">
             작성일: {new Date(selectedLog.createdAt).toLocaleString()}
           </span>
         </div>
@@ -260,11 +260,11 @@ export default function ReportsHub() {
         <div className="space-y-3 md:space-y-4">
           <div className="grid grid-cols-2 gap-3 md:gap-4">
             <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20">
-              <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">종합 점수</span>
+              <span className="text-[9px] md:text-[10px] font-black text-foreground/70 uppercase tracking-widest block">종합 점수</span>
               <p className="font-black text-obsidian text-xl md:text-2xl">{selectedLog.totalScore || 0}pt</p>
             </div>
             <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20">
-              <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">감정 온도</span>
+              <span className="text-[9px] md:text-[10px] font-black text-foreground/70 uppercase tracking-widest block">감정 온도</span>
               <p className="font-black text-obsidian text-xl md:text-2xl">{selectedLog.metaphor || '양호'}</p>
             </div>
           </div>
@@ -272,11 +272,11 @@ export default function ReportsHub() {
           {/* Score Bars */}
           {selectedLog.categoryScores && (
             <div className="space-y-1.5 md:space-y-2.5">
-              <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">상세 항목</span>
+              <span className="text-[9px] md:text-[10px] font-black text-foreground/70 uppercase tracking-widest block">상세 항목</span>
               <div className="grid grid-cols-2 gap-2 md:gap-3 text-[10px] md:text-xs">
                 {Object.entries(selectedLog.categoryScores).map(([key, val]: any) => (
                   <div key={key} className="bg-white p-2.5 md:p-3 rounded-lg border border-line/20 flex justify-between items-center">
-                    <span className="font-bold text-slate-500 capitalize">{key}</span>
+                    <span className="font-bold text-foreground/70 capitalize">{key}</span>
                     <span className="font-black text-obsidian">{val}점</span>
                   </div>
                 ))}
@@ -295,11 +295,11 @@ export default function ReportsHub() {
               </div>
             )}
             <div>
-              <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] md:text-[9px] font-bold uppercase tracking-wider mb-0.5">
+              <Badge className="bg-secondary/10 text-secondary border-none text-[8px] md:text-[9px] font-bold uppercase tracking-wider mb-0.5">
                 {selectedLog.category || 'General'}
               </Badge>
               <h5 className="text-xs md:text-sm font-black text-obsidian">{selectedLog.summary || '식단/제품 스마트 스캔 분석'}</h5>
-              <p className="text-[10px] md:text-xs font-semibold text-slate-400">매칭도/점수: {selectedLog.score || 0}점</p>
+              <p className="text-[10px] md:text-xs font-semibold text-foreground/70">매칭도/점수: {selectedLog.score || 0}점</p>
             </div>
           </div>
 
@@ -325,12 +325,12 @@ export default function ReportsHub() {
                 <div className="space-y-4">
                   {/* Ingredients Breakdown */}
                   <div className="space-y-2">
-                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">AI 이미지 디테일 성분 분석</span>
+                    <span className="text-[9px] md:text-[10px] font-black text-foreground/70 uppercase tracking-widest block">AI 이미지 디테일 성분 분석</span>
                     <div className="grid grid-cols-1 gap-2.5">
                       {Object.entries(parsedMetrics).map(([key, val]: any) => {
                         if (isNaN(Number(key))) return null;
                         return (
-                          <div key={key} className="bg-slate-50/80 p-3 md:p-3.5 rounded-xl border border-line/30 space-y-1">
+                          <div key={key} className="bg-surface/80 p-3 md:p-3.5 rounded-xl border border-line/30 space-y-1">
                             <div className="flex justify-between items-center gap-2">
                               <span className="text-[11px] md:text-xs font-black text-obsidian flex items-center gap-1.5 min-w-0">
                                 <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
@@ -341,7 +341,7 @@ export default function ReportsHub() {
                               </Badge>
                             </div>
                             {val.benefit && (
-                              <p className="text-[10px] md:text-xs text-slate-500 font-bold leading-relaxed break-keep pl-3">
+                              <p className="text-[10px] md:text-xs text-foreground/70 font-bold leading-relaxed break-keep pl-3">
                                 {val.benefit}
                               </p>
                             )}
@@ -354,8 +354,8 @@ export default function ReportsHub() {
                   {/* Future Recovery Direction */}
                   {parsedMetrics.futureDirection && (
                     <div className="bg-indigo-50/50 border border-indigo-100/40 p-4 rounded-xl space-y-2">
-                      <span className="text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-widest block">AI 맞춤형 회복 처방 가이드</span>
-                      <div className="text-[10px] md:text-xs text-slate-600 leading-relaxed font-bold space-y-2 break-keep">
+                      <span className="text-[9px] md:text-[10px] font-black text-secondary uppercase tracking-widest block">AI 맞춤형 회복 처방 가이드</span>
+                      <div className="text-[10px] md:text-xs text-obsidian leading-relaxed font-bold space-y-2 break-keep">
                         {parsedMetrics.futureDirection.split('\n').map((line: string, i: number) => {
                           const cleanLine = line.replace(/\*\*/g, '').trim();
                           if (!cleanLine) return null;
@@ -394,8 +394,8 @@ export default function ReportsHub() {
             // Robust fallback if parsing fails
             return (
               <div className="bg-white p-3 md:p-4 rounded-xl border border-line/20 space-y-1.5">
-                <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block">AI 디테일 성분 분석</span>
-                <div className="text-[10px] md:text-xs text-slate-600 leading-relaxed font-bold break-keep">
+                <span className="text-[9px] md:text-[10px] font-black text-foreground/70 uppercase tracking-widest block">AI 디테일 성분 분석</span>
+                <div className="text-[10px] md:text-xs text-obsidian leading-relaxed font-bold break-keep">
                   {typeof selectedLog.metrics === 'string' ? selectedLog.metrics : JSON.stringify(selectedLog.metrics)}
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default function ReportsHub() {
 
       {historyTab === 'daily' || historyTab === 'scanner' ? null : historyTab === 'personality' && (
         <div className="space-y-3 md:space-y-4">
-          <p className="text-[11px] md:text-sm font-bold text-slate-700 leading-relaxed break-keep">
+          <p className="text-[11px] md:text-sm font-bold text-obsidian leading-relaxed break-keep">
             {selectedLog.resultDescription || 'Big 5 모델을 적용하여 생활 패턴 및 강점을 분석한 종합 진단입니다.'}
           </p>
 
@@ -414,7 +414,7 @@ export default function ReportsHub() {
             <div className="space-y-1.5 md:space-y-2">
               {Object.entries(selectedLog.categoryScores).map(([key, val]: any) => (
                 <div key={key} className="space-y-0.5 md:space-y-1">
-                  <div className="flex justify-between text-[10px] md:text-xs font-bold text-slate-500">
+                  <div className="flex justify-between text-[10px] md:text-xs font-bold text-foreground/70">
                     <span className="capitalize">{key}</span>
                     <span>{val}%</span>
                   </div>
@@ -428,7 +428,7 @@ export default function ReportsHub() {
 
       {/* Bottom detail action links */}
       <div className="pt-3 md:pt-4 border-t border-line/50 flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center text-[10px] md:text-xs mt-3 md:mt-4">
-        <span className="font-bold text-slate-400">각 도구별 전용 상세 분석 화면으로 이동합니다.</span>
+        <span className="font-bold text-foreground/70">각 도구별 전용 상세 분석 화면으로 이동합니다.</span>
         <Link 
           href={
             historyTab === 'daily' ? '/reports/daily'
@@ -456,7 +456,7 @@ export default function ReportsHub() {
           className="bg-obsidian text-white rounded-[40px] p-8 md:p-14 shadow-2xl relative overflow-hidden border border-white/5"
         >
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 blur-[130px] rounded-full -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full -ml-32 -mb-32" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 blur-[100px] rounded-full -ml-32 -mb-32" />
           
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
             <div className="space-y-6 max-w-2xl">
@@ -524,12 +524,12 @@ export default function ReportsHub() {
             <div className="space-y-3 md:space-y-4">
               <div className="flex justify-between items-start">
                 <div className="space-y-0.5 md:space-y-1">
-                  <h3 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">CURRENT RECOVERY SCORE</h3>
+                  <h3 className="text-[10px] md:text-xs font-black text-foreground/70 uppercase tracking-widest">CURRENT RECOVERY SCORE</h3>
                   <div className="flex items-baseline gap-1 md:gap-2">
                     <span className="font-black tracking-tighter text-obsidian text-4xl md:text-4xl">
                       {data?.highlights?.latestScore?.totalScore || 0}
                     </span>
-                    <span className="text-sm md:text-lg font-bold text-slate-400">/ 100 pt</span>
+                    <span className="text-sm md:text-lg font-bold text-foreground/70">/ 100 pt</span>
                   </div>
                 </div>
 
@@ -549,14 +549,14 @@ export default function ReportsHub() {
 
             {/* 7 Days Trend Mini Chart */}
             <div className="space-y-2 md:space-y-3">
-              <div className="flex justify-between items-center text-[10px] md:text-xs font-bold text-slate-400 px-1">
+              <div className="flex justify-between items-center text-[10px] md:text-xs font-bold text-foreground/70 px-1">
                 <span className="text-obsidian font-black tracking-wider uppercase">7일 회복 트렌드</span>
-                <span className="flex items-center gap-1 text-[11px] font-extrabold text-slate-500">
+                <span className="flex items-center gap-1 text-[11px] font-extrabold text-foreground/70">
                   {data?.highlights?.totalScoreDiff !== null && (
                     <>
                       전주 대비 
                       {data.highlights.totalScoreDiff > 0 ? (
-                        <span className="text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3" />+{data.highlights.totalScoreDiff}pt</span>
+                        <span className="text-secondary bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3" />+{data.highlights.totalScoreDiff}pt</span>
                       ) : data.highlights.totalScoreDiff < 0 ? (
                         <span className="text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><ArrowDownRight className="w-3 h-3" />{data.highlights.totalScoreDiff}pt</span>
                       ) : (
@@ -710,8 +710,8 @@ export default function ReportsHub() {
                 />
               ) : (
                 <div className="text-center space-y-2">
-                  <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
-                  <span className="text-[10px] font-bold text-slate-400">데이터가 확보되지 않았습니다.</span>
+                  <AlertTriangle className="w-8 h-8 text-primary mx-auto" />
+                  <span className="text-[10px] font-bold text-foreground/70">데이터가 확보되지 않았습니다.</span>
                 </div>
               )}
             </div>
@@ -720,17 +720,17 @@ export default function ReportsHub() {
             <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-4">
               {[
                 { key: 'physical', label: 'Physical (신체적 회복)', score: data?.categoryAnalysis?.scores?.physical, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
-                { key: 'mental', label: 'Mental (정신적 회복)', score: data?.categoryAnalysis?.scores?.mental, icon: Smile, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+                { key: 'mental', label: 'Mental (정신적 회복)', score: data?.categoryAnalysis?.scores?.mental, icon: Smile, color: 'text-secondary', bg: 'bg-indigo-50' },
                 { key: 'sleep', label: 'Sleep (수면 효율)', score: data?.categoryAnalysis?.scores?.sleep, icon: Moon, color: 'text-sky-500', bg: 'bg-sky-50' },
-                { key: 'lifestyle', label: 'Lifestyle (생활 습관)', score: data?.categoryAnalysis?.scores?.lifestyle, icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' },
+                { key: 'lifestyle', label: 'Lifestyle (생활 습관)', score: data?.categoryAnalysis?.scores?.lifestyle, icon: Zap, color: 'text-primary', bg: 'bg-amber-50' },
               ].map((cat) => (
-                <div key={cat.key} className="bg-slate-50 border border-line/30 rounded-xl md:rounded-2xl p-4 md:p-5 flex items-center justify-between hover:shadow-lg transition-all duration-300">
+                <div key={cat.key} className="bg-surface border border-line/30 rounded-xl md:rounded-2xl p-4 md:p-5 flex items-center justify-between hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg md:p-2.5 md:rounded-xl ${cat.bg} ${cat.color}`}>
                       <cat.icon className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="space-y-0.5">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-400 block">{cat.label}</span>
+                      <span className="text-[10px] md:text-xs font-bold text-foreground/70 block">{cat.label}</span>
                       <div className="w-24 md:w-32 bg-slate-200 h-1 md:h-1.5 rounded-full overflow-hidden mt-1">
                         <div className={`h-full bg-slate-800`} style={{ width: `${cat.score || 0}%` }} />
                       </div>
@@ -765,7 +765,7 @@ export default function ReportsHub() {
                   당신의 회복 점수가 가장 취약한 <span className="text-chapter-accent font-bold">{lowestCategory.label}</span> 지표를 케어하기 위해 큐레이팅된 맞춤형 힐링 작품입니다.
                 </p>
               </div>
-              <Button asChild variant="outline" className="rounded-xl border-line bg-white font-bold hover:bg-slate-50 transition-all text-xs self-start md:self-auto shrink-0 shadow-sm">
+              <Button asChild variant="outline" className="rounded-xl border-line bg-white font-bold hover:bg-surface transition-all text-xs self-start md:self-auto shrink-0 shadow-sm">
                 <Link href="/gallery/artworks">전체 갤러리 로비</Link>
               </Button>
             </div>
@@ -895,7 +895,7 @@ export default function ReportsHub() {
                 <div className="w-1.5 h-5 bg-primary rounded-full" />
                 <h2 className="text-base md:text-xl font-black text-obsidian tracking-tight">회복력 흐름 및 기여도 분석</h2>
               </div>
-              <p className="text-slate-500 font-medium text-[10px] md:text-xs leading-relaxed break-keep">
+              <p className="text-foreground/70 font-medium text-[10px] md:text-xs leading-relaxed break-keep">
                 회복 점수의 오르내림을 기여 지표별로 분석하여, 어떤 행동이 점수 개선을 방해하고 끌어당겼는지 분석합니다.
               </p>
             </div>
@@ -912,11 +912,11 @@ export default function ReportsHub() {
                   const isPositive = diff >= 0;
 
                   return (
-                    <div key={key} className="flex justify-between items-center p-2.5 md:p-3 bg-slate-50 rounded-xl md:rounded-2xl border border-line/20">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-700">{titles[key] || key}</span>
+                    <div key={key} className="flex justify-between items-center p-2.5 md:p-3 bg-surface rounded-xl md:rounded-2xl border border-line/20">
+                      <span className="text-[10px] md:text-xs font-bold text-obsidian">{titles[key] || key}</span>
                       <div className="flex items-center gap-2">
                         {isPositive ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[9px] md:text-[10px] font-bold">
+                          <Badge className="bg-secondary/10 text-secondary border-none text-[9px] md:text-[10px] font-bold">
                             +{diff}pt 개선
                           </Badge>
                         ) : (
@@ -929,8 +929,8 @@ export default function ReportsHub() {
                   );
                 })
               ) : (
-                <div className="text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-400">이전 기간 비교용 데이터가 충분히 누적되지 않았습니다.</span>
+                <div className="text-center py-6 bg-surface rounded-xl border border-dashed border-line">
+                  <span className="text-[10px] font-bold text-foreground/70">이전 기간 비교용 데이터가 충분히 누적되지 않았습니다.</span>
                 </div>
               )}
             </div>
@@ -943,14 +943,14 @@ export default function ReportsHub() {
                 <div className="w-1.5 h-5 bg-primary rounded-full" />
                 <h2 className="text-base md:text-xl font-black text-obsidian tracking-tight">강점 및 기회 분석</h2>
               </div>
-              <p className="text-slate-500 font-medium text-[10px] md:text-xs leading-relaxed break-keep">
+              <p className="text-foreground/70 font-medium text-[10px] md:text-xs leading-relaxed break-keep">
                 현재 지표 중에서 가장 강력한 자원과 반대로 보완이 절실히 필요한 영역을 선별하였습니다.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 md:p-5 space-y-1.5">
-                <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] md:text-[9px] font-bold tracking-widest uppercase px-2 py-0.5">
+              <div className="bg-secondary/5 border border-emerald-500/20 rounded-2xl p-4 md:p-5 space-y-1.5">
+                <Badge className="bg-secondary/10 text-secondary border-none text-[8px] md:text-[9px] font-bold tracking-widest uppercase px-2 py-0.5">
                   Best Factor
                 </Badge>
                 <h4 className="text-sm md:text-base font-black text-obsidian">
@@ -960,11 +960,11 @@ export default function ReportsHub() {
                    : data?.variance?.strongestCategory === 'lifestyle' ? '라이프스타일'
                    : '안정화 진행 중'}
                 </h4>
-                <p className="text-[9px] text-slate-400 font-medium leading-normal break-keep">현재 당신의 회복 흐름을 단단하게 지지해 주는 중심축입니다.</p>
+                <p className="text-[9px] text-foreground/70 font-medium leading-normal break-keep">현재 당신의 회복 흐름을 단단하게 지지해 주는 중심축입니다.</p>
               </div>
 
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 md:p-5 space-y-1.5">
-                <Badge className="bg-amber-500/10 text-amber-600 border-none text-[8px] md:text-[9px] font-bold tracking-widest uppercase px-2 py-0.5">
+              <div className="bg-primary/5 border border-primary/30/20 rounded-2xl p-4 md:p-5 space-y-1.5">
+                <Badge className="bg-primary/10 text-primary border-none text-[8px] md:text-[9px] font-bold tracking-widest uppercase px-2 py-0.5">
                   Opportunity
                 </Badge>
                 <h4 className="text-sm md:text-base font-black text-obsidian">
@@ -974,7 +974,7 @@ export default function ReportsHub() {
                    : data?.variance?.weakestCategory === 'lifestyle' ? '라이프스타일'
                    : '기록이 더 필요함'}
                 </h4>
-                <p className="text-[9px] text-slate-400 font-medium leading-normal break-keep">이 부분을 보완할 때 종합 회복 속도가 크게 가속화됩니다.</p>
+                <p className="text-[9px] text-foreground/70 font-medium leading-normal break-keep">이 부분을 보완할 때 종합 회복 속도가 크게 가속화됩니다.</p>
               </div>
             </div>
           </Card>
@@ -994,12 +994,12 @@ export default function ReportsHub() {
             
             {/* Prescriptions & Solutions */}
             <div className="lg:col-span-2 space-y-4 md:space-y-6">
-              <div className="bg-slate-50 border border-line/40 rounded-2xl md:rounded-3xl p-4 md:p-8 space-y-3 md:space-y-4">
+              <div className="bg-surface border border-line/40 rounded-2xl md:rounded-3xl p-4 md:p-8 space-y-3 md:space-y-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">Medical / Expert AI Solution</span>
+                  <span className="text-[10px] md:text-xs font-black text-foreground/70 uppercase tracking-widest">Medical / Expert AI Solution</span>
                 </div>
-                <p className="text-xs md:text-sm font-semibold text-slate-700 leading-relaxed break-keep">
+                <p className="text-xs md:text-sm font-semibold text-obsidian leading-relaxed break-keep">
                   {data?.conclusion?.aiSolution?.analysis || data?.conclusion?.resultDescription || '문진 분석 결과를 토대로 곧 맞춤 처방이 작성됩니다.'}
                 </p>
               </div>
@@ -1007,12 +1007,12 @@ export default function ReportsHub() {
               {/* Recommendations list */}
               {data?.conclusion?.recommendations && data.conclusion.recommendations.length > 0 && (
                 <div className="space-y-2.5 md:space-y-3">
-                  <h4 className="text-[10px] md:text-xs font-black text-slate-400 tracking-wider">주요 행동 가이드라인</h4>
+                  <h4 className="text-[10px] md:text-xs font-black text-foreground/70 tracking-wider">주요 행동 가이드라인</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3">
                     {data.conclusion.recommendations.map((rec: string, idx: number) => (
-                      <div key={idx} className="flex gap-2 items-start bg-slate-50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-line/20">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-xs font-bold text-slate-700 leading-relaxed break-keep">{rec}</span>
+                      <div key={idx} className="flex gap-2 items-start bg-surface p-3 md:p-4 rounded-xl md:rounded-2xl border border-line/20">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-secondary shrink-0 mt-0.5" />
+                        <span className="text-xs font-bold text-obsidian leading-relaxed break-keep">{rec}</span>
                       </div>
                     ))}
                   </div>
@@ -1067,10 +1067,10 @@ export default function ReportsHub() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 border-b border-line pb-4 md:pb-6">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <History className="w-5 h-5 md:w-6 md:h-6 text-slate-700" />
+                <History className="w-5 h-5 md:w-6 md:h-6 text-obsidian" />
                 <h2 className="text-lg md:text-2xl font-black text-obsidian tracking-tight">통합 회복 기록 및 이력 관리</h2>
               </div>
-              <p className="text-slate-400 font-medium text-[10px] md:text-xs leading-relaxed">유저님이 Youniqle을 통해 기록하고 스캔해 온 모든 데이터를 모아 보실 수 있습니다.</p>
+              <p className="text-foreground/70 font-medium text-[10px] md:text-xs leading-relaxed">유저님이 Youniqle을 통해 기록하고 스캔해 온 모든 데이터를 모아 보실 수 있습니다.</p>
             </div>
 
             {/* Selection Switcher */}
@@ -1089,7 +1089,7 @@ export default function ReportsHub() {
                   className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[10px] sm:text-xs font-black transition-all shrink-0 flex-1 md:flex-initial md:px-4 md:py-2.5 md:rounded-xl ${
                     historyTab === tab.id 
                       ? 'bg-obsidian text-white shadow-md' 
-                      : 'text-slate-400 hover:text-obsidian'
+                      : 'text-foreground/70 hover:text-obsidian'
                   }`}
                 >
                   <tab.icon className="w-3.5 h-3.5" />
@@ -1112,12 +1112,12 @@ export default function ReportsHub() {
                       className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
                         selectedLog?._id === diag._id
                           ? 'bg-obsidian text-white border-obsidian'
-                          : 'bg-slate-50 border-line/20 hover:bg-mist/30 text-obsidian'
+                          : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
                       }`}
                     >
                       <div className="space-y-0.5">
                         <span className="text-[11px] md:text-xs font-bold block">{new Date(diag.createdAt).toLocaleDateString()}</span>
-                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === diag._id ? 'text-primary' : 'text-slate-400'}`}>
+                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === diag._id ? 'text-primary' : 'text-foreground/70'}`}>
                           Score: {diag.totalScore || 0}pt
                         </span>
                       </div>
@@ -1138,12 +1138,12 @@ export default function ReportsHub() {
                       className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
                         selectedLog?._id === scan._id
                           ? 'bg-obsidian text-white border-obsidian'
-                          : 'bg-slate-50 border-line/20 hover:bg-mist/30 text-obsidian'
+                          : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
                       }`}
                     >
                       <div className="space-y-0.5">
                         <span className="text-[11px] md:text-xs font-bold block">{new Date(scan.createdAt).toLocaleDateString()}</span>
-                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === scan._id ? 'text-primary' : 'text-slate-400'}`}>
+                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === scan._id ? 'text-primary' : 'text-foreground/70'}`}>
                           {scan.category || '스캔'}
                         </span>
                       </div>
@@ -1162,12 +1162,12 @@ export default function ReportsHub() {
                     className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
                       selectedLog?._id === data.personalityData._id
                         ? 'bg-obsidian text-white border-obsidian'
-                        : 'bg-slate-50 border-line/20 hover:bg-mist/30 text-obsidian'
+                        : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
                     }`}
                   >
                     <div className="space-y-0.5">
                       <span className="text-[11px] md:text-xs font-bold block">{new Date(data.personalityData.createdAt).toLocaleDateString()}</span>
-                      <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === data.personalityData._id ? 'text-primary' : 'text-slate-400'}`}>
+                      <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === data.personalityData._id ? 'text-primary' : 'text-foreground/70'}`}>
                         BIG 5 성향 데이터
                       </span>
                     </div>
@@ -1180,15 +1180,15 @@ export default function ReportsHub() {
             </div>
 
             {/* Interactive Detail Viewer Pane (Desktop only) */}
-            <div className="hidden md:flex md:col-span-2 bg-slate-50 border border-line/40 rounded-2xl p-6 min-h-[250px] flex-col justify-between">
+            <div className="hidden md:flex md:col-span-2 bg-surface border border-line/40 rounded-2xl p-6 min-h-[250px] flex-col justify-between">
               {selectedLog ? detailPaneContent : (
                 <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
-                  <div className="p-3 bg-slate-200/50 rounded-full text-slate-400">
+                  <div className="p-3 bg-slate-200/50 rounded-full text-foreground/70">
                     <History className="w-6 h-6" />
                   </div>
                   <div>
                     <h5 className="text-xs font-black text-obsidian">상세 로그 확인</h5>
-                    <p className="text-[10px] font-bold text-slate-400">좌측 리스트에서 상세 내역을 선택해 주세요.</p>
+                    <p className="text-[10px] font-bold text-foreground/70">좌측 리스트에서 상세 내역을 선택해 주세요.</p>
                   </div>
                 </div>
               )}
@@ -1216,7 +1216,7 @@ export default function ReportsHub() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className="fixed inset-0 bg-slate-50 overflow-y-auto z-[100] md:hidden scrollbar-thin p-6 flex flex-col"
+              className="fixed inset-0 bg-surface overflow-y-auto z-[100] md:hidden scrollbar-thin p-6 flex flex-col"
               style={{
                 overscrollBehaviorY: 'contain',
                 WebkitOverflowScrolling: 'touch'
@@ -1224,7 +1224,7 @@ export default function ReportsHub() {
             >
               <button 
                 onClick={() => setSelectedLog(null)}
-                className="absolute top-6 right-6 p-2 bg-slate-200/60 hover:bg-slate-200 text-slate-500 rounded-full transition-all z-10"
+                className="absolute top-6 right-6 p-2 bg-slate-200/60 hover:bg-slate-200 text-foreground/70 rounded-full transition-all z-10"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />

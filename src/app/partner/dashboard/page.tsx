@@ -272,10 +272,10 @@ function PartnerDashboardContent() {
   const getNotificationColor = (type: string) => {
     switch (type) {
       case 'order': return 'bg-green-500';
-      case 'payment': return 'bg-blue-500';
+      case 'payment': return 'bg-primary';
       case 'product': return 'bg-orange-500';
       case 'system': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      default: return 'bg-surface0';
     }
   };
 
@@ -364,7 +364,7 @@ function PartnerDashboardContent() {
         <CardContent className="p-4 md:p-8">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
             <Link href="/partner/products?action=new" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-blue-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+              <div className="p-3 rounded-2xl bg-primary-container text-primary mb-3 group-hover:scale-110 transition-transform">
                 <Package className="h-6 w-6" />
               </div>
               <span className="text-sm font-medium">상품 등록</span>
@@ -382,7 +382,7 @@ function PartnerDashboardContent() {
               <span className="text-sm font-medium">재고 관리</span>
             </Link>
             <Link href="/partner/analytics" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-purple-50 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 mb-3 group-hover:scale-110 transition-transform">
+              <div className="p-3 rounded-2xl bg-secondary-container text-secondary mb-3 group-hover:scale-110 transition-transform">
                 <BarChart3 className="h-6 w-6" />
               </div>
               <span className="text-sm font-medium">매출 분석</span>
@@ -393,14 +393,14 @@ function PartnerDashboardContent() {
               </div>
               <span className="text-sm font-medium">콘텐츠 작성</span>
             </Link>
-            <Link href="/partner/scan" className="group flex flex-col items-center p-4 rounded-2xl bg-amber-50 hover:bg-amber-100 hover:shadow-md transition-all text-center border border-amber-100">
-              <div className="p-3 rounded-2xl bg-amber-100 text-amber-600 mb-3 group-hover:scale-110 transition-transform">
+            <Link href="/partner/scan" className="group flex flex-col items-center p-4 rounded-2xl bg-amber-50 hover:bg-primary-container/50 hover:shadow-md transition-all text-center border border-amber-100">
+              <div className="p-3 rounded-2xl bg-primary-container/50 text-primary mb-3 group-hover:scale-110 transition-transform">
                 <QrCode className="h-6 w-6" />
               </div>
               <span className="text-sm font-medium text-amber-900 font-bold">고객 QR 스캔</span>
             </Link>
             <Link href="/partner/settings" className="group flex flex-col items-center p-4 rounded-2xl bg-mist hover:bg-slate-100 hover:shadow-md transition-all text-center">
-              <div className="p-3 rounded-2xl bg-slate-200 text-slate-600 mb-3 group-hover:scale-110 transition-transform">
+              <div className="p-3 rounded-2xl bg-slate-200 text-obsidian mb-3 group-hover:scale-110 transition-transform">
                 <Store className="h-6 w-6" />
               </div>
               <span className="text-sm font-medium">설정</span>
@@ -416,7 +416,7 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-blue-100 text-blue-600">
+                  <div className="p-3 rounded-2xl bg-primary-container text-primary">
                     <Users className="h-6 w-6" />
                   </div>
                 </div>
@@ -431,13 +431,13 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-purple-100 text-purple-600">
+                  <div className="p-3 rounded-2xl bg-secondary-container text-secondary">
                     <FileText className="h-6 w-6" />
                   </div>
                 </div>
                 <p className="text-sm font-medium text-text-secondary mb-1">정밀 진단 매칭</p>
                 <p className="text-3xl font-bold text-text-primary">{stats?.totalOrders || 0}</p>
-                <p className="text-xs text-blue-600 mt-2">상세 데이터 분석 완료</p>
+                <p className="text-xs text-primary mt-2">상세 데이터 분석 완료</p>
               </CardContent>
             </Card>
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
@@ -470,13 +470,13 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-indigo-100 text-indigo-600">
+                  <div className="p-3 rounded-2xl bg-secondary-container text-secondary">
                     <Calendar className="h-6 w-6" />
                   </div>
                 </div>
                 <p className="text-sm font-medium text-text-secondary mb-1">전체 예약 수</p>
                 <p className="text-3xl font-bold text-text-primary">{stats?.totalBookings || 0}</p>
-                <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
+                <p className="text-xs text-secondary mt-2 flex items-center gap-1">
                   이번 달 신규: {stats?.totalOrders || 0}
                 </p>
               </CardContent>
@@ -484,13 +484,13 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-amber-100 text-amber-600">
+                  <div className="p-3 rounded-2xl bg-primary-container/50 text-primary">
                     <Clock className="h-6 w-6" />
                   </div>
                 </div>
                 <p className="text-sm font-medium text-text-secondary mb-1">승인 대기 예약</p>
                 <p className="text-3xl font-bold text-text-primary">{stats?.pendingBookings || 0}</p>
-                <p className="text-xs text-amber-600 mt-2">확인이 필요합니다</p>
+                <p className="text-xs text-primary mt-2">확인이 필요합니다</p>
               </CardContent>
             </Card>
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
@@ -510,13 +510,13 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-600">
+                  <div className="p-3 rounded-2xl bg-secondary-container text-secondary">
                     <DollarSign className="h-6 w-6" />
                   </div>
                 </div>
                 <p className="text-sm font-medium text-text-secondary mb-1">이번 달 수익</p>
                 <p className="text-3xl font-bold text-text-primary">₩{(stats?.monthlyRevenue || 0).toLocaleString()}</p>
-                <p className="text-xs text-emerald-600 mt-2">정산 예정</p>
+                <p className="text-xs text-secondary mt-2">정산 예정</p>
               </CardContent>
             </Card>
           </>
@@ -525,7 +525,7 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-2xl bg-primary-container text-primary group-hover:scale-110 transition-transform">
                     <Package className="h-6 w-6" />
                   </div>
                   <Link href="/partner/products" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
@@ -570,7 +570,7 @@ function PartnerDashboardContent() {
             <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-2xl bg-secondary-container text-secondary group-hover:scale-110 transition-transform">
                     <DollarSign className="h-6 w-6" />
                   </div>
                   <Link href="/partner/analytics" className="text-xs text-text-secondary hover:text-primary flex items-center gap-1">
@@ -586,7 +586,7 @@ function PartnerDashboardContent() {
                       {Math.abs(revenueChange).toFixed(1)}%
                     </span>
                   )}
-                  <span className="text-xs text-blue-600">월: ₩{(stats?.monthlyRevenue || 0).toLocaleString()}</span>
+                  <span className="text-xs text-primary">월: ₩{(stats?.monthlyRevenue || 0).toLocaleString()}</span>
                 </div>
               </CardContent>
             </Card>
@@ -738,7 +738,7 @@ function PartnerDashboardContent() {
                       <p className="text-xs text-text-secondary mt-1 line-clamp-2">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-gray-400 mt-2">
+                      <p className="text-xs text-foreground/70 mt-2">
                         {new Date(notification.createdAt).toLocaleDateString('ko-KR')}
                       </p>
                     </div>
@@ -760,7 +760,7 @@ function PartnerDashboardContent() {
       <Card className="border-0 shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-amber-500" />
+            <Star className="h-5 w-5 text-primary" />
             인기 상품
           </CardTitle>
           <CardDescription>
@@ -774,7 +774,7 @@ function PartnerDashboardContent() {
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${index === 0 ? 'bg-gradient-to-br from-amber-400 to-orange-500' :
                   index === 1 ? 'bg-gradient-to-br from-slate-400 to-slate-500' :
                     index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700' :
-                      'bg-slate-200 text-slate-600'
+                      'bg-slate-200 text-obsidian'
                   }`}>
                   #{index + 1}
                 </div>

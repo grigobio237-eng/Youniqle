@@ -45,13 +45,13 @@ export function ProductRequestModal({ open, onOpenChange, productConcept }: Prod
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0 }}
-                            className="p-10 flex flex-col items-center text-center bg-gray-50"
+                            className="p-10 flex flex-col items-center text-center bg-surface"
                         >
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600">
                                 <CheckCircle2 className="w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">요청이 접수되었습니다</h2>
-                            <p className="text-gray-500 mb-8">
+                            <h2 className="text-2xl font-bold text-obsidian mb-2">요청이 접수되었습니다</h2>
+                            <p className="text-foreground/70 mb-8">
                                 유니클 연구소에 회원님의 의견이 전달되었습니다.<br />
                                 신제품 개발 시 알림을 보내드릴게요!
                             </p>
@@ -62,19 +62,19 @@ export function ProductRequestModal({ open, onOpenChange, productConcept }: Prod
                     ) : (
                         <div className="p-8">
                             <DialogHeader className="mb-6">
-                                <DialogTitle className="font-bold text-gray-900 text-xl">상품 제작 의뢰하기</DialogTitle>
-                                <DialogDescription className="text-gray-500">
-                                    유니클이 제안한 <span className="text-gray-800 font-bold">"{productConcept.name}"</span>을(를)<br />
+                                <DialogTitle className="font-bold text-obsidian text-xl">상품 제작 의뢰하기</DialogTitle>
+                                <DialogDescription className="text-foreground/70">
+                                    유니클이 제안한 <span className="text-obsidian font-bold">"{productConcept.name}"</span>을(를)<br />
                                     실제 제품으로 만나보고 싶으신가요?
                                 </DialogDescription>
                             </DialogHeader>
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <Label className="text-sm font-bold text-gray-700">추가 요청사항</Label>
+                                    <Label className="text-sm font-bold text-obsidian">추가 요청사항</Label>
                                     <Textarea
                                         placeholder="이런 기능이 더 있으면 좋겠어요..."
-                                        className="resize-none bg-gray-50 border-gray-200 focus:ring-gray-900 min-h-[120px] rounded-2xl p-4"
+                                        className="resize-none bg-surface border-line focus:ring-gray-900 min-h-[120px] rounded-2xl p-4"
                                         value={details}
                                         onChange={(e) => setDetails(e.target.value)}
                                     />

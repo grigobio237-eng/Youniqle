@@ -269,7 +269,7 @@ export default function PaymentMethodsPage() {
             </CardHeader>
             <CardContent className="p-10 space-y-10">
               <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-[32px] flex gap-4">
-                <ShieldCheck className="h-6 w-6 text-blue-600 shrink-0" />
+                <ShieldCheck className="h-6 w-6 text-primary shrink-0" />
                 <div className="text-xs font-medium text-blue-800 leading-relaxed">
                   <p className="font-extrabold mb-1">엔드투엔드 암호화 적용</p>
                   <p>모든 금융 데이터는 파편화되어 안전한 볼트에 저장됩니다. 원본 카드번호는 시스템 내부적으로만 처리되며 노출되지 않습니다.</p>

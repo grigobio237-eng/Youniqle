@@ -385,9 +385,9 @@ export default function AdminHospitalsPage() {
                           <td className="px-6 py-4">
                             <Badge className={`font-black ${
                               log.accessType === 'pre-consultation' 
-                                ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                                ? 'bg-blue-50 text-primary border-primary/30' 
                                 : log.accessType === 'patient-detail'
-                                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                ? 'bg-amber-50 text-primary border-primary/30'
                                 : 'bg-green-50 text-green-600 border-green-200'
                             }`}>
                               {log.accessType === 'pre-consultation' ? (

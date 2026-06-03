@@ -115,7 +115,7 @@ export default function SocialSharing({
           {/* 공유 메뉴 */}
           <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border z-20">
             <div className="p-4">
-              <h4 className="font-medium text-gray-900 mb-3">공유하기</h4>
+              <h4 className="font-medium text-obsidian mb-3">공유하기</h4>
               
               <div className="space-y-2">
                 {/* 네이티브 공유 (모바일) */}
@@ -155,7 +155,7 @@ export default function SocialSharing({
                   onClick={() => handleShare('facebook')}
                   className="w-full justify-start"
                 >
-                  <Facebook className="h-4 w-4 mr-3 text-blue-600" />
+                  <Facebook className="h-4 w-4 mr-3 text-primary" />
                   Facebook
                 </Button>
                 
@@ -185,23 +185,23 @@ export default function SocialSharing({
                   onClick={() => handleShare('email')}
                   className="w-full justify-start"
                 >
-                  <Mail className="h-4 w-4 mr-3 text-gray-600" />
+                  <Mail className="h-4 w-4 mr-3 text-obsidian" />
                   이메일
                 </Button>
               </div>
               
               {/* 상품 정보 미리보기 */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                <div className="text-sm text-gray-600">
-                  <div className="font-medium text-gray-900 line-clamp-2">
+              <div className="mt-4 p-3 bg-surface rounded-lg">
+                <div className="text-sm text-obsidian">
+                  <div className="font-medium text-obsidian line-clamp-2">
                     {productName}
                   </div>
                   {productPrice && (
-                    <div className="text-blue-600 font-medium">
+                    <div className="text-primary font-medium">
                       {productPrice.toLocaleString()}원
                     </div>
                   )}
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-foreground/70 mt-1">
                     {productUrl}
                   </div>
                 </div>

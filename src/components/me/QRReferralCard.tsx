@@ -92,7 +92,7 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
         >
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
           
           <div className="relative z-10 h-full flex flex-col justify-between">
             {/* Header */}
@@ -176,11 +176,11 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
         </Button>
         <Button 
           onClick={handleShare}
-          className="h-16 rounded-2xl bg-white border-2 border-obsidian text-obsidian font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all group hover:bg-slate-50"
+          className="h-16 rounded-2xl bg-white border-2 border-obsidian text-obsidian font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all group hover:bg-surface"
         >
           {copied ? (
             <>
-              <ShieldCheck className="w-4 h-4 mr-3 text-emerald-500" />
+              <ShieldCheck className="w-4 h-4 mr-3 text-secondary" />
               링크 복사 완료
             </>
           ) : (

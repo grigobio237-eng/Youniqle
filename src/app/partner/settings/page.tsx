@@ -509,7 +509,7 @@ export default function PartnerSettingsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">파트너 설정</h1>
-          <p className="text-gray-600">파트너 계정 정보를 관리하세요</p>
+          <p className="text-obsidian">파트너 계정 정보를 관리하세요</p>
         </div>
 
         {message && (
@@ -522,7 +522,7 @@ export default function PartnerSettingsPage() {
         )}
 
         {/* Custom Tabs */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-line">
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -531,8 +531,8 @@ export default function PartnerSettingsPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-primary/30 text-primary'
+                    : 'border-transparent text-foreground/70 hover:text-obsidian hover:border-gray-300'
                     }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -545,7 +545,7 @@ export default function PartnerSettingsPage() {
                 onClick={() => setActiveTab('coach')}
                 className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'coach'
                   ? 'border-chapter-accent text-chapter-accent'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-foreground/70 hover:text-obsidian hover:border-gray-300'
                   }`}
               >
                 <Briefcase className="h-4 w-4 mr-2" />
@@ -580,7 +580,7 @@ export default function PartnerSettingsPage() {
                       id="email"
                       value={settings.email}
                       disabled
-                      className="bg-gray-50"
+                      className="bg-surface"
                     />
                   </div>
                   <div>
@@ -709,7 +709,7 @@ export default function PartnerSettingsPage() {
                               });
                             }}
                           />
-                          <span className="text-gray-500">~</span>
+                          <span className="text-foreground/70">~</span>
                           <Input
                             type="time"
                             value={hours.close}
@@ -748,7 +748,7 @@ export default function PartnerSettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>자동 응답 활성화</Label>
-                      <p className="text-sm text-gray-500">영업시간 외 자동 응답 발송</p>
+                      <p className="text-sm text-foreground/70">영업시간 외 자동 응답 발송</p>
                     </div>
                     <Switch
                       checked={settings.autoReplyEnabled}
@@ -790,13 +790,13 @@ export default function PartnerSettingsPage() {
                   {/* 로고 업로드 */}
                   <div>
                     <Label>상점 로고</Label>
-                    <p className="text-sm text-gray-500 mb-2">권장 크기: 200x200px (정사각형)</p>
+                    <p className="text-sm text-foreground/70 mb-2">권장 크기: 200x200px (정사각형)</p>
                     <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
+                      <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-surface overflow-hidden">
                         {settings.shopLogo ? (
                           <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={settings.shopLogo} alt="로고" className="w-full h-full object-cover" />
                         ) : (
-                          <Upload className="h-8 w-8 text-gray-400" />
+                          <Upload className="h-8 w-8 text-foreground/70" />
                         )}
                       </div>
                       <div className="flex flex-col gap-2">
@@ -829,14 +829,14 @@ export default function PartnerSettingsPage() {
                   {/* 배너 업로드 */}
                   <div>
                     <Label>상점 배너</Label>
-                    <p className="text-sm text-gray-500 mb-2">권장 크기: 1200x400px (3:1 비율)</p>
-                    <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
+                    <p className="text-sm text-foreground/70 mb-2">권장 크기: 1200x400px (3:1 비율)</p>
+                    <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-surface overflow-hidden">
                       {settings.shopBanner ? (
                         <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={settings.shopBanner} alt="배너" className="w-full h-full object-cover" />
                       ) : (
                         <div className="text-center">
-                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500">배너 이미지 업로드</p>
+                          <Upload className="h-8 w-8 text-foreground/70 mx-auto mb-2" />
+                          <p className="text-sm text-foreground/70">배너 이미지 업로드</p>
                         </div>
                       )}
                     </div>
@@ -915,9 +915,9 @@ export default function PartnerSettingsPage() {
                       type="number"
                       value={settings.commissionRate}
                       readOnly
-                      className="bg-gray-50 font-medium text-gray-500 cursor-not-allowed"
+                      className="bg-surface font-medium text-foreground/70 cursor-not-allowed"
                     />
-                    <p className="text-xs text-gray-500 mt-1">수수료율은 관리자가 설정하며 파트너가 직접 수정할 수 없습니다.</p>
+                    <p className="text-xs text-foreground/70 mt-1">수수료율은 관리자가 설정하며 파트너가 직접 수정할 수 없습니다.</p>
                   </div>
                 </div>
                 <Button onClick={handleSavePaymentInfo} disabled={saving} className="w-full md:w-auto">
@@ -960,7 +960,7 @@ export default function PartnerSettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>주문 자동 승인</Label>
-                      <p className="text-sm text-gray-500">새로운 주문을 자동으로 승인합니다</p>
+                      <p className="text-sm text-foreground/70">새로운 주문을 자동으로 승인합니다</p>
                     </div>
                     <Switch
                       checked={settings.autoApproval}

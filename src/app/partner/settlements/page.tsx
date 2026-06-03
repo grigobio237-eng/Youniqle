@@ -185,7 +185,7 @@ function PartnerSettlementsContent() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">정산 내역</h1>
-          <p className="text-gray-500 mt-1">나의 정산 내역을 확인합니다</p>
+          <p className="text-foreground/70 mt-1">나의 정산 내역을 확인합니다</p>
         </div>
         <Button onClick={() => fetchSettlements()} variant="outline" className="rounded-full">
           <RefreshCw className="w-4 h-4 mr-2" />
@@ -233,8 +233,8 @@ function PartnerSettlementsContent() {
         <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 정산 금액</CardTitle>
-            <div className="p-2 bg-purple-100 rounded-xl">
-              <DollarSign className="h-4 w-4 text-purple-600" />
+            <div className="p-2 bg-secondary-container rounded-xl">
+              <DollarSign className="h-4 w-4 text-secondary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -284,8 +284,8 @@ function PartnerSettlementsContent() {
         <Card className="border-0 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">평균 정산액</CardTitle>
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <CreditCard className="h-4 w-4 text-blue-600" />
+            <div className="p-2 bg-primary-container rounded-xl">
+              <CreditCard className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -337,7 +337,7 @@ function PartnerSettlementsContent() {
           {loading ? (
             <div className="text-center py-8">로딩 중...</div>
           ) : settlements.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-foreground/70">
               정산 내역이 없습니다
             </div>
           ) : (
@@ -432,7 +432,7 @@ function PartnerSettlementsContent() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-semibold mb-2">정산 기간</h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-obsidian">
                     {formatDate(settlementDetails.periodStart)} ~ {formatDate(settlementDetails.periodEnd)}
                   </p>
                 </div>
@@ -465,15 +465,15 @@ function PartnerSettlementsContent() {
               {/* 계좌 정보 */}
               <div>
                 <h3 className="font-semibold mb-2">입금 계좌</h3>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-1">
+                <div className="bg-surface p-4 rounded-lg space-y-1">
                   <p className="text-sm">
-                    <span className="text-gray-600">은행:</span> {settlementDetails.bankAccount.bankName}
+                    <span className="text-obsidian">은행:</span> {settlementDetails.bankAccount.bankName}
                   </p>
                   <p className="text-sm">
-                    <span className="text-gray-600">계좌번호:</span> {settlementDetails.bankAccount.accountNumber}
+                    <span className="text-obsidian">계좌번호:</span> {settlementDetails.bankAccount.accountNumber}
                   </p>
                   <p className="text-sm">
-                    <span className="text-gray-600">예금주:</span> {settlementDetails.bankAccount.accountHolder}
+                    <span className="text-obsidian">예금주:</span> {settlementDetails.bankAccount.accountHolder}
                   </p>
                 </div>
               </div>

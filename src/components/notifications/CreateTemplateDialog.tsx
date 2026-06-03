@@ -340,7 +340,7 @@ export default function CreateTemplateDialog({
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
               />
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-foreground/70">
                 변수 사용 가능: {'{'}name{'}'}, {'{'}order_id{'}'}, {'{'}amount{'}'}
               </p>
             </div>
@@ -356,54 +356,54 @@ export default function CreateTemplateDialog({
                 value={formData.content}
                 onChange={(e) => handleChange('content', e.target.value)}
               />
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-foreground/70">
                 변수를 사용하여 동적 내용을 포함할 수 있습니다.
               </p>
             </div>
 
             {/* 변수 가이드 */}
             {showVariableGuide && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 border border-primary/30 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
                   <HelpCircle className="h-4 w-4 mr-2" />
                   사용 가능한 변수
                 </h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <h5 className="font-medium text-blue-700 mb-2">사용자 정보</h5>
-                    <div className="space-y-1 text-blue-600">
+                    <h5 className="font-medium text-primary mb-2">사용자 정보</h5>
+                    <div className="space-y-1 text-primary">
                       <div>{'{name}'} - 사용자 이름</div>
                       <div>{'{email}'} - 이메일</div>
                       <div>{'{phone}'} - 전화번호</div>
                     </div>
                   </div>
                   <div>
-                    <h5 className="font-medium text-blue-700 mb-2">주문 정보</h5>
-                    <div className="space-y-1 text-blue-600">
+                    <h5 className="font-medium text-primary mb-2">주문 정보</h5>
+                    <div className="space-y-1 text-primary">
                       <div>{'{order_id}'} - 주문번호</div>
                       <div>{'{order_amount}'} - 주문금액</div>
                       <div>{'{order_date}'} - 주문일</div>
                     </div>
                   </div>
                   <div>
-                    <h5 className="font-medium text-blue-700 mb-2">배송 정보</h5>
-                    <div className="space-y-1 text-blue-600">
+                    <h5 className="font-medium text-primary mb-2">배송 정보</h5>
+                    <div className="space-y-1 text-primary">
                       <div>{'{tracking_number}'} - 운송장번호</div>
                       <div>{'{shipping_address}'} - 배송주소</div>
                       <div>{'{estimated_delivery}'} - 예상배송일</div>
                     </div>
                   </div>
                   <div>
-                    <h5 className="font-medium text-blue-700 mb-2">상품 정보</h5>
-                    <div className="space-y-1 text-blue-600">
+                    <h5 className="font-medium text-primary mb-2">상품 정보</h5>
+                    <div className="space-y-1 text-primary">
                       <div>{'{product_name}'} - 상품명</div>
                       <div>{'{product_price}'} - 상품가격</div>
                       <div>{'{quantity}'} - 수량</div>
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-blue-200">
-                  <p className="text-xs text-blue-600">
+                <div className="mt-3 pt-3 border-t border-primary/30">
+                  <p className="text-xs text-primary">
                     💡 변수는 중괄호로 감싸서 사용하세요: {'{변수명}'}
                   </p>
                 </div>

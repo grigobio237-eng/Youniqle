@@ -272,9 +272,9 @@ export default function SimplePostcodeSearch({ onAddressSelect, disabled = false
 
       {/* 검색 결과 */}
       {showResults && searchResults.length > 0 && (
-        <div className="border border-gray-200 rounded-lg shadow-lg bg-white max-h-60 overflow-y-auto">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="text-sm font-medium text-gray-700">
+        <div className="border border-line rounded-lg shadow-lg bg-white max-h-60 overflow-y-auto">
+          <div className="p-3 border-b border-line">
+            <h3 className="text-sm font-medium text-obsidian">
               검색 결과 ({searchResults.length}건)
             </h3>
           </div>
@@ -283,18 +283,18 @@ export default function SimplePostcodeSearch({ onAddressSelect, disabled = false
               <button
                 key={index}
                 onClick={() => handleSelectAddress(result)}
-                className="w-full p-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                className="w-full p-3 text-left hover:bg-surface focus:bg-surface focus:outline-none"
               >
                 <div className="flex items-start space-x-2">
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="h-4 w-4 text-foreground/70 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-obsidian">
                       {result.address}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-foreground/70">
                       우편번호: {result.zipcode}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-foreground/70">
                       {result.bname}
                     </p>
                   </div>
@@ -305,7 +305,7 @@ export default function SimplePostcodeSearch({ onAddressSelect, disabled = false
         </div>
       )}
       
-      <div className="text-xs text-gray-500 space-y-1">
+      <div className="text-xs text-foreground/70 space-y-1">
         <div>💡 주소 검색이 안 되면 우편번호를 직접 입력해주세요.</div>
         <div>🔧 간단한 주소 검색 서비스를 사용합니다.</div>
       </div>

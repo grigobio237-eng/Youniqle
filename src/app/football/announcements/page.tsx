@@ -112,8 +112,8 @@ export default function AnnouncementsPage() {
 
   const getTypeStyle = (t: string) => {
     const map: Record<string, { label: string; bg: string; text: string; icon: any }> = {
-      notice: { label: '공지', bg: 'bg-blue-100', text: 'text-blue-700', icon: Megaphone },
-      schedule: { label: '일정', bg: 'bg-purple-100', text: 'text-purple-700', icon: Calendar },
+      notice: { label: '공지', bg: 'bg-primary-container', text: 'text-primary', icon: Megaphone },
+      schedule: { label: '일정', bg: 'bg-secondary-container', text: 'text-secondary', icon: Calendar },
       urgent: { label: '긴급', bg: 'bg-red-100', text: 'text-red-700', icon: AlertTriangle },
     };
     return map[t] || map.notice;
@@ -148,7 +148,7 @@ export default function AnnouncementsPage() {
             <h1 className="text-2xl font-black text-obsidian">팀 공지사항</h1>
           </div>
           {isCoach && (
-            <Button size="sm" onClick={() => setShowForm(true)} className="gap-1 rounded-xl bg-blue-600 hover:bg-blue-700">
+            <Button size="sm" onClick={() => setShowForm(true)} className="gap-1 rounded-xl bg-primary hover:bg-primary">
               <Plus className="w-4 h-4" /> 작성
             </Button>
           )}
@@ -176,7 +176,7 @@ export default function AnnouncementsPage() {
 
         {/* 작성 폼 */}
         {showForm && (
-          <Card className="rounded-2xl border-2 border-blue-300 shadow-xl">
+          <Card className="rounded-2xl border-2 border-primary/30 shadow-xl">
             <CardContent className="p-5 space-y-4">
               <h3 className="font-black text-obsidian">새 공지 작성</h3>
 
@@ -189,7 +189,7 @@ export default function AnnouncementsPage() {
                       key={t}
                       onClick={() => setType(t)}
                       className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
-                        type === t ? `${style.bg} ${style.text}` : 'bg-gray-100 text-gray-500'
+                        type === t ? `${style.bg} ${style.text}` : 'bg-gray-100 text-foreground/70'
                       }`}
                     >
                       {style.label}
@@ -202,13 +202,13 @@ export default function AnnouncementsPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="제목"
-                className="w-full h-11 px-3 rounded-xl border border-gray-200 text-sm font-bold"
+                className="w-full h-11 px-3 rounded-xl border border-line text-sm font-bold"
               />
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="내용을 입력하세요"
-                className="w-full h-24 px-3 py-2 rounded-xl border border-gray-200 text-sm resize-none"
+                className="w-full h-24 px-3 py-2 rounded-xl border border-line text-sm resize-none"
               />
 
               {/* 스케줄 전용 필드 */}
@@ -247,7 +247,7 @@ export default function AnnouncementsPage() {
                     {(['training', 'match', 'meeting', 'other'] as const).map((et) => (
                       <button key={et} onClick={() => setEventType(et)}
                         className={`flex-1 py-2 rounded-lg text-xs font-bold ${
-                          eventType === et ? 'bg-purple-500 text-white' : 'bg-white text-gray-500'
+                          eventType === et ? 'bg-secondary text-white' : 'bg-white text-foreground/70'
                         }`}>
                         {getEventTypeLabel(et)}
                       </button>
@@ -263,7 +263,7 @@ export default function AnnouncementsPage() {
 
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={!title || !content || formLoading}
-                  className="flex-1 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold">
+                  className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary font-bold">
                   {formLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : '게시하기'}
                 </Button>
                 <Button variant="outline" onClick={resetForm} className="rounded-xl">취소</Button>
@@ -293,7 +293,7 @@ export default function AnnouncementsPage() {
                         <Badge className={`${style.bg} ${style.text} border-none font-bold text-xs`}>
                           <TypeIcon className="w-3 h-3 mr-1" /> {style.label}
                         </Badge>
-                        {a.isPinned && <Pin className="w-3 h-3 text-blue-500" />}
+                        {a.isPinned && <Pin className="w-3 h-3 text-primary" />}
                       </div>
                       {isCoach && (
                         <Button variant="ghost" size="sm" onClick={() => handleDelete(a._id)} className="text-red-400 hover:text-red-600 h-7 w-7 p-0">
@@ -315,7 +315,7 @@ export default function AnnouncementsPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-gray-400">
+                    <div className="flex items-center justify-between text-xs text-foreground/70">
                       <span>{a.authorId?.name || '알 수 없음'}</span>
                       <span>{new Date(a.createdAt).toLocaleDateString('ko-KR')}</span>
                     </div>

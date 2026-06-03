@@ -133,11 +133,11 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <History className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-obsidian mb-2">
             최근 본 상품이 없습니다
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-obsidian mb-4">
             상품을 둘러보시면 여기에 표시됩니다.
           </p>
           <Button asChild>
@@ -185,7 +185,7 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-foreground/70">
                             <Heart className="h-12 w-12" />
                           </div>
                         )}
@@ -227,7 +227,7 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
                     <h4 className="font-medium text-sm line-clamp-2">
                       <Link
                         href={`/products/${product._id}`}
-                        className="hover:text-blue-600 transition-colors"
+                        className="hover:text-primary transition-colors"
                       >
                         {product.name}
                       </Link>
@@ -235,7 +235,7 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
 
                     {/* 가격 */}
                     <div>
-                      <div className="font-bold text-blue-600">
+                      <div className="font-bold text-primary">
                         {product.category === 'stem-cell' && (product.minPrice || product.maxPrice) ? (
                           <>
                             {formatPrice(product.minPrice || 0)} ~ {formatPrice(product.maxPrice || 0)}
@@ -245,7 +245,7 @@ export default function RecentlyViewed({ currentProductId }: RecentlyViewedProps
                         )}
                       </div>
                       {product.originalPrice && product.originalPrice > product.price && product.category !== 'stem-cell' && (
-                        <div className="text-xs text-gray-500 line-through">
+                        <div className="text-xs text-foreground/70 line-through">
                           {formatPrice(product.originalPrice)}
                         </div>
                       )}

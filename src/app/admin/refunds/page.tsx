@@ -263,7 +263,7 @@ export default function AdminRefundsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">환불/교환 관리</h1>
-          <p className="text-gray-500 mt-1">환불 및 교환 요청을 관리합니다</p>
+          <p className="text-foreground/70 mt-1">환불 및 교환 요청을 관리합니다</p>
         </div>
         <Button onClick={() => fetchRefunds()} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
@@ -281,7 +281,7 @@ export default function AdminRefundsPage() {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="환불번호, 주문번호, 사용자명, 이메일 검색..."
                   value={searchQuery}
@@ -356,7 +356,7 @@ export default function AdminRefundsPage() {
                       <TableCell>
                         <div>
                           <div className="font-medium">{refund.userName}</div>
-                          <div className="text-sm text-gray-500">{refund.userEmail}</div>
+                          <div className="text-sm text-foreground/70">{refund.userEmail}</div>
                         </div>
                       </TableCell>
                       <TableCell>{refund.orderNumber}</TableCell>
@@ -479,16 +479,16 @@ export default function AdminRefundsPage() {
                 <h4 className="font-semibold mb-4">사용자 정보</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">이름</p>
+                    <p className="text-sm text-obsidian">이름</p>
                     <p className="font-medium">{selectedRefund.userName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">이메일</p>
+                    <p className="text-sm text-obsidian">이메일</p>
                     <p className="font-medium">{selectedRefund.userEmail}</p>
                   </div>
                   {selectedRefund.userPhone && (
                     <div>
-                      <p className="text-sm text-gray-600">전화번호</p>
+                      <p className="text-sm text-obsidian">전화번호</p>
                       <p className="font-medium">{selectedRefund.userPhone}</p>
                     </div>
                   )}
@@ -501,7 +501,7 @@ export default function AdminRefundsPage() {
                   <h4 className="font-semibold mb-4">환불 상품</h4>
                   <div className="space-y-3">
                     {selectedRefund.items.map((item, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center gap-3 p-3 bg-surface rounded-lg">
                         {item.imageUrl && (
                           <Image
                             src={item.imageUrl}
@@ -513,7 +513,7 @@ export default function AdminRefundsPage() {
                         )}
                         <div className="flex-1">
                           <p className="font-medium">{item.productName}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-obsidian">
                             {item.quantity}개 × ₩{item.price.toLocaleString()}
                           </p>
                         </div>
@@ -530,7 +530,7 @@ export default function AdminRefundsPage() {
                 <Badge variant="outline" className="mb-2">
                   {reasonLabels[selectedRefund.reason] || selectedRefund.reason}
                 </Badge>
-                <div className="p-4 bg-gray-50 rounded-lg mt-2">
+                <div className="p-4 bg-surface rounded-lg mt-2">
                   <p className="whitespace-pre-wrap">{selectedRefund.reasonDetail}</p>
                 </div>
                 {selectedRefund.images && selectedRefund.images.length > 0 && (
@@ -594,13 +594,13 @@ export default function AdminRefundsPage() {
                     <span className="font-medium">₩{selectedRefund.refundAmount.toLocaleString()}</span>
                   </div>
                   {selectedRefund.shippingFee > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-obsidian">
                       <span>배송비</span>
                       <span>₩{selectedRefund.shippingFee.toLocaleString()}</span>
                     </div>
                   )}
                   {selectedRefund.refundShippingFee > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-obsidian">
                       <span>반품 배송비</span>
                       <span>-₩{selectedRefund.refundShippingFee.toLocaleString()}</span>
                     </div>
@@ -623,7 +623,7 @@ export default function AdminRefundsPage() {
                 <h4 className="font-semibold mb-2">환불 방법</h4>
                 <p>{refundMethodLabels[selectedRefund.refundMethod] || selectedRefund.refundMethod}</p>
                 {selectedRefund.refundMethod === 'bank_transfer' && selectedRefund.bankAccount && (
-                  <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                  <div className="mt-2 p-3 bg-surface rounded-lg">
                     <p className="text-sm">
                       <span className="font-medium">은행:</span> {selectedRefund.bankAccount.bankName}
                     </p>
@@ -641,10 +641,10 @@ export default function AdminRefundsPage() {
               {selectedRefund.pickupAddress && (
                 <div className="border-t pt-4">
                   <h4 className="font-semibold mb-2">수거지 정보</h4>
-                  <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="p-3 bg-surface rounded-lg">
                     <p>{selectedRefund.pickupAddress.address1} {selectedRefund.pickupAddress.address2}</p>
-                    <p className="text-sm text-gray-600">({selectedRefund.pickupAddress.zipCode})</p>
-                    <p className="text-sm text-gray-600 mt-1">연락처: {selectedRefund.pickupAddress.phone}</p>
+                    <p className="text-sm text-obsidian">({selectedRefund.pickupAddress.zipCode})</p>
+                    <p className="text-sm text-obsidian mt-1">연락처: {selectedRefund.pickupAddress.phone}</p>
                   </div>
                 </div>
               )}

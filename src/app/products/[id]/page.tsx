@@ -335,7 +335,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">상품 정보를 불러오는 중입니다...</p>
+          <p className="text-obsidian">상품 정보를 불러오는 중입니다...</p>
         </div>
       </div>
     );
@@ -347,7 +347,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">상품을 찾을 수 없습니다</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               요청하신 상품이 존재하지 않거나 삭제되었습니다.
             </p>
             <Button asChild>
@@ -632,8 +632,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 className={`w-full text-xl py-8 rounded-[16px] font-black shadow-lg transition-all active:scale-[0.98] ${product.category === 'stem-cell'
                   ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-purple-200'
                   : product.isFunding
-                    ? 'bg-status-amber hover:bg-amber-700 shadow-amber-200'
-                    : 'btn-primary shadow-blue-100'
+                    ? 'bg-status-amber hover:bg-primary shadow-primary/20'
+                    : 'btn-primary shadow-primary/20'
                   }`}
               >
                 {product.category === 'stem-cell' ? '지금 상담하기' : (product.stock === 0 ? '품절되었습니다' : (product.isFunding ? '지금 펀딩하기' : '지금 구매하기'))}
@@ -725,7 +725,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <p>• <strong>반품 주소:</strong> 서울특별시 강동구 고덕비즈밸리로 26</p>
                     <Button
                       variant="link"
-                      className="p-0 h-auto text-purple-700 underline text-xs mt-2"
+                      className="p-0 h-auto text-secondary underline text-xs mt-2"
                       onClick={() => window.open('/terms', '_blank')}
                     >
                       자세한 교환/반품 정책 보기 →
@@ -735,12 +735,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </div>
             ) : product.isFunding ? (
               <div className="space-y-4 mt-8">
-                <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-gray-700" />
+                <div className="bg-surface p-5 rounded-xl border border-line">
+                  <h3 className="font-bold text-obsidian mb-3 flex items-center">
+                    <Shield className="h-5 w-5 mr-2 text-obsidian" />
                     펀딩/후원 안내
                   </h3>
-                  <div className="text-sm text-gray-600 space-y-2">
+                  <div className="text-sm text-obsidian space-y-2">
                     <p>• 펀딩은 일반 쇼핑과 달리 예약 구매의 성격을 띱니다.</p>
                     <p>• 목표 달성 시 결제가 진행되며, 종료일 이후 순차 발송됩니다.</p>
                     <p>• 단순 변심에 의한 환불은 펀딩 종료 전까지만 가능합니다.</p>
@@ -753,7 +753,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <div className="space-y-4 mt-8">
                 <div className="bg-purple-50 p-6 rounded-[24px] border border-purple-100">
                   <h3 className="font-bold text-purple-900 mb-3 flex items-center italic">
-                    <Sparkles className="h-5 w-5 mr-2 text-purple-600" />
+                    <Sparkles className="h-5 w-5 mr-2 text-secondary" />
                     Premium Consultation
                   </h3>
                   <div className="text-sm text-purple-800 space-y-3 font-medium">
@@ -775,12 +775,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         {/* 상품 상세 정보 */}
         <Card className="shadow-lg">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">상품 설명</h2>
+            <h2 className="text-2xl font-bold text-obsidian mb-6">상품 설명</h2>
             <div className={`prose prose-gray max-w-none ${product.descriptionIsHtml ? 'prose-img:rounded-xl prose-img:shadow-md' : ''}`}>
               {product.descriptionIsHtml ? (
                 <div dangerouslySetInnerHTML={{ __html: product.description }} />
               ) : (
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                <p className="text-obsidian leading-relaxed whitespace-pre-line">
                   {product.description}
                 </p>
               )}

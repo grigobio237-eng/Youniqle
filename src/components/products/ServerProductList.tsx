@@ -138,7 +138,7 @@ export default async function ServerProductList({ searchParams }: ServerProductL
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <div className="absolute inset-0 flex items-center justify-center text-foreground/70">
                     <Heart className="h-12 w-12" />
                   </div>
                 )}
@@ -218,10 +218,10 @@ export default async function ServerProductList({ searchParams }: ServerProductL
         <h2 className="font-semibold text-red-600 mb-4 text-xl">
           문제가 발생했습니다
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-obsidian mb-4">
           상품 목록을 불러오는 중 오류가 발생했습니다.
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-foreground/70">
           잠시 후 다시 시도해주세요.
         </p>
       </div>

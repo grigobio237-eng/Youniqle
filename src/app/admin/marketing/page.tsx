@@ -132,7 +132,7 @@ export default function MarketingDashboard() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">마케팅 통계를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchMarketingStats} variant="outline">
             다시 시도
@@ -149,8 +149,8 @@ export default function MarketingDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">마케팅 대시보드</h1>
-          <p className="text-gray-600 mt-1">뉴스레터, 쿠폰, 프로모션, 알림 통합 관리</p>
+          <h1 className="text-3xl font-bold text-obsidian">마케팅 대시보드</h1>
+          <p className="text-obsidian mt-1">뉴스레터, 쿠폰, 프로모션, 알림 통합 관리</p>
         </div>
         <div className="flex items-center space-x-4">
           <select
@@ -392,7 +392,7 @@ export default function MarketingDashboard() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary">
                   {formatNumber(stats.overview.newsletter.recentSubscriptions)}
                 </div>
                 <p className="text-sm text-muted-foreground">최근 구독</p>
@@ -438,7 +438,7 @@ export default function MarketingDashboard() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary">
                   {formatNumber(stats.overview.coupon.totalUsage)}
                 </div>
                 <p className="text-sm text-muted-foreground">총 사용 횟수</p>
@@ -446,7 +446,7 @@ export default function MarketingDashboard() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-secondary">
                   {formatCurrency(stats.overview.coupon.recentDiscount)}
                 </div>
                 <p className="text-sm text-muted-foreground">최근 할인 금액</p>
@@ -484,7 +484,7 @@ export default function MarketingDashboard() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary">
                   {formatNumber(stats.overview.promotion.totalUsage)}
                 </div>
                 <p className="text-sm text-muted-foreground">총 사용 횟수</p>
@@ -514,7 +514,7 @@ export default function MarketingDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary">
                   {formatNumber(stats.overview.notification.total)}
                 </div>
                 <p className="text-sm text-muted-foreground">총 알림</p>

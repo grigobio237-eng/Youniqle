@@ -239,7 +239,7 @@ function TestView({ question, index, total, onAnswer, onPrevious, onClose }: any
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute top-0 left-8 text-slate-400 hover:text-primary -mt-2 pl-0 hover:bg-transparent"
+                        className="absolute top-0 left-8 text-foreground/70 hover:text-primary -mt-2 pl-0 hover:bg-transparent"
                         onClick={onPrevious}
                     >
                         &lt; 이전 질문
@@ -393,7 +393,7 @@ function ResultView({ result, onClose, onUnlockPaid, userName }: { result: FreeD
                             </Button>
                             {/* Temporary Dev Button for Report Page Check */}
                             <div className="mt-2">
-                                <Link href="/diagnosis/report" className="text-[10px] text-slate-400">
+                                <Link href="/diagnosis/report" className="text-[10px] text-foreground/70">
                                     (개발용) 리포트 페이지 미리보기
                                 </Link>
                             </div>

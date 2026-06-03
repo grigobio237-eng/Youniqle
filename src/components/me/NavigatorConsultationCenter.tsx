@@ -92,7 +92,7 @@ export default function NavigatorConsultationCenter() {
   if (loading && consultations.length === 0) {
     return (
       <div className="h-64 flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
         <p className="text-sm font-bold text-slate/50">상담 내역을 불러오고 있습니다...</p>
       </div>
     );
@@ -106,7 +106,7 @@ export default function NavigatorConsultationCenter() {
             onClick={() => setActiveFilter('all')}
             className={cn(
               "cursor-pointer px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest transition-all",
-              activeFilter === 'all' ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-mist text-slate hover:bg-indigo-50"
+              activeFilter === 'all' ? "bg-secondary text-white shadow-lg shadow-indigo-200" : "bg-mist text-slate hover:bg-indigo-50"
             )}
           >
             전체 내역 ({consultations.length})
@@ -115,7 +115,7 @@ export default function NavigatorConsultationCenter() {
             onClick={() => setActiveFilter('pending')}
             className={cn(
               "cursor-pointer px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest transition-all",
-              activeFilter === 'pending' ? "bg-amber-500 text-white shadow-lg shadow-amber-200" : "bg-mist text-slate hover:bg-amber-50"
+              activeFilter === 'pending' ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-mist text-slate hover:bg-amber-50"
             )}
           >
             대기 중 ({consultations.filter(c => c.status === 'pending').length})
@@ -124,7 +124,7 @@ export default function NavigatorConsultationCenter() {
             onClick={() => setActiveFilter('answered')}
             className={cn(
               "cursor-pointer px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest transition-all",
-              activeFilter === 'answered' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200" : "bg-mist text-slate hover:bg-emerald-50"
+              activeFilter === 'answered' ? "bg-secondary text-white shadow-lg shadow-emerald-200" : "bg-mist text-slate hover:bg-emerald-50"
             )}
           >
             답변 완료 ({consultations.filter(c => c.status === 'answered').length})
@@ -157,7 +157,7 @@ export default function NavigatorConsultationCenter() {
                   <div className="flex items-center gap-4 flex-1">
                     <div className={cn(
                       "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
-                      c.status === 'pending' ? "bg-amber-50 text-amber-500" : "bg-emerald-50 text-emerald-500"
+                      c.status === 'pending' ? "bg-amber-50 text-primary" : "bg-emerald-50 text-secondary"
                     )}>
                       {c.status === 'pending' ? <Clock className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
                     </div>
@@ -194,7 +194,7 @@ export default function NavigatorConsultationCenter() {
                       {/* Question */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-slate-100 text-slate-500 border-none font-black text-[9px] uppercase tracking-tighter">Question</Badge>
+                          <Badge className="bg-slate-100 text-foreground/70 border-none font-black text-[9px] uppercase tracking-tighter">Question</Badge>
                           {isNavigator && <span className="text-[10px] text-slate/40 font-bold italic">{c.userEmail}</span>}
                         </div>
                         <div className="bg-mist/30 p-5 rounded-2xl rounded-tl-none border border-line/30">
@@ -206,8 +206,8 @@ export default function NavigatorConsultationCenter() {
                       {c.answer ? (
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
-                            <Badge className="bg-indigo-600 text-white border-none font-black text-[9px] uppercase tracking-tighter">Answer</Badge>
-                            <span className="text-[10px] text-indigo-600/50 font-bold italic">
+                            <Badge className="bg-secondary text-white border-none font-black text-[9px] uppercase tracking-tighter">Answer</Badge>
+                            <span className="text-[10px] text-secondary/50 font-bold italic">
                               Replied at {new Date(c.answeredAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -219,19 +219,19 @@ export default function NavigatorConsultationCenter() {
                         isNavigator ? (
                           <div className="space-y-4 pt-2">
                             <div className="flex items-center gap-2">
-                              <Badge className="bg-amber-500 text-white border-none font-black text-[9px] uppercase tracking-tighter">Your Reply</Badge>
+                              <Badge className="bg-primary text-white border-none font-black text-[9px] uppercase tracking-tighter">Your Reply</Badge>
                             </div>
                             <div className="relative">
                               <textarea
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="회원님을 위한 맞춤 답변을 입력하세요."
-                                className="w-full h-32 p-5 rounded-2xl bg-mist/20 border border-line focus:border-indigo-300 focus:bg-white transition-all outline-none resize-none font-bold text-obsidian placeholder:text-slate/30 text-sm"
+                                className="w-full h-32 p-5 rounded-2xl bg-mist/20 border border-line focus:border-secondary/30 focus:bg-white transition-all outline-none resize-none font-bold text-obsidian placeholder:text-slate/30 text-sm"
                               />
                               <Button
                                 onClick={() => handleReply(c._id)}
                                 disabled={isSubmitting || !replyText.trim()}
-                                className="absolute bottom-4 right-4 h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-lg shadow-indigo-200 flex items-center gap-2"
+                                className="absolute bottom-4 right-4 h-10 px-5 rounded-xl bg-secondary hover:bg-secondary text-white font-black text-xs shadow-lg shadow-indigo-200 flex items-center gap-2"
                               >
                                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-3.5 h-3.5" /> 답변 전송</>}
                               </Button>
@@ -239,8 +239,8 @@ export default function NavigatorConsultationCenter() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-3 p-5 bg-amber-50/50 rounded-2xl border border-amber-100/50">
-                            <Clock className="w-5 h-5 text-amber-500" />
-                            <p className="text-sm font-bold text-amber-700">네비게이터가 문의 내용을 확인하고 있습니다. 조금만 기다려 주세요.</p>
+                            <Clock className="w-5 h-5 text-primary" />
+                            <p className="text-sm font-bold text-primary">네비게이터가 문의 내용을 확인하고 있습니다. 조금만 기다려 주세요.</p>
                           </div>
                         )
                       )}

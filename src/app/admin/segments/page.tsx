@@ -181,7 +181,7 @@ export default function SegmentDashboard() {
       case 'inactive':
         return <Badge variant="secondary">비활성</Badge>;
       case 'archived':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800">보관됨</Badge>;
+        return <Badge variant="outline" className="bg-gray-100 text-obsidian">보관됨</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -264,7 +264,7 @@ export default function SegmentDashboard() {
           <div className="text-red-500 mb-4">
             <Users className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">세그먼트 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchSegments} variant="outline">
             다시 시도
@@ -279,8 +279,8 @@ export default function SegmentDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">고객 세분화 관리</h1>
-          <p className="text-gray-600 mt-1">고객별 맞춤 마케팅을 위한 세분화 시스템</p>
+          <h1 className="text-3xl font-bold text-obsidian">고객 세분화 관리</h1>
+          <p className="text-obsidian mt-1">고객별 맞춤 마케팅을 위한 세분화 시스템</p>
         </div>
         <div className="flex space-x-2">
           <Button asChild>
@@ -314,10 +314,10 @@ export default function SegmentDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">총 고객</CardTitle>
-              <Target className="h-4 w-4 text-blue-500" />
+              <Target className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalUsers.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-primary">{stats.totalUsers.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -334,10 +334,10 @@ export default function SegmentDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">비활성</CardTitle>
-              <XCircle className="h-4 w-4 text-gray-500" />
+              <XCircle className="h-4 w-4 text-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.inactive.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-obsidian">{stats.inactive.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -359,7 +359,7 @@ export default function SegmentDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="세그먼트 이름, 설명, 태그로 검색..."
                   value={searchTerm}
@@ -431,7 +431,7 @@ export default function SegmentDashboard() {
                     <div>
                       <div className="font-medium">{segment.name}</div>
                       {segment.description && (
-                        <div className="text-sm text-gray-500">{segment.description}</div>
+                        <div className="text-sm text-foreground/70">{segment.description}</div>
                       )}
                       {segment.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
@@ -461,7 +461,7 @@ export default function SegmentDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div className="font-medium">{segment.stats.totalUsers.toLocaleString()}</div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         활성: {segment.stats.activeUsers.toLocaleString()}
                       </div>
                     </div>
@@ -473,11 +473,11 @@ export default function SegmentDashboard() {
                       ) : segment.stats.growthRate < 0 ? (
                         <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />
                       ) : (
-                        <Clock className="h-4 w-4 text-gray-500" />
+                        <Clock className="h-4 w-4 text-foreground/70" />
                       )}
                       <span className={`text-sm ${
                         segment.stats.growthRate > 0 ? 'text-green-600' :
-                        segment.stats.growthRate < 0 ? 'text-red-600' : 'text-gray-600'
+                        segment.stats.growthRate < 0 ? 'text-red-600' : 'text-obsidian'
                       }`}>
                         {segment.stats.growthRate > 0 ? '+' : ''}{segment.stats.growthRate.toFixed(1)}%
                       </span>
@@ -486,7 +486,7 @@ export default function SegmentDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div className="font-medium">{segment.stats.engagementScore.toFixed(0)}점</div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         {segment.stats.engagementScore >= 80 ? '높음' :
                          segment.stats.engagementScore >= 60 ? '보통' : '낮음'}
                       </div>
@@ -498,14 +498,14 @@ export default function SegmentDashboard() {
                         {segment.marketing.targetAudience ? (
                           <CheckCircle className="h-3 w-3 text-green-500" />
                         ) : (
-                          <XCircle className="h-3 w-3 text-gray-400" />
+                          <XCircle className="h-3 w-3 text-foreground/70" />
                         )}
                         <span>타겟</span>
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         {getToneLabel(segment.marketing.messageTone)}
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         {segment.marketing.preferredChannels.join(', ')}
                       </div>
                     </div>
@@ -516,7 +516,7 @@ export default function SegmentDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{formatDate(segment.stats.lastUpdated.toString())}</div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         {segment.stats.updateCount}회 업데이트
                       </div>
                     </div>
@@ -524,7 +524,7 @@ export default function SegmentDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{segment.createdBy.name}</div>
-                      <div className="text-gray-500">{segment.createdBy.email}</div>
+                      <div className="text-foreground/70">{segment.createdBy.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -570,7 +570,7 @@ export default function SegmentDashboard() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground/70">
                 페이지 {currentPage} / {totalPages}
               </div>
               <div className="flex space-x-2">

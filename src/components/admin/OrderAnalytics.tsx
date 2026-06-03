@@ -82,9 +82,9 @@ const statusLabels = {
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800',
+  confirmed: 'bg-primary-container text-blue-800',
   preparing: 'bg-orange-100 text-orange-800',
-  shipped: 'bg-purple-100 text-purple-800',
+  shipped: 'bg-secondary-container text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800'
 };
@@ -100,7 +100,7 @@ const paymentStatusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-green-100 text-green-800',
   failed: 'bg-red-100 text-red-800',
-  refunded: 'bg-gray-100 text-gray-800'
+  refunded: 'bg-gray-100 text-obsidian'
 };
 
 export default function OrderAnalytics() {
@@ -169,7 +169,7 @@ export default function OrderAnalytics() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">주문 분석 대시보드</h2>
-          <p className="text-gray-600">실시간 주문 현황 및 성과 분석</p>
+          <p className="text-obsidian">실시간 주문 현황 및 성과 분석</p>
         </div>
         <div className="flex gap-2">
           <Select value={period} onValueChange={setPeriod}>
@@ -203,8 +203,8 @@ export default function OrderAnalytics() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === tab.id
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white text-primary shadow-sm'
+                : 'text-obsidian hover:text-obsidian'
                 }`}
             >
               <Icon className="h-4 w-4" />
@@ -223,10 +223,10 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">총 주문</p>
+                    <p className="text-sm font-medium text-obsidian">총 주문</p>
                     <p className="text-2xl font-bold">{data.summary.totalOrders.toLocaleString()}</p>
                   </div>
-                  <Package className="h-8 w-8 text-blue-600" />
+                  <Package className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -235,7 +235,7 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">총 매출</p>
+                    <p className="text-sm font-medium text-obsidian">총 매출</p>
                     <p className="text-2xl font-bold">{formatCurrency(data.summary.totalRevenue)}</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-green-600" />
@@ -247,7 +247,7 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">처리 대기</p>
+                    <p className="text-sm font-medium text-obsidian">처리 대기</p>
                     <p className="text-2xl font-bold text-orange-600">{data.summary.urgentOrders}</p>
                   </div>
                   <AlertTriangle className="h-8 w-8 text-orange-600" />
@@ -259,7 +259,7 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">결제 실패</p>
+                    <p className="text-sm font-medium text-obsidian">결제 실패</p>
                     <p className="text-2xl font-bold text-red-600">{data.summary.failedPayments}</p>
                   </div>
                   <XCircle className="h-8 w-8 text-red-600" />
@@ -271,9 +271,9 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">주문 시도</p>
+                    <p className="text-sm font-medium text-obsidian">주문 시도</p>
                     <p className="text-2xl font-bold text-orange-400">{data.summary.totalAttempts.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-foreground/70 mt-1">
                       결제 단계 전환율: {data.summary.totalAttempts ? Math.round((data.summary.totalOrders / (data.summary.totalAttempts + data.summary.totalOrders)) * 100) : 0}%
                     </p>
                   </div>
@@ -286,10 +286,10 @@ export default function OrderAnalytics() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">환불 요청</p>
-                    <p className="text-2xl font-bold text-gray-600">{data.summary.refundRequests}</p>
+                    <p className="text-sm font-medium text-obsidian">환불 요청</p>
+                    <p className="text-2xl font-bold text-obsidian">{data.summary.refundRequests}</p>
                   </div>
-                  <TrendingDown className="h-8 w-8 text-gray-600" />
+                  <TrendingDown className="h-8 w-8 text-obsidian" />
                 </div>
               </CardContent>
             </Card>
@@ -351,17 +351,17 @@ export default function OrderAnalytics() {
               {data.partnerStats.map((partner, index) => (
                 <div key={partner.partnerId} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-blue-600">#{index + 1}</span>
+                    <div className="w-8 h-8 bg-primary-container rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-primary">#{index + 1}</span>
                     </div>
                     <div>
                       <h3 className="font-medium">{partner.partnerName}</h3>
-                      <p className="text-sm text-gray-600">평균 주문액: {formatCurrency(partner.avgOrderValue)}</p>
+                      <p className="text-sm text-obsidian">평균 주문액: {formatCurrency(partner.avgOrderValue)}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{partner.orders}건</p>
-                    <p className="text-sm text-gray-600">{formatCurrency(partner.revenue)}</p>
+                    <p className="text-sm text-obsidian">{formatCurrency(partner.revenue)}</p>
                   </div>
                 </div>
               ))}
@@ -386,12 +386,12 @@ export default function OrderAnalytics() {
                     </div>
                     <div>
                       <h3 className="font-medium">{product.productName}</h3>
-                      <p className="text-sm text-gray-600">{product.orderCount}건 주문</p>
+                      <p className="text-sm text-obsidian">{product.orderCount}건 주문</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{product.totalQuantity}개</p>
-                    <p className="text-sm text-gray-600">{formatCurrency(product.totalRevenue)}</p>
+                    <p className="text-sm text-obsidian">{formatCurrency(product.totalRevenue)}</p>
                   </div>
                 </div>
               ))}
@@ -420,9 +420,9 @@ export default function OrderAnalytics() {
                         {paymentStatusLabels[order.paymentStatus as keyof typeof paymentStatusLabels]}
                       </Badge>
                     </div>
-                    <span className="text-sm text-gray-600">{formatDate(order.createdAt)}</span>
+                    <span className="text-sm text-obsidian">{formatDate(order.createdAt)}</span>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-obsidian">
                     <p>고객: {order.customer.name} ({order.customer.email})</p>
                     <p>상품: {order.items.map(item => `${item.productName} x${item.quantity}`).join(', ')}</p>
                     <p>파트너: {order.items.map(item => item.partnerName).join(', ')}</p>

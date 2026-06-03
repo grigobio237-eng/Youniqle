@@ -130,7 +130,7 @@ export default function PersonalityHistoryPage() {
             case 'PERSONALITY':
                 return { label: 'PREMIUM', className: 'bg-reward-gold text-obsidian' };
             default:
-                return { label: 'BASIC', className: 'bg-slate-200 text-slate-600' };
+                return { label: 'BASIC', className: 'bg-slate-200 text-obsidian' };
         }
     };
 
@@ -138,9 +138,9 @@ export default function PersonalityHistoryPage() {
         <ChapterWrapper title="Inner Data History" subtitle="당신의 고유 기질과 내면 데이터 기록">
             <main className="min-h-screen bg-[#F8FAFC] pb-20">
                 {/* Header */}
-                <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4">
+                <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-line px-6 py-4">
                     <div className="max-w-5xl mx-auto flex items-center justify-between">
-                        <Link href="/reports" className="flex items-center gap-2 text-slate-500 hover:text-obsidian transition-colors group">
+                        <Link href="/reports" className="flex items-center gap-2 text-foreground/70 hover:text-obsidian transition-colors group">
                             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             <span className="font-bold text-sm">리포트 허브</span>
                         </Link>
@@ -167,7 +167,7 @@ export default function PersonalityHistoryPage() {
                             </div>
                             <div>
                                 <h2 className="font-black italic tracking-tighter text-3xl md:text-4xl">변하지 않는 당신의 가치, <br />내면의 지도를 확인하세요.</h2>
-                                <p className="text-slate-400 mt-4 max-w-xl font-medium leading-relaxed">
+                                <p className="text-foreground/70 mt-4 max-w-xl font-medium leading-relaxed">
                                     시간이 흐름에 따라 당신의 기질이 환경에 어떻게 적응하고 회복해 나가는지, <br />
                                     과거의 기록들을 통해 성장의 궤적을 발견할 수 있습니다.
                                 </p>
@@ -188,12 +188,12 @@ export default function PersonalityHistoryPage() {
                                     <TrendingUp className="w-5 h-5 text-primary" />
                                     내면 변화 트렌드
                                 </h3>
-                                <Badge variant="outline" className="border-slate-200 text-slate-400 font-bold">
+                                <Badge variant="outline" className="border-line text-foreground/70 font-bold">
                                     최근 {diagnoses.length}개 데이터 분석
                                 </Badge>
                             </div>
 
-                            <Card className="bg-white border-slate-100 rounded-[40px] overflow-hidden shadow-xl shadow-slate-200/50">
+                            <Card className="bg-white border-line rounded-[40px] overflow-hidden shadow-xl shadow-slate-200/50">
                                 <CardContent className="p-8 md:p-10">
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                                         <div className="lg:col-span-2">
@@ -247,7 +247,7 @@ export default function PersonalityHistoryPage() {
                                                     <BarChart3 className="w-5 h-5 text-primary" />
                                                 </div>
                                                 <h4 className="font-black text-obsidian text-xl">성장 인사이트</h4>
-                                                <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                                <p className="text-sm text-foreground/70 font-medium leading-relaxed">
                                                     {diagnoses.length >= 2 ? (
                                                         <>이전 기록 대비 <strong>{Math.abs(chartData[chartData.length-1].total - chartData[chartData.length-2].total)}레벨</strong>의 종합 회복 흐름 변화가 감지되었습니다. 주요 요인별 변화를 통해 당신의 적응 기제를 확인하세요.</>
                                                     ) : (
@@ -255,13 +255,13 @@ export default function PersonalityHistoryPage() {
                                                     )}
                                                 </p>
                                             </div>
-                                            <div className="pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
+                                            <div className="pt-6 border-t border-line grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">최근 회복 지표</span>
+                                                    <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest block mb-1">최근 회복 지표</span>
                                                     <span className="text-2xl font-black text-obsidian">{chartData[chartData.length-1]?.total || 0}<span className="text-xs ml-0.5 text-slate-300">레벨</span></span>
                                                 </div>
                                                 <div>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</span>
+                                                    <span className="text-[10px] font-black text-foreground/70 uppercase tracking-widest block mb-1">Status</span>
                                                     <Badge className="bg-primary text-obsidian border-none font-black text-[10px]">STABLE</Badge>
                                                 </div>
                                             </div>
@@ -273,18 +273,18 @@ export default function PersonalityHistoryPage() {
                     )}
 
                     {/* Search & Filter Bar */}
-                    <section className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
+                    <section className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-3xl border border-line shadow-sm">
                         <div className="relative w-full md:w-96">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70" />
                             <Input 
                                 placeholder="날짜 또는 리포트 명칭으로 검색..." 
-                                className="pl-12 bg-slate-50 border-none rounded-2xl h-12 text-sm font-medium focus-visible:ring-primary/30"
+                                className="pl-12 bg-surface border-none rounded-2xl h-12 text-sm font-medium focus-visible:ring-primary/30"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                         <div className="flex items-center gap-2 w-full md:w-auto">
-                            <Button variant="outline" className="rounded-2xl h-12 border-slate-100 flex-1 md:flex-none">
+                            <Button variant="outline" className="rounded-2xl h-12 border-line flex-1 md:flex-none">
                                 <Filter className="w-4 h-4 mr-2" />
                                 필터
                             </Button>
@@ -301,11 +301,11 @@ export default function PersonalityHistoryPage() {
                                 <Clock className="w-5 h-5 text-primary" />
                                 분석 타임라인
                             </h3>
-                            <span className="text-xs font-bold text-slate-400">{filteredDiagnoses.length}개의 기록</span>
+                            <span className="text-xs font-bold text-foreground/70">{filteredDiagnoses.length}개의 기록</span>
                         </div>
 
                         {loading ? (
-                            <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-4">
+                            <div className="py-20 flex flex-col items-center justify-center text-foreground/70 space-y-4">
                                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
                                 <p className="font-medium">기록을 불러오는 중입니다...</p>
                             </div>
@@ -322,11 +322,11 @@ export default function PersonalityHistoryPage() {
                                             onClick={() => router.push(`/diagnosis/report?type=personality&id=${d._id}`)}
                                             className="group cursor-pointer"
                                         >
-                                            <Card className="bg-white border-slate-100 rounded-3xl hover:border-primary/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                                            <Card className="bg-white border-line rounded-3xl hover:border-primary/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                                                 <CardContent className="p-0 flex items-center h-24 md:h-32">
                                                     {/* Date Indicator */}
-                                                    <div className="w-20 md:w-32 h-full bg-slate-50 flex flex-col items-center justify-center border-r border-slate-100">
-                                                        <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                                                    <div className="w-20 md:w-32 h-full bg-surface flex flex-col items-center justify-center border-r border-line">
+                                                        <span className="text-[10px] md:text-xs font-black text-foreground/70 uppercase tracking-widest mb-1">
                                                             {new Date(d.createdAt).toLocaleString('ko-KR', { month: 'short' })}
                                                         </span>
                                                         <span className="text-2xl md:text-3xl font-black text-obsidian leading-none">
@@ -341,7 +341,7 @@ export default function PersonalityHistoryPage() {
                                                                 <Badge className={`${badge.className} border-none text-[9px] font-black tracking-widest px-2 py-0.5 rounded-md`}>
                                                                     {badge.label}
                                                                 </Badge>
-                                                                <span className="text-[10px] font-bold text-slate-400">
+                                                                <span className="text-[10px] font-bold text-foreground/70">
                                                                     {new Date(d.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                                 </span>
                                                             </div>
@@ -357,9 +357,9 @@ export default function PersonalityHistoryPage() {
                                                                         <div key={i} className="w-5 h-5 rounded-full border-2 border-white bg-slate-200" />
                                                                     ))}
                                                                 </div>
-                                                                <span className="text-[10px] font-bold text-slate-400">Big 5 Mapped</span>
+                                                                <span className="text-[10px] font-bold text-foreground/70">Big 5 Mapped</span>
                                                             </div>
-                                                            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary transition-colors">
+                                                            <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center group-hover:bg-primary transition-colors">
                                                                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-obsidian" />
                                                             </div>
                                                         </div>
@@ -371,12 +371,12 @@ export default function PersonalityHistoryPage() {
                                 })}
                             </div>
                         ) : (
-                            <div className="py-20 text-center bg-white rounded-[40px] border border-dashed border-slate-200">
-                                <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="py-20 text-center bg-white rounded-[40px] border border-dashed border-line">
+                                <div className="bg-surface w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Brain className="w-8 h-8 text-slate-200" />
                                 </div>
-                                <h4 className="text-lg font-bold text-slate-800">기록을 찾을 수 없습니다</h4>
-                                <p className="text-slate-400 text-sm mt-2">검색어를 변경하거나 새로운 회복 기록을 작성해 보세요.</p>
+                                <h4 className="text-lg font-bold text-obsidian">기록을 찾을 수 없습니다</h4>
+                                <p className="text-foreground/70 text-sm mt-2">검색어를 변경하거나 새로운 회복 기록을 작성해 보세요.</p>
                                 <Button className="mt-8 bg-obsidian text-white rounded-full px-8 h-12" asChild>
                                     <Link href="/diagnosis">새로운 회복 기록 시작</Link>
                                 </Button>
@@ -397,7 +397,7 @@ export default function PersonalityHistoryPage() {
                                 <Sparkles className="w-5 h-5 text-primary" />
                                 성격은 변할 수 있을까요?
                             </h4>
-                            <p className="text-slate-600 text-sm font-medium leading-relaxed max-w-lg">
+                            <p className="text-obsidian text-sm font-medium leading-relaxed max-w-lg">
                                 타고난 기질은 안정적이지만, 당신이 처한 환경과 회복 노력에 따라 표현되는 양상은 충분히 달라질 수 있습니다. <br />
                                 유니클은 당신의 긍정적인 변화를 끝까지 추적하고 응원합니다.
                             </p>
@@ -424,7 +424,7 @@ export default function PersonalityHistoryPage() {
                                 <DialogTitle className="text-3xl font-black italic tracking-tighter">
                                     내면 데이터 기반 <br /><span className="text-primary">회복 전략 가이드북</span>
                                 </DialogTitle>
-                                <p className="text-slate-400 font-medium text-sm">
+                                <p className="text-foreground/70 font-medium text-sm">
                                     기질을 이해하면 더 빠르고 편안한 회복이 가능해집니다.
                                 </p>
                             </div>
@@ -438,24 +438,24 @@ export default function PersonalityHistoryPage() {
                                     </div>
                                     <div className="space-y-2">
                                         <h5 className="font-black text-obsidian tracking-tight">가이드북 활용법</h5>
-                                        <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                                        <p className="text-sm text-foreground/70 leading-relaxed font-medium">
                                             이 가이드북은 당신의 Big 5 성격 데이터를 바탕으로 최적의 회복 환경을 설계하는 방법을 제안합니다. 각 기록 시점마다 변화하는 당신의 내면 상태에 맞춰 업데이트됩니다.
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 space-y-3">
+                                    <div className="p-6 rounded-3xl bg-surface border border-line space-y-3">
                                         <div className="text-[10px] font-black text-primary uppercase tracking-widest">Strategy 01</div>
                                         <h6 className="font-bold text-obsidian">심리적 안전 기지 구축</h6>
-                                        <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                                        <p className="text-xs text-foreground/70 leading-relaxed font-medium">
                                             높은 신경증 성향을 보일 경우, 소음이 차단된 독립된 회복 공간이 필수적입니다.
                                         </p>
                                     </div>
-                                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 space-y-3">
+                                    <div className="p-6 rounded-3xl bg-surface border border-line space-y-3">
                                         <div className="text-[10px] font-black text-primary uppercase tracking-widest">Strategy 02</div>
                                         <h6 className="font-bold text-obsidian">루틴을 통한 회복 가속</h6>
-                                        <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                                        <p className="text-xs text-foreground/70 leading-relaxed font-medium">
                                             성실성이 높은 분들은 정해진 시간에 회복 보조제를 섭취하는 것만으로도 큰 심리적 안정을 얻습니다.
                                         </p>
                                     </div>
@@ -464,11 +464,11 @@ export default function PersonalityHistoryPage() {
 
                             <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 text-center">
                                 <p className="text-sm font-bold text-obsidian">상세한 맞춤형 가이드북은 현재 유니클 엔진이 생성 중입니다.</p>
-                                <p className="text-xs text-slate-500 mt-1">곧 정식 버전으로 만나보실 수 있습니다.</p>
+                                <p className="text-xs text-foreground/70 mt-1">곧 정식 버전으로 만나보실 수 있습니다.</p>
                             </div>
                         </div>
 
-                        <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <div className="p-6 bg-surface border-t border-line flex justify-end">
                             <Button onClick={() => setGuideOpen(false)} className="bg-obsidian text-white rounded-2xl px-8 font-bold">
                                 확인했습니다
                             </Button>

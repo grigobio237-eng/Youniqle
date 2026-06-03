@@ -81,7 +81,7 @@ const statusColors = {
   in_stock: 'bg-green-100 text-green-800',
   low_stock: 'bg-yellow-100 text-yellow-800',
   out_of_stock: 'bg-red-100 text-red-800',
-  overstocked: 'bg-blue-100 text-blue-800'
+  overstocked: 'bg-primary-container text-blue-800'
 };
 
 export default function InventoryManagement() {
@@ -263,7 +263,7 @@ export default function InventoryManagement() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">재고 관리</h2>
-          <p className="text-gray-600">상품 재고 현황을 모니터링하고 관리하세요</p>
+          <p className="text-obsidian">상품 재고 현황을 모니터링하고 관리하세요</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchInventory}>
@@ -279,19 +279,19 @@ export default function InventoryManagement() {
 
       {/* 재고 부족 알림 배너 */}
       {lowStockItems.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/50">
+        <Card className="border-primary/30 bg-amber-50/50">
           <div
             className="cursor-pointer hover:bg-amber-50/80 transition-colors p-4"
             onClick={() => setAlertsExpanded(!alertsExpanded)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-100 rounded-full">
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                <div className="p-2 bg-primary-container/50 rounded-full">
+                  <AlertTriangle className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-amber-900">재고 알림</h3>
-                  <p className="text-sm text-amber-700">
+                  <p className="text-sm text-primary">
                     {lowStockItems.length}개 상품의 재고가 부족하거나 품절입니다
                   </p>
                 </div>
@@ -307,7 +307,7 @@ export default function InventoryManagement() {
                 {lowStockItems.slice(0, 6).map(item => (
                   <div
                     key={item.productId}
-                    className={`flex items-center gap-3 p-3 rounded-xl ${item.status === 'out_of_stock' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'
+                    className={`flex items-center gap-3 p-3 rounded-xl ${item.status === 'out_of_stock' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-primary/30'
                       }`}
                   >
                     <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
@@ -319,7 +319,7 @@ export default function InventoryManagement() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.productName}</p>
                       <div className="flex items-center gap-2">
-                        <Badge className={item.status === 'out_of_stock' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}>
+                        <Badge className={item.status === 'out_of_stock' ? 'bg-red-100 text-red-800' : 'bg-primary-container/50 text-amber-800'}>
                           {item.status === 'out_of_stock' ? '품절' : `${item.currentStock}개 남음`}
                         </Badge>
                       </div>
@@ -331,7 +331,7 @@ export default function InventoryManagement() {
                 ))}
               </div>
               {lowStockItems.length > 6 && (
-                <p className="text-sm text-amber-700 mt-3 text-center">
+                <p className="text-sm text-primary mt-3 text-center">
                   +{lowStockItems.length - 6}개 상품 더 있음
                 </p>
               )}
@@ -347,11 +347,11 @@ export default function InventoryManagement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">총 상품</p>
+                  <p className="text-sm font-medium text-obsidian">총 상품</p>
                   <p className="text-2xl font-bold">{stats.totalProducts}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Package className="h-6 w-6 text-blue-600" />
+                <div className="p-3 bg-primary-container rounded-xl">
+                  <Package className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -361,7 +361,7 @@ export default function InventoryManagement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">재고 충분</p>
+                  <p className="text-sm font-medium text-obsidian">재고 충분</p>
                   <p className="text-2xl font-bold text-green-600">{stats.inStock}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-xl">
@@ -375,7 +375,7 @@ export default function InventoryManagement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">재고 부족</p>
+                  <p className="text-sm font-medium text-obsidian">재고 부족</p>
                   <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-xl">
@@ -389,7 +389,7 @@ export default function InventoryManagement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">품절</p>
+                  <p className="text-sm font-medium text-obsidian">품절</p>
                   <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
                 </div>
                 <div className="p-3 bg-red-100 rounded-xl">
@@ -446,7 +446,7 @@ export default function InventoryManagement() {
                   />
                   <div>
                     <h3 className="font-semibold">{item.productName}</h3>
-                    <p className="text-sm text-gray-600">{item.category}</p>
+                    <p className="text-sm text-obsidian">{item.category}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge className={statusColors[item.status]}>
                         {statusLabels[item.status]}
@@ -464,23 +464,23 @@ export default function InventoryManagement() {
                 <div className="flex flex-wrap items-center gap-6">
                   {/* 재고 정보 */}
                   <div className="text-center min-w-[80px]">
-                    <p className="text-xs text-gray-500">현재 재고</p>
-                    <p className="font-bold text-xl">{item.currentStock}<span className="text-sm font-normal text-gray-500">개</span></p>
+                    <p className="text-xs text-foreground/70">현재 재고</p>
+                    <p className="font-bold text-xl">{item.currentStock}<span className="text-sm font-normal text-foreground/70">개</span></p>
                   </div>
                   <div className="text-center min-w-[60px]">
-                    <p className="text-xs text-gray-500">예약</p>
+                    <p className="text-xs text-foreground/70">예약</p>
                     <p className="font-medium text-orange-600">{item.reservedStock}</p>
                   </div>
                   <div className="text-center min-w-[60px]">
-                    <p className="text-xs text-gray-500">가용</p>
+                    <p className="text-xs text-foreground/70">가용</p>
                     <p className="font-medium text-green-600">{item.availableStock}</p>
                   </div>
                   <div className="text-center min-w-[80px]">
-                    <p className="text-xs text-gray-500">설정</p>
+                    <p className="text-xs text-foreground/70">설정</p>
                     <p className="text-sm">
-                      <span className="text-gray-600">{item.minStock}</span>
-                      <span className="text-gray-400 mx-1">-</span>
-                      <span className="text-gray-600">{item.maxStock}</span>
+                      <span className="text-obsidian">{item.minStock}</span>
+                      <span className="text-foreground/70 mx-1">-</span>
+                      <span className="text-obsidian">{item.maxStock}</span>
                     </p>
                   </div>
 
@@ -543,8 +543,8 @@ export default function InventoryManagement() {
         {filteredInventory.length === 0 && (
           <Card className="border-0 shadow-md">
             <CardContent className="p-12 text-center">
-              <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">검색 조건에 맞는 상품이 없습니다.</p>
+              <Package className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+              <p className="text-foreground/70">검색 조건에 맞는 상품이 없습니다.</p>
             </CardContent>
           </Card>
         )}
@@ -563,15 +563,15 @@ export default function InventoryManagement() {
             {selectedProductHistory?.history.map((entry, index) => (
               <div key={index} className="flex items-center gap-4 p-3 bg-mist rounded-xl">
                 <div className={`p-2 rounded-lg ${entry.type === 'in' ? 'bg-green-100' :
-                  entry.type === 'out' ? 'bg-red-100' : 'bg-blue-100'
+                  entry.type === 'out' ? 'bg-red-100' : 'bg-primary-container'
                   }`}>
                   {entry.type === 'in' ? <TrendingUp className="h-4 w-4 text-green-600" /> :
                     entry.type === 'out' ? <TrendingDown className="h-4 w-4 text-red-600" /> :
-                      <Edit className="h-4 w-4 text-blue-600" />}
+                      <Edit className="h-4 w-4 text-primary" />}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{entry.reason}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-foreground/70">
                     {new Date(entry.date).toLocaleDateString('ko-KR')} {new Date(entry.date).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -580,7 +580,7 @@ export default function InventoryManagement() {
                     }`}>
                     {entry.quantity > 0 ? '+' : ''}{entry.quantity}
                   </p>
-                  <p className="text-xs text-gray-500">재고: {entry.newStock}</p>
+                  <p className="text-xs text-foreground/70">재고: {entry.newStock}</p>
                 </div>
               </div>
             ))}

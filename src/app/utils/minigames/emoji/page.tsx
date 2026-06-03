@@ -106,14 +106,14 @@ export default function EmojiQuizPage() {
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <Link href="/utils" className="text-gray-500 hover:text-pink-600 transition-colors">
+                    <Link href="/utils" className="text-foreground/70 hover:text-pink-600 transition-colors">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
                     <div className="text-center">
-                        <h1 className="text-2xl font-black text-gray-800 flex items-center justify-center gap-2">
+                        <h1 className="text-2xl font-black text-obsidian flex items-center justify-center gap-2">
                             <span>🧠</span> 이모지 속담 퀴즈
                         </h1>
-                        <p className="text-xs text-gray-400 mt-1">Daily Brain Training</p>
+                        <p className="text-xs text-foreground/70 mt-1">Daily Brain Training</p>
                     </div>
                     <div className="w-6" />
                 </div>
@@ -126,7 +126,7 @@ export default function EmojiQuizPage() {
                         <Badge variant="secondary" className="bg-pink-100 text-pink-700">
                             Q.{currentQuestionIndex + 1}
                         </Badge>
-                        <span className="text-sm font-bold text-gray-400">Score: {score}</span>
+                        <span className="text-sm font-bold text-foreground/70">Score: {score}</span>
                     </div>
 
                     {/* Emoji Display */}
@@ -158,7 +158,7 @@ export default function EmojiQuizPage() {
                             {!showHint && gameState === 'playing' && (
                                 <button
                                     onClick={() => setShowHint(true)}
-                                    className="text-sm text-gray-400 hover:text-pink-500 flex items-center gap-1 transition-colors"
+                                    className="text-sm text-foreground/70 hover:text-pink-500 flex items-center gap-1 transition-colors"
                                 >
                                     <HelpCircle className="w-3 h-3" /> 힌트 보기
                                 </button>
@@ -175,8 +175,8 @@ export default function EmojiQuizPage() {
                                 className="bg-green-50 border border-green-200 rounded-xl p-6 text-center"
                             >
                                 <div className="text-green-600 font-bold mb-2 text-xl">정답입니다! 🎉</div>
-                                <div className="text-2xl font-black text-gray-800 mb-2">{currentQuiz.displayAnswer}</div>
-                                <p className="text-gray-600 text-sm mb-6">{currentQuiz.meaning}</p>
+                                <div className="text-2xl font-black text-obsidian mb-2">{currentQuiz.displayAnswer}</div>
+                                <p className="text-obsidian text-sm mb-6">{currentQuiz.meaning}</p>
 
                                 <div className="flex gap-2">
                                     <Button type="button" onClick={nextQuestion} className="flex-1 bg-pink-500 hover:bg-pink-600">

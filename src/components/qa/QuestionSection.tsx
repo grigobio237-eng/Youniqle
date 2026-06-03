@@ -147,7 +147,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
       case 'answered':
         return <Badge className="bg-green-100 text-green-800">답변 완료</Badge>;
       case 'closed':
-        return <Badge className="bg-gray-100 text-gray-800">종료</Badge>;
+        return <Badge className="bg-gray-100 text-obsidian">종료</Badge>;
       default:
         return null;
     }
@@ -158,9 +158,9 @@ export default function QuestionSection({ productId, productName, forceShowForm,
       case 'admin':
         return <Shield className="h-4 w-4 text-red-500" />;
       case 'partner':
-        return <Crown className="h-4 w-4 text-blue-500" />;
+        return <Crown className="h-4 w-4 text-primary" />;
       default:
-        return <User className="h-4 w-4 text-gray-500" />;
+        return <User className="h-4 w-4 text-foreground/70" />;
     }
   };
 
@@ -180,11 +180,11 @@ export default function QuestionSection({ productId, productName, forceShowForm,
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+          <h2 className="text-2xl font-bold text-obsidian flex items-center">
             <MessageCircle className="h-6 w-6 mr-2" />
             상품 문의
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-obsidian mt-1">
             {productName}에 대한 문의사항을 남겨주세요
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                     maxLength={100}
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">{formData.title.length}/100자</p>
+                  <p className="text-xs text-foreground/70 mt-1">{formData.title.length}/100자</p>
                 </div>
 
                 <div>
@@ -225,11 +225,11 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                     placeholder="문의 내용을 입력해주세요"
                     value={formData.content}
                     onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                    className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-primary/30"
                     maxLength={1000}
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">{formData.content.length}/1000자</p>
+                  <p className="text-xs text-foreground/70 mt-1">{formData.content.length}/1000자</p>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -240,7 +240,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                     onChange={(e) => setFormData(prev => ({ ...prev, isPrivate: e.target.checked }))}
                     className="rounded"
                   />
-                  <label htmlFor="isPrivate" className="text-sm text-gray-700 flex items-center">
+                  <label htmlFor="isPrivate" className="text-sm text-obsidian flex items-center">
                     <Lock className="h-4 w-4 mr-1" />
                     비공개 문의 (관리자와 파트너만 볼 수 있습니다)
                   </label>
@@ -269,10 +269,10 @@ export default function QuestionSection({ productId, productName, forceShowForm,
               </form>
             ) : (
               <div className="text-center py-8">
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                <h3 className="text-lg font-semibold text-obsidian mb-2">
                   로그인이 필요합니다
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-obsidian mb-4">
                   상품 문의를 작성하려면 로그인해주세요.
                 </p>
                 <Button asChild>
@@ -293,9 +293,9 @@ export default function QuestionSection({ productId, productName, forceShowForm,
         ) : questions.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">아직 등록된 문의가 없습니다.</p>
-              <p className="text-sm text-gray-500 mt-2">
+              <MessageCircle className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+              <p className="text-obsidian">아직 등록된 문의가 없습니다.</p>
+              <p className="text-sm text-foreground/70 mt-2">
                 첫 번째 문의를 작성해보세요!
               </p>
             </CardContent>
@@ -315,7 +315,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                           className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
-                        <span className="text-sm font-medium text-gray-600">
+                        <span className="text-sm font-medium text-obsidian">
                           {question.userId.name.charAt(0)}
                         </span>
                       )}
@@ -336,7 +336,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-foreground/70">
                           {new Date(question.createdAt).toLocaleDateString('ko-KR')}
                         </span>
                         {getStatusBadge(question.status)}
@@ -347,14 +347,14 @@ export default function QuestionSection({ productId, productName, forceShowForm,
 
                 {/* 문의 내용 */}
                 <div className="mb-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">{question.title}</h4>
-                  <p className="text-gray-700 whitespace-pre-line">{question.content}</p>
+                  <h4 className="font-semibold text-obsidian mb-2">{question.title}</h4>
+                  <p className="text-obsidian whitespace-pre-line">{question.content}</p>
                 </div>
 
                 {/* 답변들 */}
                 {question.answers.length > 0 && (
                   <div className="space-y-3">
-                    <h5 className="font-medium text-gray-900">답변</h5>
+                    <h5 className="font-medium text-obsidian">답변</h5>
                     {question.answers.map((answer, index) => (
                       <div key={index} className="bg-blue-50 p-4 rounded-lg">
                         <div className="flex items-center space-x-2 mb-2">
@@ -363,12 +363,12 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                             {answer.userId.name}
                           </span>
                           <Badge className={`text-xs ${answer.isOfficial
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-primary-container text-blue-800'
+                              : 'bg-gray-100 text-obsidian'
                             }`}>
                             {answer.isOfficial ? '공식 답변' : '일반 답변'}
                           </Badge>
-                          <span className="text-sm text-blue-600">
+                          <span className="text-sm text-primary">
                             {new Date(answer.createdAt).toLocaleDateString('ko-KR')}
                           </span>
                         </div>

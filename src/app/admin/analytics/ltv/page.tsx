@@ -230,7 +230,7 @@ export default function LTVAnalysisDashboard() {
       case 'low':
         return 'bg-green-500 text-white';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-surface0 text-white';
     }
   };
 
@@ -254,7 +254,7 @@ export default function LTVAnalysisDashboard() {
       case 'premium':
         return <Crown className="h-4 w-4 text-yellow-500" />;
       case 'high':
-        return <Star className="h-4 w-4 text-blue-500" />;
+        return <Star className="h-4 w-4 text-primary" />;
       case 'medium':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'low':
@@ -292,7 +292,7 @@ export default function LTVAnalysisDashboard() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">LTV 분석을 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchSegments} variant="outline">
             다시 시도
@@ -307,8 +307,8 @@ export default function LTVAnalysisDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">LTV 분석</h1>
-          <p className="text-gray-600 mt-1">고객 생애 가치 분석 및 최적화</p>
+          <h1 className="text-3xl font-bold text-obsidian">LTV 분석</h1>
+          <p className="text-obsidian mt-1">고객 생애 가치 분석 및 최적화</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -332,7 +332,7 @@ export default function LTVAnalysisDashboard() {
                       {getCategoryLabel(segment.metadata.category)}
                     </Badge>
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">{segment.description}</p>
+                  <p className="text-sm text-obsidian mt-1">{segment.description}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -380,23 +380,23 @@ export default function LTVAnalysisDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-2xl font-bold text-primary">
                         {segment.metrics.totalCustomers.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-600">총 고객</div>
+                      <div className="text-sm text-obsidian">총 고객</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
                         {formatCurrency(segment.metrics.averageLTV)}
                       </div>
-                      <div className="text-sm text-gray-600">평균 LTV</div>
+                      <div className="text-sm text-obsidian">평균 LTV</div>
                     </div>
                   </div>
 
                   {/* LTV 분포 */}
                   {segment.metrics.ltvDistribution && segment.metrics.ltvDistribution.length > 0 && (
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700">LTV 분포</h4>
+                      <h4 className="text-sm font-medium text-obsidian">LTV 분포</h4>
                       <div className="space-y-1">
                         {segment.metrics.ltvDistribution.map((dist, index) => (
                           <div key={index} className="flex items-center justify-between text-xs">
@@ -411,7 +411,7 @@ export default function LTVAnalysisDashboard() {
                                   style={{ width: `${dist.percentage}%` }}
                                 ></div>
                               </div>
-                              <span className="text-gray-600 w-12 text-right">
+                              <span className="text-obsidian w-12 text-right">
                                 {formatPercentage(dist.percentage)}
                               </span>
                             </div>
@@ -441,14 +441,14 @@ export default function LTVAnalysisDashboard() {
                   {/* 인사이트 */}
                   {segment.insights && segment.insights.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700">주요 인사이트</h4>
+                      <h4 className="text-sm font-medium text-obsidian">주요 인사이트</h4>
                       {segment.insights.slice(0, 2).map((insight, index) => (
-                        <div key={index} className="flex items-start space-x-2 p-2 bg-gray-50 rounded">
+                        <div key={index} className="flex items-start space-x-2 p-2 bg-surface rounded">
                           <div className="flex-shrink-0 mt-0.5">
                             {getInsightIcon(insight.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                            <p className="text-xs text-obsidian line-clamp-2">
                               {insight.message}
                             </p>
                             <Badge 
@@ -464,8 +464,8 @@ export default function LTVAnalysisDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <BarChart3 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-500">아직 분석되지 않았습니다</p>
+                  <BarChart3 className="h-8 w-8 mx-auto mb-2 text-foreground/70" />
+                  <p className="text-sm text-foreground/70">아직 분석되지 않았습니다</p>
                   <Button
                     size="sm"
                     className="mt-2"
@@ -483,9 +483,9 @@ export default function LTVAnalysisDashboard() {
       {segments.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">LTV 분석이 없습니다</h3>
-            <p className="text-gray-500 mb-4">새로운 LTV 세그먼트를 생성하여 고객 생애 가치를 분석해보세요.</p>
+            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+            <h3 className="text-lg font-medium text-obsidian mb-2">LTV 분석이 없습니다</h3>
+            <p className="text-foreground/70 mb-4">새로운 LTV 세그먼트를 생성하여 고객 생애 가치를 분석해보세요.</p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               첫 번째 세그먼트 생성
@@ -500,7 +500,7 @@ export default function LTVAnalysisDashboard() {
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{selectedSegment.name}</h2>
+                <h2 className="text-2xl font-bold text-obsidian">{selectedSegment.name}</h2>
                 <Button
                   variant="ghost"
                   onClick={() => setSelectedSegment(null)}
@@ -515,9 +515,9 @@ export default function LTVAnalysisDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
                       <CardContent className="p-4 text-center">
-                        <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                        <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
                         <div className="text-2xl font-bold">{selectedSegment.metrics.totalCustomers.toLocaleString()}</div>
-                        <div className="text-sm text-gray-600">총 고객</div>
+                        <div className="text-sm text-obsidian">총 고객</div>
                       </CardContent>
                     </Card>
                     <Card>
@@ -526,16 +526,16 @@ export default function LTVAnalysisDashboard() {
                         <div className="text-2xl font-bold text-green-600">
                           {formatCurrency(selectedSegment.metrics.averageLTV)}
                         </div>
-                        <div className="text-sm text-gray-600">평균 LTV</div>
+                        <div className="text-sm text-obsidian">평균 LTV</div>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4 text-center">
-                        <Target className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                        <Target className="h-8 w-8 mx-auto mb-2 text-secondary" />
                         <div className="text-2xl font-bold">
                           {formatCurrency(selectedSegment.metrics.medianLTV)}
                         </div>
-                        <div className="text-sm text-gray-600">중간값 LTV</div>
+                        <div className="text-sm text-obsidian">중간값 LTV</div>
                       </CardContent>
                     </Card>
                     <Card>
@@ -545,7 +545,7 @@ export default function LTVAnalysisDashboard() {
                           {selectedSegment.metrics.ltvGrowth ? 
                             formatPercentage(selectedSegment.metrics.ltvGrowth.growthRate) : '0%'}
                         </div>
-                        <div className="text-sm text-gray-600">성장률</div>
+                        <div className="text-sm text-obsidian">성장률</div>
                       </CardContent>
                     </Card>
                   </div>
@@ -554,8 +554,8 @@ export default function LTVAnalysisDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-lg text-gray-500 mb-4">아직 분석되지 않았습니다</p>
+                  <BarChart3 className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+                  <p className="text-lg text-foreground/70 mb-4">아직 분석되지 않았습니다</p>
                   <Button onClick={() => analyzeSegment(selectedSegment._id)}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     분석 실행

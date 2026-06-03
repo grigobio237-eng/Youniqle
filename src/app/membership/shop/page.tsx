@@ -49,10 +49,10 @@ function ShopContent() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <h1 className="text-3xl font-bold text-obsidian mb-4">
                     회복 상점 (Recovery Shop)
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-obsidian">
                     회복을 돕는 보조 도구들을 만나보세요.
                 </p>
             </div>
@@ -61,12 +61,12 @@ function ShopContent() {
             <div className="mb-8">
                 <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
                     <Link href="/membership/shop">
-                        <div className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!isFunding ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
+                        <div className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!isFunding ? 'bg-white shadow text-obsidian' : 'text-foreground/70 hover:text-obsidian'}`}>
                             🛍️ 일반 상품
                         </div>
                     </Link>
                     <Link href="/membership/shop?isFunding=true">
-                        <div className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isFunding ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
+                        <div className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isFunding ? 'bg-white shadow text-obsidian' : 'text-foreground/70 hover:text-obsidian'}`}>
                             🔥 펀딩 프로젝트
                         </div>
                     </Link>

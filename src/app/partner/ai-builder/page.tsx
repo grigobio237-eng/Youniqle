@@ -32,11 +32,11 @@ export default function PartnerAIBuilderPage() {
                     <div className="flex justify-center mb-8">
                         <TabsList className="grid w-full max-w-md grid-cols-2 bg-slate-100 p-1">
                             <TabsTrigger value="detail" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                                <Sparkles className="h-4 w-4 mr-2 text-blue-500" />
+                                <Sparkles className="h-4 w-4 mr-2 text-primary" />
                                 상세페이지 빌더
                             </TabsTrigger>
                             <TabsTrigger value="thumbnail" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                                <ImageIcon className="h-4 w-4 mr-2 text-indigo-500" />
+                                <ImageIcon className="h-4 w-4 mr-2 text-secondary" />
                                 썸네일 생성기
                             </TabsTrigger>
                         </TabsList>

@@ -279,7 +279,7 @@ export default function MBTIPage() {
 
                         <div className="flex flex-wrap gap-2 justify-center">
                             {result.traits.map((trait, i) => (
-                                <span key={i} className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black tracking-wide border border-indigo-100/50 shadow-sm">
+                                <span key={i} className="px-4 py-1.5 bg-indigo-50 text-secondary rounded-xl text-xs font-black tracking-wide border border-indigo-100/50 shadow-sm">
                                     #{trait}
                                 </span>
                             ))}
@@ -305,7 +305,7 @@ export default function MBTIPage() {
                             <Button className="flex-1 h-14 bg-obsidian text-white font-black rounded-2xl shadow-lg border-none" onClick={reset}>
                                 다른 테스트 하기
                             </Button>
-                            <Button variant="outline" className="flex-1 h-14 border-2 border-line text-obsidian font-black rounded-2xl hover:bg-slate-50 transition-colors">
+                            <Button variant="outline" className="flex-1 h-14 border-2 border-line text-obsidian font-black rounded-2xl hover:bg-surface transition-colors">
                                 <Share2 className="mr-2 h-4 w-4" /> 공유하기
                             </Button>
                         </div>
@@ -331,7 +331,7 @@ export default function MBTIPage() {
                 <div className="space-y-4">
                     <div className="flex justify-between items-end">
                         <div className="space-y-1">
-                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-full">
+                            <span className="text-[10px] font-black text-secondary uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-full">
                                 Chapter {currentChapter}: {chapterTitle}
                             </span>
                             <div className="text-[10px] text-slate font-bold">
@@ -340,7 +340,7 @@ export default function MBTIPage() {
                         </div>
                         <span className="font-black text-obsidian text-lg font-mono">{Math.round(progress)}%</span>
                     </div>
-                    <Progress value={progress} className="h-2 rounded-full bg-line [&>div]:bg-indigo-500 transition-all" />
+                    <Progress value={progress} className="h-2 rounded-full bg-line [&>div]:bg-secondary transition-all" />
                 </div>
 
                 {/* Question card */}
@@ -355,11 +355,11 @@ export default function MBTIPage() {
                 <div className="space-y-8 py-6 bg-mist/20 rounded-[32px] p-6 border border-line/40">
                     <div className="flex items-center justify-between gap-6 px-2">
                         <div className="flex-1 text-center max-w-[45%]">
-                            <span className="text-[10px] font-black text-indigo-600 block mb-1">A 선택지</span>
+                            <span className="text-[10px] font-black text-secondary block mb-1">A 선택지</span>
                             <p className="text-xs font-bold text-obsidian leading-snug">{question.options[0].text}</p>
                         </div>
                         <div className="flex-1 text-center max-w-[45%]">
-                            <span className="text-[10px] font-black text-purple-600 block mb-1">B 선택지</span>
+                            <span className="text-[10px] font-black text-secondary block mb-1">B 선택지</span>
                             <p className="text-xs font-bold text-obsidian leading-snug">{question.options[1].text}</p>
                         </div>
                     </div>
@@ -382,17 +382,17 @@ export default function MBTIPage() {
                             ];
 
                             const activeColors = [
-                                'bg-indigo-600 shadow-indigo-600/30 text-white border-indigo-600',
-                                'bg-indigo-400 shadow-indigo-400/20 text-white border-indigo-400',
-                                'bg-slate-500 shadow-slate-500/20 text-white border-slate-500',
+                                'bg-secondary shadow-indigo-600/30 text-white border-indigo-600',
+                                'bg-indigo-400 shadow-indigo-400/20 text-white border-secondary/30',
+                                'bg-surface0 shadow-slate-500/20 text-white border-slate-500',
                                 'bg-purple-400 shadow-purple-400/20 text-white border-purple-400',
-                                'bg-purple-600 shadow-purple-600/30 text-white border-purple-600'
+                                'bg-secondary shadow-purple-600/30 text-white border-purple-600'
                             ];
 
                             const hoverColors = [
                                 'hover:border-indigo-600 hover:bg-indigo-50',
-                                'hover:border-indigo-400 hover:bg-indigo-50',
-                                'hover:border-slate-500 hover:bg-slate-50',
+                                'hover:border-secondary/30 hover:bg-indigo-50',
+                                'hover:border-slate-500 hover:bg-surface',
                                 'hover:border-purple-400 hover:bg-purple-50',
                                 'hover:border-purple-600 hover:bg-purple-50'
                             ];

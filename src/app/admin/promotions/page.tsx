@@ -149,7 +149,7 @@ export default function PromotionDashboard() {
       case 'paused':
         return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">일시정지</Badge>;
       case 'completed':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800">완료</Badge>;
+        return <Badge variant="outline" className="bg-primary-container text-blue-800">완료</Badge>;
       case 'cancelled':
         return <Badge variant="destructive">취소</Badge>;
       default:
@@ -239,7 +239,7 @@ export default function PromotionDashboard() {
           <div className="text-red-500 mb-4">
             <Megaphone className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">프로모션 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchPromotionData} variant="outline">
             다시 시도
@@ -254,8 +254,8 @@ export default function PromotionDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">프로모션 관리</h1>
-          <p className="text-gray-600 mt-1">프로모션 생성, 관리 및 성과 분석</p>
+          <h1 className="text-3xl font-bold text-obsidian">프로모션 관리</h1>
+          <p className="text-obsidian mt-1">프로모션 생성, 관리 및 성과 분석</p>
         </div>
         <div className="flex space-x-2">
           <Button asChild>
@@ -299,10 +299,10 @@ export default function PromotionDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">초안</CardTitle>
-              <Edit className="h-4 w-4 text-gray-500" />
+              <Edit className="h-4 w-4 text-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.draft.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-obsidian">{stats.draft.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -319,20 +319,20 @@ export default function PromotionDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">완료</CardTitle>
-              <CheckCircle className="h-4 w-4 text-blue-500" />
+              <CheckCircle className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.completed.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-primary">{stats.completed.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">총 사용</CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-500" />
+              <TrendingUp className="h-4 w-4 text-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.totalUsage.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-secondary">{stats.totalUsage.toLocaleString()}</div>
             </CardContent>
           </Card>
         </div>
@@ -344,7 +344,7 @@ export default function PromotionDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="프로모션 이름, 설명으로 검색..."
                   value={searchTerm}
@@ -417,7 +417,7 @@ export default function PromotionDashboard() {
                     <div>
                       <div className="font-medium">{promotion.name}</div>
                       {promotion.description && (
-                        <div className="text-sm text-gray-500">{promotion.description}</div>
+                        <div className="text-sm text-foreground/70">{promotion.description}</div>
                       )}
                     </div>
                   </TableCell>
@@ -437,27 +437,27 @@ export default function PromotionDashboard() {
                           }
                         </div>
                         {promotion.minOrderAmount && (
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-foreground/70">
                             최소 ₩{promotion.minOrderAmount.toLocaleString()}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-gray-500">-</span>
+                      <span className="text-foreground/70">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     {promotion.usageLimit ? (
                       <span>{promotion.usageLimit.toLocaleString()}회</span>
                     ) : (
-                      <span className="text-gray-500">제한 없음</span>
+                      <span className="text-foreground/70">제한 없음</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <span>{promotion.usageCount.toLocaleString()}</span>
                       {promotion.usageLimit && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground/70">
                           ({Math.round((promotion.usageCount / promotion.usageLimit) * 100)}%)
                         </div>
                       )}
@@ -466,7 +466,7 @@ export default function PromotionDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{formatDate(promotion.startDate)}</div>
-                      <div className="text-gray-500">~ {formatDate(promotion.endDate)}</div>
+                      <div className="text-foreground/70">~ {formatDate(promotion.endDate)}</div>
                       {isActive(promotion.status, promotion.startDate, promotion.endDate) && (
                         <div className="text-green-600 text-xs">
                           {getTimeRemaining(promotion.endDate)} 남음
@@ -496,13 +496,13 @@ export default function PromotionDashboard() {
                         <div>전환율: {promotion.stats.conversionRate.toFixed(1)}%</div>
                       </div>
                     ) : (
-                      <span className="text-gray-500">-</span>
+                      <span className="text-foreground/70">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
                       <div>{promotion.createdBy.name}</div>
-                      <div className="text-gray-500">{promotion.createdBy.email}</div>
+                      <div className="text-foreground/70">{promotion.createdBy.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -536,7 +536,7 @@ export default function PromotionDashboard() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground/70">
                 페이지 {currentPage} / {totalPages}
               </div>
               <div className="flex space-x-2">

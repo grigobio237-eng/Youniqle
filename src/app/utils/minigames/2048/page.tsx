@@ -18,16 +18,16 @@ type Tile = {
 };
 
 const POSITIONS = {
-    2: { title: '인턴', color: 'bg-slate-100 text-slate-600', emoji: '🐣' },
-    4: { title: '사원', color: 'bg-blue-100 text-blue-600', emoji: '🐥' },
+    2: { title: '인턴', color: 'bg-slate-100 text-obsidian', emoji: '🐣' },
+    4: { title: '사원', color: 'bg-primary-container text-primary', emoji: '🐥' },
     8: { title: '대리', color: 'bg-cyan-100 text-cyan-600', emoji: '👔' },
-    16: { title: '과장', color: 'bg-emerald-100 text-emerald-600', emoji: '💼' },
-    32: { title: '차장', color: 'bg-amber-100 text-amber-600', emoji: '🖋️' },
+    16: { title: '과장', color: 'bg-secondary-container text-secondary', emoji: '💼' },
+    32: { title: '차장', color: 'bg-primary-container/50 text-primary', emoji: '🖋️' },
     64: { title: '부장', color: 'bg-orange-100 text-orange-600', emoji: '📂' },
     128: { title: '상무', color: 'bg-rose-100 text-rose-600', emoji: '💎' },
     256: { title: '전무', color: 'bg-pink-100 text-pink-600', emoji: '💍' },
-    512: { title: '부사장', color: 'bg-purple-100 text-purple-600', emoji: '🏛️' },
-    1024: { title: '사장', color: 'bg-indigo-600 text-white', emoji: '👑' },
+    512: { title: '부사장', color: 'bg-secondary-container text-secondary', emoji: '🏛️' },
+    1024: { title: '사장', color: 'bg-secondary text-white', emoji: '👑' },
     2048: { title: '회장', color: 'bg-slate-900 text-reward-gold', emoji: '🌟' },
 };
 
@@ -190,7 +190,7 @@ export default function Office2048Page() {
             <div className="container mx-auto px-4 max-w-2xl">
                 <div className="mb-4">
                     <Link href="/utils/minigames">
-                        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+                        <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             미니게임 돌아가기
                         </Button>
@@ -199,8 +199,8 @@ export default function Office2048Page() {
 
                 <div className="flex justify-between items-end mb-8">
                     <div>
-                        <h1 className="font-black text-slate-900 tracking-tighter mb-2 text-4xl">2048 OFFICE</h1>
-                        <p className="text-slate-500 font-medium">인턴에서 회장까지, 승진의 기쁨을 누리세요!</p>
+                        <h1 className="font-black text-obsidian tracking-tighter mb-2 text-4xl">2048 OFFICE</h1>
+                        <p className="text-foreground/70 font-medium">인턴에서 회장까지, 승진의 기쁨을 누리세요!</p>
                     </div>
                     <div className="flex gap-2">
                         <div className="bg-slate-900 text-white px-4 py-2 rounded-2xl flex flex-col items-center min-w-[80px]">
@@ -271,14 +271,14 @@ export default function Office2048Page() {
                         <Button
                             variant="outline"
                             onClick={initGame}
-                            className="rounded-2xl h-12 border-slate-200 text-slate-500 font-bold px-6"
+                            className="rounded-2xl h-12 border-line text-foreground/70 font-bold px-6"
                         >
                             <RefreshCw className="mr-2 w-4 h-4" /> New Career
                         </Button>
                     </div>
 
-                    <div className="bg-white p-8 rounded-[32px] shadow-xl border border-slate-100">
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <div className="bg-white p-8 rounded-[32px] shadow-xl border border-line">
+                        <h3 className="text-xs font-black text-foreground/70 uppercase tracking-widest mb-6 flex items-center gap-2">
                             <Briefcase className="w-4 h-4" /> Promotion Legend
                         </h3>
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">

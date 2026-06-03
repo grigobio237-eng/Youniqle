@@ -320,7 +320,7 @@ export default function RecommendationSection({
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm text-gray-500 px-2">
+                <span className="text-sm text-foreground/70 px-2">
                   {currentPage + 1} / {totalPages}
                 </span>
                 <Button
@@ -378,10 +378,10 @@ export default function RecommendationSection({
 
               {/* 상품 정보 */}
               <div className="space-y-2">
-                <h3 className="font-semibold text-gray-900 line-clamp-2">
+                <h3 className="font-semibold text-obsidian line-clamp-2">
                   {item.product?.name || `추천 상품 ${index + 1}`}
                 </h3>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-obsidian line-clamp-2">
                   {item.reason}
                 </p>
                 <div className="flex items-center justify-between">
@@ -390,14 +390,14 @@ export default function RecommendationSection({
                       ₩{item.product?.price?.toLocaleString() || (Math.random() * 100000 + 10000).toLocaleString()}
                     </span>
                     {item.product?.originalPrice && item.product.originalPrice > item.product.price && (
-                      <span className="text-sm text-gray-500 line-through">
+                      <span className="text-sm text-foreground/70 line-through">
                         ₩{item.product.originalPrice.toLocaleString()}
                       </span>
                     )}
                   </div>
                   <div className="flex items-center space-x-1">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-obsidian">
                       {(Math.random() * 2 + 3).toFixed(1)}
                     </span>
                   </div>

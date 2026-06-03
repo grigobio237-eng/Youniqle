@@ -315,7 +315,7 @@ export default function AdminProductsPage() {
                     <p className="text-sm font-medium text-text-secondary">총 상품 수</p>
                     <p className="text-2xl font-bold text-text-primary">{products.length}</p>
                   </div>
-                  <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                  <div className="p-3 rounded-full bg-primary-container text-primary">
                     <Package className="h-6 w-6" />
                   </div>
                 </div>
@@ -378,7 +378,7 @@ export default function AdminProductsPage() {
                 {/* Search */}
                 <form onSubmit={handleSearch} className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                     <Input
                       type="text"
                       placeholder="상품명 또는 설명으로 검색..."
@@ -464,7 +464,7 @@ export default function AdminProductsPage() {
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Package className="h-8 w-8 text-gray-400" />
+                      <Package className="h-8 w-8 text-foreground/70" />
                     </div>
                   )}
 
@@ -572,7 +572,7 @@ export default function AdminProductsPage() {
           {filteredProducts.length === 0 && (
             <Card>
               <CardContent className="p-12 text-center">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Package className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-text-primary mb-2">
                   상품이 없습니다
                 </h3>

@@ -257,7 +257,7 @@ export default function CohortAnalysisDashboard() {
       case 'low':
         return 'bg-green-500 text-white';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-surface0 text-white';
     }
   };
 
@@ -312,7 +312,7 @@ export default function CohortAnalysisDashboard() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">코호트 분석을 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchCohorts} variant="outline">
             다시 시도
@@ -327,8 +327,8 @@ export default function CohortAnalysisDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">코호트 분석</h1>
-          <p className="text-gray-600 mt-1">사용자 그룹별 장기 행동 패턴 분석</p>
+          <h1 className="text-3xl font-bold text-obsidian">코호트 분석</h1>
+          <p className="text-obsidian mt-1">사용자 그룹별 장기 행동 패턴 분석</p>
         </div>
         <div className="flex items-center space-x-2">
           {selectedCohorts.length >= 2 && (
@@ -360,7 +360,7 @@ export default function CohortAnalysisDashboard() {
                       {getCohortTypeLabel(cohort.cohortType)}
                     </Badge>
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">{cohort.description}</p>
+                  <p className="text-sm text-obsidian mt-1">{cohort.description}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -408,24 +408,24 @@ export default function CohortAnalysisDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-2xl font-bold text-primary">
                         {cohort.metrics.totalMembers.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-600">총 멤버</div>
+                      <div className="text-sm text-obsidian">총 멤버</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
                         {cohort.metrics.retention.length > 0 ? 
                           formatPercentage(cohort.metrics.retention[0].retentionRate) : '0%'}
                       </div>
-                      <div className="text-sm text-gray-600">첫 달 유지율</div>
+                      <div className="text-sm text-obsidian">첫 달 유지율</div>
                     </div>
                   </div>
 
                   {/* 유지율 차트 */}
                   {cohort.metrics.retention.length > 0 && (
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700">유지율 추이</h4>
+                      <h4 className="text-sm font-medium text-obsidian">유지율 추이</h4>
                       <div className="space-y-1">
                         {cohort.metrics.retention.slice(0, 6).map((retention, index) => (
                           <div key={index} className="flex items-center justify-between text-xs">
@@ -437,7 +437,7 @@ export default function CohortAnalysisDashboard() {
                                   style={{ width: `${retention.retentionRate}%` }}
                                 ></div>
                               </div>
-                              <span className="text-gray-600 w-12 text-right">
+                              <span className="text-obsidian w-12 text-right">
                                 {formatPercentage(retention.retentionRate)}
                               </span>
                             </div>
@@ -450,14 +450,14 @@ export default function CohortAnalysisDashboard() {
                   {/* 인사이트 */}
                   {cohort.insights && cohort.insights.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700">주요 인사이트</h4>
+                      <h4 className="text-sm font-medium text-obsidian">주요 인사이트</h4>
                       {cohort.insights.slice(0, 2).map((insight, index) => (
-                        <div key={index} className="flex items-start space-x-2 p-2 bg-gray-50 rounded">
+                        <div key={index} className="flex items-start space-x-2 p-2 bg-surface rounded">
                           <div className="flex-shrink-0 mt-0.5">
                             {getInsightIcon(insight.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                            <p className="text-xs text-obsidian line-clamp-2">
                               {insight.message}
                             </p>
                             <Badge 
@@ -473,8 +473,8 @@ export default function CohortAnalysisDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <BarChart3 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-500">아직 분석되지 않았습니다</p>
+                  <BarChart3 className="h-8 w-8 mx-auto mb-2 text-foreground/70" />
+                  <p className="text-sm text-foreground/70">아직 분석되지 않았습니다</p>
                   <Button
                     size="sm"
                     className="mt-2"
@@ -492,9 +492,9 @@ export default function CohortAnalysisDashboard() {
       {cohorts.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">코호트 분석이 없습니다</h3>
-            <p className="text-gray-500 mb-4">새로운 코호트 분석을 생성하여 사용자 그룹의 행동 패턴을 분석해보세요.</p>
+            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+            <h3 className="text-lg font-medium text-obsidian mb-2">코호트 분석이 없습니다</h3>
+            <p className="text-foreground/70 mb-4">새로운 코호트 분석을 생성하여 사용자 그룹의 행동 패턴을 분석해보세요.</p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               첫 번째 코호트 생성
@@ -509,7 +509,7 @@ export default function CohortAnalysisDashboard() {
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{selectedCohort.name}</h2>
+                <h2 className="text-2xl font-bold text-obsidian">{selectedCohort.name}</h2>
                 <Button
                   variant="ghost"
                   onClick={() => setSelectedCohort(null)}
@@ -524,9 +524,9 @@ export default function CohortAnalysisDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
                       <CardContent className="p-4 text-center">
-                        <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                        <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
                         <div className="text-2xl font-bold">{selectedCohort.metrics.totalMembers.toLocaleString()}</div>
-                        <div className="text-sm text-gray-600">총 멤버</div>
+                        <div className="text-sm text-obsidian">총 멤버</div>
                       </CardContent>
                     </Card>
                     <Card>
@@ -536,17 +536,17 @@ export default function CohortAnalysisDashboard() {
                           {selectedCohort.metrics.retention.length > 0 ? 
                             formatPercentage(selectedCohort.metrics.retention[0].retentionRate) : '0%'}
                         </div>
-                        <div className="text-sm text-gray-600">첫 달 유지율</div>
+                        <div className="text-sm text-obsidian">첫 달 유지율</div>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4 text-center">
-                        <DollarSign className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                        <DollarSign className="h-8 w-8 mx-auto mb-2 text-secondary" />
                         <div className="text-2xl font-bold">
                           {selectedCohort.metrics.revenue.length > 0 ? 
                             formatCurrency(selectedCohort.metrics.revenue[0].averageRevenuePerUser) : '₩0'}
                         </div>
-                        <div className="text-sm text-gray-600">평균 ARPU</div>
+                        <div className="text-sm text-obsidian">평균 ARPU</div>
                       </CardContent>
                     </Card>
                     <Card>
@@ -556,7 +556,7 @@ export default function CohortAnalysisDashboard() {
                           {selectedCohort.metrics.purchase.length > 0 ? 
                             formatPercentage(selectedCohort.metrics.purchase[0].repeatPurchaseRate) : '0%'}
                         </div>
-                        <div className="text-sm text-gray-600">재구매율</div>
+                        <div className="text-sm text-obsidian">재구매율</div>
                       </CardContent>
                     </Card>
                   </div>
@@ -565,8 +565,8 @@ export default function CohortAnalysisDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-lg text-gray-500 mb-4">아직 분석되지 않았습니다</p>
+                  <BarChart3 className="h-16 w-16 mx-auto mb-4 text-foreground/70" />
+                  <p className="text-lg text-foreground/70 mb-4">아직 분석되지 않았습니다</p>
                   <Button onClick={() => analyzeCohort(selectedCohort._id)}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     분석 실행

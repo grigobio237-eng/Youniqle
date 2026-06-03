@@ -30,12 +30,12 @@ export default function AiNudgeBanner({ nudge, onDismiss }: AiNudgeBannerProps) 
     MEAL_PLAN: {
       icon: Utensils,
       styles: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-      iconColor: 'text-emerald-500'
+      iconColor: 'text-secondary'
     },
     MENTAL_CARE: {
       icon: BrainCircuit,
-      styles: 'bg-indigo-50 border-indigo-200 text-indigo-800',
-      iconColor: 'text-indigo-500'
+      styles: 'bg-indigo-50 border-secondary/30 text-indigo-800',
+      iconColor: 'text-secondary'
     }
   };
 

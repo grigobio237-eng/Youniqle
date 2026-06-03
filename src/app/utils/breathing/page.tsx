@@ -102,7 +102,7 @@ export default function BreathingPage() {
         <div className="container max-w-2xl mx-auto py-8 px-4">
             <div className="mb-4">
                 <Link href="/utils">
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+                    <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2">
                         <ArrowLeft className="h-4 w-4 mr-1" />
                         돌아가기
                     </Button>
@@ -110,11 +110,11 @@ export default function BreathingPage() {
             </div>
 
             <div className="text-center mb-8">
-                <Badge variant="outline" className="mb-2 text-indigo-600 border-indigo-200 bg-indigo-50">
+                <Badge variant="outline" className="mb-2 text-secondary border-secondary/30 bg-indigo-50">
                     Healing & Recovery
                 </Badge>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">마음 챙김 호흡</h1>
-                <p className="text-gray-600">
+                <h1 className="text-3xl font-bold text-obsidian mb-2">마음 챙김 호흡</h1>
+                <p className="text-obsidian">
                     잠시 멈추고 깊게 숨을 쉬어보세요. <br />
                     스트레스가 줄어들고 마음이 편안해집니다.
                 </p>
@@ -133,7 +133,7 @@ export default function BreathingPage() {
                             onValueChange={(val) => setActivePattern(val as PatternKey)}
                             disabled={isPlaying}
                         >
-                            <SelectTrigger className="w-full bg-white/80 backdrop-blur border-gray-200">
+                            <SelectTrigger className="w-full bg-white/80 backdrop-blur border-line">
                                 <SelectValue placeholder="호흡 패턴 선택" />
                             </SelectTrigger>
                             <SelectContent>
@@ -142,7 +142,7 @@ export default function BreathingPage() {
                                 <SelectItem value="calm">🌊 1분 진정 호흡</SelectItem>
                             </SelectContent>
                         </Select>
-                        <p className="text-xs text-center text-gray-500 mt-2">
+                        <p className="text-xs text-center text-foreground/70 mt-2">
                             {pattern.description}
                         </p>
                     </div>
@@ -196,7 +196,7 @@ export default function BreathingPage() {
                                 stroke="currentColor"
                                 strokeWidth="4"
                                 fill="none"
-                                className="text-gray-400"
+                                className="text-foreground/70"
                             />
                         </svg>
                     </div>
@@ -219,20 +219,20 @@ export default function BreathingPage() {
                                 variant="outline"
                                 className="h-16 px-8 rounded-full border-2 flex items-center gap-2"
                             >
-                                <Pause className="h-6 w-6 text-gray-600 fill-current" />
-                                <span className="font-bold text-gray-600 text-xl">정지</span>
+                                <Pause className="h-6 w-6 text-obsidian fill-current" />
+                                <span className="font-bold text-obsidian text-xl">정지</span>
                             </Button>
                         )}
                     </div>
 
                     {/* Stats */}
-                    <div className="mt-8 flex gap-8 text-center text-gray-500 text-sm">
+                    <div className="mt-8 flex gap-8 text-center text-foreground/70 text-sm">
                         <div>
-                            <span className="block font-bold text-lg text-gray-900">{cycles}</span>
+                            <span className="block font-bold text-lg text-obsidian">{cycles}</span>
                             <span>Cycles</span>
                         </div>
                         <div>
-                            <span className="block font-bold text-lg text-gray-900">
+                            <span className="block font-bold text-lg text-obsidian">
                                 {Math.floor((cycles * pattern.steps.reduce((acc, s) => acc + s.duration, 0)) / 1000 / 60)}:
                                 {String(Math.floor((cycles * pattern.steps.reduce((acc, s) => acc + s.duration, 0)) / 1000) % 60).padStart(2, '0')}
                             </span>
@@ -249,37 +249,37 @@ export default function BreathingPage() {
                 <div
                     onClick={() => !isPlaying && setActivePattern('4-7-8')}
                     className={`p-4 rounded-xl border shadow-sm text-center transition-all cursor-pointer hover:shadow-md 
-                        ${activePattern === '4-7-8' ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-500' : 'bg-white border-gray-100 hover:bg-gray-50'}`}
+                        ${activePattern === '4-7-8' ? 'bg-indigo-50 border-secondary/30 ring-1 ring-indigo-500' : 'bg-white border-line hover:bg-surface'}`}
                 >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === '4-7-8' ? 'bg-indigo-200 text-indigo-700' : 'bg-indigo-100 text-indigo-600'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === '4-7-8' ? 'bg-indigo-200 text-secondary' : 'bg-secondary-container text-secondary'}`}>
                         <Moon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-bold text-sm mb-1 text-gray-900">4-7-8 호흡법</h3>
-                    <p className="text-xs text-gray-500">불면증 완화와 깊은 이완에 도움을 줍니다.</p>
+                    <h3 className="font-bold text-sm mb-1 text-obsidian">4-7-8 호흡법</h3>
+                    <p className="text-xs text-foreground/70">불면증 완화와 깊은 이완에 도움을 줍니다.</p>
                 </div>
 
                 <div
                     onClick={() => !isPlaying && setActivePattern('box')}
                     className={`p-4 rounded-xl border shadow-sm text-center transition-all cursor-pointer hover:shadow-md 
-                        ${activePattern === 'box' ? 'bg-emerald-50 border-emerald-200 ring-1 ring-emerald-500' : 'bg-white border-gray-100 hover:bg-gray-50'}`}
+                        ${activePattern === 'box' ? 'bg-emerald-50 border-emerald-200 ring-1 ring-emerald-500' : 'bg-white border-line hover:bg-surface'}`}
                 >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === 'box' ? 'bg-emerald-200 text-emerald-700' : 'bg-emerald-100 text-emerald-600'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === 'box' ? 'bg-emerald-200 text-secondary' : 'bg-secondary-container text-secondary'}`}>
                         <BoxIcon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-bold text-sm mb-1 text-gray-900">박스 호흡법</h3>
-                    <p className="text-xs text-gray-500">미 해군 네이비씰이 사용하는 집중력 호흡입니다.</p>
+                    <h3 className="font-bold text-sm mb-1 text-obsidian">박스 호흡법</h3>
+                    <p className="text-xs text-foreground/70">미 해군 네이비씰이 사용하는 집중력 호흡입니다.</p>
                 </div>
 
                 <div
                     onClick={() => !isPlaying && setActivePattern('calm')}
                     className={`p-4 rounded-xl border shadow-sm text-center transition-all cursor-pointer hover:shadow-md 
-                        ${activePattern === 'calm' ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-500' : 'bg-white border-gray-100 hover:bg-gray-50'}`}
+                        ${activePattern === 'calm' ? 'bg-blue-50 border-primary/30 ring-1 ring-primary' : 'bg-white border-line hover:bg-surface'}`}
                 >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === 'calm' ? 'bg-blue-200 text-blue-700' : 'bg-blue-100 text-blue-600'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 ${activePattern === 'calm' ? 'bg-blue-200 text-primary' : 'bg-primary-container text-primary'}`}>
                         <Wind className="h-5 w-5" />
                     </div>
-                    <h3 className="font-bold text-sm mb-1 text-gray-900">진정 호흡</h3>
-                    <p className="text-xs text-gray-500">긴장된 순간, 심박수를 빠르게 안정시킵니다.</p>
+                    <h3 className="font-bold text-sm mb-1 text-obsidian">진정 호흡</h3>
+                    <p className="text-xs text-foreground/70">긴장된 순간, 심박수를 빠르게 안정시킵니다.</p>
                 </div>
             </div>
         </div>

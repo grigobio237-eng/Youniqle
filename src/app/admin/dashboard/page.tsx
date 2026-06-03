@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       icon: Users,
       change: (stats as any)?.dailyUserGrowth || 0,
       href: '/admin/users',
-      color: 'text-blue-600',
+      color: 'text-primary',
       isDaily: true
     },
     {
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
       icon: DollarSign,
       change: (stats as any)?.dailyRevenueGrowth || 0,
       href: '/admin/analytics',
-      color: 'text-purple-600',
+      color: 'text-secondary',
       isDaily: true
     }
   ];
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
           <div>
             <h1 className="font-bold text-white mb-1 md:mb-2 text-xl md:text-3xl">관리자 대시보드</h1>
-            <p className="text-slate-400 text-xs md:text-base max-w-lg">
+            <p className="text-foreground/70 text-xs md:text-base max-w-lg">
               Youniqle 관리 엔진이 가동 중입니다. 오늘의 성과를 모니터링하세요.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
                 {new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
               </span>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 flex items-center gap-1.5">
+            <div className="px-3 py-1.5 rounded-xl bg-secondary/20 backdrop-blur-md border border-secondary/30/30 flex items-center gap-1.5">
               <Activity className="h-3.5 w-3.5 text-indigo-400 animate-pulse" />
               <span className="text-[10px] md:text-sm font-medium text-indigo-100">시스템 정상</span>
             </div>
@@ -172,8 +172,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 h-48 md:w-96 md:h-96 bg-indigo-600/20 rounded-full blur-[60px] md:blur-[100px]" />
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-32 h-32 md:w-64 md:h-64 bg-purple-600/10 rounded-full blur-[40px] md:blur-[80px]" />
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 h-48 md:w-96 md:h-96 bg-secondary/20 rounded-full blur-[60px] md:blur-[100px]" />
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-32 h-32 md:w-64 md:h-64 bg-secondary/10 rounded-full blur-[40px] md:blur-[80px]" />
       </div>
 
       {/* Alert Card for Pending Concierge */}
@@ -211,14 +211,14 @@ export default function AdminDashboard() {
               <CardContent className="p-4 md:p-6 relative">
                 <div className="flex items-start justify-between relative z-10">
                   <div className="space-y-0.5 md:space-y-1">
-                    <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <p className="text-[10px] md:text-xs font-bold text-foreground/70 uppercase tracking-wider">
                       {stat.title}
                     </p>
-                    <p className="text-lg md:text-3xl font-black text-slate-900">
+                    <p className="text-lg md:text-3xl font-black text-obsidian">
                       {stat.value}
                     </p>
                     {stat.change !== 0 && (
-                      <div className={`flex items-center text-[9px] md:text-xs font-bold mt-1 md:mt-2 px-1.5 py-0.5 rounded-full w-fit ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                      <div className={`flex items-center text-[9px] md:text-xs font-bold mt-1 md:mt-2 px-1.5 py-0.5 rounded-full w-fit ${isPositive ? 'bg-emerald-50 text-secondary' : 'bg-rose-50 text-rose-600'}`}>
                         {isPositive ? <ArrowUpRight className="h-2 w-2 md:h-3 md:w-3 mr-0.5" /> : <ArrowDownRight className="h-2 w-2 md:h-3 md:w-3 mr-0.5" />}
                         <span>
                           {`${Math.abs(stat.change)}%`}
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
                       </div>
                     )}
                   </div>
-                  <div className={`p-2 md:p-4 rounded-xl md:rounded-2xl transition-transform group-hover:scale-110 duration-300 ${stat.color} bg-slate-50 shrink-0`}>
+                  <div className={`p-2 md:p-4 rounded-xl md:rounded-2xl transition-transform group-hover:scale-110 duration-300 ${stat.color} bg-surface shrink-0`}>
                     <Icon className="h-4 w-4 md:h-6" />
                   </div>
                 </div>
@@ -384,31 +384,31 @@ export default function AdminDashboard() {
         </CardHeader>
         <CardContent className="p-4 md:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
-            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all px-2">
+            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-line hover:border-secondary/30 hover:bg-indigo-50 transition-all px-2">
               <Link href="/admin/products/new">
-                <Package className="h-5 w-5 md:h-6 text-indigo-500" />
+                <Package className="h-5 w-5 md:h-6 text-secondary" />
                 <span className="font-bold text-[11px] md:text-sm">상품 등록</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all px-2">
+            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-line hover:border-emerald-500 hover:bg-emerald-50 transition-all px-2">
               <Link href="/admin/consultations">
-                <Layers className="h-5 w-5 md:h-6 text-emerald-500" />
+                <Layers className="h-5 w-5 md:h-6 text-secondary" />
                 <span className="font-bold text-[11px] md:text-sm text-center">회복 설계</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all px-2">
+            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-line hover:border-purple-500 hover:bg-purple-50 transition-all px-2">
               <Link href="/admin/orders">
-                <ShoppingCart className="h-5 w-5 md:h-6 text-purple-500" />
+                <ShoppingCart className="h-5 w-5 md:h-6 text-secondary" />
                 <span className="font-bold text-[11px] md:text-sm">주문 관리</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all px-2">
+            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-line hover:border-primary/30 hover:bg-blue-50 transition-all px-2">
               <Link href="/admin/users">
-                <Users className="h-5 w-5 md:h-6 text-blue-500" />
+                <Users className="h-5 w-5 md:h-6 text-primary" />
                 <span className="font-bold text-[11px] md:text-sm">회원 관리</span>
               </Link>
             </Button>
-            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-all px-2">
+            <Button variant="outline" asChild className="h-20 md:h-24 flex-col gap-1 border-line hover:border-orange-500 hover:bg-orange-50 transition-all px-2">
               <Link href="/admin/recovery">
                 <TrendingUp className="h-5 w-5 md:h-6 text-orange-500" />
                 <span className="font-bold text-[11px] md:text-sm">현황 분석</span>

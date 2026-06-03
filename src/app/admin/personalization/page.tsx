@@ -165,7 +165,7 @@ export default function PersonalizationDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">개인화 데이터를 불러오는 중...</p>
+          <p className="mt-2 text-obsidian">개인화 데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -175,8 +175,8 @@ export default function PersonalizationDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">개인화 관리</h1>
-          <p className="text-gray-600">사용자 개인화 및 추천 시스템 관리</p>
+          <h1 className="text-3xl font-bold text-obsidian">개인화 관리</h1>
+          <p className="text-obsidian">사용자 개인화 및 추천 시스템 관리</p>
         </div>
         <div className="flex space-x-2">
           <Button>
@@ -269,7 +269,7 @@ export default function PersonalizationDashboard() {
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <h4 className="font-medium">{rule.name}</h4>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-obsidian">
                         CTR: {(rule.clickThroughRate * 100).toFixed(2)}% | 
                         전환율: {(rule.conversionRate * 100).toFixed(2)}%
                       </p>
@@ -277,7 +277,7 @@ export default function PersonalizationDashboard() {
                     <Badge variant="secondary">우수</Badge>
                   </div>
                 )) || (
-                  <p className="text-gray-500 text-center py-4">성과 데이터가 없습니다</p>
+                  <p className="text-foreground/70 text-center py-4">성과 데이터가 없습니다</p>
                 )}
               </div>
             </CardContent>
@@ -302,8 +302,8 @@ export default function PersonalizationDashboard() {
                         </Badge>
                         <Badge variant="outline">{rule.ruleType}</Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{rule.description}</p>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                      <p className="text-sm text-obsidian mt-1">{rule.description}</p>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-foreground/70">
                         <span>CTR: {(rule.effectiveness.clickThroughRate * 100).toFixed(2)}%</span>
                         <span>전환율: {(rule.effectiveness.conversionRate * 100).toFixed(2)}%</span>
                         <span>우선순위: {rule.priority}</span>
@@ -367,16 +367,16 @@ export default function PersonalizationDashboard() {
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{experiment.description}</p>
+                    <p className="text-sm text-obsidian mb-3">{experiment.description}</p>
                     
                     {experiment.results && experiment.results.variantResults.length > 0 && (
                       <div className="space-y-2">
                         <h5 className="font-medium text-sm">실험 결과</h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {experiment.results.variantResults.map((variant, index) => (
-                            <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                            <div key={index} className="p-2 bg-surface rounded text-sm">
                               <div className="font-medium">{variant.variantName}</div>
-                              <div className="text-gray-600">
+                              <div className="text-obsidian">
                                 사용자: {variant.users} | 전환율: {(variant.conversionRate * 100).toFixed(2)}%
                               </div>
                               {variant.statisticalSignificance && (
@@ -407,8 +407,8 @@ export default function PersonalizationDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
-                <Lightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">인사이트 기능은 곧 추가될 예정입니다</p>
+                <Lightbulb className="w-12 h-12 text-foreground/70 mx-auto mb-4" />
+                <p className="text-foreground/70">인사이트 기능은 곧 추가될 예정입니다</p>
               </div>
             </CardContent>
           </Card>

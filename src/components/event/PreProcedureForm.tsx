@@ -293,11 +293,11 @@ export default function PreProcedureForm() {
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'PLASTIC', label: '성형/피부', icon: <Heart className="w-4 h-4 text-pink-500" />, bg: 'bg-pink-50' },
-                  { id: 'ORIENTAL', label: '한방 회복', icon: <Leaf className="w-4 h-4 text-emerald-500" />, bg: 'bg-emerald-50' },
-                  { id: 'DENTAL', label: '치과', icon: <Smile className="w-4 h-4 text-amber-500" />, bg: 'bg-amber-50' },
-                  { id: 'ORTHOPEDIC', label: '정형/재활', icon: <Activity className="w-4 h-4 text-blue-500" />, bg: 'bg-blue-50' },
-                  { id: 'INTERNAL', label: '내과/검진', icon: <Stethoscope className="w-4 h-4 text-indigo-500" />, bg: 'bg-indigo-50' },
-                  { id: 'GENERAL', label: '일반 상담', icon: <ShieldCheck className="w-4 h-4 text-slate-500" />, bg: 'bg-slate-50' },
+                  { id: 'ORIENTAL', label: '한방 회복', icon: <Leaf className="w-4 h-4 text-secondary" />, bg: 'bg-emerald-50' },
+                  { id: 'DENTAL', label: '치과', icon: <Smile className="w-4 h-4 text-primary" />, bg: 'bg-amber-50' },
+                  { id: 'ORTHOPEDIC', label: '정형/재활', icon: <Activity className="w-4 h-4 text-primary" />, bg: 'bg-blue-50' },
+                  { id: 'INTERNAL', label: '내과/검진', icon: <Stethoscope className="w-4 h-4 text-secondary" />, bg: 'bg-indigo-50' },
+                  { id: 'GENERAL', label: '일반 상담', icon: <ShieldCheck className="w-4 h-4 text-foreground/70" />, bg: 'bg-surface' },
                 ].map((cat) => (
                   <button 
                     key={cat.id} onClick={() => handleCategorySelect(cat.id as any)}

@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
                                 />
                             </div>
                         </div>
-                        <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+                        <CardTitle className="text-2xl font-bold text-obsidian mb-2">
                             비밀번호 찾기
                         </CardTitle>
                         <CardDescription>
@@ -47,18 +47,18 @@ export default function ForgotPasswordPage() {
                         {!isSubmitted ? (
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
+                                    <Label htmlFor="email" className="text-sm font-medium text-obsidian mb-2 block">
                                         이메일 주소
                                     </Label>
                                     <div className="relative">
-                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                                         <Input
                                             id="email"
                                             type="email"
                                             required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                            className="pl-10 h-12 border-gray-300 focus:border-primary/30 focus:ring-primary"
                                             placeholder="example@email.com"
                                         />
                                     </div>
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
 
                                 <Button
                                     type="submit"
-                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200"
+                                    className="w-full h-12 bg-primary hover:bg-primary text-white font-semibold rounded-xl transition-all duration-200"
                                 >
                                     재설정 링크 보내기
                                 </Button>
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
                         <div className="mt-8 text-center">
                             <Link
                                 href="/auth/signin"
-                                className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                                className="inline-flex items-center text-sm text-obsidian hover:text-obsidian font-medium transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 로그인 페이지로 돌아가기

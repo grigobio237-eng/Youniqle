@@ -115,7 +115,7 @@ function VerifyEmailContent() {
                 />
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
+            <CardTitle className="text-3xl font-bold text-obsidian mb-2">
               이메일 인증
             </CardTitle>
           </CardHeader>
@@ -124,7 +124,7 @@ function VerifyEmailContent() {
             {status === 'loading' && (
               <div className="space-y-6">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600">이메일을 인증하고 있습니다...</p>
+                <p className="text-obsidian">이메일을 인증하고 있습니다...</p>
               </div>
             )}
 
@@ -134,19 +134,19 @@ function VerifyEmailContent() {
                   <CheckCircle className="h-10 w-10 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-obsidian mb-2">
                     인증 완료! 🎉
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-obsidian mb-4">
                     {message}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-foreground/70">
                     이제 Youniqle의 모든 서비스를 이용하실 수 있습니다.
                   </p>
                 </div>
                 <Button 
                   size="lg" 
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-primary hover:bg-primary"
                   onClick={() => window.location.href = '/auth/signin'}
                 >
                   로그인하기
@@ -160,10 +160,10 @@ function VerifyEmailContent() {
                   <XCircle className="h-10 w-10 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-obsidian mb-2">
                     인증 실패
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-obsidian mb-4">
                     {message}
                   </p>
                 </div>
@@ -184,13 +184,13 @@ function VerifyEmailContent() {
                   <Mail className="h-10 w-10 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-obsidian mb-2">
                     인증 링크 만료
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-obsidian mb-4">
                     {message}
                   </p>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-foreground/70 mb-4">
                     새로운 인증 이메일을 발송해드리겠습니다.
                   </p>
                 </div>
@@ -201,11 +201,11 @@ function VerifyEmailContent() {
                     placeholder="이메일 주소를 입력하세요"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <Button 
                     size="lg" 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-primary hover:bg-primary"
                     onClick={resendVerification}
                     disabled={isResending}
                   >
@@ -224,7 +224,7 @@ function VerifyEmailContent() {
 
             {message && status !== 'loading' && status !== 'success' && (
               <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-600">{message}</p>
+                <p className="text-sm text-obsidian">{message}</p>
               </div>
             )}
           </CardContent>

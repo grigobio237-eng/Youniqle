@@ -39,7 +39,7 @@ export default function BMICalculatorPage() {
     const getCategoryColor = () => {
         switch (category) {
             case '저체중':
-                return 'text-blue-600';
+                return 'text-primary';
             case '정상':
                 return 'text-green-600';
             case '과체중':
@@ -56,7 +56,7 @@ export default function BMICalculatorPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-12">
             <div className="container mx-auto px-4 max-w-2xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -106,18 +106,18 @@ export default function BMICalculatorPage() {
                         {bmi !== null && (
                             <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6 text-center space-y-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-2">당신의 BMI</p>
-                                    <p className="font-bold text-gray-900 text-xl">{bmi}</p>
+                                    <p className="text-sm text-obsidian mb-2">당신의 BMI</p>
+                                    <p className="font-bold text-obsidian text-xl">{bmi}</p>
                                 </div>
 
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-2">분류</p>
+                                    <p className="text-sm text-obsidian mb-2">분류</p>
                                     <p className={`text-3xl font-bold ${getCategoryColor()}`}>{category}</p>
                                 </div>
 
                                 <div className="bg-white rounded-lg p-4 text-left text-sm">
                                     <p className="font-semibold mb-2">📊 BMI 기준 (WHO 아시아-태평양)</p>
-                                    <ul className="space-y-1 text-gray-600">
+                                    <ul className="space-y-1 text-obsidian">
                                         <li>
                                             <span className="font-medium">저체중:</span> 18.5 미만
                                         </li>
@@ -138,7 +138,7 @@ export default function BMICalculatorPage() {
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">ℹ️ BMI란?</p>
                             <p>
                                 BMI(Body Mass Index)는 체질량지수로, 신장과 체중을 이용하여 비만도를 측정하는 지표입니다.

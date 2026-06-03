@@ -38,14 +38,14 @@ export default function DDayPage() {
     const getDDayColor = () => {
         if (dday === null) return '';
         if (dday === 0) return 'text-red-600';
-        if (dday > 0) return 'text-blue-600';
-        return 'text-gray-600';
+        if (dday > 0) return 'text-primary';
+        return 'text-obsidian';
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 py-12">
             <div className="container mx-auto px-4 max-w-2xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -95,7 +95,7 @@ export default function DDayPage() {
                             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8 text-center space-y-4">
                                 {eventName && (
                                     <div>
-                                        <p className="text-lg text-gray-600 mb-2">{eventName}</p>
+                                        <p className="text-lg text-obsidian mb-2">{eventName}</p>
                                     </div>
                                 )}
 
@@ -103,21 +103,21 @@ export default function DDayPage() {
                                     <p className={`text-xl font-bold ${getDDayColor()}`}>{getDDayText()}</p>
                                 </div>
 
-                                <div className="text-gray-600">
+                                <div className="text-obsidian">
                                     {dday === 0 && <p className="font-semibold text-xl">오늘이 바로 그날입니다! 🎉</p>}
                                     {dday > 0 && (
                                         <p className="text-lg">
-                                            목표일까지 <span className="font-bold text-blue-600">{dday}일</span> 남았습니다
+                                            목표일까지 <span className="font-bold text-primary">{dday}일</span> 남았습니다
                                         </p>
                                     )}
                                     {dday < 0 && (
                                         <p className="text-lg">
-                                            목표일이 <span className="font-bold text-gray-600">{Math.abs(dday)}일</span> 지났습니다
+                                            목표일이 <span className="font-bold text-obsidian">{Math.abs(dday)}일</span> 지났습니다
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="bg-white rounded-lg p-4 text-sm text-gray-600">
+                                <div className="bg-white rounded-lg p-4 text-sm text-obsidian">
                                     <p>
                                         📆 목표 날짜: <span className="font-semibold">{new Date(targetDate).toLocaleDateString('ko-KR')}</span>
                                     </p>
@@ -128,7 +128,7 @@ export default function DDayPage() {
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 사용 팁</p>
                             <ul className="list-disc list-inside space-y-1">
                                 <li>D-Day: 당일입니다</li>

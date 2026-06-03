@@ -341,7 +341,7 @@ export default function RefundRequestPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
+          <p className="text-obsidian">로딩 중...</p>
         </div>
       </div>
     );
@@ -370,7 +370,7 @@ export default function RefundRequestPage() {
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">환불 신청 불가</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               배송 완료된 주문만 환불 신청이 가능합니다.
             </p>
             <Button asChild>
@@ -387,7 +387,7 @@ export default function RefundRequestPage() {
   const selectedItemsCount = selectedItems.size;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-surface py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* 헤더 */}
         <div className="mb-8">
@@ -398,7 +398,7 @@ export default function RefundRequestPage() {
             </Link>
           </Button>
           <h1 className="text-3xl font-bold">환불/교환 신청</h1>
-          <p className="text-gray-600 mt-2">주문번호: {order.orderNumber}</p>
+          <p className="text-obsidian mt-2">주문번호: {order.orderNumber}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -427,7 +427,7 @@ export default function RefundRequestPage() {
             <Card>
               <CardHeader>
                 <CardTitle>환불할 상품 선택 *</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-obsidian mt-1">
                   환불/교환할 상품을 선택해주세요
                 </p>
               </CardHeader>
@@ -440,7 +440,7 @@ export default function RefundRequestPage() {
                     <div
                       key={item.productId._id}
                       className={`p-4 border-2 rounded-lg ${
-                        isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        isSelected ? 'border-primary/30 bg-blue-50' : 'border-line'
                       }`}
                     >
                       <div className="flex items-start space-x-4">
@@ -461,15 +461,15 @@ export default function RefundRequestPage() {
                                   className="w-full h-full object-cover rounded-lg"
                                 />
                               ) : (
-                                <Package className="h-8 w-8 text-gray-400" />
+                                <Package className="h-8 w-8 text-foreground/70" />
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{item.productId.name}</p>
-                              <p className="text-sm text-gray-600">
+                              <p className="font-medium text-obsidian">{item.productId.name}</p>
+                              <p className="text-sm text-obsidian">
                                 {item.price.toLocaleString()}원 × {item.quantity}개
                               </p>
-                              <p className="text-sm font-semibold text-gray-900 mt-1">
+                              <p className="text-sm font-semibold text-obsidian mt-1">
                                 총 {(item.price * item.quantity).toLocaleString()}원
                               </p>
                             </div>
@@ -501,7 +501,7 @@ export default function RefundRequestPage() {
                                   +
                                 </Button>
                               </div>
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-obsidian">
                                 / {item.quantity}개
                               </span>
                             </div>
@@ -569,12 +569,12 @@ export default function RefundRequestPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="image-upload" className="cursor-pointer">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
-                      <ImageIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                      <p className="text-sm text-gray-600">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary/30 transition-colors">
+                      <ImageIcon className="h-12 w-12 mx-auto mb-4 text-foreground/70" />
+                      <p className="text-sm text-obsidian">
                         클릭하여 이미지를 업로드하세요
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-foreground/70 mt-2">
                         최대 5장, JPG/PNG 형식
                       </p>
                     </div>
@@ -621,7 +621,7 @@ export default function RefundRequestPage() {
             <Card>
               <CardHeader>
                 <CardTitle>수거지 주소 *</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-obsidian mt-1">
                   반품 상품을 수거할 주소를 입력해주세요
                 </p>
               </CardHeader>
@@ -688,7 +688,7 @@ export default function RefundRequestPage() {
                 </RadioGroup>
 
                 {refundMethod === 'account' && (
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="space-y-4 p-4 bg-surface rounded-lg">
                     <div>
                       <Label htmlFor="bank">은행 *</Label>
                       <Input
@@ -747,7 +747,7 @@ export default function RefundRequestPage() {
             )}
 
             {/* 주의사항 */}
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-blue-50 border-primary/30">
               <CardHeader>
                 <CardTitle className="text-blue-900">환불 안내</CardTitle>
               </CardHeader>
@@ -789,11 +789,11 @@ export default function RefundRequestPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-600">주문번호</p>
+                  <p className="text-sm text-obsidian">주문번호</p>
                   <p className="font-medium">{order.orderNumber}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">주문일</p>
+                  <p className="text-sm text-obsidian">주문일</p>
                   <p className="font-medium">
                     {new Date(order.createdAt).toLocaleDateString('ko-KR')}
                   </p>
@@ -812,7 +812,7 @@ export default function RefundRequestPage() {
                         <div 
                           key={index} 
                           className={`flex items-center space-x-3 p-2 rounded ${
-                            isSelected ? 'bg-blue-50 border border-blue-200' : ''
+                            isSelected ? 'bg-blue-50 border border-primary/30' : ''
                           }`}
                         >
                           <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -825,16 +825,16 @@ export default function RefundRequestPage() {
                                 className="w-full h-full object-cover rounded-lg"
                               />
                             ) : (
-                              <Package className="h-8 w-8 text-gray-400" />
+                              <Package className="h-8 w-8 text-foreground/70" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{item.productId.name}</p>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-obsidian">
                               {item.quantity}개 × {item.price.toLocaleString()}원
                             </p>
                             {isSelected && (
-                              <p className="text-xs text-blue-600 font-semibold mt-1">
+                              <p className="text-xs text-primary font-semibold mt-1">
                                 환불 {selectedQuantity}개 선택
                               </p>
                             )}

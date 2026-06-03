@@ -10,9 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 const MOODS = [
     { id: 'happy', emoji: '😊', label: '행복해요', color: 'text-yellow-500' },
     { id: 'calm', emoji: '😌', label: '평온해요', color: 'text-green-500' },
-    { id: 'tired', emoji: '😴', label: '피곤해요', color: 'text-blue-500' },
+    { id: 'tired', emoji: '😴', label: '피곤해요', color: 'text-primary' },
     { id: 'stressed', emoji: '😫', label: '힘들어요', color: 'text-red-500' },
-    { id: 'inspired', emoji: '✨', label: '활기차요', color: 'text-purple-500' },
+    { id: 'inspired', emoji: '✨', label: '활기차요', color: 'text-secondary' },
 ];
 
 export default function RecoveryNoteSection() {
@@ -97,7 +97,7 @@ export default function RecoveryNoteSection() {
                                     >
                                         <CheckCircle2 className="w-8 h-8 md:w-16 md:h-16 text-primary mb-2 md:mb-4" />
                                         <h4 className="text-sm md:text-2xl font-bold text-obsidian">마음이 기록되었습니다</h4>
-                                        <p className="text-[10px] md:text-sm text-slate-500 mt-1">사용자님의 소중한 회복 타임라인에 저장되었습니다.</p>
+                                        <p className="text-[10px] md:text-sm text-foreground/70 mt-1">사용자님의 소중한 회복 타임라인에 저장되었습니다.</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

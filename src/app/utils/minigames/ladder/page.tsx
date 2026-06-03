@@ -181,11 +181,11 @@ export default function LadderGamePage() {
                             className={`flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-2 ladder-player-${i}`}
                             onClick={() => onPlayerClick(i)}
                         >
-                            <span className={`text-xs font-bold mb-1 whitespace-nowrap ${(activePath === i || showAllResult) ? 'text-indigo-600' : 'text-gray-600'}`}>
+                            <span className={`text-xs font-bold mb-1 whitespace-nowrap ${(activePath === i || showAllResult) ? 'text-secondary' : 'text-obsidian'}`}>
                                 {p.name}
                             </span>
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center shadow-sm border-2 
-                                ${(activePath === i) ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-gray-200 text-gray-500'}`}>
+                                ${(activePath === i) ? 'bg-secondary border-indigo-600 text-white' : 'bg-white border-line text-foreground/70'}`}>
                                 <User className="w-3 h-3" />
                             </div>
                             <style jsx>{`
@@ -209,13 +209,13 @@ export default function LadderGamePage() {
                             <span className={`text-xs font-bold mt-1 whitespace-nowrap transition-all duration-500
                                 ${(activePath !== null && results[activePath] === i && !isAnimating) || (showAllResult && Object.values(results).includes(i))
                                     ? 'text-red-600 scale-110'
-                                    : 'text-gray-600'}`}>
+                                    : 'text-obsidian'}`}>
                                 {r.text}
                             </span>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm border-2 transition-all duration-500
                                 ${(activePath !== null && results[activePath] === i && !isAnimating) || (showAllResult && Object.values(results).includes(i))
                                     ? 'bg-red-500 border-red-500 text-white scale-125 shadow-lg animate-bounce'
-                                    : 'bg-gray-100 border-gray-200 text-gray-400'}`}>
+                                    : 'bg-gray-100 border-line text-foreground/70'}`}>
                                 <Trophy className="w-4 h-4" />
                             </div>
                             <style jsx>{`
@@ -296,7 +296,7 @@ export default function LadderGamePage() {
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="mb-4">
                     <Link href="/utils/minigames">
-                        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+                        <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             미니게임 돌아가기
                         </Button>
@@ -305,18 +305,18 @@ export default function LadderGamePage() {
 
                 <Card className="p-6 md:p-8 shadow-xl bg-white border-none">
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                        <h1 className="text-3xl font-bold text-obsidian flex items-center justify-center gap-2">
                             <Shuffle className="text-orange-500" />
                             커피 내기 사다리
                         </h1>
-                        <p className="text-gray-500 mt-2">누가 커피를 사게 될까요? 운명을 시험해보세요!</p>
+                        <p className="text-foreground/70 mt-2">누가 커피를 사게 될까요? 운명을 시험해보세요!</p>
                     </div>
 
                     {stage === 'setup' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
                             {/* 1. Count Settings */}
-                            <div className="flex justify-center items-center gap-4 bg-gray-50 p-4 rounded-xl">
-                                <span className="font-semibold text-gray-700">참가 인원</span>
+                            <div className="flex justify-center items-center gap-4 bg-surface p-4 rounded-xl">
+                                <span className="font-semibold text-obsidian">참가 인원</span>
                                 <div className="flex items-center gap-2">
                                     <Button
                                         variant="outline" size="icon"
@@ -335,7 +335,7 @@ export default function LadderGamePage() {
                             {/* 2. Names & Rewards */}
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
-                                    <h3 className="font-semibold text-center text-gray-700 flex items-center justify-center gap-2">
+                                    <h3 className="font-semibold text-center text-obsidian flex items-center justify-center gap-2">
                                         <User className="w-4 h-4" /> 참가자 이름
                                     </h3>
                                     {players.map((p) => (
@@ -349,7 +349,7 @@ export default function LadderGamePage() {
                                     ))}
                                 </div>
                                 <div className="space-y-3">
-                                    <h3 className="font-semibold text-center text-gray-700 flex items-center justify-center gap-2">
+                                    <h3 className="font-semibold text-center text-obsidian flex items-center justify-center gap-2">
                                         <Trophy className="w-4 h-4" /> 내기 항목
                                     </h3>
                                     {rewards.map((r) => (
@@ -379,7 +379,7 @@ export default function LadderGamePage() {
 
                             <div className="mt-16 flex flex-col items-center gap-4">
                                 {activePath === null && !showAllResult ? (
-                                    <p className="text-lg font-bold text-indigo-600 animate-pulse">
+                                    <p className="text-lg font-bold text-secondary animate-pulse">
                                         {isAnimating ? '운명의 사다리를 타는 중...' : '참가자의 이름을 클릭하여 결과를 확인하세요!'}
                                     </p>
                                 ) : (
@@ -395,7 +395,7 @@ export default function LadderGamePage() {
                                         <RefreshCw className="mr-2 h-4 w-4" /> 다시 설정
                                     </Button>
                                     <Button
-                                        className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                                        className="flex-1 bg-secondary hover:bg-secondary"
                                         onClick={() => setShowAllResult(true)}
                                     >
                                         전체 결과 보기

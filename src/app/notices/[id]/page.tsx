@@ -105,7 +105,7 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <p className="mt-4 text-obsidian">로딩 중...</p>
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
             
             <h1 className="text-3xl font-bold mb-4">{notice.title}</h1>
             
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+            <div className="flex flex-wrap gap-4 text-sm text-obsidian">
               <div className="flex items-center gap-1">
                 <User className="w-4 h-4" />
                 {notice.authorName}
@@ -175,11 +175,11 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
                     href={file.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex items-center gap-2 p-3 bg-surface hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <div className="flex-1">
                       <div className="font-medium">{file.fileName}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-foreground/70">
                         {formatFileSize(file.fileSize)}
                       </div>
                     </div>

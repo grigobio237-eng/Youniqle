@@ -491,39 +491,39 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
             <div className="flex items-center justify-center mb-12 no-print">
                 {[1, 2, 3, 4, 5].map((s) => (
                     <React.Fragment key={s}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all ${step === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110' :
-                            step > s ? 'bg-blue-100 border-blue-200 text-blue-600' : 'bg-white border-slate-200 text-slate-400'
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all ${step === s ? 'bg-primary border-blue-600 text-white shadow-lg scale-110' :
+                            step > s ? 'bg-primary-container border-primary/30 text-primary' : 'bg-white border-line text-foreground/70'
                             }`}>
                             {s}
                         </div>
-                        {s < 5 && <div className={`w-12 h-1 mx-2 rounded ${step > s ? 'bg-blue-500' : 'bg-slate-200'}`} />}
+                        {s < 5 && <div className={`w-12 h-1 mx-2 rounded ${step > s ? 'bg-primary' : 'bg-slate-200'}`} />}
                     </React.Fragment>
                 ))}
             </div>
 
             {step === 1 && (
-                <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-6 no-print">
+                <div className="bg-white rounded-3xl shadow-xl border border-line p-8 space-y-6 no-print">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-slate-800">기본 정보</h3>
+                            <h3 className="text-lg font-bold text-obsidian">기본 정보</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1">{labels.productName}</label>
+                                    <label className="block text-sm font-semibold text-obsidian mb-1">{labels.productName}</label>
                                     <input
                                         type="text"
                                         value={info.name}
                                         onChange={(e) => setInfo({ ...info, name: e.target.value })}
                                         placeholder={labels.productPlaceholder}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full px-4 py-3 rounded-xl border border-line bg-white text-obsidian placeholder:text-foreground/70 focus:ring-2 focus:ring-primary outline-none"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-1">카테고리</label>
+                                        <label className="block text-sm font-semibold text-obsidian mb-1">카테고리</label>
                                         <select
                                             value={info.category}
                                             onChange={(e) => setInfo({ ...info, category: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-line bg-white text-obsidian outline-none"
                                             aria-label="카테고리 선택"
                                         >
                                             {PRODUCT_CATEGORIES.map(cat => (
@@ -532,22 +532,22 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-1">{labels.priceLabel}</label>
+                                        <label className="block text-sm font-semibold text-obsidian mb-1">{labels.priceLabel}</label>
                                         <input
                                             type="text"
                                             value={info.price}
                                             onChange={(e) => setInfo({ ...info, price: e.target.value })}
                                             placeholder={labels.pricePlaceholder}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-line bg-white text-obsidian placeholder:text-foreground/70 focus:ring-2 focus:ring-primary outline-none"
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <label className="block text-sm font-semibold text-slate-700">{labels.featuresLabel}</label>
+                                        <label className="block text-sm font-semibold text-obsidian">{labels.featuresLabel}</label>
                                         <button
                                             onClick={handleSuggestFeatures}
-                                            className="text-xs text-blue-600 font-bold hover:underline"
+                                            className="text-xs text-primary font-bold hover:underline"
                                         >
                                             {labels.suggestBtn}
                                         </button>
@@ -557,7 +557,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                         onChange={(e) => setInfo({ ...info, features: e.target.value })}
                                         rows={3}
                                         placeholder={labels.featuresPlaceholder}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                        className="w-full px-4 py-3 rounded-xl border border-line bg-white text-obsidian placeholder:text-foreground/70 focus:ring-2 focus:ring-primary outline-none resize-none"
                                     />
                                 </div>
                                 <div className="flex items-center gap-2 pt-2">
@@ -568,7 +568,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                         onChange={(e) => setInfo({ ...info, isFunding: e.target.checked })}
                                         className="w-5 h-5 accent-blue-600 rounded"
                                     />
-                                    <label htmlFor="isFunding" className="text-sm font-semibold text-slate-700 cursor-pointer">
+                                    <label htmlFor="isFunding" className="text-sm font-semibold text-obsidian cursor-pointer">
                                         {labels.fundingLabel}
                                     </label>
                                 </div>
@@ -576,7 +576,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                         </div>
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-slate-800">이미지 및 설정</h3>
+                            <h3 className="text-lg font-bold text-obsidian">이미지 및 설정</h3>
                             <ImageUploader
                                 label="제품 실제 사진 업로드 (참조용) *"
                                 preview={info.referenceImage}
@@ -585,7 +585,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                             />
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">상세페이지 길이</label>
+                                <label className="block text-sm font-semibold text-obsidian mb-2">상세페이지 길이</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {[
                                         { val: PageLength.AUTO, label: 'AI 추천' },
@@ -597,8 +597,8 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                             key={item.val}
                                             onClick={() => setInfo({ ...info, length: item.val as PageLength })}
                                             className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${info.length === item.val
-                                                ? 'border-blue-600 bg-blue-50 text-blue-700'
-                                                : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-200'
+                                                ? 'border-blue-600 bg-blue-50 text-primary'
+                                                : 'border-line bg-surface text-foreground/70 hover:border-line'
                                                 }`}
                                         >
                                             {item.label}
@@ -647,10 +647,10 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                 step === 2 && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-slate-900">유니클 기획 전략 초안</h2>
+                            <h2 className="text-2xl font-bold text-obsidian">유니클 기획 전략 초안</h2>
                             <button
                                 onClick={() => setStep(1)}
-                                className="text-sm font-bold text-slate-400 hover:text-slate-600"
+                                className="text-sm font-bold text-foreground/70 hover:text-obsidian"
                             >
                                 정보 수정
                             </button>
@@ -658,46 +658,46 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
 
                         <div className="space-y-4">
                             {segments.map((seg, idx) => (
-                                <div key={seg.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                                    <div className="p-1 bg-slate-50 flex border-b border-slate-100">
-                                        <div className="px-4 py-2 text-xs font-bold text-slate-400">PAGE {idx + 1}</div>
+                                <div key={seg.id} className="bg-white rounded-2xl shadow-sm border border-line overflow-hidden">
+                                    <div className="p-1 bg-surface flex border-b border-line">
+                                        <div className="px-4 py-2 text-xs font-bold text-foreground/70">PAGE {idx + 1}</div>
                                     </div>
                                     <div className="p-6 grid md:grid-cols-2 gap-6">
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex flex-wrap gap-2">
                                                     {seg.logicalSections.map((tag, tIdx) => (
-                                                        <span key={tIdx} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase">
+                                                        <span key={tIdx} className="px-2 py-0.5 bg-blue-50 text-primary text-[10px] font-bold rounded uppercase">
                                                             {tag}
                                                         </span>
                                                     ))}
                                                 </div>
                                                 <button
                                                     onClick={() => handleRegenerateSegment(seg.id)}
-                                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                    className="p-1.5 text-foreground/70 hover:text-primary hover:bg-blue-50 rounded-lg transition-all"
                                                     title="기획안 다시 짜기"
                                                 >
                                                     <RefreshCw size={14} className={seg.isGenerating ? 'animate-spin' : ''} />
                                                 </button>
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Key Copy</label>
+                                                <label className="block text-xs font-bold text-foreground/70 mb-1 uppercase">Key Copy</label>
                                                 <input
                                                     type="text"
                                                     value={seg.keyMessage}
                                                     onChange={(e) => updateSegment(seg.id, 'keyMessage', e.target.value)}
-                                                    className="w-full px-0 py-2 text-lg font-bold text-slate-800 border-b-2 border-transparent bg-white focus:border-blue-400 outline-none transition-all placeholder:text-slate-300"
+                                                    className="w-full px-0 py-2 text-lg font-bold text-obsidian border-b-2 border-transparent bg-white focus:border-primary/30 outline-none transition-all placeholder:text-slate-300"
                                                     placeholder="섹션의 핵심 메시지를 입력하세요"
                                                 />
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase">Visual Prompt</label>
+                                            <label className="block text-xs font-bold text-foreground/70 mb-1 uppercase">Visual Prompt</label>
                                             <textarea
                                                 value={seg.visualPrompt}
                                                 onChange={(e) => updateSegment(seg.id, 'visualPrompt', e.target.value)}
                                                 rows={2}
-                                                className="w-full p-3 text-sm text-slate-600 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-blue-100 outline-none resize-none transition-all"
+                                                className="w-full p-3 text-sm text-obsidian bg-surface rounded-xl border-none focus:ring-2 focus:ring-blue-100 outline-none resize-none transition-all"
                                                 placeholder="화면 구성을 설명하는 프롬프트"
                                             />
                                         </div>
@@ -748,16 +748,16 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                 step === 3 && (
                     <div className="space-y-12 animate-in zoom-in duration-500">
                         <div className="flex flex-col md:flex-row items-center justify-between no-print gap-4">
-                            <h2 className="text-2xl font-bold text-slate-900">생성된 상세페이지</h2>
+                            <h2 className="text-2xl font-bold text-obsidian">생성된 상세페이지</h2>
                             <div className="flex flex-wrap gap-2 justify-center">
                                 <button
                                     onClick={() => setStep(2)}
-                                    className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-all"
+                                    className="px-4 py-2 text-sm font-bold text-foreground/70 hover:bg-slate-100 rounded-lg transition-all"
                                 >
                                     기획 수정
                                 </button>
                                 <button
-                                    className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
+                                    className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                                     onClick={handleDownloadAsImage}
                                 >
                                     <Download size={16} /> 상세 이미지 다운로드
@@ -765,7 +765,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                             </div>
                         </div>
 
-                        <div id="detail-page-container" className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 print-image-container">
+                        <div id="detail-page-container" className="flex flex-col items-center gap-0 w-full max-w-2xl mx-auto bg-white shadow-2xl rounded-sm overflow-hidden border border-line print-image-container">
                             {segments.map((seg) => (
                                 <div key={seg.id} className="relative w-full aspect-[9/16] bg-slate-100 group">
                                     {seg.imageUrl ? (
@@ -778,7 +778,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                             />
                                             <button
                                                 onClick={() => handleRegenerateImage(seg.id)}
-                                                className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg text-slate-600 hover:text-blue-600 no-print transition-all opacity-0 group-hover:opacity-100"
+                                                className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg text-obsidian hover:text-primary no-print transition-all opacity-0 group-hover:opacity-100"
                                                 title="이미지 다시 생성"
                                             >
                                                 <RefreshCw size={18} className={seg.isGenerating ? 'animate-spin' : ''} />
@@ -787,7 +787,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center space-y-3 no-print">
                                             <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
-                                            <p className="text-sm font-bold text-slate-500">이미지 생성 중...</p>
+                                            <p className="text-sm font-bold text-foreground/70">이미지 생성 중...</p>
                                         </div>
                                     )}
                                 </div>
@@ -847,7 +847,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                             </button>
                             <button
                                 onClick={() => setStep(1)}
-                                className="text-slate-400 text-sm font-bold hover:underline"
+                                className="text-foreground/70 text-sm font-bold hover:underline"
                             >
                                 처음으로 돌아가기
                             </button>
@@ -860,14 +860,14 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                 step === 4 && (
                     <div className="space-y-8 animate-in slide-in-from-right duration-500">
                         <div className="text-center space-y-2">
-                            <h2 className="text-3xl font-extrabold text-slate-900">AI 썸네일 생성</h2>
-                            <p className="text-slate-500">상품의 첫인상을 결정할 프리미엄 썸네일을 만듭니다.</p>
+                            <h2 className="text-3xl font-extrabold text-obsidian">AI 썸네일 생성</h2>
+                            <p className="text-foreground/70">상품의 첫인상을 결정할 프리미엄 썸네일을 만듭니다.</p>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8 items-start">
-                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-6">
+                            <div className="bg-white rounded-3xl p-8 border border-line shadow-xl space-y-6">
                                 <div className="space-y-4">
-                                    <label className="block text-sm font-bold text-slate-700">디자인 스타일</label>
+                                    <label className="block text-sm font-bold text-obsidian">디자인 스타일</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'premium', label: '프리미엄' },
@@ -878,7 +878,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                             <button
                                                 key={s.id}
                                                 onClick={() => setThumbnailOptions({ ...thumbnailOptions, style: s.id })}
-                                                className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${thumbnailOptions.style === s.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-50 bg-slate-50 text-slate-500 hover:border-slate-100'}`}
+                                                className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${thumbnailOptions.style === s.id ? 'border-blue-600 bg-blue-50 text-primary' : 'border-slate-50 bg-surface text-foreground/70 hover:border-line'}`}
                                             >
                                                 {s.label}
                                             </button>
@@ -887,8 +887,8 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                        <span className="text-sm font-bold text-slate-700">모델(사람) 포함</span>
+                                    <div className="flex items-center justify-between p-4 bg-surface rounded-2xl">
+                                        <span className="text-sm font-bold text-obsidian">모델(사람) 포함</span>
                                         <input
                                             type="checkbox"
                                             checked={thumbnailOptions.includeModel}
@@ -897,8 +897,8 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                             aria-label="모델(사람) 포함"
                                         />
                                     </div>
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                        <span className="text-sm font-bold text-slate-700">상품명 텍스트 포함</span>
+                                    <div className="flex items-center justify-between p-4 bg-surface rounded-2xl">
+                                        <span className="text-sm font-bold text-obsidian">상품명 텍스트 포함</span>
                                         <input
                                             type="checkbox"
                                             checked={thumbnailOptions.addText}
@@ -916,7 +916,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                     w-full py-5 rounded-2xl font-black text-xl 
                                     bg-gradient-to-r from-blue-600 to-indigo-700 
                                     hover:from-blue-700 hover:to-indigo-800 
-                                    text-white shadow-lg shadow-blue-200/50
+                                    text-white shadow-lg shadow-primary/20/50
                                     transition-all duration-300 flex items-center justify-center gap-4
                                     disabled:opacity-50
                                 `}
@@ -952,9 +952,9 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                 ) : (
                                     <div className="text-center space-y-4">
                                         <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto">
-                                            <div className="w-8 h-8 text-slate-600">🖼️</div>
+                                            <div className="w-8 h-8 text-obsidian">🖼️</div>
                                         </div>
-                                        <p className="text-slate-500 font-bold">생성된 썸네일이 여기에 표시됩니다</p>
+                                        <p className="text-foreground/70 font-bold">생성된 썸네일이 여기에 표시됩니다</p>
                                     </div>
                                 )}
                             </div>
@@ -963,7 +963,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                         <div className="pt-8 flex justify-center gap-4">
                             <button
                                 onClick={() => setStep(3)}
-                                className="px-8 py-3 text-slate-400 font-bold hover:text-slate-600"
+                                className="px-8 py-3 text-foreground/70 font-bold hover:text-obsidian"
                             >
                                 이전으로
                             </button>
@@ -1010,38 +1010,38 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                             ✅
                         </div>
                         <div className="space-y-2">
-                            <h2 className="font-extrabold text-slate-900 text-4xl">상품 등록 완료!</h2>
-                            <p className="text-slate-500 text-lg">유니클이 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
+                            <h2 className="font-extrabold text-obsidian text-4xl">상품 등록 완료!</h2>
+                            <p className="text-foreground/70 text-lg">유니클이 기획한 상품이 쇼핑몰에 성공적으로 등록되었습니다.</p>
                         </div>
 
-                        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl max-w-xl mx-auto space-y-6">
+                        <div className="bg-white rounded-3xl p-8 border border-line shadow-xl max-w-xl mx-auto space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={handleDownloadAll}
-                                    className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
+                                    className="p-6 bg-surface hover:bg-slate-100 rounded-2xl border border-line transition-all space-y-2 group"
                                 >
                                     <div className="text-2xl group-hover:scale-110 transition-transform">📥</div>
-                                    <div className="font-bold text-slate-800">이미지 저장</div>
+                                    <div className="font-bold text-obsidian">이미지 저장</div>
                                 </button>
                                 <button
                                     onClick={() => window.print()}
-                                    className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all space-y-2 group"
+                                    className="p-6 bg-surface hover:bg-slate-100 rounded-2xl border border-line transition-all space-y-2 group"
                                 >
                                     <div className="text-2xl group-hover:scale-110 transition-transform">📄</div>
-                                    <div className="font-bold text-slate-800">PDF 기획서 소장</div>
+                                    <div className="font-bold text-obsidian">PDF 기획서 소장</div>
                                 </button>
                             </div>
 
                             <div className="pt-4 space-y-3">
                                 <a
                                     href="/admin/products"
-                                    className="block w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100"
+                                    className="block w-full py-4 bg-primary hover:bg-primary text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20"
                                 >
                                     상품 관리 페이지로 이동
                                 </a>
                                 <button
                                     onClick={() => window.location.reload()}
-                                    className="block w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all"
+                                    className="block w-full py-4 bg-slate-100 hover:bg-slate-200 text-obsidian rounded-xl font-bold transition-all"
                                 >
                                     새로운 상품 기획하기
                                 </button>

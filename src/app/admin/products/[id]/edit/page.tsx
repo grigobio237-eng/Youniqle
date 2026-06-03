@@ -471,7 +471,7 @@ export default function EditProductPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">상품 수정</h1>
-            <p className="text-gray-600">상품 정보를 수정하고 있습니다...</p>
+            <p className="text-obsidian">상품 정보를 수정하고 있습니다...</p>
           </div>
         </div>
 
@@ -492,15 +492,15 @@ export default function EditProductPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">상품 수정</h1>
-            <p className="text-gray-600">상품을 찾을 수 없습니다.</p>
+            <p className="text-obsidian">상품을 찾을 수 없습니다.</p>
           </div>
         </div>
 
         <Card>
           <CardContent className="p-12 text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">상품을 찾을 수 없습니다</h3>
-            <p className="text-gray-600 mb-4">요청하신 상품이 존재하지 않거나 삭제되었습니다.</p>
+            <p className="text-obsidian mb-4">요청하신 상품이 존재하지 않거나 삭제되었습니다.</p>
             <Button onClick={() => router.push('/admin/products')}>
               상품 목록으로 돌아가기
             </Button>
@@ -521,7 +521,7 @@ export default function EditProductPage() {
             </Button>
             <div>
               <h1 className="text-2xl font-bold">상품 수정</h1>
-              <p className="text-gray-600">{product?.name || '상품 정보 로딩 중...'}</p>
+              <p className="text-obsidian">{product?.name || '상품 정보 로딩 중...'}</p>
             </div>
           </div>
           <Button onClick={handleSave} disabled={saving || !product}>

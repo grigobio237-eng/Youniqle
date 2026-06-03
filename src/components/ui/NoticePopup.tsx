@@ -226,7 +226,7 @@ export default function NoticePopup() {
 
             <div className="flex gap-2">
               {popupNotices.length > 1 && (
-                <span className="text-sm text-gray-500 py-2">
+                <span className="text-sm text-foreground/70 py-2">
                   {currentIndex + 1} / {popupNotices.length}
                 </span>
               )}

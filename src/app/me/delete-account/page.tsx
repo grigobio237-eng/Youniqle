@@ -100,7 +100,7 @@ export default function DeleteAccountPage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               회원 탈퇴를 하려면 로그인해주세요.
             </p>
             <Button asChild>
@@ -113,7 +113,7 @@ export default function DeleteAccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="mb-8">
           <Button variant="ghost" asChild className="mb-4">
@@ -123,7 +123,7 @@ export default function DeleteAccountPage() {
             </Link>
           </Button>
           <h1 className="text-3xl font-bold mb-2">회원 탈퇴</h1>
-          <p className="text-gray-600">
+          <p className="text-obsidian">
             회원 탈퇴 전에 안내사항을 확인해주세요
           </p>
         </div>
@@ -233,13 +233,13 @@ export default function DeleteAccountPage() {
                 />
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-sm text-gray-700 mb-2 font-semibold">선택한 탈퇴 사유:</p>
-                <p className="text-sm text-gray-600">
+              <div className="bg-surface rounded-lg p-4">
+                <p className="text-sm text-obsidian mb-2 font-semibold">선택한 탈퇴 사유:</p>
+                <p className="text-sm text-obsidian">
                   {deleteReasons.find(r => r.value === reason)?.label}
                 </p>
                 {reason === 'other' && reasonDetail && (
-                  <p className="text-sm text-gray-600 mt-2">{reasonDetail}</p>
+                  <p className="text-sm text-obsidian mt-2">{reasonDetail}</p>
                 )}
               </div>
 

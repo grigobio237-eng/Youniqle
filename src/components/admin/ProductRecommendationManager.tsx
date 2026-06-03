@@ -193,7 +193,7 @@ export default function ProductRecommendationManager({
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                            <div className="w-full h-full flex items-center justify-center text-foreground/70 text-xs">
                               이미지
                             </div>
                           )}
@@ -201,14 +201,14 @@ export default function ProductRecommendationManager({
 
                         {/* 상품 정보 */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-900 truncate">
+                          <h3 className="font-medium text-obsidian truncate">
                             {product.name}
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-foreground/70">
                             {product.category} • {product.price.toLocaleString()}원
                           </p>
                           {product.featuredByAdmin && product.adminRecommendationReason && (
-                            <p className="text-sm text-blue-600 mt-1">
+                            <p className="text-sm text-primary mt-1">
                               추천 이유: {product.adminRecommendationReason}
                             </p>
                           )}
@@ -286,7 +286,7 @@ export default function ProductRecommendationManager({
 
               {products.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">상품이 없습니다.</p>
+                  <p className="text-foreground/70">상품이 없습니다.</p>
                 </div>
               )}
             </div>
@@ -307,7 +307,7 @@ export default function ProductRecommendationManager({
               >
                 이전
               </Button>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-foreground/70">
                 {page} / {totalPages}
               </span>
               <Button

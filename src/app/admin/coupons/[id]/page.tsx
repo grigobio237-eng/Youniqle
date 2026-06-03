@@ -154,8 +154,8 @@ export default function EditCouponPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">쿠폰 수정</h1>
-            <p className="text-gray-600 mt-1">쿠폰 정보를 수정합니다</p>
+            <h1 className="text-3xl font-bold text-obsidian">쿠폰 수정</h1>
+            <p className="text-obsidian mt-1">쿠폰 정보를 수정합니다</p>
           </div>
         </div>
         <Button onClick={handleSave} disabled={saving}>

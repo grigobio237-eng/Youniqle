@@ -655,7 +655,7 @@ export default function MyPage() {
           <DynamicHero userName={session.user?.name || '유저'} />
 
           {/* Glassmorphic Tab Selector */}
-          <div className="flex bg-white/80 backdrop-blur-md p-1.5 rounded-[24px] border border-slate-200/50 shadow-sm mb-8 z-30 overflow-x-auto scrollbar-none w-full gap-1">
+          <div className="flex bg-white/80 backdrop-blur-md p-1.5 rounded-[24px] border border-line/50 shadow-sm mb-8 z-30 overflow-x-auto scrollbar-none w-full gap-1">
             {[
               { id: 'recovery', label: '나의 회복 🌟', icon: Activity },
               { id: 'pass', label: '디지털 패스 🎟️', icon: Ticket },
@@ -671,10 +671,10 @@ export default function MyPage() {
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-2 rounded-2xl text-[11px] sm:text-xs font-black transition-all shrink-0 ${
                     isActive 
                       ? 'bg-[#0E3A3A] text-white shadow-md shadow-[#0E3A3A]/15 scale-[1.01]' 
-                      : 'text-slate-400 hover:text-obsidian hover:bg-slate-100/50'
+                      : 'text-foreground/70 hover:text-obsidian hover:bg-slate-100/50'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-foreground/70'}`} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -695,11 +695,11 @@ export default function MyPage() {
                 {/* Badge Collection Section */}
                 {userBadges.length > 0 && (
                   <div className="mb-8">
-                    <Card className="border-none shadow-sm rounded-[32px] bg-white border border-slate-100">
+                    <Card className="border-none shadow-sm rounded-[32px] bg-white border border-line">
                       <div className="p-6 md:p-8">
                         <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
+                            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-primary">
                               <Sparkles className="w-5 h-5" />
                             </div>
                             <div>
@@ -707,7 +707,7 @@ export default function MyPage() {
                               <p className="text-[11px] md:text-sm font-bold text-slate">당신의 성취가 유니클의 리듬을 만듭니다</p>
                             </div>
                           </div>
-                          <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">
+                          <div className="bg-primary-container/50 text-primary px-3 py-1 rounded-full text-[10px] font-black">
                             {userBadges.length}개 획득
                           </div>
                         </div>
@@ -721,9 +721,9 @@ export default function MyPage() {
                             >
                               <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border-2 transition-all ${
                                 badge.rarity === 'legendary' ? 'bg-purple-50 border-purple-200 shadow-purple-100' :
-                                badge.rarity === 'epic' ? 'bg-indigo-50 border-indigo-200 shadow-indigo-100' :
-                                badge.rarity === 'rare' ? 'bg-amber-50 border-amber-200 shadow-amber-100' :
-                                'bg-slate-50 border-slate-100'
+                                badge.rarity === 'epic' ? 'bg-indigo-50 border-secondary/30 shadow-indigo-100' :
+                                badge.rarity === 'rare' ? 'bg-amber-50 border-primary/30 shadow-primary/20' :
+                                'bg-surface border-line'
                               }`}>
                                 {badge.icon}
                               </div>
@@ -765,39 +765,39 @@ export default function MyPage() {
 
                   {/* Quick Stats (Right) */}
                   <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                      <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-line flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
                         <ShoppingBag className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
+                        <p className="text-[9px] font-black text-foreground/70 uppercase tracking-widest mb-1">Orders</p>
                         <p className="font-black text-obsidian tracking-tighter text-xl">0</p>
                       </div>
                     </div>
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-line flex flex-col justify-between hover:shadow-md transition-shadow">
                       <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
                         <Ticket className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Coupons</p>
+                        <p className="text-[9px] font-black text-foreground/70 uppercase tracking-widest mb-1">Coupons</p>
                         <p className="font-black text-obsidian tracking-tighter text-xl">2</p>
                       </div>
                     </div>
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                      <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-line flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 text-primary flex items-center justify-center">
                         <Activity className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions</p>
+                        <p className="text-[9px] font-black text-foreground/70 uppercase tracking-widest mb-1">Sessions</p>
                         <p className="font-black text-obsidian tracking-tighter text-xl">{history.length}</p>
                       </div>
                     </div>
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-line flex flex-col justify-between hover:shadow-md transition-shadow">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 text-secondary flex items-center justify-center">
                         <Zap className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Points</p>
+                        <p className="text-[9px] font-black text-foreground/70 uppercase tracking-widest mb-1">Points</p>
                         <p className="font-black text-obsidian tracking-tighter text-xl">{userData?.points?.toLocaleString() || 0}</p>
                       </div>
                     </div>
@@ -892,7 +892,7 @@ export default function MyPage() {
                           <div className="flex items-center justify-between text-center border-t border-line/10 pt-4 px-2">
                             <div>
                               <p className="text-[9px] font-black text-slate uppercase opacity-40">최근 점수</p>
-                              <p className="font-black text-emerald-500">{history[0]?.totalScore || 0}점</p>
+                              <p className="font-black text-secondary">{history[0]?.totalScore || 0}점</p>
                             </div>
                             <div className="w-px h-6 bg-line/20" />
                             <div>
@@ -931,16 +931,16 @@ export default function MyPage() {
                 className="space-y-6 md:space-y-8 animate-in fade-in"
               >
                 {/* 디지털 허브 */}
-                <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-slate-100 transition-all hover:shadow-3xl">
+                <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden border border-line transition-all hover:shadow-3xl">
                   <CardHeader className="p-8 md:p-10 pb-0 border-none">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
+                        <div className="p-4 bg-emerald-50 rounded-2xl text-secondary shadow-inner">
                           <Sparkles className="h-7 w-7" />
                         </div>
                         <div>
                           <h3 className="text-2xl font-black text-obsidian tracking-tighter">디지털 허브</h3>
-                          <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Referral & medical pass</p>
+                          <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Referral & medical pass</p>
                         </div>
                       </div>
                     </div>
@@ -949,7 +949,7 @@ export default function MyPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                       <div className="space-y-6">
                         <div className="flex items-center gap-2">
-                           <Badge className="bg-emerald-100 text-emerald-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Invitation</Badge>
+                           <Badge className="bg-secondary-container text-secondary border-none px-3 font-black text-[9px] uppercase tracking-widest">Invitation</Badge>
                         </div>
                         <QRReferralCard 
                           userName={session.user?.name || ''} 
@@ -958,7 +958,7 @@ export default function MyPage() {
                       </div>
                       <div className="space-y-6">
                         <div className="flex items-center gap-2">
-                           <Badge className="bg-indigo-100 text-indigo-600 border-none px-3 font-black text-[9px] uppercase tracking-widest">Medical Pass</Badge>
+                           <Badge className="bg-secondary-container text-secondary border-none px-3 font-black text-[9px] uppercase tracking-widest">Medical Pass</Badge>
                         </div>
                         <MedicalPassCard 
                           userName={session.user?.name || ''} 
@@ -973,10 +973,10 @@ export default function MyPage() {
                 <Card className="border-none shadow-xl rounded-[40px] bg-white overflow-hidden group">
                   <CardHeader className="p-8 md:p-10 pb-4">
                     <div>
-                      <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">My Recovery Network</p>
+                      <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">My Recovery Network</p>
                       <CardTitle className="text-2xl font-black text-obsidian tracking-tighter flex items-center gap-3">
                         나의 회복 조직도
-                        <Badge className="bg-indigo-50 text-indigo-600 border-none text-[10px] font-black uppercase">Level 2</Badge>
+                        <Badge className="bg-indigo-50 text-secondary border-none text-[10px] font-black uppercase">Level 2</Badge>
                       </CardTitle>
                       <p className="text-sm font-medium text-slate mt-1">내가 소개한 친구와 친구가 소개한 사람들의 활동 현황입니다.</p>
                     </div>
@@ -1002,19 +1002,19 @@ export default function MyPage() {
                   <div className="flex flex-col gap-4">
                     {/* Concierge Status */}
                     {userStatus?.concierge && (
-                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-line">
                         <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                           <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-secondary">
                               <Clock className={`w-7 h-7 ${userStatus.concierge.status === 'pending' ? 'animate-pulse' : ''}`} />
                             </div>
                             <div>
-                              <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Service Status Protocol</p>
+                              <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">Service Status Protocol</p>
                               <h3 className="font-black text-obsidian tracking-tighter flex items-center gap-3 text-xl">
                                 {userStatus.concierge.painPoint} 회복 컨시어지
-                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                                  userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                    'bg-slate-50 text-slate-500 border-slate-200'
+                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.concierge.status === 'pending' ? 'bg-amber-50 text-primary border-primary/30' :
+                                  userStatus.concierge.status === 'approved' ? 'bg-emerald-50 text-secondary border-emerald-200' :
+                                    'bg-surface text-foreground/70 border-line'
                                   }`}>
                                   {userStatus.concierge.status === 'pending' ? '검토 중' :
                                     userStatus.concierge.status === 'approved' ? '승인 완료' : '진행 중'}
@@ -1028,19 +1028,19 @@ export default function MyPage() {
                             </div>
                           </div>
                           <div className="w-full md:w-auto">
-                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-line font-black text-xs px-8 hover:bg-surface">
                               <Link href="/me/history">진행 내역 보기</Link>
                             </Button>
                           </div>
                         </div>
 
                         {/* Progress Bar */}
-                        <div className="h-1.5 w-full bg-slate-50 px-8 pb-8">
+                        <div className="h-1.5 w-full bg-surface px-8 pb-8">
                           <div className="h-full bg-slate-200 rounded-full relative">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: userStatus.concierge.status === 'approved' ? '100%' : '50%' }}
-                              className={`absolute left-0 top-0 h-full rounded-full ${userStatus.concierge.status === 'approved' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_10px_rgba(79,70,229,0.5)]'
+                              className={`absolute left-0 top-0 h-full rounded-full ${userStatus.concierge.status === 'approved' ? 'bg-secondary shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-secondary shadow-[0_0_10px_rgba(79,70,229,0.5)]'
                                 }`}
                             />
                           </div>
@@ -1050,7 +1050,7 @@ export default function MyPage() {
 
                     {/* Inquiry Status */}
                     {userStatus?.inquiry && (
-                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-slate-100">
+                      <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden border border-line">
                         <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                           <div className="flex items-center gap-5">
                             <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600">
@@ -1060,9 +1060,9 @@ export default function MyPage() {
                               <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Support Status Protocol</p>
                               <h3 className="font-black text-obsidian tracking-tighter flex items-center gap-3 text-xl">
                                 [{userStatus.inquiry.type === 'product' ? '상품' : '일반'}] {userStatus.inquiry.subject}
-                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                                  userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                    'bg-slate-50 text-slate-500 border-slate-200'
+                                <Badge variant="outline" className={`ml-2 px-3 py-0.5 rounded-full text-[10px] font-bold ${userStatus.inquiry.status === 'pending' ? 'bg-amber-50 text-primary border-primary/30' :
+                                  userStatus.inquiry.status === 'resolved' ? 'bg-emerald-50 text-secondary border-emerald-200' :
+                                    'bg-surface text-foreground/70 border-line'
                                   }`}>
                                   {userStatus.inquiry.status === 'pending' ? '답변 대기' :
                                     userStatus.inquiry.status === 'resolved' ? '해결 완료' :
@@ -1077,7 +1077,7 @@ export default function MyPage() {
                             </div>
                           </div>
                           <div className="w-full md:w-auto">
-                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-slate-200 font-black text-xs px-8 hover:bg-slate-50">
+                            <Button variant="outline" asChild className="w-full md:w-auto h-12 rounded-xl border-line font-black text-xs px-8 hover:bg-surface">
                               <Link href="/me/inquiries">문의 내역 보기</Link>
                             </Button>
                           </div>
@@ -1092,14 +1092,14 @@ export default function MyPage() {
                   <CardHeader className="p-8 md:p-10 pb-0 border-none">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
+                        <div className="p-4 bg-indigo-50 rounded-2xl text-secondary shadow-inner">
                           <MessageCircle className="h-7 w-7" />
                         </div>
                         <div>
                           <h3 className="font-black text-obsidian tracking-tighter text-xl">
                             {(session.user as any)?.isNavigator ? '담당 회원 상담 관리' : '전담 네비게이터 상담'}
                           </h3>
-                          <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Navigator Consultation Center</p>
+                          <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Navigator Consultation Center</p>
                         </div>
                       </div>
                     </div>
@@ -1161,7 +1161,7 @@ export default function MyPage() {
                                 {(session.user as any)?.provider || 'Email'}
                               </Badge>
                               {['essence', 'balance', 'miracle'].includes(userData?.grade?.toLowerCase()) && (
-                                <Badge className="bg-amber-100 text-amber-600 border-none font-black text-[8px] uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
+                                <Badge className="bg-primary-container/50 text-primary border-none font-black text-[8px] uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
                                   <Zap className="w-2.5 h-2.5" /> FOUNDER
                                 </Badge>
                               )}
@@ -1243,7 +1243,7 @@ export default function MyPage() {
                     <Card className="border-none shadow-sm rounded-[32px] md:rounded-[40px] bg-white overflow-hidden border border-emerald-100/30">
                       <CardHeader className="p-6 md:p-8 pb-4 flex flex-row items-center justify-between border-b border-mist">
                         <div className="flex items-center gap-3">
-                          <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                          <div className="p-3 bg-emerald-50 rounded-2xl text-secondary">
                             <Trophy className="h-6 w-6" />
                           </div>
                           <div>
@@ -1260,20 +1260,20 @@ export default function MyPage() {
                           <div className="space-y-6">
                             <div className="bg-emerald-50/40 p-4 rounded-[20px] border border-emerald-100 flex flex-col gap-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-black text-base shrink-0">
+                                <div className="w-10 h-10 bg-secondary-container rounded-xl flex items-center justify-center text-secondary font-black text-base shrink-0">
                                   ⚽
                                 </div>
                                 <div className="min-w-0">
                                   <h4 className="text-base font-black text-obsidian tracking-tight truncate flex items-center gap-1.5">
                                     {footballTeamInfo.teamName}
                                   </h4>
-                                  <Badge className="bg-emerald-500 text-white font-black text-[8px] px-1.5 py-0.5 rounded mt-0.5">
+                                  <Badge className="bg-secondary text-white font-black text-[8px] px-1.5 py-0.5 rounded mt-0.5">
                                     {session.user?.footballRole === 'coach' ? '감독/코치' : 
                                      session.user?.footballRole === 'player' ? '선수' : '보호자'}
                                   </Badge>
                                 </div>
                               </div>
-                              <Button asChild size="sm" className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 shadow-sm">
+                              <Button asChild size="sm" className="w-full h-11 rounded-xl bg-secondary hover:bg-secondary text-white font-black px-4 shadow-sm">
                                 <Link href="/football/mypage" className="flex items-center justify-center gap-1.5">
                                   클럽하우스 입장 <ChevronRight className="h-3.5 w-3.5" />
                                 </Link>
@@ -1281,14 +1281,14 @@ export default function MyPage() {
                             </div>
 
                             {session.user?.footballRole === 'coach' && (
-                              <div className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-3 text-[11px]">
+                              <div className="p-4 rounded-[20px] bg-surface border border-line space-y-3 text-[11px]">
                                 <h5 className="font-black text-obsidian tracking-tight flex items-center gap-1">
                                   <span>📢</span> 스쿼드 초대 코드
                                 </h5>
                                 <p className="text-slate font-bold leading-relaxed">선수 및 학부모 가입 코드를 배포해 주세요.</p>
                                 
                                 <div className="space-y-2">
-                                  <div className="p-3 bg-white rounded-lg border border-slate-200 flex items-center justify-between gap-1">
+                                  <div className="p-3 bg-white rounded-lg border border-line flex items-center justify-between gap-1">
                                     <span className="font-black text-obsidian uppercase tracking-wider truncate">
                                       {footballTeamInfo.teamCode || footballTeamInfo.team?.teamCode || 'ST-CODE'}
                                     </span>
@@ -1302,7 +1302,7 @@ export default function MyPage() {
                                           alert(`팀 초대 코드 (${code.toUpperCase()})가 복사되었습니다!`);
                                         }
                                       }}
-                                      className="h-7 px-2 text-[10px] font-black shrink-0 hover:bg-slate-50 border border-slate-200"
+                                      className="h-7 px-2 text-[10px] font-black shrink-0 hover:bg-surface border border-line"
                                     >
                                       복사
                                     </Button>
@@ -1314,40 +1314,40 @@ export default function MyPage() {
                         ) : footballPendingTeam ? (
                           <div className="bg-amber-50/40 p-4 rounded-[20px] border border-amber-100 space-y-2 text-xs">
                             <h4 className="font-black text-obsidian tracking-tight flex items-center gap-1.5">
-                              <Clock className="w-4 h-4 text-amber-500 animate-pulse" />
+                              <Clock className="w-4 h-4 text-primary animate-pulse" />
                               {footballPendingTeam.teamName} (심사 중)
                             </h4>
-                            <p className="font-medium text-slate-500 leading-normal">보안 승인 심사가 진행 중입니다. 1~2영업일이 소요됩니다.</p>
+                            <p className="font-medium text-foreground/70 leading-normal">보안 승인 심사가 진행 중입니다. 1~2영업일이 소요됩니다.</p>
                           </div>
                         ) : (
                           <div className="space-y-4 text-xs font-bold text-slate">
                             <p className="leading-relaxed">팀 코드로 합류하거나 감독 권한으로 신규 팀 개설 신청을 진행할 수 있습니다.</p>
-                            <div className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-3">
+                            <div className="p-4 rounded-[20px] bg-surface border border-line space-y-3">
                               <p className="font-black text-obsidian">초대 코드로 팀 합류</p>
                               <div className="flex gap-1.5">
                                 <Input
                                   value={footballInviteCode}
                                   onChange={(e) => setFootballInviteCode(e.target.value)}
                                   placeholder="코드 입력"
-                                  className="h-10 text-xs rounded-xl bg-white border-slate-200"
+                                  className="h-10 text-xs rounded-xl bg-white border-line"
                                 />
                                 <Button onClick={handleFootballJoin} disabled={footballJoining} size="sm" className="h-10 rounded-xl bg-obsidian text-white font-black px-4">
                                   {footballJoining ? '...' : '합류'}
                                 </Button>
                               </div>
                             </div>
-                            <Button onClick={() => setFootballCreationMode(!footballCreationMode)} className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs">
+                            <Button onClick={() => setFootballCreationMode(!footballCreationMode)} className="w-full h-11 rounded-xl bg-secondary hover:bg-secondary text-white font-black text-xs">
                               {footballCreationMode ? '신청 양식 닫기' : '신규 축구팀 창단 신청'}
                             </Button>
 
                             {footballCreationMode && (
-                              <div className="bg-slate-50/50 p-4 rounded-[20px] border border-slate-200 space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                              <div className="bg-surface/50 p-4 rounded-[20px] border border-line space-y-3 animate-in fade-in slide-in-from-bottom-2">
                                 <div className="space-y-2 text-[11px]">
-                                  <Label className="font-black text-slate-500">팀 이름</Label>
+                                  <Label className="font-black text-foreground/70">팀 이름</Label>
                                   <Input value={footballNewTeamName} onChange={(e) => setFootballNewTeamName(e.target.value)} placeholder="예: 유니클 FC" className="h-9 rounded-lg bg-white" />
                                 </div>
                                 <div className="space-y-2 text-[11px]">
-                                  <Label className="font-black text-slate-500">카테고리</Label>
+                                  <Label className="font-black text-foreground/70">카테고리</Label>
                                   <select value={footballNewCategory} onChange={(e) => setFootballNewCategory(e.target.value)} className="w-full h-9 px-2 rounded-lg border bg-white text-[11px] font-bold">
                                     <option value="youth">유소년 클럽</option>
                                     <option value="amateur">성인 조기 축구 / 동호회</option>
@@ -1356,11 +1356,11 @@ export default function MyPage() {
                                   </select>
                                 </div>
                                 <div className="space-y-2 text-[11px]">
-                                  <Label className="font-black text-slate-500">활동 지역</Label>
+                                  <Label className="font-black text-foreground/70">활동 지역</Label>
                                   <Input value={footballNewRegion} onChange={(e) => setFootballNewRegion(e.target.value)} placeholder="예: 서울 송파구" className="h-9 rounded-lg bg-white" />
                                 </div>
                                 {footballError && <p className="text-[10px] text-rose-500">⚠ {footballError}</p>}
-                                <Button onClick={handleFootballCreate} disabled={footballCreationLoading} className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl">
+                                <Button onClick={handleFootballCreate} disabled={footballCreationLoading} className="w-full h-10 bg-secondary hover:bg-secondary text-white font-black rounded-xl">
                                   {footballCreationLoading ? '제출 중...' : '신청서 제출'}
                                 </Button>
                               </div>

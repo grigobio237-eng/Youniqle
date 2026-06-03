@@ -198,7 +198,7 @@ export default function CreateAutomationRule() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold">자동화 규칙 생성</h1>
-          <p className="text-gray-600">새로운 마케팅 자동화 규칙을 생성합니다</p>
+          <p className="text-obsidian">새로운 마케팅 자동화 규칙을 생성합니다</p>
         </div>
       </div>
 

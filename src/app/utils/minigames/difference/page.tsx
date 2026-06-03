@@ -128,26 +128,26 @@ export default function SpotTheDifferencePage() {
                 <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <Link href="/utils/minigames">
-                            <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2 mb-2">
+                            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2 mb-2">
                                 <ArrowLeft className="h-4 w-4 mr-1" />
                                 미니게임 돌아가기
                             </Button>
                         </Link>
-                        <h1 className="font-black text-slate-900 tracking-tighter text-4xl">틀린그림 찾기</h1>
-                        <p className="text-slate-500 font-medium">두 사무실 사이의 미묘한 차이를 발견하고 집중력을 높이세요!</p>
+                        <h1 className="font-black text-obsidian tracking-tighter text-4xl">틀린그림 찾기</h1>
+                        <p className="text-foreground/70 font-medium">두 사무실 사이의 미묘한 차이를 발견하고 집중력을 높이세요!</p>
                     </div>
 
                     <div className="flex gap-4">
                         <Card className="px-6 py-3 bg-white border-none shadow-lg rounded-2xl flex items-center gap-4">
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time Left</span>
-                                <div className={`text-2xl font-black tabular-nums transition-colors ${timeLeft < 10 ? 'text-rose-500 animate-pulse' : 'text-slate-900'}`}>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">Time Left</span>
+                                <div className={`text-2xl font-black tabular-nums transition-colors ${timeLeft < 10 ? 'text-rose-500 animate-pulse' : 'text-obsidian'}`}>
                                     {timeLeft}s
                                 </div>
                             </div>
                             <div className="w-px h-8 bg-slate-100" />
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Found</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">Found</span>
                                 <div className="text-2xl font-black text-rose-500">
                                     {foundCount} <span className="text-sm text-slate-300">/ {TOTAL_DIFFERENCES}</span>
                                 </div>
@@ -156,7 +156,7 @@ export default function SpotTheDifferencePage() {
                         <Button
                             onClick={useHint}
                             disabled={!isActive || hint !== null}
-                            className="h-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-lg shadow-indigo-100 transition-all flex flex-col gap-0.5"
+                            className="h-auto px-6 py-3 bg-secondary hover:bg-secondary text-white rounded-2xl shadow-lg shadow-indigo-100 transition-all flex flex-col gap-0.5"
                         >
                             <Lightbulb className="w-4 h-4" />
                             <span className="text-[10px] font-black uppercase">Hint</span>
@@ -170,8 +170,8 @@ export default function SpotTheDifferencePage() {
                         <div className="w-24 h-24 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center mb-6">
                             <MousePointer2 className="w-12 h-12" />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">집중력을 발휘할 준비가 되셨나요?</h2>
-                        <ul className="text-slate-500 mb-8 space-y-2 font-medium">
+                        <h2 className="text-3xl font-black text-obsidian mb-4 tracking-tight">집중력을 발휘할 준비가 되셨나요?</h2>
+                        <ul className="text-foreground/70 mb-8 space-y-2 font-medium">
                             <li>• 60초 안에 5군데의 다른 점을 찾으세요.</li>
                             <li>• 힌트를 사용하면 점수가 차감됩니다.</li>
                             <li>• 오답 클릭 시 시간이 5초 단축되니 주의하세요!</li>
@@ -187,7 +187,7 @@ export default function SpotTheDifferencePage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Original Image */}
                         <div className="space-y-2">
-                            <Badge variant="secondary" className="bg-slate-100 text-slate-500 uppercase font-black tracking-widest">Original Reference</Badge>
+                            <Badge variant="secondary" className="bg-slate-100 text-foreground/70 uppercase font-black tracking-widest">Original Reference</Badge>
                             <Card className="overflow-hidden border-none shadow-xl rounded-[32px] relative group">
                                 <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                     src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
@@ -279,30 +279,30 @@ export default function SpotTheDifferencePage() {
                             >
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-rose-100/50 blur-[80px] -z-10"></div>
 
-                                <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center text-xl mb-2 ${isWinner ? 'bg-amber-100 text-amber-500' : 'bg-slate-100 text-slate-400'}`}>
+                                <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center text-xl mb-2 ${isWinner ? 'bg-primary-container/50 text-primary' : 'bg-slate-100 text-foreground/70'}`}>
                                     {isWinner ? '🏆' : '⏰'}
                                 </div>
 
                                 <div>
-                                    <h2 className="font-black text-slate-900 mb-2 tracking-tighter text-4xl">
+                                    <h2 className="font-black text-obsidian mb-2 tracking-tighter text-4xl">
                                         {isWinner ? '완벽한 관찰력입니다!' : '시간이 부족했어요...'}
                                     </h2>
-                                    <p className="text-slate-500 font-medium">
+                                    <p className="text-foreground/70 font-medium">
                                         {isWinner
                                             ? `${timeLeft}초를 남기고 모든 차이점을 찾아냈습니다. 당신의 눈은 고성능 센서급이군요!`
                                             : `마지막 한 끗 차이가 아쉬웠네요. 다시 한번 도전해서 집중력을 증명해 보세요.`}
                                     </p>
                                 </div>
 
-                                <div className="bg-slate-50 p-6 rounded-3xl space-y-2">
-                                    <div className="flex justify-between text-sm font-bold text-slate-400 uppercase tracking-widest">
+                                <div className="bg-surface p-6 rounded-3xl space-y-2">
+                                    <div className="flex justify-between text-sm font-bold text-foreground/70 uppercase tracking-widest">
                                         <span>Final Score</span>
-                                        <span className="text-slate-900">{score} pts</span>
+                                        <span className="text-obsidian">{score} pts</span>
                                     </div>
                                     <div className="h-1 w-full bg-slate-200 rounded-full" />
-                                    <div className="flex justify-between text-sm font-bold text-slate-400 uppercase tracking-widest">
+                                    <div className="flex justify-between text-sm font-bold text-foreground/70 uppercase tracking-widest">
                                         <span>Observation Grade</span>
-                                        <span className={`text-xl font-black ${isWinner ? 'text-amber-500' : 'text-slate-500'}`}>
+                                        <span className={`text-xl font-black ${isWinner ? 'text-primary' : 'text-foreground/70'}`}>
                                             {isWinner ? (timeLeft > 30 ? 'SSS' : 'A') : 'F'}
                                         </span>
                                     </div>
@@ -318,7 +318,7 @@ export default function SpotTheDifferencePage() {
                                     <Link href="/utils/minigames" className="flex-1">
                                         <Button
                                             variant="outline"
-                                            className="w-full h-16 rounded-2xl border-slate-200 text-slate-900 font-bold hover:bg-slate-50"
+                                            className="w-full h-16 rounded-2xl border-line text-obsidian font-bold hover:bg-surface"
                                         >
                                             그만하기
                                         </Button>
@@ -335,7 +335,7 @@ export default function SpotTheDifferencePage() {
                         {differences.map(d => (
                             <Badge
                                 key={d.id}
-                                className={`px-4 py-2 rounded-full border-none transition-all duration-500 ${d.found ? 'bg-rose-500 text-white opacity-100' : 'bg-slate-200 text-slate-400 opacity-40'}`}
+                                className={`px-4 py-2 rounded-full border-none transition-all duration-500 ${d.found ? 'bg-rose-500 text-white opacity-100' : 'bg-slate-200 text-foreground/70 opacity-40'}`}
                             >
                                 {d.found ? <CheckCircle2 className="w-3 h-3 mr-2" /> : <div className="w-3 h-3 rounded-full bg-slate-400 mr-2" />}
                                 <span className="text-xs font-bold uppercase tracking-tight">{d.label}</span>

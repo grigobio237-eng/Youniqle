@@ -148,7 +148,7 @@ export default function SecurityDashboard() {
       case 'critical':
         return <XCircle className="h-5 w-5 text-red-500" />;
       default:
-        return <Activity className="h-5 w-5 text-gray-500" />;
+        return <Activity className="h-5 w-5 text-foreground/70" />;
     }
   };
 
@@ -161,7 +161,7 @@ export default function SecurityDashboard() {
       case 'critical':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -217,7 +217,7 @@ export default function SecurityDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Security & Performance Dashboard</h1>
-          <p className="text-gray-600">
+          <p className="text-obsidian">
             Real-time monitoring of system security and performance
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function SecurityDashboard() {
             <span className="ml-1 capitalize">{systemHealth.status}</span>
           </Badge>
           {lastUpdated && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-foreground/70">
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
           )}
@@ -246,7 +246,7 @@ export default function SecurityDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">{systemHealth.status}</div>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-obsidian">
               {systemHealth.issues.length} issues detected
             </p>
           </CardContent>
@@ -255,13 +255,13 @@ export default function SecurityDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Memory Usage</CardTitle>
-            <MemoryStick className="h-4 w-4 text-gray-600" />
+            <MemoryStick className="h-4 w-4 text-obsidian" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {systemHealth.memory.percentage.toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-obsidian">
               {formatBytes(systemHealth.memory.used)} / {formatBytes(systemHealth.memory.total)}
             </p>
           </CardContent>
@@ -270,13 +270,13 @@ export default function SecurityDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Uptime</CardTitle>
-            <Clock className="h-4 w-4 text-gray-600" />
+            <Clock className="h-4 w-4 text-obsidian" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatUptime(systemHealth.uptime)}
             </div>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-obsidian">
               System uptime
             </p>
           </CardContent>
@@ -285,13 +285,13 @@ export default function SecurityDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Cache Status</CardTitle>
-            <HardDrive className="h-4 w-4 text-gray-600" />
+            <HardDrive className="h-4 w-4 text-obsidian" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {cache.connected ? 'Connected' : 'Disconnected'}
             </div>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-obsidian">
               {cache.keys} keys, {cache.memory}
             </p>
           </CardContent>
@@ -314,7 +314,7 @@ export default function SecurityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{security.stats.violations}</div>
-                <p className="text-xs text-gray-600">Last 24 hours</p>
+                <p className="text-xs text-obsidian">Last 24 hours</p>
               </CardContent>
             </Card>
 
@@ -325,7 +325,7 @@ export default function SecurityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{security.stats.rateLimits}</div>
-                <p className="text-xs text-gray-600">Rate limit hits</p>
+                <p className="text-xs text-obsidian">Rate limit hits</p>
               </CardContent>
             </Card>
 
@@ -336,18 +336,18 @@ export default function SecurityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{security.stats.invalidAuth}</div>
-                <p className="text-xs text-gray-600">Failed attempts</p>
+                <p className="text-xs text-obsidian">Failed attempts</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Suspicious Activity</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-purple-600" />
+                <AlertTriangle className="h-4 w-4 text-secondary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{security.stats.suspiciousActivity}</div>
-                <p className="text-xs text-gray-600">Suspicious events</p>
+                <p className="text-xs text-obsidian">Suspicious events</p>
               </CardContent>
             </Card>
           </div>
@@ -364,7 +364,7 @@ export default function SecurityDashboard() {
                     <div key={index} className="flex items-center justify-between p-2 border rounded">
                       <div>
                         <p className="font-medium">{event.type}</p>
-                        <p className="text-sm text-gray-600">{event.ip}</p>
+                        <p className="text-sm text-obsidian">{event.ip}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm">{new Date(event.timestamp).toLocaleTimeString()}</p>
@@ -387,7 +387,7 @@ export default function SecurityDashboard() {
                     <div key={index} className="flex items-center justify-between p-2 border rounded">
                       <div>
                         <p className="font-medium">{ip.ip}</p>
-                        <p className="text-sm text-gray-600">{ip.types.join(', ')}</p>
+                        <p className="text-sm text-obsidian">{ip.types.join(', ')}</p>
                       </div>
                       <Badge variant="destructive">{ip.count}</Badge>
                     </div>
@@ -403,11 +403,11 @@ export default function SecurityDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-                <Activity className="h-4 w-4 text-blue-600" />
+                <Activity className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{performance.metrics.totalRequests.toLocaleString()}</div>
-                <p className="text-xs text-gray-600">Last hour</p>
+                <p className="text-xs text-obsidian">Last hour</p>
               </CardContent>
             </Card>
 
@@ -418,7 +418,7 @@ export default function SecurityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{performance.metrics.averageResponseTime.toFixed(0)}ms</div>
-                <p className="text-xs text-gray-600">Average response time</p>
+                <p className="text-xs text-obsidian">Average response time</p>
               </CardContent>
             </Card>
 
@@ -429,18 +429,18 @@ export default function SecurityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{(performance.metrics.errorRate * 100).toFixed(1)}%</div>
-                <p className="text-xs text-gray-600">Error percentage</p>
+                <p className="text-xs text-obsidian">Error percentage</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Cache Hit Rate</CardTitle>
-                <HardDrive className="h-4 w-4 text-purple-600" />
+                <HardDrive className="h-4 w-4 text-secondary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{(performance.metrics.cacheHitRate * 100).toFixed(1)}%</div>
-                <p className="text-xs text-gray-600">Cache efficiency</p>
+                <p className="text-xs text-obsidian">Cache efficiency</p>
               </CardContent>
             </Card>
           </div>
@@ -457,7 +457,7 @@ export default function SecurityDashboard() {
                     <div key={index} className="flex items-center justify-between p-2 border rounded">
                       <div className="flex-1">
                         <p className="font-medium text-sm truncate">{query.name}</p>
-                        <p className="text-xs text-gray-600">{query.count} executions</p>
+                        <p className="text-xs text-obsidian">{query.count} executions</p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold">{query.avgDuration.toFixed(0)}ms</p>
@@ -479,7 +479,7 @@ export default function SecurityDashboard() {
                     <div key={index} className="flex items-center justify-between p-2 border rounded">
                       <div>
                         <p className="font-medium text-sm">{alert.message}</p>
-                        <p className="text-xs text-gray-600">{alert.type}</p>
+                        <p className="text-xs text-obsidian">{alert.type}</p>
                       </div>
                       <Badge 
                         variant={alert.severity === 'critical' ? 'destructive' : 'secondary'}

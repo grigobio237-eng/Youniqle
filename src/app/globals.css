@@ -6,42 +6,42 @@
 
 @layer base {
   :root {
-    /* Luminous Serenity Palette - Empathy & Comfort */
-    --background: #F7FAF5; /* Ethereal Sage Background */
-    --background-rgb: 247 250 245;
-    --foreground: #181D1A; /* Moss Grey - Soft Text */
-    --foreground-rgb: 24 29 26;
+    /* LUMI Palette - Champagne Gold & Cream */
+    --background: #F9F7F2; /* Cream Background */
+    --background-rgb: 249 247 242;
+    --foreground: #1A1C18; /* Obsidian - Soft Text */
+    --foreground-rgb: 26 28 24;
     
     --surface: #FFFFFF;
-    --surface-dim: #D8DBD6;
-    --surface-bright: #F7FAF5;
+    --surface-dim: #EFECE3;
+    --surface-bright: #FDFBF7;
     --surface-container-lowest: #FFFFFF;
-    --surface-container-low: #F1F4EF;
-    --surface-container: #ECEFE9;
-    --surface-container-high: #E6E9E4;
-    --surface-container-highest: #E0E3DE;
+    --surface-container-low: #F5F2E8;
+    --surface-container: #EFECE3;
+    --surface-container-high: #EAE6DB;
+    --surface-container-highest: #E5DFD2;
     
-    --primary: #556257; /* Deep Sage */
-    --primary-rgb: 85 98 87;
-    --primary-container: #D4E2D4; /* Soft Sage */
+    --primary: #D4AF37; /* Champagne Gold */
+    --primary-rgb: 212 175 55;
+    --primary-container: #F3E5AB; /* Light Gold */
     --on-primary: #FFFFFF;
-    --on-primary-container: #58655A;
+    --on-primary-container: #5A4711;
     
-    --secondary: #6D5A51; /* Soft Brown */
-    --secondary-rgb: 109 90 81;
-    --secondary-container: #F7DDD1; /* Soft Peach */
+    --secondary: #2A3B32; /* Deep Sage Green */
+    --secondary-rgb: 42 59 50;
+    --secondary-container: #D1E0D6; /* Soft Pale Green */
     --on-secondary: #FFFFFF;
-    --on-secondary-container: #736057;
+    --on-secondary-container: #151F1A;
 
-    --tertiary: #5F5F59;
-    --tertiary-container: #E0DED6;
+    --tertiary: #B19B81; /* Muted Gold / Taupe */
+    --tertiary-container: #E8DFD5;
 
-    --line: rgba(85, 98, 87, 0.08);
+    --line: rgba(212, 175, 55, 0.15); /* Gold tinted line */
     
     /* Status Feedback (Softer Tones) */
-    --status-good: #556257;
-    --status-normal: #747873;
-    --status-amber: #B19B81;
+    --status-good: #2A3B32; /* Deep Green for success */
+    --status-normal: #B19B81;
+    --status-amber: #D4AF37;
     --status-danger: #A33200;
     
     /* Design Tokens */

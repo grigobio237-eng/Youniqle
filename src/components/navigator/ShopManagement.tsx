@@ -104,7 +104,7 @@ export default function ShopManagement() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="rounded-[32px] border-none bg-white shadow-sm p-8 flex items-center gap-6">
-          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
+          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-primary">
             <Building2 className="w-7 h-7" />
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function ShopManagement() {
           </div>
         </Card>
         <Card className="rounded-[32px] border-none bg-white shadow-sm p-8 flex items-center gap-6">
-          <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
+          <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-secondary">
             <LineChart className="w-7 h-7" />
           </div>
           <div>

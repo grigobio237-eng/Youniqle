@@ -219,7 +219,7 @@ const NotificationTemplatesPage = () => {
       case 'draft':
         return <Clock className="h-4 w-4 text-yellow-500" />;
       default:
-        return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+        return <AlertTriangle className="h-4 w-4 text-foreground/70" />;
     }
   };
 
@@ -251,7 +251,7 @@ const NotificationTemplatesPage = () => {
       case 'low':
         return 'bg-green-100 text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -259,21 +259,21 @@ const NotificationTemplatesPage = () => {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'order':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-container text-blue-800';
       case 'payment':
         return 'bg-green-100 text-green-800';
       case 'delivery':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-secondary-container text-purple-800';
       case 'promotion':
         return 'bg-pink-100 text-pink-800';
       case 'system':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
       case 'marketing':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'bg-secondary-container text-indigo-800';
       case 'security':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-obsidian';
     }
   };
 
@@ -283,7 +283,7 @@ const NotificationTemplatesPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">알림 템플릿 관리</h1>
-          <p className="text-gray-600">알림 템플릿을 생성하고 관리하세요</p>
+          <p className="text-obsidian">알림 템플릿을 생성하고 관리하세요</p>
         </div>
         <Button onClick={() => setShowCreateDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -299,7 +299,7 @@ const NotificationTemplatesPage = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-foreground/70" />
               <Input
                 placeholder="템플릿 검색..."
                 value={searchTerm}
@@ -370,11 +370,11 @@ const NotificationTemplatesPage = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Mail className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-primary-container rounded-lg">
+                <Mail className="h-6 w-6 text-primary" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">총 템플릿</p>
+                <p className="text-sm font-medium text-obsidian">총 템플릿</p>
                 <p className="text-2xl font-bold">{templates.length}</p>
               </div>
             </div>
@@ -387,7 +387,7 @@ const NotificationTemplatesPage = () => {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">활성 템플릿</p>
+                <p className="text-sm font-medium text-obsidian">활성 템플릿</p>
                 <p className="text-2xl font-bold">
                   {templates.filter(t => t.status === 'active').length}
                 </p>
@@ -402,7 +402,7 @@ const NotificationTemplatesPage = () => {
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">초안</p>
+                <p className="text-sm font-medium text-obsidian">초안</p>
                 <p className="text-2xl font-bold">
                   {templates.filter(t => t.status === 'draft').length}
                 </p>
@@ -413,11 +413,11 @@ const NotificationTemplatesPage = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Globe className="h-6 w-6 text-purple-600" />
+              <div className="p-2 bg-secondary-container rounded-lg">
+                <Globe className="h-6 w-6 text-secondary" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">다국어 지원</p>
+                <p className="text-sm font-medium text-obsidian">다국어 지원</p>
                 <p className="text-2xl font-bold">
                   {new Set(templates.map(t => t.language)).size}
                 </p>
@@ -461,7 +461,7 @@ const NotificationTemplatesPage = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium">{template.name}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground/70">
                           {template.description}
                         </div>
                       </div>
@@ -501,11 +501,11 @@ const NotificationTemplatesPage = () => {
                           <div>열람률: {template.stats.averageOpenRate.toFixed(1)}%</div>
                         </div>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-foreground/70">-</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-foreground/70">
                         {new Date(template.createdAt).toLocaleDateString()}
                       </div>
                     </TableCell>
@@ -566,7 +566,7 @@ const NotificationTemplatesPage = () => {
           >
             이전
           </Button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-obsidian">
             {page} / {totalPages}
           </span>
           <Button

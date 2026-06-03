@@ -247,7 +247,7 @@ export default function VideoContentPage() {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <Play className="h-16 w-16 text-gray-400" />
+                      <Play className="h-16 w-16 text-foreground/70" />
                     </div>
                   )}
                   {content.duration && (

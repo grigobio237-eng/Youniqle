@@ -79,7 +79,7 @@ export default function QRCodePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
             <div className="container mx-auto px-4 max-w-2xl">
-                <Link href="/utils" className="inline-flex items-center text-blue-600 hover:underline mb-6">
+                <Link href="/utils" className="inline-flex items-center text-primary hover:underline mb-6">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     돌아가기
                 </Link>
@@ -190,14 +190,14 @@ export default function QRCodePage() {
                                 </Button>
 
                                 <div className="bg-white rounded-lg p-4 text-sm text-left">
-                                    <p className="text-gray-600 break-all">
+                                    <p className="text-obsidian break-all">
                                         <span className="font-semibold">내용:</span> {text}
                                     </p>
                                 </div>
                             </div>
                         )}
 
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                        <div className="bg-surface rounded-lg p-4 text-sm text-obsidian">
                             <p className="font-semibold mb-2">💡 사용 팁</p>
                             <ul className="list-disc list-inside space-y-1">
                                 <li>URL, 이메일, 전화번호, 텍스트 모두 가능</li>

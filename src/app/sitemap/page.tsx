@@ -80,7 +80,7 @@ export default function SitemapPage() {
           <h1 className="font-black text-white tracking-tight mb-4 text-4xl md:text-4xl">
             사이트맵
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl font-medium leading-relaxed">
+          <p className="text-foreground/70 text-lg max-w-2xl font-medium leading-relaxed">
             Youniqle의 모든 서비스와 정보를 한눈에 확인하고<br />
             원하는 페이지로 빠르게 이동하실 수 있습니다.
           </p>
@@ -108,7 +108,7 @@ export default function SitemapPage() {
                   <li key={lIdx}>
                     <Link 
                       href={link.href}
-                      className="flex items-center justify-between group/link text-gray-500 hover:text-obsidian transition-colors py-1"
+                      className="flex items-center justify-between group/link text-foreground/70 hover:text-obsidian transition-colors py-1"
                     >
                       <span className="text-sm font-medium tracking-tight">{link.name}</span>
                       <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-chapter-accent" />
@@ -123,7 +123,7 @@ export default function SitemapPage() {
 
       {/* Footer Info */}
       <div className="max-w-6xl mx-auto px-6 mt-20 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-xs text-gray-400 font-medium border border-gray-100">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-surface rounded-full text-xs text-foreground/70 font-medium border border-line">
           찾으시는 페이지가 없나요? <Link href="/support/inquiry" className="text-chapter-accent font-bold">고객센터</Link>에 문의해 주세요.
         </div>
       </div>

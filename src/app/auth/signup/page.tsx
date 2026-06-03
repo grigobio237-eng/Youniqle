@@ -239,7 +239,7 @@ function SignupContent() {
               </Button>
               <Button
                 onClick={() => handleSocialLogin('google')}
-                className="h-14 bg-white border-none text-gray-900 hover:bg-gray-100 rounded-2xl font-bold transition-all"
+                className="h-14 bg-white border-none text-obsidian hover:bg-gray-100 rounded-2xl font-bold transition-all"
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
                 구글

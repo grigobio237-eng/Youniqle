@@ -80,7 +80,7 @@ const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
   approved: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
-  suspended: 'bg-gray-100 text-gray-800'
+  suspended: 'bg-gray-100 text-obsidian'
 };
 
 const statusLabels = {
@@ -98,8 +98,8 @@ const partnerTypeLabels: { [key: string]: string } = {
 };
 
 const partnerTypeColors: { [key: string]: string } = {
-  shopper: 'bg-blue-50 text-blue-700 border-blue-200',
-  business: 'bg-purple-50 text-purple-700 border-purple-200',
+  shopper: 'bg-blue-50 text-primary border-primary/30',
+  business: 'bg-purple-50 text-secondary border-purple-200',
   coach: 'bg-orange-50 text-orange-700 border-orange-200',
   artist: 'bg-pink-50 text-pink-700 border-pink-200'
 };
@@ -239,7 +239,7 @@ export default function AdminPartnersPage() {
                 <p className="text-sm font-medium text-text-secondary">총 파트너</p>
                 <p className="text-2xl font-bold text-text-primary">{partners.length}</p>
               </div>
-              <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <div className="p-3 rounded-full bg-primary-container text-primary">
                 <Users className="h-6 w-6" />
               </div>
             </div>
@@ -281,11 +281,11 @@ export default function AdminPartnersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-text-secondary">총 수수료</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-2xl font-bold text-secondary">
                   ₩{totalCommission.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+              <div className="p-3 rounded-full bg-secondary-container text-secondary">
                 <TrendingUp className="h-6 w-6" />
               </div>
             </div>
@@ -300,7 +300,7 @@ export default function AdminPartnersPage() {
             {/* Search */}
             <form className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="이름, 이메일, 상호명으로 검색..."
@@ -357,25 +357,25 @@ export default function AdminPartnersPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                     <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
+                      <Mail className="h-4 w-4 text-foreground/70" />
                       <span className="text-sm text-text-secondary">{partner.email}</span>
                     </div>
                     {partner.phone && (
                       <div className="flex items-center space-x-2">
-                        <Phone className="h-4 w-4 text-gray-500" />
+                        <Phone className="h-4 w-4 text-foreground/70" />
                         <span className="text-sm text-text-secondary">{partner.phone}</span>
                       </div>
                     )}
                     {partner.partnerApplication?.businessNumber && (
                       <div className="flex items-center space-x-2">
-                        <Building className="h-4 w-4 text-gray-500" />
+                        <Building className="h-4 w-4 text-foreground/70" />
                         <span className="text-sm text-text-secondary">
                           {partner.partnerApplication.businessNumber}
                         </span>
                       </div>
                     )}
                     <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <Calendar className="h-4 w-4 text-foreground/70" />
                       <span className="text-sm text-text-secondary">
                         신청: {new Date(partner.partnerApplication?.appliedAt || partner.createdAt).toLocaleDateString()}
                       </span>
@@ -407,7 +407,7 @@ export default function AdminPartnersPage() {
                       </div>
                       <div>
                         <span className="text-text-secondary">수수료율: </span>
-                        <span className="font-medium text-blue-600">
+                        <span className="font-medium text-primary">
                           {partner.partnerSettings?.commissionRate || 10}%
                         </span>
                       </div>
@@ -485,7 +485,7 @@ export default function AdminPartnersPage() {
       {filteredPartners.length === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <Users className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-text-primary mb-2">
               파트너가 없습니다
             </h3>
@@ -584,7 +584,7 @@ export default function AdminPartnersPage() {
                             {savingCommission ? '저장 중...' : '저장'}
                           </Button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">현재 수수료율: {selectedPartner.partnerSettings?.commissionRate || 10}%</p>
+                        <p className="text-xs text-foreground/70 mt-1">현재 수수료율: {selectedPartner.partnerSettings?.commissionRate || 10}%</p>
                       </div>
                     )}
                   </div>
@@ -604,7 +604,7 @@ export default function AdminPartnersPage() {
                           <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedPartner.partnerSettings.shopLogo} alt="상점 로고" className="w-full h-full object-cover" />
                         </div>
                       ) : (
-                        <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
+                        <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-foreground/70 text-xs">미설정</div>
                       )}
                     </div>
                     {/* 상점 배너 */}
@@ -615,7 +615,7 @@ export default function AdminPartnersPage() {
                           <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedPartner.partnerSettings.shopBanner} alt="상점 배너" className="w-full h-full object-cover" />
                         </div>
                       ) : (
-                        <div className="w-full h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
+                        <div className="w-full h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-foreground/70 text-xs">미설정</div>
                       )}
                     </div>
                   </div>
@@ -637,7 +637,7 @@ export default function AdminPartnersPage() {
                       <p className="text-sm font-bold text-slate">영업시간</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                         {Object.entries(selectedPartner.partnerSettings.businessHours).map(([day, hours]) => (
-                          <div key={day} className={`p-2 rounded-lg ${hours.isOpen ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                          <div key={day} className={`p-2 rounded-lg ${hours.isOpen ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-foreground/70'}`}>
                             <span className="font-bold">{day === 'monday' ? '월' : day === 'tuesday' ? '화' : day === 'wednesday' ? '수' : day === 'thursday' ? '목' : day === 'friday' ? '금' : day === 'saturday' ? '토' : '일'}</span>
                             {hours.isOpen ? `: ${hours.open}-${hours.close}` : ': 휴무'}
                           </div>
@@ -674,7 +674,7 @@ export default function AdminPartnersPage() {
                           </a>
                         </div>
                       ) : (
-                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-foreground/70 text-sm">
                           제출된 서류 없음
                         </div>
                       )}
@@ -698,7 +698,7 @@ export default function AdminPartnersPage() {
                           </a>
                         </div>
                       ) : (
-                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                        <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-foreground/70 text-sm">
                           제출된 서류 없음
                         </div>
                       )}

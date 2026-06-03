@@ -283,11 +283,11 @@ export default function PersonalizedRecommendations({
                 {/* 가격 정보 */}
                 {item.product?.price && (
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold text-blue-600">
+                    <span className="font-bold text-primary">
                       {item.product.price.toLocaleString()}원
                     </span>
                     {item.product.originalPrice && item.product.originalPrice > item.product.price && (
-                      <span className="text-sm text-gray-500 line-through">
+                      <span className="text-sm text-foreground/70 line-through">
                         {item.product.originalPrice.toLocaleString()}원
                       </span>
                     )}
@@ -297,21 +297,21 @@ export default function PersonalizedRecommendations({
                 {/* 추천 점수 */}
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div className={`bg-blue-600 h-2 rounded-full transition-all duration-300 rec-score-${index}`} />
+                    <div className={`bg-primary h-2 rounded-full transition-all duration-300 rec-score-${index}`} />
                     <style jsx>{`
                       .rec-score-${index} {
                         width: ${item.score * 100}%;
                       }
                     `}</style>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-foreground/70">
                     {(item.score * 100).toFixed(0)}%
                   </span>
                 </div>
 
                 {/* 추천 이유 */}
                 {showReason && (
-                  <p className="text-xs text-gray-600 line-clamp-2">
+                  <p className="text-xs text-obsidian line-clamp-2">
                     {item.reason}
                   </p>
                 )}

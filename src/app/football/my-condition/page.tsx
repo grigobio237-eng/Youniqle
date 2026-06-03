@@ -60,7 +60,7 @@ export default function MyConditionPage() {
 
   const getACWRZoneStyle = (zone: string) => {
     const styles: Record<string, string> = {
-      undertrained: 'bg-blue-100 text-blue-700 border-blue-300',
+      undertrained: 'bg-primary-container text-primary border-primary/30',
       optimal: 'bg-green-100 text-green-700 border-green-300',
       caution: 'bg-yellow-100 text-yellow-700 border-yellow-300',
       danger: 'bg-red-100 text-red-700 border-red-300',
@@ -70,7 +70,7 @@ export default function MyConditionPage() {
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'increasing') return <TrendingUp className="w-4 h-4 text-orange-500" />;
-    if (trend === 'decreasing') return <TrendingDown className="w-4 h-4 text-blue-500" />;
+    if (trend === 'decreasing') return <TrendingDown className="w-4 h-4 text-primary" />;
     return <Minus className="w-4 h-4 text-green-500" />;
   };
 
@@ -131,8 +131,8 @@ export default function MyConditionPage() {
                 </div>
 
                 {todayCheck.notes && Object.values(todayCheck.notes).some(v => v) && (
-                  <div className="bg-slate-50/60 rounded-2xl border border-slate-100 p-4 mt-4 space-y-2.5">
-                    <p className="text-[11px] font-bold text-slate-500">📝 오늘의 한 줄 메모</p>
+                  <div className="bg-surface/60 rounded-2xl border border-line p-4 mt-4 space-y-2.5">
+                    <p className="text-[11px] font-bold text-foreground/70">📝 오늘의 한 줄 메모</p>
                     <div className="space-y-1.5">
                       {Object.entries(todayCheck.notes).map(([key, val]) => {
                         if (!val) return null;
@@ -144,7 +144,7 @@ export default function MyConditionPage() {
                           mood: '기분'
                         };
                         return (
-                          <div key={key} className="text-xs bg-white py-1.5 px-3 rounded-xl border border-gray-100 flex items-center gap-2">
+                          <div key={key} className="text-xs bg-white py-1.5 px-3 rounded-xl border border-line flex items-center gap-2">
                             <span className="font-extrabold text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-lg flex-shrink-0">
                               {labels[key] || key}
                             </span>
@@ -237,11 +237,11 @@ export default function MyConditionPage() {
                 <p className="text-xs text-slate font-bold">기록 일수</p>
               </div>
               <div>
-                <p className="text-2xl font-black text-blue-600">{stats.avgWellness}</p>
+                <p className="text-2xl font-black text-primary">{stats.avgWellness}</p>
                 <p className="text-xs text-slate font-bold">평균 웰니스</p>
               </div>
               <div>
-                <p className="text-2xl font-black text-purple-600">{stats.avgLoad}</p>
+                <p className="text-2xl font-black text-secondary">{stats.avgLoad}</p>
                 <p className="text-xs text-slate font-bold">평균 부하</p>
               </div>
             </div>

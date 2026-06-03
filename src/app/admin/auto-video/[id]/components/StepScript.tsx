@@ -115,7 +115,7 @@ export default function StepScript({ project, onUpdate, onNext }: { project: any
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-blue-600">🖼️ 시각적 묘사 (Image Prompt)</Label>
+                                            <Label className="text-primary">🖼️ 시각적 묘사 (Image Prompt)</Label>
                                             <Textarea
                                                 value={scene.visualPrompt}
                                                 onChange={(e) => handleSceneChange(index, 'visualPrompt', e.target.value)}

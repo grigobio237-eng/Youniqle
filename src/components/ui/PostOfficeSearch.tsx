@@ -111,9 +111,9 @@ export default function PostOfficeSearch({ onAddressSelect, disabled = false }: 
 
       {/* 검색 결과 */}
       {showResults && searchResults.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="text-sm font-medium text-gray-700">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-line rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+          <div className="p-3 border-b border-line">
+            <h3 className="text-sm font-medium text-obsidian">
               검색 결과 ({searchResults.length}건)
             </h3>
           </div>
@@ -122,19 +122,19 @@ export default function PostOfficeSearch({ onAddressSelect, disabled = false }: 
               <button
                 key={index}
                 onClick={() => handleSelectAddress(result)}
-                className="w-full p-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                className="w-full p-3 text-left hover:bg-surface focus:bg-surface focus:outline-none"
               >
                 <div className="flex items-start space-x-2">
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="h-4 w-4 text-foreground/70 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-obsidian">
                       {result.address}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-foreground/70">
                       우편번호: {result.zipCode}
                     </p>
                     {result.addressDetail && (
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-foreground/70">
                         {result.addressDetail}
                       </p>
                     )}
@@ -148,11 +148,11 @@ export default function PostOfficeSearch({ onAddressSelect, disabled = false }: 
 
       {/* 검색 결과가 없는 경우 */}
       {showResults && searchResults.length === 0 && !isSearching && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <div className="p-4 text-center text-gray-500">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-line rounded-lg shadow-lg z-50">
+          <div className="p-4 text-center text-foreground/70">
             <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-300" />
             <p className="text-sm">검색 결과가 없습니다.</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-foreground/70 mt-1">
               다른 검색어로 시도해보세요.
             </p>
           </div>

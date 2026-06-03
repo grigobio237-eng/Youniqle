@@ -177,7 +177,7 @@ export default function AdminPointManagementPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface flex items-center justify-center">
         <div className="text-center">
           <CharacterImage
             src="/character/youniqle-1.png"
@@ -187,19 +187,19 @@ export default function AdminPointManagementPage() {
             className="w-16 h-16 mx-auto mb-4 animate-bounce"
             sizes="64px"
           />
-          <p className="text-gray-600">포인트 통계를 불러오는 중...</p>
+          <p className="text-obsidian">포인트 통계를 불러오는 중...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <div className="container mx-auto px-4 py-8">
         {/* 헤더 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">포인트 관리</h1>
-          <p className="text-gray-600">포인트 시스템 관리 및 규칙 확인</p>
+          <p className="text-obsidian">포인트 시스템 관리 및 규칙 확인</p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
@@ -217,9 +217,9 @@ export default function AdminPointManagementPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center">
-                    <Users className="h-8 w-8 text-blue-600 mr-3" />
+                    <Users className="h-8 w-8 text-primary mr-3" />
                     <div>
-                      <p className="text-sm text-gray-600">총 회원 수</p>
+                      <p className="text-sm text-obsidian">총 회원 수</p>
                       <p className="text-2xl font-bold">{stats?.totalUsers.toLocaleString()}명</p>
                     </div>
                   </div>
@@ -231,7 +231,7 @@ export default function AdminPointManagementPage() {
                   <div className="flex items-center">
                     <Star className="h-8 w-8 text-yellow-600 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-600">총 보유 포인트</p>
+                      <p className="text-sm text-obsidian">총 보유 포인트</p>
                       <p className="text-2xl font-bold">{stats?.totalPoints.toLocaleString()}P</p>
                     </div>
                   </div>
@@ -243,7 +243,7 @@ export default function AdminPointManagementPage() {
                   <div className="flex items-center">
                     <TrendingUp className="h-8 w-8 text-green-600 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-600">총 적립 포인트</p>
+                      <p className="text-sm text-obsidian">총 적립 포인트</p>
                       <p className="text-2xl font-bold">{stats?.totalEarned.toLocaleString()}P</p>
                     </div>
                   </div>
@@ -255,7 +255,7 @@ export default function AdminPointManagementPage() {
                   <div className="flex items-center">
                     <TrendingDown className="h-8 w-8 text-red-600 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-600">총 사용 포인트</p>
+                      <p className="text-sm text-obsidian">총 사용 포인트</p>
                       <p className="text-2xl font-bold">{stats?.totalUsed.toLocaleString()}P</p>
                     </div>
                   </div>
@@ -328,11 +328,11 @@ export default function AdminPointManagementPage() {
                         <h4 className="font-semibold mb-2">등급별 적립률</h4>
                         <div className="space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-amber-600">CEDAR (시작)</span>
+                            <span className="text-primary">CEDAR (시작)</span>
                             <Badge variant="outline">1%</Badge>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-blue-600">ROOTER (뿌리)</span>
+                            <span className="text-primary">ROOTER (뿌리)</span>
                             <Badge variant="outline">1.5%</Badge>
                           </div>
                           <div className="flex justify-between">
@@ -344,7 +344,7 @@ export default function AdminPointManagementPage() {
                             <Badge variant="outline">2.5%</Badge>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-purple-600">ECOSOUL (영혼)</span>
+                            <span className="text-secondary">ECOSOUL (영혼)</span>
                             <Badge variant="outline">3%</Badge>
                           </div>
                         </div>
@@ -415,12 +415,12 @@ export default function AdminPointManagementPage() {
                       <div className="p-4 border rounded-lg">
                         <h4 className="font-semibold mb-2">사용 예시</h4>
                         <div className="space-y-2 text-sm">
-                          <div className="p-2 bg-gray-50 rounded">
+                          <div className="p-2 bg-surface rounded">
                             <p><strong>주문 금액:</strong> 50,000원</p>
                             <p><strong>최대 사용:</strong> 25,000P</p>
                             <p><strong>실제 결제:</strong> 25,000원</p>
                           </div>
-                          <div className="p-2 bg-gray-50 rounded">
+                          <div className="p-2 bg-surface rounded">
                             <p><strong>보유 포인트:</strong> 10,000P</p>
                             <p><strong>실제 사용:</strong> 10,000P</p>
                             <p><strong>실제 결제:</strong> 40,000원</p>
@@ -434,7 +434,7 @@ export default function AdminPointManagementPage() {
                 {/* 만료 규칙 */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Clock className="h-5 w-5 mr-2 text-gray-600" />
+                    <Clock className="h-5 w-5 mr-2 text-obsidian" />
                     포인트 만료 규칙
                   </h3>
                   <div className="space-y-4">
@@ -450,19 +450,19 @@ export default function AdminPointManagementPage() {
                         <h4 className="font-semibold mb-2">만료 정책</h4>
                         <ul className="space-y-2 text-sm">
                           <li className="flex items-center">
-                            <Clock className="h-4 w-4 text-gray-600 mr-2" />
+                            <Clock className="h-4 w-4 text-obsidian mr-2" />
                             적립 후 365일 만료
                           </li>
                           <li className="flex items-center">
-                            <Clock className="h-4 w-4 text-gray-600 mr-2" />
+                            <Clock className="h-4 w-4 text-obsidian mr-2" />
                             자동 만료 처리
                           </li>
                           <li className="flex items-center">
-                            <Clock className="h-4 w-4 text-gray-600 mr-2" />
+                            <Clock className="h-4 w-4 text-obsidian mr-2" />
                             만료 예정 30일 전 알림
                           </li>
                           <li className="flex items-center">
-                            <Clock className="h-4 w-4 text-gray-600 mr-2" />
+                            <Clock className="h-4 w-4 text-obsidian mr-2" />
                             만료 내역 기록 보관
                           </li>
                         </ul>
@@ -471,7 +471,7 @@ export default function AdminPointManagementPage() {
                       <div className="p-4 border rounded-lg">
                         <h4 className="font-semibold mb-2">만료 처리</h4>
                         <div className="space-y-2 text-sm">
-                          <div className="p-2 bg-gray-50 rounded">
+                          <div className="p-2 bg-surface rounded">
                             <p><strong>처리 주기:</strong> 매일 자정</p>
                             <p><strong>처리 방식:</strong> 자동 배치</p>
                             <p><strong>알림 방식:</strong> 이메일 + 푸시</p>
@@ -485,7 +485,7 @@ export default function AdminPointManagementPage() {
                 {/* 관리자 규칙 */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Settings className="h-5 w-5 mr-2 text-blue-600" />
+                    <Settings className="h-5 w-5 mr-2 text-primary" />
                     관리자 포인트 관리
                   </h3>
                   <div className="space-y-4">
@@ -501,19 +501,19 @@ export default function AdminPointManagementPage() {
                         <h4 className="font-semibold mb-2">관리자 지급</h4>
                         <ul className="space-y-2 text-sm">
                           <li className="flex items-center">
-                            <Gift className="h-4 w-4 text-blue-600 mr-2" />
+                            <Gift className="h-4 w-4 text-primary mr-2" />
                             이벤트 보상
                           </li>
                           <li className="flex items-center">
-                            <Gift className="h-4 w-4 text-blue-600 mr-2" />
+                            <Gift className="h-4 w-4 text-primary mr-2" />
                             고객 만족도 보상
                           </li>
                           <li className="flex items-center">
-                            <Gift className="h-4 w-4 text-blue-600 mr-2" />
+                            <Gift className="h-4 w-4 text-primary mr-2" />
                             시스템 오류 보상
                           </li>
                           <li className="flex items-center">
-                            <Gift className="h-4 w-4 text-blue-600 mr-2" />
+                            <Gift className="h-4 w-4 text-primary mr-2" />
                             기타 특별 혜택
                           </li>
                         </ul>
@@ -589,30 +589,30 @@ export default function AdminPointManagementPage() {
               <CardContent>
                 {analyticsLoading ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-600">분석 데이터를 불러오는 중...</p>
+                    <p className="text-obsidian">분석 데이터를 불러오는 중...</p>
                   </div>
                 ) : analytics ? (
                   <div className="space-y-6">
                     {/* 개요 통계 */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 border rounded-lg">
-                        <h4 className="font-semibold mb-2 text-sm text-gray-600">포인트 보유자</h4>
+                        <h4 className="font-semibold mb-2 text-sm text-obsidian">포인트 보유자</h4>
                         <p className="text-2xl font-bold">{analytics.overview.usersWithPoints.toLocaleString()}명</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-foreground/70 mt-1">
                           전체 회원 대비 {((analytics.overview.usersWithPoints / analytics.overview.totalUsers) * 100).toFixed(1)}%
                         </p>
                       </div>
                       <div className="p-4 border rounded-lg">
-                        <h4 className="font-semibold mb-2 text-sm text-gray-600">평균 보유 포인트</h4>
+                        <h4 className="font-semibold mb-2 text-sm text-obsidian">평균 보유 포인트</h4>
                         <p className="text-2xl font-bold">{Math.round(analytics.overview.averagePoints).toLocaleString()}P</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-foreground/70 mt-1">
                           최대 {analytics.overview.maxPoints.toLocaleString()}P
                         </p>
                       </div>
                       <div className="p-4 border rounded-lg">
-                        <h4 className="font-semibold mb-2 text-sm text-gray-600">포인트 사용률</h4>
+                        <h4 className="font-semibold mb-2 text-sm text-obsidian">포인트 사용률</h4>
                         <p className="text-2xl font-bold">{analytics.stats.usageRate.toFixed(1)}%</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-foreground/70 mt-1">
                           적립 대비 사용 비율
                         </p>
                       </div>
@@ -692,7 +692,7 @@ export default function AdminPointManagementPage() {
                                 <span>{typeLabels[stat.type] || stat.type}</span>
                               </div>
                               <div className="flex items-center gap-4">
-                                <span className="text-gray-600">{stat.count.toLocaleString()}건</span>
+                                <span className="text-obsidian">{stat.count.toLocaleString()}건</span>
                                 <span className="font-semibold">{stat.total.toLocaleString()}P</span>
                               </div>
                             </div>
@@ -721,7 +721,7 @@ export default function AdminPointManagementPage() {
                             </BarChart>
                           </ResponsiveContainer>
                         ) : (
-                          <div className="text-center py-12 text-gray-500">
+                          <div className="text-center py-12 text-foreground/70">
                             <p>데이터가 없습니다.</p>
                           </div>
                         )}
@@ -765,7 +765,7 @@ export default function AdminPointManagementPage() {
                           </div>
                           <div className="flex justify-between">
                             <span>총 만료 포인트</span>
-                            <span className="font-semibold text-gray-600">-{analytics.stats.totalExpired.toLocaleString()}P</span>
+                            <span className="font-semibold text-obsidian">-{analytics.stats.totalExpired.toLocaleString()}P</span>
                           </div>
                         </div>
                       </div>

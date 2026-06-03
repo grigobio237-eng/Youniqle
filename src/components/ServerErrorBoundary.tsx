@@ -91,7 +91,7 @@ export class ServerErrorBoundary extends Component<ServerErrorBoundaryProps, Ser
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center bg-surface">
           <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
@@ -100,11 +100,11 @@ export class ServerErrorBoundary extends Component<ServerErrorBoundaryProps, Ser
                 </svg>
               </div>
               
-              <h2 className="font-semibold text-gray-900 mb-2 text-xl">
+              <h2 className="font-semibold text-obsidian mb-2 text-xl">
                 서버 오류가 발생했습니다
               </h2>
               
-              <p className="text-gray-600 mb-6">
+              <p className="text-obsidian mb-6">
                 페이지를 로드하는 중 서버에서 오류가 발생했습니다. 
                 잠시 후 다시 시도해주세요.
               </p>
@@ -112,14 +112,14 @@ export class ServerErrorBoundary extends Component<ServerErrorBoundaryProps, Ser
               <div className="space-y-3">
                 <button
                   onClick={this.handleRetry}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                  className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary transition-colors duration-200"
                 >
                   페이지 새로고침
                 </button>
                 
                 <button
                   onClick={() => window.history.back()}
-                  className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200"
+                  className="w-full bg-gray-200 text-obsidian py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200"
                 >
                   이전 페이지로 돌아가기
                 </button>
@@ -127,7 +127,7 @@ export class ServerErrorBoundary extends Component<ServerErrorBoundaryProps, Ser
               
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <details className="mt-6 text-left">
-                  <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                  <summary className="cursor-pointer text-sm text-foreground/70 hover:text-obsidian">
                     개발자 정보 (개발 환경에서만 표시)
                   </summary>
                   <div className="mt-2 p-4 bg-gray-100 rounded-md text-xs">

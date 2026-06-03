@@ -116,7 +116,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
 
       <button 
         onClick={onCancel}
-        className="absolute top-4 right-4 md:top-8 md:right-8 p-2.5 bg-white/80 border border-[#E2E6E2] hover:bg-slate-50 rounded-full transition-all duration-300 z-50 shadow-md hover:scale-105"
+        className="absolute top-4 right-4 md:top-8 md:right-8 p-2.5 bg-white/80 border border-[#E2E6E2] hover:bg-surface rounded-full transition-all duration-300 z-50 shadow-md hover:scale-105"
         title="닫기"
         aria-label="닫기"
       >
@@ -263,7 +263,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                 <Button 
                   onClick={handleSubmit} 
                   disabled={isDiagnosing}
-                  className={`w-full max-w-[280px] h-13 sm:h-16 rounded-[20px] sm:rounded-[24px] text-base sm:text-lg font-black shadow-lg transition-all duration-500 group relative overflow-hidden ${isDiagnosing ? 'bg-slate-200 text-slate-400' : 'bg-gradient-to-r from-[#556257] to-[#6A786C] hover:from-[#465248] hover:to-[#556257] text-white shadow-[#556257]/15 hover:scale-102 active:scale-98'}`}
+                  className={`w-full max-w-[280px] h-13 sm:h-16 rounded-[20px] sm:rounded-[24px] text-base sm:text-lg font-black shadow-lg transition-all duration-500 group relative overflow-hidden ${isDiagnosing ? 'bg-slate-200 text-foreground/70' : 'bg-gradient-to-r from-[#556257] to-[#6A786C] hover:from-[#465248] hover:to-[#556257] text-white shadow-[#556257]/15 hover:scale-102 active:scale-98'}`}
                 >
                   {isDiagnosing ? (
                     <>
@@ -276,7 +276,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                       />
                       
                       {/* Base Text (White opacity) - Inactive Layer */}
-                      <div className="absolute inset-0 flex items-center justify-center z-10 text-slate-400">
+                      <div className="absolute inset-0 flex items-center justify-center z-10 text-foreground/70">
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin text-[#556257]" />
                           <span>{loadingText}</span>
@@ -326,7 +326,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                   title="기록 내용 입력"
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
-                  className="min-h-[130px] sm:min-h-[200px] text-base sm:text-xl font-semibold border-2 border-[#E2E6E2] rounded-[24px] sm:rounded-[36px] p-5 sm:p-8 focus-visible:ring-2 focus-visible:ring-[#556257] focus-visible:border-[#556257] bg-white hover:bg-slate-50/50 text-[#2D3A30] leading-relaxed placeholder:text-slate-300 transition-all duration-300 shadow-inner"
+                  className="min-h-[130px] sm:min-h-[200px] text-base sm:text-xl font-semibold border-2 border-[#E2E6E2] rounded-[24px] sm:rounded-[36px] p-5 sm:p-8 focus-visible:ring-2 focus-visible:ring-[#556257] focus-visible:border-[#556257] bg-white hover:bg-surface/50 text-[#2D3A30] leading-relaxed placeholder:text-slate-300 transition-all duration-300 shadow-inner"
                 />
                 <div className="flex justify-end pr-2">
                   <span className="text-[10px] sm:text-xs text-[#68756A]/60 font-bold">{memo.length} characters</span>
@@ -337,7 +337,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                 <Button 
                   onClick={handleSubmit}
                   disabled={!memo.trim() || isDiagnosing}
-                  className={`w-full max-w-[300px] h-13 sm:h-16 rounded-[20px] sm:rounded-[24px] text-base sm:text-lg font-black shadow-lg transition-all duration-500 group relative overflow-hidden ${isDiagnosing ? 'bg-slate-200 text-slate-400' : 'bg-gradient-to-r from-[#8C6F62] to-[#A38577] hover:from-[#765D52] hover:to-[#8C6F62] text-white shadow-[#8C6F62]/15 hover:scale-102 active:scale-98'}`}
+                  className={`w-full max-w-[300px] h-13 sm:h-16 rounded-[20px] sm:rounded-[24px] text-base sm:text-lg font-black shadow-lg transition-all duration-500 group relative overflow-hidden ${isDiagnosing ? 'bg-slate-200 text-foreground/70' : 'bg-gradient-to-r from-[#8C6F62] to-[#A38577] hover:from-[#765D52] hover:to-[#8C6F62] text-white shadow-[#8C6F62]/15 hover:scale-102 active:scale-98'}`}
                 >
                   {isDiagnosing ? (
                     <>
@@ -350,7 +350,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
                       />
                       
                       {/* Base Text (Slate) - Inactive Layer */}
-                      <div className="absolute inset-0 flex items-center justify-center z-10 text-slate-400">
+                      <div className="absolute inset-0 flex items-center justify-center z-10 text-foreground/70">
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin text-[#8C6F62]" />
                           <span>{loadingText}</span>

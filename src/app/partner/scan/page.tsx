@@ -102,7 +102,7 @@ export default function PartnerScanPage() {
         </div>
 
         <Card className="border-0 shadow-2xl overflow-hidden bg-white rounded-[32px]">
-          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+          <CardHeader className="bg-surface/50 border-b border-line p-8">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <CardTitle className="flex items-center gap-2 font-bold text-xl">
@@ -120,7 +120,7 @@ export default function PartnerScanPage() {
           </CardHeader>
           <CardContent className="p-8">
             <div className="relative group">
-              <div id="reader" className="w-full overflow-hidden rounded-[24px] border-2 border-dashed border-slate-200 min-h-[300px] bg-slate-50 transition-all group-hover:border-primary/30" />
+              <div id="reader" className="w-full overflow-hidden rounded-[24px] border-2 border-dashed border-line min-h-[300px] bg-surface transition-all group-hover:border-primary/30" />
               
               {/* Overlay for Scanning Area Guide */}
               {!scanResult && (
@@ -146,8 +146,8 @@ export default function PartnerScanPage() {
 
         <div className="bg-blue-50/50 rounded-[24px] p-6 border border-blue-100/50 text-sm text-blue-900 leading-relaxed shadow-sm">
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-               <span className="text-xs font-bold text-blue-600">Tip</span>
+            <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+               <span className="text-xs font-bold text-primary">Tip</span>
             </div>
             <p>
               카메라 접근 권한을 허용해 주세요. 인식이 잘 안 될 경우 고객님의 휴대폰 화면 밝기를 최대화하고 카메라와의 거리를 15~20cm 정도로 유지해 주세요.

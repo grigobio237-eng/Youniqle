@@ -142,8 +142,8 @@ export default function BlogContentPage() {
           </div>
           
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <FileText className="h-8 w-8 text-blue-600" />
+            <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center">
+              <FileText className="h-8 w-8 text-primary" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-text-primary">{t('content.blog.title')}</h1>

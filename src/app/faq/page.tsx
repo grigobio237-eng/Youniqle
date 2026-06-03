@@ -197,15 +197,15 @@ export default function FAQPage() {
   }, [faqs]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 text-center space-y-3">
-          <Badge variant="outline" className="px-3 py-1 text-blue-600 border-blue-200 bg-blue-50">
+          <Badge variant="outline" className="px-3 py-1 text-primary border-primary/30 bg-blue-50">
             FAQ Help Center
           </Badge>
           <h1 className="font-bold text-4xl">자주 묻는 질문</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-obsidian max-w-2xl mx-auto">
             주문, 결제, 배송 등 자주 묻는 질문을 모았습니다. 검색이나 카테고리 필터를 활용해 빠르게 답을 찾아보세요.
           </p>
         </div>
@@ -214,20 +214,20 @@ export default function FAQPage() {
         <div className="grid gap-4 grid-cols-1 md:grid-cols-3 mb-6">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-500">현재 노출 중인 FAQ</p>
+              <p className="text-sm text-foreground/70">현재 노출 중인 FAQ</p>
               <p className="text-2xl font-semibold mt-2">{stats.total.toLocaleString()}건</p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-foreground/70 mt-1">
                 카테고리 {stats.categoryCounts.length}개 | 도움 지수 {stats.helpfulRate}%
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-500">도움이 많이 된 질문</p>
+              <p className="text-sm text-foreground/70">도움이 많이 된 질문</p>
               {topHelpfulFaqs.length === 0 ? (
-                <p className="text-sm text-gray-400 mt-2">최근 통계 없음</p>
+                <p className="text-sm text-foreground/70 mt-2">최근 통계 없음</p>
               ) : (
-                <ul className="mt-2 space-y-1 text-sm text-gray-700">
+                <ul className="mt-2 space-y-1 text-sm text-obsidian">
                   {topHelpfulFaqs.map((faq) => (
                     <li key={faq._id} className="flex items-center justify-between gap-2">
                       <span className="truncate">{faq.question}</span>
@@ -240,9 +240,9 @@ export default function FAQPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-500">카테고리별 비중</p>
+              <p className="text-sm text-foreground/70">카테고리별 비중</p>
               {stats.categoryCounts.length === 0 ? (
-                <p className="text-sm text-gray-400 mt-2">집계 데이터 없음</p>
+                <p className="text-sm text-foreground/70 mt-2">집계 데이터 없음</p>
               ) : (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {stats.categoryCounts.map((item) => (
@@ -262,7 +262,7 @@ export default function FAQPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                   <Input
                     placeholder="검색어를 입력하세요..."
                     value={searchQuery}
@@ -314,14 +314,14 @@ export default function FAQPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">FAQ를 불러오는 중...</p>
+            <p className="mt-4 text-obsidian">FAQ를 불러오는 중...</p>
           </div>
         ) : faqs.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
-              <HelpCircle className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+              <HelpCircle className="h-16 w-16 mx-auto text-foreground/70 mb-4" />
               <h3 className="text-lg font-semibold mb-2">FAQ가 없습니다</h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-obsidian mb-6">
                 검색 결과가 없거나 해당 카테고리에 FAQ가 없습니다.
               </p>
               <Button variant="outline" asChild>
@@ -338,7 +338,7 @@ export default function FAQPage() {
               <Card key={faq._id} className="overflow-hidden">
                 <button
                   onClick={() => setOpenFAQ(openFAQ === faq._id ? null : faq._id)}
-                  className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
+                  className="w-full p-6 text-left hover:bg-surface transition-colors"
                 >
                   <div className="flex items-start gap-4">
                     <Badge variant="outline" className="mt-1">
@@ -346,7 +346,7 @@ export default function FAQPage() {
                     </Badge>
                     <span className="flex-1 font-semibold">{highlight(faq.question)}</span>
                     <ArrowRight
-                      className={`h-5 w-5 text-gray-400 transition-transform ${
+                      className={`h-5 w-5 text-foreground/70 transition-transform ${
                         openFAQ === faq._id ? 'rotate-90' : ''
                       }`}
                     />
@@ -356,10 +356,10 @@ export default function FAQPage() {
                   <div className="px-6 pb-6 border-t">
                     <div className="pt-4">
                       <div className="prose max-w-none mb-4">
-                        <p className="whitespace-pre-wrap text-gray-700">{highlight(faq.answer)}</p>
+                        <p className="whitespace-pre-wrap text-obsidian">{highlight(faq.answer)}</p>
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-foreground/70">
                           <span>조회 {faq.views}</span>
                           <div className="flex items-center gap-2">
                             <ThumbsUp className="h-4 w-4 text-green-500" />
@@ -400,12 +400,12 @@ export default function FAQPage() {
         )}
 
         {/* Help Section */}
-        <Card className="mt-8 bg-blue-50 border-blue-200">
+        <Card className="mt-8 bg-blue-50 border-primary/30">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold mb-2">더 도움이 필요하신가요?</h3>
-                <p className="text-gray-600">
+                <p className="text-obsidian">
                   FAQ에서 원하는 답을 찾지 못하셨다면 1:1 문의를 이용해주세요.
                 </p>
               </div>

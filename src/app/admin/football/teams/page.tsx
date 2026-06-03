@@ -95,9 +95,9 @@ export default function AdminFootballTeamsPage() {
       pending: { label: '승인 대기', className: 'bg-yellow-100 text-yellow-700' },
       approved: { label: '활성', className: 'bg-green-100 text-green-700' },
       rejected: { label: '거절됨', className: 'bg-red-100 text-red-700' },
-      suspended: { label: '정지', className: 'bg-gray-100 text-gray-700' },
+      suspended: { label: '정지', className: 'bg-gray-100 text-obsidian' },
     };
-    const s = map[status] || { label: status, className: 'bg-gray-100 text-gray-700' };
+    const s = map[status] || { label: status, className: 'bg-gray-100 text-obsidian' };
     return <Badge className={`${s.className} border-none font-bold`}>{s.label}</Badge>;
   };
 
@@ -193,7 +193,7 @@ export default function AdminFootballTeamsPage() {
                       </div>
 
                       {team.description && (
-                        <p className="text-sm text-text-secondary bg-gray-50 p-3 rounded-lg">{team.description}</p>
+                        <p className="text-sm text-text-secondary bg-surface p-3 rounded-lg">{team.description}</p>
                       )}
                     </div>
 

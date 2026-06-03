@@ -66,10 +66,10 @@ export default function ApprovalModal({ project, isOpen, onClose, onApprove }: A
                 return (
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2">
-                            <FileText className="text-blue-500" />
+                            <FileText className="text-primary" />
                             <h3 className="font-semibold">대본 검수</h3>
                         </div>
-                        <p className="text-sm text-gray-500">유니클이 생성한 대본입니다. 수정이 필요하면 직접 편집하세요.</p>
+                        <p className="text-sm text-foreground/70">유니클이 생성한 대본입니다. 수정이 필요하면 직접 편집하세요.</p>
                         <Textarea
                             value={scriptEdits}
                             onChange={(e) => setScriptEdits(e.target.value)}
@@ -97,12 +97,12 @@ export default function ApprovalModal({ project, isOpen, onClose, onApprove }: A
                 return (
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2">
-                            <ImageIcon className="text-purple-500" />
+                            <ImageIcon className="text-secondary" />
                             <h3 className="font-semibold">자산 검수</h3>
                         </div>
                         <div className="space-y-4 max-h-[400px] overflow-y-auto p-2 border rounded">
                             {scriptData.segments && scriptData.segments.map((segment: any, idx: number) => (
-                                <div key={idx} className="flex gap-4 p-3 bg-slate-50 rounded border">
+                                <div key={idx} className="flex gap-4 p-3 bg-surface rounded border">
                                     <div className="w-1/3 space-y-2">
                                         {segment.image_path ? (
                                             <div className="relative aspect-[9/16] bg-black rounded overflow-hidden shadow-sm">
@@ -121,8 +121,8 @@ export default function ApprovalModal({ project, isOpen, onClose, onApprove }: A
                                     </div>
                                     <div className="w-2/3 text-sm space-y-1">
                                         <Badge variant="outline" className="mb-1">Scene {idx + 1}</Badge>
-                                        <p className="font-medium text-slate-800">{segment.text || segment.narration}</p>
-                                        <p className="text-xs text-slate-500 italic mt-2">Visual Prompt: {segment.visual_cue}</p>
+                                        <p className="font-medium text-obsidian">{segment.text || segment.narration}</p>
+                                        <p className="text-xs text-foreground/70 italic mt-2">Visual Prompt: {segment.visual_cue}</p>
                                     </div>
                                 </div>
                             ))}

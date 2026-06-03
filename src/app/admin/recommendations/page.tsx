@@ -130,7 +130,7 @@ export default function RecommendationDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">추천 데이터를 불러오는 중...</p>
+          <p className="mt-2 text-obsidian">추천 데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -140,8 +140,8 @@ export default function RecommendationDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">추천 시스템 관리</h1>
-          <p className="text-gray-600">추천 성과 분석 및 A/B 테스트 관리</p>
+          <h1 className="text-3xl font-bold text-obsidian">추천 시스템 관리</h1>
+          <p className="text-obsidian">추천 성과 분석 및 A/B 테스트 관리</p>
         </div>
         <div className="flex space-x-2">
           <Button onClick={fetchRecommendationData}>
@@ -246,19 +246,19 @@ export default function RecommendationDashboard() {
                       </div>
                       <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
                         <div>
-                          <span className="text-gray-500">CTR:</span>
+                          <span className="text-foreground/70">CTR:</span>
                           <span className="ml-1 font-medium">
                             {(data.clickThroughRate * 100).toFixed(1)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500">전환율:</span>
+                          <span className="text-foreground/70">전환율:</span>
                           <span className="ml-1 font-medium">
                             {(data.conversionRate * 100).toFixed(1)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500">평균 점수:</span>
+                          <span className="text-foreground/70">평균 점수:</span>
                           <span className="ml-1 font-medium">
                             {(data.averageScore * 100).toFixed(1)}%
                           </span>
@@ -266,10 +266,10 @@ export default function RecommendationDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-2xl font-bold text-primary">
                         {(data.clickThroughRate * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-500">CTR</div>
+                      <div className="text-sm text-foreground/70">CTR</div>
                     </div>
                   </div>
                 ))}
@@ -292,11 +292,11 @@ export default function RecommendationDashboard() {
                     <div className="flex items-center space-x-4">
                       <div className="text-sm font-medium">{trend.date}</div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500">CTR:</span>
+                        <span className="text-sm text-foreground/70">CTR:</span>
                         <span className="font-medium">{(trend.clickThroughRate * 100).toFixed(1)}%</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500">전환율:</span>
+                        <span className="text-sm text-foreground/70">전환율:</span>
                         <span className="font-medium">{(trend.conversionRate * 100).toFixed(1)}%</span>
                       </div>
                     </div>
@@ -328,21 +328,21 @@ export default function RecommendationDashboard() {
                       </div>
                       <div className="grid grid-cols-4 gap-4 mt-2 text-sm">
                         <div>
-                          <span className="text-gray-500">클릭:</span>
+                          <span className="text-foreground/70">클릭:</span>
                           <span className="ml-1 font-medium">{item.clicks}</span>
                         </div>
                         <div>
-                          <span className="text-gray-500">구매:</span>
+                          <span className="text-foreground/70">구매:</span>
                           <span className="ml-1 font-medium">{item.purchases}</span>
                         </div>
                         <div>
-                          <span className="text-gray-500">CTR:</span>
+                          <span className="text-foreground/70">CTR:</span>
                           <span className="ml-1 font-medium">
                             {(item.clickThroughRate * 100).toFixed(1)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500">전환율:</span>
+                          <span className="text-foreground/70">전환율:</span>
                           <span className="ml-1 font-medium">
                             {(item.conversionRate * 100).toFixed(1)}%
                           </span>
@@ -353,7 +353,7 @@ export default function RecommendationDashboard() {
                       <div className="text-2xl font-bold text-green-600">
                         {(item.score * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-500">추천 점수</div>
+                      <div className="text-sm text-foreground/70">추천 점수</div>
                     </div>
                   </div>
                 ))}
@@ -383,8 +383,8 @@ export default function RecommendationDashboard() {
                             test.status === 'completed' ? '완료' : '일시정지'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{test.description}</p>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                      <p className="text-sm text-obsidian mt-1">{test.description}</p>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-foreground/70">
                         <span>변형: {test.variants}개</span>
                         <span>참여자: {test.participants.toLocaleString()}명</span>
                         <span>생성일: {new Date(test.createdAt).toLocaleDateString()}</span>
@@ -422,7 +422,7 @@ export default function RecommendationDashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="font-medium">{insight.message}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{insight.recommendation}</p>
+                        <p className="text-sm text-obsidian mt-1">{insight.recommendation}</p>
                       </div>
                       <div className="text-right">
                         <Badge variant="outline">

@@ -61,8 +61,8 @@ const statusLabels = {
 };
 
 const statusColors = {
-    pending: 'bg-amber-100 text-amber-800',
-    in_progress: 'bg-blue-100 text-blue-800',
+    pending: 'bg-primary-container/50 text-amber-800',
+    in_progress: 'bg-primary-container text-blue-800',
     resolved: 'bg-green-100 text-green-800'
 };
 
@@ -207,7 +207,7 @@ function CustomerInquiryManagement() {
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">고객 문의 관리</h1>
-                    <p className="text-gray-600 mt-1">고객들의 문의사항을 확인하고 답변하세요</p>
+                    <p className="text-obsidian mt-1">고객들의 문의사항을 확인하고 답변하세요</p>
                 </div>
                 <Button onClick={fetchInquiries} variant="outline" className="rounded-full">
                     <RefreshCw className="h-4 w-4 mr-2" />
@@ -221,10 +221,10 @@ function CustomerInquiryManagement() {
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500">전체 문의</p>
+                                <p className="text-sm text-foreground/70">전체 문의</p>
                                 <p className="text-2xl font-bold">{stats.total}</p>
                             </div>
-                            <MessageSquare className="h-8 w-8 text-gray-400" />
+                            <MessageSquare className="h-8 w-8 text-foreground/70" />
                         </div>
                     </CardContent>
                 </Card>
@@ -232,10 +232,10 @@ function CustomerInquiryManagement() {
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-amber-700">답변 대기</p>
+                                <p className="text-sm text-primary">답변 대기</p>
                                 <p className="text-2xl font-bold text-amber-800">{stats.pending}</p>
                             </div>
-                            <AlertCircle className="h-8 w-8 text-amber-500" />
+                            <AlertCircle className="h-8 w-8 text-primary" />
                         </div>
                     </CardContent>
                 </Card>
@@ -243,10 +243,10 @@ function CustomerInquiryManagement() {
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-blue-700">처리 중</p>
+                                <p className="text-sm text-primary">처리 중</p>
                                 <p className="text-2xl font-bold text-blue-800">{stats.inProgress}</p>
                             </div>
-                            <MessageCircle className="h-8 w-8 text-blue-500" />
+                            <MessageCircle className="h-8 w-8 text-primary" />
                         </div>
                     </CardContent>
                 </Card>
@@ -269,7 +269,7 @@ function CustomerInquiryManagement() {
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                                 <Input
                                     placeholder="고객명, 제목, 이메일로 검색..."
                                     value={searchQuery}
@@ -298,15 +298,15 @@ function CustomerInquiryManagement() {
                 {loading ? (
                     <Card className="border-0 shadow-md">
                         <CardContent className="p-12 text-center">
-                            <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500">문의를 불러오는 중...</p>
+                            <RefreshCw className="h-8 w-8 animate-spin text-foreground/70 mx-auto mb-4" />
+                            <p className="text-foreground/70">문의를 불러오는 중...</p>
                         </CardContent>
                     </Card>
                 ) : filteredInquiries.length === 0 ? (
                     <Card className="border-0 shadow-md">
                         <CardContent className="p-12 text-center">
-                            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500">검색 조건에 맞는 문의가 없습니다.</p>
+                            <MessageSquare className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
+                            <p className="text-foreground/70">검색 조건에 맞는 문의가 없습니다.</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -325,14 +325,14 @@ function CustomerInquiryManagement() {
                                                 {statusLabels[inquiry.status]}
                                             </Badge>
                                             {inquiry.replies.length > 0 && (
-                                                <span className="text-xs text-gray-500">
+                                                <span className="text-xs text-foreground/70">
                                                     {inquiry.replies.length}개 답변
                                                 </span>
                                             )}
                                         </div>
                                         <h3 className="font-semibold text-lg">{inquiry.subject}</h3>
-                                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">{inquiry.message}</p>
-                                        <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                                        <p className="text-obsidian text-sm line-clamp-2 mt-1">{inquiry.message}</p>
+                                        <div className="flex items-center gap-4 mt-3 text-sm text-foreground/70">
                                             <span className="flex items-center gap-1">
                                                 <User className="h-4 w-4" />
                                                 {inquiry.customerName}
@@ -342,14 +342,14 @@ function CustomerInquiryManagement() {
                                                 {new Date(inquiry.createdAt).toLocaleDateString('ko-KR')}
                                             </span>
                                             {inquiry.orderNumber && (
-                                                <span className="text-blue-600">주문 #{inquiry.orderNumber}</span>
+                                                <span className="text-primary">주문 #{inquiry.orderNumber}</span>
                                             )}
                                             {inquiry.productName && (
-                                                <span className="text-purple-600">{inquiry.productName}</span>
+                                                <span className="text-secondary">{inquiry.productName}</span>
                                             )}
                                         </div>
                                     </div>
-                                    <ChevronRight className="h-5 w-5 text-gray-400 hidden lg:block" />
+                                    <ChevronRight className="h-5 w-5 text-foreground/70 hidden lg:block" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -371,7 +371,7 @@ function CustomerInquiryManagement() {
                         <div className="flex-1 overflow-y-auto space-y-4">
                             {/* Status Change */}
                             <div className="flex items-center gap-4">
-                                <span className="text-sm text-gray-500">상태:</span>
+                                <span className="text-sm text-foreground/70">상태:</span>
                                 <Select
                                     value={selectedInquiry.status}
                                     onValueChange={(value) => handleUpdateStatus(selectedInquiry._id, value as CustomerInquiry['status'])}
@@ -388,20 +388,20 @@ function CustomerInquiryManagement() {
                             </div>
 
                             {/* Original Message */}
-                            <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="bg-surface rounded-xl p-4">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <User className="h-4 w-4 text-gray-500" />
+                                    <User className="h-4 w-4 text-foreground/70" />
                                     <span className="font-medium">{selectedInquiry.customerName}</span>
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-foreground/70">
                                         {new Date(selectedInquiry.createdAt).toLocaleString('ko-KR')}
                                     </span>
                                 </div>
-                                <p className="text-gray-700 whitespace-pre-wrap">{selectedInquiry.message}</p>
+                                <p className="text-obsidian whitespace-pre-wrap">{selectedInquiry.message}</p>
                                 {selectedInquiry.orderNumber && (
-                                    <p className="text-sm text-blue-600 mt-2">주문번호: {selectedInquiry.orderNumber}</p>
+                                    <p className="text-sm text-primary mt-2">주문번호: {selectedInquiry.orderNumber}</p>
                                 )}
                                 {selectedInquiry.productName && (
-                                    <p className="text-sm text-purple-600 mt-1">관련 상품: {selectedInquiry.productName}</p>
+                                    <p className="text-sm text-secondary mt-1">관련 상품: {selectedInquiry.productName}</p>
                                 )}
                             </div>
 
@@ -411,18 +411,18 @@ function CustomerInquiryManagement() {
                                     key={index}
                                     className={`rounded-xl p-4 ${reply.sentBy === 'partner'
                                             ? 'bg-blue-50 ml-8'
-                                            : 'bg-gray-50 mr-8'
+                                            : 'bg-surface mr-8'
                                         }`}
                                 >
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="font-medium">
                                             {reply.sentBy === 'partner' ? '나' : selectedInquiry.customerName}
                                         </span>
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-foreground/70">
                                             {new Date(reply.sentAt).toLocaleString('ko-KR')}
                                         </span>
                                     </div>
-                                    <p className="text-gray-700 whitespace-pre-wrap">{reply.message}</p>
+                                    <p className="text-obsidian whitespace-pre-wrap">{reply.message}</p>
                                 </div>
                             ))}
 

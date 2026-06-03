@@ -35,8 +35,8 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         tip: '아침에 물 한 잔으로 신진대사를 깨워보세요 💧',
         lossAversionMessage: '아침 루틴을 건너뛰면 오전 집중력이 30% 저하될 수 있어요',
         recommendedProducts: ['에너지 부스터', '모닝 비타민', '그린티'],
-        color: 'text-amber-600',
-        bgColor: 'bg-white/90 md:bg-amber-50/90 backdrop-blur-xl border-amber-200/50',
+        color: 'text-primary',
+        bgColor: 'bg-white/90 md:bg-amber-50/90 backdrop-blur-xl border-primary/30/50',
     },
     afternoon: {
         icon: <Sun className="w-5 h-5" />,
@@ -55,7 +55,7 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         tip: '취침 2시간 전부터 블루라이트를 줄이면 수면 질이 높아져요 🌙',
         lossAversionMessage: '지금 휴식을 시작하지 않으면 다음 날 피로 회복이 40% 느려질 수 있어요',
         recommendedProducts: ['블루라이트 차단 안경', '수면 스프레이', '릴렉싱 오일'],
-        color: 'text-purple-600',
+        color: 'text-secondary',
         bgColor: 'bg-white/90 md:bg-purple-50/90 backdrop-blur-xl border-purple-200/50',
     },
     night: {
@@ -65,8 +65,8 @@ const TIME_BASED_CONTENT: Record<TimeOfDay, TimeBasedContent> = {
         tip: '지금이라도 화면을 끄고 눈을 감아보세요. 5분 호흡이 도움이 돼요 😴',
         lossAversionMessage: '지금 자지 않으면 내일 컨디션이 50% 이상 저하될 수 있어요',
         recommendedProducts: ['수면 유도 백색소음', '멜라토닌', '허브 베개'],
-        color: 'text-indigo-600',
-        bgColor: 'bg-white/90 md:bg-indigo-50/90 backdrop-blur-xl border-indigo-200/50',
+        color: 'text-secondary',
+        bgColor: 'bg-white/90 md:bg-indigo-50/90 backdrop-blur-xl border-secondary/30/50',
     },
 };
 

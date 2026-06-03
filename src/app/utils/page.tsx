@@ -401,7 +401,7 @@ function UtilsContent() {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2">
                                                 <h3 className="text-2xl font-black italic tracking-tighter text-obsidian line-clamp-1">{util.title}</h3>
-                                                {isToolLocked(util.id) && <Lock className="w-4 h-4 text-slate-400" />}
+                                                {isToolLocked(util.id) && <Lock className="w-4 h-4 text-foreground/70" />}
                                             </div>
                                             <p className="text-sm font-medium text-slate opacity-60 line-clamp-2 leading-relaxed">
                                                 {util.description}
@@ -559,7 +559,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
     const getStatusMessage = () => {
         if (progress >= 100) return { text: "목표 달성! 🎉 오늘도 완벽한 수분 밸런스예요!", color: "text-green-600" };
         if (progress >= 80) return { text: "거의 다 왔어요! 조금만 더 마시면 목표 달성!", color: "text-chapter-accent" };
-        if (progress >= 50) return { text: "절반 왔어요! 물 한 잔 더 마셔볼까요?", color: "text-blue-600" };
+        if (progress >= 50) return { text: "절반 왔어요! 물 한 잔 더 마셔볼까요?", color: "text-primary" };
         if (progress >= 25) return { text: "좋은 시작이에요! 꾸준히 마셔주세요 💪", color: "text-slate" };
         return { text: "수분 섭취를 시작해볼까요? 건강의 첫걸음이에요!", color: "text-slate" };
     };
@@ -622,10 +622,10 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                             aria-label="수분 섭취 목표량 (ml)"
                                         />
                                         <span className="text-sm text-slate">ml</span>
-                                        <button onClick={() => setShowGoalEdit(false)} className="text-xs text-blue-500 font-bold">확인</button>
+                                        <button onClick={() => setShowGoalEdit(false)} className="text-xs text-primary font-bold">확인</button>
                                     </div>
                                 ) : (
-                                    <button onClick={() => setShowGoalEdit(true)} className="text-sm font-bold text-blue-600 hover:underline">
+                                    <button onClick={() => setShowGoalEdit(true)} className="text-sm font-bold text-primary hover:underline">
                                         {goal.toLocaleString()}ml 변경
                                     </button>
                                 )}
@@ -635,7 +635,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                         {/* Progress Bar */}
                         <div className="h-3 bg-mist rounded-full overflow-hidden border border-line">
                             <div
-                                className={`h-full transition-all duration-500 ease-out rounded-full ${progress >= 100 ? 'bg-green-500' : 'bg-blue-500'} water-progress-bar`}
+                                className={`h-full transition-all duration-500 ease-out rounded-full ${progress >= 100 ? 'bg-green-500' : 'bg-primary'} water-progress-bar`}
                             />
                             <style jsx>{`
                                 .water-progress-bar {
@@ -652,7 +652,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                     <button
                                         key={drink.id}
                                         onClick={() => handleAdd(drink.amount, drink.label)}
-                                        className="p-2 md:p-3 rounded-2xl border-2 border-line hover:border-blue-400 bg-white transition-all flex flex-col items-center gap-0.5 md:gap-1 group active:scale-95"
+                                        className="p-2 md:p-3 rounded-2xl border-2 border-line hover:border-primary/30 bg-white transition-all flex flex-col items-center gap-0.5 md:gap-1 group active:scale-95"
                                     >
                                         <span className="group-hover:scale-110 transition-transform text-xl md:text-2xl">{drink.icon}</span>
                                         <span className="text-[9px] md:text-[10px] font-bold text-slate">{drink.label}</span>
@@ -670,12 +670,12 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                 value={customAmount}
                                 onChange={(e) => setCustomAmount(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleCustomAdd()}
-                                className="flex-1 border-2 border-line rounded-xl px-4 py-3 text-sm font-medium focus:border-blue-400 focus:outline-none"
+                                className="flex-1 border-2 border-line rounded-xl px-4 py-3 text-sm font-medium focus:border-primary/30 focus:outline-none"
                             />
                             <Button
                                 onClick={handleCustomAdd}
                                 disabled={!customAmount || parseInt(customAmount) <= 0}
-                                className="px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                                className="px-6 rounded-xl bg-primary hover:bg-primary text-white font-bold"
                             >
                                 추가
                             </Button>
@@ -697,7 +697,7 @@ function WaterModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open
                                         </span>
                                     ))}
                                     {records.length > 6 && (
-                                        <span className="bg-blue-100 px-3 py-1 rounded-full text-xs font-bold text-blue-600">
+                                        <span className="bg-primary-container px-3 py-1 rounded-full text-xs font-bold text-primary">
                                             +{records.length - 6}개 더
                                         </span>
                                     )}

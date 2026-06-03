@@ -90,7 +90,7 @@ export default function SignupForm() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold mb-2">회원가입 완료!</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-obsidian mb-4">
               회원가입이 성공적으로 완료되었습니다.
               <br />
               로그인 페이지로 이동합니다.
@@ -178,7 +178,7 @@ export default function SignupForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/70 hover:text-obsidian"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -202,7 +202,7 @@ export default function SignupForm() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/70 hover:text-obsidian"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -219,7 +219,7 @@ export default function SignupForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-obsidian">
             이미 계정이 있으신가요?{' '}
             <Link href="/login" className="text-primary hover:underline">
               로그인

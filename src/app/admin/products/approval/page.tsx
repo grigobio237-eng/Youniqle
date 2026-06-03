@@ -239,7 +239,7 @@ export default function ProductApprovalPage() {
                 <SelectItem value="rejected">거부됨</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-obsidian">
               총 {products.length}개의 상품
             </span>
           </div>
@@ -251,9 +251,9 @@ export default function ProductApprovalPage() {
         {products.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <AlertCircle className="h-12 w-12 text-foreground/70 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">상품이 없습니다</h3>
-              <p className="text-gray-600">
+              <p className="text-obsidian">
                 {filterStatus === 'pending' 
                   ? '승인 대기 중인 상품이 없습니다.' 
                   : '필터 조건에 맞는 상품이 없습니다.'}
@@ -287,16 +287,16 @@ export default function ProductApprovalPage() {
                           {getStatusBadge(product.approvalStatus)}
                         </div>
                         
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                        <p className="text-obsidian text-sm mb-2 line-clamp-2">
                           {product.summary}
                         </p>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-4 text-sm text-obsidian">
                           <span className="font-semibold text-lg text-primary">
                             ₩{product.price.toLocaleString()}
                           </span>
                           {product.originalPrice && (
-                            <span className="line-through text-gray-400">
+                            <span className="line-through text-foreground/70">
                               ₩{product.originalPrice.toLocaleString()}
                             </span>
                           )}
@@ -307,7 +307,7 @@ export default function ProductApprovalPage() {
                         </div>
                         
                         {product.partnerName && (
-                          <div className="mt-2 text-sm text-gray-600">
+                          <div className="mt-2 text-sm text-obsidian">
                             <span className="font-medium">파트너:</span> {product.partnerName}
                             {product.partnerEmail && (
                               <span className="ml-2">({product.partnerEmail})</span>

@@ -130,8 +130,8 @@ export default function RecoveryPortalPage() {
             // Vibrant glowing card borders and background gradients matching each pastel theme
             const cardBg = section.title === '회복 갤러리' ? 'from-purple-500/15 via-indigo-500/10 to-surface border-purple-500/25' :
                            section.title === '치유의 여정' ? 'from-emerald-500/15 via-teal-500/10 to-surface border-emerald-500/25' :
-                           section.title === '회복의 도구' ? 'from-blue-500/15 via-cyan-500/10 to-surface border-blue-500/25' :
-                                                             'from-amber-500/15 via-orange-500/10 to-surface border-amber-500/25';
+                           section.title === '회복의 도구' ? 'from-blue-500/15 via-cyan-500/10 to-surface border-primary/30/25' :
+                                                             'from-amber-500/15 via-orange-500/10 to-surface border-primary/30/25';
 
             return (
               <motion.div
@@ -224,8 +224,8 @@ export default function RecoveryPortalPage() {
 
             const cardBg = section.title === '회복 갤러리' ? 'from-purple-500/15 via-indigo-500/10 to-surface border-purple-500/25' :
                            section.title === '치유의 여정' ? 'from-emerald-500/15 via-teal-500/10 to-surface border-emerald-500/25' :
-                           section.title === '회복의 도구' ? 'from-blue-500/15 via-cyan-500/10 to-surface border-blue-500/25' :
-                                                             'from-amber-500/15 via-orange-500/10 to-surface border-amber-500/25';
+                           section.title === '회복의 도구' ? 'from-blue-500/15 via-cyan-500/10 to-surface border-primary/30/25' :
+                                                             'from-amber-500/15 via-orange-500/10 to-surface border-primary/30/25';
 
             return (
               <motion.div
@@ -287,7 +287,7 @@ export default function RecoveryPortalPage() {
                         <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{section.subtitle}</span>
                       </div>
                       <h3 className="text-2xl md:text-3xl font-black text-white mb-2 md:mb-4 group-hover:text-primary transition-colors">{section.title}</h3>
-                      <p className={`text-gray-400 text-[13px] md:text-sm leading-relaxed mb-4 md:mb-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 line-clamp-2 md:line-clamp-none ${section.charImage ? 'max-w-[75%]' : 'max-w-full'}`}>
+                      <p className={`text-foreground/70 text-[13px] md:text-sm leading-relaxed mb-4 md:mb-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 line-clamp-2 md:line-clamp-none ${section.charImage ? 'max-w-[75%]' : 'max-w-full'}`}>
                         {section.description}
                       </p>
                       <div className="flex items-center gap-2 text-primary text-[13px] md:text-sm font-bold opacity-60 group-hover:opacity-100 transition-all">

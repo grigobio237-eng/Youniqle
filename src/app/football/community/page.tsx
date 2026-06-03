@@ -201,11 +201,11 @@ export default function CommunityPage() {
 
   const getCategoryStyles = (cat: string) => {
     const map: Record<string, { label: string; bg: string; text: string; icon: any }> = {
-      tip: { label: '💡 조언/팁', bg: 'bg-emerald-100 text-emerald-800', text: 'text-emerald-700', icon: Award },
+      tip: { label: '💡 조언/팁', bg: 'bg-secondary-container text-emerald-800', text: 'text-secondary', icon: Award },
       question: { label: '❓ 질문/논의', bg: 'bg-pink-100 text-pink-800', text: 'text-pink-700', icon: HelpCircle },
-      free: { label: '🗣️ 자유소통', bg: 'bg-blue-100 text-blue-800', text: 'text-blue-700', icon: MessageSquare },
+      free: { label: '🗣️ 자유소통', bg: 'bg-primary-container text-blue-800', text: 'text-primary', icon: MessageSquare },
     };
-    return map[cat] || { label: '기타', bg: 'bg-slate-100 text-slate-800', text: 'text-slate-700', icon: MessageSquare };
+    return map[cat] || { label: '기타', bg: 'bg-slate-100 text-obsidian', text: 'text-obsidian', icon: MessageSquare };
   };
 
   const getRoleBadge = (role?: string) => {
@@ -222,7 +222,7 @@ export default function CommunityPage() {
     const isStaff = role === 'coach' || role === 'head_coach';
     return (
       <Badge className={`text-[10px] font-bold px-1.5 py-0 border-none ${
-        isStaff ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
+        isStaff ? 'bg-secondary-container text-secondary' : 'bg-slate-100 text-obsidian'
       }`}>
         {label}
       </Badge>
@@ -232,7 +232,7 @@ export default function CommunityPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
       </div>
     );
   }
@@ -265,8 +265,8 @@ export default function CommunityPage() {
               onClick={() => setFilter(item.value as any)}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
                 filter === item.value
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
-                  : 'text-slate hover:bg-slate-50'
+                  ? 'bg-secondary text-white shadow-md shadow-indigo-100'
+                  : 'text-slate hover:bg-surface'
               }`}
             >
               {item.label}
@@ -316,7 +316,7 @@ export default function CommunityPage() {
                             <span className="font-extrabold text-sm text-obsidian">{post.authorName}</span>
                             {getRoleBadge(post.authorId?.footballRole || (post as any).authorRole)}
                           </div>
-                          <span className="text-[10px] text-gray-400 font-medium">
+                          <span className="text-[10px] text-foreground/70 font-medium">
                             {new Date(post.createdAt).toLocaleDateString('ko-KR')}
                           </span>
                         </div>
@@ -367,23 +367,23 @@ export default function CommunityPage() {
 
                     {/* 펼쳐졌을 때의 댓글 영역 (아코디언) */}
                     {isExpanded && (
-                      <div className="pt-4 border-t border-slate-100 space-y-4" onClick={(e) => e.stopPropagation()}>
+                      <div className="pt-4 border-t border-line space-y-4" onClick={(e) => e.stopPropagation()}>
                         
                         {/* 댓글 목록 */}
                         <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
                           <p className="text-xs font-black text-slate text-left uppercase tracking-wider">의견 및 조언 스레드 ({post.comments.length})</p>
                           
                           {post.comments.length === 0 ? (
-                            <p className="text-xs text-slate/50 text-center py-4 bg-slate-50 rounded-2xl border border-dashed">
+                            <p className="text-xs text-slate/50 text-center py-4 bg-surface rounded-2xl border border-dashed">
                               첫 번째 의견을 남겨 소통을 시작해보세요!
                             </p>
                           ) : (
                             <div className="space-y-2.5 text-left">
                               {post.comments.map((comment) => (
-                                <div key={comment._id} className="bg-slate-50 border border-slate-100 rounded-2xl p-3 space-y-1.5">
+                                <div key={comment._id} className="bg-surface border border-line rounded-2xl p-3 space-y-1.5">
                                   <div className="flex items-center justify-between">
                                     <span className="font-extrabold text-xs text-obsidian">{comment.authorName}</span>
-                                    <span className="text-[9px] text-gray-400">
+                                    <span className="text-[9px] text-foreground/70">
                                       {new Date(comment.createdAt).toLocaleDateString('ko-KR')}
                                     </span>
                                   </div>
@@ -401,12 +401,12 @@ export default function CommunityPage() {
                             onChange={(e) => handleCommentInputChange(post._id, e.target.value)}
                             placeholder="의견이나 질문에 답해 보세요..."
                             required
-                            className="flex-1 h-10 px-3.5 rounded-xl border border-gray-200 text-xs focus:border-indigo-500 focus:outline-none transition-all text-text-primary"
+                            className="flex-1 h-10 px-3.5 rounded-xl border border-line text-xs focus:border-secondary/30 focus:outline-none transition-all text-text-primary"
                           />
                           <Button
                             type="submit"
                             disabled={!commentInputs[post._id]?.trim() || commentLoading[post._id]}
-                            className="h-10 w-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center p-0"
+                            className="h-10 w-10 bg-secondary hover:bg-secondary text-white rounded-xl flex items-center justify-center p-0"
                           >
                             {commentLoading[post._id] ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -430,7 +430,7 @@ export default function CommunityPage() {
         onClick={() => setShowModal(true)}
         title="글쓰기"
         aria-label="글쓰기"
-        className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 text-white rounded-full flex items-center justify-center shadow-xl shadow-indigo-300 transition-all duration-200 z-40"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-secondary hover:bg-secondary hover:scale-105 active:scale-95 text-white rounded-full flex items-center justify-center shadow-xl shadow-indigo-300 transition-all duration-200 z-40"
       >
         <Plus className="w-7 h-7" />
       </button>
@@ -465,8 +465,8 @@ export default function CommunityPage() {
                           onClick={() => setCategory(cat.value as any)}
                           className={`py-2.5 rounded-xl text-xs font-black border transition-all ${
                             isSelected
-                              ? 'bg-indigo-50 border-indigo-500 text-indigo-700 ring-2 ring-indigo-100'
-                              : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                              ? 'bg-indigo-50 border-secondary/30 text-secondary ring-2 ring-indigo-100'
+                              : 'bg-white text-foreground/70 border-line hover:bg-surface'
                           }`}
                         >
                           {cat.label}
@@ -485,7 +485,7 @@ export default function CommunityPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="팀원들의 이목을 끌 수 있는 제목"
                     required
-                    className="w-full h-11 px-3.5 rounded-2xl border border-gray-200 text-sm font-bold focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-text-primary"
+                    className="w-full h-11 px-3.5 rounded-2xl border border-line text-sm font-bold focus:border-secondary/30 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-text-primary"
                   />
                 </div>
 
@@ -498,7 +498,7 @@ export default function CommunityPage() {
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="조언할 노하우나 플랫폼 사용법, 혹은 팀원들의 피드백이 필요한 안건을 작성하세요."
                     required
-                    className="w-full h-32 px-3.5 py-2.5 rounded-2xl border border-gray-200 text-sm resize-none focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-text-primary"
+                    className="w-full h-32 px-3.5 py-2.5 rounded-2xl border border-line text-sm resize-none focus:border-secondary/30 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all text-text-primary"
                   />
                 </div>
 
@@ -507,7 +507,7 @@ export default function CommunityPage() {
                   <Button
                     type="submit"
                     disabled={!title || !content || formLoading}
-                    className="flex-1 h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold shadow-lg shadow-indigo-100 transition-all"
+                    className="flex-1 h-12 rounded-2xl bg-secondary hover:bg-secondary text-white font-extrabold shadow-lg shadow-indigo-100 transition-all"
                   >
                     {formLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : '게시하기'}
                   </Button>
@@ -515,7 +515,7 @@ export default function CommunityPage() {
                     type="button"
                     variant="outline"
                     onClick={closeModal}
-                    className="h-12 rounded-2xl hover:bg-gray-50 border-gray-200 font-bold"
+                    className="h-12 rounded-2xl hover:bg-surface border-line font-bold"
                   >
                     취소
                   </Button>

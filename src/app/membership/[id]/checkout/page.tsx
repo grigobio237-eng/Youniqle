@@ -216,7 +216,7 @@ export default function CheckoutPage({ params }: PageProps) {
           {/* Navigator Code Selection (Only for BLACK PASS and if no navigator) */}
           {id === 'black' && !hasNavigator && (
             <div className="bg-white rounded-[32px] p-8 shadow-xl border-2 border-indigo-100">
-              <h2 className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-6 border-b border-indigo-50 pb-4">전담 네비게이터 확인</h2>
+              <h2 className="text-xs font-black text-secondary uppercase tracking-widest mb-6 border-b border-indigo-50 pb-4">전담 네비게이터 확인</h2>
               <div className="space-y-4">
                 <p className="text-sm font-bold text-slate/70 break-keep">
                   블랙 패스 회원은 전문적인 상담과 관리를 위해 전담 네비게이터가 반드시 지정되어야 합니다. 전달받으신 네비게이터 코드를 입력해 주세요.
@@ -238,13 +238,13 @@ export default function CheckoutPage({ params }: PageProps) {
                   <Button 
                     onClick={verifyNavigator}
                     disabled={!navigatorCode.trim() || isValidating || isNavVerified}
-                    className="h-14 px-8 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black"
+                    className="h-14 px-8 rounded-2xl bg-secondary hover:bg-secondary text-white font-black"
                   >
                     {isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : '코드 확인'}
                   </Button>
                 </div>
                 {isNavVerified && (
-                  <div className="flex items-center gap-2 p-4 bg-emerald-50 rounded-2xl text-emerald-600 animate-in fade-in slide-in-from-top-1">
+                  <div className="flex items-center gap-2 p-4 bg-emerald-50 rounded-2xl text-secondary animate-in fade-in slide-in-from-top-1">
                     <CheckCircle2 className="w-5 h-5" />
                     <span className="text-sm font-black">[{navName}] 네비게이터가 확인되었습니다.</span>
                   </div>
@@ -297,7 +297,7 @@ export default function CheckoutPage({ params }: PageProps) {
             </div>
 
             <div className="flex items-start gap-3 px-4 py-6 bg-slate-100 rounded-2xl">
-              <ShieldCheck className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+              <ShieldCheck className="w-5 h-5 text-foreground/70 shrink-0 mt-0.5" />
               <p className="text-[11px] text-slate/50 font-bold leading-relaxed">
                 {id === 'black' 
                   ? '본 상품은 90일간 제공되는 한시적 멤버십 패스입니다. 결제 완료 즉시 혜택이 활성화되며, 기간 만료 후에는 자동으로 등급이 조정됩니다.'

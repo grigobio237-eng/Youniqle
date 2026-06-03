@@ -165,7 +165,7 @@ export default function ProductList({ searchParams }: ProductListProps) {
           return (
             <Card key={product._id} className="overflow-hidden border-none shadow-sm rounded-[24px] bg-white group hover:shadow-md transition-shadow">
               <Link href={productLink}>
-                <div className="aspect-square relative bg-slate-50 overflow-hidden">
+                <div className="aspect-square relative bg-surface overflow-hidden">
                   {product.images.length > 0 ? (
                     <Image
                       src={product.images[0].url}
@@ -189,7 +189,7 @@ export default function ProductList({ searchParams }: ProductListProps) {
 
               <CardContent className="p-3.5 sm:p-5">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <Badge variant="outline" className={`text-[9px] sm:text-xs font-bold rounded-lg px-2 py-0.5 ${product.isGalleryArt ? 'text-chapter-accent border-chapter-accent/20 bg-chapter-accent/5' : 'text-slate-400 border-slate-100'}`}>
+                  <Badge variant="outline" className={`text-[9px] sm:text-xs font-bold rounded-lg px-2 py-0.5 ${product.isGalleryArt ? 'text-chapter-accent border-chapter-accent/20 bg-chapter-accent/5' : 'text-foreground/70 border-line'}`}>
                     {categoryLabel}
                   </Badge>
                 </div>

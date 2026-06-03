@@ -116,18 +116,18 @@ export default function TypingPage() {
     };
 
     const getRank = (cpm: number) => {
-        if (cpm >= 500) return { title: 'CEO', color: 'text-purple-600', bg: 'bg-purple-100' };
+        if (cpm >= 500) return { title: 'CEO', color: 'text-secondary', bg: 'bg-secondary-container' };
         if (cpm >= 400) return { title: '이사', color: 'text-red-600', bg: 'bg-red-100' };
         if (cpm >= 300) return { title: '부장', color: 'text-orange-600', bg: 'bg-orange-100' };
-        if (cpm >= 200) return { title: '대리', color: 'text-blue-600', bg: 'bg-blue-100' };
-        return { title: '인턴', color: 'text-gray-600', bg: 'bg-gray-100' };
+        if (cpm >= 200) return { title: '대리', color: 'text-primary', bg: 'bg-primary-container' };
+        return { title: '인턴', color: 'text-obsidian', bg: 'bg-gray-100' };
     };
 
     // Render logic for highlighted text
     const renderQuote = () => {
         const quote = QUOTES[gameState.currentQuoteIndex].text;
         return (
-            <div className="text-2xl font-medium tracking-wide mb-8 leading-loose relative break-keep text-gray-400 select-none">
+            <div className="text-2xl font-medium tracking-wide mb-8 leading-loose relative break-keep text-foreground/70 select-none">
                 {/* Background Text */}
                 <div className="absolute inset-0 pointer-events-none">
                     {quote}
@@ -137,7 +137,7 @@ export default function TypingPage() {
                     {gameState.input.split('').map((char, i) => {
                         const isCorrect = char === quote[i];
                         return (
-                            <span key={i} className={isCorrect ? 'text-gray-900' : 'text-red-500 bg-red-100'}>
+                            <span key={i} className={isCorrect ? 'text-obsidian' : 'text-red-500 bg-red-100'}>
                                 {quote[i]}
                             </span>
                         );
@@ -145,7 +145,7 @@ export default function TypingPage() {
                     {/* Cursor */}
                     {gameState.status !== 'finished' && (
                         <span
-                            className="border-l-2 border-indigo-500 animate-pulse ml-[1px] inline-block h-[1.2em] align-text-bottom"
+                            className="border-l-2 border-secondary/30 animate-pulse ml-[1px] inline-block h-[1.2em] align-text-bottom"
                         />
                     )}
                 </div>
@@ -163,19 +163,19 @@ export default function TypingPage() {
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <Link href="/utils" className="text-gray-500 hover:text-blue-600 transition-colors">
+                    <Link href="/utils" className="text-foreground/70 hover:text-primary transition-colors">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
                     <div className="flex items-center gap-2">
-                        <Keyboard className="w-8 h-8 text-blue-600" />
-                        <h1 className="text-3xl font-black text-gray-800">TYPING BATTLE</h1>
+                        <Keyboard className="w-8 h-8 text-primary" />
+                        <h1 className="text-3xl font-black text-obsidian">TYPING BATTLE</h1>
                     </div>
                     <div className="w-6" />
                 </div>
 
                 <Card className="p-8 lg:p-12 shadow-xl bg-white relative overflow-hidden">
                     {/* Status Bar */}
-                    <div className="flex justify-between items-center mb-12 text-gray-500 font-mono text-sm uppercase tracking-widest border-b pb-4">
+                    <div className="flex justify-between items-center mb-12 text-foreground/70 font-mono text-sm uppercase tracking-widest border-b pb-4">
                         <div className="flex items-center gap-4">
                             <span className="flex items-center gap-2">
                                 <Timer className="w-4 h-4" />
@@ -183,15 +183,15 @@ export default function TypingPage() {
                             </span>
                         </div>
                         <div className="flex gap-6">
-                            <span>Accuracy: <span className="text-gray-900 font-bold">{gameState.accuracy}%</span></span>
-                            <span>Speed: <span className="text-gray-900 font-bold">{gameState.wpm}</span> CPM</span>
+                            <span>Accuracy: <span className="text-obsidian font-bold">{gameState.accuracy}%</span></span>
+                            <span>Speed: <span className="text-obsidian font-bold">{gameState.wpm}</span> CPM</span>
                         </div>
                     </div>
 
                     {/* Quote Display */}
                     <div className="min-h-[120px] flex flex-col justify-center text-center">
                         {renderQuote()}
-                        <p className="text-right text-gray-500 italic mt-4 text-sm">- {QUOTES[gameState.currentQuoteIndex].author} -</p>
+                        <p className="text-right text-foreground/70 italic mt-4 text-sm">- {QUOTES[gameState.currentQuoteIndex].author} -</p>
                     </div>
 
                     {/* Hidden Input field to capture typing */}
@@ -214,9 +214,9 @@ export default function TypingPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center"
                             >
-                                <div className="mb-2 text-gray-400 font-bold tracking-widest uppercase">Result Report</div>
-                                <h2 className="font-black text-gray-900 mb-6 text-xl">
-                                    {gameState.wpm} <span className="text-2xl font-normal text-gray-500">CPM</span>
+                                <div className="mb-2 text-foreground/70 font-bold tracking-widest uppercase">Result Report</div>
+                                <h2 className="font-black text-obsidian mb-6 text-xl">
+                                    {gameState.wpm} <span className="text-2xl font-normal text-foreground/70">CPM</span>
                                 </h2>
 
                                 {(() => {
@@ -229,7 +229,7 @@ export default function TypingPage() {
                                 })()}
 
                                 <div className="flex gap-4">
-                                    <Button onClick={setRandomQuote} size="lg" className="bg-blue-600 hover:bg-blue-700">
+                                    <Button onClick={setRandomQuote} size="lg" className="bg-primary hover:bg-primary">
                                         <RefreshCw className="mr-2 w-5 h-5" />
                                         다음 명언 도전
                                     </Button>
@@ -244,7 +244,7 @@ export default function TypingPage() {
                     </AnimatePresence>
                 </Card>
 
-                <p className="mt-8 text-center text-gray-400 text-sm">
+                <p className="mt-8 text-center text-foreground/70 text-sm">
                     Press any key to start typing. Focus is automatically handled.
                 </p>
             </div>

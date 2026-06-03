@@ -16,8 +16,8 @@ interface Note {
 const MOODS = [
     { id: 'happy', icon: <Smile className="w-5 h-5" />, color: 'text-yellow-500', label: '행복' },
     { id: 'calm', icon: <Heart className="w-5 h-5" />, color: 'text-primary', label: '편안' },
-    { id: 'neutral', icon: <Meh className="w-5 h-5" />, color: 'text-slate-400', label: '보통' },
-    { id: 'tired', icon: <Frown className="w-5 h-5" />, color: 'text-indigo-500', label: '피곤' },
+    { id: 'neutral', icon: <Meh className="w-5 h-5" />, color: 'text-foreground/70', label: '보통' },
+    { id: 'tired', icon: <Frown className="w-5 h-5" />, color: 'text-secondary', label: '피곤' },
     { id: 'stressed', icon: <Ghost className="w-5 h-5" />, color: 'text-red-500', label: '스트레스' },
 ];
 

@@ -203,13 +203,13 @@ export default function AdminLoginPage() {
             )}
 
             {loading && loadingStep && (
-              <Alert className="mb-6 border-blue-200 bg-blue-50">
+              <Alert className="mb-6 border-primary/30 bg-blue-50">
                 <AlertDescription className="text-blue-800">
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
                     <div>
                       <div className="font-medium">{loadingStep}</div>
-                      <div className="text-xs text-blue-600 mt-1">
+                      <div className="text-xs text-primary mt-1">
                         {loadingStep.includes('소셜 로그인') && 'OAuth 창이 열립니다...'}
                         {loadingStep.includes('관리자 권한 확인') && '소셜 로그인 사용자의 관리자 권한을 확인합니다...'}
                         {loadingStep.includes('관리자 토큰 발급') && '관리자 전용 토큰을 발급합니다...'}
@@ -222,12 +222,12 @@ export default function AdminLoginPage() {
             )}
 
             {/* 소셜 로그인 안내 - 구조 개선 (하이드레이션 방지) */}
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center flex flex-col gap-1">
+            <div className="mb-4 p-3 bg-blue-50 border border-primary/30 rounded-lg text-center flex flex-col gap-1">
               <div className="text-sm text-blue-800 font-bold">소셜 로그인 사용법</div>
               <div className="text-sm text-blue-800">
                 구글/카카오로 가입한 후 관리자 권한이 부여된 계정만 이용 가능합니다.
               </div>
-              <div className="text-xs text-blue-600">
+              <div className="text-xs text-primary">
                 ※ 소셜 로그인 시 자동으로 관리자 토큰이 발급됩니다.
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function AdminLoginPage() {
             <div className="space-y-3 mb-6">
               <Button
                 onClick={() => handleSocialLogin('google')}
-                className="w-full h-12 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+                className="w-full h-12 bg-white border-2 border-line text-obsidian hover:bg-surface hover:border-gray-300 transition-all duration-200 font-medium"
                 disabled={loading}
               >
                 <GoogleIcon className="w-5 h-5 mr-3" />
@@ -292,7 +292,7 @@ export default function AdminLoginPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">또는</span>
+                <span className="px-4 bg-white text-foreground/70 font-medium">또는</span>
               </div>
             </div>
 
@@ -330,9 +330,9 @@ export default function AdminLoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                      <EyeOff className="h-4 w-4 text-foreground/70" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      <Eye className="h-4 w-4 text-foreground/70" />
                     )}
                   </Button>
                 </div>

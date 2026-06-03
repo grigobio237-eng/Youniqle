@@ -248,7 +248,7 @@ export default function TrainerPage() {
                   <div className="space-y-6">
                      <div className="space-y-4">
                       <h3 className="text-[10px] font-black text-obsidian uppercase tracking-widest flex items-center gap-2">
-                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> 코치 철학
+                        <ShieldCheck className="w-4 h-4 text-secondary" /> 코치 철학
                       </h3>
                       <p className="text-slate/80 leading-relaxed font-medium italic text-sm">
                         &quot;{selectedTrainer.description || 'The philosophy of this curator is being synthesized.'}&quot;
@@ -269,7 +269,7 @@ export default function TrainerPage() {
                       <div className="space-y-3">
                         {selectedTrainer.coachProfile?.programs?.length > 0 ? (
                           selectedTrainer.coachProfile.programs.map((prog: any, i: number) => (
-                            <div key={i} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-chapter-accent/20 transition-colors group">
+                            <div key={i} className="flex justify-between items-center p-3 bg-surface rounded-xl border border-line hover:border-chapter-accent/20 transition-colors group">
                                <div className="space-y-0.5">
                                  <p className="text-xs font-black text-obsidian">{prog.title}</p>
                                  <p className="text-[9px] font-bold text-slate/50">{prog.duration} / {prog.intensity}</p>
@@ -354,7 +354,7 @@ export default function TrainerPage() {
                         href={selectedTrainer.coachProfile.socialMedia.tiktok} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="group flex items-center gap-4 p-5 bg-[#fafafa] rounded-3xl border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1"
+                        className="group flex items-center gap-4 p-5 bg-[#fafafa] rounded-3xl border border-line hover:shadow-xl transition-all hover:-translate-y-1"
                         aria-label="틱톡 피드 보기"
                         title="틱톡 피드 보기"
                       >
@@ -364,10 +364,10 @@ export default function TrainerPage() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TikTok</p>
+                          <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest">TikTok</p>
                           <p className="text-sm font-black text-obsidian">View Feed</p>
                         </div>
-                        <ExternalLink className="w-4 h-4 ml-auto text-slate-200 group-hover:text-slate-400" />
+                        <ExternalLink className="w-4 h-4 ml-auto text-slate-200 group-hover:text-foreground/70" />
                       </a>
                     )}
                   </div>
@@ -438,7 +438,7 @@ export default function TrainerPage() {
                     <div className="space-y-2">
                       <label htmlFor="slot-select" className="text-[10px] font-black text-obsidian uppercase tracking-widest ml-1">희망 시간</label>
                       {selectedDate && selectedTrainer?.coachProfile?.availability?.find((a: any) => a.date === selectedDate)?.isAllDay ? (
-                        <div className="w-full h-14 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center text-[11px] font-black text-amber-600 uppercase tracking-tighter">
+                        <div className="w-full h-14 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center text-[11px] font-black text-primary uppercase tracking-tighter">
                           <Star className="w-3 h-3 mr-1 fill-current" /> 전일 예약 가능
                         </div>
                       ) : (
@@ -544,7 +544,7 @@ function TrainerCalendar({ availability, onDateSelect }: { availability: any[], 
                 className={`
                   aspect-square flex flex-col items-center justify-center rounded-xl text-[10px] font-black transition-all
                   ${avail 
-                    ? (avail.isAllDay ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 cursor-pointer hover:scale-105 active:scale-95' : 'bg-obsidian text-white shadow-lg shadow-obsidian/20 cursor-pointer hover:scale-105 active:scale-95') 
+                    ? (avail.isAllDay ? 'bg-primary text-white shadow-lg shadow-amber-500/20 cursor-pointer hover:scale-105 active:scale-95' : 'bg-obsidian text-white shadow-lg shadow-obsidian/20 cursor-pointer hover:scale-105 active:scale-95') 
                     : 'text-slate/40 hover:bg-mist/50 cursor-default'}
                   ${isToday && !avail ? 'border border-chapter-accent text-chapter-accent' : ''}
                 `}
@@ -585,7 +585,7 @@ function TrainerCalendar({ availability, onDateSelect }: { availability: any[], 
           <span className="text-[9px] font-black text-obsidian/40 uppercase tracking-widest">슬롯 예약</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-amber-500" />
+          <div className="w-2 h-2 rounded-full bg-primary" />
           <span className="text-[9px] font-black text-obsidian/40 uppercase tracking-widest">전일 가능</span>
         </div>
       </div>

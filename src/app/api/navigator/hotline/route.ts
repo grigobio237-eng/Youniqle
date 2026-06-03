@@ -32,7 +32,10 @@ export async function POST(request: Request) {
 - '환자' -> '고객' 또는 '분'
 - '시술/진료' -> '프로그램' 또는 '관리'
 - '의학박사/의사' -> '줄기세포 전문가' 또는 '기술 자문위원'
-- '환자 상담' -> '고객 안내' 또는 '설명'`;
+- '환자 상담' -> '고객 안내' 또는 '설명'
+
+## ⚠️ 형식 요구사항
+챗봇 화면에 마크다운 기호(*, # 등)가 그대로 노출되지 않도록, 마크다운(굵게, 헤딩 등) 문법을 절대 사용하지 마세요. 오직 줄바꿈과 이모지만 사용하여 메신저에서 대화하듯 사람처럼 자연스럽게 답변하세요.`;
 
     // Format history for Gemini if needed, but since we don't save to DB, 
     // we can just send the current message or the last few messages for context.

@@ -151,9 +151,9 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
 
     if (!session) {
         return (
-            <Card className="w-full h-[600px] flex items-center justify-center bg-gray-50">
+            <Card className="w-full h-[600px] flex items-center justify-center bg-surface">
                 <div className="text-center">
-                    <p className="mb-4 text-gray-500">로그인이 필요한 서비스입니다.</p>
+                    <p className="mb-4 text-foreground/70">로그인이 필요한 서비스입니다.</p>
                     <Button onClick={() => window.location.href = '/auth/signin'}>로그인 하러 가기</Button>
                 </div>
             </Card>
@@ -165,22 +165,22 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
             <Card className="w-full h-[600px] relative overflow-hidden border-2 border-primary/20">
                 {/* Blurred Background with Fake Chat */}
                 <div className="absolute inset-0 bg-white/50 blur-sm pointer-events-none p-4 space-y-4">
-                    <div className="flex justify-end"><div className="bg-blue-100 p-3 rounded-lg max-w-[80%]">안녕하세요 원장님! 상담 문의드려요.</div></div>
+                    <div className="flex justify-end"><div className="bg-primary-container p-3 rounded-lg max-w-[80%]">안녕하세요 원장님! 상담 문의드려요.</div></div>
                     <div className="flex justify-start"><div className="bg-gray-100 p-3 rounded-lg max-w-[80%]">네 안녕하세요! 어떤 점이 궁금하신가요?</div></div>
                 </div>
 
                 {/* Overlay Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm z-10 p-6 text-center">
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md border border-gray-100">
+                    <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md border border-line">
                         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Lock className="w-8 h-8 text-primary" />
                         </div>
                         <h3 className="text-2xl font-bold mb-2">프라이빗 라운지 입장하기</h3>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-obsidian mb-6">
                             김미정 원장님과 실시간 1:1 상담을 원하시나요?<br />
                             멤버십 구독을 통해 더 깊은 회복의 솔루션을 만나보세요.
                         </p>
-                        <div className="bg-gray-50 p-4 rounded-lg mb-6 text-sm text-left space-y-2">
+                        <div className="bg-surface p-4 rounded-lg mb-6 text-sm text-left space-y-2">
                             <p>✓ 1:1 실시간 채팅 상담</p>
                             <p>✓ 시크릿 건강 정보 열람</p>
                             <p>✓ 우선 예약 서비스</p>
@@ -206,7 +206,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                     </div>
                     <div>
                         <div className="font-bold">김미정 원장</div>
-                        <div className="text-xs text-gray-500 flex items-center">
+                        <div className="text-xs text-foreground/70 flex items-center">
                             {isConnected ? <span className="text-green-600">● 온라인</span> : '오프라인'}
                         </div>
                     </div>
@@ -220,7 +220,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                     <div className="space-y-4">
                         {/* Welcome Message */}
                         <div className="flex justify-center my-4">
-                            <span className="text-xs bg-black/10 text-gray-600 px-3 py-1 rounded-full">
+                            <span className="text-xs bg-black/10 text-obsidian px-3 py-1 rounded-full">
                                 채팅방에 입장하셨습니다.
                             </span>
                         </div>
@@ -239,7 +239,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                                     )}
                                     <div className={`max-w-[70%] p-3 rounded-lg shadow-sm text-sm whitespace-pre-wrap ${isMe
                                             ? 'bg-yellow-100 text-black rounded-tr-none' // User: Yellow, Right
-                                            : 'bg-white text-black border border-gray-100 rounded-tl-none' // AI/Admin: White, Left
+                                            : 'bg-white text-black border border-line rounded-tl-none' // AI/Admin: White, Left
                                         }`}>
                                         {msg.content}
                                     </div>

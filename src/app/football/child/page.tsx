@@ -93,7 +93,7 @@ export default function ChildDashboardPage() {
                   value={linkEmail}
                   onChange={(e) => setLinkEmail(e.target.value)}
                   placeholder="자녀의 이메일 주소"
-                  className="w-full h-12 px-4 rounded-2xl border border-gray-200 text-sm"
+                  className="w-full h-12 px-4 rounded-2xl border border-line text-sm"
                 />
                 <Button
                   onClick={handleLink}
@@ -145,7 +145,7 @@ export default function ChildDashboardPage() {
               {todayCheck ? (
                 <Badge className="bg-green-100 text-green-700 border-none font-bold">✅ 체크 완료</Badge>
               ) : (
-                <Badge className="bg-gray-100 text-gray-500 border-none">아직 미체크</Badge>
+                <Badge className="bg-gray-100 text-foreground/70 border-none">아직 미체크</Badge>
               )}
             </div>
             {todayCheck ? (
@@ -176,8 +176,8 @@ export default function ChildDashboardPage() {
                 </div>
 
                 {todayCheck.notes && Object.values(todayCheck.notes).some(v => v) && (
-                  <div className="bg-slate-50/60 rounded-2xl border border-slate-100 p-4 mt-4 space-y-2.5 text-left">
-                    <p className="text-[11px] font-bold text-slate-500">📝 자녀의 오늘 한 줄 메모</p>
+                  <div className="bg-surface/60 rounded-2xl border border-line p-4 mt-4 space-y-2.5 text-left">
+                    <p className="text-[11px] font-bold text-foreground/70">📝 자녀의 오늘 한 줄 메모</p>
                     <div className="space-y-1.5">
                       {Object.entries(todayCheck.notes).map(([key, val]) => {
                         if (!val) return null;
@@ -189,7 +189,7 @@ export default function ChildDashboardPage() {
                           mood: '기분'
                         };
                         return (
-                          <div key={key} className="text-xs bg-white py-1.5 px-3 rounded-xl border border-gray-100 flex items-center gap-2">
+                          <div key={key} className="text-xs bg-white py-1.5 px-3 rounded-xl border border-line flex items-center gap-2">
                             <span className="font-extrabold text-[10px] text-pink-600 bg-pink-50 px-2 py-0.5 rounded-lg flex-shrink-0">
                               {labels[key] || key}
                             </span>
@@ -216,11 +216,11 @@ export default function ChildDashboardPage() {
                 <p className="text-xs text-slate font-bold">기록 일수</p>
               </div>
               <div>
-                <p className="text-2xl font-black text-blue-600">{stats.avgWellness}</p>
+                <p className="text-2xl font-black text-primary">{stats.avgWellness}</p>
                 <p className="text-xs text-slate font-bold">평균 웰니스</p>
               </div>
               <div>
-                <p className={`text-2xl font-black ${stats.checkedToday ? 'text-green-600' : 'text-gray-400'}`}>
+                <p className={`text-2xl font-black ${stats.checkedToday ? 'text-green-600' : 'text-foreground/70'}`}>
                   {stats.checkedToday ? '✅' : '⬜'}
                 </p>
                 <p className="text-xs text-slate font-bold">오늘 체크</p>
@@ -242,14 +242,14 @@ export default function ChildDashboardPage() {
                     <span className="text-xs font-black text-rose-600 flex items-center gap-1">
                       <Utensils className="w-3.5 h-3.5" /> 영양 스냅 #{todayMeals.length - idx}
                     </span>
-                    <span className="text-[10px] font-black text-slate-400">
+                    <span className="text-[10px] font-black text-foreground/70">
                       {new Date(meal.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <CardContent className="p-5 space-y-4">
                     <div className="flex gap-4">
                       {meal.imageUrl && (
-                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-slate-100 shadow-sm bg-slate-50">
+                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-line shadow-sm bg-surface">
                           <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={meal.imageUrl} alt="식사 사진" className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -274,7 +274,7 @@ export default function ChildDashboardPage() {
                         <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1">
                           <Sparkles className="w-3 h-3" /> 유니클 영양 피드백
                         </p>
-                        <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                        <p className="text-xs font-bold text-obsidian leading-relaxed">
                           {meal.metrics.futureDirection}
                         </p>
                       </div>

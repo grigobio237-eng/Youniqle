@@ -152,7 +152,7 @@ export default function WellnessCheckPage() {
             <div className={`text-xl font-black ${getScoreColor(score)}`}>{score}</div>
             <p className="text-slate">오늘의 웰니스 점수 (5점 만점)</p>
             {result.sessionLoad && (
-              <Badge className="bg-blue-100 text-blue-700 border-none font-bold text-sm px-4 py-2">
+              <Badge className="bg-primary-container text-primary border-none font-bold text-sm px-4 py-2">
                 <Dumbbell className="w-4 h-4 mr-1" /> 세션 부하: {result.sessionLoad} AU
               </Badge>
             )}
@@ -218,7 +218,7 @@ export default function WellnessCheckPage() {
                               : score >= 3
                               ? 'bg-yellow-400 text-white shadow-lg scale-105'
                               : 'bg-red-500 text-white shadow-lg scale-105'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            : 'bg-gray-100 text-obsidian hover:bg-gray-200'
                         }`}
                       >
                         {item.labels[score - 1]}
@@ -229,11 +229,11 @@ export default function WellnessCheckPage() {
 
                 {/* 수면의 질 카드 하단에 수면 시간 측정 추가 */}
                 {item.key === 'sleep' && (
-                  <div className="pt-4 border-t border-gray-100 mt-2 space-y-3">
+                  <div className="pt-4 border-t border-line mt-2 space-y-3">
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-bold text-obsidian">🌙 실제 수면 시간</span>
                       {sleepDuration !== null && (
-                        <Badge className="bg-blue-50 text-blue-600 border-none font-bold text-[10px]">
+                        <Badge className="bg-blue-50 text-primary border-none font-bold text-[10px]">
                           {sleepDuration}시간
                         </Badge>
                       )}
@@ -250,8 +250,8 @@ export default function WellnessCheckPage() {
                           }}
                           className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                             sleepDuration === dur && !isCustomSleep
-                              ? 'bg-blue-600 text-white shadow-md scale-105'
-                              : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200/50'
+                              ? 'bg-primary text-white shadow-md scale-105'
+                              : 'bg-surface text-obsidian hover:bg-gray-100 border border-line/50'
                           }`}
                         >
                           {dur}시간
@@ -265,8 +265,8 @@ export default function WellnessCheckPage() {
                         }}
                         className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                           isCustomSleep
-                            ? 'bg-blue-600 text-white shadow-md scale-105'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200/50'
+                            ? 'bg-primary text-white shadow-md scale-105'
+                            : 'bg-surface text-obsidian hover:bg-gray-100 border border-line/50'
                         }`}
                       >
                         기타
@@ -301,9 +301,9 @@ export default function WellnessCheckPage() {
                             }
                           }}
                           placeholder="수면 시간 입력 (예: 7.5)"
-                          className="flex-1 bg-white h-10 px-3 rounded-xl border border-gray-200 text-xs font-bold focus:outline-none focus:border-blue-500"
+                          className="flex-1 bg-white h-10 px-3 rounded-xl border border-line text-xs font-bold focus:outline-none focus:border-primary/30"
                         />
-                        <span className="text-xs font-bold text-blue-600 pr-2">시간</span>
+                        <span className="text-xs font-bold text-primary pr-2">시간</span>
                       </div>
                     </div>
                   </div>
@@ -312,7 +312,7 @@ export default function WellnessCheckPage() {
                 {/* 웰니스 개별 항목에 대한 한 줄 메모 입력 기능 (선택) */}
                 {values[item.key] && (
                   <div className="transition-all duration-300 ease-out overflow-hidden max-h-28 opacity-100 mt-3">
-                    <div className="flex flex-col gap-1 p-2 bg-slate-50/50 rounded-xl border border-gray-200/60 focus-within:border-green-300 focus-within:bg-green-50/10">
+                    <div className="flex flex-col gap-1 p-2 bg-surface/50 rounded-xl border border-line/60 focus-within:border-green-300 focus-within:bg-green-50/10">
                       <div className="flex items-center justify-between px-1">
                         <span className="text-[10px] font-bold text-slate flex items-center gap-1">
                           📝 {item.label} 특이사항 메모 (선택)
@@ -327,7 +327,7 @@ export default function WellnessCheckPage() {
                         value={notes[item.key] || ''}
                         onChange={(e) => setNotes({ ...notes, [item.key]: e.target.value })}
                         placeholder={`${item.label} 상태에 대해 간단히 적어보세요 (예: 햄스트링 당김, 감기 기운)`}
-                        className="bg-white h-9 px-3 rounded-lg border border-gray-200/50 text-[11px] font-bold focus:outline-none focus:border-green-500"
+                        className="bg-white h-9 px-3 rounded-lg border border-line/50 text-[11px] font-bold focus:outline-none focus:border-green-500"
                       />
                     </div>
                   </div>
@@ -341,14 +341,14 @@ export default function WellnessCheckPage() {
         <Card className="rounded-2xl border-none shadow-lg">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center gap-2">
-              <Dumbbell className="w-5 h-5 text-blue-600" />
+              <Dumbbell className="w-5 h-5 text-primary" />
               <span className="font-bold text-obsidian">오늘의 운동 정보 (훈련 부하)</span>
               <Badge className="ml-auto bg-red-50 text-red-600 border-none text-[10px] font-black">필수사항</Badge>
             </div>
 
             {/* 스포츠 과학 작성 가이드 도움말 */}
             <div className="bg-blue-50/40 rounded-xl p-3.5 border border-blue-100/60 space-y-1.5 text-left">
-              <p className="text-[11px] font-extrabold text-blue-600 flex items-center gap-1">
+              <p className="text-[11px] font-extrabold text-primary flex items-center gap-1">
                 💡 운동 정보 작성 가이드 (스포츠 과학 부상 예방)
               </p>
               <div className="space-y-1 text-[10px] text-slate font-bold leading-relaxed">
@@ -377,8 +377,8 @@ export default function WellnessCheckPage() {
                     }}
                     className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
                       sessionType === type.value
-                        ? 'bg-blue-500 text-white shadow-lg'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-primary text-white shadow-lg'
+                        : 'bg-gray-100 text-obsidian hover:bg-gray-200'
                     }`}
                   >
                     {type.emoji} {type.label}
@@ -404,7 +404,7 @@ export default function WellnessCheckPage() {
                                 : v <= 6 ? 'bg-yellow-400 text-white'
                                 : v <= 8 ? 'bg-orange-500 text-white'
                                 : 'bg-red-500 text-white'
-                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                              : 'bg-gray-100 text-foreground/70 hover:bg-gray-200'
                           }`}
                         >
                           {v}
@@ -424,7 +424,7 @@ export default function WellnessCheckPage() {
                     value={sessionDuration}
                     onChange={(e) => setSessionDuration(e.target.value)}
                     placeholder="예: 90"
-                    className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm font-bold"
+                    className="w-full h-10 px-3 rounded-xl border border-line text-sm font-bold"
                     min="1"
                     max="300"
                   />
@@ -441,7 +441,7 @@ export default function WellnessCheckPage() {
                 value={injuryNote}
                 onChange={(e) => setInjuryNote(e.target.value)}
                 placeholder="특정 부위 통증이나 불편함이 있다면 기록해 주세요"
-                className="w-full h-16 px-3 py-2 rounded-xl border border-gray-200 text-sm resize-none"
+                className="w-full h-16 px-3 py-2 rounded-xl border border-line text-sm resize-none"
               />
             </div>
           </CardContent>

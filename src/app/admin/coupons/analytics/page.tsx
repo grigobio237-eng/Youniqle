@@ -72,7 +72,7 @@ export default function CouponAnalyticsPage() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">분석 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={load} variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />다시 시도
@@ -88,7 +88,7 @@ export default function CouponAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <BarChart3 className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-bold text-gray-900">쿠폰 사용 분석</h1>
+          <h1 className="text-3xl font-bold text-obsidian">쿠폰 사용 분석</h1>
         </div>
         <Button variant="outline" onClick={load}>
           <RefreshCw className="h-4 w-4 mr-2" />새로고침
@@ -121,10 +121,10 @@ export default function CouponAnalyticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">비활성</CardTitle>
-              <XCircle className="h-4 w-4 text-gray-500" />
+              <XCircle className="h-4 w-4 text-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{data.stats.inactive.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-obsidian">{data.stats.inactive.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -141,10 +141,10 @@ export default function CouponAnalyticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">총 사용 횟수</CardTitle>
-              <BarChart3 className="h-4 w-4 text-blue-500" />
+              <BarChart3 className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{data.stats.totalUsage.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-primary">{data.stats.totalUsage.toLocaleString()}</div>
             </CardContent>
           </Card>
         </div>

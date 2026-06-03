@@ -26,14 +26,14 @@ export interface AnalysisResult {
 
 const CATEGORY_MAP = {
     MEAL: { label: '식단', icon: Utensils, color: 'text-orange-500', bg: 'bg-orange-50' },
-    HYDRATION: { label: '수분', icon: Droplets, color: 'text-blue-500', bg: 'bg-blue-50' },
+    HYDRATION: { label: '수분', icon: Droplets, color: 'text-primary', bg: 'bg-blue-50' },
     SKIN: { label: '스킨케어', icon: Smile, color: 'text-pink-500', bg: 'bg-pink-50' },
-    SLEEP: { label: '수면', icon: Bed, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+    SLEEP: { label: '수면', icon: Bed, color: 'text-secondary', bg: 'bg-indigo-50' },
     ACTIVITY: { label: '활동', icon: Dumbbell, color: 'text-green-500', bg: 'bg-green-50' },
-    ROUTINE: { label: '루틴', icon: Pill, color: 'text-purple-500', bg: 'bg-purple-50' },
+    ROUTINE: { label: '루틴', icon: Pill, color: 'text-secondary', bg: 'bg-purple-50' },
     BODY: { label: '바디/상태', icon: Activity, color: 'text-red-500', bg: 'bg-red-50' },
     MEDICAL_DOC: { label: '의료서류', icon: FileText, color: 'text-cyan-500', bg: 'bg-cyan-50' },
-    OTHER: { label: '기타', icon: LayoutGrid, color: 'text-slate-500', bg: 'bg-slate-50' },
+    OTHER: { label: '기타', icon: LayoutGrid, color: 'text-foreground/70', bg: 'bg-surface' },
     AUTO: { label: '자동 분류', icon: Sparkles, color: 'text-chapter-accent', bg: 'bg-chapter-accent/5' }
 };
 

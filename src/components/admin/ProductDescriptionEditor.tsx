@@ -113,7 +113,7 @@ export default function ProductDescriptionEditor({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="mr-2 text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                                className="mr-2 text-secondary border-secondary/30 hover:bg-indigo-50 hover:text-secondary"
                             >
                                 <Sparkles className="w-4 h-4 mr-2" />
                                 AI 자동 생성
@@ -122,7 +122,7 @@ export default function ProductDescriptionEditor({
                         <DialogContent className="sm:max-w-[500px]">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                                    <Sparkles className="w-5 h-5 text-secondary" />
                                     AI 상세페이지 자동 생성
                                 </DialogTitle>
                                 <DialogDescription>
@@ -132,13 +132,13 @@ export default function ProductDescriptionEditor({
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
                                     <Label>상품명 (자동 입력됨)</Label>
-                                    <div className="p-2 bg-gray-100 rounded text-sm text-gray-600">
+                                    <div className="p-2 bg-gray-100 rounded text-sm text-obsidian">
                                         {productContext.name || '(상품명을 먼저 입력하세요)'}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>사용될 이미지 수</Label>
-                                    <div className="p-2 bg-gray-100 rounded text-sm text-gray-600">
+                                    <div className="p-2 bg-gray-100 rounded text-sm text-obsidian">
                                         {productContext.images.length > 0
                                             ? `${productContext.images.length}장의 이미지가 적절히 배치됩니다.`
                                             : '이미지가 없습니다. 텍스트 위주로 생성됩니다.'}
@@ -184,7 +184,7 @@ export default function ProductDescriptionEditor({
                                 </Button>
                                 <Button
                                     onClick={handleGenerate}
-                                    className="bg-indigo-600 hover:bg-indigo-700"
+                                    className="bg-secondary hover:bg-secondary"
                                     disabled={isGenerating || !productContext.name}
                                 >
                                     {isGenerating ? (
@@ -214,7 +214,7 @@ export default function ProductDescriptionEditor({
                         }}
                     />
                     <Label htmlFor="html-mode" className="text-sm font-medium cursor-pointer flex items-center">
-                        <Code className="w-4 h-4 mr-1 text-gray-500" />
+                        <Code className="w-4 h-4 mr-1 text-foreground/70" />
                         HTML 모드 사용
                     </Label>
                 </div>
@@ -223,7 +223,7 @@ export default function ProductDescriptionEditor({
             <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
                 {isHtml ? (
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                        <div className="bg-gray-50 border-b px-4 py-2 flex items-center justify-between">
+                        <div className="bg-surface border-b px-4 py-2 flex items-center justify-between">
                             <TabsList className="grid w-[200px] grid-cols-2">
                                 <TabsTrigger value="edit" className="flex items-center">
                                     <Code className="w-3 h-3 mr-2" />
@@ -234,7 +234,7 @@ export default function ProductDescriptionEditor({
                                     미리보기
                                 </TabsTrigger>
                             </TabsList>
-                            <div className="text-xs text-gray-500 flex items-center gap-1">
+                            <div className="text-xs text-foreground/70 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 <span className="hidden sm:inline">이미지 태그(&lt;img&gt;) 등을 포함한 전체 HTML을 입력하세요.</span>
                             </div>
@@ -244,7 +244,7 @@ export default function ProductDescriptionEditor({
                             <Textarea
                                 value={value}
                                 onChange={(e) => onChange(e.target.value)}
-                                className="min-h-[600px] border-0 rounded-none focus-visible:ring-0 font-mono text-sm resize-y p-4 bg-gray-50 text-gray-800"
+                                className="min-h-[600px] border-0 rounded-none focus-visible:ring-0 font-mono text-sm resize-y p-4 bg-surface text-obsidian"
                                 placeholder="<div style='...'>...</div>"
                             />
                         </TabsContent>
@@ -258,7 +258,7 @@ export default function ProductDescriptionEditor({
                                         dangerouslySetInnerHTML={{ __html: value }}
                                     />
                                 </div>
-                                <div className="absolute top-2 right-2 px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">
+                                <div className="absolute top-2 right-2 px-2 py-1 bg-gray-100 rounded text-xs text-foreground/70">
                                     모바일 프리뷰
                                 </div>
                             </div>
@@ -266,7 +266,7 @@ export default function ProductDescriptionEditor({
                     </Tabs>
                 ) : (
                     <div className="relative">
-                        <div className="bg-gray-50 border-b px-4 py-2 flex items-center text-xs text-gray-500">
+                        <div className="bg-surface border-b px-4 py-2 flex items-center text-xs text-foreground/70">
                             <FileText className="w-3 h-3 mr-1" />
                             텍스트 모드: 줄바꿈이 자동으로 적용됩니다.
                         </div>

@@ -213,7 +213,7 @@ export default function AnalyticsDashboard() {
           <div className="text-red-500 mb-4">
             <BarChart3 className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">실시간 분석 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchMetrics} variant="outline">
             다시 시도
@@ -230,10 +230,10 @@ export default function AnalyticsDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">실시간 분석 대시보드</h1>
-          <p className="text-gray-600 mt-1">마케팅 성과 실시간 모니터링</p>
+          <h1 className="text-3xl font-bold text-obsidian">실시간 분석 대시보드</h1>
+          <p className="text-obsidian mt-1">마케팅 성과 실시간 모니터링</p>
           {lastUpdated && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-foreground/70 mt-1">
               마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}
             </p>
           )}
@@ -355,7 +355,7 @@ export default function AnalyticsDashboard() {
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium">{formatNumber(metric.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatNumber(metric.pageViews)} 뷰
                     </div>
                   </div>
@@ -374,12 +374,12 @@ export default function AnalyticsDashboard() {
               {metrics.channelPerformance.slice(0, 5).map((channel, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
                     <span className="text-sm font-medium">{channel.channel}</span>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium">{formatNumber(channel.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatPercentage(channel.conversionRate)} 전환율
                     </div>
                   </div>
@@ -402,17 +402,17 @@ export default function AnalyticsDashboard() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     {device.device === 'desktop' ? (
-                      <Globe className="h-4 w-4 text-blue-500" />
+                      <Globe className="h-4 w-4 text-primary" />
                     ) : device.device === 'mobile' ? (
                       <Smartphone className="h-4 w-4 text-green-500" />
                     ) : (
-                      <Smartphone className="h-4 w-4 text-purple-500" />
+                      <Smartphone className="h-4 w-4 text-secondary" />
                     )}
                     <span className="text-sm font-medium capitalize">{device.device}</span>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium">{formatNumber(device.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatNumber(device.conversions)} 전환
                     </div>
                   </div>
@@ -436,7 +436,7 @@ export default function AnalyticsDashboard() {
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium">{formatNumber(location.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatCurrency(location.revenue)} 매출
                     </div>
                   </div>
@@ -459,11 +459,11 @@ export default function AnalyticsDashboard() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{page.title || page.page}</div>
-                    <div className="text-xs text-gray-500 truncate">{page.page}</div>
+                    <div className="text-xs text-foreground/70 truncate">{page.page}</div>
                   </div>
                   <div className="text-right ml-4">
                     <div className="text-sm font-medium">{formatNumber(page.views)}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatPercentage(page.bounceRate)} 이탈률
                     </div>
                   </div>
@@ -483,13 +483,13 @@ export default function AnalyticsDashboard() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{term.term}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       평균 {term.avgResults.toFixed(0)}개 결과
                     </div>
                   </div>
                   <div className="text-right ml-4">
                     <div className="text-sm font-medium">{formatNumber(term.searches)}</div>
-                    <div className="text-xs text-gray-500">검색</div>
+                    <div className="text-xs text-foreground/70">검색</div>
                   </div>
                 </div>
               ))}
@@ -510,13 +510,13 @@ export default function AnalyticsDashboard() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{campaign.campaign}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {campaign.source} / {campaign.medium}
                     </div>
                   </div>
                   <div className="text-right ml-4">
                     <div className="text-sm font-medium">{formatNumber(campaign.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatPercentage(campaign.conversionRate)} 전환율
                     </div>
                   </div>
@@ -536,11 +536,11 @@ export default function AnalyticsDashboard() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{test.testName}</div>
-                    <div className="text-xs text-gray-500">{test.variant}</div>
+                    <div className="text-xs text-foreground/70">{test.variant}</div>
                   </div>
                   <div className="text-right ml-4">
                     <div className="text-sm font-medium">{formatNumber(test.users)}명</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-foreground/70">
                       {formatPercentage(test.conversionRate)} 전환율
                     </div>
                   </div>
@@ -562,13 +562,13 @@ export default function AnalyticsDashboard() {
               <div key={index} className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{segment.segmentName}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-foreground/70">
                     {formatCurrency(segment.avgOrderValue)} 평균 주문 금액
                   </div>
                 </div>
                 <div className="text-right ml-4">
                   <div className="text-sm font-medium">{formatNumber(segment.users)}명</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-foreground/70">
                     {formatPercentage(segment.conversionRate)} 전환율
                   </div>
                 </div>

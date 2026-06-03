@@ -146,7 +146,7 @@ export default function NotificationsPage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">로그인이 필요합니다</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-obsidian mb-6">
               알림 설정을 관리하려면 로그인해주세요.
             </p>
             <Button asChild>
@@ -159,7 +159,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Button variant="ghost" asChild className="mb-4">
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
             </Link>
           </Button>
           <h1 className="text-3xl font-bold mb-2">알림 설정</h1>
-          <p className="text-gray-600">
+          <p className="text-obsidian">
             받고 싶은 알림을 선택하세요
           </p>
         </div>
@@ -185,10 +185,10 @@ export default function NotificationsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <ShoppingCart className="h-4 w-4 text-gray-500" />
+                <ShoppingCart className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-order">주문 알림</Label>
-                  <p className="text-sm text-gray-500">주문 확인, 주문 취소 알림</p>
+                  <p className="text-sm text-foreground/70">주문 확인, 주문 취소 알림</p>
                 </div>
               </div>
               <Switch
@@ -200,10 +200,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Package className="h-4 w-4 text-gray-500" />
+                <Package className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-shipping">배송 알림</Label>
-                  <p className="text-sm text-gray-500">배송 시작, 배송 완료 알림</p>
+                  <p className="text-sm text-foreground/70">배송 시작, 배송 완료 알림</p>
                 </div>
               </div>
               <Switch
@@ -215,10 +215,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Gift className="h-4 w-4 text-gray-500" />
+                <Gift className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-coupon">쿠폰 알림</Label>
-                  <p className="text-sm text-gray-500">쿠폰 발급, 만료 예정 알림</p>
+                  <p className="text-sm text-foreground/70">쿠폰 발급, 만료 예정 알림</p>
                 </div>
               </div>
               <Switch
@@ -230,10 +230,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <CreditCard className="h-4 w-4 text-gray-500" />
+                <CreditCard className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-point">포인트 알림</Label>
-                  <p className="text-sm text-gray-500">포인트 적립, 사용, 만료 알림</p>
+                  <p className="text-sm text-foreground/70">포인트 적립, 사용, 만료 알림</p>
                 </div>
               </div>
               <Switch
@@ -245,10 +245,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Bell className="h-4 w-4 text-gray-500" />
+                <Bell className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-promotion">프로모션 알림</Label>
-                  <p className="text-sm text-gray-500">할인, 이벤트 정보 알림</p>
+                  <p className="text-sm text-foreground/70">할인, 이벤트 정보 알림</p>
                 </div>
               </div>
               <Switch
@@ -260,10 +260,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Mail className="h-4 w-4 text-gray-500" />
+                <Mail className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="email-newsletter">뉴스레터 구독</Label>
-                  <p className="text-sm text-gray-500">주간 뉴스레터 수신</p>
+                  <p className="text-sm text-foreground/70">주간 뉴스레터 수신</p>
                 </div>
               </div>
               <Switch
@@ -286,10 +286,10 @@ export default function NotificationsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <ShoppingCart className="h-4 w-4 text-gray-500" />
+                <ShoppingCart className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="sms-order">주문 알림</Label>
-                  <p className="text-sm text-gray-500">주문 확인, 주문 취소 알림</p>
+                  <p className="text-sm text-foreground/70">주문 확인, 주문 취소 알림</p>
                 </div>
               </div>
               <Switch
@@ -301,10 +301,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Package className="h-4 w-4 text-gray-500" />
+                <Package className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="sms-shipping">배송 알림</Label>
-                  <p className="text-sm text-gray-500">배송 시작, 배송 완료 알림</p>
+                  <p className="text-sm text-foreground/70">배송 시작, 배송 완료 알림</p>
                 </div>
               </div>
               <Switch
@@ -316,10 +316,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Gift className="h-4 w-4 text-gray-500" />
+                <Gift className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="sms-coupon">쿠폰 알림</Label>
-                  <p className="text-sm text-gray-500">쿠폰 발급 알림</p>
+                  <p className="text-sm text-foreground/70">쿠폰 발급 알림</p>
                 </div>
               </div>
               <Switch
@@ -331,10 +331,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Bell className="h-4 w-4 text-gray-500" />
+                <Bell className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="sms-promotion">프로모션 알림</Label>
-                  <p className="text-sm text-gray-500">할인, 이벤트 정보 알림</p>
+                  <p className="text-sm text-foreground/70">할인, 이벤트 정보 알림</p>
                 </div>
               </div>
               <Switch
@@ -357,10 +357,10 @@ export default function NotificationsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <ShoppingCart className="h-4 w-4 text-gray-500" />
+                <ShoppingCart className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="push-order">주문 알림</Label>
-                  <p className="text-sm text-gray-500">주문 확인, 주문 취소 알림</p>
+                  <p className="text-sm text-foreground/70">주문 확인, 주문 취소 알림</p>
                 </div>
               </div>
               <Switch
@@ -372,10 +372,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Package className="h-4 w-4 text-gray-500" />
+                <Package className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="push-shipping">배송 알림</Label>
-                  <p className="text-sm text-gray-500">배송 시작, 배송 완료 알림</p>
+                  <p className="text-sm text-foreground/70">배송 시작, 배송 완료 알림</p>
                 </div>
               </div>
               <Switch
@@ -387,10 +387,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Gift className="h-4 w-4 text-gray-500" />
+                <Gift className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="push-coupon">쿠폰 알림</Label>
-                  <p className="text-sm text-gray-500">쿠폰 발급, 만료 예정 알림</p>
+                  <p className="text-sm text-foreground/70">쿠폰 발급, 만료 예정 알림</p>
                 </div>
               </div>
               <Switch
@@ -402,10 +402,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <CreditCard className="h-4 w-4 text-gray-500" />
+                <CreditCard className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="push-point">포인트 알림</Label>
-                  <p className="text-sm text-gray-500">포인트 적립, 사용, 만료 알림</p>
+                  <p className="text-sm text-foreground/70">포인트 적립, 사용, 만료 알림</p>
                 </div>
               </div>
               <Switch
@@ -417,10 +417,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Bell className="h-4 w-4 text-gray-500" />
+                <Bell className="h-4 w-4 text-foreground/70" />
                 <div>
                   <Label htmlFor="push-promotion">프로모션 알림</Label>
-                  <p className="text-sm text-gray-500">할인, 이벤트 정보 알림</p>
+                  <p className="text-sm text-foreground/70">할인, 이벤트 정보 알림</p>
                 </div>
               </div>
               <Switch

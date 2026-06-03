@@ -163,7 +163,7 @@ export default function RoulettePage() {
         <div className="min-h-screen bg-green-50/50 py-12">
             <div className="container mx-auto px-4 max-w-5xl">
                 <div className="mb-4">
-                    <Link href="/utils" className="inline-flex items-center text-sm text-gray-500 hover:text-green-600 transition-colors">
+                    <Link href="/utils" className="inline-flex items-center text-sm text-foreground/70 hover:text-green-600 transition-colors">
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         미니게임 돌아가기
                     </Link>
@@ -200,10 +200,10 @@ export default function RoulettePage() {
                                             exit={{ opacity: 0, height: 0 }}
                                             className="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm group"
                                         >
-                                            <span className="font-medium text-gray-700">{item}</span>
+                                            <span className="font-medium text-obsidian">{item}</span>
                                             <button
                                                 onClick={() => handleRemoveItem(idx)}
-                                                className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                                                className="text-foreground/70 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                                                 disabled={items.length <= 2}
                                                 aria-label={`${item} 삭제`}
                                             >
@@ -225,12 +225,12 @@ export default function RoulettePage() {
                         <Card className="p-8 w-full flex flex-col items-center justify-center bg-white relative overflow-hidden min-h-[500px]">
                             {/* Title */}
                             <div className="text-center mb-8 relative z-10">
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                                <h1 className="text-3xl font-bold text-obsidian mb-2 flex items-center justify-center gap-2">
                                     <Sparkles className="w-6 h-6 text-yellow-400" />
                                     오늘의 메뉴는?
                                     <Sparkles className="w-6 h-6 text-yellow-400" />
                                 </h1>
-                                <p className="text-gray-500">돌림판을 돌려 운명의 메뉴를 선택하세요!</p>
+                                <p className="text-foreground/70">돌림판을 돌려 운명의 메뉴를 선택하세요!</p>
                             </div>
 
                             {/* Canvas Wheel */}
@@ -276,7 +276,7 @@ export default function RoulettePage() {
                                         onClick={() => setWinner(null)}
                                     >
                                         <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm mx-4 transform animate-bounce-in">
-                                            <h3 className="text-gray-500 mb-2 text-xl">오늘의 메뉴는</h3>
+                                            <h3 className="text-foreground/70 mb-2 text-xl">오늘의 메뉴는</h3>
                                             <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-6 text-4xl">
                                                 {winner}
                                             </div>

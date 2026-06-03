@@ -125,7 +125,7 @@ export default function CoachDashboardPage() {
                 <CardContent className="p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="font-bold text-obsidian text-lg">{player.name}</div>
-                    <div className={`w-2 h-2 rounded-full ${player.status === 'RED' ? 'bg-rose-500' : 'bg-amber-500'} animate-pulse`} />
+                    <div className={`w-2 h-2 rounded-full ${player.status === 'RED' ? 'bg-rose-500' : 'bg-primary'} animate-pulse`} />
                   </div>
                   <div className="bg-mist/30 p-3 rounded-xl border border-line/5 text-xs font-bold text-slate/60">
                     "{player.reason}"

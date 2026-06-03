@@ -259,7 +259,7 @@ export default function CouponDashboard() {
           <div className="text-red-500 mb-4">
             <Tag className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">쿠폰 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchCouponData} variant="outline">
             다시 시도
@@ -274,8 +274,8 @@ export default function CouponDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">쿠폰 관리</h1>
-          <p className="text-gray-600 mt-1">쿠폰 생성, 관리 및 사용 통계</p>
+          <h1 className="text-3xl font-bold text-obsidian">쿠폰 관리</h1>
+          <p className="text-obsidian mt-1">쿠폰 생성, 관리 및 사용 통계</p>
         </div>
         <div className="flex space-x-2">
           <Button asChild>
@@ -319,10 +319,10 @@ export default function CouponDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">비활성 쿠폰</CardTitle>
-              <XCircle className="h-4 w-4 text-gray-500" />
+              <XCircle className="h-4 w-4 text-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.inactive.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-obsidian">{stats.inactive.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -339,10 +339,10 @@ export default function CouponDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">총 사용 횟수</CardTitle>
-              <DollarSign className="h-4 w-4 text-blue-500" />
+              <DollarSign className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalUsage.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-primary">{stats.totalUsage.toLocaleString()}</div>
             </CardContent>
           </Card>
         </div>
@@ -354,7 +354,7 @@ export default function CouponDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="쿠폰 코드, 이름으로 검색..."
                   value={searchTerm}
@@ -422,7 +422,7 @@ export default function CouponDashboard() {
                     <div>
                       <div className="font-medium">{coupon.name}</div>
                       {coupon.description && (
-                        <div className="text-sm text-gray-500">{coupon.description}</div>
+                        <div className="text-sm text-foreground/70">{coupon.description}</div>
                       )}
                     </div>
                   </TableCell>
@@ -435,7 +435,7 @@ export default function CouponDashboard() {
                   <TableCell>
                     <div className="font-medium">{formatValue(coupon.type, coupon.value)}</div>
                     {coupon.minOrderAmount && (
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-foreground/70">
                         최소 ₩{coupon.minOrderAmount.toLocaleString()}
                       </div>
                     )}
@@ -444,14 +444,14 @@ export default function CouponDashboard() {
                     {coupon.usageLimit ? (
                       <span>{coupon.usageLimit.toLocaleString()}회</span>
                     ) : (
-                      <span className="text-gray-500">제한 없음</span>
+                      <span className="text-foreground/70">제한 없음</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <span>{coupon.usageCount.toLocaleString()}</span>
                       {coupon.usageLimit && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-foreground/70">
                           ({Math.round((coupon.usageCount / coupon.usageLimit) * 100)}%)
                         </div>
                       )}
@@ -460,7 +460,7 @@ export default function CouponDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{formatDate(coupon.validFrom)}</div>
-                      <div className="text-gray-500">~ {formatDate(coupon.validUntil)}</div>
+                      <div className="text-foreground/70">~ {formatDate(coupon.validUntil)}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -477,7 +477,7 @@ export default function CouponDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{coupon.createdBy.name}</div>
-                      <div className="text-gray-500">{coupon.createdBy.email}</div>
+                      <div className="text-foreground/70">{coupon.createdBy.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -501,7 +501,7 @@ export default function CouponDashboard() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground/70">
                 페이지 {currentPage} / {totalPages}
               </div>
               <div className="flex space-x-2">

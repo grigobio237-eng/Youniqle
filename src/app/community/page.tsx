@@ -12,7 +12,7 @@ export default function CommunityPortalPage() {
       desc: '자유롭게 소통하고 회복 노하우를 공유하는 소중한 공간',
       href: '/community/lounge',
       icon: MessageSquare,
-      color: 'bg-emerald-500',
+      color: 'bg-secondary',
       badge: 'Active',
     },
     {
@@ -28,7 +28,7 @@ export default function CommunityPortalPage() {
       desc: '김미정 원장님(유니클)과 함께하는 1:1 회복 상담 및 소통',
       href: '/chat',
       icon: Sparkles,
-      color: 'bg-indigo-500',
+      color: 'bg-secondary',
       badge: 'New',
     },
   ];
@@ -126,7 +126,7 @@ export default function CommunityPortalPage() {
           </div>
           
           <div className="absolute top-0 right-0 w-96 h-96 bg-chapter-accent/20 rounded-full blur-[100px] -mr-48 -mt-48" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -ml-48 -mb-48" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-[100px] -ml-48 -mb-48" />
         </motion.div>
       </div>
     </div>

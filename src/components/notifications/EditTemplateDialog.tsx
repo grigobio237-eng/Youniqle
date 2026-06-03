@@ -383,7 +383,7 @@ export default function EditTemplateDialog({
                   value={formData.title}
                   onChange={(e) => handleChange('title', e.target.value)}
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground/70">
                   변수 사용 가능: {'{'}name{'}'}, {'{'}order_id{'}'}, {'{'}amount{'}'}
                 </p>
               </div>
@@ -399,7 +399,7 @@ export default function EditTemplateDialog({
                   value={formData.content}
                   onChange={(e) => handleChange('content', e.target.value)}
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground/70">
                   변수를 사용하여 동적 내용을 포함할 수 있습니다.
                 </p>
               </div>

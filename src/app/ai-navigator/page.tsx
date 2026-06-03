@@ -554,7 +554,7 @@ export default function AiNavigatorPage() {
                                                      </Button>
                                                  </div>
                                                  <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                                     <Button asChild variant="outline" className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-amber-50/80 border border-amber-200 text-amber-800 hover:bg-amber-100 hover:border-amber-300 shadow-sm active:scale-95 transition-all">
+                                                     <Button asChild variant="outline" className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-amber-50/80 border border-primary/30 text-amber-800 hover:bg-primary-container/50 hover:border-primary/30 shadow-sm active:scale-95 transition-all">
                                                          <Link href="/diagnosis?type=free">간단유형 확인</Link>
                                                      </Button>
                                                      <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-teal-50/80 border border-teal-200 text-teal-800 hover:bg-teal-100 hover:border-teal-300 shadow-sm active:scale-95 transition-all">

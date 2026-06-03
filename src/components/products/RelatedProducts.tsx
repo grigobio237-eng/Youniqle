@@ -90,20 +90,20 @@ export default function RelatedProducts({
   const getRecommendationBadgeColor = (reason: string) => {
     switch (reason) {
       case '같은 카테고리':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-container text-blue-800';
       case '비슷한 가격대':
         return 'bg-green-100 text-green-800';
       case '인기 상품':
         return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-secondary-container text-purple-800';
     }
   };
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900">관련 상품</h2>
+        <h2 className="text-2xl font-bold text-obsidian">관련 상품</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i}>
@@ -128,10 +128,10 @@ export default function RelatedProducts({
     <div className="space-y-6">
       {/* 헤더 */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+        <h2 className="text-3xl font-bold text-obsidian mb-2">
           관련 상품
         </h2>
-        <p className="text-gray-600">
+        <p className="text-obsidian">
           {currentProductName}과(와) 함께 보면 좋은 상품들
         </p>
       </div>
@@ -151,7 +151,7 @@ export default function RelatedProducts({
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 16vw"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <div className="absolute inset-0 flex items-center justify-center text-foreground/70">
                     <Heart className="h-12 w-12" />
                   </div>
                 )}
@@ -192,25 +192,25 @@ export default function RelatedProducts({
               <h3 className="font-semibold text-sm mb-2 line-clamp-2">
                 <Link 
                   href={`/products/${product._id}`}
-                  className="hover:text-blue-600 transition-colors"
+                  className="hover:text-primary transition-colors"
                 >
                   {product.name}
                 </Link>
               </h3>
               
               {/* 요약 */}
-              <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+              <p className="text-xs text-obsidian mb-3 line-clamp-2">
                 {product.summary}
               </p>
               
               {/* 가격 */}
               <div className="mb-3">
                 {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-xs text-gray-500 line-through block">
+                  <span className="text-xs text-foreground/70 line-through block">
                     {formatPrice(product.originalPrice)}
                   </span>
                 )}
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-lg font-bold text-primary">
                   {formatPrice(product.price)}
                 </span>
               </div>

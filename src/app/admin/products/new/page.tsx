@@ -100,7 +100,7 @@ export default function NewProductPage() {
       case 'fresh-food':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">영양 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">영양 정보</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="calories">칼로리 (100g당)</Label>
@@ -149,7 +149,7 @@ export default function NewProductPage() {
               </div>
             </div>
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-gray-700">원산지 정보</h4>
+              <h4 className="text-sm font-medium text-obsidian">원산지 정보</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="origin">원산지</Label>
@@ -194,7 +194,7 @@ export default function NewProductPage() {
       case 'clothing':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">의류 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">의류 정보</h4>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="sizeGuide">사이즈 가이드</Label>
@@ -231,7 +231,7 @@ export default function NewProductPage() {
       case 'electronics':
         return (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-gray-700">전자제품 정보</h4>
+            <h4 className="text-sm font-medium text-obsidian">전자제품 정보</h4>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="specifications">기술 사양</Label>
@@ -371,7 +371,7 @@ export default function NewProductPage() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">새 상품 등록</h1>
-            <p className="text-gray-600">새로운 상품을 등록합니다</p>
+            <p className="text-obsidian">새로운 상품을 등록합니다</p>
           </div>
         </div>
       </div>
@@ -408,7 +408,7 @@ export default function NewProductPage() {
               placeholder="상품명을 입력하면 자동 생성됩니다"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-foreground/70 mt-1">
               URL에 사용되는 식별자입니다. 필요시 수정 가능합니다.
             </p>
           </div>
@@ -458,7 +458,7 @@ export default function NewProductPage() {
         </div>
 
         {/* Funding Fields */}
-        <div className="flex items-center space-x-2 border p-4 rounded-lg bg-gray-50">
+        <div className="flex items-center space-x-2 border p-4 rounded-lg bg-surface">
           <Checkbox
             id="isFunding"
             checked={formData.isFunding}
@@ -466,7 +466,7 @@ export default function NewProductPage() {
           />
           <div className="space-y-1">
             <Label htmlFor="isFunding" className="font-semibold">펀딩 프로젝트로 등록</Label>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-foreground/70">
               이 상품을 크라우드 펀딩 형태로 진행합니다. 목표 금액과 종료일을 설정해주세요.
             </p>
           </div>

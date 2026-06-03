@@ -238,9 +238,9 @@ export default function MembershipPage() {
                         <GradeCard
                           level={pass.name.split(' ')[0]}
                           icon={
-                            pass.id === 'reset' ? <RefreshCcw className="w-8 h-8 text-slate-400" /> :
-                            pass.id === 'reborn' ? <Leaf className="w-8 h-8 text-emerald-500" /> :
-                            pass.id === 'restart' ? <Zap className="w-8 h-8 text-amber-500" /> :
+                            pass.id === 'reset' ? <RefreshCcw className="w-8 h-8 text-foreground/70" /> :
+                            pass.id === 'reborn' ? <Leaf className="w-8 h-8 text-secondary" /> :
+                            pass.id === 'restart' ? <Zap className="w-8 h-8 text-primary" /> :
                             <Crown className="w-8 h-8 text-slate-300" />
                           }
                           title={pass.id.charAt(0).toUpperCase() + pass.id.slice(1)}
@@ -284,28 +284,28 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
     // Safe static mapping for Tailwind JIT
     const colorStyles: Record<string, any> = {
         blue: {
-            ring: 'ring-blue-500',
-            border: 'border-blue-100 hover:border-blue-300',
+            ring: 'ring-primary',
+            border: 'border-blue-100 hover:border-primary/30',
             bgLight: 'bg-blue-50',
-            text: 'text-blue-600',
-            textDark: 'text-blue-500',
-            bgDark: 'bg-blue-500'
+            text: 'text-primary',
+            textDark: 'text-primary',
+            bgDark: 'bg-primary'
         },
         emerald: {
             ring: 'ring-emerald-500',
             border: 'border-emerald-100 hover:border-emerald-300',
             bgLight: 'bg-emerald-50',
-            text: 'text-emerald-600',
-            textDark: 'text-emerald-500',
-            bgDark: 'bg-emerald-500'
+            text: 'text-secondary',
+            textDark: 'text-secondary',
+            bgDark: 'bg-secondary'
         },
         amber: {
-            ring: 'ring-amber-500',
-            border: 'border-amber-100 hover:border-amber-300',
+            ring: 'ring-primary',
+            border: 'border-amber-100 hover:border-primary/30',
             bgLight: 'bg-amber-50',
-            text: 'text-amber-600',
-            textDark: 'text-amber-500',
-            bgDark: 'bg-amber-500'
+            text: 'text-primary',
+            textDark: 'text-primary',
+            bgDark: 'bg-primary'
         },
         'chapter-accent': {
             ring: 'ring-chapter-accent',
@@ -320,7 +320,7 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
             border: 'border-slate-800 hover:border-slate-700',
             bgLight: 'bg-white/10',
             text: 'text-slate-300',
-            textDark: 'text-slate-400',
+            textDark: 'text-foreground/70',
             bgDark: 'bg-slate-800'
         }
     };
@@ -336,7 +336,7 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
                 {icon}
             </div>
             <div className="space-y-2 md:space-y-3">
-                <div className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCurrent ? (isObsidian ? 'text-amber-400' : styles.text) : (isObsidian ? 'text-slate-400 group-hover:text-amber-400' : 'text-text-secondary')}`}>{level}</div>
+                <div className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCurrent ? (isObsidian ? 'text-amber-400' : styles.text) : (isObsidian ? 'text-foreground/70 group-hover:text-amber-400' : 'text-text-secondary')}`}>{level}</div>
                 <h4 className={`font-black text-sm md:text-lg tracking-tighter ${isCurrent && isObsidian ? 'text-white' : 'text-text-primary group-hover:text-inherit'}`}>{title}</h4>
                 <p className={`text-[10px] md:text-xs font-bold tracking-tight opacity-70 break-keep min-h-[28px] md:min-h-[32px] ${isCurrent && isObsidian ? 'text-mist' : 'text-text-secondary group-hover:text-inherit'}`}>{desc}</p>
             </div>
@@ -357,10 +357,10 @@ function GradeCard({ level, icon, title, desc, benefits, isCurrent, isFounder, a
 
             <div className="pt-6 mt-auto">
                 {isCurrent ? (
-                    <Badge className={`${isObsidian ? 'bg-amber-500' : styles.bgDark} text-white border-none text-[9px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg`}>CURRENT PLAN</Badge>
+                    <Badge className={`${isObsidian ? 'bg-primary' : styles.bgDark} text-white border-none text-[9px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg`}>CURRENT PLAN</Badge>
                 ) : (
                     <div className={`text-[10px] font-black transition-all duration-300 uppercase tracking-widest flex items-center gap-2 group-hover:gap-3
-                        ${isObsidian ? 'text-mist/40 group-hover:text-amber-400' : 'text-slate-400 group-hover:text-primary'}`}>
+                        ${isObsidian ? 'text-mist/40 group-hover:text-amber-400' : 'text-foreground/70 group-hover:text-primary'}`}>
                         View Details <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                 )}

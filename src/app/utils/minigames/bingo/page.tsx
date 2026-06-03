@@ -109,7 +109,7 @@ export default function OfficeBingoPage() {
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="mb-4">
                     <Link href="/utils/minigames">
-                        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+                        <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-obsidian -ml-2">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             미니게임 돌아가기
                         </Button>
@@ -117,11 +117,11 @@ export default function OfficeBingoPage() {
                 </div>
 
                 <div className="text-center mb-10 space-y-4">
-                    <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 px-4 py-1 rounded-full font-bold">
+                    <Badge variant="outline" className="text-secondary border-emerald-200 bg-emerald-50 px-4 py-1 rounded-full font-bold">
                         Office Sympathy Bingo
                     </Badge>
-                    <h1 className="font-black text-slate-900 tracking-tighter text-4xl">팀별 대항 공감 빙고</h1>
-                    <p className="text-slate-500 font-medium">우리 팀은 얼마나 많은 오피스 빌런... 아니, 에피소드를 가지고 있을까요?</p>
+                    <h1 className="font-black text-obsidian tracking-tighter text-4xl">팀별 대항 공감 빙고</h1>
+                    <p className="text-foreground/70 font-medium">우리 팀은 얼마나 많은 오피스 빌런... 아니, 에피소드를 가지고 있을까요?</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -131,13 +131,13 @@ export default function OfficeBingoPage() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 blur-[50px] pointer-events-none"></div>
 
                             <div className="space-y-4 relative z-10">
-                                <div className="flex items-center gap-3 text-emerald-600 mb-2">
+                                <div className="flex items-center gap-3 text-secondary mb-2">
                                     <Trophy className="w-5 h-5" />
                                     <span className="text-xs font-black uppercase tracking-widest">Bingo Status</span>
                                 </div>
 
-                                <div className="font-black text-slate-900 tabular-nums text-xl">
-                                    {bingoCount} <span className="text-slate-400 text-xl">Lines</span>
+                                <div className="font-black text-obsidian tabular-nums text-xl">
+                                    {bingoCount} <span className="text-foreground/70 text-xl">Lines</span>
                                 </div>
 
                                 <div className="space-y-1">
@@ -145,10 +145,10 @@ export default function OfficeBingoPage() {
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${Math.min((bingoCount / 3) * 100, 100)}%` }}
-                                            className="h-full bg-emerald-500"
+                                            className="h-full bg-secondary"
                                         />
                                     </div>
-                                    <p className="text-[10px] font-bold text-slate-400 text-right uppercase tracking-tighter">
+                                    <p className="text-[10px] font-bold text-foreground/70 text-right uppercase tracking-tighter">
                                         Goal: 3 Lines to Win
                                     </p>
                                 </div>
@@ -177,7 +177,7 @@ export default function OfficeBingoPage() {
                         <Button
                             variant="outline"
                             onClick={initGame}
-                            className="w-full h-14 rounded-2xl border-slate-200 font-bold hover:bg-slate-50 transition-all"
+                            className="w-full h-14 rounded-2xl border-line font-bold hover:bg-surface transition-all"
                         >
                             <RefreshCw className="mr-2 w-4 h-4" /> 새로운 빙고판 생성
                         </Button>
@@ -185,7 +185,7 @@ export default function OfficeBingoPage() {
 
                     {/* Right Side: Bingo Grid */}
                     <div className="lg:col-span-2">
-                        <Card className="p-4 bg-emerald-100/50 border-none shadow-2xl rounded-[40px] relative overflow-hidden">
+                        <Card className="p-4 bg-secondary-container/50 border-none shadow-2xl rounded-[40px] relative overflow-hidden">
                             <div className="grid grid-cols-5 gap-2 md:gap-3 aspect-square w-full relative z-10">
                                 {grid.map((cell) => (
                                     <BingoCellComponent
@@ -238,16 +238,16 @@ export default function OfficeBingoPage() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                         <div className="space-y-2">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto font-black text-xs">1</div>
-                            <p className="text-slate-600 font-medium">동료들과 모여 빙고판의 각 항목을 하나씩 읽어보세요.</p>
+                            <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center mx-auto font-black text-xs">1</div>
+                            <p className="text-obsidian font-medium">동료들과 모여 빙고판의 각 항목을 하나씩 읽어보세요.</p>
                         </div>
                         <div className="space-y-2">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto font-black text-xs">2</div>
-                            <p className="text-slate-600 font-medium">팀원 중 한 명이라도 해당되는 내용이 있다면 셀을 클릭!</p>
+                            <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center mx-auto font-black text-xs">2</div>
+                            <p className="text-obsidian font-medium">팀원 중 한 명이라도 해당되는 내용이 있다면 셀을 클릭!</p>
                         </div>
                         <div className="space-y-2">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto font-black text-xs">3</div>
-                            <p className="text-slate-600 font-medium">3줄 이상의 빙고가 완성되면 승리입니다. 회식 메뉴를 정해보세요!</p>
+                            <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center mx-auto font-black text-xs">3</div>
+                            <p className="text-obsidian font-medium">3줄 이상의 빙고가 완성되면 승리입니다. 회식 메뉴를 정해보세요!</p>
                         </div>
                     </div>
                 </div>
@@ -265,8 +265,8 @@ function BingoCellComponent({ cell, onClick, isWinner }: { cell: BingoCell, onCl
             className={`
                 relative aspect-square rounded-xl md:rounded-2xl flex flex-col items-center justify-center p-2 text-center transition-all duration-300 cursor-pointer overflow-hidden border-2
                 ${cell.checked
-                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200 z-10'
-                    : 'bg-white border-transparent text-slate-600 hover:border-emerald-200'
+                    ? 'bg-secondary border-emerald-500 text-white shadow-lg shadow-emerald-200 z-10'
+                    : 'bg-white border-transparent text-obsidian hover:border-emerald-200'
                 }
             `}
         >

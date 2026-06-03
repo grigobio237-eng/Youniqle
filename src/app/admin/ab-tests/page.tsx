@@ -188,7 +188,7 @@ export default function ABTestDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800">초안</Badge>;
+        return <Badge variant="outline" className="bg-gray-100 text-obsidian">초안</Badge>;
       case 'running':
         return <Badge variant="default" className="bg-green-100 text-green-800">실행중</Badge>;
       case 'paused':
@@ -289,7 +289,7 @@ export default function ABTestDashboard() {
           <div className="text-red-500 mb-4">
             <FlaskConical className="h-16 w-16 mx-auto mb-4" />
             <p className="text-lg">A/B 테스트 데이터를 불러올 수 없습니다</p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
+            <p className="text-sm text-foreground/70 mt-2">{error}</p>
           </div>
           <Button onClick={fetchABTests} variant="outline">
             다시 시도
@@ -304,8 +304,8 @@ export default function ABTestDashboard() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">A/B 테스트 관리</h1>
-          <p className="text-gray-600 mt-1">마케팅 캠페인 최적화를 위한 A/B 테스트</p>
+          <h1 className="text-3xl font-bold text-obsidian">A/B 테스트 관리</h1>
+          <p className="text-obsidian mt-1">마케팅 캠페인 최적화를 위한 A/B 테스트</p>
         </div>
         <div className="flex space-x-2">
           <Button asChild>
@@ -339,10 +339,10 @@ export default function ABTestDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">초안</CardTitle>
-              <Edit className="h-4 w-4 text-gray-500" />
+              <Edit className="h-4 w-4 text-foreground/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.draft.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-obsidian">{stats.draft.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -369,10 +369,10 @@ export default function ABTestDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">완료</CardTitle>
-              <CheckCircle className="h-4 w-4 text-blue-500" />
+              <CheckCircle className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.completed.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-primary">{stats.completed.toLocaleString()}</div>
             </CardContent>
           </Card>
 
@@ -394,7 +394,7 @@ export default function ABTestDashboard() {
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/70 h-4 w-4" />
                 <Input
                   placeholder="테스트 이름, 가설로 검색..."
                   value={searchTerm}
@@ -469,7 +469,7 @@ export default function ABTestDashboard() {
                     <div>
                       <div className="font-medium">{test.name}</div>
                       {test.description && (
-                        <div className="text-sm text-gray-500">{test.description}</div>
+                        <div className="text-sm text-foreground/70">{test.description}</div>
                       )}
                     </div>
                   </TableCell>
@@ -493,7 +493,7 @@ export default function ABTestDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{test.variants.length}개 변형</div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         대조군: {test.variants.find(v => v.isControl)?.name}
                       </div>
                     </div>
@@ -501,7 +501,7 @@ export default function ABTestDashboard() {
                   <TableCell>
                     <div className="text-sm">
                       <div>{test.currentSampleSize.toLocaleString()} / {test.minSampleSize.toLocaleString()}</div>
-                      <div className="text-gray-500">
+                      <div className="text-foreground/70">
                         {Math.round((test.currentSampleSize / test.minSampleSize) * 100)}%
                       </div>
                     </div>
@@ -510,7 +510,7 @@ export default function ABTestDashboard() {
                     <div className="text-sm">
                       <div>시작: {formatDate(test.startDate)}</div>
                       {test.endDate && (
-                        <div className="text-gray-500">종료: {formatDate(test.endDate)}</div>
+                        <div className="text-foreground/70">종료: {formatDate(test.endDate)}</div>
                       )}
                     </div>
                   </TableCell>
@@ -533,13 +533,13 @@ export default function ABTestDashboard() {
                         )}
                       </div>
                     ) : (
-                      <span className="text-gray-500">-</span>
+                      <span className="text-foreground/70">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
                       <div>{test.createdBy.name}</div>
-                      <div className="text-gray-500">{test.createdBy.email}</div>
+                      <div className="text-foreground/70">{test.createdBy.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -604,7 +604,7 @@ export default function ABTestDashboard() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-foreground/70">
                 페이지 {currentPage} / {totalPages}
               </div>
               <div className="flex space-x-2">
