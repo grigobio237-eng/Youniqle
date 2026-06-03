@@ -1,4 +1,4 @@
-import { ExecutionContext, TrendNodeConfig, WorkflowNode } from '../types';
+import { ExecutionContext, TrendNodeConfig, WorkflowNode } from '@/lib/video-workflow/types';
 import { GeminiAIEngine } from '../../ai/gemini-engine';
 import { TrendStrategyRegistry } from '../strategies/TrendStrategies';
 import VideoProject from '@/models/VideoProject';

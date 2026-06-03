@@ -10,6 +10,7 @@ import { Loader2, Sparkles, PenTool, Image as ImageIcon, ChevronLeft, ChevronRig
 import { compressImage } from '@/lib/utils/image-client';
 import { downloadWebtoon } from '@/lib/utils/download';
 import { drawTextOnImageClient } from '@/lib/utils/canvas-text-client';
+import Image from 'next/image';
 
 export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryData }: { open: boolean, onOpenChange: (open: boolean) => void, recoveryData: any }) {
   const [step, setStep] = useState<'STYLE' | 'SCRIPT' | 'CHARACTER' | 'IMAGE' | 'POSTED'>('STYLE');
@@ -672,7 +673,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                     <div className="relative group overflow-hidden rounded-2xl border-2 border-dashed border-line hover:border-primary transition-colors cursor-pointer aspect-video flex flex-col items-center justify-center bg-mist/10"
                       onClick={() => document.getElementById('char-ref-upload')?.click()}>
                       {userReferenceImage ? (
-                        <img src={userReferenceImage} className="w-full h-full object-cover" alt="Reference" />
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={userReferenceImage} className="w-full h-full object-cover" alt="Reference" />
                       ) : (
                         <>
                           <Camera className="w-6 h-6 text-slate/40 mb-1 group-hover:scale-110 transition-transform" />
@@ -716,7 +717,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                           }`}
                         onClick={() => handleSelectCharacter('ref')}
                       >
-                        <img src={refBasedCharacter} alt="사진 기반" className="w-full aspect-square object-cover" />
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={refBasedCharacter} alt="사진 기반" className="w-full aspect-square object-cover" />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                           <p className="text-white text-xs font-black">📷 사진 기반</p>
                         </div>
@@ -735,7 +736,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                           }`}
                         onClick={() => handleSelectCharacter('prompt')}
                       >
-                        <img src={promptBasedCharacter} alt="유니클 프롬프트 기반" className="w-full aspect-square object-cover" />
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={promptBasedCharacter} alt="유니클 프롬프트 기반" className="w-full aspect-square object-cover" />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                           <p className="text-white text-xs font-black">📝 유니클 프롬프트 기반</p>
                         </div>
@@ -802,7 +803,7 @@ export default function WebtoonChallengeDialog({ open, onOpenChange, recoveryDat
                       <div key={idx} className="relative group rounded-[24px] overflow-hidden border border-line shadow-lg bg-mist/10 aspect-video flex flex-col items-center justify-center">
                         {panel.imageUrl ? (
                           <>
-                            <img src={panel.imageUrl} alt={`Panel ${panel.panelNumber}`} className="w-full h-auto animate-in fade-in duration-500" />
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={panel.imageUrl} alt={`Panel ${panel.panelNumber}`} className="w-full h-auto animate-in fade-in duration-500" />
                             <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                               <Button
                                 size="sm"

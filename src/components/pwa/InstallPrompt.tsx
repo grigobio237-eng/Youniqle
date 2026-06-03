@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, Download, Share, PlusSquare } from 'lucide-react';
+import Image from 'next/image';
 
 export default function InstallPrompt() {
   const [mounted, setMounted] = useState(false);
@@ -105,8 +106,7 @@ export default function InstallPrompt() {
         {/* 본문 콘텐츠 */}
         <div className="flex items-start space-x-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-neutral-900 border border-neutral-800 shadow-inner">
-            <img
-              src="/character/youniqle-1.png"
+            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized               src="/character/youniqle-1.png"
               alt="Youniqle"
               className="h-9 w-9 object-contain"
               onError={(e) => {

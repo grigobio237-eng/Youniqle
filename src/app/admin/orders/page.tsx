@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import Image from 'next/image';
 
 interface Order {
   _id: string;
@@ -701,8 +702,7 @@ export default function AdminOrdersPage() {
                             <div className="space-y-2">
                               {order.items.map((item, index) => (
                                 <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                  <img
-                                    src={item.image}
+                                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                                     src={item.image}
                                     alt={item.productName}
                                     className="w-12 h-12 object-cover rounded"
                                   />
@@ -884,8 +884,7 @@ export default function AdminOrdersPage() {
                 <div className="space-y-2">
                   {selectedOrder.items.map((item, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <img
-                        src={item.image}
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                         src={item.image}
                         alt={item.productName}
                         className="w-16 h-16 object-cover rounded"
                       />

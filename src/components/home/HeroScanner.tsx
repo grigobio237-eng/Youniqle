@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import { useAIProgress } from '@/hooks/use-ai-progress';
 import { AIProgressOverlay } from '@/components/shared/AIProgressOverlay';
+import Image from 'next/image';
 
 export interface AnalysisResult {
     subjectName: string;
@@ -490,7 +491,7 @@ export default function HeroScanner({
                         </div>
                     )}
                     <div className="relative h-64 md:h-72 overflow-hidden">
-                        {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
+                        {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                         <div className="absolute bottom-6 md:bottom-8 left-6 md:left-10 right-6 md:right-10 flex items-end justify-between">
                             <div className="space-y-2">
@@ -647,7 +648,7 @@ export default function HeroScanner({
                 )}
                 {status === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative aspect-[4/3] rounded-5xl bg-mist flex flex-col items-center justify-center overflow-hidden">
-                        {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
+                        {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
                         <AIProgressOverlay active={loading} progress={scanProgress} message={statusMessage} variant="compact" />
                     </motion.div>
                 )}

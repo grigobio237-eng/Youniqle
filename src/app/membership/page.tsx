@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Award, Activity, RefreshCcw, Zap, Sprout, Flower2, Sun, Share2, Crown, Lock, ArrowRight, Leaf, Star, Sparkles, Shield, MousePointer2, CheckCircle2 } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { PASS_SPECS } from '@/lib/constants/passes';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -177,7 +178,7 @@ export default function MembershipPage() {
                                   <DialogTitle className="font-black text-obsidian tracking-tight text-xl md:text-2xl">진료 전용 QR</DialogTitle>
                                 </DialogHeader>
                                 <div className="p-4 md:p-6 bg-mist rounded-2xl md:rounded-3xl shadow-inner border border-line/50">
-                                  <img 
+                                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                     src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`YOUNIQLE_USER_${session.user?.name}`)}`}
                                     alt="Treatment QR"
                                     className="w-40 h-40 md:w-48 md:h-48 mix-blend-multiply"

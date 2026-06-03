@@ -1,5 +1,5 @@
 import { GeminiCore } from '../engine/core';
-import { DailyCheckInInput, DailyCheckInOutput, NavigatorInput, NavigatorOutput } from '../types';
+import { DailyCheckInInput, DailyCheckInOutput, NavigatorInput, NavigatorOutput } from '@/lib/ai/types';
 
 export class RoutineService {
     private static questionCache: Record<string, any[]> = {};

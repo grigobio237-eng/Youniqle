@@ -1,4 +1,4 @@
-import { sendVerificationEmail } from '../lib/email';
+import { sendVerificationEmail } from '@/lib/email';
 
 async function testEmail() {
   try {

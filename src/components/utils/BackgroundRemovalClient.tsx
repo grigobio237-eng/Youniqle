@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Upload, Download, RefreshCw, Shield, AlertTriangle, Info } from 'lucide-react';
 import * as tf from '@tensorflow/tfjs';
 import * as bodyPix from '@tensorflow-models/body-pix';
+import Image from 'next/image';
 
 interface BackgroundRemovalClientProps {
     onComplete?: () => void;
@@ -203,7 +204,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                     <Card className="p-6">
                         <h3 className="text-lg font-bold mb-4 text-center">원본 이미지</h3>
                         <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
-                            <img src={originalImage} alt="Original" className="max-w-full max-h-96 rounded-lg" />
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={originalImage} alt="Original" className="max-w-full max-h-96 rounded-lg" />
                         </div>
                     </Card>
 
@@ -220,7 +221,7 @@ export default function BackgroundRemovalClient({ onComplete }: BackgroundRemova
                                 }
                             `}</style>
                             {processedImage ? (
-                                <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
+                                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
                             ) : (
                                 <div className="text-center text-gray-400">
                                     {loading ? (

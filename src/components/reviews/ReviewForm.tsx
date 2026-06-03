@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Star, Upload, X, Camera } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface ReviewFormProps {
   productId: string;
@@ -289,8 +290,7 @@ export default function ReviewForm({ productId, productName, onReviewSubmitted }
                 <div className="grid grid-cols-5 gap-2">
                   {images.map((image, index) => (
                     <div key={index} className="relative group">
-                      <img
-                        src={image}
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                         src={image}
                         alt={`리뷰 이미지 ${index + 1}`}
                         className="w-full h-20 object-cover rounded-lg border"
                       />

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Loader2, ChevronLeft, ShieldCheck, HeartPulse, UserCircle, Target, CheckCircle2, Sparkles, ClipboardCheck, Stethoscope, AlertTriangle, Activity, Coffee, Gem, Info } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export default function ReportPage({ params: originalParams }: { params: { id: string } }) {
   const params = useParams() || originalParams;
@@ -148,7 +149,7 @@ export default function ReportPage({ params: originalParams }: { params: { id: s
         {/* Profile Card */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-line flex items-center gap-3">
           {data.user?.image ? (
-            <img src={data.user.image} alt={data.user.name} className="w-12 h-12 rounded-full border border-line" />
+            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={data.user.image} alt={data.user.name} className="w-12 h-12 rounded-full border border-line" />
           ) : (
             <div className="w-12 h-12 rounded-full bg-mist flex items-center justify-center text-primary">
               <UserCircle className="w-7 h-7" />

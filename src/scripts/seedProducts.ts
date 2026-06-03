@@ -5,7 +5,7 @@ import path from 'path';
 // load .env.local
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-import Product from '../models/Product';
+import Product from '@/models/Product';
 
 const products = [
     {

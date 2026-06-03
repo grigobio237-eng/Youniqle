@@ -1,5 +1,5 @@
 
-import { ExecutionContext } from '../types';
+import { ExecutionContext } from '@/lib/video-workflow/types';
 
 export interface ScriptStrategy {
     getPrompt(trendContext: any, projectType: string, productName?: string): string;

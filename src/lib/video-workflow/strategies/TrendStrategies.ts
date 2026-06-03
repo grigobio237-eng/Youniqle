@@ -1,5 +1,5 @@
 
-import { ExecutionContext } from '../types';
+import { ExecutionContext } from '@/lib/video-workflow/types';
 
 export interface WorkflowStrategy {
     getPrompt(topic: string, context?: ExecutionContext): string;

@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import { Save, Activity, Lock } from 'lucide-react';
 import { AccessControl } from '@/lib/logic/access-control';
+import Image from 'next/image';
 
 interface PostureResult {
     subjectName: string;
@@ -298,7 +299,7 @@ export default function PostureScanner() {
                                 <div className="absolute inset-0 border-4 border-chapter-accent/20 rounded-full" />
                                 <div className="absolute inset-0 border-4 border-chapter-accent border-t-transparent rounded-full animate-spin" />
                                 <div className="absolute inset-4 overflow-hidden rounded-full">
-                                    {capturedImage && <img src={capturedImage} alt="Capture" className="w-full h-full object-cover grayscale opacity-50" />}
+                                    {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Capture" className="w-full h-full object-cover grayscale opacity-50" />}
                                 </div>
                             </div>
                             <h3 className="text-2xl font-black italic text-obsidian uppercase tracking-widest animate-pulse">Analyzing...</h3>

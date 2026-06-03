@@ -10,6 +10,7 @@ import { Loader2, Play, AlertCircle, CheckCircle2, ArrowRight, Trash2, ShoppingB
 import { useRouter } from 'next/navigation';
 import { removeBackground } from '@imgly/background-removal';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface Project {
     _id: string;
@@ -286,7 +287,7 @@ export default function AutoVideoPage() {
                                             </label>
                                             <div className="aspect-square bg-muted/20 border-2 border-dashed rounded-xl flex items-center justify-center relative overflow-hidden hover:bg-muted/40 transition-colors group">
                                                 {productImage ? (
-                                                    <img src={productImage} alt="Product" className="w-full h-full object-cover" />
+                                                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={productImage} alt="Product" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="text-center p-4">
                                                         {uploading === 'product' ? (
@@ -321,7 +322,7 @@ export default function AutoVideoPage() {
                                             </label>
                                             <div className="aspect-square bg-muted/20 border-2 border-dashed rounded-xl flex items-center justify-center relative overflow-hidden hover:bg-muted/40 transition-colors group">
                                                 {modelImage ? (
-                                                    <img src={modelImage} alt="Model" className="w-full h-full object-cover" />
+                                                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={modelImage} alt="Model" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="text-center p-4">
                                                         {uploading === 'model' ? (

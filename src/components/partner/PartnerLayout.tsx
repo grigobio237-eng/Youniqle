@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -401,8 +402,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
                 {partner.avatar ? (
-                  <img
-                    src={partner.avatar}
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                     src={partner.avatar}
                     alt={partner.name}
                     className="w-10 h-10 rounded-full object-cover"
                   />
@@ -575,7 +575,7 @@ export default function PartnerLayout({ children }: PartnerLayoutProps) {
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                       {partner.avatar ? (
-                        <img src={partner.avatar} alt={partner.name} className="w-8 h-8 rounded-full object-cover" crossOrigin="anonymous" />
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={partner.avatar} alt={partner.name} className="w-8 h-8 rounded-full object-cover" crossOrigin="anonymous" />
                       ) : (
                         <Store className="h-4 w-4 text-white" />
                       )}

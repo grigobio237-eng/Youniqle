@@ -27,6 +27,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -309,7 +310,7 @@ export default function InventoryManagement() {
                     className={`flex items-center gap-3 p-3 rounded-xl ${item.status === 'out_of_stock' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'
                       }`}
                   >
-                    <img
+                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                       src={item.image}
                       alt={item.productName}
                       crossOrigin="anonymous"
@@ -437,7 +438,7 @@ export default function InventoryManagement() {
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <img
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                     src={item.image}
                     alt={item.productName}
                     crossOrigin="anonymous"

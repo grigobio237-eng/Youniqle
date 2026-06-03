@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { ArrowLeft, Upload, Download, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 
 type ImageFormat = 'jpeg' | 'png' | 'webp';
 
@@ -172,7 +173,7 @@ export default function ImageConverterPage() {
                                     {previewUrl && (
                                         <div className="bg-gray-50 rounded-lg p-4">
                                             <Label className="text-base font-semibold mb-2 block">미리보기</Label>
-                                            <img src={previewUrl} alt="Preview" className="max-w-full max-h-64 mx-auto rounded-lg" />
+                                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={previewUrl} alt="Preview" className="max-w-full max-h-64 mx-auto rounded-lg" />
                                         </div>
                                     )}
 

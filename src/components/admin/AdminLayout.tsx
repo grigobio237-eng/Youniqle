@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CharacterImage from '@/components/ui/CharacterImage';
+import Image from 'next/image';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -490,8 +491,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                 {admin.avatar && !imgError ? (
-                  <img
-                    src={admin.avatar}
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                     src={admin.avatar}
                     alt={admin.name}
                     className="w-10 h-10 rounded-full object-cover"
                     onError={() => setImgError(true)}

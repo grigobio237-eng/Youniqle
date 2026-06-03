@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Session } from 'next-auth';
 import { io, Socket } from 'socket.io-client';
 import { Send, Lock } from 'lucide-react';
+import Image from 'next/image';
 
 
 interface Message {
@@ -199,7 +200,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                 <CardTitle className="flex items-center space-x-3">
                     <div className="relative">
                         <div className="w-10 h-10 rounded-full overflow-hidden border">
-                            <img src="/images/kim-mijeong-profile.jpg" alt="김미정 원장" className="object-cover w-full h-full" />
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src="/images/kim-mijeong-profile.jpg" alt="김미정 원장" className="object-cover w-full h-full" />
                         </div>
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
@@ -233,7 +234,7 @@ export default function ChatInterface({ session, subscriptionActive, onSubscribe
                                 <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                     {!isMe && (
                                         <div className="w-8 h-8 rounded-full overflow-hidden mr-2 mt-1 flex-shrink-0">
-                                            <img src="/images/kim-mijeong-profile.jpg" alt="원장" className="w-full h-full object-cover" />
+                                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src="/images/kim-mijeong-profile.jpg" alt="원장" className="w-full h-full object-cover" />
                                         </div>
                                     )}
                                     <div className={`max-w-[70%] p-3 rounded-lg shadow-sm text-sm whitespace-pre-wrap ${isMe

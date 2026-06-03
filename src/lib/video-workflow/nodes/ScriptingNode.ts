@@ -1,4 +1,4 @@
-import { ExecutionContext, ScriptNodeConfig, WorkflowNode } from '../types';
+import { ExecutionContext, ScriptNodeConfig, WorkflowNode } from '@/lib/video-workflow/types';
 import { GeminiAIEngine } from '../../ai/gemini-engine';
 import { ScriptStrategyRegistry } from '../strategies/ScriptStrategies';
 import VideoProject from '@/models/VideoProject';

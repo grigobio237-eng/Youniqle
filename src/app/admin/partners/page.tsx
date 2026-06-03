@@ -27,6 +27,7 @@ import {
   DollarSign,
   TrendingUp
 } from 'lucide-react';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -600,7 +601,7 @@ export default function AdminPartnersPage() {
                       <p className="text-sm font-bold text-slate">상점 로고</p>
                       {selectedPartner.partnerSettings.shopLogo ? (
                         <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-line bg-mist">
-                          <img src={selectedPartner.partnerSettings.shopLogo} alt="상점 로고" className="w-full h-full object-cover" />
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedPartner.partnerSettings.shopLogo} alt="상점 로고" className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
@@ -611,7 +612,7 @@ export default function AdminPartnersPage() {
                       <p className="text-sm font-bold text-slate">상점 배너</p>
                       {selectedPartner.partnerSettings.shopBanner ? (
                         <div className="w-full h-24 rounded-xl overflow-hidden border-2 border-line bg-mist">
-                          <img src={selectedPartner.partnerSettings.shopBanner} alt="상점 배너" className="w-full h-full object-cover" />
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedPartner.partnerSettings.shopBanner} alt="상점 배너" className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-full h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">미설정</div>
@@ -659,8 +660,7 @@ export default function AdminPartnersPage() {
                       </p>
                       {selectedPartner.partnerApplication?.businessRegistrationImage ? (
                         <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-line bg-mist group">
-                          <img
-                            src={selectedPartner.partnerApplication.businessRegistrationImage}
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                             src={selectedPartner.partnerApplication.businessRegistrationImage}
                             alt="증빙서류"
                             className="w-full h-full object-contain"
                           />
@@ -684,8 +684,7 @@ export default function AdminPartnersPage() {
                       <p className="text-sm font-bold text-slate">통장 사본</p>
                       {selectedPartner.partnerApplication?.bankStatementImage ? (
                         <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-line bg-mist group">
-                          <img
-                            src={selectedPartner.partnerApplication.bankStatementImage}
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                             src={selectedPartner.partnerApplication.bankStatementImage}
                             alt="통장사본"
                             className="w-full h-full object-contain"
                           />

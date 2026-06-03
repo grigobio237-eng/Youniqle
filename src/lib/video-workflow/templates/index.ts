@@ -1,5 +1,5 @@
 
-import { WorkflowTemplate } from '../types';
+import { WorkflowTemplate } from '@/lib/video-workflow/types';
 
 export const SHORTFORM_TEMPLATE: WorkflowTemplate = {
     type: 'shortform',

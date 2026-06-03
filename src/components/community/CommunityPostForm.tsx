@@ -6,6 +6,7 @@ import { X, Image as ImageIcon, Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface CommunityPostFormProps {
   postId?: string;
@@ -181,7 +182,7 @@ export default function CommunityPostForm({ postId, onClose, onSuccess }: Commun
                 <div className="flex flex-wrap gap-4 mt-4">
                   {images.map((url, idx) => (
                     <div key={idx} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-line group">
-                      <img src={url} alt="Uploaded" className="w-full h-full object-cover" />
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={url} alt="Uploaded" className="w-full h-full object-cover" />
                       <button 
                         type="button"
                         onClick={() => removeImage(idx)}

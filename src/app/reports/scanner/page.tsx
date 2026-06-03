@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { 
     Dialog,
     DialogContent,
@@ -112,7 +113,7 @@ export default function ScannerReportPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2">
                                     {/* Image Side */}
                                     <div className="relative aspect-square md:aspect-auto h-full min-h-[300px] bg-obsidian overflow-hidden">
-                                        <img 
+                                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                             src={latestScan.imageUrl} 
                                             alt="Scanner Analysis"
                                             className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
@@ -203,7 +204,7 @@ export default function ScannerReportPage() {
                                 >
                                     <CardContent className="p-4 flex items-center gap-4">
                                         <div className="w-16 h-16 shrink-0 bg-mist rounded-xl overflow-hidden">
-                                            <img 
+                                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                                 src={s.imageUrl} 
                                                 alt="Scan thumbnail"
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -244,7 +245,7 @@ export default function ScannerReportPage() {
                         <div className="flex flex-col max-h-[90vh]">
                             {/* Image Header */}
                             <div className="relative h-[300px] bg-obsidian">
-                                <img 
+                                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                     src={selectedScan.imageUrl} 
                                     alt="Full Scan"
                                     className="w-full h-full object-contain"

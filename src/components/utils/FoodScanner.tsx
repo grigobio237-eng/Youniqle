@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import { AccessControl } from '@/lib/logic/access-control';
 import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 
 export interface AnalysisResult {
     isMismatch?: boolean;
@@ -342,7 +343,7 @@ export default function FoodScanner({
 
                 {status === 'analyzing' && (
                     <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative aspect-[4/3] rounded-[40px] bg-obsidian flex flex-col items-center justify-center text-mist overflow-hidden border-4 border-white/10">
-                        {capturedImage && <img src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
+                        {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Scanning" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
                         <div className="relative z-10 flex flex-col items-center gap-6">
                             <div className="w-16 h-16 border-4 border-chapter-accent border-t-transparent rounded-full animate-spin" />
                             <div className="text-center">
@@ -357,7 +358,7 @@ export default function FoodScanner({
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                         <Card className="rounded-[40px] border-none shadow-2xl overflow-hidden bg-white">
                             <div className="relative h-64 overflow-hidden">
-                                {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
+                                {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                                 <div className="absolute bottom-6 left-8 right-8 flex items-end justify-between text-white">
                                     <div>

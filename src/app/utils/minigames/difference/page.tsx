@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, RefreshCw, Trophy, Timer, MousePointer2, Lightbulb, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 // --- Constants & Types ---
 const GAME_TIME = 60;
@@ -188,7 +189,7 @@ export default function SpotTheDifferencePage() {
                         <div className="space-y-2">
                             <Badge variant="secondary" className="bg-slate-100 text-slate-500 uppercase font-black tracking-widest">Original Reference</Badge>
                             <Card className="overflow-hidden border-none shadow-xl rounded-[32px] relative group">
-                                <img
+                                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                     src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
                                     alt="Office Original"
                                     className="w-full h-full object-cover grayscale-[0.2]"
@@ -221,7 +222,7 @@ export default function SpotTheDifferencePage() {
                                 onClick={handleImageClick}
                                 className={`overflow-hidden border-none shadow-xl rounded-[32px] relative cursor-crosshair transition-all duration-300 ${penalty ? 'ring-8 ring-rose-500/50 scale-[0.99] grayscale-0' : 'ring-0'}`}
                             >
-                                <img
+                                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                     src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
                                     alt="Office Modified"
                                     className="w-full h-full object-cover filter brightness-[1.02]"

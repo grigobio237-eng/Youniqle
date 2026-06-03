@@ -25,6 +25,7 @@ import ImageManager from '@/components/products/ImageManager';
 import ProductDescriptionEditor from '@/components/admin/ProductDescriptionEditor';
 import { toast } from 'sonner';
 import { PRODUCT_CATEGORIES } from '@/constants/categories';
+import Image from 'next/image';
 
 interface Product {
   _id: string;
@@ -831,8 +832,7 @@ function PartnerProductsContent() {
             <Card key={product._id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-square relative bg-gray-100">
                 {product.images?.[0] ? (
-                  <img
-                    src={product.images[0].url}
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                     src={product.images[0].url}
                     alt={product.name}
                     crossOrigin="anonymous"
                     className="w-full h-full object-cover"

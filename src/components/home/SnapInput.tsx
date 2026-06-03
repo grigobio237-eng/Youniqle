@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, PenLine, ArrowRight, X, Image as ImageIcon, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
 
 interface SnapInputProps {
   onComplete: (data: { type: 'PHOTO' | 'TEXT'; content: string | File }) => void;
@@ -241,7 +242,7 @@ export default function SnapInput({ onComplete, onCancel, initialImage, isDiagno
             >
               <div className="relative aspect-[4/3] w-full max-w-[280px] sm:max-w-md mx-auto bg-white border-4 border-white rounded-[28px] sm:rounded-[36px] overflow-hidden shadow-[0_15px_40px_rgba(85,98,87,0.15)]">
                 {selectedImage && (
-                  <img src={selectedImage} alt="Selected" className="w-full h-full object-cover" />
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedImage} alt="Selected" className="w-full h-full object-cover" />
                 )}
                 <button 
                   onClick={() => {

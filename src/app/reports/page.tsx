@@ -291,7 +291,7 @@ export default function ReportsHub() {
           <div className="flex gap-3 md:gap-4 items-center">
             {selectedLog.imageUrl && (
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border border-line/30 shrink-0 bg-slate-200">
-                <img src={selectedLog.imageUrl} alt="Scan Image" className="w-full h-full object-cover" />
+                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={selectedLog.imageUrl} alt="Scan Image" className="w-full h-full object-cover" />
               </div>
             )}
             <div>

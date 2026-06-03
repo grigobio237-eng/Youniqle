@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
+import Image from 'next/image';
 
 interface ImageUploaderProps {
     label: string;
@@ -32,7 +33,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ label, onImageSelected, p
             >
                 {preview ? (
                     <div className="w-full h-48 rounded-lg overflow-hidden relative">
-                        <img
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                             src={preview}
                             alt="Preview"
                             className="w-full h-full object-contain"

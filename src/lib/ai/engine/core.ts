@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import dbConnect from '../../db';
-import AdminSettings from '../../../models/AdminSettings';
+import AdminSettings from '@/models/AdminSettings';
 
 let _genAI: GoogleGenerativeAI | null = null;
 let _studioGenAI: GoogleGenerativeAI | null = null;

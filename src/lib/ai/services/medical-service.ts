@@ -1,5 +1,5 @@
 import { GeminiCore } from '../engine/core';
-import { DiagnosisInput, DiagnosisOutput, MedicalInterviewGuideOutput, PostCareRoadmapOutput } from '../types';
+import { DiagnosisInput, DiagnosisOutput, MedicalInterviewGuideOutput, PostCareRoadmapOutput } from '@/lib/ai/types';
 
 export class MedicalService {
     static async generateDiagnosisSolution(input: DiagnosisInput): Promise<DiagnosisOutput> {

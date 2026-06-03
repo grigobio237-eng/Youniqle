@@ -10,6 +10,7 @@ import {
   BarChart3, Link as LinkIcon, Utensils, Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ChildDashboardPage() {
   const { data: session } = useSession();
@@ -249,7 +250,7 @@ export default function ChildDashboardPage() {
                     <div className="flex gap-4">
                       {meal.imageUrl && (
                         <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-slate-100 shadow-sm bg-slate-50">
-                          <img src={meal.imageUrl} alt="식사 사진" className="w-full h-full object-cover" />
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={meal.imageUrl} alt="식사 사진" className="w-full h-full object-cover" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0 space-y-1.5">

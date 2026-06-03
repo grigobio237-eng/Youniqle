@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function NavigatorConsultationSection() {
   const { data: session } = useSession();
@@ -96,7 +97,7 @@ export default function NavigatorConsultationSection() {
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md border border-indigo-100 overflow-hidden">
                     {navigatorInfo?.avatar ? (
-                      <img src={navigatorInfo.avatar} alt="" className="w-full h-full object-cover" />
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={navigatorInfo.avatar} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <UserIcon className="w-8 h-8 text-indigo-200" />
                     )}

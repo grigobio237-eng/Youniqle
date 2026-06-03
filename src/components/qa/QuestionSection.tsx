@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Plus, Lock, Unlock, User, Shield, Crown } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface Answer {
   _id: string;
@@ -308,7 +309,7 @@ export default function QuestionSection({ productId, productName, forceShowForm,
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                       {question.userId.avatar ? (
-                        <img
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                           src={question.userId.avatar}
                           alt={question.userId.name}
                           className="w-full h-full rounded-full object-cover"

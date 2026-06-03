@@ -1,4 +1,4 @@
-import { IPIP60_QUESTIONS, IPIP60Question, IPIP60Domain } from '../data/ipip60-questions';
+import { IPIP60_QUESTIONS, IPIP60Question, IPIP60Domain } from '@/lib/data/ipip60-questions';
 
 export interface IPIP60Result {
     rawScores: Record<string, number>; // Facet & Domain raw scores

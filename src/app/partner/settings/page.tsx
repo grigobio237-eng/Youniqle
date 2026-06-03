@@ -25,12 +25,13 @@ import {
   Briefcase,
   Clock,
   MessageSquare,
-  Image,
+  Image as ImageIcon,
   Upload,
   Plus,
   Trash2
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
 import { 
   Select, 
   SelectContent, 
@@ -107,7 +108,7 @@ const tabs = [
   { id: 'basic', label: '기본 정보', icon: User },
   { id: 'business', label: '사업자 정보', icon: Building2 },
   { id: 'hours', label: '운영 설정', icon: Clock },
-  { id: 'branding', label: '상점 브랜딩', icon: Image },
+  { id: 'branding', label: '상점 브랜딩', icon: ImageIcon },
   { id: 'payment', label: '정산 정보', icon: CreditCard },
   { id: 'notifications', label: '알림 설정', icon: Bell },
   { id: 'security', label: '보안', icon: Lock }
@@ -780,7 +781,7 @@ export default function PartnerSettingsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Image className="h-5 w-5" />
+                    <ImageIcon className="h-5 w-5" />
                     상점 로고 & 배너
                   </CardTitle>
                   <CardDescription>유니클 플랫폼에 표시될 상점 이미지를 업로드하세요</CardDescription>
@@ -793,7 +794,7 @@ export default function PartnerSettingsPage() {
                     <div className="flex items-center gap-4">
                       <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
                         {settings.shopLogo ? (
-                          <img src={settings.shopLogo} alt="로고" className="w-full h-full object-cover" />
+                          <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={settings.shopLogo} alt="로고" className="w-full h-full object-cover" />
                         ) : (
                           <Upload className="h-8 w-8 text-gray-400" />
                         )}
@@ -831,7 +832,7 @@ export default function PartnerSettingsPage() {
                     <p className="text-sm text-gray-500 mb-2">권장 크기: 1200x400px (3:1 비율)</p>
                     <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
                       {settings.shopBanner ? (
-                        <img src={settings.shopBanner} alt="배너" className="w-full h-full object-cover" />
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={settings.shopBanner} alt="배너" className="w-full h-full object-cover" />
                       ) : (
                         <div className="text-center">
                           <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />

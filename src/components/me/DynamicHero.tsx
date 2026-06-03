@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Sun, Moon, Cloud, Zap, Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 interface DynamicHeroProps {
     userName: string;
@@ -103,7 +104,7 @@ export default function DynamicHero({ userName }: DynamicHeroProps) {
                         {/* Character Frame */}
                         <div className="absolute inset-2 md:inset-4 bg-white/5 backdrop-blur-2xl rounded-[40px] md:rounded-[64px] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-50" />
-                            <img
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                 src="/character/youniqle-1.png"
                                 alt="Youniqle AI Coach"
                                 className="w-[85%] h-[85%] object-contain relative z-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-transform duration-700"

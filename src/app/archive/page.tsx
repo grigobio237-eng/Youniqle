@@ -23,6 +23,7 @@ import {
   Trophy
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 export default function ArchivePage() {
   const { data: session } = useSession();
@@ -359,7 +360,7 @@ export default function ArchivePage() {
                       <div className="flex flex-col md:flex-row items-stretch">
                         <div className="bg-mist/30 p-4 md:p-10 flex flex-row md:flex-col items-center gap-4 md:w-56 border-b md:border-b-0 md:border-r border-line/50">
                           <div className="w-16 h-16 md:w-24 md:h-24 group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
-                            <img src={journey.image} alt={journey.summary} className="w-full h-full object-contain" />
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={journey.image} alt={journey.summary} className="w-full h-full object-contain" />
                           </div>
                           <div className="flex-1 md:flex-none space-y-1 md:text-center">
                             <Badge className="bg-obsidian text-white font-black text-[8px] md:text-[9px] tracking-tighter uppercase px-2 py-0.5 md:px-3 md:py-1 rounded-full">{journey.identity}</Badge>

@@ -1,5 +1,5 @@
 import { GeminiCore } from '../engine/core';
-import { OmakaseInput, OmakaseOutput, RecoveryCaseInput, RecoveryCaseOutput } from '../types';
+import { OmakaseInput, OmakaseOutput, RecoveryCaseInput, RecoveryCaseOutput } from '@/lib/ai/types';
 
 export class ContentService {
     static async generateDetailImage(prompt: string, options: any = {}): Promise<string | null> {

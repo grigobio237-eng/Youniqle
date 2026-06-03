@@ -210,7 +210,7 @@ function NavigatorLoungeContent() {
                     </div>
                     <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2 shadow-inner">
                       {/* Placeholder for QR code component if needed, or just an icon */}
-                      <img 
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}/auth/signup?ref=${(session.user as any).referralCode || (session.user.id.slice(-6).toUpperCase())}&callbackUrl=/navigator/passes/black`)}`}
                         alt="QR Code"
                         className="w-full h-full object-contain"

@@ -118,7 +118,7 @@ export default function BlackPassDashboard() {
                   </DialogHeader>
                   <div className="p-6 bg-mist rounded-3xl shadow-inner border border-line/50">
                     {isMounted && (
-                      <img 
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`${window.location.origin}/clinic/patient/${user?.id}`)}`}
                         alt="Treatment QR"
                         className="w-48 h-48 mix-blend-multiply"

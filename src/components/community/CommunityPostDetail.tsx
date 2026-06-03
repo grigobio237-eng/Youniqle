@@ -221,7 +221,7 @@ export default function CommunityPostDetail({ postId, onClose, onEdit, onDeleteS
                 <div className="space-y-6">
                   {post.images.map((url, idx) => (
                     <div key={idx} className="relative w-full rounded-[32px] overflow-hidden border border-line bg-mist">
-                      <img src={url} alt={`Post image ${idx}`} className="w-full h-auto" />
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={url} alt={`Post image ${idx}`} className="w-full h-auto" />
                     </div>
                   ))}
                 </div>

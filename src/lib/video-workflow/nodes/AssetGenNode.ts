@@ -1,5 +1,5 @@
 
-import { ExecutionContext, AssetNodeConfig, WorkflowNode } from '../types';
+import { ExecutionContext, AssetNodeConfig, WorkflowNode } from '@/lib/video-workflow/types';
 import { GeminiAIEngine } from '../../ai/gemini-engine';
 import path from 'path';
 import fs from 'fs';

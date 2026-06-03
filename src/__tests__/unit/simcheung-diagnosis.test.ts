@@ -1,6 +1,6 @@
 
-import { SimcheungDiagnosisEngine } from '../../lib/logic/simcheung-diagnosis';
-import { FullDiagnosisQuestion } from '../../lib/data/full-diagnosis-questions';
+import { SimcheungDiagnosisEngine } from '@/lib/logic/simcheung-diagnosis';
+import { FullDiagnosisQuestion } from '@/lib/data/full-diagnosis-questions';
 
 describe('SimcheungDiagnosisEngine', () => {
     // Mock Questions: 2 Domains (N, E), 2 Facets each domain, 2 Items each facet = 8 Questions

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { X, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 interface Notice {
   _id: string;
@@ -201,8 +202,7 @@ export default function NoticePopup() {
           {currentNotice.images && currentNotice.images.length > 0 && (
             <div className="space-y-2">
               {currentNotice.images.map((image, index) => (
-                <img
-                  key={index}
+                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                   key={index}
                   src={image}
                   alt={`공지 이미지 ${index + 1}`}
                   className="w-full rounded-lg"

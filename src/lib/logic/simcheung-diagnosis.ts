@@ -4,7 +4,7 @@
  * Based on IPIP-NEO-60 Commercial Edition Design
  */
 
-import { FullDiagnosisQuestion, FULL_DIAGNOSIS_QUESTIONS } from '../data/full-diagnosis-questions';
+import { FullDiagnosisQuestion, FULL_DIAGNOSIS_QUESTIONS } from '@/lib/data/full-diagnosis-questions';
 
 export interface StartDiagnosisRequest {
     answers: Record<number, number>; // { questionId: score (1-5) }

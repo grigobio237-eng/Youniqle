@@ -10,6 +10,7 @@ import MealNutrientChart from './MealNutrientChart';
 import { ShoppingBag, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GuardianNudgeCard from './GuardianNudgeCard';
+import Image from 'next/image';
 
 interface RecoveryInsightViewProps {
     unifiedData: any;
@@ -51,7 +52,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                 <Card className="bg-white border border-line rounded-[32px] overflow-hidden shadow-xl shadow-obsidian/5 hover:shadow-2xl transition-all">
                     <CardContent className="p-5 md:p-8 flex flex-col md:flex-row items-center gap-5 md:gap-8">
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-mist rounded-[24px] flex items-center justify-center shadow-inner shrink-0 overflow-hidden border border-line/50">
-                            <img 
+                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                 src="/images/characters/char_dday.png" 
                                 alt="Youniqle Manager" 
                                 className="w-full h-full object-contain"
@@ -177,7 +178,7 @@ export default function RecoveryInsightView({ unifiedData }: RecoveryInsightView
                                 {/* Product Image */}
                                 <div className="relative aspect-video w-full overflow-hidden bg-mist">
                                     {prod.imageUrl ? (
-                                        <img 
+                                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                             src={prod.imageUrl} 
                                             alt={prod.name} 
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 

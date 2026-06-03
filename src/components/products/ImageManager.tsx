@@ -14,6 +14,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ImageItem {
   url: string;
@@ -209,8 +210,7 @@ export default function ImageManager({
                   </div>
 
                   {/* 이미지 */}
-                  <img
-                    src={image.url}
+                  <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized                     src={image.url}
                     alt={`상품 이미지 ${index + 1}`}
                     className="w-full h-24 object-cover"
                     crossOrigin="anonymous" // 교차 출처 리소스 허용 (COEP 대응)

@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useRecovery } from '@/contexts/RecoveryContext';
+import Image from 'next/image';
 
 interface DynamicQuestion {
   id: string;
@@ -197,7 +198,7 @@ export default function PostOpSurveyPage() {
               <div className="aspect-square w-full max-w-sm mx-auto rounded-[40px] border-4 border-dashed border-line/30 bg-white/50 flex flex-col items-center justify-center relative overflow-hidden group">
                 {capturedImage ? (
                   <>
-                    <img src={capturedImage} alt="Capture preview" className="w-full h-full object-cover" />
+                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} alt="Capture preview" className="w-full h-full object-cover" />
                     <Button 
                       onClick={() => setCapturedImage(null)} 
                       className="absolute top-4 right-4 bg-black/50 backdrop-blur-md rounded-full w-10 h-10 p-0"

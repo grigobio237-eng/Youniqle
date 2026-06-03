@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Calendar, ChevronDown, Activity, Brain, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 const CATEGORIES = [
   { id: 'ALL', label: '전체', emoji: '🌟' },
@@ -212,7 +213,7 @@ export default function LifeSnapFeed() {
                   {/* Image Section - Mini Thumbnail */}
                   <div className="relative w-full aspect-square bg-mist overflow-hidden">
                     {snap.imageUrl ? (
-                      <img src={snap.imageUrl} alt="Snap" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" loading="lazy" />
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={snap.imageUrl} alt="Snap" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" loading="lazy" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-2xl opacity-20">
                         {getCategoryEmoji(snap.category)}

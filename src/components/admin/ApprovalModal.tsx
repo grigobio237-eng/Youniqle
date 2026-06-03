@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Check, X, FileText, Image as ImageIcon, Video } from 'lucide-react';
+import Image from 'next/image';
 
 interface VideoProject {
     _id: string;
@@ -105,7 +106,7 @@ export default function ApprovalModal({ project, isOpen, onClose, onApprove }: A
                                     <div className="w-1/3 space-y-2">
                                         {segment.image_path ? (
                                             <div className="relative aspect-[9/16] bg-black rounded overflow-hidden shadow-sm">
-                                                <img
+                                                <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                                     src={`/api/admin/video/assets?path=${encodeURIComponent(segment.image_path)}`}
                                                     alt={`Scene ${idx}`}
                                                     className="object-cover w-full h-full"

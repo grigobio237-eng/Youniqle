@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ThumbsUp, Image as ImageIcon, MessageCircle, Filter } from 'lucide-react';
+import Image from 'next/image';
 
 interface Review {
   _id: string;
@@ -269,7 +270,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                       {review.userId.avatar ? (
-                        <img
+                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                           src={review.userId.avatar}
                           alt={review.userId.name}
                           className="w-full h-full rounded-full object-cover"
@@ -309,7 +310,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                 {review.images.length > 0 && (
                   <div className="flex space-x-2 mb-4">
                     {review.images.map((image, index) => (
-                      <img
+                      <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                         key={index}
                         src={image}
                         alt={`리뷰 이미지 ${index + 1}`}

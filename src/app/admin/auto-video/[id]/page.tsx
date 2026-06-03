@@ -14,6 +14,7 @@ import StepImage from './components/StepImage';
 import StepAudio from './components/StepAudio';
 import StepVideo from './components/StepVideo';
 import StepSynthesis from './components/StepSynthesis';
+import Image from 'next/image';
 
 interface VideoProject {
     _id: string;
@@ -183,7 +184,7 @@ export default function ProjectDetailPage() {
                             <CardContent className="pt-6 flex flex-col items-center gap-4">
                                 <h3 className="text-lg font-bold">1. 업로드된 상품 에셋</h3>
                                 <div className="max-w-md w-full aspect-square rounded-xl overflow-hidden border-2 shadow-sm">
-                                    <img src={project.workflow?.data?.assets?.find((a: any) => a.role === 'product')?.path} alt="Product" className="w-full h-full object-cover" />
+                                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={project.workflow?.data?.assets?.find((a: any) => a.role === 'product')?.path} alt="Product" className="w-full h-full object-cover" />
                                 </div>
                                 <Button onClick={() => handleTabChange('model_asset')}>다음 (모델 에셋)</Button>
                             </CardContent>
@@ -195,7 +196,7 @@ export default function ProjectDetailPage() {
                             <CardContent className="pt-6 flex flex-col items-center gap-4">
                                 <h3 className="text-lg font-bold">2. 업로드된 모델 에셋</h3>
                                 <div className="max-w-md w-full aspect-square rounded-xl overflow-hidden border-2 shadow-sm">
-                                    <img src={project.workflow?.data?.assets?.find((a: any) => a.role === 'model')?.path} alt="Model" className="w-full h-full object-cover" />
+                                    <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={project.workflow?.data?.assets?.find((a: any) => a.role === 'model')?.path} alt="Model" className="w-full h-full object-cover" />
                                 </div>
                                 <Button onClick={() => handleTabChange('trend')}>다음 (기획 분석)</Button>
                             </CardContent>

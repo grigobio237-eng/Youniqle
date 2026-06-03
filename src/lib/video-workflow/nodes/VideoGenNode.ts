@@ -1,5 +1,5 @@
 
-import { ExecutionContext, VideoNodeConfig, WorkflowNode } from '../types';
+import { ExecutionContext, VideoNodeConfig, WorkflowNode } from '@/lib/video-workflow/types';
 import path from 'path';
 import fs from 'fs';
 import { spawn } from 'child_process';

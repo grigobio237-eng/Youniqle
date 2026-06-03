@@ -1,5 +1,5 @@
-import connectDB from '../lib/db';
-import User from '../models/User';
+import connectDB from '@/lib/db';
+import User from '@/models/User';
 
 async function clearTestUsers() {
   try {

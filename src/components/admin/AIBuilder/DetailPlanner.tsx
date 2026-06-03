@@ -8,6 +8,7 @@ import { removeBackground } from '@imgly/background-removal';
 import { Download, RefreshCw } from 'lucide-react';
 
 import html2canvas from 'html2canvas';
+import Image from 'next/image';
 
 // Types (Synchronized with AI Studio)
 enum PageLength {
@@ -387,7 +388,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                 .map((url, idx) => {
                     // Firebase Storage URL(이미 ?token= 포함)과 v=1 파라미터 안전하게 결합
                     const separator = url.includes('?') ? '&' : '?';
-                    return `<img src="${url}${separator}v=1" alt="${info.name}_detail_${idx + 1}" crossorigin="anonymous" style="max-width: 100%; display: block; margin: 0 auto;" />`;
+                    return `<Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src="${url}${separator}v=1" alt="${info.name}_detail_${idx + 1}" crossorigin="anonymous" style="max-width: 100%; display: block; margin: 0 auto;" />`;
                 })
                 .join('');
 
@@ -769,7 +770,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                                 <div key={seg.id} className="relative w-full aspect-[9/16] bg-slate-100 group">
                                     {seg.imageUrl ? (
                                         <>
-                                            <img
+                                            <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized 
                                                 src={seg.imageUrl.startsWith('data:') ? seg.imageUrl : (seg.imageUrl.includes('?') ? `${seg.imageUrl}&t=${new Date().getTime()}` : `${seg.imageUrl}?t=${new Date().getTime()}`)}
                                                 alt={seg.title}
                                                 className="w-full h-full object-cover block"
@@ -939,7 +940,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                             <div className="aspect-square bg-slate-900 rounded-3xl overflow-hidden shadow-2xl relative flex items-center justify-center">
                                 {thumbnailImage ? (
                                     <>
-                                        <img src={thumbnailImage} alt="Thumbnail" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                        <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={thumbnailImage} alt="Thumbnail" className="w-full h-full object-cover" crossOrigin="anonymous" />
                                         <button
                                             onClick={handleGenerateThumbnail}
                                             className="absolute top-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all"

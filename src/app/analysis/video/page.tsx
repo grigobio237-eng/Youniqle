@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface PostureResult {
     subjectName: string;
@@ -298,7 +299,7 @@ export default function PostureAnalysisPage() {
                                         className="absolute inset-0 border-t-4 border-b-4 border-chapter-accent rounded-full"
                                     />
                                     <div className="absolute inset-4 bg-white rounded-full flex items-center justify-center overflow-hidden border border-line shadow-inner">
-                                        {capturedImage && <img src={capturedImage} className="w-full h-full object-cover opacity-50" alt="Captured" />}
+                                        {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} className="w-full h-full object-cover opacity-50" alt="Captured" />}
                                         <div className="absolute inset-0 flex items-center justify-center bg-chapter-accent/10">
                                             <Loader2 className="w-12 h-12 text-chapter-accent animate-spin" />
                                         </div>
@@ -333,7 +334,7 @@ export default function PostureAnalysisPage() {
                                         </div>
 
                                         <div className="aspect-square rounded-3xl overflow-hidden bg-mist border border-line relative">
-                                            {capturedImage && <img src={capturedImage} className="w-full h-full object-cover" alt="Posture" />}
+                                            {capturedImage && <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src={capturedImage} className="w-full h-full object-cover" alt="Posture" />}
                                             <div className="absolute top-4 left-4 bg-obsidian/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-xs font-bold border border-white/20">
                                                 <Activity className="w-4 h-4 inline-block mr-2 text-chapter-accent" /> 유니클 스켈레톤 스캔 활성화
                                             </div>
