@@ -19,15 +19,16 @@ export async function GET() {
 
         await connectDB();
         
+        const queryOr = [{ userEmail: session.user.email }];
+        if (session.user.id && session.user.id.match(/^[0-9a-fA-F]{24}$/)) {
+            queryOr.push({ userId: session.user.id });
+        }
+        
         // 병렬 쿼리 실행으로 성능 최적화
         const [user, latestConcierge, latestInquiry] = await Promise.all([
             User.findOne({ email: session.user.email }).select('_id referralCode isNavigator email').lean(),
-            ConciergeRequest.findOne({ 
-                $or: [{ userId: session.user.id }, { userEmail: session.user.email }] 
-            }).sort({ createdAt: -1 }).select('status createdAt painPoint').lean(),
-            Inquiry.findOne({ 
-                $or: [{ userId: session.user.id }, { userEmail: session.user.email }] 
-            }).sort({ createdAt: -1 }).select('status createdAt subject type').lean()
+            ConciergeRequest.findOne({ $or: queryOr }).sort({ createdAt: -1 }).select('status createdAt painPoint').lean(),
+            Inquiry.findOne({ $or: queryOr }).sort({ createdAt: -1 }).select('status createdAt subject type').lean()
         ]);
 
         if (!user) {
