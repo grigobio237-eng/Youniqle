@@ -213,7 +213,7 @@ export default function RecoveryHistoryPage() {
                 <div className="space-y-6">
                     <h3 className="text-2xl font-black text-obsidian mb-6 flex items-center">
                         <FileText className="w-6 h-6 mr-3 text-foreground/70" />
-                        진단 이력 리스트
+                        리듬체크 이력 리스트
                     </h3>
                     {history.map((item, idx) => (
                         <motion.div
@@ -235,7 +235,7 @@ export default function RecoveryHistoryPage() {
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h4 className="font-bold text-obsidian group-hover:text-primary transition-colors">
-                                                    {item.resultTitle || '회복 진단 리포트'}
+                                                    {item.resultTitle || '회복 리듬체크 리포트'}
                                                 </h4>
                                                 {item.type === 'PAID' && (
                                                     <Badge className="bg-amber-50 text-primary border-none text-[10px] font-bold">PREMIUM</Badge>
@@ -284,12 +284,12 @@ export default function RecoveryHistoryPage() {
                     {history.length === 0 && (
                         <div className="py-20 text-center bg-white rounded-[40px] border-2 border-dashed border-line">
                             <Activity className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                            <p className="text-foreground/70 font-bold">아직 진단 기록이 없습니다.</p>
+                            <p className="text-foreground/70 font-bold">아직 리듬체크 기록이 없습니다.</p>
                             <Button
                                 onClick={() => router.push('/ai-navigator')}
                                 className="mt-6 bg-primary text-white rounded-full px-8"
                             >
-                                첫 진단 시작하기
+                                첫 리듬체크 시작하기
                             </Button>
                         </div>
                     )}

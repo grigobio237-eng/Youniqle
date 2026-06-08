@@ -356,7 +356,7 @@ export default function WeeklyReportView({ onDataLoaded }: { onDataLoaded?: (pro
             {/* [Section 6] Legal Disclaimer Footer */}
             <div className="text-center max-w-xl mx-auto pt-4 border-t border-line/30">
                 <p className="text-[10px] font-semibold text-slate/40 leading-relaxed break-keep">
-                    이 리포트는 의학적 진단서가 아닙니다. 사용자가 입력한 생활 기록을 바탕으로 회복 흐름과 반복 패턴을 이해하기 위한 개인 참고용 리포트이며, 정확한 의학적 판단은 전문 의료진과 상담해야 합니다.
+                    이 리포트는 의학적 리듬체크서가 아닙니다. 사용자가 입력한 생활 기록을 바탕으로 회복 흐름과 반복 패턴을 이해하기 위한 개인 참고용 리포트이며, 정확한 의학적 판단은 전문 의료진과 상담해야 합니다.
                 </p>
             </div>
 

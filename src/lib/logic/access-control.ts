@@ -175,7 +175,7 @@ export class AccessControl {
   }
 
   /**
-   * 진단 타입별 사용 가능 여부 확인
+   * 리듬체크 타입별 사용 가능 여부 확인
    * Reset: daily, free (1회 체험 로직은 API에서 처리)
    * Reborn: daily, free
    * Restart/Black: daily, free, deep/paid

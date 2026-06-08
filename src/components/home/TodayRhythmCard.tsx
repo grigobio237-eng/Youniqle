@@ -92,7 +92,7 @@ export default function TodayRhythmCard({ score, userName }: TodayRhythmCardProp
           </div>
         </div>
 
-        {/* Right: 핵심 진단 라벨 및 설명 */}
+        {/* Right: 핵심 리듬체크 라벨 및 설명 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 mb-1">
             <span className="p-0.5 bg-primary/5 rounded-full shrink-0">{icon}</span>

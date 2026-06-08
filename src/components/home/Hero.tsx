@@ -179,6 +179,25 @@ export default function Hero({
               {/* {personalMsg.desc} */}
               오늘의 나를 마주하는 가장 스마트한 방법, 60초 리듬체크를 시작하세요.
             </p>
+            
+            {/* Action Buttons: Free vs Paid */}
+            <div className="flex flex-col sm:flex-row items-start gap-4 pt-4">
+              <Button 
+                onClick={() => onStart()}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 group"
+              >
+                무료 60초 리듬체크 시작하기
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Link href="/founder-ticket">
+                <Button 
+                  variant="outline"
+                  className="px-8 py-6 rounded-full text-lg font-bold border-2 hover:bg-foreground/5 transition-all"
+                >
+                  9,900원 파운더스 티켓 알아보기
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* 2. Scanner */}

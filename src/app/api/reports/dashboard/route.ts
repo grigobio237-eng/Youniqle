@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         const latestScore = recentScores.length > 0 ? recentScores[0] : null;
 
         // ═══════════════════════════════════════════════════
-        // 2. Diagnosis — 최신 및 최근 7일 진단/데일리체크(16문항)
+        // 2. Diagnosis — 최신 및 최근 7일 리듬체크/데일리체크(16문항)
         // ═══════════════════════════════════════════════════
         const latestDiagnosis = await Diagnosis.findOne({ userId })
             .sort({ createdAt: -1 }).lean() as any;

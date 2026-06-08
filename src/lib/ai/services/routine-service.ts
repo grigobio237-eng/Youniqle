@@ -170,7 +170,7 @@ export class RoutineService {
 
         const prompt = `
 당신은 유니클(Youniqle)의 전문 회복 네비게이터입니다.
-제공된 ${baseQuestions.length}개의 정밀 진단 문항을 [${dayOfWeek}: ${theme}] 테마에 맞춰 재구성하세요.
+제공된 ${baseQuestions.length}개의 정밀 리듬체크 문항을 [${dayOfWeek}: ${theme}] 테마에 맞춰 재구성하세요.
 JSON 배열만 반환하세요.`;
 
         try {

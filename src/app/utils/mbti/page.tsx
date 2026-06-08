@@ -192,7 +192,7 @@ export default function MBTIPage() {
                             <span className="text-2xl">🚧</span>
                         </div>
                         <div>
-                            <h3 className="font-black text-slate text-sm">두피 진단 & 라이프 밸런스</h3>
+                            <h3 className="font-black text-slate text-sm">두피 리듬체크 & 라이프 밸런스</h3>
                             <p className="text-[10px] font-bold">더 다양한 맞춤 체크가 준비 중입니다.</p>
                         </div>
                     </Card>
@@ -322,7 +322,7 @@ export default function MBTIPage() {
 
         // Custom titles for chapters
         const chapterTitle = currentChapter === 1 
-            ? (category.id === 'personality' ? '대인관계 및 에너지 흐름' : '유수분 및 민감도 진단')
+            ? (category.id === 'personality' ? '대인관계 및 에너지 흐름' : '유수분 및 민감도 리듬체크')
             : (category.id === 'personality' ? '정보 처리 및 결정 패턴' : '색소 및 탄력성 지표');
 
         return (
@@ -436,7 +436,7 @@ export default function MBTIPage() {
                         className="text-slate/40 hover:text-red-500 font-bold text-xs"
                         onClick={reset}
                     >
-                        진단 그만두기
+                        리듬체크 그만두기
                     </Button>
                 </div>
             </div>

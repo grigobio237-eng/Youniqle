@@ -405,7 +405,7 @@ export default function MemberVerifyPage() {
                       <div className="space-y-2">
                         {history.map((h: any, idx: number) => (
                           <button key={idx} onClick={() => setSelectedReportIdx(idx)} className={`w-full text-left p-4 rounded-2xl transition-all ${selectedReportIdx === idx ? 'bg-indigo-50 border-2 border-secondary/30' : 'bg-surface border-2 border-transparent hover:bg-slate-100'}`}>
-                            <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-obsidian'}`}>{h.type === 'PRECISION' ? '정밀 진단' : '간편 진단'}</p>
+                            <p className={`text-xs font-black ${selectedReportIdx === idx ? 'text-indigo-900' : 'text-obsidian'}`}>{h.type === 'PRECISION' ? '정밀 리듬체크' : '간편 리듬체크'}</p>
                             <p className="text-[10px] font-bold text-foreground/70 mt-1">{new Date(h.createdAt).toLocaleDateString()}</p>
                           </button>
                         ))}

@@ -1,6 +1,6 @@
 
 /**
- * 심층 심리 진단 (Deep Diagnosis) 채점 로직
+ * 심층 심리 리듬체크 (Deep Diagnosis) 채점 로직
  * Based on IPIP-NEO-60 Commercial Edition Design
  */
 
@@ -55,7 +55,7 @@ const DEFAULT_NORMS: Record<string, { mean: number; sd: number }> = {
 export class SimcheungDiagnosisEngine {
 
     /**
-     * 진단 실행 메인 함수
+     * 리듬체크 실행 메인 함수
      */
     static calculateResults(data: StartDiagnosisRequest): DiagnosisResult {
         const { answers, questions } = data;
@@ -224,7 +224,7 @@ export class SimcheungDiagnosisEngine {
     }
 
     /**
-     * 무료 진단 (24문항) 결과 계산
+     * 무료 리듬체크 (24문항) 결과 계산
      */
     static calculateFreeDiagnosis(answers: Record<string, number>, questions: any[]): FreeDiagnosisResult {
         const scores: Record<string, number> = {

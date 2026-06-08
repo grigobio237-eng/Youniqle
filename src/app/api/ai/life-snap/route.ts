@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
             const user = await User.findOne({ email: session.user.email });
             if (user) {
                 userName = user.name;
-                // 최신 진단 데이터 가져오기 (똑똑한 분석을 위해)
+                // 최신 리듬체크 데이터 가져오기 (똑똑한 분석을 위해)
                 const Diagnosis = (await import('@/models/Diagnosis')).default;
                 latestDiagnosis = await Diagnosis.findOne({ userId: user._id }).sort({ createdAt: -1 });
                 if (latestDiagnosis) {
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         if (!isMissing) {
             contextInstruction += `[USER RECOVERY DATA] 
             사용자 이름: ${userName}님,
-            최근 진단 점수: 총점 ${latestDiagnosis.totalScore}/160, 
+            최근 리듬체크 점수: 총점 ${latestDiagnosis.totalScore}/160, 
             신체(${latestDiagnosis.categoryScores.physical}), 정신(${latestDiagnosis.categoryScores.mental}), 
             생활(${latestDiagnosis.categoryScores.lifestyle}), 수면(${latestDiagnosis.categoryScores.sleep}). 
             이 데이터와 점수가 낮은 영역을 참고하여, 현재 스캔한 이미지가 사용자의 회복에 어떤 실질적인 도움을 줄 수 있는지 맞춤형으로 설명하세요. \n`;
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
                     categoryPrompt = `이 사진의 몸 상태(부기, 멍, 자세 등)나 메모를 확인하고, 피로 회복이나 통증 완화를 위한 부드러운 조언을 제공해 줘.`;
                     break;
                 case 'MEDICAL_DOC':
-                    categoryPrompt = `이 사진은 병원 서류나 처방전입니다. [중요: 주민등록번호, 환자 이름, 연락처 등 개인정보는 절대 출력하지 마세요.] 오직 진단명, 증상, 혹은 처방된 성분의 목적과 건강상의 권고 사항만 텍스트로 추출하고 분석해 줘.`;
+                    categoryPrompt = `이 사진은 병원 서류나 처방전입니다. [중요: 주민등록번호, 환자 이름, 연락처 등 개인정보는 절대 출력하지 마세요.] 오직 리듬체크명, 증상, 혹은 처방된 성분의 목적과 건강상의 권고 사항만 텍스트로 추출하고 분석해 줘.`;
                     break;
                 case 'OTHER':
                 default:
@@ -162,18 +162,20 @@ export async function POST(request: NextRequest) {
         ${isTextOnly ? `[USER RECORDED TEXT]\n"${image}"\n` : ''}
 
         [VALIDATION RULE - CRITICAL]
-        만약 사용자가 업로드한 이미지가 분석이 불가능하거나 지나치게 저화질인 경우, 억지로 분석하지 마세요!
-        반드시 JSON 응답에 아래 형식만 반환하고 종료하세요:
+        ${isTextOnly 
+            ? '사용자가 입력한 텍스트의 맥락이 일상생활, 건강, 감정, 회복과 전혀 무관하거나 완전히 의미 없는 문자열인 경우에만 분석을 중단하세요. (예: "야간운전 너무 힘들어"는 분석 가능한 유효한 텍스트입니다.)'
+            : '만약 사용자가 업로드한 이미지가 분석이 불가능하거나 지나치게 저화질인 경우, 억지로 분석하지 마세요!'}
+        이 경우 반드시 JSON 응답에 아래 형식만 반환하고 종료하세요:
         {
             "isMismatch": true,
-            "mismatchReason": "사진을 명확히 인식할 수 없습니다. 더 밝은 곳에서 정확한 사진을 다시 촬영해 주세요."
+            "mismatchReason": "${isTextOnly ? '입력하신 내용의 의미를 파악하기 어렵습니다. 기분이나 상황을 조금 더 자세히 적어주세요.' : '사진을 명확히 인식할 수 없습니다. 더 밝은 곳에서 정확한 사진을 다시 촬영해 주세요.'}"
         }
 
         [TONE & PERSONA]
         사용자의 이름은 '${userName}'입니다. 답변(summary, benefit, futureDirection 등)에서 가급적 사용자의 이름을 언급하며(예: "${userName}님, ...") 친근한 전문가로서 답변하세요. 격식체(~하십시오) 대신 부드럽고 따뜻한 해요체(~해요, ~해보세요)를 사용하세요.
 
         [REQUIRED RESPONSE FORMAT (JSON)]
-        이미지가 정상적이라면 반드시 아래 형식으로 답변하세요:
+        ${isTextOnly ? '텍스트 내용이 유효하다면' : '이미지가 정상적이라면'} 반드시 아래 형식으로 답변하세요:
         {
             "isMismatch": false,
             "type": "위 카테고리 9개 중 하나 (예: MEAL, SKIN 등)",

@@ -1,6 +1,6 @@
 /**
  * 디버깅 유틸리티
- * 서버 컴포넌트 렌더링 에러 진단을 위한 유틸리티 함수들
+ * 서버 컴포넌트 렌더링 에러 리듬체크를 위한 유틸리티 함수들
  */
 
 /**
@@ -126,10 +126,10 @@ export async function checkSystemHealth() {
 }
 
 /**
- * 서버 컴포넌트 렌더링 에러 진단
+ * 서버 컴포넌트 렌더링 에러 리듬체크
  */
 export function diagnoseServerComponentError(error: Error) {
-  console.log('🔍 서버 컴포넌트 렌더링 에러 진단 시작...');
+  console.log('🔍 서버 컴포넌트 렌더링 에러 리듬체크 시작...');
   
   const diagnosis: {
     errorMessage: string;
@@ -163,6 +163,6 @@ export function diagnoseServerComponentError(error: Error) {
     diagnosis.suspectedCause = 'Unknown server component rendering error';
   }
 
-  console.log('🔍 에러 진단 결과:', diagnosis);
+  console.log('🔍 에러 리듬체크 결과:', diagnosis);
   return diagnosis;
 }

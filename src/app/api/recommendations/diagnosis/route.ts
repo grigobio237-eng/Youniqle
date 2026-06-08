@@ -15,7 +15,7 @@ import {
 } from '@/lib/diagnosisRecommendationMapper';
 
 /**
- * 진단 기반 개인화 추천 API
+ * 리듬체크 기반 개인화 추천 API
  * GET /api/recommendations/diagnosis
  */
 export async function GET(request: NextRequest) {
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         let latestDiagnosis = null;
         let userId = null;
 
-        // 로그인한 사용자는 실제 진단 데이터 사용
+        // 로그인한 사용자는 실제 리듬체크 데이터 사용
         // For development: use hardcoded test user if session is missing but we want to simulate logged in context?
         // Actually, if session is missing, we usually shouldn't show results.
         // But if we are in dev mode and want to show 'No Diagnosis', we must return null or explicitly indicate it.

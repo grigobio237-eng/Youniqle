@@ -19,7 +19,7 @@ export async function generateMetadata({
     
     const userName = user?.name || 'Youniqle';
     const title = `${userName}님의 초대장 - Youniqle`;
-    const description = `${userName}님이 당신을 Youniqle에 초대했습니다. 60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요.`;
+    const description = `${userName}님이 당신을 Youniqle에 초대했습니다. 60초 리듬체크으로 데이터 기반 맞춤 회복 솔루션을 경험하세요.`;
 
     return {
       title,

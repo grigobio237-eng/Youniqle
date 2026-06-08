@@ -79,12 +79,12 @@ export async function POST(request: NextRequest) {
         if (!isMissing) {
             contextInstruction += `[USER DATA] 
             사용자 이름: ${userName}님,
-            최근 진단 점수: 총점 ${latestDiagnosis.totalScore}/160, 
+            최근 리듬체크 점수: 총점 ${latestDiagnosis.totalScore}/160, 
             신체(${latestDiagnosis.categoryScores.physical}), 정신(${latestDiagnosis.categoryScores.mental}), 
             생활(${latestDiagnosis.categoryScores.lifestyle}), 수면(${latestDiagnosis.categoryScores.sleep}). 
             특히 점수가 낮은 영역을 보완할 수 있는 영양적 가치를 강조하세요. \n`;
         } else {
-            contextInstruction += `[USER DATA] 진단 데이터 없음. 보편적인 건강 지표를 기준으로 설명하세요. \n`;
+            contextInstruction += `[USER DATA] 리듬체크 데이터 없음. 보편적인 건강 지표를 기준으로 설명하세요. \n`;
         }
 
         let personaInstruction = "";

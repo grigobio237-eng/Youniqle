@@ -51,9 +51,9 @@ const utilities: UtilityCard[] = [
     },
     {
         id: 'mbti',
-        title: '60초 정밀 진단 (Recovery Diagnosis)',
+        title: '60초 정밀 리듬체크 (Recovery Diagnosis)',
         description: '과학적인 질문 알고리즘을 통해 당신의 신체적, 정신적 회복 필요도를 정밀 측정합니다.',
-        icon: <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src="/images/characters/char_diagnosis.png" alt="진단" className="w-14 h-14 object-contain" />,
+        icon: <Image width={800} height={800} style={{ width: '100%', height: '100%', objectFit: 'inherit' }} unoptimized src="/images/characters/char_diagnosis.png" alt="리듬체크" className="w-14 h-14 object-contain" />,
         category: ['건강', '회복'],
         href: '/utils/mbti',
         badge: 'Youniqle CORE',

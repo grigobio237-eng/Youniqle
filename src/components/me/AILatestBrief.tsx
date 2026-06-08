@@ -29,7 +29,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
 
                     <p className="text-[11px] md:text-sm font-bold text-slate-300 leading-relaxed">
                         아직 기록된 회복 솔루션이 존재하지 않습니다.<br />
-                        매일 60초 리듬 체크와 유니클 진단을 통해 나에게 딱 맞는 1:1 맞춤 회복 처방 솔루션을 확인해보세요!
+                        매일 60초 리듬 체크와 유니클 리듬체크를 통해 나에게 딱 맞는 1:1 맞춤 회복 처방 솔루션을 확인해보세요!
                     </p>
                 </div>
 
@@ -39,7 +39,7 @@ export default function AILatestBrief({ solution, createdAt }: AILatestBriefProp
                         <p className="text-[11px] font-bold text-foreground/70">CGM 분석을 통해 수면, 영양, 운동 맞춤 추천 처방</p>
                     </div>
                     <Link href="/ai-navigator" className="w-full py-3.5 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
-                        유니클 진단 시작하기 <ArrowRight className="w-4 h-4" />
+                        유니클 리듬체크 시작하기 <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
             </div>

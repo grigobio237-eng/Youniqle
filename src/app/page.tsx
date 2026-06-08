@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
@@ -116,6 +117,12 @@ export default function HomePage() {
     // welcome=true 인 경우(신규 가입) → 랜딩 그대로 보여줌
     const params = new URLSearchParams(window.location.search);
     const isWelcome = params.get('welcome') === 'true';
+    const referralCode = params.get('ref');
+
+    // 추천인 코드(ref)가 URL에 있으면 로컬 스토리지에 저장 (비회원 가입 유도 시 사용)
+    if (referralCode) {
+      localStorage.setItem('referralCode', referralCode);
+    }
 
     const storedScore = localStorage.getItem('recovery_last_score');
 
@@ -236,21 +243,28 @@ export default function HomePage() {
       if (!response.ok) throw new Error('Gemini analysis failed');
       const analysisRes = await response.json();
       
+      if (analysisRes.isMismatch) {
+        toast.error(analysisRes.mismatchReason || "분석을 완료할 수 없습니다. 내용을 다시 확인해 주세요.");
+        return;
+      }
+      
       // Auto save scan record
-      try {
-        await fetch('/api/scan/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: analysisRes.type || 'OTHER',
-            imageData: data.type === 'PHOTO' ? contentStr : undefined,
-            score: analysisRes.matchScore,
-            summary: analysisRes.summary,
-            metrics: { ...analysisRes.analysisTable, futureDirection: analysisRes.futureDirection }
-          })
-        });
-      } catch (saveErr) {
-        console.error("Auto save scan failed:", saveErr);
+      if (session?.user?.email) {
+        try {
+          await fetch('/api/scan/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: analysisRes.type || 'OTHER',
+              imageData: data.type === 'PHOTO' ? contentStr : undefined,
+              score: analysisRes.matchScore,
+              summary: analysisRes.summary,
+              metrics: { ...analysisRes.analysisTable, futureDirection: analysisRes.futureDirection }
+            })
+          });
+        } catch (saveErr) {
+          console.error("Auto save scan failed:", saveErr);
+        }
       }
 
       // Save analysis results to state

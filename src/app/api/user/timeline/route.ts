@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
        _id: rs._id
     }));
 
-    // 2b. Diagnosis 컬렉션에서 최근 DAILY 진단 점수 타임라인 가져오기 (누락 복구!)
+    // 2b. Diagnosis 컬렉션에서 최근 DAILY 리듬체크 점수 타임라인 가져오기 (누락 복구!)
     const dailyDiagnoses = await Diagnosis.find({ 
       userId: user._id,
       type: 'DAILY'
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       score: d.totalScore || d.score,
       createdAt: d.createdAt,
       type: 'DIAGNOSIS_DAILY',
-      metaphor: d.resultDescription || '오늘의 리듬 진단',
+      metaphor: d.resultDescription || '오늘의 리듬 리듬체크',
       _id: d._id
     }));
 

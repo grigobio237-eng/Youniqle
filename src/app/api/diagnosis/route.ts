@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             id: newDiagnosis._id,
-            message: '정밀 진단 결과가 성공적으로 저장되었습니다.'
+            message: '정밀 리듬체크 결과가 성공적으로 저장되었습니다.'
         });
     } catch (error: any) {
         console.error('Diagnosis Save Error:', error);

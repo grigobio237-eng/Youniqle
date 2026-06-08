@@ -88,7 +88,10 @@ function SignupContent() {
     }
 
     setIsSubmitting(true);
-    const referralCode = searchParams?.get('ref') || '';
+    let referralCode = searchParams?.get('ref') || '';
+    if (!referralCode && typeof window !== 'undefined') {
+      referralCode = localStorage.getItem('referralCode') || '';
+    }
 
     try {
       const response = await fetch('/api/auth/signup', {

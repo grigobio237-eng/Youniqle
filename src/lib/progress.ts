@@ -2,7 +2,7 @@ import { getKSTDate } from './date';
 
 // Streak and Checklist Management
 export interface DailyChecklist {
-    diagnosis: boolean;      // 진단 완료
+    diagnosis: boolean;      // 리듬체크 완료
     aiAdvice: boolean;       // Youniqle 조언 확인
     routine: boolean;        // 오늘의 루틴 완수
     content: boolean;        // 회복 콘텐츠 읽기

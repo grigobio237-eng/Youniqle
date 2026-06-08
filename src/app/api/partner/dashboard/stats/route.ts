@@ -196,8 +196,8 @@ export async function GET(request: NextRequest) {
 
     if (partner.partnerApplication?.partnerType === 'medical') {
         const Diagnosis = (await import('@/models/Diagnosis')).default;
-        // 병/의원의 경우 이 파트너가 추천된 진단 결과 또는 이 파트너와 연계된 고객들의 통계
-        // (현재는 전체 진단 트렌드 샘플 또는 연계 로직에 따른 데이터)
+        // 병/의원의 경우 이 파트너가 추천된 리듬체크 결과 또는 이 파트너와 연계된 고객들의 통계
+        // (현재는 전체 리듬체크 트렌드 샘플 또는 연계 로직에 따른 데이터)
         const totalMatchingDiagnosis = await Diagnosis.countDocuments({}); 
         typeSpecificStats = {
             ...typeSpecificStats,

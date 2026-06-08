@@ -13,7 +13,7 @@ export const categories = [
   { name: '수면/안정', value: 'sleep-relax' },
   { name: '활력/에너지', value: 'energy' },
   { name: '영양/보충', value: 'nutrition' },
-  { name: '측정/진단', value: 'diagnostic' },
+  { name: '측정/리듬체크', value: 'diagnostic' },
 ];
 
 export const sortOptions = [

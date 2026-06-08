@@ -60,7 +60,7 @@ function DiagnosisContent() {
         if (prog < 40) return "유니클 회복 패턴 매칭 중...";
         if (prog < 75) return "회복 데이터를 수집하고 있습니다...";
         if (prog < 90) return "맞춤형 리듬 질문을 생성하고 있습니다...";
-        if (prog < 99) return "진단지를 정교하게 조율하는 중...";
+        if (prog < 99) return "리듬체크지를 정교하게 조율하는 중...";
         return "분석 완료! 문진을 시작합니다.";
     };
 
@@ -187,7 +187,7 @@ function DiagnosisContent() {
     const totalQ = questions.length || 16;
     let currentChapter = 1;
     let totalChapters = 3;
-    let chapterName = "신체 컨디션 및 에너지 진단";
+    let chapterName = "신체 컨디션 및 에너지 리듬체크";
     let bridgeText = "";
 
     if (totalQ <= 5) {
@@ -212,7 +212,7 @@ function DiagnosisContent() {
         } else if (step < qPerChapter * 2) {
             currentChapter = 2;
             chapterName = "마음 스트레스 및 정신 탄력성";
-            bridgeText = "훌륭합니다! 멘탈 복원력 스코어 연산을 마쳤습니다. 마지막 3장인 매일의 영양 섭취 및 일상 생활 리듬 진단으로 넘어가 보겠습니다.";
+            bridgeText = "훌륭합니다! 멘탈 복원력 스코어 연산을 마쳤습니다. 마지막 3장인 매일의 영양 섭취 및 일상 생활 리듬 리듬체크으로 넘어가 보겠습니다.";
         } else {
             currentChapter = 3;
             chapterName = "일반 식습관 및 수면 밸런스";
@@ -528,7 +528,7 @@ function DiagnosisContent() {
                                                 <span className="tracking-tight text-white truncate max-w-[200px] sm:max-w-none">{getLoadingText(loadingProgress)}</span>
                                                 <span className="ml-1.5 font-mono bg-white/20 px-1.5 py-0.2 rounded-full text-xs shrink-0">{Math.round(loadingProgress)}%</span>
                                             </>
-                                        ) : '진단 시작하기'}
+                                        ) : '리듬체크 시작하기'}
                                     </span>
                                 </Button>
                                 <Button variant="ghost" asChild className="text-slate font-bold text-sm md:text-base">
@@ -659,7 +659,7 @@ function DiagnosisContent() {
                                 <div className={`w-24 h-24 ${type === 'daily' ? 'bg-reward-gold' : 'bg-chapter-accent'} rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl`}>
                                     <CheckCircle2 className="w-12 h-12 text-white" />
                                 </div>
-                                <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tighter">진단이 완료되었습니다!</h2>
+                                <h2 className="text-lg md:text-3xl font-black text-obsidian tracking-tighter">리듬체크가 완료되었습니다!</h2>
                                 <p className="text-[11px] md:text-sm text-slate font-medium">분석된 데이터를 바탕으로 개인화 솔루션을 구성했습니다.</p>
                             </div>
 

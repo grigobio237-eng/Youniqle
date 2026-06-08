@@ -39,12 +39,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // 진단 타입별 권한 체크
+        // 리듬체크 타입별 권한 체크
         const { AccessControl, FEATURE_COSTS } = await import('@/lib/logic/access-control');
         
         if (!AccessControl.canUseDiagnosisType(user, type)) {
             return NextResponse.json({ 
-                error: '현재 멤버십 등급에서는 사용할 수 없는 진단 타입입니다.',
+                error: '현재 멤버십 등급에서는 사용할 수 없는 리듬체크 타입입니다.',
                 code: 'TIER_RESTRICTED'
             }, { status: 403 });
         }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 2. 사용량 체크 및 포인트 소진 (60초 진단 전용)
+        // 2. 사용량 체크 및 포인트 소진 (60초 리듬체크 전용)
         await AccessControl.checkAndResetDailyStats(user);
 
         if (type === 'daily' || type === 'DAILY') {
@@ -151,18 +151,18 @@ export async function POST(request: NextRequest) {
                     // Use Shared Mapping Logic
                     categoryScores = SimcheungDiagnosisEngine.mapFreeToStandard(result);
                     totalScoreVal = result.totalScore;
-                    resultTitle = `간편 진단 결과: ${result.totalScore}점`;
+                    resultTitle = `간편 리듬체크 결과: ${result.totalScore}점`;
                     resultDescription = `${result.lowestCategory} 영역의 케어가 시급합니다.`;
                 } else if (type === 'paid' || type === 'DEEP' || type === 'deep' || type === 'personality') {
                     // Use Shared Mapping Logic
                     categoryScores = SimcheungDiagnosisEngine.mapPaidToStandard({ domains: result.tScores.domains });
                     const t = result.tScores.domains;
                     totalScoreVal = Math.round((t.N + t.E + t.O + t.A + t.C) / 5); // Average T-score
-                    resultTitle = (type.toUpperCase() === 'DEEP' || type === 'personality') ? `심층 심리 진단 (IPIP-60)` : `심층 심리 진단 (Premium)`;
+                    resultTitle = (type.toUpperCase() === 'DEEP' || type === 'personality') ? `심층 심리 리듬체크 (IPIP-60)` : `심층 심리 리듬체크 (Premium)`;
                     resultDescription = `5대 요인 및 30개 국면 정밀 분석 완료`;
                 } else if (type === 'daily' || type === 'DAILY') {
                     totalScoreVal = result.totalScore;
-                    resultTitle = `60초 진단 결과: ${totalScoreVal}점`;
+                    resultTitle = `60초 리듬체크 결과: ${totalScoreVal}점`;
                     resultDescription = `오늘의 상태를 기반으로 한 맞춤 케어 분석 완료`;
                     categoryScores = result.convertedScores || {
                         physical: totalScoreVal,

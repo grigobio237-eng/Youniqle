@@ -147,8 +147,8 @@ export function GoldenTimeOffer({ script, userName = '회원', gender, mood }: G
                             </h2>
                             <p className="text-slate-200 text-sm leading-relaxed font-medium">
                                 {script === "YOUNIQLE_LOADING"
-                                    ? "진단 결과를 바탕으로 유니클 원장님이 당신만을 위한 힐링 가이드를 작성하고 있습니다. 잠시만 기다려주세요..."
-                                    : "진단 결과, 지금 가장 필요한 위로와 가이드를 유니클이 직접 설계했습니다. 이 창을 닫으면 다시 들을 수 없습니다. 지금 바로 청취하세요."}
+                                    ? "리듬체크 결과를 바탕으로 유니클 원장님이 당신만을 위한 힐링 가이드를 작성하고 있습니다. 잠시만 기다려주세요..."
+                                    : "리듬체크 결과, 지금 가장 필요한 위로와 가이드를 유니클이 직접 설계했습니다. 이 창을 닫으면 다시 들을 수 없습니다. 지금 바로 청취하세요."}
                             </p>
                         </div>
 

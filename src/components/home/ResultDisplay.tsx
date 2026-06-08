@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck, Brain, Gift, Layout } from 'lucide-react';
+import { CheckCircle, RefreshCw, ArrowRight, Sparkles, FileText, Clock, ShieldCheck, Brain, Gift, Layout, Lock } from 'lucide-react';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { AnalysisResult } from './HeroScanner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,6 +32,16 @@ export default function ResultDisplay({
   const [isDesigning, setIsDesigning] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
+  const [completedActions, setCompletedActions] = useState<number[]>([]);
+
+  const handleActionComplete = (idx: number) => {
+    if (!completedActions.includes(idx)) {
+      setCompletedActions(prev => [...prev, idx]);
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }
+  };
 
   // AI 가이드 텍스트의 지저분한 마크다운 기호를 지우고 이쁜 구조로 분할 파싱하는 헬퍼
   const parseFutureDirection = (text: string) => {
@@ -112,7 +122,13 @@ export default function ResultDisplay({
 
   const scoreLevel = recoveryScore >= 70 ? '활기 회복 단계' : recoveryScore >= 40 ? '회복 진행 중' : '회복 초기 단계';
 
-
+  // Holistic Future Projection Logic
+  const getFutureProjection = (score: number) => {
+    if (score >= 70) return "지금의 좋은 리듬을 7일만 유지하면 번아웃 위험 구간에서 완벽히 탈출할 수 있어요!";
+    if (score >= 40) return "회복이 진행되고 있어요. 오늘 하루 1분만 더 휴식하면 다음 주에는 활기찬 단계에 진입합니다.";
+    return "주의가 필요해요! 불균형이 지속되면 피로가 누적될 수 있습니다. 오늘 당장 작은 휴식을 시작하세요.";
+  };
+  const futureMessage = getFutureProjection(recoveryScore);
 
   useEffect(() => {
     const saveData = async () => {
@@ -124,32 +140,34 @@ export default function ResultDisplay({
       // 2. Dispatch event to open header
       window.dispatchEvent(new Event('recovery-gate-passed'));
 
-      // 3. Save to DB (Background)
-      try {
-        await fetch('/api/recovery/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            date: today, // Use YYYY-MM-DD string for consistency
-            rawScore: score,
-            totalScore: recoveryScore,
-            metaphor: rhythmType,
-            answers: answers.map(a => ({
-              questionId: a.questionId,
-              category: a.category,
-              score: a.score,
-              answer: a.answer,
-              detail: a.detail // 상세 약물/식품 정보 포함
-            })),
-            userNote: userNote,
-            snapData: snapData ? {
-              type: snapData.type,
-              content: snapData.content
-            } : undefined
-          })
-        });
-      } catch (e) {
-        console.error('Failed to save recovery score to DB', e);
+      // 3. Save to DB (Background) - Only if logged in
+      if (session?.user?.email) {
+        try {
+          await fetch('/api/recovery/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              date: today, // Use YYYY-MM-DD string for consistency
+              rawScore: score,
+              totalScore: recoveryScore,
+              metaphor: rhythmType,
+              answers: answers.map(a => ({
+                questionId: a.questionId,
+                category: a.category,
+                score: a.score,
+                answer: a.answer,
+                detail: a.detail // 상세 약물/식품 정보 포함
+              })),
+              userNote: userNote,
+              snapData: snapData ? {
+                type: snapData.type,
+                content: snapData.content
+              } : undefined
+            })
+          });
+        } catch (e) {
+          console.error('Failed to save recovery score to DB', e);
+        }
       }
     };
     saveData();
@@ -208,52 +226,132 @@ export default function ResultDisplay({
             {typeDescription}
           </p>
 
-          {/* AI 프리미엄 밀착 처방전 섹션 */}
-          {analysisData?.futureDirection && (
-            <div className="space-y-4 pt-6 border-t border-line">
-              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" /> Youniqle AI Recovery Report
-              </span>
-              <div className="grid grid-cols-1 gap-3">
-                {parseFutureDirection(analysisData.futureDirection).map((item, idx) => (
-                  <div key={idx} className="p-4 sm:p-5 bg-primary/5 rounded-[20px] sm:rounded-3xl border border-primary/10 hover:bg-primary/10 transition-all text-left">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-base leading-none">{item.icon}</span>
-                      <span className="text-[10px] sm:text-[11px] font-black text-primary uppercase tracking-widest leading-none">{item.label}</span>
-                    </div>
-                    <p className="text-xs sm:text-sm font-bold text-foreground/80 leading-relaxed break-keep pl-5 sm:pl-6">
-                      {item.content}
-                    </p>
+          {session ? (
+            <>
+              {/* Holistic Future Projection */}
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="p-4 bg-primary/5 rounded-2xl border border-primary/20 text-left mt-4"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                  <span className="text-[10px] sm:text-[11px] font-black text-primary uppercase tracking-widest">Future Projection</span>
+                </div>
+                <p className="text-sm sm:text-base font-bold text-foreground/80 break-keep leading-snug">
+                  {futureMessage}
+                </p>
+              </motion.div>
+
+              {/* AI 프리미엄 밀착 처방전 섹션 */}
+              {analysisData?.futureDirection && (
+                <div className="space-y-4 pt-6 border-t border-line mt-6">
+                  <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" /> Youniqle AI Recovery Report
+                  </span>
+                  <div className="grid grid-cols-1 gap-3">
+                    {parseFutureDirection(analysisData.futureDirection).map((item, idx) => (
+                      <div key={idx} className="p-4 sm:p-5 bg-primary/5 rounded-[20px] sm:rounded-3xl border border-primary/10 hover:bg-primary/10 transition-all text-left">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-base leading-none">{item.icon}</span>
+                          <span className="text-[10px] sm:text-[11px] font-black text-primary uppercase tracking-widest leading-none">{item.label}</span>
+                        </div>
+                        <p className="text-xs sm:text-sm font-bold text-foreground/80 leading-relaxed break-keep pl-5 sm:pl-6">
+                          {item.content}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              <div className="space-y-4 pt-6 border-t border-line mt-6">
+                <span className="text-[9px] sm:text-[10px] font-black text-chapter-accent uppercase tracking-widest block text-left">Today's Micro Therapy</span>
+                <div className="grid grid-cols-1 gap-3">
+                  {dailyActions.map((action, idx) => {
+                    const isCompleted = completedActions.includes(idx);
+                    return (
+                      <motion.button 
+                        key={idx} 
+                        whileHover={!isCompleted ? { scale: 1.02 } : {}}
+                        whileTap={!isCompleted ? { scale: 0.98 } : {}}
+                        onClick={() => handleActionComplete(idx)}
+                        className={`relative overflow-hidden flex items-center gap-4 p-4 rounded-2xl border text-left transition-all w-full
+                          ${isCompleted 
+                            ? 'bg-primary/5 border-primary/20 shadow-none' 
+                            : 'bg-mist/50 border-line/50 hover:border-primary/40 hover:shadow-md cursor-pointer'
+                          }
+                        `}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-sm shrink-0 z-10 transition-colors
+                          ${isCompleted ? 'bg-primary text-white' : 'bg-white'}
+                        `}>
+                          {isCompleted ? <CheckCircle className="w-4.5 h-4.5 text-white animate-in zoom-in" /> : action.icon}
+                        </div>
+                        <span className={`text-sm font-bold leading-tight break-keep text-left z-10 transition-colors
+                          ${isCompleted ? 'text-primary/70 line-through' : 'text-obsidian'}
+                        `}>
+                          {action.text}
+                        </span>
+                        
+                        {/* Completion Background Animation */}
+                        {isCompleted && (
+                          <motion.div 
+                            initial={{ width: 0, opacity: 0.5 }}
+                            animate={{ width: "100%", opacity: 0 }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="absolute left-0 top-0 h-full bg-primary/20 pointer-events-none"
+                          />
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="mt-8 relative overflow-hidden rounded-2xl border border-dashed border-line bg-slate-50 p-8">
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[3px] z-10 flex flex-col items-center justify-center text-center p-6">
+                  <Lock className="w-8 h-8 text-primary mb-3 opacity-80" />
+                  <h4 className="font-black text-obsidian mb-1 text-lg">상세 리포트 잠금</h4>
+                  <p className="text-xs font-bold text-foreground/60 break-keep">가입하시면 상세 분석과 맞춤 솔루션을 모두 보실 수 있습니다.</p>
+              </div>
+              <div className="space-y-4 opacity-30 select-none pointer-events-none filter blur-[2px]">
+                  <div className="flex items-center gap-2"><div className="w-4 h-4 bg-primary/40 rounded-full"></div><div className="h-3 bg-slate-300 rounded w-1/4"></div></div>
+                  <div className="h-4 bg-slate-300 rounded w-full"></div>
+                  <div className="h-4 bg-slate-300 rounded w-5/6"></div>
+                  <div className="h-12 bg-primary/10 rounded-xl w-full mt-4"></div>
+                  <div className="h-12 bg-primary/10 rounded-xl w-full"></div>
               </div>
             </div>
           )}
-
-          <div className="space-y-4 pt-6 border-t border-line">
-            <span className="text-[9px] sm:text-[10px] font-black text-chapter-accent uppercase tracking-widest block text-left">Today's Small Action</span>
-            <div className="grid grid-cols-1 gap-3">
-              {dailyActions.map((action, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-4 bg-mist/50 rounded-2xl border border-line/50 text-left">
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg shadow-sm shrink-0">
-                    {action.icon}
-                  </div>
-                  <span className="text-sm font-bold text-obsidian leading-tight break-keep text-left">{action.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </motion.div>
 
           <div className="grid grid-cols-1 gap-4">
-            <Button 
-              onClick={onEnter} 
-              size="lg" 
-              className="w-full h-16 md:h-20 rounded-[24px] bg-obsidian text-white text-lg md:text-xl font-black shadow-2xl shadow-obsidian/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <span>기록 완료하고 대시보드로 이동</span>
-              <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
-            </Button>
+            {session ? (
+              <Button 
+                onClick={onEnter} 
+                size="lg" 
+                className="w-full h-16 md:h-20 rounded-[24px] bg-obsidian text-white text-lg md:text-xl font-black shadow-2xl shadow-obsidian/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>기록 완료하고 대시보드로 이동</span>
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Button 
+                  onClick={() => router.push('/auth/signup')} 
+                  size="lg" 
+                  className="w-full h-16 md:h-20 rounded-[24px] bg-primary text-white text-lg md:text-xl font-black shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <Gift className="w-5 h-5 md:w-6 md:h-6" />
+                  <span>간편 가입하고 리포트 저장하기</span>
+                  <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                </Button>
+                <p className="text-xs text-foreground/50 font-medium">가입하시면 상세 7일 패턴 분석과 맞춤 솔루션을 받아보실 수 있습니다.</p>
+              </div>
+            )}
           </div>
       </div>
 

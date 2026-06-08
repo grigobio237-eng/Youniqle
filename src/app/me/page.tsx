@@ -910,9 +910,9 @@ export default function MyPage() {
                     ) : (
                       <div className="h-[200px] flex flex-col items-center justify-center text-center bg-mist/30 rounded-3xl border-2 border-dashed border-line/50">
                         <Activity className="h-8 w-8 text-slate/20 mb-3" />
-                        <p className="text-xs font-bold text-slate mb-4">아직 진단 기록이 관측되지 않았습니다.</p>
+                        <p className="text-xs font-bold text-slate mb-4">아직 리듬체크 기록이 관측되지 않았습니다.</p>
                         <Button asChild size="sm" className="bg-obsidian text-mist rounded-full px-6 font-black text-[10px]">
-                          <Link href="/ai-navigator">첫 진단 시작</Link>
+                          <Link href="/ai-navigator">첫 리듬체크 시작</Link>
                         </Button>
                       </div>
                     )}

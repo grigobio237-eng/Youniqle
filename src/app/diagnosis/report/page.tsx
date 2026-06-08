@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { RefreshCw, Download, Lock, Sparkles, ChevronLeft } from 'lucide-react';
+import { RefreshCw, Download, Lock, Sparkles, ChevronLeft, Brain } from 'lucide-react';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { MockPaymentModal } from '@/components/payment/MockPaymentModal';
 import { DeepDiagnosisModal } from '@/components/diagnosis/DeepDiagnosisModal';
@@ -344,7 +344,7 @@ export default function DeepDiagnosisReportPage() {
             <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-8 text-center">
                 <Lock className="w-8 h-8 text-foreground/70 mb-6" />
                 <h2 className="text-2xl font-black text-obsidian mb-2">분석 리포트가 없습니다</h2>
-                <Button onClick={() => router.push('/ai-navigator')} className="mt-8 bg-chapter-accent text-white rounded-xl px-8">진단 하러 가기</Button>
+                <Button onClick={() => router.push('/ai-navigator')} className="mt-8 bg-chapter-accent text-white rounded-xl px-8">리듬체크 하러 가기</Button>
             </div>
         );
     }
@@ -469,20 +469,116 @@ export default function DeepDiagnosisReportPage() {
                                     ))
                                 ) : (
                                     <Card className="border-dashed border-2 border-line bg-surface/50 p-12 text-center rounded-[32px]">
-                                        <p className="text-foreground/70 font-medium">상세 분석 데이터가 없습니다. 정밀 진단을 진행해 보세요.</p>
-                                        <Button onClick={() => setDeepDiagnosisModalOpen(true)} variant="outline" className="mt-4 rounded-full">정밀 진단 시작하기</Button>
+                                        <p className="text-foreground/70 font-medium">상세 분석 데이터가 없습니다. 정밀 리듬체크를 진행해 보세요.</p>
+                                        <Button onClick={() => setDeepDiagnosisModalOpen(true)} variant="outline" className="mt-4 rounded-full">정밀 리듬체크 시작하기</Button>
                                     </Card>
                                 )
                             ) : (
-                                <Card className="border-none shadow-inner bg-surface/50 p-12 text-center relative overflow-hidden group cursor-pointer" onClick={handleUnlockClick}>
-                                    <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
-                                        <Lock className="w-6 h-6 text-chapter-accent mb-4" />
-                                        <h3 className="font-bold text-obsidian mb-2 text-xl">프리미엄 리포트 잠금</h3>
-                                        <p className="text-foreground/70 mb-6">5대 성격 요인과 30개 세부 국면을 확인하세요.</p>
-                                        <Button className="bg-obsidian text-white rounded-full px-8">지금 확인하기</Button>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mt-8">
+                                    {/* 1. 무료 (Basic) 티어 */}
+                                    <div className="relative group rounded-[32px] bg-white border border-line shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex flex-col">
+                                        <div className="p-8 pb-6 bg-slate-50 border-b border-line">
+                                            <Badge variant="outline" className="mb-4 bg-white text-foreground/60 border-line">FREE</Badge>
+                                            <h3 className="font-black text-2xl text-obsidian tracking-tight mb-2">Basic Report</h3>
+                                            <p className="text-sm text-foreground/70 leading-relaxed h-10">현재 나의 전반적인 회복 리듬과 상태 요약</p>
+                                        </div>
+                                        <div className="p-8 flex-1 flex flex-col space-y-6">
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span className="font-bold text-obsidian flex items-center gap-2"><Sparkles className="w-4 h-4 text-slate-400"/> 수면 리듬</span>
+                                                    <span className="font-black">보통</span>
+                                                </div>
+                                                <Progress value={60} className="h-2 bg-slate-100" indicatorColor="#94a3b8" />
+                                                <div className="flex items-center justify-between text-sm pt-2">
+                                                    <span className="font-bold text-obsidian flex items-center gap-2"><Brain className="w-4 h-4 text-slate-400"/> 멘탈 리듬</span>
+                                                    <span className="font-black">주의</span>
+                                                </div>
+                                                <Progress value={40} className="h-2 bg-slate-100" indicatorColor="#94a3b8" />
+                                            </div>
+                                            <div className="mt-auto pt-6">
+                                                <Button variant="outline" className="w-full rounded-2xl h-14 font-bold text-obsidian border-line bg-slate-50 cursor-default">
+                                                    현재 열람 중
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="opacity-10 blur-sm pointer-events-none select-none h-40 bg-slate-200 rounded-3xl" />
-                                </Card>
+
+                                    {/* 2. 9,900원 (Founder) 티어 */}
+                                    <div className="relative group rounded-[32px] bg-white shadow-xl shadow-chapter-accent/5 transition-all duration-500 overflow-hidden flex flex-col border border-chapter-accent/20 hover:border-chapter-accent/50 hover:-translate-y-1">
+                                        <div className="p-8 pb-6 bg-gradient-to-br from-chapter-accent/10 to-transparent border-b border-chapter-accent/10">
+                                            <Badge variant="default" className="mb-4 bg-chapter-accent text-white border-none shadow-sm shadow-chapter-accent/20">FOUNDER</Badge>
+                                            <h3 className="font-black text-2xl text-obsidian tracking-tight mb-2">7-Day Analysis</h3>
+                                            <p className="text-sm text-foreground/70 leading-relaxed h-10">7일간의 누적 데이터를 바탕으로 한 정밀 패턴 분석</p>
+                                        </div>
+                                        <div className="relative flex-1 bg-white">
+                                            {/* Mock Content */}
+                                            <div className="p-8 space-y-6 opacity-30 select-none pointer-events-none filter blur-[2px]">
+                                                <div className="flex items-end gap-2 h-24 pb-2 border-b border-line">
+                                                    {[40, 60, 45, 80, 50, 70, 90].map((h, i) => (
+                                                        <div key={i} className="flex-1 bg-chapter-accent/40 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                                                    ))}
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                                                    <div className="h-4 bg-slate-200 rounded w-full"></div>
+                                                    <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                                                </div>
+                                            </div>
+                                            {/* Lock Overlay */}
+                                            <div className="absolute inset-0 bg-white/40 backdrop-blur-[3px] flex flex-col items-center justify-center p-6 z-10">
+                                                <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 text-chapter-accent">
+                                                    <Lock className="w-7 h-7" />
+                                                </div>
+                                                <h4 className="font-black text-obsidian mb-2">데이터 분석 잠금</h4>
+                                                <p className="text-xs font-bold text-foreground/60 mb-6 text-center">9,900원 결제 후<br/>일주일간의 숨겨진 패턴을 확인하세요</p>
+                                                <Button onClick={handleUnlockClick} className="w-full rounded-2xl h-14 font-black text-white bg-obsidian hover:bg-obsidian/90 shadow-xl shadow-obsidian/20 transition-transform active:scale-95">
+                                                    파운더스 리포트 오픈
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* 3. 29,800원 (Premium) 티어 */}
+                                    <div className="relative group rounded-[32px] bg-white shadow-2xl shadow-reward-gold/10 transition-all duration-500 overflow-hidden flex flex-col border border-reward-gold/30 hover:border-reward-gold hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-reward-gold/5 via-transparent to-white pointer-events-none" />
+                                        <div className="relative p-8 pb-6 bg-gradient-to-r from-obsidian to-slate-800 border-b border-obsidian/10">
+                                            <div className="absolute top-0 right-0 p-6 opacity-20 pointer-events-none"><Sparkles className="w-16 h-16 text-reward-gold" /></div>
+                                            <Badge variant="default" className="mb-4 bg-reward-gold text-white border-none shadow-[0_0_15px_rgba(251,191,36,0.4)] tracking-wider">PREMIUM</Badge>
+                                            <h3 className="font-black text-2xl text-white tracking-tight mb-2">Expert Solution</h3>
+                                            <p className="text-sm text-white/70 leading-relaxed h-10">전문가 코멘트 및 30개 세부 지표 기반 1:1 맞춤 솔루션</p>
+                                        </div>
+                                        <div className="relative flex-1 bg-white">
+                                            {/* Mock Content */}
+                                            <div className="p-8 space-y-6 opacity-20 select-none pointer-events-none filter blur-[3px]">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="w-12 h-12 rounded-full bg-reward-gold/40"></div>
+                                                    <div className="space-y-2 flex-1">
+                                                        <div className="h-4 bg-slate-300 rounded w-1/3"></div>
+                                                        <div className="h-3 bg-slate-200 rounded w-full"></div>
+                                                        <div className="h-3 bg-slate-200 rounded w-5/6"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3 mt-6">
+                                                    <div className="h-16 rounded-xl bg-slate-100"></div>
+                                                    <div className="h-16 rounded-xl bg-slate-100"></div>
+                                                    <div className="h-16 rounded-xl bg-slate-100"></div>
+                                                    <div className="h-16 rounded-xl bg-slate-100"></div>
+                                                </div>
+                                            </div>
+                                            {/* Lock Overlay */}
+                                            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center p-6 z-10">
+                                                <div className="w-16 h-16 bg-gradient-to-br from-reward-gold to-yellow-600 rounded-full shadow-lg shadow-reward-gold/30 flex items-center justify-center mb-4 text-white">
+                                                    <Lock className="w-7 h-7" />
+                                                </div>
+                                                <h4 className="font-black text-obsidian mb-2">프리미엄 솔루션 잠금</h4>
+                                                <p className="text-xs font-bold text-foreground/60 mb-6 text-center">29,800원으로 나만의 전담<br/>전문가 분석과 솔루션을 만나보세요</p>
+                                                <Button onClick={handleUnlockClick} className="w-full rounded-2xl h-14 font-black text-obsidian bg-reward-gold hover:bg-yellow-400 shadow-[0_10px_30px_rgba(251,191,36,0.3)] transition-transform active:scale-95">
+                                                    프리미엄 리포트 오픈
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </section>
@@ -522,7 +618,7 @@ export default function DeepDiagnosisReportPage() {
                                 </div>
                             ) : (
                                 <Card className="border-dashed border-2 border-line bg-surface/50 p-12 text-center rounded-[32px]">
-                                    <p className="text-foreground/70 font-medium">세부 국면 분석 데이터는 정밀 진단 시 제공됩니다.</p>
+                                    <p className="text-foreground/70 font-medium">세부 국면 분석 데이터는 정밀 리듬체크 시 제공됩니다.</p>
                                 </Card>
                             )}
                         </section>
@@ -533,7 +629,7 @@ export default function DeepDiagnosisReportPage() {
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="bg-obsidian w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"><span className="text-white font-bold text-xl">3</span></div>
-                                <div><h3 className="text-2xl font-black text-obsidian">유니클 맞춤 솔루션</h3><p className="text-foreground/70 text-sm">진단 결과를 바탕으로 설계된 처방전입니다.</p></div>
+                                <div><h3 className="text-2xl font-black text-obsidian">유니클 맞춤 솔루션</h3><p className="text-foreground/70 text-sm">리듬체크 결과를 바탕으로 설계된 처방전입니다.</p></div>
                             </div>
                             <GoldenTimeOffer
                                 script={result?.aiSolution?.audioScript || "YOUNIQLE_LOADING"}

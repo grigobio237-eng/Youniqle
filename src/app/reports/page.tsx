@@ -407,7 +407,7 @@ export default function ReportsHub() {
       {historyTab === 'daily' || historyTab === 'scanner' ? null : historyTab === 'personality' && (
         <div className="space-y-3 md:space-y-4">
           <p className="text-[11px] md:text-sm font-bold text-obsidian leading-relaxed break-keep">
-            {selectedLog.resultDescription || 'Big 5 모델을 적용하여 생활 패턴 및 강점을 분석한 종합 진단입니다.'}
+            {selectedLog.resultDescription || 'Big 5 모델을 적용하여 생활 패턴 및 강점을 분석한 종합 리듬체크입니다.'}
           </p>
 
           {selectedLog.categoryScores && (
@@ -473,7 +473,7 @@ export default function ReportsHub() {
                 <span className="text-sm font-bold text-white/40 tracking-wider">RECOVERY AUDIT REPORT</span>
                 <h1 className="text-[26px] font-black tracking-tight leading-tight break-keep sm:text-4xl md:text-4xl">
                   {data?.cover?.userName}님의<br />
-                  종합 회복 분석 진단서
+                  종합 회복 분석 리듬체크서
                 </h1>
               </div>
 

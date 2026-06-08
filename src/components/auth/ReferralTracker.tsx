@@ -7,7 +7,12 @@ export default function ReferralTracker() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        const ref = searchParams?.get('ref');
+        let ref = searchParams?.get('ref');
+        
+        if (!ref && typeof window !== 'undefined') {
+            ref = localStorage.getItem('referralCode');
+        }
+
         if (ref) {
             // 7일간 유효한 쿠키 설정
             const expires = new Date();

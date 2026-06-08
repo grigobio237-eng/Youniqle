@@ -1,6 +1,6 @@
 /**
  * 개인화 오디오 가이드 보이스 매칭 전략
- * 유저의 성별과 진단 결과(Mood)에 따라 최적의 프리미엄 목소리를 배정합니다.
+ * 유저의 성별과 리듬체크 결과(Mood)에 따라 최적의 프리미엄 목소리를 배정합니다.
  */
 
 export type VoiceMood = 'CALM' | 'REFRESHING' | 'PROFESSIONAL';
@@ -88,7 +88,7 @@ export function getVoiceConfig(gender: UserGender = 'other', mood: VoiceMood = '
 }
 
 /**
- * 진단 결과 점수를 바탕으로 기분(Mood)을 판별합니다.
+ * 리듬체크 결과 점수를 바탕으로 기분(Mood)을 판별합니다.
  */
 export function determineMood(totalScore: number, scores: Record<string, number>): VoiceMood {
     // 1. 신경증(N) 또는 스트레스 관련 점수가 높으면 차분한 목소리 우선

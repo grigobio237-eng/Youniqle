@@ -341,7 +341,7 @@ function BlackPassGuideContent() {
             <h3 className="text-2xl font-black text-obsidian">영구적인 데이터 자산 관리</h3>
           </div>
           <p className="text-slate/70 leading-relaxed font-medium break-keep">
-            <strong className="text-obsidian font-black">'나의 데이터 자산'</strong> 메뉴에서 당신의 모든 진단 기록과 회복 히스토리를 영구적으로 보관하세요. 
+            <strong className="text-obsidian font-black">'나의 데이터 자산'</strong> 메뉴에서 당신의 모든 리듬체크 기록과 회복 히스토리를 영구적으로 보관하세요. 
             주간 정밀 분석 리포트를 통해 시간이 지남에 따라 변화하는 회복의 궤적을 데이터로 증명할 수 있습니다.
           </p>
         </div>

@@ -81,7 +81,7 @@ export async function GET(
       }
     }
 
-    // 최신 진단 결과 (기본 정보 리턴용)
+    // 최신 리듬체크 결과 (기본 정보 리턴용)
     const diagnosisResults = (member as any).diagnosisResults || [];
     const latestDiagnosis = diagnosisResults.length > 0
       ? diagnosisResults[diagnosisResults.length - 1]

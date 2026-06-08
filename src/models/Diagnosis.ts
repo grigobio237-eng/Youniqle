@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IDiagnosis extends Document {
     userId: mongoose.Types.ObjectId;
-    type: 'PRECISION'; // 정밀 진단 구분
+    type: 'PRECISION'; // 정밀 리듬체크 구분
     totalScore: number;
     categoryScores: {
         physical: number;

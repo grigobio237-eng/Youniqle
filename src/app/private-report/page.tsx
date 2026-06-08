@@ -74,7 +74,7 @@ export default function PrivateReportRequestPage() {
             <h2 className="font-black text-obsidian tracking-tight text-xl">리포트 포함 내용</h2>
             <div className="space-y-4">
               {[
-                { title: '상태 요약', desc: '데이터에 나타난 현재의 핵심 흔들림 진단' },
+                { title: '상태 요약', desc: '데이터에 나타난 현재의 핵심 흔들림 리듬체크' },
                 { title: '루틴 설계', desc: '당신의 생활 패턴에 최적화된 3가지 마이크로 루틴' },
                 { title: '선택 기준 정리', desc: '불필요한 정보를 걷어내고 지금 필요한 선택지만 제안' }
               ].map((item, i) => (

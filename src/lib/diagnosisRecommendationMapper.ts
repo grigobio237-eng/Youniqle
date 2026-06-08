@@ -1,6 +1,6 @@
 /**
- * 진단 기반 회복 프로토콜 추천 매핑 유틸리티
- * 60초 진단 결과(categoryScores)를 분석하여 개인화된 추천을 생성합니다.
+ * 리듬체크 기반 회복 프로토콜 추천 매핑 유틸리티
+ * 60초 리듬체크 결과(categoryScores)를 분석하여 개인화된 추천을 생성합니다.
  */
 
 // 추천 아이템 타입
@@ -21,7 +21,7 @@ export interface RecommendationItem {
     isExternal?: boolean;
 }
 
-// 진단 카테고리 점수
+// 리듬체크 카테고리 점수
 export interface CategoryScores {
     physical: number;
     mental: number;
@@ -279,7 +279,7 @@ const CONTENT_MAPPINGS: Record<string, Record<ScoreLevel, RecommendationItem[]>>
             {
                 id: 'content-analysis-physical',
                 type: 'content',
-                title: 'AI 비디오 자세 진단',
+                title: 'AI 비디오 자세 리듬체크',
                 description: '카메라로 실시간 신체 밸런스 점검',
                 link: '/analysis/video',
                 icon: '👁️',
@@ -410,7 +410,7 @@ export const PRODUCT_KEYWORDS: Record<string, Record<ScoreLevel, string[]>> = {
 };
 
 /**
- * 진단 결과를 기반으로 추천 아이템 생성
+ * 리듬체크 결과를 기반으로 추천 아이템 생성
  */
 export function generateRecommendations(
     categoryScores: CategoryScores,

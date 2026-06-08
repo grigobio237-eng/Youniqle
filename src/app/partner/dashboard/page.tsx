@@ -435,7 +435,7 @@ function PartnerDashboardContent() {
                     <FileText className="h-6 w-6" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-text-secondary mb-1">정밀 진단 매칭</p>
+                <p className="text-sm font-medium text-text-secondary mb-1">정밀 리듬체크 매칭</p>
                 <p className="text-3xl font-bold text-text-primary">{stats?.totalOrders || 0}</p>
                 <p className="text-xs text-primary mt-2">상세 데이터 분석 완료</p>
               </CardContent>
@@ -623,7 +623,7 @@ function PartnerDashboardContent() {
                 </span>
               </CardTitle>
               <CardDescription>
-                {stats?.partnerType === 'medical' ? '진단 결과 기반 매칭된 고객' : '최근 확정된 코칭 일정'}
+                {stats?.partnerType === 'medical' ? '리듬체크 결과 기반 매칭된 고객' : '최근 확정된 코칭 일정'}
               </CardDescription>
             </CardHeader>
             <CardContent>

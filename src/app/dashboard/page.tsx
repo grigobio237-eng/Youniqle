@@ -267,7 +267,7 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 text-center space-y-6">
           <div className="w-16 h-16 md:w-20 md:h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           <h2 className="text-lg md:text-3xl font-bold text-foreground">회복 데이터를 정리하고 있어요</h2>
-          <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed">최근 기록하신 {localScore}점의 진단 결과를 토대로<br />오늘의 회복 리듬을 분석하고 있습니다.</p>
+          <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed">최근 기록하신 {localScore}점의 리듬체크 결과를 토대로<br />오늘의 회복 리듬을 분석하고 있습니다.</p>
           <Button variant="ghost" onClick={() => window.location.reload()} className="rounded-full text-[11px] md:text-sm">잠시만 기다려주세요</Button>
         </div>
       );

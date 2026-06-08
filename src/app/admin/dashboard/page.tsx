@@ -248,12 +248,12 @@ export default function AdminDashboard() {
         <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-black uppercase tracking-widest opacity-80 flex items-center gap-2">
-              <HeartPulse className="w-4 h-4" /> 정밀 회복 진단
+              <HeartPulse className="w-4 h-4" /> 정밀 회복 리듬체크
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="font-black text-4xl">{stats?.activityMetrics?.totalDiagnoses || 0}</div>
-            <p className="text-xs opacity-60 mt-1">총 누적 진단 완료 건수</p>
+            <p className="text-xs opacity-60 mt-1">총 누적 리듬체크 완료 건수</p>
           </CardContent>
         </Card>
 

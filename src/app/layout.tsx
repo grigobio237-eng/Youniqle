@@ -19,8 +19,8 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.grigobio.co.kr'),
   title: 'Youniqle - 번아웃 극복을 위한 유니클 맞춤 회복 솔루션',
-  description: '60초 진단으로 나만의 회복 점수를 확인하고, 1만+ 사용자가 검증한 데이터 기반 맞춤형 회복 프로토콜을 경험하세요.',
-  keywords: ['번아웃', '회복', '유니클 진단', '웰니스', '맞춤 솔루션', 'youniqle', '리커버리', '스트레스 관리', '수면 개선', '피로 해소'],
+  description: '60초 리듬체크으로 나만의 회복 점수를 확인하고, 1만+ 사용자가 검증한 데이터 기반 맞춤형 회복 프로토콜을 경험하세요.',
+  keywords: ['번아웃', '회복', '유니클 리듬체크', '웰니스', '맞춤 솔루션', 'youniqle', '리커버리', '스트레스 관리', '수면 개선', '피로 해소'],
   authors: [{ name: 'Youniqle Team' }],
   creator: 'Youniqle',
   publisher: 'Youniqle',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     url: 'https://grigobio.co.kr',
     title: 'Youniqle - 번아웃 극복을 위한 유니클 맞춤 회복 솔루션',
-    description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
+    description: '60초 리듬체크으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
     siteName: 'Youniqle',
     images: [
       {
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Youniqle - 번아웃 극복을 위한 유니클 맞춤 회복 솔루션',
-    description: '60초 진단으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
+    description: '60초 리듬체크으로 데이터 기반 맞춤 회복 솔루션을 경험하세요',
     images: ['/images/og-banner.png'],
   },
   verification: {

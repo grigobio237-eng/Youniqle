@@ -416,7 +416,7 @@ export default function HeroScanner({
                         { id: 'ACTIVITY', emoji: '🏃', title: '활동과 움직임', desc: '가벼운 산책이나 운동 기록' },
                         { id: 'ROUTINE', emoji: '💊', title: '자기관리 루틴', desc: '영양제나 관리 제품 기록' },
                         { id: 'BODY', emoji: '🤕', title: '불편한 부위', desc: '피로나 통증이 느껴지는 곳' },
-                        { id: 'MEDICAL_DOC', emoji: '📄', title: '처방전/진단서', desc: '의료적인 기록과 안내문' },
+                        { id: 'MEDICAL_DOC', emoji: '📄', title: '처방전/리듬체크서', desc: '의료적인 기록과 안내문' },
                         { id: 'OTHER', emoji: '📸', title: '기타 일상', desc: '회복 과정의 모든 순간' },
                     ].map((cat) => (
                         <button
@@ -545,30 +545,32 @@ export default function HeroScanner({
                             </div>
                         </div>
 
-                        <div className="p-6 md:p-8 rounded-[32px] md:rounded-5xl bg-primary/5 border border-primary/10 space-y-4 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-transform duration-1000" />
-                            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-primary relative z-10">
-                                <Sparkles className="w-4 h-4 text-primary animate-pulse" /> Gentle Recovery Guide
+                        {result.futureDirection && (
+                            <div className="p-6 md:p-8 rounded-[32px] md:rounded-5xl bg-primary/5 border border-primary/10 space-y-4 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-transform duration-1000" />
+                                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-primary relative z-10">
+                                    <Sparkles className="w-4 h-4 text-primary animate-pulse" /> Gentle Recovery Guide
+                                </div>
+                                <div className="space-y-3 relative z-10">
+                                    {result.futureDirection.split(/\n|\\n/).filter(line => line.trim().length > 0).map((line, index) => {
+                                        const parts = line.split(/(\*\*.*?\*\*)/g);
+                                        return (
+                                            <div key={index} className="flex items-start gap-3 bg-white/80 backdrop-blur-sm p-4 rounded-3xl border border-primary/5 shadow-sm hover:shadow transition-all duration-300">
+                                                <span className="text-primary font-bold text-base leading-none mt-0.5 select-none">•</span>
+                                                <p className="text-sm md:text-base font-medium text-foreground/80 leading-relaxed">
+                                                    {parts.map((part, pIdx) => {
+                                                        if (part.startsWith('**') && part.endsWith('**')) {
+                                                            return <strong key={pIdx} className="text-primary font-extrabold">{part.slice(2, -2)}</strong>;
+                                                        }
+                                                        return part;
+                                                    })}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="space-y-3 relative z-10">
-                                {result.futureDirection.split(/\n|\\n/).filter(line => line.trim().length > 0).map((line, index) => {
-                                    const parts = line.split(/(\*\*.*?\*\*)/g);
-                                    return (
-                                        <div key={index} className="flex items-start gap-3 bg-white/80 backdrop-blur-sm p-4 rounded-3xl border border-primary/5 shadow-sm hover:shadow transition-all duration-300">
-                                            <span className="text-primary font-bold text-base leading-none mt-0.5 select-none">•</span>
-                                            <p className="text-sm md:text-base font-medium text-foreground/80 leading-relaxed">
-                                                {parts.map((part, pIdx) => {
-                                                    if (part.startsWith('**') && part.endsWith('**')) {
-                                                        return <strong key={pIdx} className="text-primary font-extrabold">{part.slice(2, -2)}</strong>;
-                                                    }
-                                                    return part;
-                                                })}
-                                            </p>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                        )}
 
                         <div className="pt-4 md:pt-6 flex flex-col gap-3">
                             {isDiagnosing ? (

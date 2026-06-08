@@ -66,7 +66,7 @@ export const QUIZ_DATA: Record<string, QuizCategory> = {
     },
     skin: {
         id: 'skin',
-        title: '피부 타입 진단 (Baumann)',
+        title: '피부 타입 리듬체크 (Baumann)',
         description: '내 피부는 지성일까 건성일까? 정확한 피부 타입을 알아보세요.',
         icon: '✨',
         color: 'from-pink-400 to-rose-400',

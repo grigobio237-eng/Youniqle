@@ -197,7 +197,7 @@ export default function AiNavigatorPage() {
 
             setScoreHistory(dynamicHistory);
 
-            // 2. 진단 기반 추천 API 호출
+            // 2. 리듬체크 기반 추천 API 호출
             const diagResponse = await fetch('/api/recommendations/diagnosis?limit=4&protocols=true&content=true');
             if (diagResponse.ok) {
                 const diagData = await diagResponse.json();
@@ -467,7 +467,7 @@ export default function AiNavigatorPage() {
                             {(['diagnosis', 'routine', 'reflection'] as const).map((tab) => {
                                 const isActive = subActiveTab === tab;
                                 const labels: Record<typeof tab, string> = {
-                                    diagnosis: '진단 🩺',
+                                    diagnosis: '리듬체크 🩺',
                                     routine: '오늘의 케어 ⚡',
                                     reflection: '회고 📝'
                                 };
@@ -522,7 +522,7 @@ export default function AiNavigatorPage() {
                                                     ) : (
                                                         <div className="text-center p-4 space-y-2">
                                                             <span className="text-2xl md:text-3xl">🧘</span>
-                                                            <h4 className="text-xs md:text-sm font-black text-obsidian">오늘의 건강을 진단해 보세요</h4>
+                                                            <h4 className="text-xs md:text-sm font-black text-obsidian">오늘의 건강을 리듬체크해 보세요</h4>
                                                             <p className="text-[9px] md:text-[10px] text-slate opacity-70">60초 리듬체크로 맞춤 그래프가 열립니다.</p>
                                                         </div>
                                                     )}
@@ -672,7 +672,7 @@ export default function AiNavigatorPage() {
                     </DialogContent>
                 </Dialog>
 
-                {/* 진단 모달 */}
+                {/* 리듬체크 모달 */}
                 <DetailedDiagnosisModal
                     open={diagnosisModalOpen}
                     onOpenChange={setDiagnosisModalOpen}

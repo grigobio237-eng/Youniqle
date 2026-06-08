@@ -55,7 +55,7 @@ export default function RecoveryPortalPage() {
     },
     {
       title: '회복의 도구',
-      subtitle: '스마트 데이터 진단 툴',
+      subtitle: '스마트 데이터 리듬체크 툴',
       description: '유니클 비디오 자세 분석부터 호흡 가이드까지, 과학적인 회복을 위한 최신 도구를 활용하세요.',
       icon: <Wrench className="w-6 h-6" />,
       bgImage: '/images/portal/tools-1.png',

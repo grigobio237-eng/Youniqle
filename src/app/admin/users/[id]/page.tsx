@@ -385,7 +385,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 활동 타임라인
               </TabsTrigger>
               <TabsTrigger value="diagnosis" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
-                진단 내역
+                리듬체크 내역
               </TabsTrigger>
               <TabsTrigger value="orders" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
                 구매 및 포인트 이력
@@ -456,7 +456,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                        </div>
                      ))
                    ) : (
-                     <div className="p-8 text-center text-foreground/70">진단 이력이 없습니다.</div>
+                     <div className="p-8 text-center text-foreground/70">리듬체크 이력이 없습니다.</div>
                    )}
                 </CardContent>
               </Card>

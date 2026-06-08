@@ -499,7 +499,7 @@ export default function AdminUsersPage() {
                             <Brain className="w-3.5 h-3.5" />
                             <span>{user.recoveryStats?.lastScore || 0}점</span>
                           </div>
-                          <span className="text-[10px] text-text-secondary font-medium">최근 진단</span>
+                          <span className="text-[10px] text-text-secondary font-medium">최근 리듬체크</span>
                         </div>
 
                         {/* Recent Activity Badge */}
@@ -523,7 +523,7 @@ export default function AdminUsersPage() {
                           </div>
                           <div className="flex flex-col border-l pl-4">
                             <span className="text-text-secondary text-[9px] uppercase font-bold">이용 횟수</span>
-                            <span className="text-text-primary font-black">진단 {user.recoveryStats?.diagnosisCount || 0} / 스캔 {user.recoveryStats?.scannerCount || 0}</span>
+                            <span className="text-text-primary font-black">리듬체크 {user.recoveryStats?.diagnosisCount || 0} / 스캔 {user.recoveryStats?.scannerCount || 0}</span>
                           </div>
                         </div>
                       </div>

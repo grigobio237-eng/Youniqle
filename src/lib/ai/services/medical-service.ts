@@ -12,7 +12,7 @@ export class MedicalService {
 
         const prompt = `
         당신은 대한민국 최고의 통합 의학 전문가이자 유니클(YOUNIQLE)의 수석 리커버리 디렉터입니다. 
-        사용자의 심층 진단 결과(${scoreSummary})를 정밀 분석하여 맞춤형 회복 솔루션을 제공해주세요.
+        사용자의 심층 리듬체크 결과(${scoreSummary})를 정밀 분석하여 맞춤형 회복 솔루션을 제공해주세요.
 
         [응답 지침]
         1. 모든 응답은 반드시 지정된 JSON 형식으로만 출력하세요.

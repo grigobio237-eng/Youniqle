@@ -29,7 +29,7 @@ export default function PartnerPage() {
             </h1>
             <p className="text-lg md:text-xl text-slate/70 leading-relaxed font-medium">
               불특정 다수가 아닌, 당신의 전문 솔루션이 가장 필요한 <br className="hidden md:block" />
-              '준비된 고객'을 유니클의 정밀 진단 데이터로 연결해 드립니다.
+              '준비된 고객'을 유니클의 정밀 리듬체크 데이터로 연결해 드립니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button 
@@ -58,9 +58,9 @@ export default function PartnerPage() {
                 <BarChart className="w-6 h-6" />
               </div>
               <div className="space-y-2">
-                <h3 className="font-black text-obsidian tracking-tight text-xl">사전 진단 가치</h3>
+                <h3 className="font-black text-obsidian tracking-tight text-xl">사전 리듬체크 가치</h3>
                 <p className="text-slate/60 leading-relaxed text-[13px] md:text-sm font-medium">
-                  고객이 센터에 방문하기 전, 60초 진단을 통해 이미 본인의 상태를 인지하고 있습니다. 상담 시간을 70% 이상 단축시키고 상담의 질을 높입니다.
+                  고객이 센터에 방문하기 전, 60초 리듬체크를 통해 이미 본인의 상태를 인지하고 있습니다. 상담 시간을 70% 이상 단축시키고 상담의 질을 높입니다.
                 </p>
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function PartnerPage() {
             <div className="flex-1 space-y-8 md:space-y-10">
               <div className="space-y-4">
                 <h2 className="font-black text-obsidian tracking-tight text-3xl md:text-4xl">파트너 전용 <br />데이터 대시보드 제공</h2>
-                <p className="text-lg text-slate/60">연결된 고객의 진단 이력, 회복 변화 추이, 서비스 만족도를 한눈에 분석하고 관리할 수 있는 도구를 제공합니다.</p>
+                <p className="text-lg text-slate/60">연결된 고객의 리듬체크 이력, 회복 변화 추이, 서비스 만족도를 한눈에 분석하고 관리할 수 있는 도구를 제공합니다.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[

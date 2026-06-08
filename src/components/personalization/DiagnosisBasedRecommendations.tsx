@@ -237,7 +237,7 @@ export default function DiagnosisBasedRecommendations({
                 <p className="text-slate font-medium mb-6">
                     {isPaid 
                         ? '정밀 성격 분석을 통해 당신에게 완벽히 맞춤화된 회복 솔루션을 설계해 보세요.' 
-                        : '유니클 네비게이터에서 약식 또는 정밀 진단을 완료하시면 더욱 정밀한 추천을 받으실 수 있습니다.'}
+                        : '유니클 네비게이터에서 약식 또는 정밀 리듬체크를 완료하시면 더욱 정밀한 추천을 받으실 수 있습니다.'}
                 </p>
                 <Button asChild className="bg-obsidian text-white rounded-2xl h-16 px-10 text-lg font-black shadow-xl hover:scale-105 transition-all">
                     <Link href="/ai-navigator">
@@ -464,7 +464,7 @@ export default function DiagnosisBasedRecommendations({
                     </div>
                 )}
 
-                {/* 1일 회복 진단 (매일 참여 및 포인트 획득 유도) */}
+                {/* 1일 회복 리듬체크 (매일 참여 및 포인트 획득 유도) */}
                 <div className="mt-12 bg-obsidian text-mist rounded-[32px] p-10 text-center border border-white/5 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
                         <Sparkles className="w-10 h-10 text-reward-gold mx-auto mb-4" />
@@ -472,7 +472,7 @@ export default function DiagnosisBasedRecommendations({
 
                         <p className="text-mist/60 font-medium mb-6">
                             오늘의 에너지를 체크하고 나만의 회복 리포트를 받아보세요.<br />
-                            지금 진단을 완료하면 <span className="bg-reward-gold text-obsidian px-2 py-0.5 rounded font-black">100 PT</span>를 즉시 드립니다!
+                            지금 리듬체크를 완료하면 <span className="bg-reward-gold text-obsidian px-2 py-0.5 rounded font-black">100 PT</span>를 즉시 드립니다!
                         </p>
                         <div className="flex flex-col items-center gap-4">
                             <Button asChild size="lg" className="bg-reward-gold text-obsidian font-black rounded-2xl px-12 h-16 shadow-xl shadow-reward-gold/20 hover:scale-105 transition-transform border-none">
@@ -482,7 +482,7 @@ export default function DiagnosisBasedRecommendations({
                                 </Link>
                             </Button>
                             <p className="text-xs font-bold text-mist/30">
-                                * 정밀 성격 진단(24/60문항)은 <Link href="/ai-navigator" className="text-mist/50 underline hover:text-mist">유니클 네비게이터</Link>에서 가능합니다.
+                                * 정밀 성격 리듬체크(24/60문항)은 <Link href="/ai-navigator" className="text-mist/50 underline hover:text-mist">유니클 네비게이터</Link>에서 가능합니다.
                             </p>
                         </div>
                     </div>

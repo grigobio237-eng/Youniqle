@@ -85,7 +85,7 @@ export function DeepDiagnosisModal({ open, onOpenChange }: DeepDiagnosisModalPro
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-2xl p-0 overflow-hidden border-none rounded-[40px] bg-surface shadow-2xl h-[700px] flex flex-col">
                 <DialogHeader className="sr-only">
-                    <DialogTitle>IPIP-NEO-60 심층 진단</DialogTitle>
+                    <DialogTitle>IPIP-NEO-60 심층 리듬체크</DialogTitle>
                     <DialogDescription>
                         60개의 정밀 문항을 통해 당신의 성격 5요인과 30개 국면을 분석합니다.
                     </DialogDescription>
@@ -132,7 +132,7 @@ function DeepIntroView({ onStart, onClose }: { onStart: () => void, onClose: () 
 
                 <div>
                     <Badge variant="outline" className="text-primary border-primary mb-4 px-3 py-1">PREMIUM ANALYSIS</Badge>
-                    <h2 className="font-black mb-4 tracking-tight text-4xl">IPIP-NEO-60 심층 진단</h2>
+                    <h2 className="font-black mb-4 tracking-tight text-4xl">IPIP-NEO-60 심층 리듬체크</h2>
                     <p className="text-white/60 leading-relaxed max-w-sm mx-auto">
                         단순 성향 파악을 넘어, 30가지 세부 심리 국면과<br />
                         요인 간 상호작용을 유니클 알고리즘으로 분석합니다.

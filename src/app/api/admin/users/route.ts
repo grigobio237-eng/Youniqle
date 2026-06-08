@@ -83,7 +83,7 @@ async function getUsersHandler(request: NextRequest) {
         const totalOrders = orders.length;
         const totalSpent = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
-        // 최신 진단 결과 추출
+        // 최신 리듬체크 결과 추출
         const latestDiagnosis = user.diagnosisResults?.length > 0 
           ? user.diagnosisResults[user.diagnosisResults.length - 1] 
           : null;

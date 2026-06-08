@@ -55,7 +55,7 @@ export default function RecoveryNoteSection() {
                     <div className="space-y-2 md:space-y-4 md:max-w-xs w-full">
                         <h3 className="text-sm md:text-3xl font-black text-obsidian tracking-tight">오늘의 마음 기록</h3>
                         <p className="text-foreground/50 text-[10px] md:text-lg font-semibold leading-normal md:leading-relaxed">
-                            수치화된 진단보다 더 중요한 것은 당신의 진솔한 생각입니다. 지금 기분은 어떠신가요?
+                            수치화된 리듬체크보다 더 중요한 것은 당신의 진솔한 생각입니다. 지금 기분은 어떠신가요?
                         </p>
                         
                         <div className="flex flex-wrap gap-1.5 md:gap-3 pt-1 md:pt-4">
