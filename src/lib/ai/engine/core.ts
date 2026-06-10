@@ -24,12 +24,12 @@ export class GeminiCore {
     
     private static sortModelsByPriority(models: string[]): string[] {
         const getPriority = (name: string) => {
-            if (name.includes('3.5-flash')) return 0;
-            if (name.includes('3.1-flash')) return 1;
-            if (name.includes('2.5-flash')) return 2;
-            if (name.includes('2.0-flash')) return 3;
-            if (name.includes('1.5-flash')) return 4;
-            if (name.includes('pro')) return 5;
+            if (name === 'gemini-2.5-flash') return 0;
+            if (name.includes('2.5-flash')) return 1;
+            if (name.includes('2.5-pro')) return 2;
+            if (name.includes('2.0')) return 3;
+            if (name.includes('pro')) return 4;
+            if (name.includes('flash')) return 5;
             return 6;
         };
         return [...models].sort((a, b) => getPriority(a) - getPriority(b));
@@ -58,7 +58,7 @@ export class GeminiCore {
         this.initializationPromise = (async () => {
             try {
                 if (this.availableTextModels.length === 0) {
-                    this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                    this.availableTextModels = ['gemini-2.5-flash', 'gemini-2.5-pro'];
                 }
 
                 await dbConnect();
@@ -99,12 +99,12 @@ export class GeminiCore {
                             .map(m => m.name.replace('models/', ''))
                             .sort((a, b) => {
                                 const getPriority = (name: string) => {
-                                    if (name.includes('3.5-flash')) return 0;
-                                    if (name.includes('3.1-flash')) return 1;
-                                    if (name.includes('2.5-flash')) return 2;
-                                    if (name.includes('2.0-flash')) return 3;
-                                    if (name.includes('1.5-flash')) return 4;
-                                    if (name.includes('pro')) return 5;
+                                    if (name === 'gemini-2.5-flash') return 0;
+                                    if (name.includes('2.5-flash')) return 1;
+                                    if (name.includes('2.5-pro')) return 2;
+                                    if (name.includes('2.0')) return 3;
+                                    if (name.includes('pro')) return 4;
+                                    if (name.includes('flash')) return 5;
                                     return 6;
                                 };
                                 return getPriority(a) - getPriority(b);
@@ -162,7 +162,7 @@ export class GeminiCore {
             models = await this.getTieredModels('text');
         }
 
-        const effectiveModels = models.length > 0 ? this.sortModelsByPriority(models) : ['gemini-2.5-flash', 'gemini-2.0-flash'];
+        const effectiveModels = models.length > 0 ? this.sortModelsByPriority(models) : ['gemini-2.5-flash', 'gemini-2.5-pro'];
         let lastError: any;
 
         for (let i = 0; i < effectiveModels.length; i++) {

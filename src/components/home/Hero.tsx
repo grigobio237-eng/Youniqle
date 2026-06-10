@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles, CheckCircle, ArrowRight, Activity, ShieldCheck, Layout } from 'lucide-react';
+import { Activity, ArrowRight } from 'lucide-react';
 import HeroScanner, { AnalysisResult } from './HeroScanner';
+import MembershipTierCards from './MembershipTierCards';
 import { useRecovery } from '@/contexts/RecoveryContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
@@ -181,22 +182,14 @@ export default function Hero({
             </p>
             
             {/* Action Buttons: Free vs Paid */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4 pt-4 w-full">
               <Button 
                 onClick={() => onStart()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 group"
+                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 group"
               >
                 무료 60초 리듬체크 시작하기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Link href="/founder-ticket">
-                <Button 
-                  variant="outline"
-                  className="px-8 py-6 rounded-full text-lg font-bold border-2 hover:bg-foreground/5 transition-all"
-                >
-                  9,900원 파운더스 티켓 알아보기
-                </Button>
-              </Link>
             </div>
           </div>
 
@@ -235,6 +228,9 @@ export default function Hero({
           </div>
 
         </div>
+        
+        {/* Membership Tier Cards */}
+        <MembershipTierCards onStart={onStart} />
       </div>
     </div>
   );

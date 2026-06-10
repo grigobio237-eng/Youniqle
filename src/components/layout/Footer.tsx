@@ -96,7 +96,7 @@ export default function Footer() {
     },
     businessRegistration: {
       registrationNumber: '838-88-02527',
-      businessAddress: '서울특별시 강동구 고덕비즈밸리로 26, 7층(고덕동, 고덕비즈밸리)',
+      businessAddress: '서울특별시 강동구 고덕비즈밸리로 26, 6층(고덕동, 고덕비즈밸리)',
       businessAddressDetail: '',
       businessPhone: '-',
       businessEmail: 'contact@sapienet.co.kr'
@@ -130,7 +130,7 @@ export default function Footer() {
               Stay Re-connected
             </div>
             <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">다음에 또 만나면<br />더 정확한 피드백을 드려요</h3>
-            <p className="text-foreground/70 text-sm font-medium">데이터가 쌓일수록 당신의 회복 플랜은 더 정교해집니다.</p>
+            <p className="text-gray-500 text-sm font-medium">데이터가 쌓일수록 당신의 회복 플랜은 더 정교해집니다.</p>
           </div>
           <div className="w-full max-w-md space-y-4">
             <div className="flex gap-2">
@@ -143,7 +143,7 @@ export default function Footer() {
                 알림 받기
               </button>
             </div>
-            <p className="text-[10px] text-obsidian text-center md:text-left">
+            <p className="text-[10px] text-gray-600 text-center md:text-left">
               구독 시 <Link href="/privacy" className="font-bold">개인정보처리방침</Link>에 동의하는 것으로 간주됩니다.
             </p>
           </div>
@@ -151,20 +151,20 @@ export default function Footer() {
 
         {/* Top Section: Navigation Links */}
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3 py-8 border-b border-line/5 text-[13px]">
-          <Link href="/trainer" onClick={handleProtectedLink} className="text-foreground/70 hover:text-white transition-colors">트레이너</Link>
-          <Link href="/products/shop" onClick={handleProtectedLink} className="text-foreground/70 hover:text-white transition-colors">유니클 스토어</Link>
-          <Link href="/community" onClick={handleProtectedLink} className="text-foreground/70 hover:text-white transition-colors">커뮤니티</Link>
-          <Link href="/sitemap" className="text-foreground/70 hover:text-white transition-colors">사이트맵</Link>
+          <Link href="/trainer" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">트레이너</Link>
+          <Link href="/products/shop" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">유니클 스토어</Link>
+          <Link href="/community" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">커뮤니티</Link>
+          <Link href="/sitemap" className="text-gray-400 hover:text-white transition-colors">사이트맵</Link>
         </div>
 
         {/* Middle Section: Legal Links & Copyright */}
         <div className="flex flex-wrap items-center justify-between gap-6 pt-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium">
-            <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-foreground/70 hover:text-white transition-colors">이용약관</Link>
+            <Link href={currentSettings.legalInfo.termsOfServiceUrl} className="text-gray-400 hover:text-white transition-colors">이용약관</Link>
             <Link href={currentSettings.legalInfo.privacyPolicyUrl} className="text-white hover:opacity-80">개인정보처리방침</Link>
-            <Link href="/support/inquiry" onClick={handleProtectedLink} className="text-foreground/70 hover:text-white transition-colors">고객센터</Link>
+            <Link href="/support/inquiry" onClick={handleProtectedLink} className="text-gray-400 hover:text-white transition-colors">고객센터</Link>
           </div>
-          <div className="text-obsidian text-[11px] tracking-tight">
+          <div className="text-gray-600 text-[11px] tracking-tight">
             <span className="flex items-center gap-1">
               © <ClientOnly fallback={<span>2026</span>}>{new Date().getFullYear()}</ClientOnly> {currentSettings.siteName}. All rights reserved.
             </span>
@@ -173,8 +173,8 @@ export default function Footer() {
 
         {/* Bottom Section: Company Details (Subtle) */}
         <div className="mt-8 pt-8 border-t border-line/5">
-          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-[11px] text-foreground/70/60 leading-relaxed font-light">
-            <span className="text-foreground/70/80 font-medium">상호명: {currentSettings.companyInfo.companyName}</span>
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-[11px] text-gray-500/60 leading-relaxed font-light">
+            <span className="text-gray-500/80 font-medium">상호명: {currentSettings.companyInfo.companyName}</span>
             <span>대표이사: {currentSettings.companyInfo.ceoName}</span>
             <span>사업자등록번호: {currentSettings.businessRegistration.registrationNumber}</span>
             <span>통신판매업신고: {currentSettings.ecommerceRegistration.reportNumber}</span>

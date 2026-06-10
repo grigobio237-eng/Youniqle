@@ -37,12 +37,12 @@ const NATURE_LAYERS = [
 
 export default function SoundTherapy() {
   const { data: session } = useSession();
-  const userTier = AccessControl.getUserGroup(session?.user);
-  const isFreeUser = userTier === 'RESET' || userTier === 'NONE';
+  const reportAccessLevel = AccessControl.getReportAccessLevel(session?.user);
 
   // 맛보기 모드: 432Hz(delta)와 백색소음(white)만 무료, 나머지 잠금
-  const isFreqLocked = (freqId: string) => isFreeUser && freqId !== 'delta';
-  const isNatureLocked = (natureId: string) => isFreeUser; // 자연음은 전부 프리미엄
+  const isFreqLocked = (freqId: string) => reportAccessLevel === 'BASIC' && freqId !== 'delta';
+  const isNatureLocked = (natureId: string) => reportAccessLevel === 'BASIC'; // 자연음은 FOUNDER부터 무제한
+  const isPremium = reportAccessLevel === 'PREMIUM';
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [masterVolume, setMasterVolume] = useState(0.5);
@@ -443,6 +443,32 @@ export default function SoundTherapy() {
                   <Button variant="outline" onClick={() => setTimeLeft(1200)} className="w-12 h-12 rounded-xl border-white/10 text-white hover:bg-white/5 p-0 flex items-center justify-center"><RotateCcw className="w-4 h-4"/></Button>
               </div>
           </div>
+
+          {/* Premium AI Voice Strategy */}
+          {isPremium ? (
+              <div className={`${cardStyle} bg-reward-gold/10 border-reward-gold/30 mt-6`}>
+                  <div className="flex justify-between items-center mb-4">
+                      <div className={`${labelStyle} text-reward-gold`}><Sparkles className="w-4 h-4" /> AI 보이스 스트래티지</div>
+                      <span className="text-[10px] font-black uppercase text-reward-gold bg-reward-gold/20 px-2 py-0.5 rounded-full">PREMIUM</span>
+                  </div>
+                  <Button className="w-full bg-reward-gold hover:bg-yellow-500 text-obsidian font-black rounded-xl h-12">
+                      오늘의 기질 맞춤 명상 생성
+                  </Button>
+                  <p className="text-[10px] text-reward-gold/70 mt-3 text-center">회원님의 30개 세부 기질을 바탕으로 지금 나에게 가장 필요한 1:1 보이스 스크립트를 생성합니다.</p>
+              </div>
+          ) : (
+              <div className={`${cardStyle} bg-white/5 border-white/5 mt-6 cursor-pointer hover:bg-white/10 transition-colors`} onClick={() => setShowUpsell(true)}>
+                  <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-reward-gold/20 flex items-center justify-center">
+                          <Lock className="w-5 h-5 text-reward-gold" />
+                      </div>
+                      <div className="flex-1">
+                          <h4 className="text-sm font-bold text-reward-gold mb-1">AI 보이스 스트래티지 잠금</h4>
+                          <p className="text-[10px] text-white/50">프리미엄으로 업그레이드하고 맞춤 음성을 오버레이하세요.</p>
+                      </div>
+                  </div>
+              </div>
+          )}
         </div>
       </div>
       <style jsx global>{`

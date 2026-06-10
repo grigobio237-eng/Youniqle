@@ -269,13 +269,11 @@ export default function DeepDiagnosisReportPage() {
     const domainNames = useMemo(() => ({ 'N': '신경증 (Neuroticism)', 'E': '외향성 (Extraversion)', 'O': '개방성 (Openness)', 'A': '우호성 (Agreeableness)', 'C': '성실성 (Conscientiousness)' } as Record<string, string>), []);
 
     // Access Control Logic
-    const userRole = (session?.user as any)?.role;
-    const isAdmin = userRole === 'admin' || userRole === 'superadmin' || AccessControl.isAdmin(session?.user);
-    const finalTier = userTier || AccessControl.getUserGroup(session?.user);
-    const isPremiumTier = ['REBORN', 'RESTART', 'BLACK'].includes(finalTier);
-    const canSeePremium = isAdmin || isPremiumTier;
-    const isPremiumType = result && ['PAID', 'DEEP', 'PERSONALITY'].includes(result.type?.toUpperCase() || '');
-    const hasAccess = canSeePremium || isPremiumType;
+    const reportAccessLevel = AccessControl.getReportAccessLevel(session?.user, result?.type);
+    const hasFounderAccess = reportAccessLevel === 'FOUNDER' || reportAccessLevel === 'PREMIUM';
+    const hasPremiumAccess = reportAccessLevel === 'PREMIUM';
+    const hasAccess = hasPremiumAccess; // Legacy compatibility for data prep
+    const isPremiumType = hasPremiumAccess;
 
     // Data Preparation
     const { chartData, big5DomainData } = useMemo(() => {
@@ -433,7 +431,7 @@ export default function DeepDiagnosisReportPage() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-6">
-                            {hasAccess ? (
+                            {hasPremiumAccess ? (
                                 big5DomainData.length > 0 ? (
                                     big5DomainData.map((domain) => (
                                         <Card key={domain.subject} className="bg-white border-line shadow-sm hover:shadow-md transition-shadow rounded-[24px] md:rounded-[32px] overflow-hidden group">
@@ -473,6 +471,44 @@ export default function DeepDiagnosisReportPage() {
                                         <Button onClick={() => setDeepDiagnosisModalOpen(true)} variant="outline" className="mt-4 rounded-full">정밀 리듬체크 시작하기</Button>
                                     </Card>
                                 )
+                            ) : hasFounderAccess ? (
+                                <div className="space-y-6">
+                                    <Card className="bg-white border-chapter-accent/30 shadow-xl rounded-[32px] overflow-hidden">
+                                        <CardContent className="p-8">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <Badge className="bg-chapter-accent text-white">FOUNDER</Badge>
+                                                <h3 className="text-xl font-black text-obsidian">7-Day 리듬 패턴</h3>
+                                            </div>
+                                            <div className="h-48 flex items-end gap-2 border-b border-line pb-2">
+                                                {/* Mock 7-Day Chart for Founder */}
+                                                {[50, 60, 45, 80, 50, 75, result?.totalScore || 85].map((h, i) => (
+                                                    <div key={i} className="flex-1 bg-chapter-accent/80 rounded-t-sm transition-all duration-1000 hover:bg-chapter-accent" style={{ height: `${Math.max(h, 10)}%` }}></div>
+                                                ))}
+                                            </div>
+                                            <div className="flex justify-between text-xs font-bold text-foreground/50 mt-2">
+                                                <span>6일 전</span>
+                                                <span>오늘</span>
+                                            </div>
+                                            <div className="mt-8 p-6 bg-slate-50 rounded-2xl">
+                                                <h4 className="font-bold text-obsidian mb-2 flex items-center gap-2"><Sparkles className="w-4 h-4 text-chapter-accent" /> 패턴 인사이트</h4>
+                                                <p className="text-sm text-foreground/80 leading-relaxed">회원님의 최근 7일간의 기록을 분석한 결과, 주말에 리듬 점수가 크게 상승하는 패턴이 있습니다. 주중의 멘탈 리듬을 방어하기 위한 특별한 루틴이 필요합니다.</p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    
+                                    {/* Premium Upsell for Founders */}
+                                    <Card className="bg-gradient-to-br from-slate-900 to-obsidian border-none shadow-2xl rounded-[32px] overflow-hidden relative">
+                                        <div className="absolute top-0 right-0 p-6 opacity-20 pointer-events-none"><Sparkles className="w-16 h-16 text-reward-gold" /></div>
+                                        <CardContent className="p-8 flex flex-col items-center text-center">
+                                            <Badge variant="default" className="mb-4 bg-reward-gold text-white shadow-[0_0_15px_rgba(251,191,36,0.4)]">PREMIUM</Badge>
+                                            <h3 className="text-xl font-black text-white mb-2">30개 세부 기질 데이터 잠금</h3>
+                                            <p className="text-sm text-white/70 mb-6">프리미엄 솔루션으로 업그레이드하고 나만의 선천적 기질과 1:1 전문가 처방을 받아보세요.</p>
+                                            <Button onClick={handleUnlockClick} className="rounded-2xl h-12 px-8 font-black text-obsidian bg-reward-gold hover:bg-yellow-400">
+                                                프리미엄 솔루션 오픈
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mt-8">
                                     {/* 1. 무료 (Basic) 티어 */}
@@ -584,7 +620,7 @@ export default function DeepDiagnosisReportPage() {
                     </section>
 
                     {/* Section 2: 30 Facets Table */}
-                    {hasAccess && (
+                    {hasPremiumAccess && (
                         <section className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="bg-obsidian w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"><span className="text-white font-bold text-xl">2</span></div>

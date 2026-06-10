@@ -1,6 +1,7 @@
 import { IUser } from '@/models/User';
 
 export type UserGroup = 'NONE' | 'RESET' | 'REBORN' | 'RESTART' | 'BLACK';
+export type ReportAccessLevel = 'BASIC' | 'FOUNDER' | 'PREMIUM';
 
 export interface TierLimits {
   scannerLimit: number;
@@ -12,7 +13,7 @@ export interface TierLimits {
 
 export const TIER_LIMITS: Record<UserGroup, TierLimits> = {
   NONE: {
-    scannerLimit: 1,
+    scannerLimit: 5,
     diagnosisLimit: 0,
     webtoonLimitHours: 72,
     webtoonGenerationLimit: 0,
@@ -83,6 +84,32 @@ export class AccessControl {
   static isPremium(user: any): boolean {
     const group = this.getUserGroup(user);
     return ['REBORN', 'RESTART', 'BLACK'].includes(group);
+  }
+
+  /**
+   * 리포트 및 콘텐츠 접근 권한 레벨 (BASIC, FOUNDER, PREMIUM)
+   */
+  static getReportAccessLevel(user: any, diagnosisType?: string): ReportAccessLevel {
+    if (this.isAdmin(user)) return 'PREMIUM';
+
+    // 특정 유료 진단 결과(단건 결제)인 경우 프리미엄 리포트로 간주
+    if (diagnosisType && ['PAID', 'DEEP', 'PERSONALITY'].includes(diagnosisType.toUpperCase())) {
+      return 'PREMIUM';
+    }
+
+    const group = this.getUserGroup(user);
+    
+    // REBORN 이상의 정기 구독자/멤버십은 PREMIUM
+    if (['REBORN', 'RESTART', 'BLACK'].includes(group)) {
+      return 'PREMIUM';
+    }
+
+    // RESET 티어이거나 파운더 전용 뱃지/티켓 소유자는 FOUNDER
+    if (group === 'RESET' || user?.isFounder || user?.passInfo?.isFounder) {
+      return 'FOUNDER';
+    }
+
+    return 'BASIC';
   }
 
   /**
