@@ -516,9 +516,9 @@ export default function AiNavigatorPage() {
                                     >
                                         {subActiveTab === 'diagnosis' && (
                                             <div className="space-y-1.5 md:space-y-6">
-                                                <div className="h-[105px] md:h-44 relative flex items-center justify-center bg-gradient-to-br from-[#0E3A3A]/5 to-[#0E3A3A]/[0.01] border border-[#0E3A3A]/10 rounded-2xl shadow-sm p-1 overflow-hidden">
+                                                <div className="h-48 md:h-64 relative flex items-center justify-center bg-gradient-to-br from-[#0E3A3A]/5 to-[#0E3A3A]/[0.01] border border-[#0E3A3A]/10 rounded-2xl shadow-sm p-2 overflow-hidden">
                                                     {radarData.length > 0 ? (
-                                                        <DiagnosisRadarChart data={normalizedRadarData} color="#0E3A3A" className="w-full h-full scale-105" />
+                                                        <DiagnosisRadarChart data={normalizedRadarData} color="#0E3A3A" className="w-full h-full scale-110" />
                                                     ) : (
                                                         <div className="text-center p-4 space-y-2">
                                                             <span className="text-2xl md:text-3xl">🧘</span>
