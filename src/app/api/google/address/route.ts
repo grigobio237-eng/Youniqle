@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Google API 키 확인
-    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GOOGLE_API_KEY;
     
     if (!apiKey || apiKey === 'your_google_api_key_here') {
       console.warn('Google API 키가 설정되지 않았습니다. 로컬 데이터베이스를 사용합니다.');

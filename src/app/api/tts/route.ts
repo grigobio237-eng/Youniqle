@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             pitch = -1.0;
         }
 
-        const apiKey = process.env.GOOGLE_TTS_API_KEY || process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GOOGLE_TTS_API_KEY;
         if (!apiKey) {
             return NextResponse.json({ error: 'API configuration error' }, { status: 500 });
         }

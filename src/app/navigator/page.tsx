@@ -16,7 +16,6 @@ import SquarePostForm from '@/components/navigator/SquarePostForm';
 import SquarePostDetail from '@/components/navigator/SquarePostDetail';
 import HotlineChat from '@/components/navigator/HotlineChat';
 import ArchiveContent from '@/components/navigator/ArchiveContent';
-import PassOperationGuide from '@/components/navigator/PassOperationGuide';
 import ShopManagement from '@/components/navigator/ShopManagement';
 import ConsultationList from '@/components/navigator/ConsultationList';
 
@@ -81,16 +80,10 @@ function NavigatorLoungeContent() {
       desc: '줄기세포 시술에 대한 필수 기초 상식과 자료',
     },
     {
-      id: 'policy',
-      label: '패스 운영 가이드',
-      icon: CreditCard,
-      desc: 'START/SIGNATURE/BLACK 패스 상품 및 정책',
-    },
-    {
-      id: 'black-pass-guide',
-      label: 'Black Pass 사용설명서',
-      icon: Sparkles,
-      desc: '블랙 패스의 핵심 기능 및 프리미엄 혜택 활용 가이드',
+      id: 'navigator-guide',
+      label: '네비게이터 사용설명서',
+      icon: BookOpen,
+      desc: '네비게이터 라운지의 핵심 메뉴 및 도구 활용 가이드',
     },
     {
       id: 'square',
@@ -112,7 +105,7 @@ function NavigatorLoungeContent() {
     },
     {
       id: 'shops',
-      label: '업소 및 리드 관리',
+      label: '조직 및 리드 관리',
       icon: Building2,
       desc: '등록한 업체별 설문 리드 현황 및 마케팅 관리',
     },
@@ -130,13 +123,12 @@ function NavigatorLoungeContent() {
   const renderTabContent = (tabId: string) => {
     switch (tabId) {
       case 'square': return <SquareBoard key={`board-${refreshKey}`} onPostSelect={setSelectedPostId} onPostCreate={() => { setEditingPostId(undefined); setIsFormOpen(true); }} />;
-      case 'policy': return <PassOperationGuide />;
       case 'hotline': return <HotlineChat />;
       case 'archive': return <ArchiveContent />;
       case 'catalog': return <PassCatalog />;
       case 'shops': return <ShopManagement />;
       case 'consultations': return <ConsultationList />;
-      case 'black-pass-guide': return <BlackPassGuideContent />;
+      case 'navigator-guide': return <NavigatorGuideContent />;
       default: return null;
     }
   };
@@ -298,82 +290,87 @@ function NavigatorLoungeContent() {
   );
 }
 
-function BlackPassGuideContent() {
+function NavigatorGuideContent() {
   return (
-    <div className="space-y-12 max-w-3xl mx-auto py-4">
-      {/* Step 1 */}
-      <div className="space-y-6 group">
-        <div className="relative aspect-video rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
-          <Image 
-            src="/images/guide/black-pass-guide-1.png" 
-            alt="전용 QR 코드로 스마트한 진료 연동" 
-            fill 
-            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        </div>
-        <div className="space-y-3 px-2">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">01</span>
-            <h3 className="text-2xl font-black text-obsidian">스마트한 진료 데이터 연동</h3>
-          </div>
-          <p className="text-slate/70 leading-relaxed font-medium break-keep">
-            블랙 패스 허브 상단의 <strong className="text-obsidian font-black">'진료 전용 QR'</strong>을 파트너 클리닉에 제시하세요. 
-            번거로운 문진 과정 없이 당신의 정밀 회복 데이터가 의료진에게 즉시 전달되어 개인화된 처방을 받을 수 있습니다.
-          </p>
-        </div>
+    <div className="space-y-12 max-w-4xl mx-auto py-8">
+      {/* Introduction */}
+      <div className="text-center space-y-4 mb-16">
+        <h2 className="text-3xl font-black text-obsidian tracking-tight">네비게이터 100% 활용 가이드</h2>
+        <p className="text-slate/70 font-medium text-lg">성공적인 네비게이터 활동을 위한 라운지 메뉴별 핵심 사용법을 안내합니다.</p>
       </div>
 
-      {/* Step 2 */}
-      <div className="space-y-6 group">
-        <div className="relative aspect-video rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
-          <Image 
-            src="/images/guide/black-pass-guide-2.png" 
-            alt="영구적인 데이터 자산 관리" 
-            fill 
-            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        </div>
-        <div className="space-y-3 px-2">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">02</span>
-            <h3 className="text-2xl font-black text-obsidian">영구적인 데이터 자산 관리</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Feature 1 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <Plus className="w-6 h-6" />
           </div>
-          <p className="text-slate/70 leading-relaxed font-medium break-keep">
-            <strong className="text-obsidian font-black">'나의 데이터 자산'</strong> 메뉴에서 당신의 모든 리듬체크 기록과 회복 히스토리를 영구적으로 보관하세요. 
-            주간 정밀 분석 리포트를 통해 시간이 지남에 따라 변화하는 회복의 궤적을 데이터로 증명할 수 있습니다.
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">고객 초대 전용 도구</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            화면 상단의 검은색 섹션입니다. <strong className="text-obsidian">초대 링크 복사하기</strong> 버튼을 눌러 발급된 고유 URL을 고객에게 전달하세요. 
+            해당 링크로 가입한 고객은 네비게이터님의 리드로 자동 등록되며, 즉시 패스 결제 안내 화면으로 연결됩니다.
           </p>
         </div>
-      </div>
 
-      {/* Step 3 */}
-      <div className="space-y-6 group">
-        <div className="relative aspect-[4/5] max-w-sm mx-auto rounded-[32px] overflow-hidden shadow-2xl border border-line bg-mist flex items-center justify-center">
-          <Image 
-            src="/images/guide/black-pass-guide-3.png" 
-            alt="클리닉 전용 정밀 케어 시스템" 
-            fill 
-            className="object-contain p-6 transition-transform duration-700 group-hover:scale-105" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        </div>
-        <div className="space-y-3 px-2">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-chapter-accent flex items-center justify-center text-obsidian font-black text-xs">03</span>
-            <h3 className="text-2xl font-black text-obsidian">클리닉 전용 정밀 케어 시스템</h3>
+        {/* Feature 2 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <Building2 className="w-6 h-6" />
           </div>
-          <p className="text-slate/70 leading-relaxed font-medium break-keep">
-            블랙 패스 허브의 <strong className="text-obsidian font-black">'병원 방문 전 정밀 문진'</strong>을 통해 최적의 시술 결과를 먼저 설계하세요. 
-            클리닉 현장에서 QR을 제시하여 데이터를 연동하고, 귀가 후에는 <strong className="text-obsidian font-black">'시술/수술 후 맞춤 케어'</strong>를 통해 현재의 상태 분석 및 실시간 회복 관리를 받을 수 있습니다.
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">조직 및 리드 관리</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            초대 링크를 통해 유입된 고객 명단과 등록된 산하 조직(업체)의 현황을 파악하는 대시보드입니다. 
+            고객별 설문 완료 여부 및 마케팅 진행 단계를 체계적으로 관리하여 영업 효율을 극대화하세요.
           </p>
         </div>
-      </div>
 
-      <div className="pt-10">
-        <Button asChild className="w-full h-16 rounded-[24px] bg-obsidian text-mist font-black text-lg shadow-2xl shadow-obsidian/20 hover:scale-[1.02] transition-transform">
-          <Link href="/black-pass">블랙 패스 허브로 이동하기</Link>
-        </Button>
+        {/* Feature 3 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <Presentation className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">상품 프리젠테이션</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            유니클의 핵심 패스 상품을 현장에서 바로 고객에게 설명할 수 있는 영업용 브로슈어입니다. 
+            태블릿이나 스마트폰으로 고객과 마주보며 효과적으로 세일즈하기에 최적화되어 있습니다.
+          </p>
+        </div>
+
+        {/* Feature 4 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <MessageCircle className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">상담 요청 현황</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            고객들이 보내온 상담 티켓과 문의 내역을 모아보고 응대하는 관리 메뉴입니다.
+            고객의 요구사항에 빠르게 대응하고, 맞춤형 컨설팅을 제공하여 신뢰를 구축할 수 있습니다.
+          </p>
+        </div>
+
+        {/* Feature 5 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <Users className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">자문위 핫라인 & 커뮤니티</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            의학적 전문 지식이나 본사 지원이 필요할 때 <strong className="text-obsidian">자문위 핫라인</strong>으로 소통하세요. 
+            또한 <strong className="text-obsidian">커뮤니티</strong>에서 전국 네비게이터들과 성공 사례, 영업 노하우를 교류할 수 있습니다.
+          </p>
+        </div>
+
+        {/* Feature 6 */}
+        <div className="bg-mist/30 p-8 rounded-[32px] border border-line hover:border-chapter-accent/50 transition-colors group">
+          <div className="w-12 h-12 bg-obsidian text-mist rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-black text-obsidian mb-3 group-hover:text-chapter-accent transition-colors">네비게이터의 역할</h3>
+          <p className="text-slate/70 leading-relaxed font-medium text-sm break-keep">
+            줄기세포 시술에 대한 필수 기초 상식과 자료를 모아둔 아카이브입니다.
+            최신 의료 트렌드와 유니클 서비스의 핵심 가치를 학습하여 전문가로서의 역량을 강화하세요.
+          </p>
+        </div>
       </div>
     </div>
   );
