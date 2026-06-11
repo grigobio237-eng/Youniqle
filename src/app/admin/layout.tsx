@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ServerErrorBoundary from '@/components/ServerErrorBoundary';
+import { Toaster } from 'sonner';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ export default function Layout({ children }: AdminLayoutProps) {
       <AdminLayout>
         {children}
       </AdminLayout>
+      <Toaster position="top-center" />
     </ServerErrorBoundary>
   );
 }

@@ -46,4 +46,40 @@ export class ContentService {
             return { response: "잠시 후 다시 시도해주세요." };
         }
     }
+
+    static async planDetailPage(input: any): Promise<any> {
+        const prompt = `
+당신은 최고의 상세페이지 기획자입니다. 다음 상품/서비스 정보를 바탕으로 기획안(섹션별 구성)을 JSON 형식으로 작성하세요.
+반드시 JSON 배열 형태로 응답해야 하며, 각 항목은 다음 구조를 가져야 합니다:
+{
+  "id": "고유문자열 (예: section_1)",
+  "title": "섹션 제목",
+  "logicalSections": ["Hook", "Problem", "Solution", "Benefit", "Proof", "Action" 중 해당되는 것 1~2개"],
+  "keyMessage": "이 섹션에서 전달할 핵심 메시지 카피",
+  "visualPrompt": "이 섹션을 표현할 이미지 생성용 프롬프트 (영어로 상세히 작성)"
+}
+
+상품명: ${input.name}
+카테고리: ${input.category}
+가격: ${input.price}
+키워드: ${input.keywords}
+타겟 고객: 성별(${input.targetGender}), 연령대(${input.targetAge})
+기획 섹션 수: ${input.length}개
+        `;
+
+        try {
+            const response = await GeminiCore.generateWithFallback(prompt, "전문 카피라이터 및 상세페이지 기획자", 0.7);
+            const jsonMatch = response.match(/\[[\s\S]*\]/); // Match array
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            const objectMatch = response.match(/\{[\s\S]*\}/); // Match object just in case
+            if (objectMatch) {
+                return JSON.parse(objectMatch[0]);
+            }
+        } catch (error) {
+            console.error('planDetailPage error:', error);
+        }
+        throw new Error("상세페이지 기획안 생성에 실패했습니다.");
+    }
 }

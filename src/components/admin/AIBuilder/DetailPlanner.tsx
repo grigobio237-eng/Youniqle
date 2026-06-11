@@ -60,7 +60,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
         planningBtn: isMedical ? '🪄 서비스 기획 시작하기' : '🪄 상세페이지 기획 시작하기',
         generatingMsg: isMedical ? '유니클이 서비스 전략 기획 중...' : '유니클이 브랜드 전략 기획 중...',
         registerSuccess: isMedical ? '서비스가 등록되었습니다 (승인 대기)' : '상품이 등록되었습니다 (승인 대기)',
-        emptyMsg: isMedical ? '서비스명과 관련 사진은 필수입니다!' : '상품명과 제품 사진은 필수입니다!',
+        emptyMsg: isMedical ? '서비스명은 필수입니다!' : '상품명은 필수입니다!',
         suggestBtn: isMedical ? '유니클 효과 추천' : '유니클 자동 추천',
         thumbnailBtn: isMedical ? '썸네일 생성' : '썸네일 생성',
         registerBtn: isMedical ? '서비스 등록' : '상품 등록',
@@ -161,7 +161,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
     };
 
     const handleStartPlanning = async () => {
-        if (!info.name || !info.referenceImage) {
+        if (!info.name) {
             toast.error(labels.emptyMsg);
             return;
         }
@@ -578,7 +578,7 @@ const DetailPlanner: React.FC<DetailPlannerProps> = ({ mode = 'admin', partnerTy
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-obsidian">이미지 및 설정</h3>
                             <ImageUploader
-                                label="제품 실제 사진 업로드 (참조용) *"
+                                label="제품/서비스 참조 사진 업로드 (선택사항)"
                                 preview={info.referenceImage}
                                 onImageSelected={handleImageSelected}
                                 isRemovingBackground={isRemovingBackground}

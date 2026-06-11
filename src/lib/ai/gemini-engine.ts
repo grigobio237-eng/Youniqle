@@ -41,6 +41,7 @@ export class GeminiAIEngine {
     static generateOmakasePlans = ContentService.generateOmakasePlans;
     static generateRecoveryWebtoonScript = ContentService.generateRecoveryWebtoonScript;
     static generateManagerResponse = ContentService.generateManagerResponse;
+    static planDetailPage = ContentService.planDetailPage;
 
     // Utility
     static async paraphraseQuestion(input: { question: string; context?: any }) {
