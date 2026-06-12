@@ -186,7 +186,7 @@ export default function QRReferralCard({ userName, referralCode }: QRReferralCar
           ) : (
             <>
               <Share2 className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />
-              초대 링크 공유하기
+              공유하기
             </>
           )}
         </Button>

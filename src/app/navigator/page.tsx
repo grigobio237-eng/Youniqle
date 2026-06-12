@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2, ChevronDown, Sparkles } from 'lucide-react';
+import { BookOpen, MessageCircle, Users, ChevronRight, Lock, Plus, CreditCard, Presentation, Building2, ChevronDown, Sparkles, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -210,15 +210,31 @@ function NavigatorLoungeContent() {
                     </div>
                   </div>
                   <button 
-                    onClick={() => {
+                    onClick={async () => {
                       const link = `${window.location.origin}/auth/signup?ref=${(session.user as any).referralCode || (session.user.id.slice(-6).toUpperCase())}&callbackUrl=/navigator/passes/black`;
-                      navigator.clipboard.writeText(link);
-                      alert('네비게이터 전용 초대 링크가 복사되었습니다.');
+                      if (navigator.share) {
+                        try {
+                          await navigator.share({
+                            title: 'Youniqle 네비게이터 초대',
+                            text: 'Youniqle 프리미엄 멤버십에 초대합니다.',
+                            url: link,
+                          });
+                        } catch (err) {
+                          console.error('Failed to share:', err);
+                        }
+                      } else {
+                        try {
+                          await navigator.clipboard.writeText(link);
+                          alert('네비게이터 전용 초대 링크가 복사되었습니다.');
+                        } catch (err) {
+                          console.error('Failed to copy text:', err);
+                        }
+                      }
                     }}
                     className="w-full py-4 bg-white text-obsidian rounded-xl font-black text-sm hover:bg-primary transition-all flex items-center justify-center gap-2 group"
                   >
-                    초대 링크 복사하기
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    공유하기
+                    <Share2 className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>

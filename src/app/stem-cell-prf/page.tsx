@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { CalendarCheck, Shield, Award, ChevronRight, Activity, Zap, CheckCircle2, Link as LinkIcon, Check } from 'lucide-react';
+import { CalendarCheck, Shield, Award, ChevronRight, Activity, Zap, CheckCircle2, Link as LinkIcon, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -22,13 +22,25 @@ export default function StemCellPrfPage() {
   const [activeTab, setActiveTab] = useState<'face' | 'body'>('face');
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Youniqle 프리미엄 재생 솔루션',
+          text: '이제 겉을 가리는 시술이 아닌, 세포부터 젊어지는 근본적인 재생을 경험하세요.',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('Failed to share: ', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
     }
   };
 
@@ -354,7 +366,7 @@ export default function StemCellPrfPage() {
 
             <Button 
               size="lg" 
-              onClick={handleCopyLink}
+              onClick={handleShare}
               className={`h-14 md:h-16 px-8 md:px-12 rounded-full text-white text-base md:text-lg font-black shadow-2xl transition-all hover:-translate-y-1 w-full md:w-auto ${
                 isCopied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-obsidian hover:bg-obsidian/90'
               }`}
@@ -365,7 +377,7 @@ export default function StemCellPrfPage() {
                 </>
               ) : (
                 <>
-                  <LinkIcon className="mr-2 w-4 h-4 md:w-5 md:h-5" /> 페이지 링크 복사하기
+                  <Share2 className="mr-2 w-4 h-4 md:w-5 md:h-5" /> 공유하기
                 </>
               )}
             </Button>
