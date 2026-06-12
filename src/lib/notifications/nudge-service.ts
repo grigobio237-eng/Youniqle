@@ -32,7 +32,7 @@ export class NudgeService {
                     const payload = {
                         title: '🌿 오늘의 회복 리듬 체크',
                         body: `${userName}님, 아직 오늘의 회복 점수를 확인하지 않으셨네요! 60초만 투자해 보세요.`,
-                        data: { url: '/recovery-cgm' },
+                        data: { url: '/ai-navigator' },
                         tag: 'daily-checkin-reminder'
                     };
 
@@ -86,7 +86,7 @@ export class NudgeService {
                     const payload = {
                         title: '🔥 대단해요! 스트릭 유지 중',
                         body: `${user?.name}님은 벌써 ${streak}일째 회복 리듬을 기록하고 있습니다. 오늘도 잊지 마세요!`,
-                        data: { url: '/recovery-cgm' },
+                        data: { url: '/ai-navigator' },
                         tag: 'streak-nudge'
                     };
                     await WebPushService.sendNotification({
