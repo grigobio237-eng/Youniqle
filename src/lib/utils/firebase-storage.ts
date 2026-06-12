@@ -1,5 +1,6 @@
 import sharp from 'sharp';
 import { getFirebaseStorageInstance } from '@/lib/firebase-admin';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Base64 이미지를 WebP로 변환하여 Firebase Storage에 업로드합니다.
@@ -31,16 +32,26 @@ export async function uploadImageToFirebase(
 
         // Firebase Storage에 업로드
         const file = bucket.file(path);
+        const downloadToken = uuidv4();
+        
         await file.save(webpBuffer, {
             metadata: {
                 contentType: 'image/webp',
-                cacheControl: 'public, max-age=31536000' // 1년 캐시
+                cacheControl: 'public, max-age=31536000', // 1년 캐시
+                metadata: {
+                    firebaseStorageDownloadTokens: downloadToken
+                }
             }
         });
 
-        // 공개 URL 생성
-        await file.makePublic();
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${path}`;
+        // 공개 URL 생성 (실패해도 토큰 URL 반환)
+        try {
+            await file.makePublic();
+        } catch (e) {
+            console.warn('[Firebase Storage] makePublic failed, using token url fallback');
+        }
+        
+        const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${downloadToken}`;
 
         console.log(`[Firebase Storage] Image uploaded: ${publicUrl}`);
         return publicUrl;
@@ -76,15 +87,25 @@ export async function uploadImageFromUrl(
 
         // Firebase Storage에 업로드
         const file = bucket.file(path);
+        const downloadToken = uuidv4();
+        
         await file.save(webpBuffer, {
             metadata: {
                 contentType: 'image/webp',
-                cacheControl: 'public, max-age=31536000'
+                cacheControl: 'public, max-age=31536000',
+                metadata: {
+                    firebaseStorageDownloadTokens: downloadToken
+                }
             }
         });
 
-        await file.makePublic();
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${path}`;
+        try {
+            await file.makePublic();
+        } catch (e) {
+            console.warn('[Firebase Storage] makePublic failed, using token url fallback');
+        }
+        
+        const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${downloadToken}`;
 
         console.log(`[Firebase Storage] Image from URL uploaded: ${publicUrl}`);
         return publicUrl;
