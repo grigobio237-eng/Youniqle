@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/notifications/cron-nudge",
-      "schedule": "0 2,7 * * *"
+      "schedule": "0 2 * * *"
     }
   ],
   "buildCommand": "npm run build",
