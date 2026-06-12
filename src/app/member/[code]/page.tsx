@@ -83,8 +83,9 @@ export default function MemberVerifyPage() {
         if (!res.ok) {
           setError(json.error || '정보를 불러오지 못했습니다.');
         } else {
-          // 본인 QR 스캔 시 마이페이지로 이동
-          if (json.viewerRole === 'self') {
+          const currentIsMedicalMode = new URL(window.location.href).searchParams.get('mode') === 'medical';
+          // 본인 QR 스캔 시 마이페이지로 이동 (단, 의료 모드일 때는 이동하지 않음)
+          if (json.viewerRole === 'self' && !currentIsMedicalMode) {
             router.replace('/me');
             return;
           }
@@ -99,7 +100,7 @@ export default function MemberVerifyPage() {
     };
 
     fetchData();
-  }, [code, router, pinInput]);
+  }, [code, router, pinInput, isMedicalMode]);
 
   if (loading) {
     return (
@@ -113,8 +114,8 @@ export default function MemberVerifyPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0D10] text-white gap-6 px-6">
         <QrCode className="w-16 h-16 text-white/20" />
-        <h1 className="text-2xl font-black">유효하지 않은 코드입니다</h1>
-        <p className="text-white/50 text-sm text-center">이 QR 코드는 만료되었거나 존재하지 않습니다.</p>
+        <h1 className="text-2xl font-black">문서를 찾을 수 없습니다</h1>
+        <p className="text-white/50 text-sm text-center">{error || '유효하지 않은 코드이거나 만료되었습니다.'}</p>
         <Button asChild className="bg-[#D4AF37] text-black font-black hover:bg-[#D4AF37]/80">
           <Link href="/">홈으로</Link>
         </Button>
@@ -125,7 +126,7 @@ export default function MemberVerifyPage() {
   const { member, viewerRole } = data;
 
   // ─── 파트너 전용 뷰 ───────────────────────────────────────────
-  if (viewerRole === 'partner') {
+  if (viewerRole === 'partner' && !isMedicalMode) {
     return (
       <div className="min-h-screen bg-[#0B0D10] flex items-center justify-center px-4 py-16">
         <motion.div
@@ -316,21 +317,21 @@ export default function MemberVerifyPage() {
                         </h4>
                         <div className="space-y-4">
                           <div className="p-4 bg-surface rounded-2xl border border-line">
-                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">과거 경험</p>
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">과거 수술 이력</p>
                             <p className="text-sm font-bold text-obsidian">
-                              {clinicalData.medicalHistory.pastExperience.hasExperience ? `있음: ${clinicalData.medicalHistory.pastExperience.details}` : '없음'}
+                              {clinicalData.medicalHistory?.pastSurgery?.has ? `있음: ${clinicalData.medicalHistory.pastSurgery.details}` : '없음'}
                             </p>
                           </div>
                           <div className="p-4 bg-surface rounded-2xl border border-line">
                             <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">현재 복용 약물</p>
                             <p className="text-sm font-bold text-obsidian">
-                              {clinicalData.medicalHistory.currentMedication.taking ? `있음: ${clinicalData.medicalHistory.currentMedication.details}` : '없음'}
+                              {clinicalData.medicalHistory?.currentMedication?.taking ? `있음: ${clinicalData.medicalHistory.currentMedication.details}` : '없음'}
                             </p>
                           </div>
                           <div className="p-4 bg-surface rounded-2xl border border-line">
-                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">기타 건강 이슈</p>
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">특이 알레르기</p>
                             <p className="text-sm font-bold text-obsidian">
-                              {clinicalData.medicalHistory.healthStatus.isIssue ? `있음: ${clinicalData.medicalHistory.healthStatus.details}` : '특이사항 없음'}
+                              {clinicalData.medicalHistory?.allergies?.has ? `있음: ${clinicalData.medicalHistory.allergies.details}` : '특이사항 없음'}
                             </p>
                           </div>
                         </div>
@@ -343,20 +344,20 @@ export default function MemberVerifyPage() {
                         </h4>
                         <div className="space-y-4">
                           <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-2">집중 중점 관리 및 불안 지점</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-2">집중 관리 희망 항목 및 부작용 우려 사항</p>
                             <div className="flex flex-wrap gap-2">
-                              {(clinicalData.anxiety.points || []).map((p: string, i: number) => (
+                              {(clinicalData.expectation?.concerns || []).map((p: string, i: number) => (
                                 <Badge key={i} className="bg-white text-secondary border-emerald-100 font-bold px-3 py-1">{p}</Badge>
                               ))}
                             </div>
                           </div>
                           <div className="p-4 bg-surface rounded-2xl border border-line">
-                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">상세 안내 요청 및 보안</p>
-                            <p className="text-sm font-bold text-obsidian">{clinicalData.anxiety.privacyDetails || '특이사항 없음'}</p>
+                            <p className="text-[10px] font-black text-foreground/70 uppercase tracking-widest mb-1">특별 진료 요청 내용</p>
+                            <p className="text-sm font-bold text-obsidian">{clinicalData.visitPlan?.specialRequest || '특이사항 없음'}</p>
                           </div>
                           <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">환자 성향 분류</p>
-                            <p className="text-sm font-black text-indigo-900">{clinicalData.anxiety.classifiedType || '미분류'}</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">환자의 주요 증상과 지속 기간</p>
+                            <p className="text-sm font-black text-indigo-900">{clinicalData.chiefComplaint?.symptom} ({clinicalData.chiefComplaint?.duration})</p>
                           </div>
                         </div>
                       </div>
@@ -368,20 +369,18 @@ export default function MemberVerifyPage() {
                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10">
                          <div className="space-y-4">
                             <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Treatment Expectations</p>
-                            <h5 className="text-2xl font-black tracking-tight">{clinicalData.expectation.changeScale} 지향</h5>
-                            <p className="text-indigo-100/60 text-sm font-medium">선호 회복 기간: {clinicalData.expectation.downtime}</p>
+                            <h5 className="text-2xl font-black tracking-tight">{clinicalData.expectation?.preferredTreatment || '맞춤 치료'} 지향</h5>
+                            <p className="text-indigo-100/60 text-sm font-medium">통증 척도 (VAS): {clinicalData.chiefComplaint?.vasScore} / 10</p>
                          </div>
                          <div className="space-y-4">
-                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Important Schedule</p>
+                            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Condition Note</p>
                             <p className="text-sm font-bold">
-                              {clinicalData.expectation.importantEvent.hasEvent ? `일정 있음: ${clinicalData.expectation.importantEvent.details}` : '중요 일정 없음'}
+                              일상 생활 지장 정도: {clinicalData.lifestyle?.dailyImpact || '기록 안됨'}
                             </p>
                             <div className="h-px bg-white/10 w-full my-4" />
                             <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Visit Plan</p>
                             <p className="text-xs text-indigo-100/70">
-                               동반자 {clinicalData.visitPlan.companion.hasCompanion ? clinicalData.visitPlan.companion.details : '없음'} • 
-                               이동지원 {clinicalData.visitPlan.transportation.needsHelp ? '필요' : '직접'} • 
-                               {clinicalData.visitPlan.privacyRoute.wantsPrivacy ? '프라이빗 경로 선호' : '일반 경로'}
+                               동반자 {clinicalData.visitPlan?.companion?.has ? clinicalData.visitPlan.companion.details : '없음'}
                             </p>
                          </div>
                        </div>
