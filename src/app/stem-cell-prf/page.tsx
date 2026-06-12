@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { CalendarCheck, Shield, Award, ChevronRight, Activity, Zap, CheckCircle2, Link as LinkIcon, Check, Share2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CalendarCheck, Shield, Award, ChevronRight, Activity, Zap, CheckCircle2, Link as LinkIcon, Check, Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -21,6 +21,7 @@ const FadeUp = ({ children, delay = 0 }: { children: React.ReactNode, delay?: nu
 export default function StemCellPrfPage() {
   const [activeTab, setActiveTab] = useState<'face' | 'body'>('face');
   const [isCopied, setIsCopied] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -267,9 +268,14 @@ export default function StemCellPrfPage() {
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 flex items-center justify-center">
                     <Award className="w-6 h-6 md:w-8 md:h-8 text-emerald-400" />
                   </div>
-                  <div>
-                    <p className="font-black text-lg md:text-xl">대표원장 김미정</p>
-                    <p className="text-mist/60 text-xs md:text-sm font-bold">줄기세포 항노화 연구센터</p>
+                  <div 
+                    className="cursor-pointer group"
+                    onClick={() => setIsProfileModalOpen(true)}
+                  >
+                    <p className="font-black text-lg md:text-xl group-hover:text-emerald-400 transition-colors inline-flex items-center gap-1">
+                      대표원장 김미정 <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    </p>
+                    <p className="text-mist/60 text-xs md:text-sm font-bold mt-1">줄기세포 항노화 연구센터</p>
                   </div>
                 </div>
               </FadeUp>
@@ -390,6 +396,73 @@ export default function StemCellPrfPage() {
         </div>
       </section>
 
+      {/* Doctor Profile Modal */}
+      <AnimatePresence>
+        {isProfileModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/80 backdrop-blur-sm"
+            onClick={() => setIsProfileModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-[32px] p-6 md:p-10 w-full max-w-lg shadow-2xl relative overflow-hidden text-left"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setIsProfileModalOpen(false)}
+                className="absolute top-6 right-6 w-10 h-10 bg-mist rounded-full flex items-center justify-center text-slate hover:bg-line transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <Award className="w-8 h-8 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-obsidian">김미정 대표원장</h3>
+                  <p className="text-emerald-700 font-bold">줄기세포 항노화 연구센터장</p>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-black text-slate/50 uppercase tracking-widest mb-3 border-b border-line pb-2">전문 분야</h4>
+                  <p className="text-obsidian font-bold text-lg break-keep">SVF 줄기세포 항노화 재생, PRF 통증/조직 복원, 자가혈액 스킨부스터</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-black text-slate/50 uppercase tracking-widest mb-3 border-b border-line pb-2">주요 약력</h4>
+                  <ul className="space-y-2 text-slate/80 font-medium max-h-[220px] md:max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 더 웰셈 양,한방병원 대표원장 (현)</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 고려대학교 의과대학 외래교수 역임</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 대한 발란스의학회 부회장</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 세계얼굴 학회 상임회장</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 춘사 영화제 운영위원</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 국제 항노화 협회장 역임</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 미스코리아 심사위원</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 일본 중입자 크리닉 대표원장 역임</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 사랑의 크리닉 대원장 역임</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 독일 프리덴바일 병원 연수</li>
+                    <li className="flex gap-2"><div className="mt-1.5 w-1 h-1 bg-emerald-500 rounded-full flex-shrink-0"/> 독일 웰셀브 면역병원 연수</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-mist p-4 rounded-2xl">
+                  <p className="text-sm text-slate/80 font-medium italic break-keep leading-relaxed">
+                    "가장 자연스럽고 강력한 회복은 언제나 내 몸 안에 답이 있습니다. 1%의 타협도 없는 섬세한 기술로 환자 본연의 재생력을 극대화하여 잃어버린 시간과 자유를 되찾아 드립니다."
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
