@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Sparkles, Crown } from 'lucide-react';
 
 interface Props {
-  onStart?: () => void;
+  onStart: () => void;
 }
 
-export default function MembershipTierCards({ onStart }: Props = {}) {
+export default function MembershipTierCards({ onStart }: Props) {
   return (
     <div className="w-full mt-12 md:mt-24 mb-8 md:mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
       <div className="text-center mb-8 md:mb-12 px-2">
