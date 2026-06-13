@@ -42,8 +42,7 @@ export const ABOUT_CONTENT: AboutContent = {
   short: "Youniqle(유니클)은 주식회사 사피에넷이 운영하는 프리미엄 회복 큐레이션 브랜드입니다. 우리는 감각이 아닌 '데이터'에 기반하여 당신의 삶을 다시 세팅하는 가장 과학적이고 프라이빗한 솔루션을 제안합니다. 사피에넷의 기술력과 파트너 네트워크가 엄선한 회복 프로토콜을 만나보세요.",
   navigatorPass: {
     start: "START PASS: 입문형 회복 시스템 (330만원)",
-    signature: "SIGNATURE PASS: 5년의 완벽한 회복 설계 (1,100만원)",
-    black: "BLACK PASS: VIP 프라이빗 컨시어지 (3,300만원)"
+    signature: "SIGNATURE PASS: 5년의 완벽한 회복 설계 (1,100만원)"
   },
   standard: [
     "우리는 회복의 본질을 데이터로 증명합니다.",

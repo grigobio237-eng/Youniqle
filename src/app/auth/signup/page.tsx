@@ -65,7 +65,7 @@ function SignupContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
 
-  const isBlackPassFlow = callbackUrl.includes('navigator/passes/black');
+
 
   useEffect(() => {
     setIsInWebView(isWebView());
@@ -154,14 +154,7 @@ function SignupContent() {
               </p>
             </div>
             
-            {isBlackPassFlow && (
-              <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 max-w-sm mx-auto">
-                <p className="text-white/80 font-medium leading-relaxed">
-                  네비게이터님께서 추천하신 <br/>
-                  <span className="text-chapter-accent font-black">90일 회복 관리 블랙 패스</span> 상세 페이지로 이동합니다.
-                </p>
-              </div>
-            )}
+
 
             <div className="pt-10">
               <div className="flex items-center justify-center gap-2 text-white/40 text-xs font-black uppercase tracking-[0.3em]">

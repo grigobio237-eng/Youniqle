@@ -69,34 +69,5 @@ export const PASS_SPECS: Record<string, any> = {
     ],
     theme: 'bg-amber-50/50',
     accent: 'text-amber-600',
-    buttonColor: 'bg-amber-600 hover:bg-amber-700'
-  },
-  black: {
-    id: 'black',
-    name: 'BLACK PASS',
-    title: '[BLACK] 90일 회복 관리 패스',
-    subtitle: '"데이터로 증명하는 90일간의 회복 여정"',
-    intro: '전문 네비게이터와 의료기관이 협력하여 당신의 회복을 정밀하게 관리하는 90일 집중 프로그램입니다. 오프라인과 온라인을 잇는 폐쇄형 멤버십 서비스를 경험하세요.',
-    price: '99,000',
-    period: '3개월',
-    position: '90일 집중 회복 관리 및 의료기관 연계 서비스',
-    recommendations: [
-      '신뢰할 수 있는 데이터 기반의 정밀 회복 관리가 필요하신 분',
-      '전문 네비게이터의 밀착 가이드와 병원 진료를 연계하고 싶으신 분',
-      '90일이라는 명확한 기간 동안 확실한 변화를 만들고 싶으신 분'
-    ],
-    keyBenefits: [
-      { id: 1, title: '90일 집중 데이터 모니터링', desc: '매일 기록되는 회복 데이터를 전문가가 상시 모니터링하여 최적의 타이밍에 가이드를 드립니다.' },
-      { id: 2, title: '의료기관 방문 전 문진 & 리포트', desc: '병원 방문 전 상세 문진을 통해 의료진에게 최적화된 상담 자료를 미리 전달합니다.' },
-      { id: 3, title: '네비게이터 1:1 매칭 관리', desc: '전담 네비게이터가 모든 여정을 함께하며 회복의 흐름을 놓치지 않게 돕습니다.' }
-    ],
-    roadmap: [
-      { step: '01', title: '네비게이터 상담 및 가입', desc: '전문 네비게이터와의 상담 후 90일 패스 전용 링크를 통해 가입을 완료합니다.' },
-      { step: '02', title: '회복 관리 및 사전 문진', desc: '데일리 리듬을 기록하며 의료기관 방문 전 정밀 문진 데이터를 작성합니다.' },
-      { step: '03', title: '의료기관 방문 및 심층 케어', desc: '작성된 데이터를 기반으로 제휴 의료기관에서 효율적이고 전문적인 진료를 받습니다.' }
-    ],
-    theme: 'bg-obsidian text-mist',
-    accent: 'text-chapter-accent',
-    buttonColor: 'bg-chapter-accent hover:bg-chapter-accent/90'
   }
 };

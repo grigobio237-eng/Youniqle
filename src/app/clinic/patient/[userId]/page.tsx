@@ -204,7 +204,6 @@ export default function ClinicPatientDetail() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-black text-obsidian text-xl">{user?.name} 님</h1>
-                <Badge className="bg-primary/10 text-primary border-none text-[10px] px-2">BLACK PASS</Badge>
               </div>
               <p className="text-xs text-slate/50 font-bold">{user?.email}</p>
             </div>
@@ -356,7 +355,7 @@ export default function ClinicPatientDetail() {
         {/* Footer info */}
         <div className="pt-10 text-center">
           <p className="text-slate/30 text-sm font-medium">
-            이 정보는 유니클 Black Pass 멤버십의 AI 분석 결과이며, 최종 진료 판단은 의료진의 책임하에 이루어집니다.
+            이 정보는 유니클 멤버십의 AI 분석 결과이며, 최종 진료 판단은 의료진의 책임하에 이루어집니다.
           </p>
         </div>
       </main>

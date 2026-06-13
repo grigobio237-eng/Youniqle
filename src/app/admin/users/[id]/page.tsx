@@ -294,15 +294,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     <Badge className="bg-chapter-accent text-white mr-2">RESTART</Badge>
                     SIGNATURE PASS 지급
                   </Button>
-                  <Button 
-                    variant={user.passInfo?.type === 'BLACK' ? 'default' : 'outline'} 
-                    size="sm" 
-                    className="w-full justify-start h-9"
-                    onClick={() => handleGrantPass('BLACK')}
-                  >
-                    <Badge className="bg-obsidian text-chapter-accent border border-chapter-accent/30 mr-2">RESTART</Badge>
-                    BLACK PASS 지급
-                  </Button>
+
                 </div>
               </div>
             </CardContent>

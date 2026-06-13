@@ -90,3 +90,4 @@ youniqle-eea2f-firebase-adminsdk- fbsvc-*.json
 *.log
 *.mp4
 *.zip
+.vercel

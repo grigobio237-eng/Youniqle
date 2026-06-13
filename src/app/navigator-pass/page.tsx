@@ -68,29 +68,7 @@ const tiers = [
             '멤버십 우선순위 예약 권한',
         ],
     },
-    {
-        id: 'black',
-        name: 'BLACK PASS',
-        subtitle: 'Private Concierge VIP',
-        price: 33000000,
-        color: 'from-slate-700 to-obsidian',
-        bgColor: 'bg-surface',
-        borderColor: 'border-slate-300',
-        iconBg: 'bg-slate-200',
-        textColor: 'text-obsidian',
-        description: 'VIP 고객을 위한 프라이빗 운영형 패스',
-        coreFeatures: [
-            { icon: Crown, text: 'SIGNATURE PASS 혜택 전체 포함' },
-            { icon: Sparkles, text: '프리미엄 리포트 상시 제공' },
-            { icon: Brain, text: '지정인 1인 혜택 공유 (연 3회)' },
-            { icon: Shield, text: '유니클 독점 프로그램 평생 이용권' },
-        ],
-        economicBenefits: [
-            '제휴사 비급여 항목 최대 30% 멤버십 전용가',
-            '활동 포인트 적립률 15% 보장',
-            '최상위 우선 예약 및 전담 응대 라인',
-        ],
-    },
+
 ];
 
 // FAQ Data

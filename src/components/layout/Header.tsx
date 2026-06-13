@@ -82,9 +82,7 @@ export default function Header() {
     { label: '대시보드', href: '/dashboard', desc: '나의 회복 현황 대시보드' },
     { label: '힐링 라운지', href: '/products', desc: '프리미엄 회복 공간 및 프로그램' },
     { label: '파트너', href: '/partners', desc: '협업 및 제휴 안내' },
-    // @ts-ignore
-    ...((AccessControl.isAdmin(session?.user) || session?.user?.isNavigator === true || (session?.user?.passInfo?.type === 'BLACK' && session?.user?.passInfo?.status === 'ACTIVE')) 
-      ? [{ label: 'BLACK PASS', href: '/black-pass', desc: '블랙 패스 전용 매니지먼트' }] : []),
+
     // @ts-ignore
     ...(session?.user?.isNavigator === true ? [{ label: '네비게이터', href: '/navigator', desc: '네비게이터 전용 공간' }] : []),
   ];

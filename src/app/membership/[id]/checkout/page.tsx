@@ -77,10 +77,6 @@ export default function CheckoutPage({ params }: PageProps) {
       return;
     }
 
-    if (id === 'black' && !hasNavigator && !isNavVerified) {
-      alert('블랙 패스 이용을 위해 전담 네비게이터 코드를 먼저 확인해 주세요.');
-      return;
-    }
 
     setIsProcessing(true);
 
@@ -208,50 +204,11 @@ export default function CheckoutPage({ params }: PageProps) {
             <div className="flex justify-between items-center py-4 border-t border-line mt-4">
               <p className="text-sm font-bold text-slate/60">이용 기간</p>
               <p className="text-sm font-black text-obsidian">
-                {id === 'black' ? '90일 (3개월)' : (pass.period === '무료체험' ? '1회성' : `매달 (${pass.period})`)}
+                {pass.period === '무료체험' ? '1회성' : `매달 (${pass.period})`}
               </p>
             </div>
           </div>
 
-          {/* Navigator Code Selection (Only for BLACK PASS and if no navigator) */}
-          {id === 'black' && !hasNavigator && (
-            <div className="bg-white rounded-[32px] p-8 shadow-xl border-2 border-indigo-100">
-              <h2 className="text-xs font-black text-secondary uppercase tracking-widest mb-6 border-b border-indigo-50 pb-4">전담 네비게이터 확인</h2>
-              <div className="space-y-4">
-                <p className="text-sm font-bold text-slate/70 break-keep">
-                  블랙 패스 회원은 전문적인 상담과 관리를 위해 전담 네비게이터가 반드시 지정되어야 합니다. 전달받으신 네비게이터 코드를 입력해 주세요.
-                </p>
-                <div className="flex gap-3">
-                  <div className="relative flex-1">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate/30" />
-                    <Input 
-                      placeholder="네비게이터 코드 입력"
-                      value={navigatorCode}
-                      onChange={(e) => {
-                        setNavigatorCode(e.target.value.toUpperCase());
-                        setIsNavVerified(false);
-                      }}
-                      disabled={isNavVerified || isValidating}
-                      className="pl-11 h-14 rounded-2xl border-line bg-mist/30 font-black text-obsidian placeholder:text-slate/20"
-                    />
-                  </div>
-                  <Button 
-                    onClick={verifyNavigator}
-                    disabled={!navigatorCode.trim() || isValidating || isNavVerified}
-                    className="h-14 px-8 rounded-2xl bg-secondary hover:bg-secondary text-white font-black"
-                  >
-                    {isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : '코드 확인'}
-                  </Button>
-                </div>
-                {isNavVerified && (
-                  <div className="flex items-center gap-2 p-4 bg-emerald-50 rounded-2xl text-secondary animate-in fade-in slide-in-from-top-1">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span className="text-sm font-black">[{navName}] 네비게이터가 확인되었습니다.</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Payment Method */}
           <div className="bg-white rounded-[32px] p-8 shadow-xl border border-line/50">
@@ -299,10 +256,7 @@ export default function CheckoutPage({ params }: PageProps) {
             <div className="flex items-start gap-3 px-4 py-6 bg-slate-100 rounded-2xl">
               <ShieldCheck className="w-5 h-5 text-foreground/70 shrink-0 mt-0.5" />
               <p className="text-[11px] text-slate/50 font-bold leading-relaxed">
-                {id === 'black' 
-                  ? '본 상품은 90일간 제공되는 한시적 멤버십 패스입니다. 결제 완료 즉시 혜택이 활성화되며, 기간 만료 후에는 자동으로 등급이 조정됩니다.'
-                  : '본 결제는 정기 결제로, 매달 동일한 날짜에 자동으로 결제됩니다. 결제 정보는 안전하게 관리되며 마이페이지에서 언제든 해지 가능합니다.'
-                }
+                본 결제는 정기 결제로, 매달 동일한 날짜에 자동으로 결제됩니다. 결제 정보는 안전하게 관리되며 마이페이지에서 언제든 해지 가능합니다.
               </p>
             </div>
           </div>
@@ -320,7 +274,7 @@ export default function CheckoutPage({ params }: PageProps) {
               </>
             ) : (
               <>
-                {pass.price}원 {id === 'black' ? '멤버십 시작하기' : '정기 구독 시작하기'}
+                {pass.price}원 정기 구독 시작하기
                 <Sparkles className="w-5 h-5 group-hover:scale-125 transition-transform" />
               </>
             )}
