@@ -43,29 +43,29 @@ export default function PremiumPlanPage() {
               <li className="flex items-start gap-3 md:gap-4">
                 <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-reward-gold shrink-0" />
                 <div>
-                  <strong className="block text-white text-base md:text-lg mb-1">심층 기질 분석 (30개 세부 국면)</strong>
-                  <p className="break-keep text-xs md:text-sm text-white/60">표면적인 컨디션 분석을 넘어, 타고난 기질과 성향을 30개의 세부 항목으로 심층 분석합니다.</p>
+                  <strong className="block text-white text-base md:text-lg mb-1">심층 기질 분석 (16개 세부 국면)</strong>
+                  <p className="break-keep text-xs md:text-sm text-white/60">단순한 상태 체크를 뛰어넘어, 개인의 고유한 기질과 성격적 16가지 다면적 심도 지표를 추출해 철저하게 규명합니다.</p>
                 </div>
               </li>
               <li className="flex items-start gap-3 md:gap-4">
                 <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-reward-gold shrink-0" />
                 <div>
-                  <strong className="block text-white text-base md:text-lg mb-1">AI 보이스 맞춤 명상</strong>
-                  <p className="break-keep text-xs md:text-sm text-white/60">현재의 감정 상태와 스트레스 레벨에 맞춰 AI가 실시간으로 생성하는 나만의 명상 오디오를 제공합니다.</p>
+                  <strong className="block text-white text-base md:text-lg mb-1">AI 보이스 스트레칭 (맞춤 영상)</strong>
+                  <p className="break-keep text-xs md:text-sm text-white/60">목소리의 톤, 성량, 템포를 지능적으로 판별하고 피로 해소에 최적화된 맞춤형 운동 요법 영상을 실시간 매칭 추천합니다.</p>
                 </div>
               </li>
               <li className="flex items-start gap-3 md:gap-4">
                 <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-reward-gold shrink-0" />
                 <div>
                   <strong className="block text-white text-base md:text-lg mb-1">전문가 1:1 커스텀 솔루션</strong>
-                  <p className="break-keep text-xs md:text-sm text-white/60">축적된 데이터를 기반으로 건강, 심리, 라이프스타일 전문가가 직접 구성한 1:1 맞춤형 피드백을 받아볼 수 있습니다.</p>
+                  <p className="break-keep text-xs md:text-sm text-white/60">측정된 데이터 이력을 기반으로 멘탈 웰니스 및 피지컬 테라피 전문가진이 1:1 맞춤 피드백을 전달해 드립니다.</p>
                 </div>
               </li>
               <li className="flex items-start gap-3 md:gap-4">
                 <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-reward-gold shrink-0" />
                 <div>
                   <strong className="block text-white text-base md:text-lg mb-1">리본 패스 모든 혜택 포함</strong>
-                  <p className="break-keep text-xs md:text-sm text-white/60">무제한 라이프 스냅과 7-Day 누적 패턴 분석, 테라피 사운드 등 리본 패스의 혜택을 기본으로 누리세요.</p>
+                  <p className="break-keep text-xs md:text-sm text-white/60">무제한 AI 카메라스캔, 7-Day 누적 패턴 분석, 사운드 네이처 전체 라이브러리 등 리본 패스의 모든 특권을 누립니다.</p>
                 </div>
               </li>
             </ul>
@@ -99,24 +99,24 @@ export default function PremiumPlanPage() {
             
             <div className="divide-y divide-line">
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">AI 라이프 스냅</div>
+                <div className="text-left font-bold text-slate/80">AI 카메라스캔</div>
                 <div className="font-medium text-slate/70">일 5회 제한</div>
                 <div className="font-bold text-chapter-accent">무제한</div>
                 <div className="font-bold text-reward-gold">무제한</div>
               </div>
               
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">리포트 분석 깊이</div>
-                <div className="font-medium text-slate/70">현재 상태 브리프</div>
-                <div className="font-bold text-chapter-accent">7일 누적 패턴 분석</div>
-                <div className="font-bold text-reward-gold">심층 기질 분석 (30 facets)</div>
+                <div className="text-left font-bold text-slate/80">분석 및 리포트</div>
+                <div className="font-medium text-slate/70">베이직 회복 리포트 (최근 7일)</div>
+                <div className="font-bold text-chapter-accent">7-Day 누적 패턴 분석 (무제한)</div>
+                <div className="font-bold text-reward-gold">심층 기질 분석 (16개 세부 국면)</div>
               </div>
 
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">사운드 테라피</div>
-                <div className="font-medium text-slate/70">베이직 트랙</div>
-                <div className="font-bold text-chapter-accent">전체 라이브러리</div>
-                <div className="font-bold text-reward-gold">AI 보이스 맞춤 명상</div>
+                <div className="text-left font-bold text-slate/80">사운드 & 영상 힐링</div>
+                <div className="font-medium text-slate/70">사운드 네이처 일부 트랙</div>
+                <div className="font-bold text-chapter-accent">사운드 네이처 전체 라이브러리</div>
+                <div className="font-bold text-reward-gold">AI 보이스 스트레칭 (맞춤 영상)</div>
               </div>
 
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">

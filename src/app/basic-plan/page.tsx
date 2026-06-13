@@ -33,22 +33,22 @@ export default function BasicPlanPage() {
             <li className="flex items-start gap-3 md:gap-4">
               <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-primary shrink-0" />
               <div>
-                <strong className="block text-obsidian text-base md:text-lg mb-1">일 5회 AI 라이프 스냅</strong>
-                <p className="break-keep text-xs md:text-sm">얼굴, 음식, 환경 등을 스캔하여 매일 5번까지 무료로 컨디션을 분석할 수 있습니다.</p>
+                <strong className="block text-obsidian text-base md:text-lg mb-1">일 5회 AI 카메라스캔</strong>
+                <p className="break-keep text-xs md:text-sm">얼굴, 손끝 맥파, 주변 환경을 카메라로 스캔하여 매일 5회 무료로 생체 리듬을 체크합니다.</p>
               </div>
             </li>
             <li className="flex items-start gap-3 md:gap-4">
               <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-primary shrink-0" />
               <div>
                 <strong className="block text-obsidian text-base md:text-lg mb-1">베이직 회복 리포트</strong>
-                <p className="break-keep text-xs md:text-sm">현재 상태에 대한 기본적인 분석 결과와 가벼운 상태 브리핑을 제공받습니다.</p>
+                <p className="break-keep text-xs md:text-sm">현재 상태에 대한 기본적인 분석 결과와 최근 7일 동안의 상태 브리핑을 제공받습니다.</p>
               </div>
             </li>
             <li className="flex items-start gap-3 md:gap-4">
               <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 mt-0.5 text-primary shrink-0" />
               <div>
-                <strong className="block text-obsidian text-base md:text-lg mb-1">사운드 테라피 (일부)</strong>
-                <p className="break-keep text-xs md:text-sm">기본적인 휴식을 돕는 자연음과 백색소음 트랙을 제한적으로 이용할 수 있습니다.</p>
+                <strong className="block text-obsidian text-base md:text-lg mb-1">사운드 네이처 (일부 트랙)</strong>
+                <p className="break-keep text-xs md:text-sm">안정감과 스트레스 해소를 돕는 고음질 자연 사운드 중 무료 에디션 일부 트랙을 감상할 수 있습니다.</p>
               </div>
             </li>
           </ul>
@@ -81,24 +81,24 @@ export default function BasicPlanPage() {
             
             <div className="divide-y divide-line">
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">AI 라이프 스냅</div>
+                <div className="text-left font-bold text-slate/80">AI 카메라스캔</div>
                 <div className="font-medium text-slate/70">일 5회 제한</div>
                 <div className="font-bold text-chapter-accent">무제한</div>
                 <div className="font-bold text-reward-gold">무제한</div>
               </div>
               
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">리포트 분석 깊이</div>
-                <div className="font-medium text-slate/70">현재 상태 브리프</div>
-                <div className="font-bold text-chapter-accent">7일 누적 패턴 분석</div>
-                <div className="font-bold text-reward-gold">심층 기질 분석 (30 facets)</div>
+                <div className="text-left font-bold text-slate/80">분석 및 리포트</div>
+                <div className="font-medium text-slate/70">베이직 회복 리포트 (최근 7일)</div>
+                <div className="font-bold text-chapter-accent">7-Day 누적 패턴 분석 (무제한)</div>
+                <div className="font-bold text-reward-gold">심층 기질 분석 (16개 세부 국면)</div>
               </div>
 
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
-                <div className="text-left font-bold text-slate/80">사운드 테라피</div>
-                <div className="font-medium text-slate/70">베이직 트랙</div>
-                <div className="font-bold text-chapter-accent">전체 라이브러리</div>
-                <div className="font-bold text-reward-gold">AI 보이스 맞춤 명상</div>
+                <div className="text-left font-bold text-slate/80">사운드 & 영상 힐링</div>
+                <div className="font-medium text-slate/70">사운드 네이처 일부 트랙</div>
+                <div className="font-bold text-chapter-accent">사운드 네이처 전체 라이브러리</div>
+                <div className="font-bold text-reward-gold">AI 보이스 스트레칭 (맞춤 영상)</div>
               </div>
 
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
