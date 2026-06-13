@@ -3,7 +3,25 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUserBehavior extends Document {
   userId?: mongoose.Types.ObjectId;
   sessionId: string;
-  eventType: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'purchase' | 'like' | 'dislike' | 'share' | 'comment' | 'search' | 'filter' | 'sort' | 'scroll' | 'time_on_page';
+  eventType: 
+    | 'view' 
+    | 'click' 
+    | 'add_to_cart' 
+    | 'remove_from_cart' 
+    | 'purchase' 
+    | 'like' 
+    | 'dislike' 
+    | 'share' 
+    | 'comment' 
+    | 'search' 
+    | 'filter' 
+    | 'sort' 
+    | 'scroll' 
+    | 'time_on_page'
+    | 'sound_therapy_start'
+    | 'sound_therapy_stop'
+    | 'recommendation_view'
+    | 'recommendation_click';
   itemId?: mongoose.Types.ObjectId;
   itemType?: 'product' | 'content' | 'category' | 'brand';
   itemData?: {
@@ -46,7 +64,11 @@ const UserBehaviorSchema: Schema = new Schema({
   sessionId: { type: String, required: true },
   eventType: {
     type: String,
-    enum: ['view', 'click', 'add_to_cart', 'remove_from_cart', 'purchase', 'like', 'dislike', 'share', 'comment', 'search', 'filter', 'sort', 'scroll', 'time_on_page'],
+    enum: [
+      'view', 'click', 'add_to_cart', 'remove_from_cart', 'purchase', 'like', 'dislike', 'share', 'comment', 
+      'search', 'filter', 'sort', 'scroll', 'time_on_page',
+      'sound_therapy_start', 'sound_therapy_stop', 'recommendation_view', 'recommendation_click'
+    ],
     required: true
   },
   itemId: { type: Schema.Types.ObjectId },

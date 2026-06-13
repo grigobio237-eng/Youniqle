@@ -12,7 +12,7 @@ export const SoundVisualizer = ({ isPlaying }: { isPlaying: boolean }) => {
 
   // Hydration mismatch avoidance: return a simplified placeholder during SSR
   if (!isMounted) {
-    return <div className="relative w-full h-[400px] flex items-center justify-center overflow-hidden bg-black" />;
+    return <div className="relative w-full h-[400px] flex items-center justify-center overflow-hidden bg-transparent" />;
   }
 
   return (

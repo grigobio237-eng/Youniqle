@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Pause, RotateCcw, Volume2, Moon, Sun, Wind, Waves, 
-  Headphones, Sparkles, CloudRain, Trees, Flame, Zap, X, Lock
+  Headphones, Sparkles, CloudRain, Trees, Flame, Zap, X, Lock, Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -16,22 +16,22 @@ import { AccessControl } from '@/lib/logic/access-control';
 import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 
 const FREQUENCIES = [
-  { id: 'delta', name: '편안한', desc: '깊은 수면과 세포 재생 (432Hz)', freq: 432 },
-  { id: 'theta', name: '상쾌한', desc: '창의력 및 에너지 회복 (528Hz)', freq: 528 },
-  { id: 'alpha', name: '차분한', desc: '마음의 안정과 조화 (639Hz)', freq: 639 },
-  { id: 'solfeggio', name: '맑은', desc: '직관력 향상 및 정화 (741Hz)', freq: 741 },
+  { id: 'delta', name: '수면 회복', desc: '💤 깊은 잠과 세포 재생에 도움을 줍니다. (Delta 432Hz)', freq: 432 },
+  { id: 'theta', name: '에너지 충전', desc: '🔋 창의적인 영감과 지친 에너지를 채워줍니다. (Theta 528Hz)', freq: 528 },
+  { id: 'alpha', name: '마음의 안정', desc: '🧘 감정을 가라앉히고 정서적 평안을 선사합니다. (Alpha 639Hz)', freq: 639 },
+  { id: 'solfeggio', name: '머리 정화', desc: '🧼 머릿속 잡념을 지우고 맑은 직관을 깨웁니다. (741Hz)', freq: 741 },
 ];
 
 const BASIC_NOISES = [
-  { id: 'white', name: '백색 소음', icon: <Wind className="w-5 h-5" /> },
-  { id: 'pink', name: '핑크 노이즈', icon: <Waves className="w-5 h-5" /> },
-  { id: 'brown', name: '브라운 노이즈', icon: <Headphones className="w-5 h-5" /> },
+  { id: 'white', name: '백색 소음', desc: '집중력을 돕는 균형잡힌 소리', icon: <Wind className="w-5 h-5" /> },
+  { id: 'pink', name: '핑크 노이즈', desc: '마음이 편안해지는 부드러운 소리', icon: <Waves className="w-5 h-5" /> },
+  { id: 'brown', name: '브라운 노이즈', desc: '깊은 수면을 돕는 묵직한 소리', icon: <Headphones className="w-5 h-5" /> },
 ];
 
 const NATURE_LAYERS = [
-  { id: 'rain', name: '빗소리', icon: <CloudRain className="w-5 h-5" />, color: 'text-blue-400' },
-  { id: 'forest', name: '숲소리', icon: <Trees className="w-5 h-5" />, color: 'text-green-400' },
-  { id: 'fire', name: '모닥불', icon: <Flame className="w-5 h-5" />, color: 'text-orange-400' },
+  { id: 'rain', name: '토닥토닥 빗소리', icon: <CloudRain className="w-5 h-5" />, color: 'text-blue-500' },
+  { id: 'forest', name: '숲의 새소리', icon: <Trees className="w-5 h-5" />, color: 'text-emerald-500' },
+  { id: 'fire', name: '장작 모닥불', icon: <Flame className="w-5 h-5" />, color: 'text-orange-500' },
 ];
 
 // Helper to create synthetic reverb impulse response buffer
@@ -75,11 +75,11 @@ export default function SoundTherapy() {
 
   // Mixer State
   const [selectedFreq, setSelectedFreq] = useState(FREQUENCIES[0]);
-  const [freqVolume, setFreqVolume] = useState(0.15);
+  const [freqVolume, setFreqVolume] = useState(0.25);
   const [selectedNoise, setSelectedNoise] = useState(BASIC_NOISES[1]); 
-  const [noiseVolume, setNoiseVolume] = useState(0.1);
+  const [noiseVolume, setNoiseVolume] = useState(0.15);
   const [selectedNature, setSelectedNature] = useState(NATURE_LAYERS[0]); 
-  const [natureVolume, setNatureVolume] = useState(0.7);
+  const [natureVolume, setNatureVolume] = useState(0.4);
   const [timeLeft, setTimeLeft] = useState(1200);
 
   // Web Audio Refs
@@ -129,7 +129,7 @@ export default function SoundTherapy() {
         // Reverb convolver
         reverbNode.current = audioCtx.current.createConvolver();
         reverbWetGain.current = audioCtx.current.createGain();
-        reverbWetGain.current.gain.setValueAtTime(0, audioCtx.current.currentTime); // Off by default
+        reverbWetGain.current.gain.setValueAtTime(0, audioCtx.current.currentTime);
 
         // Connect wet paths to convolver
         freqGain.current.connect(reverbWetGain.current);
@@ -176,7 +176,6 @@ export default function SoundTherapy() {
     return buffer;
   };
 
-  // Pre-load natural audio assets (Graceful degradation on load failure)
   const loadNatureSound = async (id: string): Promise<AudioBuffer | null> => {
     if (natureBuffers.current[id]) return natureBuffers.current[id];
     
@@ -250,7 +249,7 @@ export default function SoundTherapy() {
     }
     
     if (isPlaying) {
-        natureSource.current.start();
+        try { natureSource.current.start(); } catch(e) {}
     }
   };
 
@@ -263,13 +262,12 @@ export default function SoundTherapy() {
     noiseSource.current.buffer = createBuffer(selectedNoise.id as any);
     noiseSource.current.loop = true;
     noiseSource.current.connect(noiseGain.current);
-    noiseSource.current.start();
+    try { noiseSource.current.start(); } catch(e) {}
   };
 
   const startFrequency = () => {
     if (!audioCtx.current || !freqGain.current) return;
     
-    // Stop all previous oscillators
     if (oscillator.current) {
         try { oscillator.current.stop(); } catch(e) {}
         oscillator.current = null;
@@ -286,14 +284,12 @@ export default function SoundTherapy() {
     const ctx = audioCtx.current;
     
     if (isBinaural) {
-        // Binaural beats configuration: split Left and Right channels with a slight delta
         oscillatorLeft.current = ctx.createOscillator();
         oscillatorRight.current = ctx.createOscillator();
         
         oscillatorLeft.current.type = 'sine';
         oscillatorLeft.current.frequency.setValueAtTime(selectedFreq.freq, ctx.currentTime);
         
-        // Alpha wave brain entrainment: 8Hz differential
         const offset = 8;
         oscillatorRight.current.type = 'sine';
         oscillatorRight.current.frequency.setValueAtTime(selectedFreq.freq + offset, ctx.currentTime);
@@ -310,14 +306,16 @@ export default function SoundTherapy() {
         oscillatorRight.current.connect(pannerRight.current);
         pannerRight.current.connect(freqGain.current);
         
-        oscillatorLeft.current.start();
-        oscillatorRight.current.start();
+        try {
+            oscillatorLeft.current.start();
+            oscillatorRight.current.start();
+        } catch(e) {}
     } else {
         oscillator.current = ctx.createOscillator();
         oscillator.current.type = 'sine';
         oscillator.current.frequency.setValueAtTime(selectedFreq.freq, ctx.currentTime);
         oscillator.current.connect(freqGain.current);
-        oscillator.current.start();
+        try { oscillator.current.start(); } catch(e) {}
     }
   };
 
@@ -367,13 +365,11 @@ export default function SoundTherapy() {
     
     const now = audioCtx.current.currentTime;
     
-    // Reset master gain to current volume immediately
     masterGainNode.current?.gain.cancelScheduledValues(now);
     masterGainNode.current?.gain.setValueAtTime(masterVolume, now);
 
     const factor = isMeditationPlaying ? 0.25 : 1.0;
 
-    // Fade in tracks
     freqGain.current?.gain.cancelScheduledValues(now);
     freqGain.current?.gain.setValueAtTime(0, now);
     freqGain.current?.gain.linearRampToValueAtTime(freqVolume * factor, now + 1);
@@ -405,25 +401,27 @@ export default function SoundTherapy() {
     if (!audioCtx.current || !masterGainNode.current) return;
     const now = audioCtx.current.currentTime;
     
-    masterGainNode.current.gain.cancelScheduledValues(now);
-    masterGainNode.current.gain.exponentialRampToValueAtTime(0.0001, now + 1);
+    try {
+        masterGainNode.current.gain.cancelScheduledValues(now);
+        masterGainNode.current.gain.exponentialRampToValueAtTime(0.0001, now + 1);
+    } catch(e) {}
     
     stopMeditationGuide();
     
     setTimeout(() => {
-      oscillator.current?.stop();
+      try { oscillator.current?.stop(); } catch(e) {}
       oscillator.current = null;
       
-      oscillatorLeft.current?.stop();
+      try { oscillatorLeft.current?.stop(); } catch(e) {}
       oscillatorLeft.current = null;
       
-      oscillatorRight.current?.stop();
+      try { oscillatorRight.current?.stop(); } catch(e) {}
       oscillatorRight.current = null;
       
-      noiseSource.current?.stop();
+      try { noiseSource.current?.stop(); } catch(e) {}
       noiseSource.current = null;
       
-      natureSource.current?.stop();
+      try { natureSource.current?.stop(); } catch(e) {}
       natureSource.current = null;
       
       setIsPlaying(false);
@@ -446,12 +444,14 @@ export default function SoundTherapy() {
       }
 
       if (audioCtx.current) {
-        masterGainNode.current?.gain.setValueAtTime(masterVolume, audioCtx.current.currentTime);
+        try {
+            masterGainNode.current?.gain.cancelScheduledValues(audioCtx.current.currentTime);
+            masterGainNode.current?.gain.setValueAtTime(masterVolume, audioCtx.current.currentTime);
+        } catch(e) {}
       }
     }, 1100);
   };
 
-  // AI Voice Guide Generation & Ducking Playback
   const generateMeditation = async () => {
     if (isGeneratingScript) return;
     setIsGeneratingScript(true);
@@ -470,7 +470,6 @@ export default function SoundTherapy() {
             setMeditationScript(data.script);
             
             if (data.audioContent) {
-                // Decode base64 audio content
                 const binaryString = window.atob(data.audioContent);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
@@ -520,7 +519,6 @@ export default function SoundTherapy() {
     const now = ctx.currentTime;
     const duration = meditationAudioBuffer.duration;
     
-    // Audio Ducking: decrease other gain nodes to 25% volume over 0.5s
     freqGain.current?.gain.cancelScheduledValues(now);
     freqGain.current?.gain.setValueAtTime(freqGain.current.gain.value, now);
     freqGain.current?.gain.linearRampToValueAtTime(freqVolume * 0.25, now + 0.5);
@@ -533,7 +531,6 @@ export default function SoundTherapy() {
     natureGain.current?.gain.setValueAtTime(natureGain.current.gain.value, now);
     natureGain.current?.gain.linearRampToValueAtTime(natureVolume * 0.25, now + 0.5);
     
-    // Recovery: restore volume levels 0.8s before guide ending
     const recoveryStart = now + Math.max(0, duration - 0.8);
     const recoveryEnd = now + duration;
     
@@ -551,7 +548,7 @@ export default function SoundTherapy() {
     };
     
     setIsMeditationPlaying(true);
-    source.start(now);
+    try { source.start(now); } catch(e) {}
     toast.info("마음챙김 가이드 낭독이 시작됩니다.");
   };
 
@@ -583,21 +580,23 @@ export default function SoundTherapy() {
         const now = audioCtx.current.currentTime;
         const factor = isMeditationPlaying ? 0.25 : 1.0;
         
-        masterGainNode.current.gain.cancelScheduledValues(now);
-        masterGainNode.current.gain.setValueAtTime(masterGainNode.current.gain.value, now);
-        masterGainNode.current.gain.linearRampToValueAtTime(masterVolume, now + 0.1);
+        try {
+            masterGainNode.current.gain.cancelScheduledValues(now);
+            masterGainNode.current.gain.setValueAtTime(masterGainNode.current.gain.value, now);
+            masterGainNode.current.gain.linearRampToValueAtTime(masterVolume, now + 0.1);
 
-        freqGain.current?.gain.cancelScheduledValues(now);
-        freqGain.current?.gain.setValueAtTime(freqGain.current.gain.value, now);
-        freqGain.current?.gain.linearRampToValueAtTime(freqVolume * factor, now + 0.1);
+            freqGain.current?.gain.cancelScheduledValues(now);
+            freqGain.current?.gain.setValueAtTime(freqGain.current.gain.value, now);
+            freqGain.current?.gain.linearRampToValueAtTime(freqVolume * factor, now + 0.1);
 
-        noiseGain.current?.gain.cancelScheduledValues(now);
-        noiseGain.current?.gain.setValueAtTime(noiseGain.current.gain.value, now);
-        noiseGain.current?.gain.linearRampToValueAtTime(noiseVolume * factor, now + 0.1);
+            noiseGain.current?.gain.cancelScheduledValues(now);
+            noiseGain.current?.gain.setValueAtTime(noiseGain.current.gain.value, now);
+            noiseGain.current?.gain.linearRampToValueAtTime(noiseVolume * factor, now + 0.1);
 
-        natureGain.current?.gain.cancelScheduledValues(now);
-        natureGain.current?.gain.setValueAtTime(natureGain.current.gain.value, now);
-        natureGain.current?.gain.linearRampToValueAtTime(natureVolume * factor, now + 0.1);
+            natureGain.current?.gain.cancelScheduledValues(now);
+            natureGain.current?.gain.setValueAtTime(natureGain.current.gain.value, now);
+            natureGain.current?.gain.linearRampToValueAtTime(natureVolume * factor, now + 0.1);
+        } catch(e) {}
     }
   }, [masterVolume, freqVolume, noiseVolume, natureVolume, isPlaying, isMeditationPlaying]);
 
@@ -623,30 +622,32 @@ export default function SoundTherapy() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const labelStyle = "text-[10px] font-black uppercase tracking-widest text-white/60 flex items-center gap-2";
-  const cardStyle = "space-y-4 bg-white/[0.05] p-6 rounded-[32px] border border-white/10 backdrop-blur-sm transition-all duration-300";
+  // Fresh, lively healing style theme classes
+  const labelStyle = "text-[11px] font-black uppercase tracking-widest text-[#10b981] flex items-center gap-1.5";
+  const cardStyle = "space-y-4 bg-white/70 border border-slate-100 p-6 rounded-[32px] shadow-sm shadow-emerald-900/[0.01] backdrop-blur-md transition-all duration-300 hover:shadow-md hover:border-emerald-100/60";
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-black text-white p-6 md:p-10 rounded-[40px]">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+    <div className="w-full max-w-4xl mx-auto bg-gradient-to-tr from-[#f0faf7] via-[#f7fcf9] to-[#f4faff] border border-white shadow-2xl shadow-slate-900/5 text-slate-800 p-6 md:p-10 rounded-[40px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <div className="lg:col-span-12 xl:col-span-5 space-y-8">
-          <div className="relative aspect-square flex items-center justify-center bg-white/[0.03] rounded-[40px] border border-white/5 overflow-hidden">
+        {/* Left Side: Visualizer and Session Playback control */}
+        <div className="lg:col-span-12 xl:col-span-5 space-y-6">
+          <div className="relative aspect-square flex items-center justify-center bg-gradient-to-br from-[#0c2b24] to-[#041714] rounded-[40px] border border-emerald-900/20 overflow-hidden shadow-xl shadow-emerald-950/20">
               <SoundVisualizer isPlaying={isPlaying} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-2 z-10">
                   <AnimatePresence mode="wait">
                       {isPlaying ? (
                           <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                              <p className="font-serif italic text-white tracking-tighter drop-shadow-2xl text-xl">{formatTime(timeLeft)}</p>
-                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-chapter-accent mt-4">Harmonizing Now</p>
+                              <p className="font-serif italic text-white tracking-tighter drop-shadow-2xl text-4xl">{formatTime(timeLeft)}</p>
+                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#10b981] mt-4">Harmonizing Now</p>
                           </motion.div>
                       ) : (
                           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Moon className="w-8 h-8 text-white/20" />
+                              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md border border-white/10">
+                                <Moon className="w-8 h-8 text-white/50" />
                               </div>
                               <h2 className="font-serif italic font-light tracking-tight text-white mb-2 text-4xl">Deep Recovery</h2>
-                              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">심층 사운드 테라피</p>
+                              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">심층 사운드 테라피</p>
                           </motion.div>
                       )}
                   </AnimatePresence>
@@ -656,45 +657,33 @@ export default function SoundTherapy() {
           <Button 
               onClick={isPlaying ? stopTherapy : startTherapy}
               size="lg"
-              className={`w-full h-20 rounded-[24px] text-xl font-serif italic transition-all duration-700 shadow-2xl ${
-                  isPlaying ? 'bg-chapter-accent text-white border-chapter-accent shadow-chapter-accent/20' : 'bg-white text-black hover:scale-[1.02]'
+              className={`w-full h-18 rounded-[24px] text-lg font-serif italic transition-all duration-300 shadow-lg ${
+                  isPlaying 
+                    ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-red-200 shadow-md' 
+                    : 'bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white hover:scale-[1.02] shadow-emerald-200'
               }`}
           >
-              {isPlaying ? <><Pause className="mr-3 w-6 h-6" /> 세션 종료</> : <><Play className="mr-3 w-6 h-6" /> 회복 세션 시작</>}
+              {isPlaying ? <><Pause className="mr-3 w-6 h-6 animate-pulse" /> 세션 종료하기</> : <><Play className="mr-3 w-6 h-6" /> 치유 세션 시작하기</>}
           </Button>
         </div>
 
-        <div className="lg:col-span-12 xl:col-span-7 space-y-6">
+        {/* Right Side: Sound Controls & Mixer */}
+        <div className="lg:col-span-12 xl:col-span-7 space-y-5">
           
           {/* Frequencies Card */}
           <div className={cardStyle}>
               <div className="flex justify-between items-center">
-                  <div className={labelStyle}><Zap className="w-4 h-4 text-chapter-accent" /> 기본 치유 주파수 (Frequency)</div>
-                  <div className="flex items-center gap-2">
-                      <button 
-                          onClick={() => {
-                              if (reportAccessLevel === 'BASIC') { 
-                                  setUpsellConfig({
-                                      title: "바이노럴 비트 기능 잠금",
-                                      desc: "좌우 독립형 뇌파 동조 입체음향을 경험하시려면 리본 등급 이상으로 업그레이드하세요."
-                                  });
-                                  setShowUpsell(true); 
-                                  return; 
-                              }
-                              setIsBinaural(prev => !prev);
-                          }}
-                          className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 ${
-                              isBinaural ? 'bg-chapter-accent text-white border-chapter-accent shadow-lg shadow-chapter-accent/20' : 'bg-white/5 text-white/40 border-white/10 hover:bg-white/10'
-                          }`}
-                      >
-                          <Sparkles className="w-2.5 h-2.5" /> Binaural {isBinaural ? 'ON' : 'OFF'}
-                      </button>
-                      <span className="text-[10px] font-black text-white/40">{Math.round(freqVolume * 100)}%</span>
+                  <div className={labelStyle}>
+                    <Zap className="w-4 h-4 text-emerald-500" /> 
+                    <span>뇌파 안정 주파수 (Frequency)</span>
                   </div>
+                  <span className="text-[11px] font-black text-slate-400">{Math.round(freqVolume * 100)}%</span>
               </div>
+              
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                   {FREQUENCIES.map(f => {
                       const locked = isFreqLocked(f.id);
+                      const isSelected = selectedFreq.id === f.id;
                       return (
                           <button key={f.id} onClick={() => {
                               if (locked) { 
@@ -707,53 +696,110 @@ export default function SoundTherapy() {
                               }
                               setSelectedFreq(f);
                           }}
-                              className={`py-3 rounded-xl text-center border transition-all flex flex-col items-center justify-center gap-1 relative ${
-                                  locked ? 'bg-white/[0.02] text-white/20 border-white/5 cursor-not-allowed' :
-                                  selectedFreq.id === f.id ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                              className={`py-3.5 rounded-2xl text-center border transition-all duration-300 flex flex-col items-center justify-center gap-1 relative ${
+                                  locked ? 'bg-slate-50/50 text-slate-300 border-slate-100 cursor-not-allowed' :
+                                  isSelected 
+                                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-transparent shadow-md shadow-emerald-100 scale-[1.02]' 
+                                    : 'bg-white/80 text-slate-600 border-slate-100 hover:bg-white hover:border-slate-200 hover:text-slate-800 shadow-sm'
                               }`}
                           >
-                              {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-white/30" />}
-                              <p className="text-sm font-serif italic font-bold">{f.name}</p>
-                              <p className="text-[8px] opacity-40">{f.freq}Hz</p>
+                              {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-300" />}
+                              <p className="text-xs font-bold leading-tight">{f.name}</p>
+                              <p className={`text-[9px] ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>{f.freq}Hz</p>
                           </button>
                       );
                   })}
               </div>
+              
+              {/* Interactive Info Banner for explaining active frequency */}
+              <div className="p-3.5 bg-emerald-50/50 rounded-2xl text-[11px] text-[#047857] flex items-start gap-2 border border-emerald-100/30">
+                  <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                  <div>
+                      <span className="font-extrabold">{selectedFreq.name} 주파수: </span>
+                      <span>{selectedFreq.desc}</span>
+                  </div>
+              </div>
+              
               <Slider value={[freqVolume]} max={1} step={0.01} onValueChange={v => setFreqVolume(v[0])} className="pt-2" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Binaural Beats Toggle Box (Enhanced) */}
+          <div className="bg-white/60 p-4 rounded-3xl border border-white flex justify-between items-center shadow-sm hover:border-emerald-100 transition-all">
+              <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-extrabold text-slate-700">입체 뇌파 동조 (Binaural Beats)</span>
+                      <span className="bg-emerald-100 text-emerald-800 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+                          <Headphones className="w-2 h-2" /> 이어폰 권장
+                      </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500">양측 귀 주파수 격차를 통한 깊은 이완 기술</span>
+              </div>
+              <button 
+                  onClick={() => {
+                      if (reportAccessLevel === 'BASIC') { 
+                          setUpsellConfig({
+                              title: "바이노럴 비트 기능 잠금",
+                              desc: "좌우 독립형 뇌파 동조 입체음향을 경험하시려면 리본 등급 이상으로 업그레이드하세요."
+                          });
+                          setShowUpsell(true); 
+                          return; 
+                      }
+                      setIsBinaural(prev => !prev);
+                  }}
+                  className={`relative w-12 h-7 rounded-full transition-all duration-300 ${isBinaural ? 'bg-emerald-500 shadow-inner' : 'bg-slate-200'}`}
+              >
+                  <motion.span 
+                      layout 
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="absolute left-1 top-1 w-5 h-5 rounded-full bg-white shadow-md"
+                      animate={{ x: isBinaural ? 20 : 0 }}
+                  />
+              </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               
               {/* Background Noise Card */}
               <div className={cardStyle}>
                   <div className="flex justify-between items-center">
-                      <div className={labelStyle}><Headphones className="w-4 h-4" /> 배경 소음 (Noise)</div>
-                      <span className="text-[10px] font-black text-white/40">{Math.round(noiseVolume * 100)}%</span>
+                      <div className={labelStyle}><Headphones className="w-4 h-4 text-emerald-500" /> 배경 소음 (Noise)</div>
+                      <span className="text-[11px] font-black text-slate-400">{Math.round(noiseVolume * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
-                      {BASIC_NOISES.map(n => (
-                          <button key={n.id} onClick={() => setSelectedNoise(n)}
-                              className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center ${
-                                  selectedNoise.id === n.id ? 'bg-white/20 text-white border-white/20' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
-                              }`}
-                          >
-                              {n.icon}
-                              <span className="text-[9px] font-bold opacity-60">{n.name}</span>
-                          </button>
-                      ))}
+                      {BASIC_NOISES.map(n => {
+                          const isSelected = selectedNoise.id === n.id;
+                          return (
+                              <button key={n.id} onClick={() => setSelectedNoise(n)}
+                                  className={`flex-1 flex flex-col gap-2 py-3 rounded-2xl border transition-all duration-300 items-center justify-center ${
+                                      isSelected 
+                                        ? 'bg-slate-800 text-white border-transparent shadow-md scale-[1.02]' 
+                                        : 'bg-white/80 text-slate-500 border-slate-100 hover:bg-white hover:text-slate-800 hover:border-slate-200 shadow-sm'
+                                  }`}
+                              >
+                                  {n.icon}
+                                  <span className="text-[10px] font-bold">{n.name}</span>
+                              </button>
+                          );
+                      })}
                   </div>
+                  
+                  <div className="text-[10px] text-slate-400 italic text-center">
+                      "{selectedNoise.desc}"
+                  </div>
+                  
                   <Slider value={[noiseVolume]} max={1} step={0.01} onValueChange={v => setNoiseVolume(v[0])} className="pt-2" />
               </div>
 
               {/* Nature Sounds Card with Reverb Selector */}
-              <div className={`${cardStyle} bg-chapter-accent/5`}>
+              <div className={cardStyle}>
                   <div className="flex justify-between items-center">
-                      <div className={`${labelStyle} text-chapter-accent/80`}><CloudRain className="w-4 h-4" /> 자연의 소리 (Nature)</div>
-                      <span className="text-[10px] font-black text-chapter-accent/60">{Math.round(natureVolume * 100)}%</span>
+                      <div className={labelStyle}><CloudRain className="w-4 h-4 text-emerald-500" /> 자연의 소리 (Nature)</div>
+                      <span className="text-[11px] font-black text-slate-400">{Math.round(natureVolume * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
                       {NATURE_LAYERS.map(n => {
                           const locked = isNatureLocked(n.id);
+                          const isSelected = selectedNature.id === n.id;
                           return (
                               <button key={n.id} onClick={() => {
                                   if (locked) { 
@@ -766,14 +812,16 @@ export default function SoundTherapy() {
                                   }
                                   setSelectedNature(n);
                               }}
-                                  className={`flex-1 flex flex-col gap-2 py-3 rounded-xl border transition-all items-center justify-center relative ${
-                                      locked ? 'bg-white/[0.02] text-white/20 border-white/5 cursor-not-allowed' :
-                                      selectedNature.id === n.id ? 'bg-chapter-accent text-white border-chapter-accent/40' : 'bg-white/5 text-white/20 border-transparent hover:bg-white/10'
+                                  className={`flex-1 flex flex-col gap-2 py-3 rounded-2xl border transition-all duration-300 items-center justify-center relative ${
+                                      locked ? 'bg-slate-50/50 text-slate-300 border-slate-100 cursor-not-allowed' :
+                                      isSelected 
+                                        ? 'bg-emerald-500 text-white border-transparent shadow-md shadow-emerald-100 scale-[1.02]' 
+                                        : 'bg-white/80 text-slate-500 border-slate-100 hover:bg-white hover:text-slate-800 hover:border-slate-200 shadow-sm'
                                   }`}
                               >
-                                  {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-white/30" />}
+                                  {locked && <Lock className="w-3 h-3 absolute top-1.5 right-1.5 text-slate-300" />}
                                   {n.icon}
-                                  <span className="text-[9px] font-bold opacity-80">{n.name}</span>
+                                  <span className="text-[10px] font-bold">{n.name}</span>
                               </button>
                           );
                       })}
@@ -781,14 +829,15 @@ export default function SoundTherapy() {
                   <Slider value={[natureVolume]} max={1} step={0.01} onValueChange={v => setNatureVolume(v[0])} className="pt-2" />
                   
                   {/* Space Reverb Control */}
-                  <div className="pt-2 flex flex-col gap-2 border-t border-white/5">
-                      <div className="flex justify-between items-center text-[9px] font-bold text-white/40">
+                  <div className="pt-3 flex flex-col gap-2 border-t border-slate-100">
+                      <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
                           <span>3D 입체 반향 (Reverb Space)</span>
-                          <span className="uppercase text-chapter-accent font-black">{reverbSpace === 'none' ? '일반' : reverbSpace === 'forest' ? '숲 속' : reverbSpace === 'cave' ? '동굴' : '해변'}</span>
+                          <span className="text-[10px] text-emerald-600 font-extrabold">{reverbSpace === 'none' ? '일반' : reverbSpace === 'forest' ? '숲 속' : reverbSpace === 'cave' ? '동굴' : '해변'}</span>
                       </div>
                       <div className="grid grid-cols-4 gap-1">
                           {['none', 'forest', 'cave', 'ocean'].map(space => {
                               const locked = reportAccessLevel === 'BASIC' && space !== 'none';
+                              const isSelected = reverbSpace === space;
                               return (
                                   <button 
                                       key={space} 
@@ -803,12 +852,13 @@ export default function SoundTherapy() {
                                           }
                                           setReverbSpace(space as any);
                                       }}
-                                      className={`py-1.5 rounded-lg text-[9px] font-bold border transition-all relative ${
-                                          locked ? 'bg-white/[0.02] text-white/20 border-white/5 cursor-not-allowed' :
-                                          reverbSpace === space ? 'bg-chapter-accent text-white border-chapter-accent/40' : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                                      className={`py-1.5 rounded-xl text-[10px] font-bold border transition-all ${
+                                          locked ? 'bg-slate-50/50 text-slate-300 border-slate-100 cursor-not-allowed' :
+                                          isSelected 
+                                            ? 'bg-teal-600 text-white border-transparent shadow-sm' 
+                                            : 'bg-white/80 text-slate-500 border-slate-100 hover:bg-white hover:text-slate-700 shadow-sm'
                                       }`}
                                   >
-                                      {locked && <Lock className="w-2 h-2 absolute top-0.5 right-0.5 text-white/30" />}
                                       {space === 'none' ? '일반' : space === 'forest' ? '숲' : space === 'cave' ? '동굴' : '바다'}
                                   </button>
                               );
@@ -819,42 +869,44 @@ export default function SoundTherapy() {
           </div>
 
           {/* Master Volume and Session time */}
-          <div className={`${cardStyle} bg-white/[0.08]`}>
+          <div className={`${cardStyle} bg-emerald-50/20`}>
               <div className="flex justify-between items-center">
-                  <div className={labelStyle}><Volume2 className="w-5 h-5" /> 전체 볼륨 조절</div>
+                  <div className={labelStyle}><Volume2 className="w-5 h-5 text-emerald-500" /> 전체 볼륨 조절</div>
                   <span className="text-sm font-black italic">{Math.round(masterVolume * 100)}%</span>
               </div>
               <Slider value={[masterVolume]} max={1} step={0.01} onValueChange={v => setMasterVolume(v[0])} className="pt-2" />
               <div className="flex gap-3 pt-2">
-                  <Button variant="outline" onClick={() => setTimeLeft(t => t + 300)} className="flex-1 h-12 rounded-xl border-white/10 text-white font-bold text-xs hover:bg-white/5">+ 5 MIN</Button>
-                  <Button variant="outline" onClick={() => setTimeLeft(1200)} className="w-12 h-12 rounded-xl border-white/10 text-white hover:bg-white/5 p-0 flex items-center justify-center"><RotateCcw className="w-4 h-4"/></Button>
+                  <Button variant="outline" onClick={() => setTimeLeft(t => t + 300)} className="flex-1 h-12 rounded-2xl border-slate-200 bg-white text-slate-700 font-extrabold text-xs hover:bg-slate-50">+ 5분 추가</Button>
+                  <Button variant="outline" onClick={() => setTimeLeft(1200)} className="w-12 h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 p-0 flex items-center justify-center"><RotateCcw className="w-4 h-4"/></Button>
               </div>
           </div>
 
           {/* Premium AI Voice Strategy */}
           {isPremium ? (
-              <div className={`${cardStyle} bg-reward-gold/10 border-reward-gold/30 mt-6 space-y-4`}>
+              <div className="bg-gradient-to-br from-[#fffbeb] to-[#fff7ed] border border-amber-200 p-6 rounded-[32px] shadow-sm space-y-4">
                   <div className="flex justify-between items-center">
-                      <div className={`${labelStyle} text-reward-gold`}><Sparkles className="w-4 h-4" /> AI 보이스 스트래티지</div>
-                      <span className="text-[10px] font-black uppercase text-reward-gold bg-reward-gold/20 px-2 py-0.5 rounded-full">PREMIUM</span>
+                      <div className="text-[11px] font-black uppercase tracking-widest text-amber-700 flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-amber-500" /> 나를 위한 AI 치유 가이드 (AI Guide)
+                      </div>
+                      <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">PREMIUM</span>
                   </div>
                   
                   <div className="flex gap-3">
                       <Button 
                           onClick={generateMeditation}
                           disabled={isGeneratingScript}
-                          className="flex-1 bg-reward-gold hover:bg-yellow-500 text-black font-black rounded-xl h-12 text-xs transition-transform active:scale-95"
+                          className="flex-1 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-extrabold rounded-2xl h-12 text-xs shadow-md shadow-amber-200/40 transition-transform active:scale-95"
                       >
-                          {isGeneratingScript ? "AI 힐링 가이드 생성 중..." : "오늘의 기질 맞춤 명상 생성"}
+                          {isGeneratingScript ? "AI 맞춤 가이드 생성 중..." : "오늘의 기질 맞춤 명상 생성"}
                       </Button>
                       
                       {meditationAudioBuffer && (
                           <Button 
                               onClick={isMeditationPlaying ? stopMeditationGuide : playMeditationGuide}
                               disabled={!isPlaying}
-                              className={`px-6 rounded-xl h-12 text-xs font-black transition-all ${
-                                  !isPlaying ? 'bg-white/10 text-white/40 cursor-not-allowed' :
-                                  isMeditationPlaying ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white text-black hover:bg-white/80 shadow-lg'
+                              className={`px-6 rounded-2xl h-12 text-xs font-extrabold transition-all duration-300 ${
+                                  !isPlaying ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' :
+                                  isMeditationPlaying ? 'bg-red-500 hover:bg-red-600 text-white shadow-md shadow-red-200' : 'bg-slate-800 text-white hover:bg-slate-900 shadow-md'
                               }`}
                           >
                               {isMeditationPlaying ? "낭독 정지" : "가이드 낭독"}
@@ -868,20 +920,22 @@ export default function SoundTherapy() {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="p-4 bg-black/60 rounded-2xl border border-reward-gold/20 text-xs italic text-reward-gold/80 max-h-28 overflow-y-auto leading-relaxed shadow-inner"
+                              className="p-4 bg-white/80 rounded-2xl border border-amber-100 text-xs italic text-amber-900 leading-relaxed shadow-sm"
                           >
-                              <div className="flex items-center gap-1.5 mb-1.5 not-italic text-[10px] font-bold text-reward-gold/60 uppercase">
-                                  <Sparkles className="w-3 h-3 text-reward-gold" /> 실시간 맞춤 가이드 스크립트
+                              <div className="flex items-center gap-1.5 mb-1.5 not-italic text-[10px] font-bold text-amber-700 uppercase">
+                                  <Sparkles className="w-3 h-3 text-amber-500" /> 생성된 1:1 맞춤 가이드
                               </div>
                               "{meditationScript}"
                           </motion.div>
                       )}
                   </AnimatePresence>
                   
-                  <p className="text-[10px] text-reward-gold/70 text-center">회원님의 30개 세부 기질을 바탕으로 지금 나에게 가장 필요한 1:1 보이스 스크립트를 생성합니다. (낭독 중 배경음 70% 자동 감쇄)</p>
+                  <p className="text-[10px] text-amber-800/80 leading-relaxed">
+                      💡 <strong>자동 오디오 더킹(Ducking) 지원:</strong> 가이드 낭독 재생 시, 기본 치유 소리가 <strong>자동으로 25%까지 내려가며</strong> 잔잔한 배경음으로 깔려 목소리가 잘 들릴 수 있도록 유도합니다.
+                  </p>
               </div>
           ) : (
-              <div className={`${cardStyle} bg-white/5 border-white/5 mt-6 cursor-pointer hover:bg-white/10 transition-all hover:border-reward-gold/20`} 
+              <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-3xl flex items-center justify-between shadow-sm cursor-pointer hover:bg-slate-100 transition-all" 
                   onClick={() => {
                       setUpsellConfig({
                           title: "AI 보이스 스트래티지는 리스타트 전용입니다",
@@ -891,14 +945,17 @@ export default function SoundTherapy() {
                   }}
               >
                   <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-reward-gold/20 flex items-center justify-center">
-                          <Lock className="w-5 h-5 text-reward-gold" />
+                      <div className="w-10 h-10 rounded-2xl bg-amber-100/60 flex items-center justify-center border border-amber-100 shadow-inner">
+                          <Lock className="w-4 h-4 text-amber-600" />
                       </div>
                       <div className="flex-1">
-                          <h4 className="text-sm font-bold text-reward-gold mb-1">AI 보이스 스트래티지 잠금</h4>
-                          <p className="text-[10px] text-white/50">프리미엄으로 업그레이드하고 맞춤 음성을 오버레이하세요.</p>
+                          <h4 className="text-[13px] font-extrabold text-slate-700">AI 보이스 1:1 명상 가이드 잠금</h4>
+                          <p className="text-[10px] text-slate-400">리스타트(PREMIUM) 패스로 업그레이드하고 활성화하세요.</p>
                       </div>
                   </div>
+                  <Button size="sm" className="bg-amber-400 hover:bg-amber-500 text-slate-900 rounded-xl text-[10px] font-extrabold py-1 h-8 shadow-sm">
+                      활성화
+                  </Button>
               </div>
           )}
         </div>
