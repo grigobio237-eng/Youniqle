@@ -13,11 +13,11 @@ export default function FounderTicketPage() {
       {/* Header */}
       <div className="mb-12 md:mb-24 text-center space-y-4 md:space-y-6 max-w-3xl mx-auto">
         <div className="inline-flex items-center px-4 py-1.5 bg-chapter-accent/10 text-chapter-accent rounded-full text-[10px] md:text-xs font-black tracking-[0.3em] uppercase border border-chapter-accent/20">
-          Founder Ticket
+          REBORN PASS
         </div>
         <h1 className="font-black text-obsidian tracking-tighter leading-[1.2] break-keep text-2xl md:text-5xl">
           나만의 완벽한 회복 리듬,<br />
-          <span className="text-chapter-accent">파운더스 티켓</span>
+          <span className="text-chapter-accent">리본 패스</span>
         </h1>
         <p className="text-xs md:text-base text-slate/70 leading-relaxed font-bold max-w-2xl mx-auto break-keep px-2">
           무제한 스캐너와 주간 심층 데이터 분석을 통해 당신만의 완벽한 회복 흐름을 완성하세요.
@@ -32,7 +32,7 @@ export default function FounderTicketPage() {
           </div>
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6 md:mb-8 border-b border-line pb-6">
-              <h2 className="text-xl md:text-2xl font-black text-obsidian">파운더스 티켓 제공 혜택</h2>
+              <h2 className="text-xl md:text-2xl font-black text-obsidian">리본 패스 제공 혜택</h2>
               <div className="text-right">
                 <span className="text-2xl md:text-3xl font-black text-obsidian">9,900원</span>
                 <span className="text-xs md:text-sm font-bold text-slate/50 ml-1">/ 월</span>
@@ -64,7 +64,7 @@ export default function FounderTicketPage() {
             </ul>
             
             <div className="mt-8 md:mt-12 text-center">
-              <Link href="/checkout?plan=founder">
+              <Link href="/membership/reborn/checkout">
                 <Button className="w-full md:w-auto bg-obsidian text-white hover:bg-obsidian/90 px-6 md:px-10 py-6 md:py-6 rounded-[20px] md:rounded-full text-base md:text-lg font-bold shadow-lg transition-all hover:scale-105">
                   월 9,900원으로 시작하기 <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -85,9 +85,9 @@ export default function FounderTicketPage() {
           <div className="min-w-[600px] md:min-w-[700px] bg-white rounded-[24px] md:rounded-[32px] border border-line shadow-sm overflow-hidden">
             <div className="grid grid-cols-4 bg-slate-50 border-b border-line p-4 md:p-6 text-center">
               <div className="text-left font-bold text-slate/50">기능 및 혜택</div>
-              <div className="font-black text-obsidian text-lg">Basic<br/><span className="text-sm font-bold text-primary">무료</span></div>
-              <div className="font-black text-obsidian text-lg">Founder<br/><span className="text-sm font-bold text-chapter-accent">9,900원/월</span></div>
-              <div className="font-black text-obsidian text-lg">Premium<br/><span className="text-sm font-bold text-reward-gold">29,800원/월</span></div>
+              <div className="font-black text-obsidian text-lg">RESET<br/><span className="text-sm font-bold text-primary">무료</span></div>
+              <div className="font-black text-obsidian text-lg">REBORN<br/><span className="text-sm font-bold text-chapter-accent">9,900원/월</span></div>
+              <div className="font-black text-obsidian text-lg">RESTART<br/><span className="text-sm font-bold text-reward-gold">29,800원/월</span></div>
             </div>
             
             <div className="divide-y divide-line">
@@ -100,7 +100,7 @@ export default function FounderTicketPage() {
               
               <div className="grid grid-cols-4 p-4 md:p-6 text-center items-center hover:bg-slate-50/50 transition-colors">
                 <div className="text-left font-bold text-slate/80">리포트 분석 깊이</div>
-                <div className="font-medium text-slate/70">현재 상태 브리핑</div>
+                <div className="font-medium text-slate/70">현재 상태 브리프</div>
                 <div className="font-bold text-chapter-accent">7일 누적 패턴 분석</div>
                 <div className="font-bold text-reward-gold">심층 기질 분석 (30 facets)</div>
               </div>
@@ -131,7 +131,7 @@ export default function FounderTicketPage() {
                 <Button disabled variant="outline" className="w-full rounded-full font-bold opacity-50 border-chapter-accent/50 text-chapter-accent">현재 선택됨</Button>
               </div>
               <div className="px-2">
-                <Link href="/membership">
+                <Link href="/premium-plan">
                   <Button className="w-full rounded-full font-bold bg-reward-gold text-obsidian hover:bg-yellow-400">업그레이드</Button>
                 </Link>
               </div>

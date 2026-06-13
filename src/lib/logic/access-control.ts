@@ -20,17 +20,17 @@ export const TIER_LIMITS: Record<UserGroup, TierLimits> = {
     dataRetentionDays: 1
   },
   RESET: {
-    scannerLimit: 3,
-    diagnosisLimit: 1,
+    scannerLimit: 5,
+    diagnosisLimit: 5,
     webtoonLimitHours: 48,
     webtoonGenerationLimit: 0,
     dataRetentionDays: 7
   },
   REBORN: {
-    scannerLimit: 10,
-    diagnosisLimit: 3,
+    scannerLimit: 9999,
+    diagnosisLimit: 9999,
     webtoonLimitHours: 0, // 무제한
-    webtoonGenerationLimit: 2,
+    webtoonGenerationLimit: 9999,
     dataRetentionDays: 90
   },
   RESTART: {

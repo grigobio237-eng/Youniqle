@@ -11,7 +11,7 @@ import CharacterImage from '@/components/ui/CharacterImage';
 const passItems = [
   {
     id: 'basic',
-    name: 'BASIC',
+    name: 'RESET',
     description: '가장 기초적인 나를 발견하는 시작',
     price: '0원',
     period: '무료체험',
@@ -24,7 +24,7 @@ const passItems = [
   },
   {
     id: 'founder',
-    name: 'FOUNDER',
+    name: 'REBORN',
     description: '과거의 내가 미래의 나를 돕는 데이터 OS',
     price: '9,900원',
     period: '월',
@@ -37,9 +37,9 @@ const passItems = [
   },
   {
     id: 'premium',
-    name: 'PREMIUM',
+    name: 'RESTART',
     description: '나만의 정답을 찾아주는 프리미엄 OS',
-    price: '49,900원',
+    price: '29,800원',
     period: '월',
     theme: 'border-primary/20 bg-primary/5',
     accent: 'text-primary',
