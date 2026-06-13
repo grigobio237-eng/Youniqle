@@ -28,12 +28,15 @@ import {
   Smile,
   ChevronRight,
   UserCheck,
-  X
+  X,
+  Lock
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AccessControl } from '@/lib/logic/access-control';
+import MembershipUpsellDialog from '@/components/auth/MembershipUpsellDialog';
 import ChapterWrapper from '@/components/layout/ChapterWrapper';
 import { Progress } from '@/components/ui/progress';
 import { DiagnosisRadarChart } from '@/components/charts/DiagnosisRadarChart';
@@ -66,6 +69,12 @@ export default function ReportsHub() {
   
   // 웰니스 명화 추천 시스템 전용 상태
   const [recommendedArtworks, setRecommendedArtworks] = useState<any[]>([]);
+
+  // 멤버십 등급 및 업셀링을 위한 상태
+  const [userStatus, setUserStatus] = useState<any>(null);
+  const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellTitle, setUpsellTitle] = useState('');
+  const [upsellDesc, setUpsellDesc] = useState('');
 
   // Fetch and parse all artworks
   useEffect(() => {
@@ -127,9 +136,10 @@ export default function ReportsHub() {
       setData(json);
 
       // 전체 히스토리 로드 (캐시 방지 적용)
-      const [diagRes, scanRes] = await Promise.all([
+      const [diagRes, scanRes, statusRes] = await Promise.all([
         fetch(`/api/diagnosis?t=${Date.now()}`, { cache: 'no-store' }),
-        fetch(`/api/scan?t=${Date.now()}`, { cache: 'no-store' })
+        fetch(`/api/scan?t=${Date.now()}`, { cache: 'no-store' }),
+        fetch(`/api/user/status?t=${Date.now()}`, { cache: 'no-store' })
       ]);
 
       if (diagRes.ok) {
@@ -139,6 +149,10 @@ export default function ReportsHub() {
       if (scanRes.ok) {
         const scanJson = await scanRes.json();
         setAllScans(scanJson.scans || []);
+      }
+      if (statusRes.ok) {
+        const statusJson = await statusRes.json();
+        setUserStatus(statusJson.user);
       }
 
     } catch (err: any) {
@@ -233,12 +247,45 @@ export default function ReportsHub() {
     RISK: { bg: 'bg-rose-500/10', text: 'text-rose-500', border: 'border-rose-500/20', label: '위험 수준' },
   };
 
+  const isAdmin = ['admin', 'superadmin'].includes(userStatus?.role);
+  const isPremium = isAdmin || ['REBORN', 'RESTART', 'BLACK'].includes(userStatus?.grade?.toUpperCase());
+
+  const handleLogSelect = (log: any) => {
+    const canView = AccessControl.canViewHistoryDate(log.createdAt, userStatus || session?.user);
+    if (!canView) {
+      setUpsellTitle('7일 이전 기록 조회는 REBORN 등급 이상 전용입니다');
+      setUpsellDesc('RESET 등급은 최근 7일 동안의 기록만 조회할 수 있습니다. 과거 데이터를 보관하고 무제한 조회하려면 멤버십을 업그레이드하세요.');
+      setShowUpsell(true);
+    } else {
+      setSelectedLog(log);
+    }
+  };
+
   const status = data?.highlights?.statusBadge || 'GOOD';
   const badgeInfo = badgeColors[status] || badgeColors['GOOD'];
 
   // Detail Viewer Content Helper
   const detailPaneContent = selectedLog ? (
-    <div className="space-y-4 md:space-y-6">
+    !AccessControl.canViewHistoryDate(selectedLog.createdAt, userStatus || session?.user) ? (
+      <div className="flex flex-col items-center justify-center py-16 text-center space-y-3 relative overflow-hidden bg-[#0E3A3A]/5 border border-[#0E3A3A]/10 rounded-2xl p-6">
+        <Lock className="w-8 h-8 text-[#0E3A3A] mb-1.5" />
+        <h5 className="text-sm font-black text-obsidian">7일 이전 과거 기록 잠금</h5>
+        <p className="text-[10px] font-bold text-foreground/70 max-w-[240px] leading-relaxed">
+          과거 회복 기록의 영구 보관과 분석 조회를 원하시면 REBORN 패스로 멤버십을 업그레이드하세요.
+        </p>
+        <Button 
+          onClick={() => {
+            setUpsellTitle('7일 이전 기록 조회는 REBORN 등급 이상 전용입니다');
+            setUpsellDesc('RESET 등급은 최근 7일 동안의 기록만 조회할 수 있습니다. 과거 데이터를 보관하고 무제한 조회하려면 멤버십을 업그레이드하세요.');
+            setShowUpsell(true);
+          }}
+          className="mt-2 h-8 px-4 bg-[#0E3A3A] hover:bg-[#0E3A3A]/90 text-white text-[10px] font-black rounded-lg"
+        >
+          업그레이드 ⚡
+        </Button>
+      </div>
+    ) : (
+      <div className="space-y-4 md:space-y-6">
       <div className="border-b border-line pb-3 md:pb-4 flex justify-between items-center">
         <div>
           <h4 className="text-sm md:text-base font-black text-obsidian">
@@ -441,6 +488,7 @@ export default function ReportsHub() {
         </Link>
       </div>
     </div>
+    )
   ) : null;
 
   return (
@@ -826,7 +874,8 @@ export default function ReportsHub() {
                 sub: 'Velocity',
                 value: data?.keyRatios?.recoveryVelocity !== null ? `${data.keyRatios.recoveryVelocity}%` : '계산 중',
                 desc: '전주 평균 점수 대비 상승율',
-                positive: (data?.keyRatios?.recoveryVelocity || 0) >= 0
+                positive: (data?.keyRatios?.recoveryVelocity || 0) >= 0,
+                premiumOnly: true
               },
               {
                 label: '컨디션 안정성',
@@ -841,7 +890,8 @@ export default function ReportsHub() {
                 value: data?.keyRatios?.routineCompletionRate !== null ? `${data.keyRatios.routineCompletionRate}%` : '기록 없음',
                 desc: 'AI 맞춤 루틴 실질 이행율',
                 positive: true,
-                onboarding: data?.keyRatios?.routineCompletionRate === null
+                onboarding: data?.keyRatios?.routineCompletionRate === null,
+                premiumOnly: true
               },
               {
                 label: '수면 효율',
@@ -857,30 +907,64 @@ export default function ReportsHub() {
                 desc: '최근 7일 측정 일수 비중',
                 positive: (data?.keyRatios?.participationRate || 0) >= 50
               }
-            ].map((ratio, idx) => (
-              <div key={idx} className="snap-start shrink-0 w-[140px] md:w-auto bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-5 flex flex-col justify-between h-36 md:h-44 hover:bg-white/10 transition-all duration-300">
-                <div className="space-y-0.5">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] md:text-xs font-bold text-white/50">{ratio.label}</span>
-                    <Info className="w-3 md:w-3.5 h-3 md:h-3.5 text-white/20" />
-                  </div>
-                  <span className="text-[9px] font-bold tracking-wider text-primary uppercase block">{ratio.sub}</span>
-                </div>
-
-                <div className="space-y-1.5">
-                  {ratio.onboarding ? (
-                    <Button asChild size="sm" className="bg-primary text-obsidian hover:bg-primary/80 font-black h-7 text-[9px] rounded-xl w-full">
-                      <Link href="/ai-navigator">루틴 시작하기</Link>
-                    </Button>
+            ].map((ratio, idx) => {
+              const isLocked = ratio.premiumOnly && !isPremium;
+              return (
+                <div 
+                  key={idx} 
+                  onClick={() => {
+                    if (isLocked) {
+                      setUpsellTitle(`${ratio.label} 분석은 REBORN 등급 이상 전용입니다`);
+                      setUpsellDesc(`시간 경과에 따른 상세 회복 지표 추세 분석 및 루틴 달성 피드백을 활성화하려면 멤버십을 업그레이드하세요.`);
+                      setShowUpsell(true);
+                    }
+                  }}
+                  className={`snap-start shrink-0 w-[140px] md:w-auto bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-5 flex flex-col justify-between h-36 md:h-44 transition-all duration-300 relative overflow-hidden ${
+                    isLocked ? 'cursor-pointer hover:bg-white/10' : 'hover:bg-white/10'
+                  }`}
+                >
+                  {isLocked ? (
+                    <>
+                      <div className="space-y-0.5 filter blur-[2px] opacity-35 select-none pointer-events-none">
+                        <div className="flex justify-between items-start">
+                          <span className="text-[10px] md:text-xs font-bold text-white/50">{ratio.label}</span>
+                          <Info className="w-3 md:w-3.5 h-3 md:h-3.5 text-white/20" />
+                        </div>
+                        <span className="text-[9px] font-bold tracking-wider text-primary uppercase block">{ratio.sub}</span>
+                      </div>
+                      <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-2">
+                        <Lock className="w-4 h-4 text-primary mb-1 animate-pulse" />
+                        <span className="text-[10px] font-black text-white">{ratio.label}</span>
+                        <span className="text-[8px] text-white/60 mt-0.5">REBORN 전용 ⚡</span>
+                      </div>
+                    </>
                   ) : (
-                    <span className="font-black tracking-tight text-white block text-xl md:text-2xl">
-                      {ratio.value}
-                    </span>
+                    <>
+                      <div className="space-y-0.5">
+                        <div className="flex justify-between items-start">
+                          <span className="text-[10px] md:text-xs font-bold text-white/50">{ratio.label}</span>
+                          <Info className="w-3 md:w-3.5 h-3 md:h-3.5 text-white/20" />
+                        </div>
+                        <span className="text-[9px] font-bold tracking-wider text-primary uppercase block">{ratio.sub}</span>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        {ratio.onboarding ? (
+                          <Button asChild size="sm" className="bg-primary text-obsidian hover:bg-primary/80 font-black h-7 text-[9px] rounded-xl w-full">
+                            <Link href="/ai-navigator">루틴 시작하기</Link>
+                          </Button>
+                        ) : (
+                          <span className="font-black tracking-tight text-white block text-xl md:text-2xl">
+                            {ratio.value}
+                          </span>
+                        )}
+                        <p className="text-[9px] font-semibold text-white/40 leading-normal break-keep">{ratio.desc}</p>
+                      </div>
+                    </>
                   )}
-                  <p className="text-[9px] font-semibold text-white/40 leading-normal break-keep">{ratio.desc}</p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
@@ -1105,25 +1189,34 @@ export default function ReportsHub() {
             <div className="col-span-1 md:col-span-1 border border-line/50 rounded-xl md:rounded-2xl p-3 md:p-4 max-h-[280px] md:max-h-[380px] overflow-y-auto space-y-1.5 md:space-y-2 scrollbar-thin">
               {historyTab === 'daily' && (
                 allDiagnoses.length > 0 ? (
-                  allDiagnoses.map((diag, index) => (
-                    <button
-                      key={diag._id}
-                      onClick={() => setSelectedLog(diag)}
-                      className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
-                        selectedLog?._id === diag._id
-                          ? 'bg-obsidian text-white border-obsidian'
-                          : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
-                      }`}
-                    >
-                      <div className="space-y-0.5">
-                        <span className="text-[11px] md:text-xs font-bold block">{new Date(diag.createdAt).toLocaleDateString()}</span>
-                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === diag._id ? 'text-primary' : 'text-foreground/70'}`}>
-                          Score: {diag.totalScore || 0}pt
-                        </span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-55" />
-                    </button>
-                  ))
+                  allDiagnoses.map((diag, index) => {
+                    const canView = AccessControl.canViewHistoryDate(diag.createdAt, userStatus || session?.user);
+                    return (
+                      <button
+                        key={diag._id}
+                        onClick={() => handleLogSelect(diag)}
+                        className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
+                          selectedLog?._id === diag._id
+                            ? 'bg-obsidian text-white border-obsidian'
+                            : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
+                        }`}
+                      >
+                        <div className={`space-y-0.5 flex-1 ${!canView ? 'filter blur-[1.5px] opacity-40 select-none pointer-events-none' : ''}`}>
+                          <span className="text-[11px] md:text-xs font-bold block">{new Date(diag.createdAt).toLocaleDateString()}</span>
+                          <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === diag._id ? 'text-primary' : 'text-foreground/70'}`}>
+                            Score: {diag.totalScore || 0}pt
+                          </span>
+                        </div>
+                        <div className="flex items-center shrink-0">
+                          {!canView ? (
+                            <Lock className="w-3.5 h-3.5 text-[#0E3A3A] mr-0.5" />
+                          ) : (
+                            <ChevronRight className="w-3.5 h-3.5 opacity-55" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })
                 ) : (
                   <div className="text-center py-6 text-xs font-bold text-slate-300">내역이 존재하지 않습니다.</div>
                 )
@@ -1131,49 +1224,67 @@ export default function ReportsHub() {
 
               {historyTab === 'scanner' && (
                 allScans.length > 0 ? (
-                  allScans.map((scan, index) => (
-                    <button
-                      key={scan._id}
-                      onClick={() => setSelectedLog(scan)}
-                      className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
-                        selectedLog?._id === scan._id
-                          ? 'bg-obsidian text-white border-obsidian'
-                          : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
-                      }`}
-                    >
-                      <div className="space-y-0.5">
-                        <span className="text-[11px] md:text-xs font-bold block">{new Date(scan.createdAt).toLocaleDateString()}</span>
-                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === scan._id ? 'text-primary' : 'text-foreground/70'}`}>
-                          {scan.category || '스캔'}
-                        </span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-55" />
-                    </button>
-                  ))
+                  allScans.map((scan, index) => {
+                    const canView = AccessControl.canViewHistoryDate(scan.createdAt, userStatus || session?.user);
+                    return (
+                      <button
+                        key={scan._id}
+                        onClick={() => handleLogSelect(scan)}
+                        className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
+                          selectedLog?._id === scan._id
+                            ? 'bg-obsidian text-white border-obsidian'
+                            : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
+                        }`}
+                      >
+                        <div className={`space-y-0.5 flex-1 ${!canView ? 'filter blur-[1.5px] opacity-40 select-none pointer-events-none' : ''}`}>
+                          <span className="text-[11px] md:text-xs font-bold block">{new Date(scan.createdAt).toLocaleDateString()}</span>
+                          <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === scan._id ? 'text-primary' : 'text-foreground/70'}`}>
+                            {scan.category || '스캔'}
+                          </span>
+                        </div>
+                        <div className="flex items-center shrink-0">
+                          {!canView ? (
+                            <Lock className="w-3.5 h-3.5 text-[#0E3A3A] mr-0.5" />
+                          ) : (
+                            <ChevronRight className="w-3.5 h-3.5 opacity-55" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })
                 ) : (
                   <div className="text-center py-6 text-xs font-bold text-slate-300">내역이 존재하지 않습니다.</div>
                 )
               )}
 
               {historyTab === 'personality' && (
-                data?.personalityData ? (
-                  <button
-                    onClick={() => setSelectedLog(data.personalityData)}
-                    className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between ${
-                      selectedLog?._id === data.personalityData._id
-                        ? 'bg-obsidian text-white border-obsidian'
-                        : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
-                    }`}
-                  >
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] md:text-xs font-bold block">{new Date(data.personalityData.createdAt).toLocaleDateString()}</span>
-                      <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === data.personalityData._id ? 'text-primary' : 'text-foreground/70'}`}>
-                        BIG 5 성향 데이터
-                      </span>
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 opacity-55" />
-                  </button>
-                ) : (
+                data?.personalityData ? (() => {
+                  const canView = AccessControl.canViewHistoryDate(data.personalityData.createdAt, userStatus || session?.user);
+                  return (
+                    <button
+                      onClick={() => handleLogSelect(data.personalityData)}
+                      className={`w-full text-left p-2.5 md:p-3.5 rounded-lg md:rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
+                        selectedLog?._id === data.personalityData._id
+                          ? 'bg-obsidian text-white border-obsidian'
+                          : 'bg-surface border-line/20 hover:bg-mist/30 text-obsidian'
+                      }`}
+                    >
+                      <div className={`space-y-0.5 flex-1 ${!canView ? 'filter blur-[1.5px] opacity-40 select-none pointer-events-none' : ''}`}>
+                        <span className="text-[11px] md:text-xs font-bold block">{new Date(data.personalityData.createdAt).toLocaleDateString()}</span>
+                        <span className={`text-[9px] md:text-[10px] font-black uppercase ${selectedLog?._id === data.personalityData._id ? 'text-primary' : 'text-foreground/70'}`}>
+                          BIG 5 성향 데이터
+                        </span>
+                      </div>
+                      <div className="flex items-center shrink-0">
+                        {!canView ? (
+                          <Lock className="w-3.5 h-3.5 text-[#0E3A3A] mr-0.5" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 opacity-55" />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })() : (
                   <div className="text-center py-6 text-xs font-bold text-slate-300">내역이 존재하지 않습니다.</div>
                 )
               )}
@@ -1236,6 +1347,13 @@ export default function ReportsHub() {
           </>
         )}
       </AnimatePresence>
+
+      <MembershipUpsellDialog 
+        isOpen={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        title={upsellTitle}
+        description={upsellDesc}
+      />
 
     </ChapterWrapper>
   );

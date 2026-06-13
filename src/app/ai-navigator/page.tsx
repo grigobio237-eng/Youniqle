@@ -109,13 +109,17 @@ export default function AiNavigatorPage() {
     const [timelineItems, setTimelineItems] = useState<any[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [showUpsell, setShowUpsell] = useState(false);
+    const [upsellTitle, setUpsellTitle] = useState<string>('클리닉 케어는 리본 등급 이상 전용입니다');
+    const [upsellDesc, setUpsellDesc] = useState<string>('전문적인 회복 설계와 클리닉 연계 서비스를 이용하시려면 멤버십을 업그레이드하세요.');
     const [activeTab, setActiveTab] = useState('today-routine');
     const [routineData, setRoutineData] = useState<any>(null);
     const [dailyMissions, setDailyMissions] = useState<any>(null);
     const [subActiveTab, setSubActiveTab] = useState<'diagnosis' | 'routine' | 'reflection'>('diagnosis');
 
 
-    const userTier = AccessControl.getUserGroup(session?.user);
+    const [userStatus, setUserStatus] = useState<any>(null);
+    const userTier = AccessControl.getUserGroup(userStatus || session?.user);
+    const isPremium = AccessControl.isPremium(userStatus || session?.user);
     const isClinicLocked = userTier === 'RESET' || userTier === 'NONE';
 
     const fetchedRef = React.useRef(false);
@@ -151,6 +155,7 @@ export default function AiNavigatorPage() {
             if (statusRes.ok) {
                 const statusData = await statusRes.json();
                 setAssetStats(statusData.assetStats);
+                setUserStatus(statusData.user);
             }
 
             // localStorage에서 점수 불러오기 (백업용)
@@ -306,6 +311,17 @@ export default function AiNavigatorPage() {
         setBridgeDialogOpen(false);
         setSelectedProduct(null);
     };
+
+    const handleForecastClick = () => {
+        if (userTier === 'RESET' || userTier === 'NONE') {
+            setUpsellTitle('내일 예보는 REBORN 등급 이상 전용입니다');
+            setUpsellDesc('내일의 생체 흐름 예측과 상세 타임라인 분석을 확인하시려면 멤버십을 업그레이드하세요.');
+            setShowUpsell(true);
+        } else {
+            setIsForecastOpen(true);
+        }
+    };
+
     // 레이더 차트 데이터
     const radarData = categoryScores ? [
         { category: 'PHYSICAL', score: categoryScores.physical || 0, fullMark: 40 },
@@ -411,7 +427,7 @@ export default function AiNavigatorPage() {
 
                         {tomorrowForecast && (
                             <Button 
-                                onClick={() => setIsForecastOpen(true)}
+                                onClick={handleForecastClick}
                                 className="h-7 px-2.5 bg-[#0E3A3A] hover:bg-[#0E3A3A]/90 text-white text-[9px] font-black rounded-lg flex items-center gap-1 shadow-md shadow-[#0E3A3A]/10 transition-transform active:scale-95"
                             >
                                 <Sparkles className="w-2.5 h-2.5 text-[#FFE066]" />
@@ -557,9 +573,57 @@ export default function AiNavigatorPage() {
                                                      <Button asChild variant="outline" className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-amber-50/80 border border-primary/30 text-amber-800 hover:bg-primary-container/50 hover:border-primary/30 shadow-sm active:scale-95 transition-all">
                                                          <Link href="/diagnosis?type=free">간단유형 확인</Link>
                                                      </Button>
-                                                     <Button onClick={() => isClinicLocked ? setShowUpsell(true) : router.push('/diagnosis?type=personality')} variant="outline" className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-teal-50/80 border border-teal-200 text-teal-800 hover:bg-teal-100 hover:border-teal-300 shadow-sm active:scale-95 transition-all">
+                                                     <Button 
+                                                         onClick={() => {
+                                                             if (isClinicLocked) {
+                                                                 setUpsellTitle('심층유형 진단은 REBORN 등급 이상 전용입니다');
+                                                                 setUpsellDesc('나의 세부적인 기질 분석과 맞춤 처방 정보를 확인하시려면 멤버십을 업그레이드하세요.');
+                                                                 setShowUpsell(true);
+                                                             } else {
+                                                                 router.push('/diagnosis?type=personality');
+                                                             }
+                                                         }} 
+                                                         variant="outline" 
+                                                         className="h-8 md:h-9 rounded-md md:rounded-lg text-[9px] md:text-[10px] font-black bg-teal-50/80 border border-teal-200 text-teal-800 hover:bg-teal-100 hover:border-teal-300 shadow-sm active:scale-95 transition-all"
+                                                     >
                                                          심층유형 확인
                                                      </Button>
+
+                                                 {/* AI Advice Card with Blur & Gating for RESET */}
+                                                 {aiAdvice && (
+                                                     <div className="bg-[#0E3A3A]/5 border border-[#0E3A3A]/10 rounded-2xl p-4 space-y-2 relative overflow-hidden mt-4">
+                                                         <div className="flex items-center gap-1.5 mb-1">
+                                                             <Sparkles className="w-3.5 h-3.5 text-[#0E3A3A]" />
+                                                             <span className="text-[10px] font-black text-[#0E3A3A] uppercase tracking-wider">AI 리듬 피드백</span>
+                                                         </div>
+                                                         {(!isPremium) ? (
+                                                             <div className="relative min-h-[85px] flex flex-col justify-center">
+                                                                 <p className="text-[11px] text-obsidian/40 leading-relaxed select-none filter blur-[2px] opacity-60">
+                                                                     {aiAdvice}
+                                                                 </p>
+                                                                 <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center text-center p-2">
+                                                                     <Lock className="w-3.5 h-3.5 text-[#0E3A3A] mb-1 animate-bounce-slow" />
+                                                                     <p className="text-[10px] font-black text-obsidian tracking-tight">AI 심층 가이드라인</p>
+                                                                     <p className="text-[8px] text-slate opacity-75 mb-1.5">식단, 행동, 마인드 복합 처방 솔루션은 REBORN 패스 전용입니다.</p>
+                                                                     <Button 
+                                                                         onClick={() => {
+                                                                             setUpsellTitle('AI 심층 가이드라인은 REBORN 등급 이상 전용입니다');
+                                                                             setUpsellDesc('내 건강 지표와 기질 분석을 크로스 매칭한 맞춤 솔루션을 받아보세요.');
+                                                                             setShowUpsell(true);
+                                                                         }}
+                                                                         className="h-5 px-3 bg-[#0E3A3A] hover:bg-[#0E3A3A]/90 text-white text-[8px] font-black rounded-full"
+                                                                     >
+                                                                         업그레이드 ⚡
+                                                                     </Button>
+                                                                 </div>
+                                                             </div>
+                                                         ) : (
+                                                             <p className="text-xs text-obsidian leading-relaxed font-medium">
+                                                                 {aiAdvice}
+                                                             </p>
+                                                         )}
+                                                     </div>
+                                                 )}
                                                  </div>
                                             </div>
                                         )}
@@ -569,10 +633,33 @@ export default function AiNavigatorPage() {
                                                 <React.Suspense fallback={<div className="h-48 w-full bg-mist animate-pulse rounded-2xl" />}>
                                                     <RoutineCard userStatus={categoryScores} initialData={routineData} />
                                                 </React.Suspense>
-                                                <div className="mt-1 border-t border-line/30 pt-2 hidden md:block">
-                                                    <React.Suspense fallback={<div className="h-20 w-full bg-mist animate-pulse rounded-2xl" />}>
-                                                        <DailyFlowTimeline />
-                                                    </React.Suspense>
+                                                <div className="mt-1 border-t border-line/30 pt-2 hidden md:block relative">
+                                                    {(!isPremium) ? (
+                                                        <div className="relative">
+                                                            <div className="filter blur-[3px] pointer-events-none opacity-50">
+                                                                <DailyFlowTimeline />
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex flex-col items-center justify-center text-center p-4">
+                                                                <Lock className="w-5 h-5 text-[#0E3A3A] mb-1.5 animate-bounce-slow" />
+                                                                <p className="text-[11px] font-black text-obsidian tracking-tight">지능형 루틴 타임라인</p>
+                                                                <p className="text-[9px] text-slate opacity-70 mb-2">시간대별 세부 추천 루틴은 REBORN 등급 이상에서 활성화됩니다.</p>
+                                                                <Button 
+                                                                    onClick={() => {
+                                                                        setUpsellTitle('지능형 루틴 타임라인은 REBORN 등급 이상 전용입니다');
+                                                                        setUpsellDesc('시간대별 맞춤 루틴 타임라인 분석을 확인하시려면 멤버십을 업그레이드하세요.');
+                                                                        setShowUpsell(true);
+                                                                    }}
+                                                                    className="h-6 px-3 bg-[#0E3A3A] hover:bg-[#0E3A3A]/90 text-white text-[8px] font-black rounded-full"
+                                                                >
+                                                                    멤버십 업그레이드 ⚡
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <React.Suspense fallback={<div className="h-20 w-full bg-mist animate-pulse rounded-2xl" />}>
+                                                            <DailyFlowTimeline />
+                                                        </React.Suspense>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}

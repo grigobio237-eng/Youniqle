@@ -71,8 +71,8 @@ export class AccessControl {
     if (passType === 'REBORN' || user.subscription?.status === 'active') return 'REBORN';
     if (passType === 'RESET') return 'RESET';
     
-    // 구형 필드(tier) 폴백
-    const tier = user.tier || 'NONE';
+    // 구형 필드(tier) 및 grade 폴백
+    const tier = user.tier || user.grade || 'NONE';
     if (['BLACK', 'RESTART', 'REBORN', 'RESET'].includes(tier)) return tier as UserGroup;
 
     return 'NONE';
@@ -248,4 +248,22 @@ export class AccessControl {
     };
     return labels[group] ?? '';
   }
+
+  /**
+   * 유저 등급별 과거 데이터 조회 기한(RESET 7일, REBORN 90일)에 만족하는지 검사
+   */
+  static canViewHistoryDate(user: any, createdAtDate: Date | string): boolean {
+    if (this.isAdmin(user)) return true;
+    const group = this.getUserGroup(user);
+    const limits = TIER_LIMITS[group];
+    if (!limits) return false;
+    
+    const retentionDays = limits.dataRetentionDays;
+    if (retentionDays >= 9999) return true; // 무제한
+
+    const createdTime = new Date(createdAtDate).getTime();
+    const cutoffTime = new Date().getTime() - (retentionDays * 24 * 60 * 60 * 1000);
+    return createdTime >= cutoffTime;
+  }
 }
+

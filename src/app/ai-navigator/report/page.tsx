@@ -141,7 +141,7 @@ export default function WeeklyReportPage() {
 
 
   const isAdmin = ['admin', 'superadmin'].includes(userStatus?.role);
-  const isPremium = isAdmin || ['RESTART', 'BLACK'].includes(userStatus?.grade?.toUpperCase());
+  const isPremium = isAdmin || ['REBORN', 'RESTART', 'BLACK'].includes(userStatus?.grade?.toUpperCase());
 
   if (loading) {
     return (
@@ -577,7 +577,7 @@ export default function WeeklyReportPage() {
                 <div className="space-y-3">
                   <h4 className="text-2xl font-black text-obsidian tracking-tight">회복의 흐름을<br />평생의 자산으로</h4>
                   <p className="text-sm text-slate font-medium leading-relaxed">
-                    멤버십으로 전환하여 무제한 기록 보관과<br />
+                    REBORN 멤버십으로 업그레이드하여 무제한 기록 보관과<br />
                     매주 AI의 심층 분석 리포트를 받아보세요.
                   </p>
                 </div>
