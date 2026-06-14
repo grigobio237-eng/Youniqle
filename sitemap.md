@@ -27,6 +27,7 @@ graph LR
     ROOT --> C["🛒 커머스"]
     ROOT --> D["📋 마이페이지 /me"]
     ROOT --> E["⚙️ 관리자 /admin"]
+    ROOT --> F["⚽ 축구 클럽하우스 /football"]
 
     %% 사용자 서비스
     A --> A1["/about - 소개"]
@@ -120,6 +121,22 @@ graph LR
     E27 --> E27a["/admin/ai-builder - AI 빌더"]
     E27 --> E27b["/admin/auto-video - 자동 영상 생성"]
     E27 --> E27c["/admin/automation - 자동화"]
+    E --> E28["/admin/football/teams - 축구팀 관리"]
+    E --> E29["/admin/football/stats - 축구 통계 분석"]
+
+    %% 축구 클럽하우스
+    F --> F1["/football/mypage - 메인 허브"]
+    F --> F2["/football/dashboard - 코치 대시보드"]
+    F --> F3["/football/announcements - 팀 공지사항"]
+    F --> F4["/football/child - 자녀 컨디션"]
+    F --> F5["/football/my-condition - 내 컨디션 분석"]
+    F --> F6["/football/wellness - 컨디션 기록"]
+    F --> F7["/football/schedule - 팀 스케줄"]
+    F --> F8["/football/subscription - 구독 관리"]
+    F --> F9["/football/players - 소속 선수 명단"]
+    F --> F10["/football/join/[teamCode] - 팀 가입"]
+    F --> F11["/football/community - 팀 커뮤니티"]
+    F --> F12["/coach/dashboard - 코치 전용 관리"]
 ```
 
 ---
@@ -207,6 +224,25 @@ graph LR
 | `/admin/settings` | 전체 시스템 설정 |
 | `/admin/recovery` | 데이터 복구 관리 |
 
+### 3.4 유소년 축구 클럽하우스 (`/football`)
+
+| 경로 | 기능 |
+|---|---|
+| `/football/mypage` | 축구 클럽 메인 허브 (초대코드 가입, 창단 신청, 역할별 메뉴 분기) |
+| `/football/dashboard` | 감독/코치용 스쿼드 웰니스 오버뷰 및 피로 경보(경고/주의/양호) 관리 |
+| `/football/announcements` | 클럽/팀 내 공지사항 게시판 |
+| `/football/child` | 학부모(보호자)용 자녀 컨디션 및 웰니스 모니터링 |
+| `/football/my-condition` | 선수용 웰니스 트렌드 분석 및 급만성 훈련 부하 비율(ACWR) 차트 조회 |
+| `/football/wellness` | 선수용 데일리 컨디션(수면/통증/피로/스트레스/기분) 및 RPE 자각도 기록 |
+| `/football/schedule` | 팀 훈련 및 경기 일정 캘린더 |
+| `/football/subscription` | 팀 요금제 구독 및 청구 상세 관리 |
+| `/football/players` | 코치용 전체 선수 명단 관리 및 개별 웰니스 로그 추적 |
+| `/football/join/[teamCode]` | 초대 코드를 통한 동적 팀 참가 신청 |
+| `/football/community` | 팀 소속 부원 간 비공개 소통 피드 |
+| `/coach/dashboard` | 코치 전용 관리 대시보드 |
+| `/admin/football/teams` | 어드민용 등록 팀 승인 및 상태 관리 |
+| `/admin/football/stats` | 어드민용 유소년 클럽 웰니스 이상 증후 감지 통계 분석 |
+
 ---
 
 ## 4. API 주요 엔드포인트 구조 (`/api`)
@@ -223,7 +259,9 @@ graph LR
 | 관리자 | `/api/admin/*` | 관리자 전용 데이터 처리 |
 | 알림 | `/api/notifications`, `/api/newsletter` | 알림/뉴스레터 발송 |
 | 파트너 | `/api/partner`, `/api/coaches` | 파트너/코치 관리 |
+| 축구 클럽 | `/api/football/*` | 축구 스쿼드 웰니스 체크, 공지, RPE 부하(ACWR), 가입 및 구독 |
 | 기타 | `/api/wishlist`, `/api/cart`, `/api/reviews` | 커머스 부가 기능 |
+
 
 ---
 
