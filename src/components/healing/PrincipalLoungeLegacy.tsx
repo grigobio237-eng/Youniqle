@@ -2,33 +2,33 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BadgeCheck, 
-  Quote, 
-  Award, 
-  BookOpen, 
-  MessageCircle,
-  ChevronRight,
-  User,
-  Info
+import {
+    BadgeCheck,
+    Quote,
+    Award,
+    BookOpen,
+    MessageCircle,
+    ChevronRight,
+    User,
+    Info
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription
 } from "@/components/ui/dialog";
 
 interface PrincipalLoungeLegacyProps {
@@ -59,7 +59,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     <div className="space-y-4 md:space-y-6">
                         <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] block">Research Director & Program Developer</span>
                         <h2 className="font-black text-[#0B0D10] tracking-tighter text-3xl md:text-5xl leading-tight">
-                            박상회 의학박사 <span className="text-lg md:text-xl font-bold text-[#0B0D10]/50 not-italic block md:inline md:ml-3">Dr. Part Sang-Hwoi</span>
+                            박상회 의학박사 <span className="text-lg md:text-xl font-bold text-[#0B0D10]/50 not-italic block md:inline md:ml-3">Dr. Park Sang-Hwoi</span>
                         </h2>
                         <h3 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-xl md:text-2xl opacity-90">
                             "인간의 마음과 신체가 조화롭게 회복될 때, 비로소 완전한 삶의 웰니스가 완성됩니다."
@@ -124,10 +124,10 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                 </div>
 
                 <div className="relative w-5/6 sm:w-2/3 mx-auto md:w-full aspect-[4/5] rounded-[24px] md:rounded-[60px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.12)] group order-1 md:order-2">
-                    <Image 
-                        src="/images/park-sanghoe-profile.png" 
-                        alt="박상회 박사" 
-                        fill 
+                    <Image
+                        src="/images/park-sanghoe-profile.png"
+                        alt="박상회 박사"
+                        fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
@@ -141,10 +141,10 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
             {/* 1. Principal Profile Section */}
             <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center">
                 <div className="relative w-5/6 sm:w-2/3 mx-auto md:w-full aspect-[4/5] rounded-[24px] md:rounded-[60px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.12)] group">
-                    <Image 
-                        src={data.image} 
-                        alt={data.name} 
-                        fill 
+                    <Image
+                        src={data.image}
+                        alt={data.name}
+                        fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
@@ -209,7 +209,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                         {data.philosophy.map((card, i) => (
-                            <motion.div 
+                            <motion.div
                                 key={i}
                                 whileHover={{ y: -10 }}
                                 className="bg-white p-6 sm:p-10 md:p-12 rounded-[28px] md:rounded-[48px] shadow-[0_30px_80px_rgba(0,0,0,0.02)] border border-[#0B0D10]/5 space-y-6 md:space-y-8"
@@ -256,7 +256,7 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                         <p className="text-sm sm:text-lg text-[#0B0D10]/40 font-bold">원장 김미정 혹은 유니클 어시스턴트와 1:1로 직접 대화하세요.</p>
                     </div>
                 </div>
-                
+
                 <Button className="h-auto py-4 md:py-0 md:h-24 px-6 sm:px-16 bg-[#0B0D10] text-white rounded-[20px] md:rounded-full font-black text-sm sm:text-base md:text-xl uppercase tracking-widest shadow-[0_30px_60px_rgba(0,0,0,0.15)] hover:scale-105 transition-all gap-2 md:gap-4 flex flex-col md:flex-row items-center justify-center w-full md:w-auto mx-auto">
                     <span className="text-[#D4AF37] opacity-60 text-[9px] md:text-xs tracking-[0.2em] md:mt-1">1:1 Consultation</span>
                     <span>프라이빗 라운지 입장하기</span>
