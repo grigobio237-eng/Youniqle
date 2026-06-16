@@ -57,9 +57,9 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
             <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center border-b border-[#0B0D10]/5 pb-16 md:pb-32">
                 <div className="space-y-6 md:space-y-10 order-2 md:order-1">
                     <div className="space-y-4 md:space-y-6">
-                        <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] block">Advisory Committee & Program Developer</span>
+                        <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] block">Research Director & Program Developer</span>
                         <h2 className="font-black text-[#0B0D10] tracking-tighter text-3xl md:text-5xl leading-tight">
-                            박상회 박사 <span className="text-lg md:text-xl font-bold text-[#0B0D10]/50 not-italic block md:inline md:ml-3">Dr. Park Sang-hoe</span>
+                            박상회 의학박사 <span className="text-lg md:text-xl font-bold text-[#0B0D10]/50 not-italic block md:inline md:ml-3">Dr. Part Sang-Hwoi</span>
                         </h2>
                         <h3 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-xl md:text-2xl opacity-90">
                             "인간의 마음과 신체가 조화롭게 회복될 때, 비로소 완전한 삶의 웰니스가 완성됩니다."
@@ -70,8 +70,8 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                         <div className="space-y-3">
                             <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-[0.4em]">Profile & Background</p>
                             <p className="text-sm md:text-base font-semibold text-[#0B0D10]/70 leading-relaxed break-keep">
-                                도쿄대학교 의학박사 출신으로 뇌과학과 심리 케어 분야의 최고 권위자입니다. <br />
-                                청소년 및 현대인들의 정신 건강 증진과 회복 메커니즘을 연구하고 설계하여, 유니클의 통합 웰니스 프로그램 개발 자문을 담당하고 있습니다.
+                                도쿄대학교 의학박사 출신이자 인정건강심리카운셀러로 뇌과학과 심리 케어 분야의 최고 권위자입니다. <br />
+                                유니클 힐링 라운지의 연구소장으로서 청소년 및 현대인들의 정신 건강 증진과 회복 메커니즘을 연구하고 설계하여, 통합 웰니스 프로그램 개발 자문을 담당하고 있습니다.
                             </p>
                         </div>
 
@@ -80,35 +80,43 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm font-bold text-[#0B0D10]/80">
                                 <li className="flex items-start gap-2">
                                     <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                                    <span>도쿄대학 의학박사(Dr.M.Sc)</span>
+                                    <span>도쿄대학 의학박사 (Dr.M.Sc)</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>인정건강심리카운셀러</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>인정건강심리카운셀러 (Q.H.Psychologist)</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
                                     <span>도쿄대학 의학부 객원연구원</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>일본후생노동성 국립정신보건연구소 연구원</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>후생노동성 국립정신보건연구소 심신의학연구실 비상근연구원</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>자살예방한국연맹(NPO) 대표</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>서울특별시보건협회 회장</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>서울특별시보건협회 자살예방센터장</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>(사)청소년희망본부 대표</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>하나금융그룹 / 청소년그루터기재단 이사</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>전 숭실대학교 문화치유전공 겸임교수</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                                    <span>명지대학교 특임교수</span>
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>대한임상건강의학회 학술이사</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>대한임상암예방학회 상임이사</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                    <span>KBS &lt;여유만만&gt; (박수홍과 함께) 출연 등 다수</span>
                                 </li>
                             </ul>
                         </div>
@@ -124,8 +132,8 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 md:right-12 text-white space-y-1 md:space-y-2">
-                        <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Advisory & Program Developer</p>
-                        <h2 className="font-black tracking-tighter italic text-xl md:text-4xl">박상회 박사</h2>
+                        <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Research Director</p>
+                        <h2 className="font-black tracking-tighter italic text-xl md:text-4xl">박상회 의학박사</h2>
                     </div>
                 </div>
             </section>
