@@ -5,31 +5,16 @@ import { motion } from 'framer-motion';
 import {
     BadgeCheck,
     Quote,
-    Award,
-    BookOpen,
-    MessageCircle,
-    ChevronRight,
-    User,
-    Info
+    MessageCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription
-} from "@/components/ui/dialog";
 
 interface PrincipalLoungeLegacyProps {
     data: {
@@ -149,50 +134,42 @@ export default function PrincipalLoungeLegacy({ data }: PrincipalLoungeLegacyPro
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10]/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 md:right-12 text-white space-y-1 md:space-y-2">
-                        <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Master Architect</p>
-                        <h2 className="font-black tracking-tighter italic text-xl md:text-4xl">{data.name}</h2>
+                        <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37]">Representative Director</p>
+                        <h2 className="font-black tracking-tighter italic text-xl md:text-4xl">김미정 원장</h2>
                     </div>
                 </div>
 
                 <div className="space-y-6 md:space-y-10">
                     <div className="space-y-4 md:space-y-6">
-                        <Quote className="w-8 h-8 md:w-12 md:h-12 text-[#D4AF37] opacity-20" />
-                        <h3 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-2xl md:text-4xl">
-                            "{data.bio}"
+                        <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] block">Representative Director & Master Architect</span>
+                        <h2 className="font-black text-[#0B0D10] tracking-tighter text-3xl md:text-5xl leading-tight">
+                            김미정 원장 <span className="text-lg md:text-xl font-bold text-[#0B0D10]/50 not-italic block md:inline md:ml-3">Director Kim Mi-jung</span>
+                        </h2>
+                        <h3 className="font-black text-[#0B0D10] tracking-tighter leading-tight italic text-xl md:text-2xl opacity-90">
+                            "회복 설계는 기적이 아닙니다. 회복된 몸 위에 놓일 때 비로소 완성되는 도구일 뿐입니다."
                         </h3>
                     </div>
 
                     <div className="space-y-6 md:space-y-8">
-                        <div className="space-y-2">
-                            <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-[0.4em]">Background</p>
-                            <p className="text-base md:text-lg font-bold text-[#0B0D10]/80 leading-relaxed">
-                                정밀 의학과 데이터 분석을 기반으로, <br />
-                                무너진 생체 리듬을 재구축하는 최고의 전문가입니다.
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-[0.4em]">Profile & Background</p>
+                            <p className="text-sm md:text-base font-semibold text-[#0B0D10]/70 leading-relaxed break-keep">
+                                정밀 의학과 데이터 분석을 기반으로, 무너진 생체 리듬을 재구축하는 최고의 전문가입니다. <br />
+                                임상에서의 풍부한 한방·양방 통합 진료 경험을 바탕으로 개인별 유전체 및 라이프 데이터를 분석하여, 유니클의 개인 맞춤형 회복 프로토콜 설계를 주도하고 있습니다.
                             </p>
                         </div>
 
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button className="h-14 md:h-16 px-6 md:px-10 bg-[#0B0D10] text-white rounded-[16px] md:rounded-[20px] font-black text-xs uppercase tracking-widest gap-2 md:gap-4 group w-full sm:w-auto justify-center">
-                                    원장 약력 및 커리어 보기
-                                    <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl bg-white border-none rounded-[28px] md:rounded-[40px] p-6 md:p-12 max-h-[85vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle className="text-2xl md:text-3xl font-black text-[#0B0D10] tracking-tighter italic mb-6 md:mb-8">Career Detail</DialogTitle>
-                                    <DialogDescription className="sr-only">원장 김미정의 상세 약력입니다.</DialogDescription>
-                                </DialogHeader>
-                                <ul className="space-y-4 md:space-y-6">
-                                    {data.history.map((item, i) => (
-                                        <li key={i} className="flex items-start gap-3 md:gap-4 text-sm sm:text-lg font-bold text-[#0B0D10]/70">
-                                            <BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37] shrink-0 mt-0.5" />
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </DialogContent>
-                        </Dialog>
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-[#0B0D10]/30 uppercase tracking-[0.4em]">Career & History</p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm font-bold text-[#0B0D10]/80">
+                                {data.history.map((item, i) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                        <BadgeCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </section>
